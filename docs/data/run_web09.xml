@@ -1,0 +1,14 @@
+<parameters>
+
+<index>/umd/indexes/clue.en.segment.01.stable</index>
+
+     <!-- bm25 -->
+     <model id="UMHOO-BM25-catB" type="Feature" output="/user/telsayed/ivory/UMHOO-BM25-catB.ranking">
+          <feature id="term" weight="1.0" cliqueSet="term" potential="IvoryExpression" generator="term" scoreFunction="BM25" k1="0.5" b="0.3" />
+     </model>
+	 
+	 <!-- query likelihood -->
+     <model id="UMHOO-QL-catB" type="FullIndependence" mu="1000.0" output="/user/telsayed/ivory/UMHOO-QL-catB.ranking" />
+
+
+</parameters>

@@ -34,8 +34,8 @@ import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapred.Counters;
 import org.apache.hadoop.mapred.FileInputFormat;
 import org.apache.hadoop.mapred.FileOutputFormat;
@@ -162,7 +162,7 @@ public class BuildInvertedIndexDocSorted extends PowerTool {
 	};
 
 	private static class MyMapper extends MapReduceBase implements
-			Mapper<LongWritable, Indexable, TermDocno, TermPositions> {
+			Mapper<Writable, Indexable, TermDocno, TermPositions> {
 
 		// key and value
 		private static TermPositions sTermPositions = new TermPositions();
@@ -195,48 +195,7 @@ public class BuildInvertedIndexDocSorted extends PowerTool {
 
 		private String mTaskId;
 
-		public void configure(JobConf job) {
-			sLogger.setLevel(Level.WARN);
-
-			mLocalDfs = new OHMapKI<String>();
-			mDocLengths = new OHMapII();
-
-			mTaskId = job.get("mapred.task.id");
-			indexPath = job.get("Ivory.IndexPath");
-			mJobConf = job;
-
-			// initialize the tokenizer
-			try {
-				mTokenizer = (Tokenizer) Class.forName(job.get("Ivory.Tokenizer")).newInstance();
-			} catch (Exception e) {
-				e.printStackTrace();
-				throw new RuntimeException("Error initializing Ivory.Tokenizer!");
-			}
-
-			// load the docid to docno mappings
-			try {
-				mDocMapping = (DocnoMapping) Class.forName(job.get("Ivory.DocnoMappingClass"))
-						.newInstance();
-
-				// Detect if we're in standalone mode; if so, we can't us the
-				// DistributedCache because it does not (currently) work in
-				// standalone mode...
-				if (job.get("mapred.job.tracker").equals("local")) {
-					FileSystem fs = FileSystem.get(job);
-					String indexPath = job.get("Ivory.IndexPath");
-					String mappingFile = RetrievalEnvironment.getDocnoMappingFile(indexPath);
-					mDocMapping.loadMapping(new Path(mappingFile), fs);
-				} else {
-					Path[] localFiles = DistributedCache.getLocalCacheFiles(job);
-					mDocMapping.loadMapping(localFiles[0], FileSystem.getLocal(job));
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-				throw new RuntimeException("Error initializing DocnoMapping!");
-			}
-		}
-
-		public void map(LongWritable key, Indexable doc,
+		public void map(Writable key, Indexable doc,
 				OutputCollector<TermDocno, TermPositions> output, Reporter reporter)
 				throws IOException {
 			mOutput = output;
@@ -327,6 +286,47 @@ public class BuildInvertedIndexDocSorted extends PowerTool {
 
 			// end of mapper
 			reporter.incrCounter(MapTime.Total, System.currentTimeMillis() - startTime);
+		}
+
+		public void configure(JobConf job) {
+			sLogger.setLevel(Level.WARN);
+		
+			mLocalDfs = new OHMapKI<String>();
+			mDocLengths = new OHMapII();
+		
+			mTaskId = job.get("mapred.task.id");
+			indexPath = job.get("Ivory.IndexPath");
+			mJobConf = job;
+		
+			// initialize the tokenizer
+			try {
+				mTokenizer = (Tokenizer) Class.forName(job.get("Ivory.Tokenizer")).newInstance();
+			} catch (Exception e) {
+				e.printStackTrace();
+				throw new RuntimeException("Error initializing Ivory.Tokenizer!");
+			}
+		
+			// load the docid to docno mappings
+			try {
+				mDocMapping = (DocnoMapping) Class.forName(job.get("Ivory.DocnoMappingClass"))
+						.newInstance();
+		
+				// Detect if we're in standalone mode; if so, we can't us the
+				// DistributedCache because it does not (currently) work in
+				// standalone mode...
+				if (job.get("mapred.job.tracker").equals("local")) {
+					FileSystem fs = FileSystem.get(job);
+					String indexPath = job.get("Ivory.IndexPath");
+					String mappingFile = RetrievalEnvironment.getDocnoMappingFile(indexPath);
+					mDocMapping.loadMapping(new Path(mappingFile), fs);
+				} else {
+					Path[] localFiles = DistributedCache.getLocalCacheFiles(job);
+					mDocMapping.loadMapping(localFiles[0], FileSystem.getLocal(job));
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+				throw new RuntimeException("Error initializing DocnoMapping!");
+			}
 		}
 
 		public void close() throws IOException {
@@ -455,7 +455,7 @@ public class BuildInvertedIndexDocSorted extends PowerTool {
 
 			if (values.hasNext()) {
 				throw new RuntimeException(
-						"Error: multiple TermDocno with the same term and docno.");
+						"Error: multiple TermDocno with the same term and docno -- docno: " + tp.getDocno() + ", term:" + curTerm);
 			}
 
 			mPrevTerm = curTerm;
@@ -549,6 +549,12 @@ public class BuildInvertedIndexDocSorted extends PowerTool {
 					// multiple copies of doclength data. Therefore, we can't
 					// just count number of doclengths read. Instead, keep track
 					// of largest docno encountered.
+
+					if (docno < docnoOffset) {
+						throw new RuntimeException("Error: docno " + docno + " < docnoOffset "
+								+ docnoOffset + "!");
+					}
+
 					doclengths[docno - docnoOffset] = len;
 
 					if (docno > maxDocno)
@@ -624,11 +630,7 @@ public class BuildInvertedIndexDocSorted extends PowerTool {
 		// PowerTool
 		JobConf conf = new JobConf(getConf(), BuildInvertedIndexDocSorted.class);
 		FileSystem fs = FileSystem.get(conf);
-
-		conf.set("mapred.child.java.opts", "-Xmx2048m");
-		conf.setInt("mapred.map.max.attempts", 20);
-		conf.setInt("mapred.reduce.max.attempts", 10);
-
+		
 		String indexPath = conf.get("Ivory.IndexPath");
 		int mapTasks = conf.getInt("Ivory.NumMapTasks", 0);
 		int reduceTasks = conf.getInt("Ivory.NumReduceTasks", 0);
@@ -659,7 +661,7 @@ public class BuildInvertedIndexDocSorted extends PowerTool {
 		String mappingFile = RetrievalEnvironment.getDocnoMappingFile(indexPath);
 
 		if (!fs.exists(new Path(mappingFile))) {
-			throw new RuntimeException("Error, docno mapping data file doesn't exist!");
+			throw new RuntimeException("Error, docno mapping data file " + mappingFile + "doesn't exist!");
 		}
 
 		DistributedCache.addCacheFile(new URI(mappingFile), conf);
@@ -692,6 +694,12 @@ public class BuildInvertedIndexDocSorted extends PowerTool {
 		}
 
 		FileOutputFormat.setOutputPath(conf, postingsPath);
+
+		conf.set("mapred.child.java.opts", "-Xmx2048m");
+		//conf.setInt("mapred.map.max.attempts", 20);
+		//conf.setInt("mapred.reduce.max.attempts", 10);
+		//conf.setSpeculativeExecution(false);
+		//conf.setCompressMapOutput(true);
 
 		conf.setInputFormat((Class<? extends InputFormat>) Class.forName(inputFormat));
 		conf.setMapOutputKeyClass(TermDocno.class);
@@ -759,6 +767,7 @@ public class BuildInvertedIndexDocSorted extends PowerTool {
 		sLogger.info(" - Docno offset: " + docnoOffset);
 
 		conf.setJobName("DocLengthTable:" + collectionName);
+		conf.set("mapred.child.java.opts", "-Xmx2048m");
 		conf.setSpeculativeExecution(false);
 
 		conf.setNumMapTasks(1);

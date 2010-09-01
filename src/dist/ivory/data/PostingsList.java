@@ -50,11 +50,6 @@ import org.apache.hadoop.io.Writable;
  * 
  * </ul>
  * 
- * <p>
- * The local/global distinction in the last bullet point above also applies to
- * {@link #getSumOfPostingsScore()} and {@link #getCf()}
- * </p>
- * 
  * @author Jimmy Lin
  */
 public interface PostingsList extends Writable {
@@ -119,13 +114,6 @@ public interface PostingsList extends Writable {
 	public int getNumberOfPostings();
 
 	/**
-	 * Returns the sum of all scores of all postings. In the most common case,
-	 * scores are term frequencies, so this method returns the number of times
-	 * the term occurs. However, see important caveat in {@link #getCf()}.
-	 */
-	public long getSumOfPostingsScore();
-
-	/**
 	 * Returns the document frequency of the term associated with this postings
 	 * list. Note this is may be different from {@link #getNumberOfPostings()}
 	 * because of document partitioning for large collections. In these cases,
@@ -137,18 +125,15 @@ public interface PostingsList extends Writable {
 	 */
 	public int getDf();
 
+	public void setDf(int df);
+
 	/**
 	 * Returns the collection frequency of the term associated with this
-	 * postings list. Note this is may be different from
-	 * {@link #getSumOfPostingsScore()} because of document partitioning for
-	 * large collections. In these cases, this method should return the global
-	 * collection frequency, whereas {@link #getSumOfPostingsScore()} should
-	 * return the collection frequency <i>in this partition</i>. In a
-	 * collection with only a single partition, this is exactly the same value
-	 * as {@link #getSumOfPostingsScore()}. This method is not meaningful for
-	 * impact-sorted indexes.
+	 * postings list. This method is not meaningful for impact-sorted indexes.
 	 */
 	public long getCf();
+
+	public void setCf(long cf);
 
 	/**
 	 * Returns the raw byte array representation of this postings list.

@@ -1,0 +1,10 @@
+<parameters>
+
+     <model id="ql" type="FullIndependence" mu="1000.0" />
+
+     <server id="trec">
+       <index>/umd-lin/shared/indexes/trec</index>
+       <findex>/umd-lin/shared/collections/trec4-5_noCRFR.findex.dat</findex>
+     </server>
+
+</parameters>

@@ -1,5 +1,5 @@
 /*
- * Ivory: A Hadoop toolkit for Web-scale information retrieval
+ * Ivory: A Hadoop toolkit for web-scale information retrieval
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You may
@@ -80,8 +80,10 @@ public class BuildPostingsForwardIndex extends PowerTool {
 				outputValue.set(fileNo + "\t" + pos);
 
 				Matcher m = sPatternAlphanumeric.matcher(key.toString());
-				if (!m.matches())
+				if (!m.matches()){
+					pos = input.getPos();
 					continue;
+				}
 
 				if (value.getDf() > dfThreshold) {
 					output.collect(key, outputValue);
@@ -205,7 +207,7 @@ public class BuildPostingsForwardIndex extends PowerTool {
 
 		int mapTasks = conf.getInt("Ivory.NumMapTasks", 0);
 		int minSplitSize = conf.getInt("Ivory.MinSplitSize", 0);
-		int nTerms = conf.getInt("Ivory.IndexNumberOfTerms", 10000);
+		int nTerms = conf.getInt("Ivory.IndexNumberOfTerms", -1);
 		int indexWindow = conf.getInt("Ivory.ForwardIndexWindow", 8);
 		int dfThreshold = conf.getInt("Ivory.DfThreshold", 1);
 
@@ -218,7 +220,7 @@ public class BuildPostingsForwardIndex extends PowerTool {
 		sLogger.info(" - ForwardIndexWindow: " + indexWindow);
 		sLogger.info(" - DfThreshold: " + dfThreshold);
 
-		conf.setJobName("BuildPostingsForwardIndexTable: " + collectionName);
+		conf.setJobName("BuildPostingsForwardIndexTable:" + collectionName);
 
 		Path inputPath = new Path(RetrievalEnvironment.getPostingsDirectory(indexPath));
 		Path outputPath = new Path(RetrievalEnvironment.getTempDirectory(indexPath));
@@ -232,8 +234,8 @@ public class BuildPostingsForwardIndex extends PowerTool {
 		conf.setInt("mapred.min.split.size", minSplitSize);
 
 		conf.set("mapred.child.java.opts", "-Xmx2048m");
-		conf.setInt("mapred.map.max.attempts", 10);
-		conf.setInt("mapred.reduce.max.attempts", 10);
+		//conf.setInt("mapred.map.max.attempts", 10);
+		//conf.setInt("mapred.reduce.max.attempts", 10);
 
 		conf.setInputFormat(SequenceFileInputFormat.class);
 		conf.setMapOutputKeyClass(Text.class);

@@ -26,8 +26,19 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 public class PrefixEncodedForwardIndex{
+
+	/**
+	 * logger
+	 */
+	private static final Logger LOGGER = Logger.getLogger(PrefixEncodedForwardIndex.class);
+
+	static {
+		//LOGGER.setLevel(Level.WARN);
+	}
 
 	Configuration conf = new Configuration();
 	FileSystem fileSys = FileSystem.get(conf);
@@ -36,8 +47,12 @@ public class PrefixEncodedForwardIndex{
 	FSDataInputStream termsInput;
 	FSDataInputStream posInput;
 	String postingsPath;
-	
+
 	public PrefixEncodedForwardIndex(Path prefixSetPath , Path positionsPath, String postingsPath) throws IOException{
+		initIndex(prefixSetPath, positionsPath, postingsPath);
+	}
+
+	private void initIndex(Path prefixSetPath , Path positionsPath, String postingsPath)throws IOException{
 		this.postingsPath = postingsPath;
 		termsInput = fileSys.open(prefixSetPath);
 		posInput = fileSys.open(positionsPath);
@@ -49,24 +64,33 @@ public class PrefixEncodedForwardIndex{
 		for(int i = 0 ; i<l; i++) positions[i] = posInput.readLong();
 		//System.out.println("Loading done.");
 	}
-	
-	public void close() throws IOException{
+
+	public void close() throws IOException {
 		termsInput.close();
 		posInput.close();
 	}
-	
+
 	private long getPos(String term){
 		int index = prefixSet.getIndex(term);
-		//System.out.println("index of "+term+": "+index);
+		LOGGER.info("index of "+term+": "+index);
 		if(index < 0) return -1;
 		return positions[index];
 	}
-	
-	public long getTermPosting(String term, Text key, PostingsList value) throws IOException{
+
+	public PostingsList getTermPosting(String term) throws IOException{
+
+		PostingsList value = null;
+
 		long origPos = getPos(term);
 		long pos = origPos;
-		if(pos<0) return -1; 
+		if(pos<0) return null;
+
+		value = new PostingsListDocSortedPositional();
+		Text key = new Text();
+
+		LOGGER.info("stored pos: "+pos);
 		int fileNo = (int)(pos*1.0f / BuildPostingsForwardIndex.BIG_LONG_NUMBER);
+
 		pos = pos % BuildPostingsForwardIndex.BIG_LONG_NUMBER;
 
 		String fileNoStr = fileNo+"";
@@ -75,43 +99,23 @@ public class PrefixEncodedForwardIndex{
 		fileNoStr=padd+fileNoStr;
 
 		// open up the SequenceFile
-		
-		//System.out.println("fileNoSte: "+fileNoStr);
-		//System.out.println("file pos: "+pos);
-		
+
+		LOGGER.info("file no: "+fileNoStr);
+		LOGGER.info("file pos: "+pos);
+
 		SequenceFile.Reader reader = new SequenceFile.Reader(fileSys, new Path(postingsPath+"/part-"+fileNoStr), conf);
 
 		reader.seek(pos);
 		reader.next(key, value);
-		reader.close();
-		 
-		return origPos;
-	}
-	
-	public int length(){
-		return prefixSet.length();
-	}
-	
-	public void printKeys(){
-		System.out.println("Window: "+this.prefixSet.getWindow());
-		System.out.println("Length: "+this.length());
-		//int window = prefixSet.getWindow();
-		for(int i = 0 ; i<length() && i<100; i++){
-			long pos = positions[i];
-			System.out.println(i+"\t"+prefixSet.getKey(i)+"\t"+positions[i]);
-			
-			int fileNo = (int)(pos*1.0f / BuildPostingsForwardIndex.BIG_LONG_NUMBER);
-			pos = pos % BuildPostingsForwardIndex.BIG_LONG_NUMBER;
-			System.out.println("\t\t\t"+fileNo+"\t"+pos);
-			
-			
-		}
 
+		if (!key.toString().equals(term)) {
+			LOGGER.error("unable to fetch postings for term \"" + term + "\": found key \"" + key
+					+ "\" instead");
+			return null;
+			// LOGGER.info("Getting posting list of: "+key.toString());
+			// mTermPostingsIndex.getTermPosting(key.toString(), key, value);
+		}
+		reader.close();
+		return value;
 	}
-	
-	
-	/*public void printPrefixSetContent(){
-		prefixSet.printCompressedKeys();
-		prefixSet.printKeys();
-	}*/
 }

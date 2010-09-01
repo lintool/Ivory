@@ -1,0 +1,57 @@
+<parameters>
+
+     <model id="bm25" type="Feature">
+          <feature id="term" weight="1.0" cliqueSet="term" potential="IvoryExpression" generator="term" scoreFunction="BM25" k1="0.5" b="0.3" />
+     </model>
+
+     <server id="ClueWeb09.en.segment01">
+       <index>/shared/ClueWeb09/indexes/clue.en.01</index>
+       <findex>/shared/ClueWeb09/collection.compressed.block/findex.en.01.dat</findex>
+     </server>
+
+     <server id="ClueWeb09.en.segment02">
+       <index>/shared/ClueWeb09/indexes/clue.en.02</index>
+       <findex>/shared/ClueWeb09/collection.compressed.block/findex.en.02.dat</findex>
+     </server>
+
+     <server id="ClueWeb09.en.segment03">
+       <index>/shared/ClueWeb09/indexes/clue.en.03</index>
+       <findex>/shared/ClueWeb09/collection.compressed.block/findex.en.03.dat</findex>
+     </server>
+
+     <server id="ClueWeb09.en.segment04">
+       <index>/shared/ClueWeb09/indexes/clue.en.04</index>
+       <findex>/shared/ClueWeb09/collection.compressed.block/findex.en.04.dat</findex>
+     </server>
+
+     <server id="ClueWeb09.en.segment05">
+       <index>/shared/ClueWeb09/indexes/clue.en.05</index>
+       <findex>/shared/ClueWeb09/collection.compressed.block/findex.en.05.dat</findex>
+     </server>
+
+     <server id="ClueWeb09.en.segment06">
+       <index>/shared/ClueWeb09/indexes/clue.en.06</index>
+       <findex>/shared/ClueWeb09/collection.compressed.block/findex.en.06.dat</findex>
+     </server>
+
+     <server id="ClueWeb09.en.segment07">
+       <index>/shared/ClueWeb09/indexes/clue.en.07</index>
+       <findex>/shared/ClueWeb09/collection.compressed.block/findex.en.07.dat</findex>
+     </server>
+
+     <server id="ClueWeb09.en.segment08">
+       <index>/shared/ClueWeb09/indexes/clue.en.08</index>
+       <findex>/shared/ClueWeb09/collection.compressed.block/findex.en.08.dat</findex>
+     </server>
+
+     <server id="ClueWeb09.en.segment09">
+       <index>/shared/ClueWeb09/indexes/clue.en.09</index>
+       <findex>/shared/ClueWeb09/collection.compressed.block/findex.en.09.dat</findex>
+     </server>
+
+     <server id="ClueWeb09.en.segment10">
+       <index>/shared/ClueWeb09/indexes/clue.en.10</index>
+       <findex>/shared/ClueWeb09/collection.compressed.block/findex.en.10.dat</findex>
+     </server>
+
+</parameters>

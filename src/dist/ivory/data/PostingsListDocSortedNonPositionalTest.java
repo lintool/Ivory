@@ -36,13 +36,13 @@ public class PostingsListDocSortedNonPositionalTest {
 		postings.add(14, (short) 2, null);
 		postings.add(24, (short) 1, null);
 
-		PostingsListDocSortedNonPositional decodedPostings = PostingsListDocSortedNonPositional.create(postings.serialize());
-		decodedPostings.setCollectionDocumentCount(10);
-		decodedPostings.setNumberOfPostings(3);
+		PostingsListDocSortedNonPositional postings2 = PostingsListDocSortedNonPositional.create(postings.serialize());
+		postings2.setCollectionDocumentCount(10);
+		postings2.setNumberOfPostings(3);
 
 		Posting posting = new Posting();
 
-		PostingsReader reader = decodedPostings.getPostingsReader();
+		PostingsReader reader = postings2.getPostingsReader();
 
 		reader.nextPosting(posting);
 		assertEquals(13, posting.getDocno());
@@ -56,6 +56,85 @@ public class PostingsListDocSortedNonPositionalTest {
 		assertEquals(24, posting.getDocno());
 	}
 
+	@Test
+	public void testBasic2() throws IOException {
+		PostingsListDocSortedNonPositional postings = new PostingsListDocSortedNonPositional();
+		postings.setCollectionDocumentCount(20);
+		postings.setNumberOfPostings(3);
+
+		postings.add(13, (short) 5, null);
+		postings.add(14, (short) 2, null);
+		postings.add(24, (short) 1, null);
+
+		PostingsListDocSortedNonPositional postings2 = PostingsListDocSortedNonPositional.create(postings.serialize());
+		// verify cf and df
+		assertEquals(8, postings2.getCf());
+		assertEquals(3, postings2.getDf());
+		
+		postings2.setCollectionDocumentCount(20);
+		postings2.setNumberOfPostings(3);
+
+		// try decoding
+		Posting posting = new Posting();
+		PostingsReader reader = postings2.getPostingsReader();
+
+		reader.nextPosting(posting);
+		assertEquals(13, posting.getDocno());
+		assertEquals(5, posting.getScore());
+
+		reader.nextPosting(posting);
+		assertEquals(14, posting.getDocno());
+		assertEquals(2, posting.getScore());
+
+		reader.nextPosting(posting);
+		assertEquals(24, posting.getDocno());
+		
+		// modify df and cf
+		postings2.setCf(16);
+		postings2.setDf(6);
+		
+		assertEquals(16, postings2.getCf());
+		assertEquals(6, postings2.getDf());
+		
+		// try decoding again, should have an impact
+		reader.reset();
+
+		reader.nextPosting(posting);
+		assertEquals(13, posting.getDocno());
+		assertEquals(5, posting.getScore());
+
+		reader.nextPosting(posting);
+		assertEquals(14, posting.getDocno());
+		assertEquals(2, posting.getScore());
+
+		reader.nextPosting(posting);
+		assertEquals(24, posting.getDocno());
+		
+		
+		PostingsListDocSortedNonPositional postings3 = PostingsListDocSortedNonPositional.create(postings2.serialize());
+		// verify cf, df, and number of postings
+		assertEquals(16, postings3.getCf());
+		assertEquals(6, postings3.getDf());
+		assertEquals(3, postings3.getNumberOfPostings());
+
+		// try decoding
+		postings3.setCollectionDocumentCount(20);
+		postings3.setNumberOfPostings(3);
+		
+		reader = postings3.getPostingsReader();
+
+		reader.nextPosting(posting);
+		assertEquals(13, posting.getDocno());
+		assertEquals(5, posting.getScore());
+
+		reader.nextPosting(posting);
+		assertEquals(14, posting.getDocno());
+		assertEquals(2, posting.getScore());
+
+		reader.nextPosting(posting);
+		assertEquals(24, posting.getDocno());
+	}
+	
 	// test for not setting collection size
 
 	public static junit.framework.Test suite() {

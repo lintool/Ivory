@@ -64,6 +64,10 @@ public class DocLengthTable {
 		this(file, FileSystem.get(new Configuration()));
 	}
 
+	public DocLengthTable(String file, FileSystem fs) throws IOException {
+		this(new Path(file), fs);
+	}	
+	
 	/**
 	 * Creates a new <code>DocLengthTable</code>.
 	 * 
@@ -73,11 +77,11 @@ public class DocLengthTable {
 	 *            FileSystem to read from
 	 * @throws IOException
 	 */
-	public DocLengthTable(String file, FileSystem fs) throws IOException {
+	public DocLengthTable(Path file, FileSystem fs) throws IOException {
 		long docLengthSum = 0;
 		nDocs = 0;
 
-		FSDataInputStream in = fs.open(new Path(file));
+		FSDataInputStream in = fs.open(file);
 
 		// docno offset
 		mDocnoOffset = in.readInt();

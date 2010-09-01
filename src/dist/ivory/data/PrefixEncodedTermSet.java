@@ -23,6 +23,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import org.apache.hadoop.io.Writable;
+import org.apache.log4j.Logger;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.EOFException;
@@ -33,7 +35,11 @@ import java.io.ObjectOutputStream;
 
 public class PrefixEncodedTermSet implements Writable {
 
-
+	/**
+	 * logger
+	 */
+	private static final Logger LOGGER = Logger.getLogger(PrefixEncodedTermSet.class);
+	
 	public long totalOriginalBytes = 0;
 	public long totalMemoryBytes = 0;
 
@@ -233,12 +239,11 @@ public class PrefixEncodedTermSet implements Writable {
 	}*/
 
 	private int getPosFromRoot(String key, int pos){
-		//System.out.println("looking at index "+pos);
+		//LOGGER.info("looking at index "+pos);
 		for(int i= pos+1; i< pos + window && i<curKeyIndex ; i++){
 			String s = getKey(i);
-			//System.out.println("\t\tcur key :"+s);
+			//LOGGER.info("\tcur index: "+i+"\tcur key :"+s);
 			if(s.equals(key)) return i;
-			//if(getKey(i).equals(key)) return i;
 		}
 		return -1;
 	}

@@ -92,6 +92,8 @@ public class TermPositions implements Writable {
 	public void set(int[] pos, short tf) {
 		mPos = pos;
 		mTf = tf;
+		// reset so we will recompute encoded size
+		mTotalBits = 0;
 	}
 
 	/**

@@ -24,45 +24,44 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.zip.GZIPOutputStream;
 
+import org.apache.hadoop.fs.FSDataOutputStream;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.fs.FileSystem;
+
 /**
  * @author Don Metzler
  *
  */
-public class ResultWriter {
-
-	/**
-	 * output buffer size 
-	 */
-	private static final int OUTPUT_BUFFER_SIZE = 1 * 1024*1024;
+public /*abstract*/ class ResultWriter {
 
 	/**
 	 * system-dependent newline character 
 	 */
-	private static final String newLine = System.getProperty("line.separator");
+	protected static final String newLine = System.getProperty("line.separator");
 	
 	/**
 	 * print writer
 	 */
-	private Writer mWriter = null;
+	protected Writer mWriter = null;
 	
 	/**
 	 * gzip output stream 
 	 */
-	private GZIPOutputStream mGzipStream = null;
+	protected GZIPOutputStream mGzipStream = null;
 
+	/**
+	 * output buffer size 
+	 */
+	protected static final int OUTPUT_BUFFER_SIZE = 1 * 1024*1024;
+	
 	/**
 	 * @param file
 	 * @param compress
 	 * @throws IOException
 	 */
-	public ResultWriter(String file, boolean compress) throws IOException {
-		OutputStream out = null;
+	public ResultWriter(String file, boolean compress, FileSystem fs) throws IOException {
 		
-		if( file == null ) {
-			out = System.out;
-		} else {
-			out = new FileOutputStream( file );
-		}
+		FSDataOutputStream out = fs.create(new Path(file), true);
 		
 		if( compress ) {
 			mGzipStream = new GZIPOutputStream( out );

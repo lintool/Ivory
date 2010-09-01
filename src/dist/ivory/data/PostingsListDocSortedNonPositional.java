@@ -68,6 +68,8 @@ public class PostingsListDocSortedNonPositional implements PostingsList {
 	public PostingsListDocSortedNonPositional() {
 		this.mSumOfPostingsScore = 0;
 		this.mPostingsAdded = 0;
+		this.mDf = 0;
+		this.mCf = 0;
 		this.mPrevDocno = -1;
 
 		try {
@@ -81,6 +83,8 @@ public class PostingsListDocSortedNonPositional implements PostingsList {
 	public void clear() {
 		this.mSumOfPostingsScore = 0;
 		this.mPostingsAdded = 0;
+		this.mDf = 0;
+		this.mCf = 0;
 		this.mPrevDocno = -1;
 
 		try {
@@ -92,6 +96,9 @@ public class PostingsListDocSortedNonPositional implements PostingsList {
 	}
 
 	public void add(int docno, short score, TermPositions pos) {
+		add(docno, score);
+	}
+	public void add(int docno, short score) {
 		sLogger.info("adding posting: " + docno + ", " + score);
 
 		try {
@@ -168,16 +175,20 @@ public class PostingsListDocSortedNonPositional implements PostingsList {
 		mGolombParam = (int) Math.ceil(0.69 * ((float) mCollectionSize) / (float) mNumPostings);
 	}
 
-	public long getSumOfPostingsScore() {
-		return mSumOfPostingsScore;
-	}
-
 	public int getDf() {
 		return mDf;
+	}
+	
+	public void setDf(int df) {
+		this.mDf = df;
 	}
 
 	public long getCf() {
 		return mCf;
+	}
+	
+	public void setCf(long cf) {
+		this.mCf = cf;
 	}
 
 	public void readFields(DataInput in) throws IOException {
@@ -197,8 +208,8 @@ public class PostingsListDocSortedNonPositional implements PostingsList {
 			// this would happen if we're reading in an already-encoded
 			// postings; if that's the case, simply write out the byte array
 			WritableUtils.writeVInt(out, mPostingsAdded);
-			WritableUtils.writeVInt(out, mPostingsAdded); // df
-			WritableUtils.writeVLong(out, mSumOfPostingsScore); // cf
+			WritableUtils.writeVInt(out, mDf == 0 ? mPostingsAdded : mDf); // df
+			WritableUtils.writeVLong(out, mCf == 0 ? mSumOfPostingsScore : mCf); // cf
 			WritableUtils.writeVInt(out, mRawBytes.length);
 			out.write(mRawBytes);
 		} else {
@@ -213,8 +224,8 @@ public class PostingsListDocSortedNonPositional implements PostingsList {
 				}
 
 				WritableUtils.writeVInt(out, mPostingsAdded);
-				WritableUtils.writeVInt(out, mPostingsAdded); // df
-				WritableUtils.writeVLong(out, mSumOfPostingsScore); // cf
+				WritableUtils.writeVInt(out, mDf == 0 ? mPostingsAdded : mDf); // df
+				WritableUtils.writeVLong(out, mCf == 0 ? mSumOfPostingsScore : mCf); // cf
 				byte[] bytes = mBytesOut.toByteArray();
 				WritableUtils.writeVInt(out, bytes.length);
 				out.write(bytes);
@@ -315,7 +326,7 @@ public class PostingsListDocSortedNonPositional implements PostingsList {
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
-				throw new RuntimeException();
+				throw new RuntimeException(e.toString());
 			}
 
 			mCnt++;

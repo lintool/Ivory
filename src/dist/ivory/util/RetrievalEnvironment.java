@@ -1,5 +1,5 @@
 /*
- * Ivory: A Hadoop toolkit for Web-scale information retrieval
+ * Ivory: A Hadoop toolkit for web-scale information retrieval
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You may
@@ -34,9 +34,9 @@ import java.util.Random;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.Text;
 import org.apache.log4j.Logger;
 
+import edu.umd.cloud9.collection.DocnoMapping;
 import edu.umd.cloud9.util.FSProperty;
 
 /**
@@ -59,12 +59,12 @@ public class RetrievalEnvironment {
 	/**
 	 * default df value
 	 */
-	private int mDefaultDF;
+	private int mDefaultDf;
 
 	/**
 	 * default cf value
 	 */
-	private long mDefaultCF;
+	private long mDefaultCf;
 
 	/**
 	 * type of postings in the index
@@ -81,10 +81,8 @@ public class RetrievalEnvironment {
 	 */
 	private int mDocumentCount;
 
-	/**
-	 * average document length
-	 */
-	// private float mAvgDocumentLength;
+	private int mDocumentCountLocal = -1;
+
 	/**
 	 * number of terms in the collection
 	 */
@@ -105,38 +103,44 @@ public class RetrievalEnvironment {
 	}
 
 	/**
-	 * @param indexRoot
+	 * @param indexPath
 	 */
-	public RetrievalEnvironment(String indexRoot, boolean loadDoclengths) throws IOException {
+	public RetrievalEnvironment(String indexPath, boolean loadDoclengths) throws IOException {
 		// hadoop variables
 		Configuration conf = new Configuration();
 		FileSystem fs = FileSystem.get(conf);
 
-		// get number of postings
-		mTermCount = FSProperty.readInt(fs, indexRoot + "/property.NumberOfPostings");
-
 		// get number of documents
-		mDocumentCount = FSProperty.readInt(fs, indexRoot + "/property.CollectionDocumentCount");
+		mDocumentCount = readCollectionDocumentCount(fs, indexPath);
 
-		// total length of the collection
-		mTermCount = FSProperty.readLong(fs, indexRoot + "/property.CollectionTermCount");
+		// If property.CollectionDocumentCount.local exists, it means that this
+		// index is a partition of a large document collection. We want to use
+		// the global doc count for score, but the Golomb compression is
+		// determined using the local doc count.
+		if (fs.exists(new Path(indexPath + "/property.CollectionDocumentCount.local"))) {
+			mDocumentCountLocal = FSProperty.readInt(fs, indexPath
+					+ "/property.CollectionDocumentCount.local");
+		}
+
+		// get vocabulary size
+		mTermCount = readCollectionTermCount(fs, indexPath);
 
 		// get the posting type
-		mPostingsType = FSProperty.readString(fs, indexRoot + "/property.PostingsType");
+		mPostingsType = readPostingsType(fs, indexPath);
 
 		// read the table of doc lengths
 		if (loadDoclengths) {
 			LOGGER.info("Loading doclengths table...");
-			mDocumentLengths = new DocLengthTable(indexRoot + "/doclengths.dat", fs);
+			mDocumentLengths = new DocLengthTable(getDoclengthsFile(indexPath), fs);
 		}
 
 		// read document frequencies
-		mDefaultDF = mDocumentCount / 100; // heuristic
+		mDefaultDf = mDocumentCount / 100; // heuristic
 
 		// read collection frequencies
-		mDefaultCF = mDefaultDF * 2; // heuristic
+		mDefaultCf = mDefaultDf * 2; // heuristic
 
-		LOGGER.info("IndexPath: " + indexRoot);
+		LOGGER.info("IndexPath: " + indexPath);
 		LOGGER.info("PostingsType: " + mPostingsType);
 		LOGGER.info("Collection document count: " + mDocumentCount);
 		LOGGER.info("Collection term count: " + mTermCount);
@@ -144,7 +148,7 @@ public class RetrievalEnvironment {
 		// initialize the tokenizer; this information is stored along with the
 		// index since we need to use the same tokenizer to parse queries
 		try {
-			String tokenizer = FSProperty.readString(fs, indexRoot + "/property.Tokenizer");
+			String tokenizer = readTokenizerClass(fs, indexPath);
 			LOGGER.info("Tokenizer: " + tokenizer);
 			mTokenizer = (Tokenizer) Class.forName(tokenizer).newInstance();
 		} catch (Exception e) {
@@ -152,10 +156,10 @@ public class RetrievalEnvironment {
 		}
 
 		LOGGER.info("Loading postings index...");
-		String termsFile = indexRoot + "/postings-index-terms.dat";
-		String positionsFile = indexRoot + "/postings-index-positions.dat";
-		String postingsPath = indexRoot + "/postings/";
-		int termCnt = FSProperty.readInt(fs, indexRoot + "/property.PostingsForwardIndexTermCount");
+		String termsFile = RetrievalEnvironment.getPostingsIndexTerms(indexPath);
+		String positionsFile = RetrievalEnvironment.getPostingsIndexPositions(indexPath);
+		String postingsPath = RetrievalEnvironment.getPostingsDirectory(indexPath);
+		int termCnt = RetrievalEnvironment.readPostingsIndexTermCount(fs, indexPath);
 
 		LOGGER.info("Number of terms: " + termCnt);
 		mTermPostingsIndex = new PrefixEncodedForwardIndex(new Path(termsFile), new Path(
@@ -177,7 +181,7 @@ public class RetrievalEnvironment {
 		}
 
 	}
-
+	
 	public long documentCount() {
 		return mDocumentCount;
 	}
@@ -206,7 +210,7 @@ public class RetrievalEnvironment {
 
 				List<PostingsListDocSortedPositional.PostingsReader> readers = new ArrayList<PostingsListDocSortedPositional.PostingsReader>();
 				for (int i = 0; i < terms.length; i++) {
-					PostingsList list = _getPostingsList(terms[i]);
+					PostingsList list = getPostingsList(terms[i]);
 					readers
 							.add((PostingsListDocSortedPositional.PostingsReader) mPostingsReaderConstructor
 									.newInstance(list.getRawBytes(), list.getNumberOfPostings(),
@@ -223,7 +227,7 @@ public class RetrievalEnvironment {
 
 				List<PostingsListDocSortedPositional.PostingsReader> readers = new ArrayList<PostingsListDocSortedPositional.PostingsReader>();
 				for (int i = 0; i < terms.length; i++) {
-					PostingsList list = _getPostingsList(terms[i]);
+					PostingsList list = getPostingsList(terms[i]);
 					readers
 							.add((PostingsListDocSortedPositional.PostingsReader) mPostingsReaderConstructor
 									.newInstance(list.getRawBytes(), list.getNumberOfPostings(),
@@ -233,11 +237,12 @@ public class RetrievalEnvironment {
 				postings = new ProximityPostingsListUnorderedWindow(readers
 						.toArray(new PostingsListDocSortedPositional.PostingsReader[0]), windowSize);
 			} else {
-				PostingsList postingsList = _getPostingsList(expression);
+				PostingsList postingsList = getPostingsList(expression);
 
-				if (postingsList == null)
-					throw new RuntimeException("Unable to fetch postings list for \"" + expression
-							+ "\"");
+				// if we couldn't get the postings list, then just return null
+				if (postingsList == null) {
+					return null;
+				}
 
 				postings = postingsList.getPostingsReader();
 			}
@@ -255,7 +260,43 @@ public class RetrievalEnvironment {
 	 * @throws IllegalAccessException
 	 * @throws ClassNotFoundException
 	 */
-	private PostingsList _getPostingsList(String term) throws IOException, InstantiationException,
+	private PostingsList getPostingsList(String term) throws IOException, InstantiationException,
+			IllegalAccessException, ClassNotFoundException {
+		
+
+		long start = System.currentTimeMillis();
+		PostingsList value = mTermPostingsIndex.getTermPosting(term);
+		long duration = System.currentTimeMillis() - start;
+
+		if(value == null) return null;
+		
+		if (mDocumentCountLocal != -1) {
+			value.setCollectionDocumentCount(mDocumentCountLocal);
+		} else {
+			value.setCollectionDocumentCount(mDocumentCount);
+		}
+
+		LOGGER.info("fetched postings for term \"" + term + "\" in " + duration + " ms");
+		LOGGER.info("CF: "+value.getCf()+"\tDF: "+value.getDf()+"\tnDocsInColl: "+value.getCollectionDocumentCount()+"\t nPostings: "+value.getNumberOfPostings());
+		
+		/*if (!key.toString().equals(term)) {
+			LOGGER.error("unable to fetch postings for term \"" + term + "\": found key \"" + key
+					+ "\" instead");
+			return null;
+			// LOGGER.info("Getting posting list of: "+key.toString());
+			// mTermPostingsIndex.getTermPosting(key.toString(), key, value);
+		}*/
+
+		return value;
+	}
+
+	/**
+	 * @throws IOException
+	 * @throws InstantiationException
+	 * @throws IllegalAccessException
+	 * @throws ClassNotFoundException
+	 */
+	/*private PostingsList getPostingsList(String term) throws IOException, InstantiationException,
 			IllegalAccessException, ClassNotFoundException {
 		Text key = new Text();
 		PostingsList value = new PostingsListDocSortedPositional();
@@ -264,24 +305,35 @@ public class RetrievalEnvironment {
 		mTermPostingsIndex.getTermPosting(term, key, value);
 		long duration = System.currentTimeMillis() - start;
 
-		value.setCollectionDocumentCount(mDocumentCount);
+		if (mDocumentCountLocal != -1) {
+			value.setCollectionDocumentCount(mDocumentCountLocal);
+		} else {
+			value.setCollectionDocumentCount(mDocumentCount);
+		}
 
 		LOGGER.info("fetched postings for term \"" + key + "\" in " + duration + " ms");
+		if (!key.toString().equals(term)) {
+			LOGGER.error("unable to fetch postings for term \"" + term + "\": found key \"" + key
+					+ "\" instead");
+			return null;
+			// LOGGER.info("Getting posting list of: "+key.toString());
+			// mTermPostingsIndex.getTermPosting(key.toString(), key, value);
+		}
 
 		return value;
-	}
+	}*/
 
 	public long collectionFrequency(String expression) throws Exception {
 		// TODO: fix this
 		// we currently don't support cf for proximity expressions
 		if (expression.startsWith("#od")) {
-			return mDefaultCF;
+			return mDefaultCf;
 		} else if (expression.startsWith("#uw")) {
-			return mDefaultCF;
+			return mDefaultCf;
 		}
 
 		try {
-			return _getPostingsList(expression).getCf();
+			return getPostingsList(expression).getCf();
 		} catch (Exception e) {
 			throw new Exception(e);
 		}
@@ -291,13 +343,13 @@ public class RetrievalEnvironment {
 		// TODO: fix this
 		// we currently don't support df for proximity expressions
 		if (expression.startsWith("#od")) {
-			return mDefaultDF;
+			return mDefaultDf;
 		} else if (expression.startsWith("#uw")) {
-			return mDefaultDF;
+			return mDefaultDf;
 		}
 
 		try {
-			return _getPostingsList(expression).getDf();
+			return getPostingsList(expression).getDf();
 		} catch (Exception e) {
 			throw new Exception(e);
 		}
@@ -308,25 +360,17 @@ public class RetrievalEnvironment {
 	}
 
 	public int getDefaultDF() {
-		return mDefaultDF;
+		return mDefaultDf;
 	}
 
 	public long getDefaultCF() {
-		return mDefaultCF;
+		return mDefaultCf;
 	}
 
 	private static Random r = new Random();
 
 	private static String appendPath(String base, String file) {
 		return base + (base.endsWith("/") ? "" : "/") + file;
-	}
-
-	public static String getDocumentForwardIndex(String indexPath) {
-		return appendPath(indexPath, "doc-forward-index.dat");
-	}
-
-	public static String getDocumentForwardIndexDirectory(String indexPath) {
-		return appendPath(indexPath, "doc-forward-index/");
 	}
 
 	public static String getDocnoMappingFile(String indexPath) {
@@ -408,15 +452,7 @@ public class RetrievalEnvironment {
 	public static void writeCollectionTermCount(FileSystem fs, String indexPath, long cnt) {
 		FSProperty.writeLong(fs, appendPath(indexPath, "property.CollectionTermCount"), cnt);
 	}
-
-	public static String readDocumentForwardIndexClass(FileSystem fs, String indexPath) {
-		return FSProperty.readString(fs, appendPath(indexPath, "property.ForwardIndexClass"));
-	}
-
-	public static void writeDocumentForwardIndexClass(FileSystem fs, String indexPath, String s) {
-		FSProperty.writeString(fs, appendPath(indexPath, "property.ForwardIndexClass"), s);
-	}
-
+	
 	public static String readInputFormat(FileSystem fs, String indexPath) {
 		return FSProperty.readString(fs, appendPath(indexPath, "property.InputFormat"));
 	}
@@ -474,25 +510,20 @@ public class RetrievalEnvironment {
 		FSProperty.writeInt(fs, appendPath(indexPath, "property.NumberOfPostings"), numPostings);
 	}
 
-	public static void main(String[] args) throws Exception {
-		// String indexPath = "/umd/indexes/trec45noCRFR.positional.galago/";
-		String indexPath = "/umd/indexes/clue.en.segment.01/";
-
-		RetrievalEnvironment env = new RetrievalEnvironment(indexPath, false);
-
+	public static void testTerm(RetrievalEnvironment env, String term) {
 		long startTime = System.currentTimeMillis();
 
 		PostingsReader reader = null;
 		Posting p = new Posting();
 		int df = 0;
-		String termOrig = "iraq";
+		String termOrig = term;
 		String termTokenized = env.tokenize(termOrig)[0];
 
 		reader = env.getPostingsReader(termTokenized);
 		df = reader.getNumberOfPostings();
 		System.out.print(termOrig + ", tokenized=" + termTokenized + ", df=" + df
 				+ "\n First ten postings: ");
-		for (int i = 0; i < 10; i++) {
+		for (int i = 0; i < (df < 10 ? df : 10); i++) {
 			reader.nextPosting(p);
 			System.out.print(p);
 		}
@@ -502,5 +533,48 @@ public class RetrievalEnvironment {
 		long endTime = System.currentTimeMillis();
 
 		System.out.println("total time: " + (endTime - startTime));
+	}
+	
+	public static DocnoMapping loadDocnoMapping(String indexPath){
+		DocnoMapping mDocMapping = null;
+		// load the docid to docno mappings
+		try {
+			LOGGER.info("Loading DocnoMapping file ...");
+			Configuration conf = new Configuration();
+			FileSystem fs = FileSystem.get(conf);
+			
+			String className = RetrievalEnvironment.readDocnoMappingClass(fs, indexPath);
+			LOGGER.info(" Class name: "+className);
+			mDocMapping = (DocnoMapping) Class.forName(className).newInstance();
+	
+			String mappingFile = RetrievalEnvironment.getDocnoMappingFile(indexPath);
+			LOGGER.info(" File name: "+mappingFile);
+			mDocMapping.loadMapping(new Path(mappingFile), fs);
+			LOGGER.info("Loading Done.");
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new RuntimeException("Error initializing DocnoMapping!");
+		}
+		return mDocMapping;
+	}
+
+
+	public static void main(String[] args) throws Exception {
+		// String indexPath = "/umd/indexes/trec45noCRFR.positional.galago/";
+		// String indexPath = "/umd/indexes/clue.en.segment.01/";
+		// String indexPath = "/fs/clip-qa/clue.en.segment.01.stable/";
+		String indexPath = "/umd/indexes/medline04.positional/";
+		RetrievalEnvironment env = new RetrievalEnvironment(indexPath, false);
+		testTerm(env, "jim");
+		// testTerm(env, "test");
+		// testTerm(env, "usa");
+		// testTerm(env, "general");
+		// testTerm(env, "ice");
+		// testTerm(env, "back");
+		testTerm(env, "egypt");
+		// testTerm(env, "iraq");
+		// testTerm(env, "turkey");
+		// testTerm(env, "best");
+
 	}
 }

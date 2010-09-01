@@ -1,0 +1,13 @@
+<parameters>
+
+     <index>/umd-lin/shared/indexes/medline</index>
+
+     <!-- query likelihood -->
+     <model id="genomics05-lm-ql" type="FullIndependence" mu="1000.0" output="/tmp/ranking.genomics05-lm-ql.txt" hits="1000" />
+
+     <!-- bm25 -->
+     <model id="genomics05-bm25-base" type="Feature" output="/tmp/ranking.genomics05-bm25-base.txt" hits="1000">
+          <feature id="term" weight="1.0" cliqueSet="term" potential="IvoryExpression" generator="term" scoreFunction="BM25" k1="0.5" b="0.3" />
+     </model>
+
+</parameters>

@@ -109,6 +109,7 @@ public class ComputeDictionarySize extends PowerTool {
 		FileInputFormat.setInputPaths(conf, inputPath);
 		FileOutputFormat.setOutputPath(conf, outputPath);
 
+		conf.set("mapred.child.java.opts", "-Xmx2048m");
 		conf.setInputFormat(SequenceFileInputFormat.class);
 		conf.setMapperClass(MyMapper.class);
 		conf.setNumReduceTasks(0);

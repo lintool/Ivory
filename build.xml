@@ -9,10 +9,10 @@
 		<fileset dir="../umd-hadoop-core/">
 			<include name="cloud9.jar" />
 		</fileset>
-		<fileset dir="../umd-hadoop-core/hadoop/hadoop-0.17.2/">
+		<fileset dir="../umd-hadoop-core/hadoop/hadoop-0.20.1/">
 			<include name="*.jar" />
 		</fileset>
-		<fileset dir="../umd-hadoop-core/hadoop/hadoop-0.17.2/lib">
+		<fileset dir="../umd-hadoop-core/hadoop/hadoop-0.20.1/lib">
 			<include name="*.jar" />
 		</fileset>
 		<fileset dir="../umd-hadoop-core/lib/">
@@ -92,7 +92,7 @@
 				<exclude name="dist/org/**/*.java" />
 			</fileset>
 			<link href="http://java.sun.com/javase/6/docs/api/" />
-			<link href="../../../umd-hadoop-core/hadoop/hadoop-0.17.2/docs/api/" />
+			<link href="../../../umd-hadoop-core/hadoop/hadoop-0.20.1/docs/api/" />
 		</javadoc>
 	</target>
 

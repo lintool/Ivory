@@ -213,15 +213,19 @@ public class PostingsListScoreSorted implements PostingsList {
 		return mNumPostings;
 	}
 
-	public long getSumOfPostingsScore() {
-		throw new UnsupportedOperationException();
-	}
-
 	public int getDf() {
 		throw new UnsupportedOperationException();
 	}
 
+	public void setDf(int df) {
+		throw new UnsupportedOperationException();
+	}
+
 	public long getCf() {
+		throw new UnsupportedOperationException();
+	}
+
+	public void setCf(long cf) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -291,10 +295,12 @@ public class PostingsListScoreSorted implements PostingsList {
 	}
 
 	/**
-	 * <p>PostingsReader for PostingsListScoreSorted.</p>
+	 * <p>
+	 * PostingsReader for PostingsListScoreSorted.
+	 * </p>
 	 * 
 	 * @author Jimmy Lin
-	 *
+	 * 
 	 */
 	public static class PostingsReader implements ivory.data.PostingsReader {
 		private ByteArrayInputStream mBytesIn;

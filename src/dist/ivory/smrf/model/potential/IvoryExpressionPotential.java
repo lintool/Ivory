@@ -134,7 +134,11 @@ public class IvoryExpressionPotential extends PotentialFunction {
 		mPostingsReader = mEnv.getPostingsReader(expression);
 
 		// get collection statistics for the expression
-		if( mPostingsReader instanceof ProximityPostingsReader ) {
+		if(mPostingsReader == null) {
+			mDf = 0;
+			mCf = 0;
+		}
+		else if(mPostingsReader instanceof ProximityPostingsReader) {
 			mDf = mEnv.getDefaultDF();
 			mCf = mEnv.getDefaultCF();
 		}
@@ -148,7 +152,7 @@ public class IvoryExpressionPotential extends PotentialFunction {
 		mScoringFunction.initialize(termEvidence, globalEvidence);
 
 		// read first posting
-		if(mPostingsReader != null && !mPostingsReader.nextPosting(mCurPosting)) {
+		if(mPostingsReader == null || (mPostingsReader != null && !mPostingsReader.nextPosting(mCurPosting))) {
 			mEndOfList = true;
 		}
 	}

@@ -42,6 +42,7 @@ import uk.ac.gla.terrier.compression.BitOutputStream;
  * @author Jimmy Lin
  * 
  */
+
 public class PostingsListDocSortedPositional implements PostingsList {
 	private static final Logger sLogger = Logger.getLogger(PostingsListDocSortedPositional.class);
 	private static final int MAX_DOCNO_BITS = 32;
@@ -61,12 +62,14 @@ public class PostingsListDocSortedPositional implements PostingsList {
 	private int mDf;
 	private long mCf;
 
-	private ByteArrayOutputStream mBytesOut;
-	private BitOutputStream mBitsOut;
+	transient private ByteArrayOutputStream mBytesOut;
+	transient private BitOutputStream mBitsOut;
 
 	public PostingsListDocSortedPositional() {
 		this.mSumOfPostingsScore = 0;
 		this.mPostingsAdded = 0;
+		this.mDf = 0;
+		this.mCf = 0;
 		this.mPrevDocno = -1;
 
 		try {
@@ -80,6 +83,8 @@ public class PostingsListDocSortedPositional implements PostingsList {
 	public void clear() {
 		this.mSumOfPostingsScore = 0;
 		this.mPostingsAdded = 0;
+		this.mDf = 0;
+		this.mCf = 0;
 		this.mPrevDocno = -1;
 
 		try {
@@ -215,16 +220,20 @@ public class PostingsListDocSortedPositional implements PostingsList {
 		mGolombParam = (int) Math.ceil(0.69 * ((float) mCollectionSize) / (float) mNumPostings);
 	}
 
-	public long getSumOfPostingsScore() {
-		return mSumOfPostingsScore;
-	}
-
 	public int getDf() {
 		return mDf;
 	}
 
+	public void setDf(int df) {
+		this.mDf = df;
+	}
+
 	public long getCf() {
 		return mCf;
+	}
+
+	public void setCf(long cf) {
+		this.mCf = cf;
 	}
 
 	public void readFields(DataInput in) throws IOException {
@@ -244,8 +253,8 @@ public class PostingsListDocSortedPositional implements PostingsList {
 			// this would happen if we're reading in an already-encoded
 			// postings; if that's the case, simply write out the byte array
 			WritableUtils.writeVInt(out, mPostingsAdded);
-			WritableUtils.writeVInt(out, mPostingsAdded); // df
-			WritableUtils.writeVLong(out, mSumOfPostingsScore); // cf
+			WritableUtils.writeVInt(out, mDf == 0 ? mPostingsAdded : mDf); // df
+			WritableUtils.writeVLong(out, mCf == 0 ? mSumOfPostingsScore : mCf); // cf
 			WritableUtils.writeVInt(out, mRawBytes.length);
 			out.write(mRawBytes);
 		} else {
@@ -260,8 +269,8 @@ public class PostingsListDocSortedPositional implements PostingsList {
 				}
 
 				WritableUtils.writeVInt(out, mPostingsAdded);
-				WritableUtils.writeVInt(out, mPostingsAdded); // df
-				WritableUtils.writeVLong(out, mSumOfPostingsScore); // cf
+				WritableUtils.writeVInt(out, mDf == 0 ? mPostingsAdded : mDf); // df
+				WritableUtils.writeVLong(out, mCf == 0 ? mSumOfPostingsScore : mCf); // cf
 				byte[] bytes = mBytesOut.toByteArray();
 				WritableUtils.writeVInt(out, bytes.length);
 				out.write(bytes);
@@ -311,10 +320,12 @@ public class PostingsListDocSortedPositional implements PostingsList {
 	}
 
 	/**
-	 * <p>PostingsReader for PostingsListDocSortedPositional.</p>
+	 * <p>
+	 * PostingsReader for PostingsListDocSortedPositional.
+	 * </p>
 	 * 
 	 * @author Jimmy Lin
-	 *
+	 * 
 	 */
 	public static class PostingsReader implements ivory.data.PostingsReader {
 		private ByteArrayInputStream mBytesIn;
@@ -407,8 +418,19 @@ public class PostingsListDocSortedPositional implements PostingsList {
 			return pos;
 		}
 
+		public boolean getPositions(TermPositions tp) {
+			int[] pos = getPositions();
+
+			if (pos == null)
+				return false;
+
+			tp.set(pos, (short) pos.length);
+
+			return true;
+		}
+
 		public boolean hasMorePostings() {
-			throw new UnsupportedOperationException();
+			return !(mCnt >= mInnerNumPostings);
 		}
 
 		public short peekNextScore() {
@@ -430,5 +452,86 @@ public class PostingsListDocSortedPositional implements PostingsList {
 		public PostingsList getPostingsList() {
 			return mPostingsList;
 		}
+	}
+
+	public static PostingsListDocSortedPositional merge(PostingsListDocSortedPositional plist1,
+			PostingsListDocSortedPositional plist2, int docs) {
+
+		plist1.setCollectionDocumentCount(docs);
+		plist2.setCollectionDocumentCount(docs);
+
+		int numPostings1 = plist1.getNumberOfPostings();
+		int numPostings2 = plist2.getNumberOfPostings();
+
+		//System.out.println("number of postings (1): " + numPostings1);
+		//System.out.println("number of postings (2): " + numPostings2);
+
+		PostingsListDocSortedPositional newPostings = new PostingsListDocSortedPositional();
+		newPostings.setCollectionDocumentCount(docs);
+		newPostings.setNumberOfPostings(numPostings1 + numPostings2);
+
+		Posting posting1 = new Posting();
+		PostingsReader reader1 = plist1.getPostingsReader();
+
+		Posting posting2 = new Posting();
+		PostingsReader reader2 = plist2.getPostingsReader();
+
+		reader1.nextPosting(posting1);
+		reader2.nextPosting(posting2);
+
+		TermPositions tp1 = new TermPositions();
+		TermPositions tp2 = new TermPositions();
+
+		reader1.getPositions(tp1);
+		reader2.getPositions(tp2);
+
+		while (true) {
+			if (posting1 == null) {
+				newPostings.add(posting2.getDocno(), posting2.getScore(), tp2);
+				//System.out.println("2: " + posting2);
+
+				// read the rest from reader 2
+				while (reader2.nextPosting(posting2)) {
+					reader2.getPositions(tp2);
+					newPostings.add(posting2.getDocno(), posting2.getScore(), tp2);
+					//System.out.println("2: " + posting2);
+				}
+
+				break;
+			} else if (posting2 == null) {
+				newPostings.add(posting1.getDocno(), posting1.getScore(), tp1);
+				//System.out.println("1: " + posting1);
+
+				// read the rest from reader 1
+				while (reader1.nextPosting(posting1)) {
+					reader1.getPositions(tp1);
+					newPostings.add(posting1.getDocno(), posting1.getScore(), tp1);
+					//System.out.println("1: " + posting1);
+				}
+
+				break;
+
+			} else if (posting1.getDocno() < posting2.getDocno()) {
+				//System.out.println("1: " + posting1);
+				newPostings.add(posting1.getDocno(), posting1.getScore(), tp1);
+
+				if (reader1.nextPosting(posting1) == false) {
+					posting1 = null;
+				} else {
+					reader1.getPositions(tp1);
+				}
+			} else {
+				//System.out.println("2: " + posting2);
+				newPostings.add(posting2.getDocno(), posting2.getScore(), tp2);
+
+				if (reader2.nextPosting(posting2) == false) {
+					posting2 = null;
+				} else {
+					reader2.getPositions(tp2);
+				}
+			}
+		}
+
+		return newPostings;
 	}
 }

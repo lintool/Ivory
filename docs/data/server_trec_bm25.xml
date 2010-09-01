@@ -1,0 +1,12 @@
+<parameters>
+
+     <model id="bm25" type="Feature">
+          <feature id="term" weight="1.0" cliqueSet="term" potential="IvoryExpression" generator="term" scoreFunction="BM25" k1="0.5" b="0.3" />
+     </model>
+
+     <server id="trec">
+       <index>/umd-lin/shared/indexes/trec</index>
+       <findex>/umd-lin/shared/collections/trec4-5_noCRFR.findex.dat</findex>
+     </server>
+	 
+</parameters>
