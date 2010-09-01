@@ -1,5 +1,5 @@
 /*
- * Ivory: A Hadoop toolkit for Web-scale information retrieval
+ * Ivory: A Hadoop toolkit for web-scale information retrieval
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You may
@@ -16,25 +16,25 @@
 
 package ivory.smrf.model.builder;
 
+import org.w3c.dom.Node;
 
 /**
  * @author Don Metzler
- *
+ * 
  */
 public class TermExpressionGenerator extends ExpressionGenerator {
 
-	/* (non-Javadoc)
-	 * @see edu.umass.cs.SMRF.model.expressiongenerator.ExpressionGenerator#getExpression(java.lang.String)
-	 */
 	@Override
-	public String getExpression(String terms) {
-		// TODO: possibly add some error checking here to make sure this is actually a term
-		return terms;
+	public void configure(Node domNode) throws Exception {
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
+	@Override
+	public String getExpression(String[] terms) {
+		// TODO: possibly add some error checking here to make sure this is
+		// actually a term
+		return terms[0];
+	}
+
 	@Override
 	public String toString() {
 		return "<expressiongenerator type=\"Term\" />\n";

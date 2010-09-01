@@ -46,7 +46,6 @@ import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.ServletHolder;
 
-import edu.umd.cloud9.demo.DemoNullInput;
 import edu.umd.cloud9.mapred.NullInputFormat;
 import edu.umd.cloud9.mapred.NullMapper;
 import edu.umd.cloud9.mapred.NullOutputFormat;
@@ -195,7 +194,7 @@ public class RunRetrievalBroker extends Configured implements Tool {
 			ids += sid;
 		}
 
-		JobConf conf = new JobConf(DemoNullInput.class);
+		JobConf conf = new JobConf(RunRetrievalBroker.class);
 		conf.setJobName("RetrievalBroker");
 
 		conf.setNumMapTasks(1);
@@ -309,7 +308,7 @@ public class RunRetrievalBroker extends Configured implements Tool {
 
 				if (docnoToServerMapping != null) {
 					for (Accumulator a : serverResults)
-						docnoToServerMapping.put(a.docid, i);
+						docnoToServerMapping.put(a.docno, i);
 				}
 				results = mergeScores(results, serverResults);
 			}
@@ -328,8 +327,8 @@ public class RunRetrievalBroker extends Configured implements Tool {
 
 			sb.append("<ol>");
 			for (Accumulator a : results) {
-				sb.append("<li>docno <a href=" + BrokerFetchServlet.formatRequestURL(a.docid) + ">"
-						+ a.docid + "</a> (" + a.score + ")</li>\n");
+				sb.append("<li>docno <a href=" + BrokerFetchServlet.formatRequestURL(a.docno) + ">"
+						+ a.docno + "</a> (" + a.score + ")</li>\n");
 			}
 			sb.append("</ol>");
 			sb.append("</body></html>\n");
@@ -424,7 +423,7 @@ public class RunRetrievalBroker extends Configured implements Tool {
 				}
 				int n = results.length;
 				double muo = sum / n;
-				double sigma = Math.sqrt((sumSq - n * muo) / (n - 1));
+				double sigma = Math.sqrt((sumSq - n * muo * muo) / (n - 1));
 
 				for (Accumulator a : results) {
 					a.score = (a.score - muo) / sigma;
@@ -531,11 +530,11 @@ public class RunRetrievalBroker extends Configured implements Tool {
 			StringBuffer sb = new StringBuffer();
 			int k = 0;
 			for (Accumulator a : results) {
-				String origDocID = getOriginalDocID(a.docid, servers);
+				String origDocID = getOriginalDocID(a.docno, servers);
 				if (origDocID == null) {
-					sLogger.info("Docno not found in all servers: " + a.docid + " !!");
+					sLogger.info("Docno not found in all servers: " + a.docno + " !!");
 				}
-				sb.append(a.docid + "\t" + a.score + "\t" + origDocID + "\n");
+				sb.append(a.docno + "\t" + a.score + "\t" + origDocID + "\n");
 				k++;
 				if (k >= 2000)
 					break;

@@ -32,12 +32,7 @@ public interface DfTable {
 	/**
 	 * Returns the document frequency of a term.
 	 */
-	public int getDf(String term);
-
-	/**
-	 * Returns the number of documents in the collection.
-	 */
-	public int getDocumentCount();
+	public int getDf(int term);
 
 	/**
 	 * Returns the number of unique terms in the collection.
@@ -53,7 +48,7 @@ public interface DfTable {
 	/**
 	 * Returns the term with the highest document frequency.
 	 */
-	public String getMaxDfTerm();
+	public int getMaxDfTerm();
 
 	/**
 	 * Returns the number of terms that only appear in one document.

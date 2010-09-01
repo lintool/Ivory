@@ -47,8 +47,6 @@ import uk.ac.gla.terrier.compression.BitOutputStream;
  * and the current term position.
  * </p>
  * 
- * @see BuildInvertedIndexDocSorted
- * 
  * @author Jimmy Lin
  * 
  */

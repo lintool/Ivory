@@ -1,0 +1,677 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Ivory: Experimental Results</title>
+<style type="text/css" media="screen">@import url( style.css );</style>
+</head>
+
+<body>
+
+<div id="wrap">
+<div id="container" class="one-column" >
+
+<!-- header START -->
+
+<div id="header">
+<div id="caption">
+<h1 id="title" style="color: white;">Ivory</h1>
+<div id="tagline">A Hadoop toolkit for web-scale information retrieval research</div>
+</div>
+
+<div class="fixed"></div>
+
+</div>
+
+<!-- header END -->
+
+<!-- navigation START -->
+
+<div id="navigation">
+<ul id="menus">
+
+  <li class="page_item"><a class="home" title="Home" href="index.html">Home</a></li>
+  <li class="page_item"><a href="api/index.html" title="API">API</a></li>
+
+</ul>
+
+<div class="fixed"></div>
+
+</div>
+
+<!-- navigation END -->
+
+
+
+<!-- content START -->
+
+<div id="content">
+
+
+
+	<!-- main START -->
+
+	<div id="main">
+
+
+<!--- START MAIN CONTENT HERE -->
+
+<h2>Ivory: Experimental Results</h2>
+
+<div class="post">
+<div class="content">
+
+<p>This page describes a number of experiments on standard test
+collections using Ivory.  Each experiment is associated with a
+command-line invocation to perform the experiment, command-line
+invocations to evaluate the results, and a JUnit test case that
+performs the experiment and checks to see if the results are as
+expected (in terms of standard metrics of effectiveness).  The purpose
+of enumerating these experiments is for others to be able to replicate
+our results, thereby providing a solid foundation for building on our
+work.</p>
+
+<p>Here are the experiments categorized:</p>
+
+<ul>
+
+  <li>Experiments on <a href="#trec">TREC Disks 4-5</a>: baselines,
+  weighted sequential dependence model, latent concept expansion</li>
+
+  <li>Experiments on <a href="#wt10g">Wt10g</a>: baselines</li>
+
+  <li>Experiments on <a href="#gov2">Gov2</a>: baselines</li>
+
+  <li>Experiments on <a href="#web09b">first segment of ClueWeb09</a>
+  (i.e., TREC Web09 track, category B): baselines, incorporating
+  Waterloo spam scores</li>
+
+  <li>Experiments from Wang et al.'s <a href="#sigir2010">SIGIR 2010
+  paper</a>: the efficient sequential dependence model (ESD) on Wt10g,
+  Gov2, and Clue</li>
+
+</ul>
+
+</div></div>
+
+<div class="post">
+<h2><a style="text-decoration:none; color:#555;" id="trec">TREC Disks 4-5</a></h2>
+<div class="content">
+
+<p><b>Basic models</b></p>
+
+<pre>
+# command-line
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal docs/data/trec/run.robust04.basic.xml docs/data/trec/queries.robust04.xml
+
+# evaluating effectiveness
+trec_eval docs/data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-base.txt
+trec_eval docs/data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-sd.txt
+trec_eval docs/data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-fd.txt
+trec_eval docs/data/trec/qrels.robust04.noCRFR.txt ranking.robust04-bm25-base.txt
+trec_eval docs/data/trec/qrels.robust04.noCRFR.txt ranking.robust04-bm25-sd.txt
+trec_eval docs/data/trec/qrels.robust04.noCRFR.txt ranking.robust04-bm25-fd.txt
+
+# junit
+etc/junit.sh ivory.regression.Robust04_Basic
+</pre>
+
+<table>
+<tr><td class="myheader" style="width: 300px;"><b>description</b></td>
+    <td class="myheader" style="width: 300px;"><b>tag</b></td>
+    <td class="myheader"><b>MAP</b></td>
+    <td class="myheader"><b>P10</b></td></tr>
+
+<tr><td class="mycell">Dirichlet, full independence</td>
+    <td class="mycell">robust04-dir-base</td>
+    <td class="mycell">0.3063</td>
+    <td class="mycell">0.4424</td></tr>
+
+<tr><td class="mycell">Dirichlet, sequential dependence</td>
+    <td class="mycell">robust04-dir-sd</td>
+    <td class="mycell">0.3194</td>
+    <td class="mycell"> 0.4485</td></tr>
+
+<tr><td class="mycell">Dirichlet, full dependence</td>
+    <td class="mycell">robust04-dir-fd</td>
+    <td class="mycell">0.3237</td>
+    <td class="mycell">0.4566</td></tr>
+
+<tr><td class="mycell">bm25, full independence</td>
+    <td class="mycell">robust04-bm25-base</td>
+    <td class="mycell">0.3034</td>
+    <td class="mycell">0.4283</td></tr>
+
+<tr><td class="mycell">bm25, sequential dependence</td>
+    <td class="mycell">robust04-bm25-sd</td>
+    <td class="mycell">0.3212</td>
+    <td class="mycell">0.4505</td></tr>
+
+<tr><td class="mycell">bm25, full dependence</td>
+    <td class="mycell">robust04-bm25-fd</td>
+    <td class="mycell">0.3220</td>
+    <td class="mycell">0.4566</td></tr>
+
+</table>
+
+<p><b>WSD models</b></p>
+
+<p>WSD refers to Bendersky et al.'s Weighted Sequential Dependence model (WSDM 2010).</p>
+
+<pre>
+# command-line
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal docs/data/trec/run.robust04.wsd.xml docs/data/trec/queries.robust04.xml
+
+# evaluating effectiveness
+trec_eval docs/data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-wsd-sd.txt
+trec_eval docs/data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-wsd-fd.txt
+
+# junit
+etc/junit.sh ivory.regression.Robust04_WSD
+</pre>
+
+<table>
+
+<tr><td class="myheader" style="width: 300px;"><b>description</b></td>
+    <td class="myheader" style="width: 300px;"><b>tag</b></td>
+    <td class="myheader"><b>MAP</b></td>
+    <td class="myheader"><b>P10</b></td></tr>
+
+<tr><td class="mycell">Dirichlet, WSD, sequential dependence</td>
+    <td class="mycell">robust04-dir-wsd-sd</td>
+    <td class="mycell">0.3246</td>
+    <td class="mycell">0.4626</td></tr>
+
+<tr><td class="mycell">Dirichlet, WSD, full dependence</td>
+    <td class="mycell">robust04-dir-wsd-fd</td>
+    <td class="mycell">0.3286</td>
+    <td class="mycell">0.4667</td></tr>
+
+</table>
+
+<p><b>Basic + LCE models</b></p>
+
+<p>LCE refers to Metzler et al's Latent Concept Expansion model (SIGIR
+2007).  These models take a long time to run (approximately 1.5 hours
+on our production machine).</p>
+
+<pre>
+# command-line
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal docs/data/trec/run.robust04.basic.lce.xml docs/data/trec/queries.robust04.xml
+
+# evaluating effectiveness
+trec_eval docs/data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-rm3-f.txt
+trec_eval docs/data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-rm3-s.txt
+trec_eval docs/data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-sd-lce-f.txt
+trec_eval docs/data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-sd-lce-s.txt
+trec_eval docs/data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-sd-lce-bigram.txt
+
+# junit
+etc/junit.sh ivory.regression.Robust04_Basic_LCE
+</pre>
+
+<table>
+
+<tr><td class="myheader" style="width: 300px;"><b>description</b></td>
+    <td class="myheader" style="width: 300px;"><b>tag</b></td>
+    <td class="myheader"><b>MAP</b></td>
+    <td class="myheader"><b>P10</b></td></tr>
+
+<tr><td class="mycell">Dir., full indep., LCE (unigrams) ["RM3"] (fast)</td>
+    <td class="mycell">robust04-dir-rm3-f</td>
+    <td class="mycell">0.3558</td>
+    <td class="mycell">0.4596</td></tr>
+
+<tr><td class="mycell">Dir., full indep., LCE (unigrams) ["RM3"] (slow)</td>
+    <td class="mycell">robust04-dir-rm3-s</td>
+    <td class="mycell">0.3557</td>
+    <td class="mycell">0.4596</td></tr>
+
+
+<tr><td class="mycell">Dir., SD, LCE (unigrams) (fast)</td>
+    <td class="mycell">robust04-dir-sd-lce-f</td>
+    <td class="mycell">0.3789</td>
+    <td class="mycell">0.4808</td></tr>
+
+<tr><td class="mycell">Dir., SD, LCE (unigrams) (slow)</td>
+    <td class="mycell">robust04-dir-sd-lce-s</td>
+    <td class="mycell">0.3753</td>
+    <td class="mycell">0.4657</td></tr>
+
+<tr><td class="mycell">Dir., SD, LCE (bigrams)</td>
+    <td class="mycell">robust04-dir-sd-lce-bigram</td>
+    <td class="mycell">0.3510</td>
+    <td class="mycell">0.4535</td></tr>
+
+</table>
+
+<p><b>WSD + LCE models</b></p>
+
+<pre>
+# command-line
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal docs/data/trec/run.robust04.wsd.lce.xml docs/data/trec/queries.robust04.xml
+
+# evaluating effectiveness
+trec_eval docs/data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-wsd-lce-f.txt
+
+# junit
+etc/junit.sh ivory.regression.Robust04_WSD_LCE
+</pre>
+
+<table>
+
+<tr><td class="myheader" style="width: 300px;"><b>description</b></td>
+    <td class="myheader" style="width: 300px;"><b>tag</b></td>
+    <td class="myheader"><b>MAP</b></td>
+    <td class="myheader"><b>P10</b></td></tr>
+
+<tr><td class="mycell">Dir., WSD, LCE (unigrams) (fast)</td>
+    <td class="mycell">robust04-dir-wsd-lce-f</td>
+    <td class="mycell">0.3885</td>
+    <td class="mycell">0.4848</td></tr>
+
+</table>
+
+
+</div></div>
+
+<div class="post">
+<h2><a style="text-decoration:none; color:#555;" id="wt10g">Wt10g</a></h2>
+<div class="content">
+
+<p><b>Basic models</b></p>
+
+<pre>
+# command-line
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal \
+  docs/data/wt10g/run.wt10g.basic.xml docs/data/wt10g/wt10g_queries_451-500.xml docs/data/wt10g/wt10g_queries_501-550.xml
+
+# evaluating effectiveness
+trec_eval docs/data/wt10g/qrels.wt10g ranking.wt10g-dir-base.txt
+trec_eval docs/data/wt10g/qrels.wt10g ranking.wt10g-dir-sd.txt
+trec_eval docs/data/wt10g/qrels.wt10g ranking.wt10g-dir-fd.txt
+trec_eval docs/data/wt10g/qrels.wt10g ranking.wt10g-bm25-base.txt
+trec_eval docs/data/wt10g/qrels.wt10g ranking.wt10g-bm25-sd.txt
+trec_eval docs/data/wt10g/qrels.wt10g ranking.wt10g-bm25-fd.txt
+
+# junit
+etc/junit.sh ivory.regression.Wt10g_Basic
+</pre>
+
+<table>
+<tr><td class="myheader" style="width: 300px;"><b>description</b></td>
+    <td class="myheader" style="width: 300px;"><b>tag</b></td>
+    <td class="myheader"><b>MAP</b></td>
+    <td class="myheader"><b>P10</b></td></tr>
+
+<tr><td class="mycell">Dirichlet, full independence</td>
+    <td class="mycell">wt10g-dir-base</td>
+    <td class="mycell">0.2093</td>
+    <td class="mycell">0.3131</td></tr>
+
+<tr><td class="mycell">Dirichlet, sequential dependence</td>
+    <td class="mycell">wt10g-dir-sd</td>
+    <td class="mycell">0.2187</td>
+    <td class="mycell">0.3192</td></tr>
+
+<tr><td class="mycell">Dirichlet, full dependence</td>
+    <td class="mycell">wt10g-dir-fd</td>
+    <td class="mycell">0.2200</td>
+    <td class="mycell">0.3242</td></tr>
+
+<tr><td class="mycell">bm25, full independence</td>
+    <td class="mycell">wt10g-bm25-base</td>
+    <td class="mycell">0.2105</td>
+    <td class="mycell">0.3202</td></tr>
+
+<tr><td class="mycell">bm25, sequential dependence</td>
+    <td class="mycell">wt10g-bm25-sd</td>
+    <td class="mycell">0.2248</td>
+    <td class="mycell">0.3333</td></tr>
+
+<tr><td class="mycell">bm25, full dependence</td>
+    <td class="mycell">wt10g-bm25-fd</td>
+    <td class="mycell">0.2228</td>
+    <td class="mycell">0.3424</td></tr>
+
+</table>
+
+</div></div>
+
+<div class="post">
+<h2><a style="text-decoration:none; color:#555;" id="gov2">Gov2</a></h2>
+<div class="content">
+
+<p><b>Basic models</b></p>
+
+<pre>
+# command-line
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal \
+  docs/data/gov2/run.gov2.basic.xml docs/data/gov2/gov2.title.701-775 docs/data/gov2/gov2.title.776-850
+
+# evaluating effectiveness
+trec_eval docs/data/gov2/qrels.gov2.all ranking.gov2-dir-base.txt
+trec_eval docs/data/gov2/qrels.gov2.all ranking.gov2-dir-sd.txt
+trec_eval docs/data/gov2/qrels.gov2.all ranking.gov2-dir-fd.txt
+trec_eval docs/data/gov2/qrels.gov2.all ranking.gov2-bm25-base.txt
+trec_eval docs/data/gov2/qrels.gov2.all ranking.gov2-bm25-sd.txt
+trec_eval docs/data/gov2/qrels.gov2.all ranking.gov2-bm25-fd.txt
+
+# junit
+etc/junit.sh ivory.regression.Gov2_Basic
+</pre>
+
+<table>
+<tr><td class="myheader" style="width: 300px;"><b>description</b></td>
+    <td class="myheader" style="width: 300px;"><b>tag</b></td>
+    <td class="myheader"><b>MAP</b></td>
+    <td class="myheader"><b>P10</b></td></tr>
+
+<tr><td class="mycell">Dirichlet, full independence</td>
+    <td class="mycell">gov2-dir-base</td>
+    <td class="mycell">0.3077</td>
+    <td class="mycell">0.5631</td></tr>
+
+<tr><td class="mycell">Dirichlet, sequential dependence</td>
+    <td class="mycell">gov2-dir-sd</td>
+    <td class="mycell">0.3239</td>
+    <td class="mycell">0.6007</td></tr>
+
+<tr><td class="mycell">Dirichlet, full dependence</td>
+    <td class="mycell">gov2-dir-fd</td>
+    <td class="mycell">0.3235</td>
+    <td class="mycell">0.5980</td></tr>
+
+<tr><td class="mycell">bm25, full independence</td>
+    <td class="mycell">gov2-bm25-base</td>
+    <td class="mycell">0.2999</td>
+    <td class="mycell">0.5846</td></tr>
+
+<tr><td class="mycell">bm25, sequential dependence</td>
+    <td class="mycell">gov2-bm25-sd</td>
+    <td class="mycell">0.3294</td>
+    <td class="mycell">0.6081</td></tr>
+
+<tr><td class="mycell">bm25, full dependence</td>
+    <td class="mycell">gov2-bm25-fd</td>
+    <td class="mycell">0.3306</td>
+    <td class="mycell">0.6168</td></tr>
+
+</table>
+
+</div></div>
+
+<div class="post">
+<h2><a style="text-decoration:none; color:#555;" id="web09b">Web09 category B results</a></h2>
+<div class="content">
+
+<p><b>Baseline models</b></p>
+
+<p>These are the same as our runs submitted to the TREC 2009 web
+track.</p>
+
+<pre>
+# command-line etc/run.sh ivory.smrf.retrieval.RunQueryLocal
+docs/data/clue/run.web09catB.xml \ docs/data/clue/queries.web09.xml
+
+# evaluating effectiveness
+trec_eval docs/data/clue/qrels.web09catB.txt ranking.web09catB-bm25.txt 
+trec_eval docs/data/clue/qrels.web09catB.txt ranking.web09catB-ql.txt 
+
+# junit
+etc/junit.sh ivory.regression.Web09catB_Baseline
+</pre>
+
+<table>
+
+<tr><td class="myheader" style="width: 300px;"><b>description</b></td>
+    <td class="myheader" style="width: 300px;"><b>tag</b></td>
+    <td class="myheader"><b>MAP</b></td>
+    <td class="myheader"><b>P10</b></td></tr>
+
+<tr><td class="mycell">bm25</td>
+    <td class="mycell">UMHOO-BM25-catB</td>
+    <td class="mycell">0.2051</td>
+    <td class="mycell">0.3720</td></tr>
+
+<tr><td class="mycell">QL</td>
+    <td class="mycell">UMHOO-QL-catB</td>
+    <td class="mycell">0.1931</td>
+    <td class="mycell">0.3380</td></tr>
+
+</table>
+
+
+<p><b>Baseline + Waterloo spam scores</b></p>
+
+<p>The first two runs represent baseline QL with the addition of the
+Waterloo spam scores as document-level features.  The two settings
+represent the best MAP and best P10 from a parameter sweep (note, no
+cross-validation was performed).  The third run is a parameter sweep
+with bm25: this was the setting found to have best MAP and P10.</p>
+
+<pre>
+# command-line
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal docs/data/clue/run.web09catB.spam.xml \
+  docs/data/clue/queries.web09.xml
+
+# evaluating effectiveness
+trec_eval docs/data/clue/qrels.web09catB.txt ranking.web09catB-ql-waterloo-spam.0.3.txt 
+trec_eval docs/data/clue/qrels.web09catB.txt ranking.web09catB-ql-waterloo-spam.0.5.txt 
+trec_eval docs/data/clue/qrels.web09catB.txt ranking.web09catB-bm25-waterloo-spam.0.02.txt 
+
+# junit
+etc/junit.sh ivory.regression.Web09catB_Baseline_WaterlooSpam
+</pre>
+
+<table>
+
+<tr><td class="myheader" style="width: 300px;"><b>description</b></td>
+    <td class="myheader" style="width: 300px;"><b>tag</b></td>
+    <td class="myheader"><b>MAP</b></td>
+    <td class="myheader"><b>P10</b></td></tr>
+
+<tr><td class="mycell">QL + Waterloo spam scores (weight 0.3)</td>
+    <td class="mycell">web09catB-ql-waterloo-spam-0.3</td>
+    <td class="mycell">0.2163</td>
+    <td class="mycell">0.4220</td></tr>
+
+<tr><td class="mycell">QL + Waterloo spam scores (weight 0.5)</td>
+    <td class="mycell">web09catB-ql-waterloo-spam-0.5</td>
+    <td class="mycell">0.2143</td>
+    <td class="mycell">0.4540</td></tr>
+
+<tr><td class="mycell">bm25 + Waterloo spam scores (weight 0.02)</td>
+    <td class="mycell">web09catB-bm25-waterloo-spam-0.02</td>
+    <td class="mycell">0.2180</td>
+    <td class="mycell">0.4240</td></tr>
+
+</table>
+
+
+</div></div>
+
+<div class="post">
+<h2><a style="text-decoration:none; color:#555;" id="sigir2010">Results from SIGIR 2010</a></h2>
+<div class="content">
+
+<p>These regression runs represent experiments presented in:</p>
+
+<p style="padding-left: 30px">Lidan Wang, Jimmy Lin, and Donald Metzler. <b><a href="http://www.umiacs.umd.edu/~jimmylin/publications/Wang_etal_SIGIR2010.pdf">Learning to Efficiently Rank.</a></b> <i>Proceedings of the 33rd Annual International ACM SIGIR Conference on Research and Development in Information Retrieval (SIGIR 2010)</i>, July 2010, Geneva, Switzerland.</p>
+
+<p>Note that Bendersky et al.'s WSD model (WSDM 2010) is a special
+case of the ESD model (without any time constraints).  These runs
+represent results in Tables 5 and 6 of the paper.</p>
+
+<p><b>Wt10g results</b></p>
+
+<pre>
+# command-line
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal docs/data/wt10g/run.wt10g.SIGIR2010.xml \
+  docs/data/wt10g/wt10g_queries_501-550.xml
+
+# evaluating effectiveness
+trec_eval docs/data/wt10g/qrels.wt10g ranking.sigir2010-wt10g-ql.txt
+trec_eval docs/data/wt10g/qrels.wt10g ranking.sigir2010-wt10g-sd.txt
+trec_eval docs/data/wt10g/qrels.wt10g ranking.sigir2010-wt10g-wsd-sd.txt
+
+# junit
+etc/junit.sh ivory.regression.Wt10g_SIGIR2010
+</pre>
+
+<table>
+<tr><td class="myheader" style="width: 300px;"><b>description</b></td>
+    <td class="myheader" style="width: 300px;"><b>tag</b></td>
+    <td class="myheader"><b>MAP</b></td>
+    <td class="myheader"><b>P10</b></td></tr>
+
+<tr><td class="mycell">Dirichlet, full independence</td>
+    <td class="mycell">wt10g-ql</td>
+    <td class="mycell">0.2151</td>
+    <td class="mycell">0.3560</td></tr>
+
+<tr><td class="mycell">Dirichlet, sequential dependence</td>
+    <td class="mycell">wt10g-dir-sd</td>
+    <td class="mycell">0.2242</td>
+    <td class="mycell">0.3640</td></tr>
+
+<tr><td class="mycell">Dirichlet, ESD, no time constraints (=WSD)</td>
+    <td class="mycell">wt10g-wsd-sd</td>
+    <td class="mycell"> 0.2411</td>
+    <td class="mycell">0.3820</td></tr>
+
+</table>
+
+<p><b>Gov2 results</b></p>
+    
+<pre>
+# command-line
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal docs/data/gov2/run.gov2.SIGIR2010.xml  \
+  docs/data/gov2/gov2.title.776-850 
+    
+# evaluating effectiveness
+trec_eval docs/data/gov2/qrels.gov2.all ranking.sigir2010-gov2-ql.txt
+trec_eval docs/data/gov2/qrels.gov2.all ranking.sigir2010-gov2-sd.txt
+trec_eval docs/data/gov2/qrels.gov2.all ranking.sigir2010-gov2-wsd-sd.txt
+    
+# junit
+etc/junit.sh ivory.regression.Gov2_SIGIR2010
+</pre>
+        
+<table>
+<tr><td class="myheader" style="width: 300px;"><b>description</b></td>
+    <td class="myheader" style="width: 300px;"><b>tag</b></td>
+    <td class="myheader"><b>MAP</b></td>
+    <td class="myheader"><b>P10</b></td></tr>
+
+<tr><td class="mycell">Dirichlet, full independence</td>
+    <td class="mycell">gov2-ql</td>
+    <td class="mycell">0.3195</td>
+    <td class="mycell">0.5573</td></tr>
+
+<tr><td class="mycell">Dirichlet, sequential dependence</td>
+    <td class="mycell">gov2-dir-sd</td>
+    <td class="mycell">0.3357</td>
+    <td class="mycell">0.5813</td></tr>
+
+<tr><td class="mycell">Dirichlet, ESD, no time constraints (=WSD)</td>
+    <td class="mycell">gov2-wsd-sd</td>
+    <td class="mycell"> 0.3435</td>
+    <td class="mycell">0.5827</td></tr>
+
+</table>
+
+
+<p><b>Web09 category B results</b></p>
+
+<pre>
+# command-line
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal docs/data/clue/run.web09catB.SIGIR2010.xml \
+  docs/data/clue/queries.web09.26-50.xml
+
+# evaluating effectiveness
+trec_eval docs/data/clue/qrels.web09catB.txt ranking.sigir2010-web09catB-ql.txt 
+trec_eval docs/data/clue/qrels.web09catB.txt ranking.sigir2010-web09catB-sd.txt 
+trec_eval docs/data/clue/qrels.web09catB.txt ranking.sigir2010-web09catB-wsd-sd.txt
+
+perl etc/statAP_MQ_eval_v3.pl docs/data/clue/prels.web09catB.txt ranking.sigir2010-web09catB-ql.txt
+perl etc/statAP_MQ_eval_v3.pl docs/data/clue/prels.web09catB.txt ranking.sigir2010-web09catB-sd.txt
+perl etc/statAP_MQ_eval_v3.pl docs/data/clue/prels.web09catB.txt ranking.sigir2010-web09catB-wsd-sd.txt
+
+# junit
+etc/junit.sh ivory.regression.Web09catB_SIGIR2010
+</pre>
+
+<table>
+<tr><td class="myheader" style="width: 300px;"><b>description</b></td>
+    <td class="myheader" style="width: 300px;"><b>tag</b></td>
+    <td class="myheader"><b>MAP</b></td>
+    <td class="myheader"><b>statMAP</b></td></tr>
+
+<tr><td class="mycell">Dirichlet, full independence</td>
+    <td class="mycell">clue-ql</td>
+    <td class="mycell">0.2098</td>
+    <td class="mycell">0.2075</td></tr>
+
+<tr><td class="mycell">Dirichlet, sequential dependence</td>
+    <td class="mycell">clue-sd</td>
+    <td class="mycell">0.2208</td>
+    <td class="mycell">0.2168</td></tr>
+
+<tr><td class="mycell">Dirichlet, ESD, no time constraints (=WSD)</td>
+    <td class="mycell">clue-wsd-sd</td>
+    <td class="mycell">0.2212</td>
+    <td class="mycell">0.2243</td></tr>
+
+</table>
+
+
+<p style="padding-top: 25px"><a href="./index.html">Back to main page</a></p>
+
+</div></div>
+
+<!--- END MAIN CONTENT HERE -->
+
+	</div>
+
+	<!-- main END -->
+
+
+
+		<div class="fixed"></div>
+
+</div>
+
+<!-- content END -->
+
+<!-- footer START -->
+
+<div id="footer">
+<div id="copyright">
+Last updated:
+<script type="text/javascript">
+<!--//
+document.write(document.lastModified);
+//-->
+</script>
+</div>
+
+<div id="themeinfo">
+Adapted from a WordPress Theme by <a href="http://www.neoease.com/">NeoEase</a>. Valid <a href="http://validator.w3.org/check?uri=referer">XHTML 1.1</a> and <a href="http://jigsaw.w3.org/css-validator/check/referer?profile=css3">CSS 3</a>.	</div>
+
+</div>
+
+<!-- footer END -->
+
+
+
+</div>
+
+<!-- container END -->
+
+</div>
+
+<!-- wrap END -->
+
+</body>
+</html>

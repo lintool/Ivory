@@ -1,0 +1,349 @@
+bengal 950
+cat 25309
+bengal cat 20
+beaver 3697
+live 193187
+beaver live 7
+salt 17117
+water 100862
+salt water 1079
+hunger 4383
+parkinson 1455
+diseas 40690
+parkinson diseas 671
+jacki 5067
+robinson 10623
+jacki robinson 191
+first 367705
+game 99065
+first game 1549
+world 306677
+go 344849
+world go 589
+end 211063
+2000 60580
+end 2000 21
+chevrolet 1581
+truck 20095
+chevrolet truck 36
+fast 61361
+can 538785
+lender 4890
+foreclos 1007
+lender foreclos 11
+properti 94913
+who 375515
+mose 3991
+lava 1334
+lamp 6046
+lava lamp 148
+real 138179
+estat 38176
+real estat 25086
+new 686997
+jersey 22399
+new jersey 19206
+tartan 521
+nativ 34037
+scene 36080
+nativ scene 174
+deer 7036
+peer 18324
+gynt 128
+peer gynt 127
+suit 97275
+gynt suit 60
+dachshund 155
+dachshund 155
+dachshund dachshund 2
+wiener 854
+dachshund wiener 0
+dog 32217
+wiener dog 12
+incandesc 515
+light 97461
+incandesc light 97
+bulb 3190
+light bulb 1247
+steinbach 239
+nutcrack 646
+steinbach nutcrack 4
+mistleto 284
+mexican 10351
+food 78064
+mexican food 475
+cultur 84032
+food cultur 56
+antiqu 13154
+applianc 9695
+antiqu applianc 23
+restor 31174
+applianc restor 0
+toronto 23861
+film 58548
+toronto film 57
+award 75607
+film award 108
+mail 378518
+benefit 107691
+mail benefit 14
+busi 297229
+benefit busi 133
+composit 24237
+zirconium 209
+jennif 11924
+aniston 224
+jennif aniston 204
+royal 25095
+caribbean 8918
+royal caribbean 191
+cruis 14129
+caribbean cruis 295
+line 256335
+cruis line 755
+baltimor 13748
+can 538785
+find 266640
+kappa 2892
+alpha 14668
+kappa alpha 345
+psi 2718
+alpha psi 265
+car 65434
+traffic 35996
+car traffic 52
+report 233024
+traffic report 441
+babe 4574
+ruth 8096
+babe ruth 302
+1920s 7609
+can 538785
+find 266640
+growth 63590
+find growth 15
+rate 146459
+growth rate 4312
+pine 14029
+tree 46043
+pine tree 999
+rosebowl 20
+parad 7683
+rosebowl parad 1
+auto 25218
+skoda 193
+auto skoda 0
+gps 5254
+clock 17077
+gps clock 6
+eldorado 519
+casino 6228
+eldorado casino 2
+reno 4448
+angioplast 1
+newport 5455
+beach 42057
+newport beach 1192
+california 87850
+beach california 1028
+calcium 3240
+motorcycl 5933
+safeti 57829
+motorcycl safeti 89
+helmet 4245
+safeti helmet 71
+japanes 21876
+wave 27851
+japanes wave 1
+save 102158
+bond 31095
+save bond 452
+retir 31497
+nirvana 2059
+can 538785
+find 266640
+decad 32672
+1920s 7609
+tmj 213
+orchid 1840
+hair 26021
+transplant 6616
+hair transplant 95
+pool 32322
+cue 3645
+pool cue 91
+dna 8030
+test 127875
+dna test 303
+deduct 12133
+induct 4790
+english 72679
+prime 24844
+factor 57987
+prime factor 141
+vike 3816
+scotland 10734
+manate 763
+eat 35478
+manate eat 0
+edmund 3224
+hillari 3452
+edmund hillari 34
+sir 11817
+hillari sir 1
+histori 137613
+skateboard 1323
+dodg 5226
+recal 20121
+dodg recal 0
+hair 26021
+loss 62298
+hair loss 422
+symptom 13376
+diseas 40690
+steroid 2120
+bodi 94461
+robert 81312
+oppenheim 1011
+robert oppenheim 78
+diseas 40690
+caus 105813
+diseas caus 651
+smoke 27160
+tornado 2029
+form 260083
+tornado form 10
+earthquak 5446
+money 105101
+retir 31497
+alexand 14594
+graham 13484
+alexand graham 252
+bell 31282
+graham bell 257
+halloween 3501
+titan 2801
+went 62566
+wrong 46081
+went wrong 1077
+statist 71327
+decis 87655
+make 374217
+decis make 11939
+frog 4527
+live 193187
+frog live 15
+black 84807
+plagu 5871
+black plagu 44
+survey 57887
+best 222709
+place 255170
+best place 2823
+live 193187
+water 100862
+suppli 84881
+water suppli 3591
+mojav 864
+desert 16171
+mojav desert 180
+region 116136
+desert region 119
+cloud 13958
+eras 6539
+scar 7890
+eras scar 0
+water 100862
+atmospher 23510
+bmi 881
+booker 1150
+washington 102394
+hygromet 78
+measur 76887
+hygromet measur 1
+humid 4821
+atmospher 23510
+histori 137613
+cambodia 1796
+pheromon 236
+scent 2958
+pheromon scent 1
+work 388730
+scent work 0
+who 375515
+whom 37673
+hypnosi 844
+school 205467
+uniform 18221
+school uniform 317
+public 311526
+school 205467
+public school 10425
+artist 54884
+who 375515
+artist who 2418
+die 39732
+who die 3438
+1700s 6436
+canadian 38885
+build 151789
+canadian build 8
+code 121013
+build code 1278
+can 538785
+babi 29425
+can babi 12
+eat 35478
+babi eat 19
+honey 6232
+eat honey 18
+sun 69420
+bed 31887
+sun bed 16
+safe 47380
+bed safe 5
+fha 802
+author 206261
+who 375515
+author who 1600
+suffer 37407
+who suffer 1895
+depress 14588
+stress 30105
+caus 105813
+stress caus 147
+obes 1761
+caus obes 17
+instrument 44632
+forecast 17805
+weather 49986
+fire 59089
+environ 112211
+radiographi 480
+risk 62674
+estrogen 1321
+need 324495
+extent 25145
+peter 51805
+great 174485
+reform 35022
+great reform 55
+russia 13920
+reform russia 30
+recycl 14595
+can 538785
+recycl can 82
+camel 2249
+domest 31615
+solar 9300
+heat 35073
+solar heat 324
+heat 35073
+pool 32322
+cancer 22880
+cell 30259
+reproduct 19922
+cell reproduct 21
+volcano 3554
+made 219753
+volcano made 5

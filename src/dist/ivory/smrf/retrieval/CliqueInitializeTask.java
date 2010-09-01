@@ -44,9 +44,6 @@ public class CliqueInitializeTask implements Runnable {
 		mGlobalEvidence = globalEvidence;
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Runnable#run()
-	 */
 	public void run() {
 		try {
 			mClique.initialize(mGlobalEvidence);

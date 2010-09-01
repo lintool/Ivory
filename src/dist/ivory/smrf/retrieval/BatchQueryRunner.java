@@ -17,9 +17,7 @@
 package ivory.smrf.retrieval;
 
 import ivory.smrf.model.builder.MRFBuilder;
-import ivory.smrf.model.builder.MRFBuilderFactory;
 import ivory.smrf.model.expander.MRFExpander;
-import ivory.smrf.model.expander.MRFExpanderFactory;
 import ivory.util.ResultWriter;
 import ivory.util.RetrievalEnvironment;
 import ivory.util.XMLTools;
@@ -31,6 +29,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -55,8 +54,11 @@ public class BatchQueryRunner {
 
 	private Map<String, String> mQueries = new LinkedHashMap<String, String>();
 	private Map<String, Node> mModels = new LinkedHashMap<String, Node>();
+	private Map<String, Node> mDocscores = new LinkedHashMap<String, Node>();
 	private Map<String, Node> mExpanders = new HashMap<String, Node>();
 	private HashSet<String> mStopwords = new HashSet<String>();
+
+	private Map<String, QueryRunner> mQueryRunners = new LinkedHashMap<String, QueryRunner>();
 
 	/**
 	 * @param args
@@ -77,7 +79,22 @@ public class BatchQueryRunner {
 		}
 
 		mDocnoMapping = RetrievalEnvironment.loadDocnoMapping(mIndexPath);
-		mEnv = new RetrievalEnvironment(mIndexPath);
+		mEnv = new RetrievalEnvironment(mIndexPath, fs);
+		mEnv.initialize(true);
+
+		for (Map.Entry<String, Node> n : mDocscores.entrySet()) {
+			String type = XMLTools.getAttributeValue(n.getValue(), "type", "");
+			String provider = XMLTools.getAttributeValue(n.getValue(), "provider", "");
+			String path = n.getValue().getTextContent();
+
+			if (type.equals("") || provider.equals("") || path.equals("")) {
+				throw new Exception("Invalid docscore!");
+			}
+
+			LOGGER.info("Loading docscore: type=" + type + ", provider=" + provider + ", path="
+					+ path);
+			mEnv.loadDocScore(type, provider, path);
+		}
 
 		// make sure there are models that need evaluated
 		if (mModels.size() == 0) {
@@ -102,12 +119,12 @@ public class BatchQueryRunner {
 			MRFExpander expander = null;
 			try {
 				// get the MRF builder
-				builder = MRFBuilderFactory.getBuilder(mEnv, modelNode.cloneNode(true));
+				builder = MRFBuilder.get(mEnv, modelNode.cloneNode(true));
 
 				// get the MRF expander
 				expander = null;
 				if (expanderNode != null) {
-					expander = MRFExpanderFactory.getExpander(mEnv, expanderNode.cloneNode(true));
+					expander = MRFExpander.getExpander(mEnv, expanderNode.cloneNode(true));
 				}
 				if (mStopwords != null && mStopwords.size() != 0) {
 					expander.setStopwordList(mStopwords);
@@ -117,6 +134,8 @@ public class BatchQueryRunner {
 
 				LOGGER.info("number of hits: " + numHits);
 				runner = new ThreadedQueryRunner(builder, expander, 1, numHits);
+
+				mQueryRunners.put(modelID, runner);
 				// multi-threaded query evaluation still a bit unstable, setting
 				// thread=1 for now
 			} catch (Exception e) {
@@ -125,18 +144,12 @@ public class BatchQueryRunner {
 
 			for (String queryID : mQueries.keySet()) {
 				String rawQueryText = mQueries.get(queryID);
-				// tokenize query (stopping, stemming, etc.)
 				String[] queryTokens = mEnv.tokenize(rawQueryText);
-				StringBuffer queryText = new StringBuffer();
 
-				for (String token : queryTokens) {
-					queryText.append(token);
-					queryText.append(" ");
-				}
-				LOGGER.info("query id:" + queryID + ", query:" + queryText.toString());
+				LOGGER.info("query id:" + queryID + ", query:" + rawQueryText);
 
 				// execute the query
-				runner.runQuery(queryID, queryText.toString());
+				runner.runQuery(queryID, queryTokens);
 			}
 
 			// where should we output these results?
@@ -150,6 +163,18 @@ public class BatchQueryRunner {
 			resultWriter.flush();
 		}
 
+	}
+
+	public Set<String> getModels() {
+		return mModels.keySet();
+	}
+
+	public Map<String, Accumulator[]> getResults(String model) {
+		return mQueryRunners.get(model).getResults();
+	}
+
+	public DocnoMapping getDocnoMapping() {
+		return mDocnoMapping;
 	}
 
 	public ResultWriter getResultWriter(String fileName, boolean compress) throws Exception {
@@ -170,12 +195,12 @@ public class BatchQueryRunner {
 			if (mDocnoMapping == null) {
 				// print the results
 				for (int i = 0; i < list.length; i++) {
-					resultWriter.println(queryID + " Q0 " + list[i].docid + " " + (i + 1) + " "
+					resultWriter.println(queryID + " Q0 " + list[i].docno + " " + (i + 1) + " "
 							+ list[i].score + " " + modelID);
 				}
 			} else {
 				for (int i = 0; i < list.length; i++) {
-					resultWriter.println(queryID + " Q0 " + mDocnoMapping.getDocid(list[i].docid)
+					resultWriter.println(queryID + " Q0 " + mDocnoMapping.getDocid(list[i].docno)
 							+ " " + (i + 1) + " " + list[i].score + " " + modelID);
 				}
 			}
@@ -269,6 +294,27 @@ public class BatchQueryRunner {
 						"Must specify only one index! There is no support for multiple indexes!");
 			}
 			mIndexPath = index.item(0).getTextContent();
+		}
+
+		// parse model elements
+		NodeList docscores = d.getElementsByTagName("docscore");
+		for (int i = 0; i < docscores.getLength(); i++) {
+			// model XML node
+			Node node = docscores.item(i);
+
+			// get model id
+			String docscoreType = XMLTools.getAttributeValue(node, "type", "");
+			if (docscoreType.equals("")) {
+				throw new Exception("Must specify a type for every docscore!");
+			}
+
+			// add model to lookup
+			if (mDocscores.get(docscoreType) != null) {
+				throw new Exception(
+						"Duplicate docscore types not allowed! Already parsed model with id="
+								+ docscoreType);
+			}
+			mDocscores.put(docscoreType, node);
 		}
 	}
 

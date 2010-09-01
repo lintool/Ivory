@@ -28,7 +28,7 @@ public class ProximityPostingsListOrderedWindow extends ProximityPostingsReader 
 	 * @param readers
 	 * @param size
 	 */
-	public ProximityPostingsListOrderedWindow(PostingsReader [] readers, int size) {
+	public ProximityPostingsListOrderedWindow(ivory.data.PostingsListDocSortedPositional.PostingsReader [] readers, int size) {
 		super(readers, size);
 	}
 
@@ -45,7 +45,7 @@ public class ProximityPostingsListOrderedWindow extends ProximityPostingsReader 
 			int maxGap = 0;
 			boolean ordered = true;
 			
-			boolean [] matchedIDs = new boolean[_readers.length];
+			boolean [] matchedIDs = new boolean[mReaders.length];
 			matchedIDs[positions.get(i).id] = true;
 			int matchedIDCounts = 1;
 			
@@ -68,12 +68,12 @@ public class ProximityPostingsListOrderedWindow extends ProximityPostingsReader 
 				
 				// stop looking if the maximum gap is too large
 				// or the terms appear out of order
-				if(maxGap > _size || !ordered) {
+				if(maxGap > mSize || !ordered) {
 					break;
 				}
 				
 				// did we match all the terms, and in order?
-				if(matchedIDCounts == _readers.length && ordered) {
+				if(matchedIDCounts == mReaders.length && ordered) {
 					//System.out.println("MATCH");
 					matches++;
 					break;
@@ -83,5 +83,4 @@ public class ProximityPostingsListOrderedWindow extends ProximityPostingsReader 
 		//System.err.println("</positions>");
 		return matches;
 	}
-
 }

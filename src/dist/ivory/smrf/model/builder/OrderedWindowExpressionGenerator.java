@@ -1,5 +1,5 @@
 /*
- * Ivory: A Hadoop toolkit for Web-scale information retrieval
+ * Ivory: A Hadoop toolkit for web-scale information retrieval
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You may
@@ -16,46 +16,46 @@
 
 package ivory.smrf.model.builder;
 
+import ivory.util.XMLTools;
+
+import org.w3c.dom.Node;
 
 /**
  * @author Don Metzler
- *
+ * 
  */
 public class OrderedWindowExpressionGenerator extends ExpressionGenerator {
 
 	/**
-	 * ordered window width 
+	 * ordered window width
 	 */
 	private int mWidth;
-	
-	/**
-	 * default constructor 
-	 */
-	public OrderedWindowExpressionGenerator() {
-		mWidth = 1;
-	}
-	
-	/**
-	 * @param width
-	 */
-	public OrderedWindowExpressionGenerator( int width ) {
-		mWidth = width;
-	}
-	
-	/* (non-Javadoc)
-	 * @see edu.umass.cs.SMRF.model.expressiongenerator.ExpressionGenerator#getExpression(java.lang.String)
-	 */
+
 	@Override
-	public String getExpression(String terms) {
-		return "#od" + mWidth + "( " + terms + " )";
+	public void configure(Node domNode) throws Exception {
+		mWidth = XMLTools.getAttributeValue(domNode, "width", 1);
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
+	@Override
+	public String getExpression(String[] terms) {
+		return "#od" + mWidth + "( " + join(terms, " ") + " )";
+	}
+
 	@Override
 	public String toString() {
 		return "<expressiongenerator type=\"Ordered\" width=\"" + mWidth + "\"/>\n";
+	}
+
+	private static String join(String[] terms, String sep) {
+		StringBuilder sb = new StringBuilder();
+
+		for (int i = 0; i < terms.length; i++) {
+			sb.append(terms[i]);
+			if (i < terms.length - 1)
+				sb.append(sep);
+		}
+
+		return sb.toString();
 	}
 
 }

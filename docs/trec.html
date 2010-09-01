@@ -1,22 +1,68 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-<head><title>Ivory: A Hadoop toolkit for Web-scale information retrieval</title>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<link rel="stylesheet" href="style.css" type="text/css" />
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Ivory: Getting Started with TREC Disks 4-5</title>
+<style type="text/css" media="screen">@import url( style.css );</style>
 </head>
 
 <body>
 
-<center><table width="80%"><tbody><tr><td align="left">
+<div id="wrap">
+<div id="container" class="one-column" >
 
-<h2>Ivory: Getting started with TREC disks 4-5</h2>
+<!-- header START -->
 
-<div class="main">
+<div id="header">
+<div id="caption">
+<h1 id="title" style="color: white;">Ivory</h1>
+<div id="tagline">A Hadoop toolkit for web-scale information retrieval research</div>
+</div>
 
-<h3>Introduction</h3>
+<div class="fixed"></div>
+
+</div>
+
+<!-- header END -->
+
+<!-- navigation START -->
+
+<div id="navigation">
+<ul id="menus">
+
+  <li class="page_item"><a class="home" title="Home" href="index.html">Home</a></li>
+  <li class="page_item"><a href="api/index.html" title="API">API</a></li>
+
+</ul>
+
+<div class="fixed"></div>
+
+</div>
+
+<!-- navigation END -->
+
+
+
+<!-- content START -->
+
+<div id="content">
+
+
+
+	<!-- main START -->
+
+	<div id="main">
+
+
+<!--- START MAIN CONTENT HERE -->
+
+<h2>Ivory: Getting Started with TREC Disks 4-5</h2>
+
+<div class="post">
+<div class="content">
 
 <p>This tutorial provides a guide to batch and interactive retrieval
-with SMRF on the venerable TREC
+with Ivory on the venerable TREC
 disks <a href="http://www.nist.gov/srd/nistsd22.htm">4</a>
 and <a href="http://www.nist.gov/srd/nistsd23.htm">5</a> document
 collection, which is distributed
@@ -26,29 +72,45 @@ many <a href="http://trec.nist.gov/">Text Retrieval Conferences</a>
 used as a starting point for information retrieval research.  This
 guide will cover both indexing the collection, performing retrieval
 runs with queries from the TREC 2004 robust track, and interactive
-querying.  This guide assumes you have Ivory downloaded and set up
-already; otherwise, visit <a href="start.html">this page</a>.</p>
+querying.</p>
 
-<h3>Indexing the Collection</h3>
+</div></div>
+
+<div class="post">
+<h2>Getting the Collection</h2>
+<div class="content">
 
 <p>The first task is to obtain the collection (from NIST).  We're
 assuming you have it in hand already.  A standard "view" of the disks
 is to ignore the Congressional Record (CR) and Federal Register (FR),
 so the collection is often written shorthand as TREC 45 (-CR,FR) or
-something along these lines.</p>
+something similar.</p>
 
 <p>There are a total of 472,525 documents in the collection as
 described above, distributed in a number of files;
-see <a href="data/files.TREC45-noCRFR.txt">complete list of all
+see <a href="data/trec/files.TREC45-noCRFR.txt">complete list of all
 files</a>.  Since Hadoop doesn't work well will lots of small files,
 the first step is to prepare the collection by concatenating all the
 documents into a large file.  This is most easily done with a Perl or
-Python script.  See this <a href="data/cat_all_docs.pl">simple Perl
-script</a>, but it should be very easy to write your own.</p>
+Python script.  See this <a href="data/trec/cat_all_docs.pl">simple
+Perl script</a>, but it should be very easy to write your own.</p>
 
-<p>Once the collection has been prepared, you can use the program
-<b>ivory.driver.BuildIndexTrec</b> to build the collection.  The
-program takes four command-line arguments:</p>
+</div></div>
+
+<div class="post">
+<h2>Building the Inverted Index</h2>
+<div class="content">
+
+<p>The complete Ivory preprocssing and indexing pipeline is described
+in detail <a href="pipeline.html">on this page</a>.  Here, we mostly
+focus on <i>what to do</i>, as opposed to <i>how it works</i>.</p>
+
+<p>Let's get started!  Prior to indexing, we must first preprocess the
+collection.  The goal of this step is to create a compact
+representation of the original document collection.  To preprocess the
+collection, use the program
+<code><b>ivory.driver.PreprocessTREC</b></code>. The program takes four 
+command-line arguments:</p>
  
 <ul>
  <li>[input-path] path to the document collection</li>
@@ -57,257 +119,167 @@ program takes four command-line arguments:</p>
  <li>[num-reducers] number of reducers to run</li>
 </ul>
 
-<p>Here's a sample invocation:</p>
+<p>Here's a sample invocation (notice that the input path is
+simple one large file):</p>
 
 <pre>
-hadoop jar ivory.jar ivory.driver.BuildIndexTrec \
-/umd-lin/shared/collections/trec/trec4-5_noCRFR.xml /umd-lin/shared/indexes/trec 100 10
+hadoop jar ivory.jar ivory.driver.PreprocessTREC \
+  /umd-lin/shared/collections/trec/trec4-5_noCRFR.xml /umd-lin/shared/indexes/trec 100 10
 </pre>
 
-<p>You'll note that the input path is simple one large file.</p>
-
-<p>The nice thing about Hadoop is its ability to scale out&mdash;from
-a cluster with a few to a few thousand nodes.  In fact, you can even
-run the above program on a single machine, in Hadoop's standalone
-mode.  The invocation for this:</p>
+<p>Once the collection has been preprocessed, we can use the program
+<code><b>ivory.driver.BuildIPIndex</b></code> to build the index.  The program
+takes three command-line arguments&mdash;the same four used in the
+preprocessing step except the first.  Here's a sample invocation:</p>
 
 <pre>
-hadoop jar ivory.jar ivory.driver.BuildIndexTrec \
- -D mapred.job.tracker=local -D fs.default.name=file:/// \
- /umd-lin/shared/collections/trec/trec4-5_noCRFR.xml /umd-lin/shared/indexes/trec 100 1
+hadoop jar ivory.jar ivory.driver.BuildIPIndex /umd-lin/shared/indexes/trec 100 10
 </pre>
 
-<p>The two -D options force Hadoop to run in standalone mode on the
-local machine.  Note that in Hadoop standalone mode the number of
-reducers is fixed at one, so the final command-line argument is
-irrelevant.  See this sample <a href="trec-local-log.txt">trace of
-indexing</a> the entire TREC collection in standalone mode.  For
-reference, on a Core 2 Duo (2.6 GHz) laptop with 2 GB RAM running
-Windows XP, the entire process takes about an hour.  On a cluster, the
-job obviously runs much faster, but the scaling on this collection
-isn't very linear because the dataset is relatively small; on large
-clusters, running times become dominated by the startup overhead of
-mappers and reducers.</p>
+<p>Next, let's build the document forward index. This forward index
+provides a mechanism for accessing the actual document text.  It's
+essentially a big lookup table of docnos to byte offsets in the
+collection file on disk (and also the length of each document).</p>
 
-<p>The class itself is well-commented and very readable, but here's an
-overview of the various indexing phases:</p>
-
-<ol>
-
-  <li><b>Number the documents.</b>  In order for the indexer to work
-  properly, the documents must be assigned a sequentially-numbered
-  int, from 1 to <i>n</i>, where <i>n</i> is the size of the
-  collection (472,525 in our case).  For clarity, this is referred to
-  as the docno, while the original collection-specific document id is
-  referred to as the docid (which is typically an alphanumeric
-  identifier).  As a note, this is slightly confusing since the
-  collection uses the XML tag &lt;DOCNO&gt;, but Ivory documentation
-  is consistent about its reference to docnos and docids.  Numbering
-  the documents is handled by classes in the
-  edu.umd.cloud9.collection.trec package in
-  <a href="http://www.umiacs.umd.edu/~jimmylin/cloud9/docs/index.html">Cloud<sup><small>9</small></sup></a>.
-  See documentation there for more details.</li>
-
-  <li><b>Build the inverted index.</b> This is the heart of the
-  indexing process.  During document analysis in the map phase,
-  document length data is written out "on the side".  After the
-  postings lists have been written to disk (after the reduce phase),
-  the document length data are collected in a single binary-encoded
-  file.</li>
-
-  <li><b>Merge the postings.</b> During the indexing phase, each
-  reducer writes out its postings lists in a separate file.  This is
-  an optional step to merge all of the postings lists into a single
-  file.</li>
-
-<!--
-  <li><b>Extract document frequency and collection frequency data.</b>
-  In this optional phase, <i>df</i> and <i>cf</i> information are
-  extracted from the postings and written out into separate
-  binary-encoded files.  Although this isn't actually used by the SMRF
-  retrieval engine, these data files can be useful for other
-  purposes.</li>
-
--->
-
-  <li><b>Build the term postings forward index.</b>  This forward
-  index allows the retrieval engine to look up and quickly access
-  postings on disk.  The forward index is simply an in-memory lookup
-  table from term to disk locations (file and byte offset).  To
-  control memory usage, a <i>df</i> filter can be applied to throw
-  away all terms with low document frequencies.</li>
-
-</ol>
-
-<p>Next you should build the document forward index. This forward
-index provides a mechanism for accessing the actual document text.
-It's essentially a big lookup table of docnos to byte offsets in the
-collection file on disk (and also the length of each document).  The
-program for doing this is actually included in
-Cloud<sup><small>9</small></sup>.  Here's a sample invocation:</p>
+<p>The program for doing this is actually included in
+the <a href="http://cloud9lib.org">Cloud<sup><small>9</small></sup></a>
+library.  Here's a sample invocation:</p>
 
 <pre>
-hadoop jar cloud9.jar edu.umd.cloud9.collection.DocumentForwardIndexHttpServer \
- /umd-lin/shared/collections/trec4-5_noCRFR.findex.dat \
- /umd-lin/shared/indexes/trec/docno-mapping.dat
+hadoop jar cloud9.jar edu.umd.cloud9.collection.trec.BuildTrecForwardIndex \
+  /umd-lin/shared/collections/trec/trec4-5_noCRFR.xml /tmp/findex/ \
+  /umd-lin/shared/collections/trec4-5_noCRFR.findex.dat \
+  /umd-lin/shared/indexes/trec/docno-mapping.dat
 </pre>
 
-<p>Of course, add the two -D options if you want to run in standalone
-mode.</p>
+</div></div>
 
-<h3>Performing a Retrieval Run</h3>
+<div class="post">
+<h2>Performing Batch Retrieval</h2>
+<div class="content">
 
-<p>Now you're ready to perform a batch retrieval run!  We're going to
-use topics from the TREC 2004 robust track.  In information retrieval
-parlance, topics define information needs, from which the actual
-queries derive.  In the docs/data/ directory, you'll find two
-configuration files:</p>
+<p>Now we're ready to perform batch retrieval!  To demonstrate, we're
+going to use topics from the TREC 2004 robust track.  In information
+retrieval parlance, topics define information needs, from which the
+actual queries derive.  In the <code>docs/data/trec/</code> directory, you'll find
+two configuration files:</p>
 
 <ul>
 
-  <li><a href="data/run_robust04.xml">docs/data/run_robust04.xml</a>:
-  this file tells the retrieval engine which retrieval models to use
-  (and what parameters).</li>
+  <li><a href="data/trec/run.robust04.basic.xml"><code>docs/data/trec/run.robust04.basic.xml</code></a>:
+  retrieval models and parameters</li>
 
-  <li><a href="data/queries_robust04.xml">docs/data/queries_robust04.xml</a>:
-  this file tells the retrieval engine what queries to run.</li>
+  <li><a href="data/trec/queries.robust04.xml"><code>docs/data/trec/queries.robust04.xml</code></a>:
+  queries (TREC 2004 robust track)</li>
 
 </ul>
 
-<p>You'll see that the first configuration file specifies four
-different models:</p>
+<p>The first configuration file specifies six different models:</p>
 
 <ul>
 
-  <li><b>robust04-lm-ql</b>: language modeling framework, simple query
-  likelihood.</li>
+  <li><b>robust04-dir-base</b>: language modeling framework, Dirichlet
+  prior, simple query likelihood.</li>
 
-  <li><b>robust04-lm-sd</b>: language modeling framework, sequential
-  dependencies using MRFs.</li>
+  <li><b>robust04-dir-sd</b>: language modeling framework, Dirichlet
+  prior, sequential dependence model using MRFs.</li>
+
+  <li><b>robust04-dir-fd</b>: language modeling framework, Dirichlet
+  prior, full dependence model using MRFs.</li>
 
   <li><b>robust04-bm25-base</b>: <i>bm25</i> term weighting, simple
   bag-of-words queries.</li>
 
-  <li><b>robust04-bm25-sd</b>: sequential dependencies using MRFs,
+  <li><b>robust04-bm25-sd</b>: sequential dependence model using MRFs,
+  with <i>bm25</i> term weighting.</li>
+
+  <li><b>robust04-bm25-fd</b>: full dependence model using MRFs,
   with <i>bm25</i> term weighting.</li>
 
 </ul>
 
-<p>The class <b>ivory.smrf.retrieval.RunQueryLocal</b> takes the XML
-configuration files as input and generates ranked lists in standard
-TREC format.</p>
-
-<p>You'll have to go
-into <a href="data/run_robust04.xml">docs/data/run_robust04.xml</a>
-and modify the location of your index (likely different from the
-default).  Then run the class (i.e., directly from within Eclipse),
-passing in the configuration filenames as command-line parameters.</p>
-
-<p>Alternatively, Ivory contains a generic launch script that
-automatically includes all the right classpaths, automatically
-generated by Ant.  Open up a shell and change directory into Ivory.
-Type:</p>
+<p>You might want to tweak the index location and output paths
+in <a href="data/trec/run.robust04.xml"><code>docs/data/trec/run.robust04.xml</code></a>,
+specifying where the index resides and where the retrieval results go.
+After that, put both configuration files in HDFS.  The
+class <b><code>ivory.smrf.retrieval.RunQueryHDFS</code></b> performs a
+batch <i>ad hoc</i> retrieval run: it takes the two XML configuration
+files as input and produces results in standard TREC format on HDFS.
+Here's a sample invocation:</p>
 
 <pre>
-$ ant
+hadoop jar ivory.jar ivory.smrf.retrieval.RunQueryHDFS \
+  /umd-lin/jimmylin/run.robust04.basic.xml /umd-lin/jimmylin/queries.robust04.xml
 </pre>
 
-<p>Ant should automatically build ivory.jar and create a launch script
-in etc/, either run.sh or run.bat depending on your operating system.
-If you get errors you might want to look at <a href="start.html">this
-guide to downloading and setting up Ivory</a>.</p>
+<p>Here's what happens: <code>RunQueryHDFS</code> executes a Hadoop
+job with a single mapper, and inside the mapper a retrieval engine is
+instantiated.  The retrieval engine loads in the configuration files
+and performs batch <i>ad hoc</i> retrieval, reading indexes directly
+from HDFS (more on this below).</p>
 
-<p>On the command line, here's the invocation to perform an <i>ad
-hoc</i> retrieval run:</p>
-
-<pre>
-$ etc/run.bat ivory.smrf.retrieval.RunQueryLocal docs/data/run_robust04.xml docs/data/queries_robust04.xml
-</pre>
-
-<p>Ivory (more precisely, the SMRF retrieval engine) should whirl to
-life and run the robust04 queries using the four different retrieval
-models.  After it's done, you should end up with four files in
-/tmp/:</p>
-
-<pre>
-$ ls -l /tmp/ranking.*
--rw-r-----+ 1 jimmylin None 6144657 Nov 18 20:27 /tmp/ranking.robust04-bm25-base.txt
--rw-r-----+ 1 jimmylin None 5942843 Nov 18 20:28 /tmp/ranking.robust04-bm25-sd.txt
--rw-r-----+ 1 jimmylin None 5896883 Nov 18 20:27 /tmp/ranking.robust04-lm-ql.txt
--rw-r-----+ 1 jimmylin None 5895820 Nov 18 20:27 /tmp/ranking.robust04-lm-sd.txt
-</pre>
-
-<p>The first few lines of ranking.robust04-lm-ql.txt should look like the
-following:</p>
-
-<pre>
-$ head ranking.robust04-lm-ql.txt
-601 Q0 FT923-11593 1 -14.090268788470937 robust04-lm-ql
-601 Q0 FT942-15268 2 -14.400598975281312 robust04-lm-ql
-601 Q0 FT944-10568 3 -14.951631953705153 robust04-lm-ql
-601 Q0 FBIS4-64831 4 -15.035094304404174 robust04-lm-ql
-601 Q0 FBIS3-38725 5 -15.096709770158036 robust04-lm-ql
-601 Q0 FT931-10200 6 -15.10832966886381 robust04-lm-ql
-601 Q0 FBIS3-38723 7 -15.388110425436714 robust04-lm-ql
-601 Q0 FT923-11594 8 -15.518158934682525 robust04-lm-ql
-601 Q0 FBIS4-59241 9 -15.641473260350587 robust04-lm-ql
-601 Q0 FT943-6412 10 -15.753654209988563 robust04-lm-ql
-</pre>
-
-<p>This is run output in the standard TREC format.  The first column
-is the topic number, the third column is the TREC document identifier,
-the fourth column is the rank order, and the fifth column is the score
-(log probability, in this case).  Document relevance information
-(qrels) is included below:</p>
+<p>After the job is complete, grab the output files (one for each
+model) from HDFS&mdash;these are results in standard TREC format.  The
+first column is the topic number, the third column is the TREC
+document identifier, the fourth column is the rank order, and the
+fifth column is the score (log probability, in this case).  Document
+relevance information (qrels) is included below:</p>
 
 <ul>
 
-  <li><a href="data/qrels.robust04.noCR.txt">docs/data/qrels.robust04.noCR.txt</a>:
+  <li><a href="data/trec/qrels.robust04.noCR.txt">docs/data/trec/qrels.robust04.noCR.txt</a>:
   original qrels file; does not contain CR documents, but contains FR
   documents.</li>
 
-  <li><a href="data/qrels.robust04.noCRFR.txt">docs/data/qrels.robust04.noCRFR.txt</a>:
+  <li><a href="data/trec/qrels.robust04.noCRFR.txt">docs/data/trec/qrels.robust04.noCRFR.txt</a>:
   modified qrels file; does not contain CR and FR documents.</li>
 
 </ul>
 
 <p>With
 the <a href="http://trec.nist.gov/trec_eval/index.html">trec_eval</a>
-program, you should be able to evaluate the runs.  Sample
-invocation:</p>
+program, you should be able to evaluate the runs.  See
+our <a href="regression.html#trec">experimental results page (under "Basic models")</a> for the
+effectiveness numbers you should be getting.</p>
+
+<p>Alternatively, you may want to run things locally (i.e., from a
+local machine), instead of remotely on the cluster.  In that case, you
+should copy the index over to your local machine.  The
+class <b><code>ivory.smrf.retrieval.RunQueryLocal</code></b> performs
+batch <i>ad hoc</i> retrieval on a local index.  Pass the XML
+configuration files as command-line parameters, just like
+RunQueryHDFS.</p>
+
+<p>Ivory contains a generic launch script that automatically includes
+all the right classpaths, automatically generated by Ant.  Open up a
+shell and change directory into Ivory.  Type:</p>
 
 <pre>
-$ trec_eval docs/data/qrels.robust04.noCRFR.txt /tmp/ranking.robust04-lm-ql.txt
-num_q           all     99
-num_ret         all     99000
-num_rel         all     3417
-num_rel_ret     all     2791
-map             all     0.3063
-gm_ap           all     0.2062
-R-prec          all     0.3322
-bpref           all     0.2914
-recip_rank      all     0.7340
-...
+ant
 </pre>
 
-<p>Mean average precision ("map" in results above) is the
-most-commonly reported single-point metric to characterize retrieval
-effectiveness.  For the four retrieval models listed above, here are
-the figures that you should be getting:</p>
+<p>Ant should automatically build ivory.jar and create a launch script
+in <code>etc/</code>, either <code>run.sh</code>
+or <code>run.bat</code> depending on your operating system.</p>
+
+<p>On the command line, here's the invocation to perform an <i>ad
+hoc</i> retrieval run:</p>
 
 <pre>
-robust04-lm-ql          map     0.3063
-robust04-lm-sd          map     0.3194
-robust04-bm25-base      map     0.3033
-robust04-bm25-sd        map     0.3212
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal \
+  docs/data/trec/run.robust04.basic.xml docs/data/trec/queries.robust04.xml
 </pre>
 
-<p>And that's it.  Congratulations, you've successfully performed a
-retrieval run with SMRF!</p>
+<p>You should get exactly the same results as with RunQueryHDFS.</p>
 
-<h3>Searching Interactively</h3>
+</div></div>
 
-<p>Now, what about interactive retrieval?  You'll of course know that
+
+<div class="post">
+<h2>Searching Interactively</h2>
+<div class="content">
+
+<p>Now, what about interactive retrieval?  We of course know that
 MapReduce is designed for large batch jobs and is not suitable for
 real-time interactive applications.  Specifically, HDFS is designed
 for high-throughput streaming reads, not low-latency access to
@@ -323,14 +295,14 @@ presents a data-management challenging (copying large index files
 around), and naturally, you lose the benefits of HDFS (e.g.,
 redundancy through replication).</p>
 
-<p>As an experiment, we've been playing with retrieval engines <b>that
-directly read postings from HDFS</b>.  This may at first seem like a
-stupid idea, but this approach does have merits.  Sure, most likely
-you'll be reading postings from a remote datanode, but you gain the
-benefit of a homogeneous environment (everything is Hadoop).  Early
-indications suggest that this architecture give reasonable performance
-(we're working on some ideas that we believe will make this
-architecture just as fast as the alternative).</p>
+<p>However, we've been playing with retrieval engines that directly
+read postings from HDFS.  This may at first seem like a stupid idea,
+but this approach does have merits.  Sure, most likely you'll be
+reading postings from a remote datanode, but you gain the benefit of a
+homogeneous environment (everything is Hadoop).  Early indications
+suggest that this architecture give reasonable performance (we're
+working on some ideas that we believe will make this architecture just
+as fast as the alternative).</p>
 
 <p>In summary, the Ivory retrieval architecture looks like the
 following:</p>
@@ -342,123 +314,147 @@ is easy because Hadoop already
 uses <a href="http://www.mortbay.org/jetty/">Jetty</a> for its
 webapps.  Furthermore, we folded the webapp inside a mapper (albeit a
 degenerate one), so that we launch the retrieval sever like any other
-Hadoop job.  See following invocation:</p>
+Hadoop job.</p>
 
-<pre>
-$ hadoop jar ivory.jar ivory.server.RunDistributedRetrievalServers /umd-lin/jimmylin/server_trec_bm25.xml /tmp/config
-09/11/18 20:42:55 INFO server.RunDistributedRetrievalServers: Reading configuration to determine number of servers to launch:
-09/11/18 20:42:55 INFO server.RunDistributedRetrievalServers:  - sid: trec
-09/11/18 20:42:55 INFO server.RunDistributedRetrievalServers: Writing configuration to: /tmp/config/config-1.txt
-09/11/18 20:43:32 INFO mapred.FileInputFormat: Total input paths to process : 1
-09/11/18 20:43:40 INFO server.RunDistributedRetrievalServers: Waiting for servers to start up...
-09/11/18 20:43:50 INFO server.RunDistributedRetrievalServers:  ...
-09/11/18 20:44:00 INFO server.RunDistributedRetrievalServers:  ...
-09/11/18 20:44:10 INFO server.RunDistributedRetrievalServers:  ...
-09/11/18 20:44:23 INFO server.RunDistributedRetrievalServers:  ...
-09/11/18 20:44:23 INFO server.RunDistributedRetrievalServers: All servers ready!
-09/11/18 20:44:23 INFO server.RunDistributedRetrievalServers: Host information:
-09/11/18 20:44:26 INFO server.RunDistributedRetrievalServers:  sid=trec, xxx.xxx.xxx.xxx:7001
-</pre>
-
-<p>The first command-line argument is the path to a configuration file
-in HDFS.  The second argument is the path of a temporary directory in
-HDFS.  Here are two sample configuration files:</p>
+<p>Here are two configuration files for starting the server (copy over
+to HDFS):</p>
 
 <ul>
 
-  <li><a href="data/server_trec_bm25.xml">docs/data/server_trec_bm25.xml</a>:
+  <li><a href="data/trec/server.trec.ql.xml">data/trec/server.trec.ql.xml</a>:
+    configuration file for launching a query-likelihood server.</li>
+
+  <li><a href="data/trec/server.trec.bm25.xml">data/trec/server.trec.bm25.xml</a>:
   configuration file for launching a bm25 server.</li>
 
-  <li><a href="data/server_trec_ql.xml">docs/data/server_trec_ql.xml</a>:
-  configuration file for launching a query-likelihood server.</li>
-
 </ul>
+
+<p>Each configuration file specifies the index location and also the
+location of the forward index into the document collection (so you can
+actually examine the retrieved results).  The
+class <b><code>ivory.server.RunDistributedRetrievalServers</code></b>
+launches the server.  Here's a sample invocation:</p>
+
+<pre>
+$ hadoop jar ivory.jar ivory.server.RunDistributedRetrievalServers /umd-lin/jimmylin/server.trec.ql.xml /tmp/config
+10/05/23 23:00:28 INFO server.RunDistributedRetrievalServers: Reading configuration to determine number of servers to launch:
+10/05/23 23:00:28 INFO server.RunDistributedRetrievalServers:  - sid: trec
+10/05/23 23:00:28 INFO server.RunDistributedRetrievalServers: Writing configuration to: /tmp/config/config-1.txt
+10/05/23 23:01:36 INFO mapred.FileInputFormat: Total input paths to process : 1
+10/05/23 23:01:39 INFO server.RunDistributedRetrievalServers: Waiting for servers to start up...
+10/05/23 23:01:49 INFO server.RunDistributedRetrievalServers:  ...
+10/05/23 23:01:59 INFO server.RunDistributedRetrievalServers:  ...
+10/05/23 23:02:10 INFO server.RunDistributedRetrievalServers:  ...
+10/05/23 23:02:10 INFO server.RunDistributedRetrievalServers: All servers ready!
+10/05/23 23:02:10 INFO server.RunDistributedRetrievalServers: Host information:
+10/05/23 23:02:10 INFO server.RunDistributedRetrievalServers:  sid=trec, XX.XXX.X.XX:7001
+</pre>
+
+<p>The first command-line argument is the path to the configuration
+file in HDFS.  The second argument is the path of a temporary
+directory in HDFS.  (As a side note, you can start up multiple
+retrieval servers simultaneously but simply specifying multiple index
+locations.)</p>
 
 <p>What happens is that the mapper starts up, initializes the
 retrieval engine, and fires up a webapp by creating a Jetty HTTP
 server listening on a particular port.  Of course, we have no idea
 which cluster node ran the mapper, so the webapp writes out its
-hostname and port to HDFS (yes, this should really be done in
-Zookeeper).  Meanwhile, the client submitting the job polls HDFS
-waiting for the file to appear.  Once it does, the client reads the
-config file and tells you where the webapp is.  If you navigate to
-that hostname/port in a browser, you'll get access to a since search
-interface where you can put in a query and look at retrieved
-documents.</p>
+hostname and port to HDFS.  Meanwhile, the client submitting the job
+polls HDFS waiting for the file to appear.  Once it does, the client
+reads the config file and tells you where the webapp is.  If you
+navigate to that hostname/port in a browser, you'll get access to a
+since search interface where you can put in a query and look at
+retrieved documents.</p>
 
-<p>Finally, there's a variant of the above program that will run in
-standalone mode on a local machine.  See below for a sample
+<p>Finally, there's a
+class <b><code>ivory.server.RunLocalRetrievalServer</code></b> that
+supports interactive retrieval on a local machine.  Here's a sample
 invocation:</p>
 
 <pre>
-$ etc/run.sh ivory.server.RunLocalRetrievalServer docs/data/server_trec_bm25.xml 9000
-09/11/18 20:47:19 INFO server.RunLocalRetrievalServer: Reading configuration...
-09/11/18 20:47:19 INFO server.RetrievalServer: Initializing RetrievalServer for "trec"...
-09/11/18 20:47:19 INFO server.RetrievalServer:  - sid: trec
-09/11/18 20:47:19 INFO server.RetrievalServer:  - index: /umd-lin/shared/indexes/trec
-09/11/18 20:47:19 INFO server.RetrievalServer:  - findex: /umd-lin/shared/collections/trec4-5_noCRFR.findex.dat
-09/11/18 20:47:19 INFO util.RetrievalEnvironment: Loading doclengths table...
-09/11/18 20:47:19 INFO data.DocLengthTable: Docno offset: 0
-09/11/18 20:47:19 INFO data.DocLengthTable: Number of docs: 472525
-09/11/18 20:47:19 INFO data.DocLengthTable: Total of 472525 doclengths read
-09/11/18 20:47:19 INFO util.RetrievalEnvironment: IndexPath: /umd-lin/shared/indexes/trec
-09/11/18 20:47:19 INFO util.RetrievalEnvironment: PostingsType: ivory.data.PostingsListDocSortedPositional
-09/11/18 20:47:19 INFO util.RetrievalEnvironment: Collection document count: 472525
-09/11/18 20:47:19 INFO util.RetrievalEnvironment: Collection term count: 134888069
-09/11/18 20:47:19 INFO util.RetrievalEnvironment: Tokenizer: ivory.util.GalagoTokenizer
-09/11/18 20:47:19 INFO util.RetrievalEnvironment: Loading postings index...
-09/11/18 20:47:19 INFO util.RetrievalEnvironment: Number of terms: 977542
-09/11/18 20:47:20 INFO util.RetrievalEnvironment: Done!
-09/11/18 20:47:21 INFO server.RetrievalServer: RetrievalServer successfully initialized.
-09/11/18 20:47:21 INFO server.RetrievalServer: Staring server...
-09/11/18 20:47:21 INFO mortbay.log: Logging to org.slf4j.impl.Log4jLoggerAdapter(org.mortbay.log) via org.mortbay.log.Slf4jLog
-09/11/18 20:47:21 INFO mortbay.log: jetty-6.1.14
-09/11/18 20:47:21 INFO mortbay.log: Started SocketConnector@0.0.0.0:9000
-09/11/18 20:47:21 INFO server.RetrievalServer: Server successfully started!
+$ etc/run.sh ivory.server.RunLocalRetrievalServer docs/data/trec/server.trec.ql.xml 9000
+10/05/24 00:54:15 INFO server.RunLocalRetrievalServer: Reading configuration...
+10/05/24 00:54:15 INFO server.RetrievalServer: Initializing RetrievalServer for "trec"...
+10/05/24 00:54:15 INFO server.RetrievalServer:  - sid: trec
+10/05/24 00:54:15 INFO server.RetrievalServer:  - index: /umd-lin/shared/indexes/trec
+10/05/24 00:54:15 INFO server.RetrievalServer:  - findex: /umd-lin/shared/collections/trec4-5_noCRFR.findex.dat
+10/05/24 00:54:15 INFO util.RetrievalEnvironment: Loading doclengths table...
+10/05/24 00:54:15 INFO data.DocLengthTable: Docno offset: 0
+10/05/24 00:54:15 INFO data.DocLengthTable: Number of docs: 472525
+10/05/24 00:54:16 INFO data.DocLengthTable: Total of 472525 doclengths read
+10/05/24 00:54:16 INFO util.RetrievalEnvironment: IndexPath: /umd-lin/shared/indexes/trec
+10/05/24 00:54:16 INFO util.RetrievalEnvironment: PostingsType: ivory.data.PostingsListDocSortedPositional
+10/05/24 00:54:16 INFO util.RetrievalEnvironment: Collection document count: 472525
+10/05/24 00:54:16 INFO util.RetrievalEnvironment: Collection length: 134888069
+10/05/24 00:54:16 INFO util.RetrievalEnvironment: Tokenizer: ivory.util.GalagoTokenizer
+10/05/24 00:54:16 INFO util.RetrievalEnvironment: Loading postings index...
+10/05/24 00:54:16 INFO util.RetrievalEnvironment: Number of terms: 978058
+10/05/24 00:54:16 INFO util.RetrievalEnvironment: Done!
+10/05/24 00:54:21 INFO server.RetrievalServer: RetrievalServer successfully initialized.
+10/05/24 00:54:21 INFO server.RetrievalServer: Staring server...
+10/05/24 00:54:21 INFO mortbay.log: Logging to org.slf4j.impl.Log4jLoggerAdapter(org.mortbay.log)
+10/05/24 00:54:21 INFO mortbay.log: jetty-6.1.14
+10/05/24 00:54:22 INFO mortbay.log: Started SocketConnector@0.0.0.0:9000
+10/05/24 00:54:22 INFO server.RetrievalServer: Server successfully started!
 </pre>
 
-<p>Once the program starts, you can navigate to http://localhost:9000/
-in a browser and access a simple search interface.  It's important to
-note that you're running this program outside of MapReduce, so that's
-why you want to use the launch script etc/run.sh, which is
-automatically generated by Ant.</p>
+<p>Once the program starts, you can navigate
+to <code>http://localhost:9000/</code> in a browser and access a simple
+search interface.  It's important to note that you're running this
+program outside of MapReduce, so that's why you want to use the launch
+script <code>etc/run.sh</code>, which is automatically generated by
+Ant.</p>
 
-<p>And that's it.  We've covered indexing, batching retrieval, and
+<p>And that's it.  We've covered indexing, batch retrieval, and
 interactive retrieval.  Enjoy!</p>
 
 <p style="padding-top: 25px"><a href="./index.html">Back to main page</a></p>
 
+</div></div>
+
+<!--- END MAIN CONTENT HERE -->
+
+	</div>
+
+	<!-- main END -->
+
+
+
+		<div class="fixed"></div>
+
 </div>
 
-<table width="100%" border="0" cellpadding="0" cellspacing="0" style="padding-top: 10px;">
-<tr><td valign="top" align="left">
-<small>
-This page, first created: 30 Jun 2009; last updated:
-<script language="JavaScript" type="text/javascript">
-<!--
-var LastUpdated = "$Date: 2009-11-18 22:25:06 -0500 (Wed, 18 Nov 2009) $";
-LastUpdated = LastUpdated.substring(LastUpdated.length-14, LastUpdated.length-3);
-document.writeln (LastUpdated);
--->
+<!-- content END -->
+
+<!-- footer START -->
+
+<div id="footer">
+<div id="copyright">
+Last updated:
+<script type="text/javascript">
+<!--//
+document.write(document.lastModified);
+//-->
 </script>
-</small>
-</td>
-<td valign="top" align="right">
-  <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/us/">
-  <img src="images/creative-commons.png" border="0" alt="Creative Commons: Attribution-Noncommercial-Share Alike 3.0 United States"/>
-  </a>
-  <a href="http://validator.w3.org/check/referer">
-  <img src="images/valid-xhtml10.gif" border="0"
-       alt="Valid XHTML 1.0!" height="31" width="88" />
-  </a>
-  <a href="http://jigsaw.w3.org/css-validator/check/referer">
-  <img style="border:0;width:88px;height:31px"
-       src="images/vcss.gif" 
-       alt="Valid CSS!" />
-  </a>
-</td></tr></table>
+</div>
+
+<div id="themeinfo">
+Adapted from a WordPress Theme by <a href="http://www.neoease.com/">NeoEase</a>. Valid <a href="http://validator.w3.org/check?uri=referer">XHTML 1.1</a> and <a href="http://jigsaw.w3.org/css-validator/check/referer?profile=css3">CSS 3</a>.	</div>
+
+</div>
+
+<!-- footer END -->
 
 
-</td></tr></tbody></table></center>
 
-</body></html>
+</div>
+
+<!-- container END -->
+
+</div>
+
+<!-- wrap END -->
+
+</body>
+</html>

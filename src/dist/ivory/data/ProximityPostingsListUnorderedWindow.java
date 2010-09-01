@@ -28,7 +28,7 @@ public class ProximityPostingsListUnorderedWindow extends ProximityPostingsReade
 	 * @param readers
 	 * @param size
 	 */
-	public ProximityPostingsListUnorderedWindow(PostingsReader[] readers, int size) {
+	public ProximityPostingsListUnorderedWindow(ivory.data.PostingsListDocSortedPositional.PostingsReader[] readers, int size) {
 		super(readers, size);
 	}
 
@@ -42,7 +42,7 @@ public class ProximityPostingsListUnorderedWindow extends ProximityPostingsReade
 		for( int i = 0; i < positions.size(); i++ ) {
 			//System.err.println(positions.get(i).toString());
 
-			boolean [] matchedIDs = new boolean[_readers.length];
+			boolean [] matchedIDs = new boolean[mReaders.length];
 			matchedIDs[positions.get(i).id] = true;
 			int matchedIDCounts = 1;
 			
@@ -60,12 +60,12 @@ public class ProximityPostingsListUnorderedWindow extends ProximityPostingsReade
 				}
 				
 				// stop looking if we've exceeded the maximum window size
-				if(windowSize > _size ) {
+				if(windowSize > mSize ) {
 					break;
 				}
 				
 				// did we match all the terms?
-				if(matchedIDCounts == _readers.length) {
+				if(matchedIDCounts == mReaders.length) {
 					//System.out.println("MATCH");
 					matches++;
 					break;
@@ -75,5 +75,4 @@ public class ProximityPostingsListUnorderedWindow extends ProximityPostingsReade
 		//System.err.println("</positions>");
 		return matches;
 	}
-
 }

@@ -1,5 +1,5 @@
 /*
- * Ivory: A Hadoop toolkit for Web-scale information retrieval
+ * Ivory: A Hadoop toolkit for web-scale information retrieval
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You may
@@ -18,30 +18,54 @@ package ivory.smrf.model.builder;
 
 import ivory.smrf.model.MarkovRandomField;
 import ivory.util.RetrievalEnvironment;
+import ivory.util.XMLTools;
+
+import org.w3c.dom.Node;
 
 /**
  * @author Don Metzler
- *
+ * 
  */
 public abstract class MRFBuilder {
-	
-	/**
-	 * indri query environment 
-	 */
+
 	protected RetrievalEnvironment mEnv = null;
-	
-	/**
-	 * @param env
-	 */
+
 	public MRFBuilder(RetrievalEnvironment env) {
 		mEnv = env;
 	}
-	
-	/**
-	 * @param queryText
-	 * @return markov random field model based on query
-	 * @throws Exception 
-	 */
-	public abstract MarkovRandomField buildMRF(String queryText) throws Exception;
 
+	public abstract MarkovRandomField buildMRF(String[] queryTerms) throws Exception;
+
+	public static MRFBuilder get(RetrievalEnvironment env, Node model) throws Exception {
+		if (model == null) {
+			throw new Exception("Unable to generate a MRFBuilder from a null node!");
+		}
+
+		// get model type
+		String modelType = XMLTools.getAttributeValue(model, "type", null);
+		if (modelType == null) {
+			throw new Exception("Model type must be specified!");
+		}
+
+		// build the builder
+		MRFBuilder builder = null;
+
+		System.out.println("The model type is .. "+modelType);
+
+		if (modelType.equals("Feature") || modelType.equals("WSD")) {
+			builder = new FeatureBasedMRFBuilder(env, model);
+
+		}
+		/* 
+		else if (modelType.equals("WSD")) { 
+			builder = new FeatureBasedWSDBuilder(env, model);
+		} 
+		*/
+
+		else {
+			throw new Exception("Unrecognized model type: " + modelType);
+		}
+
+		return builder;
+	}
 }

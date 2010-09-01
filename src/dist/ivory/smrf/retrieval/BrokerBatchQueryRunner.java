@@ -48,19 +48,19 @@ public class BrokerBatchQueryRunner {
 	private String mOutputFile;
 	private String mBrokerAddress;
 	private String mRuntag;
+	private int mNumHits;
 
 	public BrokerBatchQueryRunner(String queriesFilePath, String mid, String brokerAddr,
-			String outputFile) throws SAXException, IOException, ParserConfigurationException,
+			String outputFile, int numHits) throws SAXException, IOException, ParserConfigurationException,
 			Exception, NotBoundException {
 		mQueries = new LinkedHashMap<String, String>();
 
 		Configuration conf = new Configuration();
-		FileSystem fs = FileSystem.get(conf);
-		this.mFileSystem = fs;
+		mFileSystem = FileSystem.get(conf);
 		String element = queriesFilePath;
 		Document d = null;
 		d = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(
-				fs.open(new Path(element)));
+				mFileSystem.open(new Path(element)));
 		parseParameters(d);
 
 		// make sure we have some queries to run
@@ -71,6 +71,7 @@ public class BrokerBatchQueryRunner {
 		mOutputFile = outputFile;
 		mBrokerAddress = brokerAddr;
 		mRuntag = mid;
+		mNumHits = numHits;
 	}
 
 	public void runQueries() throws Exception {
@@ -85,7 +86,7 @@ public class BrokerBatchQueryRunner {
 		for (String qid : mQueries.keySet()) {
 			String rawQueryText = mQueries.get(qid);
 			sLogger.info("query id:" + qid + ", query text:" + rawQueryText);
-			runner.runQuery(qid, rawQueryText);
+			runner.runQuery(qid, rawQueryText.split("\\s+"));
 		}
 
 		// where should we output these results?
@@ -142,8 +143,8 @@ public class BrokerBatchQueryRunner {
 				sLogger.info("null docno mapping for: " + qid);
 				throw new RuntimeException("null docno mapping for: \"+queryID");
 			}
-			for (int i = 0; i < list.length; i++) {
-				resultWriter.println(qid + " Q0 " + queryDocnoMapping.get(list[i].docid) + " "
+			for (int i = 0; i < list.length && i < mNumHits; i++) {
+				resultWriter.println(qid + " Q0 " + queryDocnoMapping.get(list[i].docno) + " "
 						+ (i + 1) + " " + list[i].score + " " + runtag);
 			}
 		}

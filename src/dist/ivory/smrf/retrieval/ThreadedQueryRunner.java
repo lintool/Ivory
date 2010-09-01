@@ -21,7 +21,7 @@ import ivory.smrf.model.TermNode;
 import ivory.smrf.model.builder.MRFBuilder;
 import ivory.smrf.model.expander.MRFExpander;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -49,17 +49,17 @@ public class ThreadedQueryRunner implements QueryRunner {
 		mBuilder = builder;
 		mExpander = expander;
 		mThreadPool = Executors.newFixedThreadPool(numThreads);
-		mQueryResults = new HashMap<String, Future<Accumulator[]>>();
+		mQueryResults = new LinkedHashMap<String, Future<Accumulator[]>>();
 		mNumHits = numHits;
 	}
 
-	public void runQuery(String qid, String query) {
+	public void runQuery(String qid, String[] query) {
 		Future<Accumulator[]> future = mThreadPool.submit(new ThreadTask(query, mBuilder,
 				mExpander, mNumHits));
 		mQueryResults.put(qid, future);
 	}
 
-	public Accumulator[] runQuery(String query) {
+	public Accumulator[] runQuery(String[] query) {
 		Future<Accumulator[]> future = mThreadPool.submit(new ThreadTask(query, mBuilder,
 				mExpander, mNumHits));
 		Accumulator[] results = null;
@@ -91,7 +91,7 @@ public class ThreadedQueryRunner implements QueryRunner {
 	}
 
 	public Map<String, Accumulator[]> getResults() {
-		Map<String, Accumulator[]> results = new HashMap<String, Accumulator[]>();
+		Map<String, Accumulator[]> results = new LinkedHashMap<String, Accumulator[]>();
 		for (Map.Entry<String, Future<Accumulator[]>> e : mQueryResults.entrySet()) {
 			try {
 				results.put(e.getKey(), e.getValue().get());
@@ -103,7 +103,7 @@ public class ThreadedQueryRunner implements QueryRunner {
 	}
 
 	public class ThreadTask implements Callable<Accumulator[]> {
-		private String mQuery;
+		private String[] mQuery;
 		private MRFBuilder mBuilder;
 		private MRFExpander mExpander;
 		private int mNumHits;
@@ -113,7 +113,7 @@ public class ThreadedQueryRunner implements QueryRunner {
 		 * @param builder
 		 * @param expander
 		 */
-		public ThreadTask(String query, MRFBuilder builder, MRFExpander expander, int numHits) {
+		public ThreadTask(String[] query, MRFBuilder builder, MRFExpander expander, int numHits) {
 			mQuery = query;
 			mBuilder = builder;
 			mExpander = expander;
@@ -148,18 +148,10 @@ public class ThreadedQueryRunner implements QueryRunner {
 					// get expanded MRF
 					MarkovRandomField expandedMRF = mExpander.getExpandedMRF(mrf, results);
 
-					// update doc set to reflect the expansion terms
-					String queryTerms = "";
-					List<ivory.smrf.model.Node> nodes = expandedMRF.getNodes();
-					for (ivory.smrf.model.Node node : nodes) {
-						if (node instanceof TermNode) {
-							queryTerms += ((TermNode) node).getTerm() + " ";
-						}
-					}
-
 					// re-rank documents according to expanded MRF
-					ranker = new MRFDocumentRanker(expandedMRF, mNumHits * 2);
+					ranker = new MRFDocumentRanker(expandedMRF, mNumHits);
 				}
+
 
 				endTime = System.currentTimeMillis();
 				sLogger.info("MRF document ranker initialization time (ms): "

@@ -1,5 +1,5 @@
 /*
- * Ivory: A Hadoop toolkit for Web-scale information retrieval
+ * Ivory: A Hadoop toolkit for web-scale information retrieval
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You may
@@ -18,86 +18,67 @@ package ivory.smrf.model.score;
 
 import ivory.smrf.model.GlobalEvidence;
 import ivory.smrf.model.GlobalTermEvidence;
+import ivory.util.XMLTools;
 
+import org.w3c.dom.Node;
 
 /**
  * @author Don Metzler
- *
+ * 
  */
 public class JelinekMercerScoringFunction extends ScoringFunction {
 
-	/**
-	 * Smoothing parameter 
-	 */
+	// smoothing parameter
 	private double mLambda = 0.7;
-	
-	/**
-	 * background probability
-	 */
+
+	// background probability
 	private double mBackgroundProb;
-	
-	/**
-	 * log of background probability (efficiency trick)
-	 */
+
+	// log of background probability (efficiency trick)
 	private double mLogBackgroundProb;
-	
-	/**
-	 * maximum possible score
-	 */
+
+	// maximum possible score
 	private double mMaxScore;
-	
-	/**
-	 * is this term OOV?
-	 */
+
+	// is this term OOV?
 	private boolean mOOV = false;
-	
-	/**
-	 * @param lambda
-	 */
-	public JelinekMercerScoringFunction(double lambda) {
-		mLambda = lambda;
-	}
-	
-	/* (non-Javadoc)
-	 * @see edu.umass.cs.SMRF.model.scoringfunction.ScoringFunction#getScore(double, int, int, double, long, long)
-	 */
+
 	@Override
-	public double getScore(double tf, int docLen) {
-		if(mOOV) {
-			return 0.0;
-		}
-		if(tf == 0.0) {
-			return mLogBackgroundProb;
-		}
-		return Math.log( ( 1.0 - mLambda ) * ( tf / docLen ) + mLambda * mBackgroundProb );
+	public void configure(Node domNode) {
+		mLambda = XMLTools.getAttributeValue(domNode, "lambda", 0.5);
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
+	@Override
+	public double getScore(double tf, int docLen) {
+		if (mOOV) {
+			return 0.0;
+		}
+		if (tf == 0.0) {
+			return mLogBackgroundProb;
+		}
+		return Math.log((1.0 - mLambda) * (tf / docLen) + mLambda * mBackgroundProb);
+	}
+
 	@Override
 	public String toString() {
 		return "<scoringfunction type=\"JelinekMercer\" lambda=\"" + mLambda + "\" />\n";
 	}
 
-	/* (non-Javadoc)
-	 * @see ivory.smrf.model.score.ScoringFunction#initialize(ivory.smrf.model.GlobalTermEvidence, ivory.smrf.model.GlobalEvidence)
-	 */
 	@Override
-	public void initialize(GlobalTermEvidence termEvidence,
-			GlobalEvidence globalEvidence) {
+	public void initialize(GlobalTermEvidence termEvidence, GlobalEvidence globalEvidence) {
 		mOOV = termEvidence.cf == 0 ? true : false;
-		if(!mOOV) {
-			mBackgroundProb = (double)termEvidence.cf / (double)globalEvidence.collectionLength;
+		if (!mOOV) {
+			mBackgroundProb = (double) termEvidence.cf / (double) globalEvidence.collectionLength;
 			mLogBackgroundProb = Math.log(mLambda * mBackgroundProb);
-			mMaxScore = Math.log( ( 1.0 - mLambda ) + mLambda * mBackgroundProb );
-		}
-		else {
+			mMaxScore = Math.log((1.0 - mLambda) + mLambda * mBackgroundProb);
+		} else {
 			mMaxScore = 0.0;
 		}
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see ivory.smrf.model.score.ScoringFunction#getMaxScore()
 	 */
 	public double getMaxScore() {

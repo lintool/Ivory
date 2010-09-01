@@ -1,5 +1,5 @@
 /*
- * Ivory: A Hadoop toolkit for Web-scale information retrieval
+ * Ivory: A Hadoop toolkit for web-scale information retrieval
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You may
@@ -19,30 +19,30 @@ package ivory.smrf.model.score;
 import ivory.smrf.model.GlobalEvidence;
 import ivory.smrf.model.GlobalTermEvidence;
 
+import org.w3c.dom.Node;
+
 /**
  * @author Don Metzler
- *
+ * 
  */
 public class BinaryTFScoringFunction extends ScoringFunction {
 
-	/* (non-Javadoc)
-	 * @see edu.umass.cs.SMRF.model.scoringfunction.ScoringFunction#getScore(double, int, int, double, long, long)
-	 */
+	@Override
+	public void configure(Node domNode) {
+		// do nothing
+	}
+
 	@Override
 	public double getScore(double tf, int docLen) {
-		if( tf > 0.0 ) {
+		if (tf > 0.0) {
 			return 1.0;
 		}
-		
+
 		return 0.0;
 	}
 
-	/* (non-Javadoc)
-	 * @see ivory.smrf.model.score.ScoringFunction#initialize(ivory.smrf.model.GlobalTermEvidence, ivory.smrf.model.GlobalEvidence)
-	 */
 	@Override
-	public void initialize(GlobalTermEvidence termEvidence,
-			GlobalEvidence globalEvidence) {
+	public void initialize(GlobalTermEvidence termEvidence, GlobalEvidence globalEvidence) {
 		// do nothing
 	}
 

@@ -1,0 +1,137 @@
+<parameters>
+
+     <index>/fs/clip-hadoop/indexes/trec</index>
+
+     <!-- Dirichlet, full independence, Latent Concept Expansion (1-grams) ["RM3"] (Fast Version) -->
+     <model id="robust04-dir-rm3-f" type="Feature" output="ranking.robust04-dir-rm3-f.txt" hits="1000">
+         <feature id="termWt" weight="0.15"
+                  cliqueSet="ivory.smrf.model.builder.TermCliqueSet"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.TermExpressionGenerator"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1000.0" />
+	 <expander type="UnigramLatentConcept" fbDocs="10" fbTerms="25">
+	   <conceptscore id="expansionTermWt" weight="0.85"
+			 scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1.0" />
+	 </expander>
+     </model>
+
+     <!-- Dirichlet, full independence, Latent Concept Expansion (1-grams) ["RM3"] (Slow Version) -->
+     <model id="robust04-dir-rm3-s" type="Feature" output="ranking.robust04-dir-rm3-s.txt" hits="1000">
+         <feature id="termWt" weight="0.15"
+                  cliqueSet="ivory.smrf.model.builder.TermCliqueSet"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.TermExpressionGenerator"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1000.0" />
+	 <expander type="LatentConcept">
+	   <expansionmodel type="Feature" gramSize="1" fbDocs="10" fbTerms="25">
+	     <feature id="expansionTermWt" weight="0.85" 
+		      cliqueSet="ivory.smrf.model.builder.TermCliqueSet"
+		      potential="ivory.smrf.model.potential.QueryPotential"
+		      generator="ivory.smrf.model.builder.TermExpressionGenerator"
+		      scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1.0" />
+	   </expansionmodel>
+	 </expander>
+     </model>
+
+     <!-- Dirichlet, sequential dependence, Latent Concept Expansion (unigram concepts) (Fast Version) -->
+     <model id="robust04-dir-sd-lce-f" type="Feature" output="ranking.robust04-dir-sd-lce-f.txt" hits="1000">
+         <feature id="termWt" weight="0.1544"
+                  cliqueSet="ivory.smrf.model.builder.TermCliqueSet"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.TermExpressionGenerator"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1000.0" />
+         <feature id="orderedWt" weight="0.0147" 
+                  cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.OrderedWindowExpressionGenerator" width="1"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="750.0" />
+         <feature id="unorderedWt" weight="0.0147"
+                  cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.UnorderedWindowExpressionGenerator" width="4"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="750.0" />
+	 <expander type="UnigramLatentConcept" fbDocs="10" fbTerms="25">
+	   <conceptscore id="expansionTermWt" weight="0.6836"
+			 scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1.0" />
+	   <conceptscore id="expansionTermLMWt" weight="-0.1325"
+			 scoreFunction="ivory.smrf.model.score.JelinekMercerScoringFunction" lambda="1.0" />
+	 </expander>
+     </model>
+
+     <!-- Dirichlet, sequential dependence, Latent Concept Expansion (unigram concepts) (Slow Version) -->
+     <model id="robust04-dir-sd-lce-s" type="Feature" output="ranking.robust04-dir-sd-lce-s.txt" hits="1000">
+         <feature id="termWt" weight="0.1544"
+                  cliqueSet="ivory.smrf.model.builder.TermCliqueSet"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.TermExpressionGenerator"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1000.0" />
+         <feature id="orderedWt" weight="0.0147" 
+                  cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.OrderedWindowExpressionGenerator" width="1"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="750.0" />
+         <feature id="unorderedWt" weight="0.0147"
+                  cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.UnorderedWindowExpressionGenerator" width="4"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="750.0" />
+	 <expander type="LatentConcept">
+	     <expansionmodel type="Feature" gramSize="1" fbDocs="25" fbTerms="25">
+	         <feature id="expansionTermWt" weight="0.6836" 
+			  cliqueSet="ivory.smrf.model.builder.TermCliqueSet"
+			  potential="ivory.smrf.model.potential.QueryPotential"
+			  generator="ivory.smrf.model.builder.TermExpressionGenerator"
+			  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1.0" />
+		 <feature id="expansionTermLMWt" weight="-0.1325"
+			  cliqueSet="ivory.smrf.model.builder.TermCliqueSet"
+			  potential="ivory.smrf.model.potential.QueryPotential"
+			  generator="ivory.smrf.model.builder.TermExpressionGenerator"
+			  scoreFunction="ivory.smrf.model.score.JelinekMercerScoringFunction" lambda="1.0" />
+	     </expansionmodel>
+	 </expander>
+     </model>
+
+     <!-- BM25, sequential dependence, Latent Concept Expansion (bigram concepts) -->
+     <model id="robust04-dir-sd-lce-bigram" type="Feature" output="ranking.robust04-dir-sd-lce-bigram.txt" hits="1000">
+         <feature id="termWt" weight="0.1544"
+                  cliqueSet="ivory.smrf.model.builder.TermCliqueSet"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.TermExpressionGenerator"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="100.0" />
+         <feature id="orderedWt" weight="0.0147" 
+                  cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.OrderedWindowExpressionGenerator" width="1"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="750.0" />
+         <feature id="unorderedWt" weight="0.0147"
+                  cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.UnorderedWindowExpressionGenerator" width="4"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="750.0" />
+	 <expander type="LatentConcept" maxCandidates="250">
+	     <expansionmodel type="Feature" gramSize="2" fbDocs="25" fbTerms="25">
+	         <feature id="expansionTermWt" weight="0.6836" 
+			  cliqueSet="ivory.smrf.model.builder.TermCliqueSet"
+			  potential="ivory.smrf.model.potential.QueryPotential"
+			  generator="ivory.smrf.model.builder.TermExpressionGenerator"
+			  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1000.0" />
+	         <feature id="expansionOrderedWt" weight="0.0651" 
+			  cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+			  potential="ivory.smrf.model.potential.QueryPotential"
+			  generator="ivory.smrf.model.builder.OrderedWindowExpressionGenerator" width="1"
+			  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="750.0" />
+	         <feature id="expansionUnorderedWt" weight="0.0651" 
+			  cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+			  potential="ivory.smrf.model.potential.QueryPotential"
+			  generator="ivory.smrf.model.builder.UnorderedWindowExpressionGenerator" width="4"
+			  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="750.0" />
+		 <feature id="expansionTermLMWt" weight="-0.1325"
+			  cliqueSet="ivory.smrf.model.builder.TermCliqueSet"
+			  potential="ivory.smrf.model.potential.QueryPotential"
+			  generator="ivory.smrf.model.builder.TermExpressionGenerator"
+			  scoreFunction="ivory.smrf.model.score.JelinekMercerScoringFunction" lambda="1.0" />
+	     </expansionmodel>
+	 </expander>
+     </model>
+
+</parameters>

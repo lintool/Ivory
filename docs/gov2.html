@@ -1,0 +1,271 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Ivory: Getting Started with the Gov2 Collection</title>
+<style type="text/css" media="screen">@import url( style.css );</style>
+</head>
+
+<body>
+
+<div id="wrap">
+<div id="container" class="one-column" >
+
+<!-- header START -->
+
+<div id="header">
+<div id="caption">
+<h1 id="title" style="color: white;">Ivory</h1>
+<div id="tagline">A Hadoop toolkit for web-scale information retrieval research</div>
+</div>
+
+<div class="fixed"></div>
+
+</div>
+
+<!-- header END -->
+
+<!-- navigation START -->
+
+<div id="navigation">
+<ul id="menus">
+
+  <li class="page_item"><a class="home" title="Home" href="index.html">Home</a></li>
+  <li class="page_item"><a href="api/index.html" title="API">API</a></li>
+
+</ul>
+
+<div class="fixed"></div>
+
+</div>
+
+<!-- navigation END -->
+
+
+
+<!-- content START -->
+
+<div id="content">
+
+
+
+	<!-- main START -->
+
+	<div id="main">
+
+
+<!--- START MAIN CONTENT HERE -->
+
+<h2>Ivory: Getting Started with the Gov2 Collection</h2>
+
+<div class="post">
+<div class="content">
+
+<p>This tutorial provides a guide to batch retrieval with Ivory on
+<a href="http://ir.dcs.gla.ac.uk/test_collections/gov2-summary.htm">Gov2</a>,
+a document collection which is distributed by the
+<a href="http://www.gla.ac.uk/">University of Glasgow</a> and used in
+many <a href="http://trec.nist.gov/">Text Retrieval Conferences</a>
+(TRECs). Users interested in experimenting with a newer, larger web data
+set should see the guide for getting started with
+<a href="clue.html">ClueWeb</a>. This guide will cover both indexing the
+collection and performing retrieval runs with queries from the 2004, 2005
+and 2006 TREC Terabyte tracks.</p>
+
+<p><b>NOTE:</b> the process for working with the Wt10g collection is
+quite similar to working with TREC disks 4-5, which is described in <a
+href="trec.html">a separate tutorial</a>.  This tutorial primarily
+focuses on the differences between the collections, so the TREC disks
+4-5 tutorial might be a good starting point.</p>
+
+</div></div>
+
+<div class="post">
+<h2>Prerequisites</h2>
+<div class="content">
+
+<p>The first task is to obtain the collection (from the <a
+href="http://ir.dcs.gla.ac.uk/test_collections/access_to_data.html">University
+of Glasgow</a>).  There are a total of 25,205,179 documents in the
+collection. The data is distributed in 273 directories (GX000 to
+GX272), with each directory, except for the last, consisting of 100
+files (00.gz to 99.gz). The last directory consists of just 85 files
+(00.gz to 84.gz). Therefore, there are a total of 27,285 input
+files. Each file consists of multiple of Web pages stored in an SGML
+format known as TREC Web format.  In Hadoop it's easiest to work with
+the collection as block-uncompressed SequenceFiles, so you'll want to
+first repack the original Wt10g files.  See <a
+href="http://www.umiacs.umd.edu/~jimmylin/cloud9/docs/content/clue-access.html">this
+guide</a> for more information.</p>
+
+<p>There's a program in <a
+href="http://cloud9lib.org/">Cloud<sup><small>9</small></sup></a> for
+repacking the collection:</p>
+
+<pre>
+hadoop jar cloud9.jar edu.umd.cloud9.collection.trecweb.RepackGov2Documents \
+  /shared/gov2/ /shared/gov2-repacked/ block
+</pre>
+
+<p>The first command-line argument is the base path of your Gov2
+distribution; the second is the output path; the third is "block" to
+specify block-level compression.</p>
+
+</div></div>
+
+<div class="post">
+<h2>Building the Inverted Index</h2>
+<div class="content">
+
+<p>Use the program <b><code>ivory.driver.PreprocessGov2</code></b> to
+preprocess the collection.  Here's a sample invocation (notice that
+the input path is the repacked distribution, not the original):</p>
+
+<pre>
+hadoop jar ivory.jar ivory.driver.PreprocessGov2 \
+  /shared/gov2-repacked /shared/indexes/gov2 100 10
+</pre>
+
+<p>Once the collection has been preprocessed, we can use the program
+<b><code>ivory.driver.BuildIPIndex</code></b> to build the index.
+Here's a sample invocation:</p>
+
+<pre>
+hadoop jar ivory.jar ivory.driver.BuildIPIndex /shared/indexes/gov2 100 10
+</pre>
+
+<p>For more detail, see our guide on <a href="trec.html">working with
+TREC disks 4-5</a>, which provides a more detail explanation of the
+command-line parameters.</p>
+
+</div></div>
+
+<div class="post">
+<h2>Performing Batch Retrieval</h2>
+<div class="content">
+
+<p>To demonstrate batch retrieval, we're
+going to use topics from the 2004, 2005, and 2006 TREC Terabyte tracks.
+In the <code>docs/data/gov2/</code> directory, you'll
+find the following configuration files:</p>
+
+<ul>
+
+  <li><a href="data/gov2/run.gov2.basic.xml"><code>docs/data/gov2/run.gov2.basic.xml</code></a>:
+  retrieval models and parameters</li>
+
+  <li><a href="data/gov2/gov2.title.701-775"><code>docs/data/gov2/gov2.title.701-775</code></a>:
+  queries (topics 701-750 from TREC
+  2004 and topics 751-775 from TREC 2005)</li>
+
+  <li><a href="data/gov2/gov2.title.776-850"><code>docs/data/gov2/gov2.title.776-850</code></a>:
+  queries (topics 776-800 from TREC
+  2005 and topics 801-850 from TREC 2006)</li>
+
+</ul>
+
+<p>The first configuration file specifies six different models:</p>
+
+<ul>
+
+  <li><b>gov2-dir-base</b>: language modeling framework, simple query
+  likelihood.</li>
+
+  <li><b>gov2-dir-sd</b>: language modeling framework, sequential
+  dependencies using MRFs.</li>
+
+  <li><b>gov2-dir-fd</b>:  language modeling framework, full
+  dependencies using MRFs.</li>
+
+  <li><b>gov2-bm25-base</b>: <i>bm25</i> term weighting, simple
+  bag-of-words queries.</li>
+
+  <li><b>gov2-bm25-base</b>: <i>bm25</i> term weighting, sequential
+  dependencies using MRFs.</li>
+
+  <li><b>gov2-bm25-base</b>: <i>bm25</i> term weighting, full
+  depencencies using MRFs.</li>
+</ul>
+
+<p>You might want to tweak the index location and output paths in <a
+href="data/gov2/run.gov2.basic.xml"><code>docs/data/gov2/run.gov2.basic.xml</code></a>,
+specifying where the index resides and where the retrieval results go.
+After that, put both configuration files in HDFS.  The class
+<b><code>ivory.smrf.retrieval.RunQueryHDFS</code></b> performs a batch
+<i>ad hoc</i> retrieval run. Here's a sample invocation that will run both the TREC 2000
+and TREC 2001 Web track queries:</p>
+
+<pre>
+hadoop jar ivory.jar ivory.smrf.retrieval.RunQueryHDFS \
+  /shared/run.gov2.basic.xml \
+  /shared/gov2.title.701-775 \
+  /shared/gov2.title.776-850
+</pre>
+
+<p>Alternatively, you may want to perform ad hoc retrieval on your
+local machine, with the following command-line invocation:</p>
+
+<pre>
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal \
+  docs/data/gov2/run.gov2.basic.xml \
+  docs/data/gov2/gov2.title.701-775 \
+  docs/data/gov2/gov2.title.776-850
+</pre>
+
+<p>Document relevance information (qrels) is found in the <a
+href="data/gov2/qrels.gov2.all"><code>docs/data/gov2/qrels.gov2.all</code></a>
+file.  With the <a
+href="http://trec.nist.gov/trec_eval/index.html">trec_eval</a>
+program, you should be able to evaluate the runs.  See
+our <a href="regression.html#gov2">experimental results page</a> for the
+effectiveness numbers you should be getting.</p>
+
+<p style="padding-top: 25px"><a href="./index.html">Back to main page</a></p>
+
+</div></div>
+
+<!--- END MAIN CONTENT HERE -->
+
+	</div>
+
+	<!-- main END -->
+
+
+
+		<div class="fixed"></div>
+
+</div>
+
+<!-- content END -->
+
+<!-- footer START -->
+
+<div id="footer">
+<div id="copyright">
+Last updated:
+<script type="text/javascript">
+<!--//
+document.write(document.lastModified);
+//-->
+</script>
+</div>
+
+<div id="themeinfo">
+Adapted from a WordPress Theme by <a href="http://www.neoease.com/">NeoEase</a>. Valid <a href="http://validator.w3.org/check?uri=referer">XHTML 1.1</a> and <a href="http://jigsaw.w3.org/css-validator/check/referer?profile=css3">CSS 3</a>.	</div>
+
+</div>
+
+<!-- footer END -->
+
+
+
+</div>
+
+<!-- container END -->
+
+</div>
+
+<!-- wrap END -->
+
+</body>
+</html>

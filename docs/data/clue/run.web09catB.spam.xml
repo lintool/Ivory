@@ -1,0 +1,37 @@
+<parameters>
+
+     <index>/fs/clip-clueweb/indexes/clue.en.01</index>
+
+     <docscore type="spam" provider="ivory.data.SpamPercentileScore">/fs/clip-clueweb/indexes/clue.en.01/docscores-spam.dat</docscore>
+
+     <model id="web09catB-ql-waterloo-spam-0.3" type="Feature" output="ranking.web09catB-ql-waterloo-spam.0.3.txt" hits="1000">
+         <feature id="termWt" weight="1.0" 
+                  cliqueSet="ivory.smrf.model.builder.TermCliqueSet"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.TermExpressionGenerator"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1000.0" />
+         <feature id="docscore" weight="0.3"
+                  potential="ivory.smrf.model.potential.DocumentPotential" type="spam" />
+     </model>
+
+     <model id="web09catB-ql-waterloo-spam-0.5" type="Feature" output="ranking.web09catB-waterloo-ql-spam.0.5.txt" hits="1000">
+         <feature id="termWt" weight="1.0" 
+                  cliqueSet="ivory.smrf.model.builder.TermCliqueSet"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.TermExpressionGenerator"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1000.0" />
+         <feature id="docscore" weight="0.5"
+                  potential="ivory.smrf.model.potential.DocumentPotential" type="spam" />
+     </model>
+
+     <model id="web09catB-bm25-waterloo-spam-0.02" type="Feature" output="ranking.web09catB-bm25-waterloo-spam.0.02.txt" hits="1000">
+         <feature id="term" weight="1.0"
+                  cliqueSet="ivory.smrf.model.builder.TermCliqueSet"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.TermExpressionGenerator" 
+                  scoreFunction="ivory.smrf.model.score.BM25ScoringFunction" k1="0.5" b="0.3" />
+         <feature id="docscore" weight="0.02"
+                  potential="ivory.smrf.model.potential.DocumentPotential" type="spam" />
+     </model>
+
+</parameters>

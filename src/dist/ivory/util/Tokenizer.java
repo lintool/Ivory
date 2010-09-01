@@ -16,6 +16,10 @@
 
 package ivory.util;
 
+import org.apache.hadoop.conf.Configuration;
+
 public interface Tokenizer {
+	public void configure(Configuration conf);
+	
 	public String[] processContent(String text);
 }

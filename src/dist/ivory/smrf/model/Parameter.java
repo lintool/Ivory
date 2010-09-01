@@ -1,5 +1,5 @@
 /*
- * Ivory: A Hadoop toolkit for Web-scale information retrieval
+ * Ivory: A Hadoop toolkit for web-scale information retrieval
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You may
@@ -18,7 +18,6 @@ package ivory.smrf.model;
 
 /**
  * @author Don Metzler
- *
  */
 public class Parameter {
 
@@ -29,30 +28,27 @@ public class Parameter {
 	public static final String QUERY_ORDERED_ID = "query-orderedWt";
 	public static final String UNORDERED_ID = "unorderedWt";
 	public static final String QUERY_UNORDERED_ID = "query-unorderedWt";
-	
+
 	public static final String BIGRAM_ID = "bigramWt";
-	
+
 	/**
-	 * parameter id 
+	 * parameter id
 	 */
 	public String id = null;
-	
+
 	/**
-	 * weight parameter 
+	 * weight parameter
 	 */
 	public double weight;
-	
+
 	/**
 	 * @param weight
 	 */
-	public Parameter( String id, double weight ) {
+	public Parameter(String id, double weight) {
 		this.id = id;
 		this.weight = weight;
 	}
-	
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
+
 	@Override
 	public String toString() {
 		return "[id:" + id + ", weight: " + weight + "]";

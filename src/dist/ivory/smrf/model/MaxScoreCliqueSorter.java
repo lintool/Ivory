@@ -1,5 +1,5 @@
 /*
- * Ivory: A Hadoop toolkit for Web-scale information retrieval
+ * Ivory: A Hadoop toolkit for web-scale information retrieval
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You may
@@ -20,23 +20,17 @@ import java.util.Comparator;
 
 /**
  * @author Don Metzler
- *
  */
 public class MaxScoreCliqueSorter implements Comparator<Clique> {
 
-	/* (non-Javadoc)
-	 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
-	 */
 	public int compare(Clique a, Clique b) {
 		double maxScoreA = a.getMaxScore();
 		double maxScoreB = b.getMaxScore();
-		if( maxScoreA == maxScoreB ) {
+		if (maxScoreA == maxScoreB) {
 			return 0;
-		}
-		else if( maxScoreA < maxScoreB ) {
+		} else if (maxScoreA < maxScoreB) {
 			return 1;
-		}
-		else {
+		} else {
 			return -1;
 		}
 	}

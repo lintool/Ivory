@@ -32,17 +32,12 @@ public interface CfTable {
 	/**
 	 * Returns the collection frequency of a term.
 	 */
-	public long getCf(String term);
+	public long getCf(int term);
 
 	/**
 	 * Returns the total number of terms in this collection.
 	 */
 	public long getCollectionSize();
-
-	/**
-	 * Returns the number of documents in the collection.
-	 */
-	public int getDocumentCount();
 
 	/**
 	 * Returns the number of unique terms in the collection.
@@ -58,7 +53,7 @@ public interface CfTable {
 	/**
 	 * Returns the term with the highest collection frequency.
 	 */
-	public String getMaxCfTerm();
+	public int getMaxCfTerm();
 
 	/**
 	 * Returns the number of terms that only appear once in the collection.

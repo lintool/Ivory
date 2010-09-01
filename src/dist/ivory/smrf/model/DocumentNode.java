@@ -1,5 +1,5 @@
 /*
- * Ivory: A Hadoop toolkit for Web-scale information retrieval
+ * Ivory: A Hadoop toolkit for web-scale information retrieval
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You may
@@ -17,33 +17,38 @@
 package ivory.smrf.model;
 
 /**
+ * <p>
+ * Object representing a document node in a Markov Random Field.
+ * <p>
+ * 
  * @author Don Metzler
- *
+ * 
  */
-public class DocumentNode extends Node {
+public class DocumentNode extends GraphNode {
 
-	// document id currently associated with this node
-	protected int mDocid = 0;
-	
+	protected int mDocno = 0;
+
 	/**
-	 * @return Document id associated with this node.
+	 * Returns the docno associated with this node.
 	 */
-	public int getDocumentID() {
-		return mDocid;
+	public int getDocno() {
+		return mDocno;
 	}
-	
+
 	/**
-	 * @param docid Sets the document of this node.
+	 * Sets the docno associated with this node.
 	 */
-	public void setDocumentID(int docid) {
-		mDocid = docid;
+	public void setDocno(int docno) {
+		mDocno = docno;
 	}
-	
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
+
+	public int getType() {
+		return DOCUMENT;
+	}
+
 	@Override
 	public String toString() {
-		return "<node type=\"Document\" docid=\"" + mDocid + "\" />\n";
+		return new StringBuilder("<node type=\"Document\" docid=\"").append(mDocno).append(
+				"\" />\n").toString();
 	}
 }

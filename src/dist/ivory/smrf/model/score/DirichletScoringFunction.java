@@ -1,5 +1,5 @@
 /*
- * Ivory: A Hadoop toolkit for Web-scale information retrieval
+ * Ivory: A Hadoop toolkit for web-scale information retrieval
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You may
@@ -18,67 +18,50 @@ package ivory.smrf.model.score;
 
 import ivory.smrf.model.GlobalEvidence;
 import ivory.smrf.model.GlobalTermEvidence;
+import ivory.util.XMLTools;
+
+import org.w3c.dom.Node;
 
 /**
  * @author Don Metzler
- *
+ * 
  */
 public class DirichletScoringFunction extends ScoringFunction {
 
-	/**
-	 * Smoothing parameter 
-	 */
+	// Smoothing parameter
 	private double mMu = 2500.0;
-	
-	/**
-	 * background probability
-	 */
+
+	// background probability
 	private double mBackgroundProb;
 
-	/**
-	 * is this term OOV?
-	 */
+	// is this term OOV?
 	private boolean mOOV = false;
-	
-	/**
-	 * @param mu
-	 */
-	public DirichletScoringFunction(double mu) {
+
+	@Override
+	public void configure(Node domNode) {
+		double mu = XMLTools.getAttributeValue(domNode, "mu", 2500.0);
 		mMu = mu;
 	}
-	
-	/* (non-Javadoc)
-	 * @see edu.umass.cs.SMRF.model.scoringfunction.ScoringFunction#getScore(double, int, int, double, long, long)
-	 */
+
 	@Override
 	public double getScore(double tf, int docLen) {
-		if( mOOV ) {
+		if (mOOV) {
 			return 0.0;
 		}
-		return Math.log( ( tf + mMu * mBackgroundProb ) / ( docLen + mMu ) );
+		return Math.log((tf + mMu * mBackgroundProb) / (docLen + mMu));
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
 	@Override
 	public String toString() {
 		return "<scoringfunction type=\"Dirichlet\" mu=\"" + mMu + "\" />\n";
 	}
 
-	/* (non-Javadoc)
-	 * @see ivory.smrf.model.score.ScoringFunction#initialize(ivory.smrf.model.GlobalTermEvidence, ivory.smrf.model.GlobalEvidence)
-	 */
 	@Override
-	public void initialize(GlobalTermEvidence termEvidence,
-			GlobalEvidence globalEvidence) {
+	public void initialize(GlobalTermEvidence termEvidence, GlobalEvidence globalEvidence) {
 		mOOV = termEvidence.cf == 0 ? true : false;
-		mBackgroundProb = (double)termEvidence.cf / (double)globalEvidence.collectionLength;
+		mBackgroundProb = (double) termEvidence.cf / (double) globalEvidence.collectionLength;
 	}
-	
-	/* (non-Javadoc)
-	 * @see ivory.smrf.model.score.ScoringFunction#getMaxScore()
-	 */
+
 	public double getMaxScore() {
 		// TODO: make a tighter upper bound for this score
 		return 0.0;

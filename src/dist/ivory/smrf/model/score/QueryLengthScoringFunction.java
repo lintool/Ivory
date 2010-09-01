@@ -1,5 +1,5 @@
 /*
- * Ivory: A Hadoop toolkit for Web-scale information retrieval
+ * Ivory: A Hadoop toolkit for web-scale information retrieval
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You may
@@ -16,28 +16,30 @@
 
 package ivory.smrf.model.score;
 
+import org.w3c.dom.Node;
+
 import ivory.smrf.model.GlobalEvidence;
 import ivory.smrf.model.GlobalTermEvidence;
 
 /**
  * @author Don Metzler
- *
+ * 
  */
 public class QueryLengthScoringFunction extends ScoringFunction {
 
 	private int mQueryLength;
-	
-	/* (non-Javadoc)
-	 * @see edu.umass.cs.SMRF.model.scoringfunction.ScoringFunction#getScore(double, int, int, double, long, long, int, int)
-	 */
+
+	public void configure(Node domNode) {
+		// do nothing
+	}
+
 	@Override
 	public double getScore(double tf, int docLen) {
 		return mQueryLength;
 	}
 
 	@Override
-	public void initialize(GlobalTermEvidence termEvidence,
-			GlobalEvidence globalEvidence) {
+	public void initialize(GlobalTermEvidence termEvidence, GlobalEvidence globalEvidence) {
 		mQueryLength = globalEvidence.queryLength;
 	}
 

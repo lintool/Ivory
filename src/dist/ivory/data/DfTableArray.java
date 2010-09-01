@@ -16,12 +16,7 @@
 
 package ivory.data;
 
-import ivory.index.ExtractDfFromPostings;
-
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.Arrays;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
@@ -29,28 +24,24 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.WritableUtils;
 
-import edu.umd.cloud9.debug.MemoryUsageUtils;
-
 /**
  * <p>
  * Array-based implementation of <code>DfTable</code>. Binary search is used
  * for lookup.
  * </p>
  * 
- * @see ExtractDfFromPostings
  * @author Jimmy Lin
+ * @author Tamer Elsayed
  * 
  */
 public class DfTableArray implements DfTable {
-	private int mNumDocs;
 	private int mNumTerms;
 
 	private int mMaxDf = 0;
-	private String mMaxDfTerm;
+	private int mMaxDfTerm;
 
 	private int mDfOne = 0;
 
-	private String[] mTerms;
 	private int[] mDfs;
 
 	/**
@@ -74,24 +65,33 @@ public class DfTableArray implements DfTable {
 	 * @throws IOException
 	 */
 	public DfTableArray(String file, FileSystem fs) throws IOException {
-		FSDataInputStream in = fs.open(new Path(file));
+		this(new Path(file), fs);
+	}
 
-		this.mNumDocs = in.readInt();
+	/**
+	 * Creates a <code>DfTableArray</code> object.
+	 * 
+	 * @param file
+	 *            collection frequency data file path
+	 * @param fs
+	 *            FileSystem to read from
+	 * @throws IOException
+	 */
+	public DfTableArray(Path file, FileSystem fs) throws IOException {
+		FSDataInputStream in = fs.open(file);
+
 		this.mNumTerms = in.readInt();
 
-		mTerms = new String[mNumTerms];
 		mDfs = new int[mNumTerms];
 
 		for (int i = 0; i < mNumTerms; i++) {
-			String term = in.readUTF();
 			int df = WritableUtils.readVInt(in);
 
-			mTerms[i] = term;
 			mDfs[i] = df;
 
 			if (df > mMaxDf) {
 				mMaxDf = df;
-				mMaxDfTerm = term;
+				mMaxDfTerm = i + 1;
 			}
 
 			if (df == 1) {
@@ -102,17 +102,8 @@ public class DfTableArray implements DfTable {
 		in.close();
 	}
 
-	public int getDf(String term) {
-		int index = Arrays.binarySearch(mTerms, term);
-
-		if (index < 0)
-			return -1;
-
-		return mDfs[index];
-	}
-
-	public int getDocumentCount() {
-		return mNumDocs;
+	public int getDf(int term) {
+		return mDfs[term - 1];
 	}
 
 	public int getVocabularySize() {
@@ -123,39 +114,11 @@ public class DfTableArray implements DfTable {
 		return mMaxDf;
 	}
 
-	public String getMaxDfTerm() {
+	public int getMaxDfTerm() {
 		return mMaxDfTerm;
 	}
 
 	public int getCountOfTermWithDfOne() {
 		return mDfOne;
-	}
-
-	public static void main(String[] args) throws Exception {
-		if (args.length != 1) {
-			System.out.println("usage: [df-file]");
-			System.exit(-1);
-		}
-
-		long startingMemoryUse = MemoryUsageUtils.getUsedMemory();
-
-		DfTableArray dfs = new DfTableArray(args[0]);
-
-		System.out.println("Number of documents: " + dfs.getDocumentCount());
-		System.out.println("Vocab size: " + dfs.getVocabularySize());
-		System.out.println("term with max df is " + dfs.getMaxDfTerm() + ", df=" + dfs.getMaxDf());
-		System.out.println(dfs.getCountOfTermWithDfOne() + " terms have df=1");
-
-		long endingMemoryUse = MemoryUsageUtils.getUsedMemory();
-
-		System.out.println("Memory usage: " + (endingMemoryUse - startingMemoryUse) + " bytes\n");
-
-		String term = null;
-		BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
-		System.out.print("Look up df of stemmed term> ");
-		while ((term = stdin.readLine()) != null) {
-			System.out.println(term + ", df=" + dfs.getDf(term));
-			System.out.print("Look up df of stemmed term > ");
-		}
 	}
 }

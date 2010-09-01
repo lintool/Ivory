@@ -19,6 +19,7 @@ package ivory.util;
 import java.io.Reader;
 import java.io.StringReader;
 
+import org.apache.hadoop.conf.Configuration;
 import org.apache.lucene.analysis.LowerCaseFilter;
 import org.apache.lucene.analysis.PorterStemFilter;
 import org.apache.lucene.analysis.StopFilter;
@@ -177,5 +178,8 @@ public class LuceneTokenizer implements Tokenizer {
 		// is much faster than a more sensible alternative of temporarily
 		// storing the terms in an ArrayList and then generating an array at the
 		// end (which I tried). -- Jimmy, 2008/10/09
+	}
+	
+	public void configure(Configuration conf) {
 	}
 }

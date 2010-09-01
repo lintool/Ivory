@@ -30,7 +30,6 @@ import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Logger;
 
-import edu.umd.cloud9.demo.DemoNullInput;
 import edu.umd.cloud9.mapred.NullInputFormat;
 import edu.umd.cloud9.mapred.NullMapper;
 import edu.umd.cloud9.mapred.NullOutputFormat;
@@ -53,7 +52,8 @@ public class RunQueryBroker extends Configured implements Tool {
 			String configPath = conf.get("ConfigPath");
 			String queriesFilePath = conf.get("QueriesFilePath");
 			String resultsFilePath = conf.get("ResultsFilePath");
-			String modelID = conf.get("ModelID");
+			String runtag = conf.get("Runtag");
+			int numHits = conf.getInt("NumHits", 0);
 
 			FileSystem fs = FileSystem.get(conf);
 			String fname = appendPath(configPath, "broker.brokerhost");
@@ -63,8 +63,8 @@ public class RunQueryBroker extends Configured implements Tool {
 
 			BrokerBatchQueryRunner qr;
 			try {
-				qr = new BrokerBatchQueryRunner(queriesFilePath, modelID, brokerAddress,
-						resultsFilePath);
+				qr = new BrokerBatchQueryRunner(queriesFilePath, runtag, brokerAddress,
+						resultsFilePath, numHits);
 
 				long start = System.currentTimeMillis();
 				qr.runQueries();
@@ -84,7 +84,8 @@ public class RunQueryBroker extends Configured implements Tool {
 	}
 
 	private static int printUsage() {
-		System.out.println("usage: [config-path] [runtag] [queries-file] [results-file]");
+		System.out
+				.println("usage: [config-path] [runtag] [queries-file] [results-file] [num-hits]");
 		ToolRunner.printGenericCommandUsage(System.out);
 		return -1;
 	}
@@ -93,7 +94,7 @@ public class RunQueryBroker extends Configured implements Tool {
 	 * Runs this tool.
 	 */
 	public int run(String[] args) throws Exception {
-		if (args.length != 4) {
+		if (args.length != 5) {
 			printUsage();
 			return -1;
 		}
@@ -109,13 +110,12 @@ public class RunQueryBroker extends Configured implements Tool {
 			return -1;
 		}
 
-		String modelID = args[1];
-
+		String runtag = args[1];
 		String queriesFilePath = args[2];
-
 		String resultsFilePath = args[3];
+		int numHits = Integer.parseInt(args[4]);
 
-		JobConf conf = new JobConf(DemoNullInput.class);
+		JobConf conf = new JobConf(RunQueryBroker.class);
 		conf.setJobName("RunQueryBroker");
 
 		conf.setNumMapTasks(1);
@@ -128,7 +128,8 @@ public class RunQueryBroker extends Configured implements Tool {
 		conf.set("QueriesFilePath", queriesFilePath);
 		conf.set("ConfigPath", configPath);
 		conf.set("ResultsFilePath", resultsFilePath);
-		conf.set("ModelID", modelID);
+		conf.set("Runtag", runtag);
+		conf.setInt("NumHits", numHits);
 
 		conf.set("mapred.child.java.opts", "-Xmx2048m");
 

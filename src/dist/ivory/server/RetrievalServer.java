@@ -17,7 +17,6 @@
 package ivory.server;
 
 import ivory.smrf.model.builder.MRFBuilder;
-import ivory.smrf.model.builder.MRFBuilderFactory;
 import ivory.smrf.retrieval.Accumulator;
 import ivory.smrf.retrieval.QueryRunner;
 import ivory.smrf.retrieval.ThreadedQueryRunner;
@@ -96,23 +95,19 @@ public class RetrievalServer {
 					sLogger.info(" - index: " + child.getTextContent().trim());
 
 					indexPath = child.getTextContent().trim();
-					break;
 				}
-			}
 
-			if (indexPath == null) {
-				throw new RuntimeException("Error: must specify an index location!");
-			}
-
-			for (int j = 0; j < children.getLength(); j++) {
-				Node child = children.item(j);
 				if ("findex".equals(child.getNodeName())) {
 					sLogger.info(" - findex: " + child.getTextContent().trim());
 
 					// initialize forward index
 					findexPath = child.getTextContent().trim();
-					break;
 				}
+
+			}
+
+			if (indexPath == null) {
+				throw new RuntimeException("Error: must specify an index location!");
 			}
 
 			if (findexPath == null)
@@ -120,10 +115,36 @@ public class RetrievalServer {
 		}
 
 		try {
+			mEnv = new RetrievalEnvironment(indexPath, fs);
+			mEnv.initialize(true);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new RuntimeException();
+		}
+
+		NodeList docscores = d.getElementsByTagName("docscore");
+		for (int j = 0; j < docscores.getLength(); j++) {
+			// model XML node
+			Node dscore = docscores.item(j);
+			
+			String type = XMLTools.getAttributeValue(dscore, "type", "");
+			String provider = XMLTools.getAttributeValue(dscore, "provider", "");
+			String path = dscore.getTextContent();
+
+			if (type.equals("") || provider.equals("") || path.equals("")) {
+				throw new RuntimeException("Invalid docscore!");
+			}
+
+			 sLogger.info("Loading docscore: type=" + type + ", provider=" +
+			 provider + ", path="
+			 + path);
+			mEnv.loadDocScore(type, provider, path);
+		}
+
+		try {
 			Node modelNode = d.getElementsByTagName("model").item(0);
 
-			mEnv = new RetrievalEnvironment(indexPath);
-			MRFBuilder builder = MRFBuilderFactory.getBuilder(mEnv, modelNode.cloneNode(true));
+			MRFBuilder builder = MRFBuilder.get(mEnv, modelNode.cloneNode(true));
 
 			// Set the number of hits to 2000 because that's what we had in our
 			// official TREC 2009 web track runs; otherwise, IF merging approach
@@ -134,10 +155,10 @@ public class RetrievalServer {
 			// load docno/docid mapping
 			try {
 				mDocnoMapping = (DocnoMapping) Class.forName(
-						RetrievalEnvironment.readDocnoMappingClass(fs, indexPath)).newInstance();
+						mEnv.readDocnoMappingClass()).newInstance();
 
-				mDocnoMapping.loadMapping(new Path(RetrievalEnvironment
-						.getDocnoMappingFile(indexPath)), fs);
+				mDocnoMapping.loadMapping(new Path(mEnv
+						.getDocnoMappingData()), fs);
 			} catch (Exception e) {
 				e.printStackTrace();
 				throw new RuntimeException("Error initializing DocnoMapping!");
@@ -152,8 +173,8 @@ public class RetrievalServer {
 				try {
 					mForwardIndex = (DocumentForwardIndex<Indexable>) Class.forName(indexClass)
 							.newInstance();
-					mForwardIndex.loadIndex(findexPath, RetrievalEnvironment
-							.getDocnoMappingFile(indexPath));
+					mForwardIndex.loadIndex(findexPath, mEnv
+							.getDocnoMappingData());
 				} catch (Exception e) {
 					e.printStackTrace();
 					throw new RuntimeException("Error initializing forward index!");
@@ -175,7 +196,8 @@ public class RetrievalServer {
 		root.addServlet(
 				new ServletHolder(new QueryBrokerServlet(mQueryRunner, mEnv, mDocnoMapping)),
 				QueryBrokerServlet.ACTION);
-		root.addServlet(new ServletHolder(new QueryDirectServlet(mQueryRunner, mEnv)),
+		root.addServlet(
+				new ServletHolder(new QueryDirectServlet(mQueryRunner, mEnv, mDocnoMapping)),
 				QueryDirectServlet.ACTION);
 		root.addServlet(new ServletHolder(new FetchDocnoServlet(mForwardIndex)),
 				FetchDocnoServlet.ACTION);
@@ -191,6 +213,18 @@ public class RetrievalServer {
 	}
 
 	public RetrievalServer() {
+	}
+
+	private static String join(String[] terms, String sep) {
+		StringBuilder sb = new StringBuilder();
+
+		for (int i = 0; i < terms.length; i++) {
+			sb.append(terms[i]);
+			if (i < terms.length - 1)
+				sb.append(sep);
+		}
+
+		return sb.toString();
 	}
 
 	public static class HomeServlet extends HttpServlet {
@@ -231,10 +265,13 @@ public class RetrievalServer {
 
 		private QueryRunner mQueryRunner = null;
 		private RetrievalEnvironment mEnv = null;
+		private DocnoMapping mDocnoMapping = null;
 
-		public QueryDirectServlet(QueryRunner queryRunner, RetrievalEnvironment env) {
+		public QueryDirectServlet(QueryRunner queryRunner, RetrievalEnvironment env,
+				DocnoMapping mapping) {
 			mQueryRunner = queryRunner;
 			mEnv = env;
+			mDocnoMapping = mapping;
 		}
 
 		public void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException,
@@ -257,17 +294,10 @@ public class RetrievalServer {
 			long startTime = System.currentTimeMillis();
 
 			String[] queryTokens = mEnv.tokenize(query);
-			StringBuffer queryText = new StringBuffer();
-			for (String token : queryTokens) {
-				queryText.append(token);
-				queryText.append(" ");
-			}
-
-			String tokenizedQuery = queryText.toString();
-			sLogger.info("Tokenized query: " + tokenizedQuery);
+			sLogger.info("Tokenized query: " + join(queryTokens, " "));
 
 			// run the query
-			Accumulator[] results = mQueryRunner.runQuery(tokenizedQuery);
+			Accumulator[] results = mQueryRunner.runQuery(queryTokens);
 			long endTime = System.currentTimeMillis();
 
 			sLogger.info("query execution time (ms): " + (endTime - startTime));
@@ -277,8 +307,9 @@ public class RetrievalServer {
 
 			sb.append("<ol>");
 			for (Accumulator a : results) {
-				sb.append("<li>docno <a href=" + FetchDocnoServlet.formatRequestURL(a.docid) + ">"
-						+ a.docid + "</a> (" + a.score + ")</li>\n");
+				sb.append("<li>docno " + a.docno + ", docid <a href="
+						+ FetchDocnoServlet.formatRequestURL(a.docno) + ">"
+						+ mDocnoMapping.getDocid(a.docno) + "</a> (" + a.score + ")</li>\n");
 			}
 			sb.append("</ol>");
 			sb.append("</body></html>\n");
@@ -321,30 +352,20 @@ public class RetrievalServer {
 			if (req.getParameterValues(QUERY_FIELD) != null)
 				query = req.getParameterValues(QUERY_FIELD)[0];
 
-			sLogger.info("Broker raw query: " + query);
-
 			long startTime = System.currentTimeMillis();
 
 			String[] queryTokens = mEnv.tokenize(query);
-			StringBuffer queryText = new StringBuffer();
-			for (String token : queryTokens) {
-				queryText.append(token);
-				queryText.append(" ");
-			}
-
-			String tokenizedQuery = queryText.toString();
-			sLogger.info("Tokenized query: " + tokenizedQuery);
+			sLogger.info("Tokenized query: " + join(queryTokens, " "));
 
 			// run the query
-			Accumulator[] results = mQueryRunner.runQuery(tokenizedQuery);
+			Accumulator[] results = mQueryRunner.runQuery(queryTokens);
 			long endTime = System.currentTimeMillis();
 
 			sLogger.info("query execution time (ms): " + (endTime - startTime));
 
 			StringBuffer sb = new StringBuffer();
 			for (Accumulator a : results) {
-				// sb.append(a.docid + "\t" + a.score + "\t");
-				sb.append(a.docid + "\t" + a.score + "\t" + mDocnoMapping.getDocid(a.docid) + "\t");
+				sb.append(a.docno + "\t" + a.score + "\t" + mDocnoMapping.getDocid(a.docno) + "\t");
 			}
 			PrintWriter out = res.getWriter();
 			out.print(sb.toString().trim());
@@ -393,10 +414,10 @@ public class RetrievalServer {
 
 				if (doc != null) {
 					sLogger.info("fetched: " + doc.getDocid() + " = docno " + docno);
-					res.setContentType(mForwardIndex.getContentType());
+					res.setContentType(doc.getDisplayContentType());
 
 					PrintWriter out = res.getWriter();
-					out.print(doc.getContent());
+					out.print(doc.getDisplayContent());
 					out.close();
 				} else {
 					throw new Exception();

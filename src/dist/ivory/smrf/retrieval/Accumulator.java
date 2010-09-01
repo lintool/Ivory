@@ -1,5 +1,5 @@
 /*
- * Ivory: A Hadoop toolkit for Web-scale information retrieval
+ * Ivory: A Hadoop toolkit for web-scale information retrieval
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You may
@@ -20,9 +20,9 @@ import java.io.Serializable;
 
 /**
  * @author Don Metzler
- *
+ * 
  */
-public class Accumulator implements Comparable, Serializable {
+public class Accumulator implements Comparable<Accumulator>, Serializable {
 
 	/**
 	 * serialization unique id
@@ -32,59 +32,46 @@ public class Accumulator implements Comparable, Serializable {
 	/**
 	 * docid associated with this accumulator
 	 */
-	public int docid = 0;
-	
+	public int docno = 0;
+
 	/**
-	 * score associated with this accumulator 
+	 * score associated with this accumulator
 	 */
 	public double score = 0.0;
-	
+
 	/**
-	 * @param docid
+	 * @param docno
 	 * @param score
 	 */
-	public Accumulator( int docid, double score ) {
-		this.docid = docid;
+	public Accumulator(int docno, double score) {
+		this.docno = docno;
 		this.score = score;
 	}
-	
-	/* (non-Javadoc)
-	 * @see java.lang.Comparable#compareTo(java.lang.Object)
-	 */
-	public int compareTo(Object o) {
-		Accumulator a = (Accumulator)o;
-		if( score > a.score ) {
+
+	public int compareTo(Accumulator a) {
+		if (score > a.score) {
 			return 1;
-		}
-		else if( score < a.score ) {
+		} else if (score < a.score) {
 			return -1;
-		}
-		else if( score == a.score ) {
-			if( docid > a.docid ) {
+		} else if (score == a.score) {
+			if (docno > a.docno) {
 				return 1;
-			}
-			else if( docid < a.docid ) {
+			} else if (docno < a.docno) {
 				return -1;
 			}
 		}
 		return 0;
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
 	@Override
 	public String toString() {
-		return "<accumulator docid=\"" + docid + "\" score=\"" + score + "\" />\n";
+		return "<accumulator docno=\"" + docno + "\" score=\"" + score + "\" />\n";
 	}
 
-	/**
-	 * @param results
-	 */
-	public static int [] accumulatorsToDocIDS( Accumulator[] results ) {
-		int [] ids = new int[ results.length ];
-		for( int i = 0; i < results.length; i++ ) {
-			ids[ i ] = results[ i ].docid;
+	public static int[] accumulatorsToDocnos(Accumulator[] results) {
+		int[] ids = new int[results.length];
+		for (int i = 0; i < results.length; i++) {
+			ids[i] = results[i].docno;
 		}
 		return ids;
 	}

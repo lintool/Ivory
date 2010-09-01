@@ -58,14 +58,26 @@ public class BrokerQueryRunner implements QueryRunner {
 		return mQueryResults;
 	}
 
-	public Accumulator[] runQuery(String query) {
+	private static String join(String[] terms, String sep) {
+		StringBuilder sb = new StringBuilder();
+		
+		for ( int i=0; i<terms.length; i++ ) {
+			sb.append(terms[i]);
+			if ( i<terms.length-1)
+				sb.append(sep);
+		}
+		
+		return sb.toString();
+	}
+
+	public Accumulator[] runQuery(String[] query) {
 		Accumulator[] results = null;
 		sLogger.info("Contacting broker for query: " + query);
 		try {
 			String url = "http://" + mBrokerAddress
 					+ RunRetrievalBroker.PlainTextQueryServlet.ACTION + "?"
 					+ RunRetrievalBroker.PlainTextQueryServlet.QUERY_FIELD + "="
-					+ query.replaceAll(" ", "+");
+					+ join(query, "+");
 
 			sLogger.info("fetching " + url);
 
@@ -108,7 +120,7 @@ public class BrokerQueryRunner implements QueryRunner {
 		return mAllQueriesDocnoMapping.get(qid);
 	}
 
-	public void runQuery(String qid, String query) {
+	public void runQuery(String qid, String[] query) {
 		Accumulator[] results = runQuery(query);
 		this.mQueryResults.put(qid, results);
 		mAllQueriesDocnoMapping.put(qid, mSingleQueryDocnoMapping);

@@ -1,0 +1,51 @@
+<parameters>
+
+     <model id="bm25" type="Feature" hits="1000">
+         <feature id="term" weight="1.0"
+                  cliqueSet="ivory.smrf.model.builder.TermCliqueSet"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.TermExpressionGenerator" 
+                  scoreFunction="ivory.smrf.model.score.BM25ScoringFunction" k1="0.5" b="0.3" />
+     </model>
+
+     <server id="ClueWeb09.en.segment01">
+       <index>/shared/ClueWeb09/indexes/clue.en.01</index>
+     </server>
+
+     <server id="ClueWeb09.en.segment02">
+       <index>/shared/ClueWeb09/indexes/clue.en.02</index>
+     </server>
+
+     <server id="ClueWeb09.en.segment03">
+       <index>/shared/ClueWeb09/indexes/clue.en.03</index>
+     </server>
+
+     <server id="ClueWeb09.en.segment04">
+       <index>/shared/ClueWeb09/indexes/clue.en.04</index>
+     </server>
+
+     <server id="ClueWeb09.en.segment05">
+       <index>/shared/ClueWeb09/indexes/clue.en.05</index>
+     </server>
+
+     <server id="ClueWeb09.en.segment06">
+       <index>/shared/ClueWeb09/indexes/clue.en.06</index>
+     </server>
+
+     <server id="ClueWeb09.en.segment07">
+       <index>/shared/ClueWeb09/indexes/clue.en.07</index>
+     </server>
+
+     <server id="ClueWeb09.en.segment08">
+       <index>/shared/ClueWeb09/indexes/clue.en.08</index>
+     </server>
+
+     <server id="ClueWeb09.en.segment09">
+       <index>/shared/ClueWeb09/indexes/clue.en.09</index>
+     </server>
+
+     <server id="ClueWeb09.en.segment10">
+       <index>/shared/ClueWeb09/indexes/clue.en.10</index>
+     </server>
+
+</parameters>

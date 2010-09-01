@@ -1,0 +1,59 @@
+<parameters>
+
+     <index>/fs/clip-hadoop/indexes/wt10g</index>
+     <!-- Dirichlet, WSD, sequential dependence -->
+     <model id="wt10g-wsd-sd" type="WSD" output="/tmp/ranking.wt10g-dir-wsd-sd.txt" hits="1000" collection="wt10g">
+         
+         <metaFeature id="collection_freq" weight="0.0756" file="/fs/clip-trec/trunk1/docs/data/wt10g/stats.wt10g.cf.collection.txt" />
+         <metaFeature id="document_freq" weight = "0.6256" file="/fs/clip-trec/trunk1/docs/data/wt10g/stats.wt10g.df.collection.txt" />
+         <metaFeature id="clue_cf" weight = "0.000695" file="/fs/clip-trec/trunk1/docs/data/wt10g/stats.wt10g.cf.clue.txt" />
+         <metaFeature id="enwiki_cf" weight = "0.2980" file="/fs/clip-trec/trunk1/docs/data/wt10g/stats.wt10g.cf.enwiki.txt" />
+         
+         <feature id="termWt" weight="0.82"
+                  cliqueSet="ivory.smrf.model.builder.TermCliqueSet"   
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.TermExpressionGenerator"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1000.0" />
+         <feature id="orderedWt" weight="0.09"
+                  cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.OrderedWindowExpressionGenerator" width="1"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="750.0" />
+         <feature id="unorderedWt" weight="0.09"
+                  cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.UnorderedWindowExpressionGenerator" width="4"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="750.0" />
+     </model>     
+
+     <!-- Dirichlet, WSD, full dependence -->
+     <model id="wt10g-wsd-fd" type="WSD" output="/tmp/ranking.wt10g-dir-wsd-fd.txt" hits="1000" collection="wt10g">
+
+         <metaFeature id="collection_freq" weight="0.0756" file="/fs/clip-trec/trunk1/docs/data/wt10g/stats.wt10g.cf.collection.txt" />
+         <metaFeature id="document_freq" weight = "0.6256" file="/fs/clip-trec/trunk1/docs/data/wt10g/stats.wt10g.df.collection.txt" />
+         <metaFeature id="clue_cf" weight = "0.000695" file="/fs/clip-trec/trunk1/docs/data/wt10g/stats.wt10g.cf.clue.txt" />
+         <metaFeature id="enwiki_cf" weight = "0.2980" file="/fs/clip-trec/trunk1/docs/data/wt10g/stats.wt10g.cf.enwiki.txt" />
+         
+         <feature id="termWt" weight="0.82"
+                  cliqueSet="ivory.smrf.model.builder.TermCliqueSet"
+                 potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.TermExpressionGenerator"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1000.0" />
+         <feature id="orderedWt" weight="0.09"
+                  cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="full"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.OrderedWindowExpressionGenerator" width="1"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="750.0" /> 
+         <feature id="unorderedWt" weight="0.09"
+                  cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="full"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.UnorderedWindowExpressionGenerator" width="4"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="750.0" />
+         <feature id="unorderedWt" weight="0.09"
+                  cliqueSet="ivory.smrf.model.builder.UnorderedCliqueSet" dependence="full"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.UnorderedWindowExpressionGenerator" width="4"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="750.0" />
+	</model>     
+
+</parameters>

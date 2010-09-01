@@ -1,5 +1,5 @@
 /*
- * Ivory: A Hadoop toolkit for Web-scale information retrieval
+ * Ivory: A Hadoop toolkit for web-scale information retrieval
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You may
@@ -16,15 +16,38 @@
 
 package ivory.smrf.model.builder;
 
+import org.w3c.dom.Node;
+
 /**
  * @author Don Metzler
- *
+ * 
  */
 public abstract class ExpressionGenerator {
+
+	public abstract void configure(Node domNode) throws Exception;
 
 	/**
 	 * @param terms
 	 */
-	public abstract String getExpression(String terms);
+	public abstract String getExpression(String[] terms);
 
+	@SuppressWarnings("unchecked")
+	public static ExpressionGenerator create(String type, Node domNode) throws Exception {
+		if (domNode == null) {
+			throw new Exception("Unable to generate a ExpressionGenerator from a null node!");
+		}
+
+		try {
+			Class<? extends ExpressionGenerator> clz = (Class<? extends ExpressionGenerator>) Class
+					.forName(type);
+			ExpressionGenerator f = clz.newInstance();
+
+			f.configure(domNode);
+
+			return f;
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new RuntimeException("Error: Unable to instantiate ExpressionGenerator!");
+		}
+	}
 }

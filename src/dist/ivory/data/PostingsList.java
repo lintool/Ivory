@@ -16,6 +16,8 @@
 
 package ivory.data;
 
+import java.io.IOException;
+
 import ivory.index.TermPositions;
 
 import org.apache.hadoop.io.Writable;
@@ -139,4 +141,6 @@ public interface PostingsList extends Writable {
 	 * Returns the raw byte array representation of this postings list.
 	 */
 	public byte[] getRawBytes();
+	
+	public byte[] serialize() throws IOException;
 }

@@ -1,5 +1,13 @@
 package ivory.util;
 
+import org.apache.hadoop.conf.Configuration;
+
+/**
+ * English truncator/tokenizer copied from Hadoop-MT, to be used when translating document vectors
+ * 
+ * @author ferhanture
+ *
+ */
 public class MTTokenizer implements Tokenizer {
 
 	public String[] processContent(String text) {
@@ -52,4 +60,6 @@ public class MTTokenizer implements Tokenizer {
 
 	}
 
+	public void configure(Configuration conf) {
+	}
 }

@@ -1,0 +1,559 @@
+geeche 2
+freighter 29
+slot 167
+retir 268
+ship registr 3
+anthrax 82
+diamond 2134
+puerto rico 1186
+comput 7382
+adopt 242
+yew 116
+stem cell 118
+huang 487
+revers 744
+feder 9678
+coyot 247
+candi maker 2
+iceland govern 3
+histori 15338
+new jersey 6607
+galapago 107
+acid 3358
+mersenn prime 10
+prevent program 8
+reactor 488
+intellig 1954
+seminol 183
+squirrel 630
+pennsylvania 9425
+mine 3317
+treatment 616
+chesapeak bay 53
+student 2375
+success 717
+enron 28
+energi 3555
+women right 61
+execut 1622
+america 7316
+oversight 89
+johnstown flood 7
+repair 191
+bay maryland 4
+custer 203
+continu care 10
+erupt 182
+notabl 933
+candi 857
+fund 1878
+dull 120
+illeg 220
+depart defens 78
+damag 362
+schizophrenia 51
+war support 1
+shopper 69
+river 41503
+bulli 245
+hidden markov 14
+data 2370
+pot 490
+world 27954
+dam remov 1
+blood 3117
+sourc 1282
+pueraria 5
+id 1789
+north 20494
+sport 6901
+internet 2367
+wetland 243
+markov model 21
+pharmacist 64
+sue 569
+mersenn 34
+music 16433
+wastewat 34
+rico state 3
+complic 108
+david mccullough 5
+cancer prevent 4
+volcano erupt 5
+mass 2119
+secret 2733
+camel 250
+big dig 19
+save 1351
+patrol 836
+volcano 986
+airport 17953
+airport secur 14
+intracoast 13
+low 2293
+measur 1341
+last 3286
+resal 11
+spanish 2413
+librari comput 7
+scam 177
+secret shopper 3
+global temperatur 4
+right saudi 9
+associ 14364
+contra 313
+sea life 11
+smuggl 40
+arabl land 3
+import 459
+reclam 71
+hidden 573
+band 16036
+illeg immigr 34
+research 4828
+crisi 1540
+usaid assist 1
+right 6397
+civil war 1412
+type 4213
+air 12476
+indian 7322
+volcan activ 6
+hubbl telescop 3
+tomato 262
+registr 623
+care 1573
+embryon 56
+leopard 387
+sunflow 109
+hors race 97
+javelina 7
+maryland 5429
+may day 47
+depart 6966
+artifici intellig 150
+ident theft 8
+park 25805
+race 5255
+alzheim research 5
+acid rain 11
+highland 2009
+law 11399
+letter 2102
+census 1131
+stand 1601
+secur 4075
+puerto 2018
+cultiv 74
+dull airport 4
+hoax 238
+knee 281
+india 5559
+muslim 1185
+cultur 5752
+mill 4162
+cancer treatment 21
+day 11499
+jersey 7435
+pol 288
+model railroad 33
+intracoast waterway 9
+kroll 58
+seminol indian 4
+ephedra 26
+wolv 309
+social 4404
+season 26110
+whale 760
+issu 1086
+coast 2924
+blood cell 24
+involv 274
+care retir 1
+social secur 139
+textil 252
+pet 623
+posit system 28
+oil 2735
+older 111
+human clone 3
+leopard frog 18
+iran 1816
+iraq foreign 1
+recycl 466
+john edward 200
+immigr 805
+dye 257
+flood 927
+women state 1
+cell 3117
+legislatur 574
+cocker spaniel 11
+player 8782
+decor 451
+ma huang 2
+cult 597
+temperatur 458
+counterfeit 87
+mississippi river 103
+mean 1618
+mississippi 2092
+fire 5717
+civil air 53
+1890 census 3
+stadium 6034
+church 16125
+rico 1391
+surgeri 549
+clone 517
+prostat cancer 17
+job 852
+pyramid scheme 6
+prevent 599
+quota 79
+kroll associ 3
+dam 2463
+bay 7907
+jersey tomato 2
+slot machin 13
+drug 2012
+chaco cultur 2
+blower 63
+train 5398
+type ii 127
+american 21130
+doomsday cult 3
+pyramid 618
+north america 810
+kudzu 13
+cocker 75
+machin 3233
+ident 1046
+blue grass 22
+american muslim 14
+industri histori 15
+land 5823
+remov 277
+orang 2541
+fire ant 19
+johnstown 122
+mortgag 319
+locat 1012
+fuel car 5
+golden ratio 16
+cell count 8
+earthquak 1394
+nuclear reactor 56
+hybrid 904
+census data 3
+volcan 452
+music festiv 432
+abandon 147
+replac 276
+poison 732
+obes 117
+wastewat treatment 16
+vector 831
+festiv 5832
+industri 4728
+mercuri poison 4
+cultur nation 6
+view 2077
+river flood 47
+physician 514
+deform 124
+assist live 16
+arson 47
+infect 545
+textil mill 7
+languag cultur 36
+union 12986
+reform 1928
+timeshar resal 1
+product 3964
+knee replac 5
+call 3207
+display rule 1
+pol pot 5
+duplic 93
+tree 4590
+atlant intracoast 3
+increas 128
+scottish highland 12
+atlant 2427
+employe 440
+war 17329
+continu 919
+blue 10034
+terror 1484
+relat 9334
+station call 5
+doctor border 4
+markov 236
+stem 343
+coast guard 310
+radio station 762
+women 9554
+gullah 12
+domest adopt 1
+test 4101
+spaniel 75
+control 3956
+bse 12
+scrabbl 85
+mccullough 113
+battl reenact 1
+lobata 35
+global posit 18
+reintroduct 7
+librari 4421
+hors 3505
+rang 2491
+ant 894
+radio 8011
+eskimo 209
+state 75478
+nation 44675
+debt 381
+korean 2254
+revers mortgag 4
+intern 18746
+white 11153
+bagpip 75
+parti 16455
+low white 2
+hedg fund 21
+ovarian 71
+foreign 3187
+homeless 156
+telescop 599
+cancer 1064
+crimin court 43
+parti polit 17
+rule 3793
+commerci 985
+artifici 578
+system 14127
+call letter 21
+pet therapi 1
+descript 273
+recognit 480
+pearl 1155
+florida seminol 1
+whistl 317
+saudi 730
+protect 2141
+iran contra 19
+massachusett 5082
+sport stadium 45
+polit view 43
+ship 4961
+gray 2953
+energi crisi 29
+passport 489
+reactor type 2
+waterway 152
+ban 810
+talent 373
+war ii 1522
+1890 281
+labor 1266
+spanish civil 61
+therapi 965
+anim 4980
+prime 2188
+ii diabet 3
+portug 2074
+regul 858
+farm 3498
+geyser 97
+reenact 54
+whistl blower 5
+custer last 6
+nuclear 2454
+total 1508
+sea 5263
+foreign debt 6
+ii 16672
+edward 12165
+live 11071
+diabet 251
+retir communiti 7
+cruis ship 60
+urban 2013
+chaco 103
+air patrol 40
+clean 603
+wage 243
+north korean 202
+weight 761
+domest 643
+chees 976
+state relat 706
+muslim mosqu 5
+display 549
+dig 312
+woodpeck 310
+hubbl 101
+mean test 8
+train station 753
+driver 1132
+global 2363
+gastric bypass 7
+gift 710
+gift talent 20
+human 4848
+welfar reform 7
+languag 16777
+hered 19
+school 62783
+golden 4865
+anthrax hoax 3
+guard 2092
+flag 4284
+life 8702
+aspirin 26
+handwrit recognit 5
+habitat 148
+hedg 300
+railroad 5266
+doctor 2977
+afghan women 7
+spammer 4
+transit 2774
+hmm 49
+magnet school 37
+vector graphic 26
+associ employe 2
+cruis 492
+count 4096
+death 4584
+support 1713
+outsourc 87
+licens 1070
+posit 1369
+scheme 757
+rescu 1152
+pearl farm 3
+highland game 18
+david 18018
+grass 1305
+nation park 3272
+total knee 1
+airlin 3109
+california energi 6
+green parti 429
+green 10141
+polit 5663
+pueraria lobata 1
+import fire 5
+govern 5715
+defens 2621
+war battl 42
+afghan 443
+scalabl vector 5
+iceland 1029
+techniqu 749
+scottish 3707
+ratio 769
+handwrit 45
+mine reclam 5
+fuel 1027
+crimin 1099
+mosqu 1227
+saudi arabia 412
+urban suburban 2
+civil 4816
+theft 346
+border 1395
+name 7219
+doomsday 204
+endang 163
+mass transit 49
+iraq 1681
+hmong 41
+bypass 361
+punish 606
+applic 1097
+prostat 105
+chesapeak 272
+segment 276
+portug world 3
+model 5467
+reduct 498
+program 6396
+gambl 379
+nation guard 346
+communiti 6047
+assist 1304
+state legislatur 159
+student program 3
+game 24382
+caus 595
+maker 661
+oil industri 36
+fraud 242
+timeshar 10
+frog 1863
+usaid 5
+rain 1356
+john 51047
+varieti 393
+graphic 998
+court 6758
+name right 5
+california 17438
+battl 18116
+may 2757
+alzheim 75
+abandon mine 2
+yew tree 15
+arabl 10
+gullah geeche 1
+live maryland 1
+new 54412
+scrabbl player 8
+activ 2034
+mercuri 804
+world war 2341
+white blood 12
+jockey 256
+mural 87
+florida 7404
+condit 885
+big 7276
+habitat human 7
+pork 223
+execut privileg 2
+gastric 116
+kurd 91
+magnet 1052
+station 45386
+restrict 281
+suburban 325
+last stand 58
+replac surgeri 5
+labor union 54
+slate 223
+welfar 506
+chees product 1
+ma 3279
+altern 1874
+arrest 314
+embryon stem 9
+requir 240
+arabia 552
+overbook 3
+hunt 1980
+ovarian cancer 12
+union activ 5
+segment duplic 1
+scalabl 46
+altern fuel 21
+women issu 5
+car 4469
+privileg 254
+problem 2031
+gray wolv 7
+sugar 1179
+intern crimin 43

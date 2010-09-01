@@ -1,5 +1,5 @@
 /*
- * Ivory: A Hadoop toolkit for Web-scale information retrieval
+ * Ivory: A Hadoop toolkit for web-scale information retrieval
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You may
@@ -17,80 +17,108 @@
 package ivory.smrf.model;
 
 import ivory.util.RetrievalEnvironment;
-import ivory.util.TextTools;
+import ivory.util.XMLTools;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 /**
+ * <p>
+ * Object representing a Markov Random Field.
+ * </p>
+ * 
  * @author Don Metzler
- *
  */
 public class MarkovRandomField {
 
 	/**
-	 * global evidence
+	 * Retrieval environment
 	 */
-	protected GlobalEvidence mGlobalEvidence = null;
-	
-	/**
-	 * 	the cliques associated with this MRF 
-	 */
-	protected List<Clique> mCliques = null;
-	
-	/**
-	 * @param queryText
-	 * @param env
-	 */
-	public MarkovRandomField(String queryText, RetrievalEnvironment env) {
-		// initialize cliques
-		mCliques = new ArrayList<Clique>();
-		
-		// set global evidence
-		mGlobalEvidence = new GlobalEvidence(env.documentCount(), env.termCount(), TextTools.countTokens(queryText));
-	}
+	protected RetrievalEnvironment mEnv = null;
 
 	/**
-	 * @return Returns the log of the unormalized joint
-	 *         probability of the current graph configuration.
-	 * @throws SMRFException 
-	 * @throws Exception
+	 * Global evidence associated with this MRF.
+	 */
+	protected GlobalEvidence mGlobalEvidence = null;
+
+	/**
+	 * List of cliques associated with this MRF.
+	 */
+	protected List<Clique> mCliques = null;
+
+	/**
+	 * Query terms associated with this MRF.
+	 */
+	protected String[] mQueryTerms = null;
+	
+	/**
+	 * <p>
+	 * Creates a <code>MarkovRandomField</code> object.
+	 * </p>
+	 * 
+	 * @param queryTerms
+	 *            query terms
+	 * @param env
+	 *            retrieval environment (for global evidence)
+	 */
+	public MarkovRandomField(String[] queryTerms, RetrievalEnvironment env) {
+		mEnv = env;
+		
+		mQueryTerms = queryTerms;
+
+		// initialize cliques
+		mCliques = new ArrayList<Clique>();
+
+		// set global evidence
+		mGlobalEvidence = new GlobalEvidence(env.documentCount(), env.termCount(),
+				queryTerms.length);
+	}
+
+	public void initialize() throws Exception {
+		mEnv.clearPostingsReaderCache();
+		for(Clique c : mCliques) {
+			c.initialize(mGlobalEvidence);
+		}
+	}
+	
+	/**
+	 * Returns the log of the unnormalized joint probability of the current
+	 * graph configuration.
 	 */
 	public double getLogUnormalizedProb() throws Exception {
 		double prob = 0.0;
-		
+
 		for (Clique c : mCliques) {
 			prob += c.getPotential();
 		}
 
 		return prob;
 	}
-		
+
 	/**
-	 * @return Returns the nodes associated with this MRF.
+	 * Returns the nodes associated with this MRF.
 	 */
-	// TODO: this is rather inefficient, but should be okay for small graphs
-	public List<Node> getNodes() {
-		ArrayList<Node> nodes = new ArrayList<Node>();
+	public List<GraphNode> getNodes() {
+		ArrayList<GraphNode> nodes = new ArrayList<GraphNode>();
 		for (Clique clique : mCliques) {
-			List<Node> cliqueNodes = clique.getNodes();
-			for (Node node : cliqueNodes) {
-				if( !nodes.contains( node ) ) {
-					nodes.add( node );
+			List<GraphNode> cliqueNodes = clique.getNodes();
+			for (GraphNode node : cliqueNodes) {
+				if (!nodes.contains(node)) {
+					nodes.add(node);
 				}
 			}
 		}
 		return nodes;
 	}
-	
+
 	/**
 	 * @param c
 	 */
 	public void addClique(Clique c) {
-		mCliques.add( c );
+		mCliques.add(c);
 	}
-	
+
 	/**
 	 * @return Returns the cliques associated with this MRF.
 	 */
@@ -100,42 +128,48 @@ public class MarkovRandomField {
 
 	public int getNextCandidate() {
 		int nextCandidate = Integer.MAX_VALUE;
-		
-		for(Clique clique : mCliques) {
+
+		for (Clique clique : mCliques) {
 			int candidate = clique.getNextCandidate();
-			if( candidate < nextCandidate ) {
+			if (candidate < nextCandidate) {
 				nextCandidate = candidate;
 			}
 		}
-		
+
 		return nextCandidate;
-	}
-	
-	/**
-	 * @param evidence
-	 */
-	public void setGlobalEvidence(GlobalEvidence evidence) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	/**
-	 * @return global evidence hash
+	 * Sets the <code>GlobalEvidence</code> associated with this MRF.
+	 */
+	public void setGlobalEvidence(GlobalEvidence evidence) {
+		mGlobalEvidence = evidence;
+	}
+
+	/**
+	 * Returns the <code>GlobalEvidence</code> associated with this MRF.
 	 */
 	public GlobalEvidence getGlobalEvidence() {
 		return mGlobalEvidence;
 	}
-	
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
+
+	public String[] getQueryTerms() {
+		return mQueryTerms;
+	}
+
 	@Override
 	public String toString() {
-		String ret = new String();
-		ret = "<mrf>\n";
-		for( Iterator<Clique> cliqueIter = mCliques.iterator(); cliqueIter.hasNext(); ) {
-			ret += cliqueIter.next();
-		}		
-		return ret + "</mrf>\n";
+		return toString(false);
 	}
+
+	public String toString(boolean verbose) {
+		StringBuilder sb = new StringBuilder("<mrf>\n");
+
+		for (Iterator<Clique> cliqueIter = mCliques.iterator(); cliqueIter.hasNext();) {
+			sb.append(cliqueIter.next().toString(verbose));
+		}
+		return XMLTools.format(sb.append("</mrf>").toString());
+	}
+
+
 }

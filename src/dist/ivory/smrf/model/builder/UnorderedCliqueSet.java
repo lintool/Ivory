@@ -1,5 +1,5 @@
 /*
- * Ivory: A Hadoop toolkit for Web-scale information retrieval
+ * Ivory: A Hadoop toolkit for web-scale information retrieval
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You may
@@ -18,30 +18,39 @@ package ivory.smrf.model.builder;
 
 import ivory.smrf.model.Clique;
 import ivory.util.RetrievalEnvironment;
+import ivory.util.XMLTools;
 
 import java.util.ArrayList;
 
+import org.w3c.dom.Node;
+
 /**
  * @author Don Metzler
- *
+ * 
  */
 public class UnorderedCliqueSet extends CliqueSet {
 
-	public UnorderedCliqueSet(RetrievalEnvironment env, String queryText, org.w3c.dom.Node csNode, DEPENDENCE_TYPE type, boolean docDependent) throws Exception {
-		// initialize clique set
+	@Override
+	public void configure(RetrievalEnvironment env, String[] queryTerms, Node domNode)
+			throws Exception {
+		String dependenceType = XMLTools.getAttributeValue(domNode, "dependence", "sequential");
+		boolean docDependent = XMLTools.getAttributeValue(domNode, "docDependent", true);
+
 		cliques = new ArrayList<Clique>();
 
 		// generate clique set
-		if( type == DEPENDENCE_TYPE.SEQUENTIAL ) {
-			//cliques = CliqueSetHelper.getSequentialDependenceCliques(queryText, potential, docDependent);
-			throw new Exception("Unsupported operation -- there are no unordered cliques within a sequentially dependent graph.");
-		}
-		else if( type == DEPENDENCE_TYPE.FULL ) {
-			cliques = CliqueSetHelper.getFullDependenceCliques(env, queryText, csNode, false, docDependent);
-		}
-		else {
-			throw new Exception("Unrecognized UnorderedCliqueSet type -- " + type);
+		if (dependenceType.equals("sequential")) {
+			throw new Exception(
+					"Unsupported operation: there are no unordered cliques within a sequentially dependent graph.");
+		} else if (dependenceType.equals("full")) {
+			cliques = CliqueFactory.getFullDependenceCliques(env, queryTerms, domNode, false,
+					docDependent);
+		} else {
+			throw new Exception("Unrecognized UnorderedCliqueSet type: " + dependenceType);
 		}
 	}
 
+	public String getType() {
+		return "Unordered";
+	}
 }

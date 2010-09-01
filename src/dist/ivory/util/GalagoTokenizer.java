@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
+import org.apache.hadoop.conf.Configuration;
 import org.galagosearch.core.parse.Document;
 import org.galagosearch.core.parse.TagTokenizer;
 import org.tartarus.snowball.ext.englishStemmer;
@@ -30,9 +31,9 @@ public class GalagoTokenizer implements Tokenizer {
 
 	//final static LuceneTokenizer defaultTokenizer = new LuceneTokenizer();
 
-    englishStemmer stemmer = new englishStemmer();
-    HashMap<String, String> cache = new HashMap();
-    
+	englishStemmer stemmer = new englishStemmer();
+	HashMap<String, String> cache = new HashMap();
+
 	private static final String[] TERRIER_STOP_WORDS = { "x", "y", "your", "yours", "yourself",
 		"yourselves", "you", "yond", "yonder", "yon", "ye", "yet", "z", "zillion", "j", "u",
 		"umpteen", "usually", "us", "username", "uponed", "upons", "uponing", "upon", "ups",
@@ -123,84 +124,92 @@ public class GalagoTokenizer implements Tokenizer {
 		"either", "even", "evens", "evenser", "evensest", "evened", "evenest", "ever",
 		"everyone", "everything", "everybody", "everywhere", "every", "ere", "each", "et",
 		"etc", "elsewhere", "else", "ex", "excepted", "excepts", "except", "excepting", "exes",
-		"enough" };
+	"enough" };
 
 	static private HashSet<String> stopwords = new HashSet<String>();
-	
+
 	static {
 		for (int i=0; i<TERRIER_STOP_WORDS.length; i++) {
 			stopwords.add(TERRIER_STOP_WORDS[i]);
 		}
 	}
-	
+
+	public boolean isStopWord(String word){
+		return stopwords.contains(word);
+	}
+
 	public String[] processContent(String text) {
-		
+
 		/*String[] terms = defaultTokenizer.processContent(text);
 		StringBuffer str = new StringBuffer();
 		for(String term : terms)
 			str.append(term).append(" ");
-		*/
+		 */
 		TagTokenizer tokenizer = new TagTokenizer();
 		Document doc = null;
 		try {
 			doc = tokenizer.tokenize(text);
 			//doc = tokenizer.tokenize(text);
-			
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		//String[] words = new String[doc.terms.size()];
 		//for(int i=0; i < doc.terms.size(); i++) words[i] = doc.terms.get(i);
-		
 
-        List<String> toks = doc.terms;
-        List<String> words = new ArrayList<String>();
-        
-        for ( String tok : toks ) {
-        	if ( !stopwords.contains(tok))
-        		words.add(tok);
-        }
 
-        for (int i = 0; i < words.size(); i++) {
-            String word = words.get(i);
+		List<String> toks = doc.terms;
+		List<String> words = new ArrayList<String>();
 
-            if (word != null) {
-                if (cache.containsKey(word)) {
-                    words.set(i, cache.get(word));
-                } else {
-                    stemmer.setCurrent(word);
-                    if (stemmer.stem()) {
-                        String stem = stemmer.getCurrent();
-                        words.set(i, stem);
-                        cache.put(word, stem);
-                    } else {
-                        cache.put(word, word);
-                    }
-                }
+		for ( String tok : toks ) {
+			if ( !stopwords.contains(tok))
+				words.add(tok);
 
-                if (cache.size() > 50000) {
-                    cache.clear();
-                }
-            }
-        }
-	    
-        String[] arr = new String[words.size()];
+		}
+
+		for (int i = 0; i < words.size(); i++) {
+			String word = words.get(i);
+
+			if (word != null) {
+				if (cache.containsKey(word)) {
+					words.set(i, cache.get(word));
+				} else {
+					stemmer.setCurrent(word);
+					if (stemmer.stem()) {
+						String stem = stemmer.getCurrent();
+						words.set(i, stem);
+						cache.put(word, stem);
+					} else {
+						cache.put(word, word);
+					}
+				}
+
+				if (cache.size() > 50000) {
+					cache.clear();
+				}
+			}
+		}
+
+		String[] arr = new String[words.size()];
 		return (String[]) words.toArray(arr);
+	}
+
+	public void configure(Configuration conf) {
 	}
 	
 	public static void main(String[] args){
 		String text = " this is a the <test> for the teokenizer 101 546 345-543543545436-4656765865865 rgger <xml> ergtre 456435klj345lj34590";
-		
+
 		Tokenizer tokenizer;
 		String[] tokens;
-		
+
 		System.out.println("tokenization according to Galago: ");
 		tokenizer = new GalagoTokenizer();
 		tokens = tokenizer.processContent(text);
 		for(String t : tokens)	System.out.println(t);
-		
-		
+
+
 		System.out.println("\n\ntokenization according to Lucene: ");
 		tokenizer = new LuceneTokenizer();
 		tokens = tokenizer.processContent(text);

@@ -1,0 +1,740 @@
+plastic 570
+benefit 436
+franc nuclear 2
+damag eye 1
+storm 2727
+softwar piraci 9
+oscar 1730
+clergi 140
+time 11158
+schengen 35
+salvat armi 72
+technolog transfer 20
+build syndrom 4
+event 1695
+schengen agreement 3
+partner 754
+human genet 34
+cyanid 79
+black 12276
+estonia 642
+timber 272
+tibet protest 3
+clear cut 10
+enforc 784
+accid 893
+death 4584
+parent 574
+organ soil 1
+discoveri 876
+devolut 48
+smoke 800
+project 5235
+stirl engin 6
+magnet levit 12
+salmon 471
+air 12476
+sick 472
+disast 1267
+flavr savr 2
+invent scientif 2
+tunnel 1771
+scandal 1007
+behavior 559
+implant 169
+exposur 209
+ocean 2075
+commerci 985
+petroleum 572
+peac 2743
+kurd 91
+lawsuit 70
+osteoporosi 16
+popul 1437
+literaci 127
+wage 243
+oic 16
+presid 4649
+pisa 197
+softwar 4612
+bear 2707
+viral hepat 5
+orphan drug 6
+melanoma 33
+speci mammal 1
+labor 1266
+invest 1033
+air traffic 83
+new 54412
+savr tomato 1
+unmarri 6
+el 9009
+balkan 263
+hydrogen 518
+hydroelectr 221
+intern 18746
+casino 932
+britain 4113
+american indian 131
+polygami 143
+cabl 1246
+lead 1003
+compost pile 1
+tibet 371
+doctor 2977
+gasolin 132
+tin mine 10
+winni mandela 2
+toxic chemic 1
+war syndrom 4
+civilian 209
+sdi 19
+fiber optic 33
+bank 7513
+alcohol consumpt 10
+welsh devolut 7
+el nino 17
+surgeri 549
+fax 90
+station 45386
+welsh 1220
+sex school 5
+watch 1258
+afghanistan 1530
+speci 1114
+church england 236
+wildlif preserv 11
+code 5201
+home school 13
+agent 1577
+chunnel 4
+plastic surgeri 27
+sale 994
+lean 191
+africa sub 1
+hussein 656
+dam 2463
+leav 1151
+unexplain 31
+countri 5871
+wall 2213
+incom 640
+nuclear test 58
+sex 2282
+motorist 17
+blood alcohol 12
+mandela 94
+membership 171
+rap 595
+europ 2266
+mutual fund 46
+polygyni 7
+argentina 1509
+england 6197
+matern leav 4
+invent 497
+swim 2081
+czech slovak 19
+asia 1904
+fuel 1027
+famili leav 4
+talk 1448
+law 11399
+mail 1056
+stamp 1580
+export 348
+thatcher 149
+child labor 32
+wildlif 1681
+nobel prize 115
+predictor 27
+tropic 1824
+piraci 168
+pan 2024
+mine ban 2
+whale watch 8
+british relat 18
+tiananmen squar 50
+termin 1730
+great 10978
+secur 4075
+nuclear 2454
+recal 131
+am 7571
+medic treatment 7
+rain forest 79
+remot sens 43
+poppi 225
+growth 610
+optic 1202
+energi 3555
+ireland 6769
+tomato 262
+stamped 194
+collar 515
+dentistri 177
+genet 962
+nino 204
+curb 101
+court 6758
+salvat 321
+social 4404
+import 459
+suicid 741
+media bias 8
+cryptographi 190
+vitro fertil 5
+limit 3648
+aspirin 26
+ban 810
+transfer 1205
+elect 18738
+invas 1422
+tiananmen 81
+spanish 2413
+church 16125
+mexican 1509
+drug law 8
+czech 1311
+drug price 8
+museum 9507
+resign 55
+health 4315
+adopt record 2
+carbon monoxid 16
+gas 2054
+oceanograph 67
+traffic 751
+islam 3063
+russian 3310
+anorexia 23
+hepat 230
+olymp 12906
+airport secur 14
+recycl 466
+home 5297
+pollut 328
+hgh 11
+ayatollah 179
+nobel 322
+sick build 6
+school prayer 3
+fiber 548
+build 6165
+space 6038
+protect 2141
+lean tower 23
+ethnic popul 6
+territori water 4
+clear 813
+space station 60
+golden triangl 46
+insur 1421
+khomeini 62
+withdraw 100
+prostat 105
+dollar 1275
+tunnel disast 1
+water 6496
+flavr 2
+british 11222
+greek 2646
+star 12275
+robot 1458
+hormon 335
+technolog 6893
+custodi 100
+product 3964
+cigar 207
+open adopt 1
+am 103 5
+tobacco 484
+capita 203
+prostat cancer 17
+gas electr 60
+smuggl 40
+peg 219
+cut 1388
+whale 760
+savr 3
+health safeti 42
+art crime 3
+terror 1484
+electron media 17
+agoraphobia 4
+counterfeit 87
+comput virus 115
+euro 763
+electr 4022
+peac talk 7
+volkswagen 364
+basqu 310
+creativ 508
+altern 1874
+human growth 5
+export control 12
+revolut 2298
+antibiot 95
+gulf 1319
+train 5398
+medicin 2503
+polyandri 8
+educ 6365
+viral 209
+colleg 21850
+eye 4264
+indict 26
+joint 1490
+1990s 239
+poverti 293
+famili 7463
+bee 1103
+fatal 346
+scientif 1091
+assist 1304
+violenc 671
+tire 398
+cooper 2772
+poliomyel 13
+monoxid poison 2
+philosophi 1294
+sovereignti 145
+argentin 1050
+hydrogen energi 7
+hybrid 904
+industri wast 2
+drug treatment 4
+human smuggl 1
+ayatollah khomeini 3
+invas panama 6
+armi 7160
+moon 3316
+telemarket 10
+growth hormon 31
+star war 1316
+arthriti 60
+loss 536
+highway 24953
+duti 503
+african 4826
+marin 3967
+term limit 29
+lead poison 4
+south africa 1936
+metabol 261
+add 155
+war 17329
+risk 723
+syndrom 4220
+declin 152
+rate 1984
+arrest 314
+shipwreck 303
+comput termin 5
+cruis 492
+greenpeac 20
+drug 2012
+spanish school 2
+polio 41
+monoxid 61
+argentin british 2
+czechoslovakia 270
+iran 1816
+locat 1012
+petroleum explor 4
+standard 2825
+ill 1163
+hydropon 13
+dismantl 14
+agreement 1490
+modern slaveri 1
+indian 7322
+iraq 1681
+illeg 220
+human 4848
+amazon 463
+panama 672
+expuls 121
+plan 2715
+polic 3932
+salvag 103
+wrong 489
+southeast asia 95
+act 9902
+women ordain 1
+timber export 1
+sugar 1179
+disabl children 2
+eta 165
+legionnair 47
+clinic 760
+treatment 616
+pacif northwest 79
+winner 1440
+health insur 81
+immigr 805
+oscar winner 4
+hubbl telescop 3
+danger 992
+diseas 3412
+collar crime 8
+minimum wage 62
+fluid 443
+prize winner 33
+adopt 242
+postmenopaus 3
+evas 46
+espionag 81
+bias 332
+brain 1331
+line shop 1
+price fix 8
+tax evas 9
+health care 412
+unsolicit 22
+california 17438
+advantag 145
+pregnanc 217
+windmil 509
+compost 62
+blood 3117
+endang speci 79
+amazon rain 4
+price 2604
+disabl 381
+crime 1819
+remot 503
+obes 117
+brain cancer 4
+sourc 1282
+poach 21
+endang 163
+critic 2797
+increas 128
+american casino 4
+extinct 411
+antarctica 363
+lyme diseas 10
+advers 85
+minimum 415
+use 253
+cultiv 74
+northwest 1212
+consumpt 172
+territori 2930
+life 8702
+uv 185
+american 21130
+electron 2634
+gasolin tax 2
+best 8565
+franc 6519
+tryptophan 39
+nativ american 301
+cult 597
+levit 66
+supercrit 26
+cosmic 433
+nervosa 44
+retir 268
+joint custodi 3
+orphan 237
+wtc 58
+drug legal 2
+great britain 2933
+weapon 1679
+incom tax 138
+declin birth 2
+south 25814
+berlin 2300
+part 3036
+dog 3910
+cancer 1064
+world 27954
+world bank 33
+abort 437
+oversea 411
+minor germani 2
+squar 3782
+juri duti 7
+traffic control 79
+arsenal 405
+minor 3274
+wast dispos 21
+steel product 5
+germani 3785
+slaveri 346
+anorexia nervosa 10
+hydrogen fuel 18
+vitro 26
+encrypt 251
+soviet 2888
+care 1573
+automobil 1329
+alzheim 75
+chemic weapon 39
+wind power 97
+control 3956
+mainstream 121
+greek philosophi 13
+vessel 503
+household 257
+chemic 1426
+estrogen 41
+select 1203
+mexico 3434
+white 11153
+preserv 962
+tourism 761
+poison 732
+forest 5456
+literari 596
+radioact 171
+tourist 318
+railway 22061
+heroic 114
+economi 2204
+sahara 330
+postmenopaus estrogen 1
+killer 1078
+foreign 3187
+prosecut 99
+english 5772
+estonia economi 1
+legal 1402
+car 4469
+sub 794
+bear attack 5
+wrong convict 5
+abus 637
+marin life 23
+breakup 41
+land 5823
+explor 1040
+obes medic 1
+children 3418
+slovak 408
+social secur 139
+veget 409
+opposit 506
+altern medicin 61
+rd 240
+merci 627
+consum 707
+child 2338
+counterfeit money 3
+triangl 860
+rain 1356
+genet code 9
+nra 30
+ethnic 1064
+ferri 1860
+maglev 33
+abort clinic 2
+adult 716
+civilian death 1
+markov 236
+tropic storm 952
+deregul 28
+achiev 407
+caus 595
+school 62783
+sentenc 257
+hubbl 101
+black bear 44
+mirjana 23
+winni 128
+falkland 388
+magnet 1052
+food drug 74
+equip 647
+birth 628
+ordain church 1
+quilt 82
+vehicl 2340
+test 4101
+tin 833
+industri 4728
+open 8929
+airport 17953
+fuel car 5
+carbon 1080
+toxic 346
+relat 9334
+mexican air 1
+iran iraq 40
+northern ireland 1345
+teenag pregnanc 9
+ship loss 2
+stirl 391
+exot anim 4
+human stamped 1
+journalist 1218
+wind 2302
+agent orang 12
+art 12836
+poverti africa 2
+radioact wast 28
+mammal 827
+non 3157
+parliament 6730
+record 10824
+disput 474
+gorg 436
+tax 1646
+post polio 8
+land mine 22
+gulf war 74
+alcohol 861
+organ crime 208
+teenag 542
+prize 2344
+sweatshop 13
+bulimia 7
+biolog parent 1
+cuba 1058
+mental ill 50
+supercrit fluid 7
+prayer 684
+anim 4980
+industri espionag 3
+ship 4961
+undersea 71
+engin 8102
+line 13629
+juri 364
+king 13551
+holist 34
+modern 2245
+cloth 936
+transport 5711
+money 1593
+forg 395
+pile 162
+mine 3317
+railway accid 36
+103 577
+educ standard 3
+apathi 28
+stolen 168
+beatif 14
+valdez 144
+crisi 1540
+post 3504
+ireland peac 6
+killer bee 21
+berlin wall 16
+biolog 1603
+parkinson diseas 37
+damag 362
+withdraw afghanistan 1
+law enforc 498
+leg 665
+legionnair diseas 10
+birth rate 13
+russia 3032
+mutual 514
+advers impact 2
+bacteria 151
+radio 8011
+attack 2617
+diplomat 1675
+scientif discoveri 6
+white collar 55
+telescop 599
+pacif 3783
+famili plan 27
+shop 1941
+indian museum 9
+convict 231
+literaci rate 11
+food crisi 20
+kill 1992
+impact 663
+cuba economi 1
+mirjana markov 1
+water disput 6
+lyme 143
+newspap 2217
+diagnosi 131
+behavior genet 7
+power 8276
+milosev 44
+cigarett 350
+fund 1878
+sens 553
+profil 367
+hybrid fuel 3
+ineffect 6
+stoicism 5
+colleg educ 149
+cancer detect 1
+sub sahara 4
+sink 258
+matern 142
+polici 1826
+russian food 1
+trap 763
+northern 6268
+gorg project 2
+intern organ 107
+treasur 920
+food 3203
+bomb 2972
+wave 1992
+comput 7382
+abus mail 1
+olymp train 5
+media 3857
+golden 4865
+medic 4261
+soil 530
+hydroelectr project 15
+food stamp 13
+popul growth 21
+world court 9
+protest 873
+oceanograph vessel 1
+virus 1692
+air pollut 76
+optic cabl 8
+fuel sourc 4
+radio wave 14
+orang 2541
+squar protest 20
+fix 647
+southeast 720
+doctor assist 1
+merci kill 3
+africa 3780
+ferri sink 1
+intern art 13
+detect 887
+tower pisa 8
+exempt 128
+safeti 1306
+part time 28
+exot 103
+king hussein 8
+lifestyl 167
+assist suicid 14
+pan am 78
+rabi 158
+steel 2290
+nativ 1115
+teach 548
+women 9554
+islam revolut 38
+wast 723
+tower 5121
+fertil 200
+organ 4682
+term 1599
+mental 720
+parkinson 233
+dispos 166
+plagiar 29
+ordain 14
+turkey 1806
+enhanc 452
+pope 1732

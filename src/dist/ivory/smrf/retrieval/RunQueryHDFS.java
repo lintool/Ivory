@@ -16,7 +16,6 @@
 
 package ivory.smrf.retrieval;
 
-
 import java.io.IOException;
 
 import org.apache.hadoop.conf.Configuration;
@@ -99,7 +98,7 @@ public class RunQueryHDFS extends Configured implements Tool {
 		String argsStr = convertStringArrayToString(args, ";");
 
 		JobConf conf = new JobConf(RunQueryHDFS.class);
-		conf.setJobName("RunQueryCluster");
+		conf.setJobName("RunQueryHDFS");
 
 		conf.setNumMapTasks(1);
 		conf.setNumReduceTasks(0);

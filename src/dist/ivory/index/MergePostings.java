@@ -57,11 +57,13 @@ public class MergePostings extends PowerTool {
 
 		String indexPath = getConf().get("Ivory.IndexPath");
 
-		String collectionName = RetrievalEnvironment.readCollectionName(fs, indexPath);
-		String postingsType = RetrievalEnvironment.readPostingsType(fs, indexPath);
+		RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fs);
 
-		Path inputPath = new Path(RetrievalEnvironment.getPostingsDirectory(indexPath));
-		Path outputPath = new Path(RetrievalEnvironment.getTempDirectory(indexPath));
+		String collectionName = env.readCollectionName();
+		String postingsType = env.readPostingsType();
+
+		Path inputPath = new Path(env.getPostingsDirectory());
+		Path outputPath = new Path(env.getTempDirectory());
 
 		fs.delete(outputPath, true);
 

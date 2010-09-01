@@ -1,5 +1,5 @@
 /*
- * Ivory: A Hadoop toolkit for Web-scale information retrieval
+ * Ivory: A Hadoop toolkit for web-scale information retrieval
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You may
@@ -23,13 +23,19 @@ package ivory.smrf.model;
  */
 public class GlobalTermEvidence {
 
-	// global term evidence
-	public long df;
+	public int df;
 	public long cf;
 	
-	public GlobalTermEvidence(long df, long cf) {
+	public GlobalTermEvidence(){
+	}
+	
+	public GlobalTermEvidence(int df, long cf) {
 		this.df = df;
 		this.cf = cf;
 	}
-
+	
+	public void set(int df, long cf) {
+		this.df = df;
+		this.cf = cf;
+	}
 }

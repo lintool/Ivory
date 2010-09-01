@@ -1,5 +1,5 @@
 /*
- * Ivory: A Hadoop toolkit for Web-scale information retrieval
+ * Ivory: A Hadoop toolkit for web-scale information retrieval
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You may
@@ -18,6 +18,7 @@ package ivory.smrf.model.builder;
 
 import ivory.smrf.model.Clique;
 import ivory.util.RetrievalEnvironment;
+import ivory.util.XMLTools;
 
 import java.util.ArrayList;
 
@@ -25,23 +26,32 @@ import org.w3c.dom.Node;
 
 /**
  * @author Don Metzler
- *
+ * 
  */
 public class OrderedCliqueSet extends CliqueSet {
 
-	public OrderedCliqueSet(RetrievalEnvironment env, String queryText, Node csNode, DEPENDENCE_TYPE type, boolean docDependent) throws Exception {
+	@Override
+	public void configure(RetrievalEnvironment env, String[] queryTerms, Node domNode)
+			throws Exception {
+		String dependenceType = XMLTools.getAttributeValue(domNode, "dependence", "sequential");
+		boolean docDependent = XMLTools.getAttributeValue(domNode, "docDependent", true);
+
 		// initialize clique set
 		cliques = new ArrayList<Clique>();
 
 		// generate clique set
-		if( type == DEPENDENCE_TYPE.SEQUENTIAL ) {
-			cliques = CliqueSetHelper.getSequentialDependenceCliques(env, queryText, csNode, docDependent);
+		if (dependenceType.equals("sequential")) {
+			cliques = CliqueFactory.getSequentialDependenceCliques(env, queryTerms, domNode,
+					docDependent);
+		} else if (dependenceType.equals("full")) {
+			cliques = CliqueFactory.getFullDependenceCliques(env, queryTerms, domNode, true,
+					docDependent);
+		} else {
+			throw new Exception("Unrecognized OrderedCliqueSet type: " + dependenceType);
 		}
-		else if( type == DEPENDENCE_TYPE.FULL ) {
-			cliques = CliqueSetHelper.getFullDependenceCliques(env, queryText, csNode, true, docDependent);
-		}
-		else {
-			throw new Exception("Unrecognized OrderedCliqueSet type -- " + type);
-		}
+	}
+
+	public String getType() {
+		return "Ordered";
 	}
 }

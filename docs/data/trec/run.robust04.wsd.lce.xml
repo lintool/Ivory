@@ -1,0 +1,37 @@
+<parameters>
+
+     <index>/fs/clip-hadoop/indexes/trec</index>
+
+     <!-- Dirichlet, WSD, Latent Concept Expansion (unigram concepts) (Fast Version) -->
+     <model id="robust04-dir-wsd-lce-f" type="WSD" output="ranking.robust04-dir-wsd-lce-f.txt" hits="1000" collection="trec45">
+
+         <metaFeature id="collection_freq" weight="0.0688" file="docs/data/trec/stats.robust04.cf.collection.txt" />
+         <metaFeature id="document_freq" weight="0.4505" file="docs/data/trec/stats.robust04.df.collection.txt" />
+         <metaFeature id="clue_cf" weight="0.4272" file="docs/data/trec/stats.robust04.cf.clue.txt" />
+         <metaFeature id="enwiki_cf" weight="0.0535" file="docs/data/trec/stats.robust04.cf.enwiki.txt" />
+
+         <feature id="termWt" weight="0.1544"
+                  cliqueSet="ivory.smrf.model.builder.TermCliqueSet"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.TermExpressionGenerator"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1000.0" />
+         <feature id="orderedWt" weight="0.0147"
+                  cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.OrderedWindowExpressionGenerator" width="1"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="750.0" />
+         <feature id="unorderedWt" weight="0.0147"
+                  cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.UnorderedWindowExpressionGenerator" width="4"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="750.0" />
+         <expander type="UnigramLatentConcept" fbDocs="10" fbTerms="25">
+           <conceptscore id="expansionTermWt" weight="0.6836"
+                         scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1.0" />
+           <conceptscore id="expansionTermLMWt" weight="-0.1325"
+                         scoreFunction="ivory.smrf.model.score.JelinekMercerScoringFunction" lambda="1.0" />
+         </expander>
+     </model>
+
+
+</parameters>

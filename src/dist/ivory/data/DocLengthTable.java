@@ -16,13 +16,6 @@
 
 package ivory.data;
 
-import java.io.IOException;
-
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FSDataInputStream;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
-import org.apache.log4j.Logger;
 
 /**
  * <p>
@@ -45,99 +38,20 @@ import org.apache.log4j.Logger;
  * @author Jimmy Lin
  * 
  */
-public class DocLengthTable {
-	private static final Logger sLogger = Logger.getLogger(DocLengthTable.class);
-
-	private int[] mLengths;
-	private int nDocs;
-	private float avgDocLength;
-	private int mDocnoOffset;
-
-	/**
-	 * Creates a new <code>DocLengthTable</code>.
-	 * 
-	 * @param file
-	 *            document length data file
-	 * @throws IOException
-	 */
-	public DocLengthTable(String file) throws IOException {
-		this(file, FileSystem.get(new Configuration()));
-	}
-
-	public DocLengthTable(String file, FileSystem fs) throws IOException {
-		this(new Path(file), fs);
-	}	
-	
-	/**
-	 * Creates a new <code>DocLengthTable</code>.
-	 * 
-	 * @param file
-	 *            document length data file
-	 * @param fs
-	 *            FileSystem to read from
-	 * @throws IOException
-	 */
-	public DocLengthTable(Path file, FileSystem fs) throws IOException {
-		long docLengthSum = 0;
-		nDocs = 0;
-
-		FSDataInputStream in = fs.open(file);
-
-		// docno offset
-		mDocnoOffset = in.readInt();
-
-		// this is the size of the document collection
-		int sz = in.readInt() + 1;
-
-		sLogger.info("Docno offset: " + mDocnoOffset);
-		sLogger.info("Number of docs: " + (sz - 1));
-
-		// initialize an array to hold all the doc lengths
-		mLengths = new int[sz];
-
-		// read each doc length
-		for (int i = 1; i < sz; i++) {
-			int l = in.readInt();
-			mLengths[i] = l;
-			docLengthSum += l;
-			nDocs++;
-
-			if (i % 1000000 == 0)
-				sLogger.info(i + " doclengths read");
-		}
-
-		in.close();
-
-		sLogger.info("Total of " + nDocs + " doclengths read");
-
-		// compute avg doc length
-		avgDocLength = docLengthSum * 1.0f / nDocs;
-	}
+public interface DocLengthTable {
 
 	/**
 	 * Returns the length of a document.
 	 */
-	public int getDocLength(int docno) {
-		// docnos are numbered starting from one
-		return mLengths[docno - mDocnoOffset];
-	}
+	public int getDocLength(int docno);
 
-	public int getDocnoOffset() {
-		return mDocnoOffset;
-	}
+	public int getDocnoOffset();
 
-	/**
-	 * Returns the average length of documents in the collection.
-	 */
-	public float getAvgDocLength() {
-		return avgDocLength;
-	}
+	public float getAvgDocLength();
 
 	/**
 	 * Returns number of documents in the collection.
 	 */
-	public int getDocCount() {
-		return nDocs;
-	}
+	public int getDocCount();
 
 }

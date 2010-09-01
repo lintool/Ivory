@@ -16,6 +16,8 @@
 
 package ivory.data;
 
+import ivory.index.TermPositions;
+
 /**
  * <p>
  * Interface for a postings reader.
@@ -55,7 +57,7 @@ public interface PostingsReader {
 	 * Resets this object to start reading from the first posting.
 	 */
 	public void reset();
-
+	
 	/**
 	 * Returns an array of term positions corresponding to the current posting.
 	 * This is an optional operation valid only for postings that store
@@ -63,6 +65,16 @@ public interface PostingsReader {
 	 */
 	public int[] getPositions();
 
+	/**
+	 * Loads a <code>TermPositions</code> object corresponding to the current posting.
+	 * This is an optional operation valid only for postings that store
+	 * positional information.
+	 * 
+	 * @return <code>true</code> if there are any more postings to be read,
+	 *         <code>false</code> otherwise
+	 */
+	public boolean getPositions(TermPositions tp);
+	
 	/**
 	 * Returns the score of the next posting, without consuming it from the
 	 * stream of postings. This is an optional operation.
@@ -75,6 +87,16 @@ public interface PostingsReader {
 	 */
 	public int peekNextDocno();
 
+	/**
+	 * @return returns the score corresponding to the current posting
+	 */
+	public short getScore();
+	
+	/**
+	 * @return returns the docno corresponding to the current posting
+	 */
+	public int getDocno();
+	
 	/**
 	 * Returns the <code>PostingsList</code> associated with this reader.
 	 */

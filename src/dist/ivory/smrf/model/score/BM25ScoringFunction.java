@@ -1,5 +1,5 @@
 /*
- * Ivory: A Hadoop toolkit for Web-scale information retrieval
+ * Ivory: A Hadoop toolkit for web-scale information retrieval
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You may
@@ -18,102 +18,59 @@ package ivory.smrf.model.score;
 
 import ivory.smrf.model.GlobalEvidence;
 import ivory.smrf.model.GlobalTermEvidence;
+import ivory.util.XMLTools;
+
+import org.w3c.dom.Node;
 
 /**
  * @author Don Metzler
- *
+ * 
  */
 public class BM25ScoringFunction extends ScoringFunction {
 
-	/**
-	 * bm25 parameter 
-	 */
 	private double mK1;
-	
-	/**
-	 * bm25 parameter
-	 */
 	private double mB;
-	
-	/**
-	 * avg. document length
-	 */
 	private double mAvgDocLen;
-	
-	/**
-	 * type of idf to use
-	 */
 	private String mIdfType;
-	
-	/**
-	 * idf
-	 */
 	private double mIDF;
-	
-	/**
-	 * @param k1
-	 * @param b
-	 * @param idfType
-	 */
-	public BM25ScoringFunction( double k1, double b, String idfType ) {
-		// bm25 parameters
-		mK1 = k1;
-		mB = b;
-		mIdfType = idfType;
+
+	@Override
+	public void configure(Node domNode) {
+		mK1 = XMLTools.getAttributeValue(domNode, "k1", 1.2);
+		mB = XMLTools.getAttributeValue(domNode, "b", 0.75);
+		mIdfType = XMLTools.getAttributeValue(domNode, "idf", "okapi");
 	}
-	
-	/**
-	 * @param k1 bm25 parameter
-	 * @param b bm25 parameter
-	 */
-	public BM25ScoringFunction( double k1, double b ) {
-		this(k1, b, "okapi");
-	}
-	
-	/* (non-Javadoc)
-	 * @see edu.umass.cs.SMRF.model.scoringfunction.ScoringFunction#getScore(double, int, int, double, long, long)
-	 */
+
 	@Override
 	public double getScore(double tf, int docLen) {
-		double bm25TF = ( ( mK1 + 1.0 ) * tf ) / ( mK1 * ( ( 1.0 - mB ) + mB * docLen / mAvgDocLen ) + tf );		
+		double bm25TF = ((mK1 + 1.0) * tf) / (mK1 * ((1.0 - mB) + mB * docLen / mAvgDocLen) + tf);
 		return bm25TF * mIDF;
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
 	public String toString() {
 		return "<scoringfunction>BM25</scoringfunction>\n";
 	}
 
-	/* (non-Javadoc)
-	 * @see ivory.smrf.model.score.ScoringFunction#initialize(ivory.smrf.model.GlobalTermEvidence, ivory.smrf.model.GlobalEvidence)
-	 */
 	@Override
-	public void initialize(GlobalTermEvidence termEvidence,
-			GlobalEvidence globalEvidence) {
+	public void initialize(GlobalTermEvidence termEvidence, GlobalEvidence globalEvidence) {
 		// avg. document length
-		mAvgDocLen = (double)globalEvidence.collectionLength / (double)globalEvidence.numDocs;
-		
+		mAvgDocLen = (double) globalEvidence.collectionLength / (double) globalEvidence.numDocs;
+
 		// idf
-		if( "none".equals( mIdfType ) ) {
+		if ("none".equals(mIdfType)) {
 			mIDF = 1;
-		}
-		else if( "classic".equals( mIdfType ) ) {
-			mIDF = Math.log( (double)globalEvidence.numDocs / (double)termEvidence.df );
-		}
-		else if( "okapi-positive".equals( mIdfType ) ) {
-			mIDF = Math.log( ( (double)globalEvidence.numDocs + 0.5 ) / ( (double)termEvidence.df + 0.5 ) ); 
-		}
-		else { // defaults to "okapi" IDF
-			mIDF = Math.log( ( (double)globalEvidence.numDocs - (double)termEvidence.df + 0.5 ) / ( (double)termEvidence.df + 0.5 ) );
+		} else if ("classic".equals(mIdfType)) {
+			mIDF = Math.log((double) globalEvidence.numDocs / (double) termEvidence.df);
+		} else if ("okapi-positive".equals(mIdfType)) {
+			mIDF = Math.log(((double) globalEvidence.numDocs + 0.5)
+					/ ((double) termEvidence.df + 0.5));
+		} else { // defaults to "okapi" IDF
+			mIDF = Math.log(((double) globalEvidence.numDocs - (double) termEvidence.df + 0.5)
+					/ ((double) termEvidence.df + 0.5));
 		}
 	}
-	
-	/* (non-Javadoc)
-	 * @see ivory.smrf.model.score.ScoringFunction#getMaxScore()
-	 */
+
 	public double getMaxScore() {
-		return ( mK1 + 1.0 ) * mIDF;
+		return (mK1 + 1.0) * mIDF;
 	}
 }

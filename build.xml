@@ -6,20 +6,11 @@
 	<property name="test" location="test" />
 
 	<path id="classpath">
-		<fileset dir="../umd-hadoop-core/">
-			<include name="cloud9.jar" />
-		</fileset>
-		<fileset dir="../umd-hadoop-core/hadoop/hadoop-0.20.1/">
-			<include name="*.jar" />
-		</fileset>
-		<fileset dir="../umd-hadoop-core/hadoop/hadoop-0.20.1/lib">
-			<include name="*.jar" />
-		</fileset>
-		<fileset dir="../umd-hadoop-core/lib/">
-			<include name="*.jar" />
-		</fileset>
 		<fileset dir=".">
 			<include name="ivory.jar" />
+		</fileset>
+		<fileset dir="packages/">
+			<include name="**/*.jar" />
 		</fileset>
 	</path>
 
@@ -42,12 +33,8 @@
 		<javac classpathref="classpath" srcdir="${src}/dist" destdir="${build}" optimize="on" debug="on">
 			<!-- compilerarg value="-Xlint:unchecked"/ uncomment this to check for generics -->
 		</javac>
-		<copy todir="${build}">
-			<fileset dir="${src}/dist" excludes="**/*.java" />
-		</copy>
-		<copy todir="${build}">
-			<fileset dir="../umd-hadoop-core/build/" />
-		</copy>
+		<javac classpathref="classpath" srcdir="${src}/dist-test" destdir="${build}" optimize="on" debug="on">
+		</javac>
 	</target>
 
 	<target name="lib" depends="compile" description="generate the distribution">
@@ -64,13 +51,13 @@
 		<junit printsummary="yes" fork="yes" maxmemory="1024m">
 			<sysproperty key="java.library.path" path="${lib}" />
 			<sysproperty key="org.xml.sax.driver" value="org.apache.xerces.parsers.SAXParser" />
-			<sysproperty key="ura.resource.base" value="../ura-resources/" />
 			<classpath refid="classpath" />
 
 			<formatter type="xml" />
 			<batchtest todir="${test}">
 				<fileset dir="${build}">
 					<include name="**/*Test.class" />
+					<include name="ivory/regression/*.class" />
 				</fileset>
 			</batchtest>
 		</junit>
@@ -81,18 +68,22 @@
 			</fileset>
 			<report format="noframes" styledir="etc/" todir="${test}" />
 		</junitreport>
+
 	</target>
 
 	<target name="javadoc">
-		<javadoc destdir="docs/javadoc/" access="public" use="false" notree="false" nonavbar="false" noindex="false" splitindex="no" author="true" version="true" nodeprecatedlist="true" nodeprecated="true" classpathref="classpath">
+		<javadoc destdir="docs/api/" access="public" use="false" notree="false" nonavbar="false" noindex="false" splitindex="no" author="true" version="true" nodeprecatedlist="true" nodeprecated="true" classpathref="classpath">
 			<fileset dir="src">
 				<include name="dist/**/*.java" />
+				<exclude name="dist/ivory/util/AnnotateClueRunAllWithURLs.java" />
+				<exclude name="dist/ivory/util/AnnotateClueRunWithURLs.java" />
 				<exclude name="dist/**/*Test.java" />
 				<exclude name="dist/uk/**/*.java" />
 				<exclude name="dist/org/**/*.java" />
 			</fileset>
 			<link href="http://java.sun.com/javase/6/docs/api/" />
-			<link href="../../../umd-hadoop-core/hadoop/hadoop-0.20.1/docs/api/" />
+			<link href="http://hadoop.apache.org/common/docs/current/api/" />
+			<link href="http://www.umiacs.umd.edu/~jimmylin/Cloud9/docs/api//" />
 		</javadoc>
 	</target>
 
@@ -127,7 +118,7 @@
 			<equals arg1="${platform}" arg2="windows" />
 		</condition>
 
-		<property name="java_command" value="${java} -Xmx1024m  -classpath &quot;${classpath}&quot;" />
+		<property name="java_command" value="${java} -Xmx2g -classpath &quot;${classpath}&quot;" />
 
 		<condition property="script_prefix" value="#!/bin/sh${line.separator}if test -s ~/.bashrc${line.separator}then${line.separator}source ~/.bashrc${line.separator}fi${line.separator}">
 			<equals arg1="${platform}" arg2="unix" />

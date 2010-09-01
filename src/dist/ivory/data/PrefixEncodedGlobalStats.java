@@ -16,11 +16,14 @@
 
 package ivory.data;
 
+import ivory.util.RetrievalEnvironment;
+
 import java.io.IOException;
 
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.WritableUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.log4j.Logger;
 
@@ -71,7 +74,9 @@ public class PrefixEncodedGlobalStats {
 		}
 		df = new int[l];
 		for (int i = 0; i < l; i++)
-			df[i] = dfStatsInput.readInt();
+			//df[i] = dfStatsInput.readInt();
+			df[i] = WritableUtils.readVInt(dfStatsInput);
+		
 		dfStatsInput.close();
 	}
 
@@ -88,7 +93,8 @@ public class PrefixEncodedGlobalStats {
 		}
 		cf = new long[l];
 		for (int i = 0; i < l; i++)
-			cf[i] = cfStatsInput.readLong();
+			//cf[i] = cfStatsInput.readLong();
+			cf[i] = WritableUtils.readVLong(cfStatsInput);
 		cfStatsInput.close();
 	}
 
@@ -121,6 +127,14 @@ public class PrefixEncodedGlobalStats {
 		p.set(df[index], cf[index]);
 		return p;
 	}
+	
+	public PairOfIntLong getStats(int index) {
+		if (index < 0)
+			return null;
+		PairOfIntLong p = new PairOfIntLong();
+		p.set(df[index], cf[index]);
+		return p;
+	}
 
 	public int length() {
 		return prefixSet.length();
@@ -144,4 +158,51 @@ public class PrefixEncodedGlobalStats {
 	 * public void printPrefixSetContent(){ prefixSet.printCompressedKeys();
 	 * prefixSet.printKeys(); }
 	 */
+	public static void main(String[] args) throws Exception{
+		//String indexPath = "/umd-lin/telsayed/indexes/medline04";
+		String indexPath = "c:/Research/ivory-workspace";
+
+		Configuration conf = new Configuration();
+		FileSystem fileSys= FileSystem.getLocal(conf);
+
+		RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fileSys);
+		
+		Path termsFilePath = new Path(env.getIndexTermsData());
+		
+		Path dfByTermFilePath = new Path(env.getDfByTermData());
+		Path cfByTermFilePath = new Path(env.getCfByTermData());
+
+		System.out.println("PrefixEncodedGlobalStats");
+		PrefixEncodedGlobalStats globalStatsMap = new PrefixEncodedGlobalStats(termsFilePath);
+		System.out.println("PrefixEncodedGlobalStats1");
+		globalStatsMap.loadDFStats(dfByTermFilePath);
+		System.out.println("PrefixEncodedGlobalStats2");
+		globalStatsMap.loadCFStats(cfByTermFilePath);
+		System.out.println("PrefixEncodedGlobalStats3");
+		//String[] firstKeys = termIDMap.getDictionary().getFirstKeys(100);
+		int nTerms = globalStatsMap.length();
+		System.out.println("nTerms: "+nTerms);
+		/*for(int i = 0; i < nTerms; i++){
+			
+			PairOfIntLong p = globalStatsMap.getStats(i);
+			System.out.println(i+"\t"+p.getLeftElement() +"\t"+ p.getRightElement());
+			//if(i%10000 == 0) System.out.println(i+" terms so far ("+p+").");
+		}*/
+		String term;
+		term = "0046";	System.out.println(term+"\t"+globalStatsMap.getDF(term));
+		term = "00565";	System.out.println(term+"\t"+globalStatsMap.getDF(term));
+		term = "01338";	System.out.println(term+"\t"+globalStatsMap.getDF(term));
+		term = "01hz";	System.out.println(term+"\t"+globalStatsMap.getDF(term));
+		term = "03x";	System.out.println(term+"\t"+globalStatsMap.getDF(term));
+		term = "0278x";	System.out.println(term+"\t"+globalStatsMap.getDF(term));
+		
+		term = "0081";	System.out.println(term+"\t"+globalStatsMap.getDF(term));
+		term = "0183";	System.out.println(term+"\t"+globalStatsMap.getDF(term));
+		term = "0244";	System.out.println(term+"\t"+globalStatsMap.getDF(term));
+		term = "032";	System.out.println(term+"\t"+globalStatsMap.getDF(term));
+		//for(int i = 1; i<=200; i++){
+		//	term = termIDMap.getTerm(i);
+		//	System.out.println(i+"\t"+term+"\t"+termIDMap.getID(term));
+		//}
+	}
 }

@@ -16,12 +16,7 @@
 
 package ivory.data;
 
-import ivory.index.ExtractCfFromPostings;
-
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.Arrays;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
@@ -29,29 +24,25 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.WritableUtils;
 
-import edu.umd.cloud9.debug.MemoryUsageUtils;
-
 /**
  * <p>
  * Array-based implementation of <code>CfTable</code>. Binary search is used
  * for lookup.
  * </p>
  * 
- * @see ExtractCfFromPostings
  * @author Jimmy Lin
+ * @author Tamer Elsayed
  * 
  */
 public class CfTableArray implements CfTable {
-	private int mNumDocs;
 	private int mNumTerms;
 	private long mTotalTermCount;
 
 	private long mMaxCf = 0;
-	private String mMaxCfTerm;
+	private int mMaxCfTerm;
 
 	private int mCfOne = 0;
 
-	private String[] mTerms;
 	private long[] mCfs;
 
 	/**
@@ -62,28 +53,29 @@ public class CfTableArray implements CfTable {
 	 * @throws IOException
 	 */
 	public CfTableArray(String file) throws IOException {
-		Configuration config = new Configuration();
-		FileSystem fs = FileSystem.get(config);
+		this(file, FileSystem.get(new Configuration()));
+	}
 
-		FSDataInputStream in = fs.open(new Path(file));
+	public CfTableArray(String file, FileSystem fs) throws IOException {
+		this(new Path(file), fs);
+	}
 
-		this.mNumDocs = in.readInt();
+	public CfTableArray(Path file, FileSystem fs) throws IOException {
+		FSDataInputStream in = fs.open(file);
+
 		this.mNumTerms = in.readInt();
 
-		mTerms = new String[mNumTerms];
 		mCfs = new long[mNumTerms];
 
 		for (int i = 0; i < mNumTerms; i++) {
-			String term = in.readUTF();
 			long cf = WritableUtils.readVLong(in);
 
-			mTerms[i] = term;
 			mCfs[i] = cf;
 			mTotalTermCount += cf;
 
 			if (cf > mMaxCf) {
 				mMaxCf = cf;
-				mMaxCfTerm = term;
+				mMaxCfTerm = i + 1;
 			}
 
 			if (cf == 1) {
@@ -94,21 +86,12 @@ public class CfTableArray implements CfTable {
 		in.close();
 	}
 
-	public long getCf(String term) {
-		int index = Arrays.binarySearch(mTerms, term);
-
-		if (index < 0)
-			return -1;
-
-		return mCfs[index];
+	public long getCf(int term) {
+		return mCfs[term - 1];
 	}
 
 	public long getCollectionSize() {
 		return mTotalTermCount;
-	}
-
-	public int getDocumentCount() {
-		return mNumDocs;
 	}
 
 	public int getVocabularySize() {
@@ -119,40 +102,11 @@ public class CfTableArray implements CfTable {
 		return mMaxCf;
 	}
 
-	public String getMaxCfTerm() {
+	public int getMaxCfTerm() {
 		return mMaxCfTerm;
 	}
 
 	public int getCountOfTermWithCfOne() {
 		return mCfOne;
-	}
-
-	public static void main(String[] args) throws Exception {
-		if (args.length != 1) {
-			System.out.println("usage: [cf-file]");
-			System.exit(-1);
-		}
-
-		long startingMemoryUse = MemoryUsageUtils.getUsedMemory();
-
-		CfTableArray cfs = new CfTableArray(args[0]);
-
-		System.out.println("Number of documents: " + cfs.getDocumentCount());
-		System.out.println("Vocab size: " + cfs.getVocabularySize());
-		System.out.println("Collection size: " + cfs.getCollectionSize());
-		System.out.println("term with max cf is " + cfs.getMaxCfTerm() + ", cf=" + cfs.getMaxCf());
-		System.out.println(cfs.getCountOfTermWithCfOne() + " terms have cf=1");
-
-		long endingMemoryUse = MemoryUsageUtils.getUsedMemory();
-
-		System.out.println("Memory usage: " + (endingMemoryUse - startingMemoryUse) + " bytes\n");
-
-		String term = null;
-		BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
-		System.out.print("Look up cf of stemmed term> ");
-		while ((term = stdin.readLine()) != null) {
-			System.out.println(term + ", cf=" + cfs.getCf(term));
-			System.out.print("Look up cf of stemmed term > ");
-		}
 	}
 }
