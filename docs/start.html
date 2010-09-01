@@ -1,0 +1,78 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head><title>Ivory: A Hadoop toolkit for Web-scale information retrieval</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+<center><table width="80%"><tbody><tr><td align="left">
+
+<h2>Ivory: Downloading and setting up</h2>
+
+<div class="main">
+
+<p>Ivory uses
+<a href="http://www.umiacs.umd.edu/~jimmylin/cloud9/docs/index.html">Cloud<sup><small>9</small></sup></a>,
+a MapReduce library for Hadoop developed at the University of
+Maryland.  It primarily started off as a teaching tool, but in the
+spirit of eating your own dog food, it is being actively used in
+several research projects.</p>
+
+<p>Cloud<sup><small>9</small></sup> is available as a tarball, or
+alternatively you can check out the latest code from our Subversion
+repository.  Either way, you'll want to put both
+Cloud<sup><small>9</small></sup> and Ivory in the same top-level
+directory.  Specifically, you should have:</p>
+
+<ul>
+
+  <li><b>foo/umd-hadoop-core/</b> for Cloud<sup><small>9</small></sup></li>
+
+  <li><b>foo/umd-hadoop-ivory/</b> for Ivory</li>
+
+</ul>
+
+<p>Go into foo/umd-hadoop-ivory/ and type "ant".  This should
+automatically build the distribution and create ivory.jar.  The jar
+will contain all the class files in Cloud<sup><small>9</small></sup>
+also, this jar is self-contained and ready for submitting to a Hadoop
+cluster.</p>
+
+<p style="padding-top: 25px"><a href="./index.html">Back to main page</a></p>
+
+</div>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" style="padding-top: 10px;">
+<tr><td valign="top" align="left">
+<small>
+This page, first created: 16 Jul 2009; last updated:
+<script language="JavaScript" type="text/javascript">
+<!--
+var LastUpdated = "$Date: 2009-07-16 21:47:57 -0400 (Thu, 16 Jul 2009) $";
+LastUpdated = LastUpdated.substring(LastUpdated.length-14, LastUpdated.length-3);
+document.writeln (LastUpdated);
+-->
+</script>
+</small>
+</td>
+<td valign="top" align="right">
+  <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/us/">
+  <img src="images/creative-commons.png" border="0" alt="Creative Commons: Attribution-Noncommercial-Share Alike 3.0 United States"/>
+  </a>
+  <a href="http://validator.w3.org/check/referer">
+  <img src="images/valid-xhtml10.gif" border="0"
+       alt="Valid XHTML 1.0!" height="31" width="88" />
+  </a>
+  <a href="http://jigsaw.w3.org/css-validator/check/referer">
+  <img style="border:0;width:88px;height:31px"
+       src="images/vcss.gif" 
+       alt="Valid CSS!" />
+  </a>
+</td></tr></table>
+
+
+</td></tr></tbody></table></center>
+
+</body></html>

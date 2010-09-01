@@ -1,0 +1,429 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head><title>Ivory: A Hadoop toolkit for Web-scale information retrieval</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+<center><table width="80%"><tbody><tr><td align="left">
+
+<h2>Ivory: Getting started with TREC disks 4-5</h2>
+
+<div class="main">
+
+<h3>Introduction</h3>
+
+<p>This tutorial provides a guide to batch and interactive retrieval
+with SMRF on the venerable TREC
+disks <a href="http://www.nist.gov/srd/nistsd22.htm">4</a>
+and <a href="http://www.nist.gov/srd/nistsd23.htm">5</a> document
+collection, which is distributed
+by <a href="http://www.nist.gov/">NIST</a> and used in
+many <a href="http://trec.nist.gov/">Text Retrieval Conferences</a>
+(TRECs).  Although the collection is over a decade old, it is still
+used as a starting point for information retrieval research.  This
+guide will cover both indexing the collection, performing retrieval
+runs with queries from the TREC 2004 robust track, and interactive
+querying.  This guide assumes you have Ivory downloaded and set up
+already; otherwise, visit <a href="start.html">this page</a>.</p>
+
+<h3>Indexing the Collection</h3>
+
+<p>The first task is to obtain the collection (from NIST).  We're
+assuming you have it in hand already.  A standard "view" of the disks
+is to ignore the Congressional Record (CR) and Federal Register (FR),
+so the collection is often written shorthand as TREC 45 (-CR,FR) or
+something along these lines.</p>
+
+<p>There are a total of 472,525 documents in the collection as
+described above, distributed in a number of files;
+see <a href="data/files.TREC45-noCRFR.txt">complete list of all
+files</a>.  Since Hadoop doesn't work well will lots of small files,
+the first step is to prepare the collection by concatenating all the
+documents into a large file.  This is most easily done with a Perl or
+Python script.  See this <a href="data/cat_all_docs.pl">simple Perl
+script</a>, but it should be very easy to write your own.</p>
+
+<p>Once the collection has been prepared, you can use the program
+<b>ivory.demo.DriverBuildIndexTrec</b> to build the collection.  The
+program takes four command-line arguments:</p>
+ 
+<ul>
+ <li>[input-path] path to the document collection</li>
+ <li>[index-path] path to index directory</li>
+ <li>[num-mappers] number of mappers to run</li>
+ <li>[num-reducers] number of reducers to run</li>
+</ul>
+
+<p>Here's a sample invocation:</p>
+
+<pre>
+hadoop jar ivory.jar ivory.demo.DriverBuildIndexTrec \
+ /umd/collections/trec/trec4-5_noCRFR.xml /umd/indexes/trec45noCRFR.positional/ 100 10
+</pre>
+
+<p>You'll note that the input path is simple one large file.</p>
+
+<p>The nice thing about Hadoop is its ability to scale out&mdash;from
+a cluster with a few to a few thousand nodes.  In fact, you can even
+run the above program on a single machine, in Hadoop's standalone
+mode.  The invocation for this:</p>
+
+<pre>
+hadoop jar ivory.jar ivory.demo.DriverBuildIndexTrec \
+ -D mapred.job.tracker=local \
+ -D fs.default.name=file:/// \
+ /umd/collections/trec/trec4-5_noCRFR.xml \
+ /umd/indexes/trec45noCRFR.positional/ 100 1
+</pre>
+
+<p>The two -D options force Hadoop to run in standalone mode on the
+local machine.  Note that in Hadoop standalone mode the number of
+reducers is fixed at one, so the final command-line argument is
+irrelevant.  See this sample <a href="trec-local-log.txt">trace of
+indexing</a> the entire TREC collection in standalone mode.  For
+reference, on a Core 2 Duo (2.6 GHz) laptop with 2 GB RAM running
+Windows XP, the entire process takes about an hour and twenty minutes.
+On a cluster, the job obviously runs much faster, but the scaling on
+this collection isn't very linear because the dataset is relatively
+small; on large clusters, running times become dominated by the
+startup overhead of mappers and reducers.</p>
+
+<p>The class itself is well-commented and very readable, but here's an
+overview of the various indexing phases:</p>
+
+<ol>
+
+  <li><b>Number the documents.</b>  In order for the indexer to work
+  properly, the documents must be assigned a sequentially-numbered
+  int, from 1 to <i>n</i>, where <i>n</i> is the size of the
+  collection (472,525 in our case).  For clarity, this is referred to
+  as the docno, while the original collection-specific document id is
+  referred to as the docid (which is typically an alphanumeric
+  identifier).  As a note, this is slightly confusing since the
+  collection uses the XML tag &lt;DOCNO&gt;, but Ivory documentation
+  is consistent about its reference to docnos and docids.  Numbering
+  the documents is handled by classes in the
+  edu.umd.cloud9.collection.trec package in
+  <a href="http://www.umiacs.umd.edu/~jimmylin/cloud9/docs/index.html">Cloud<sup><small>9</small></sup></a>.
+  See documentation there for more details.</li>
+
+  <li><b>Build the inverted index.</b> This is the heart of the
+  indexing process.  During document analysis in the map phase,
+  document length data is written out "on the side".  After the
+  postings lists have been written to disk (after the reduce phase),
+  the document length data are collected in a single binary-encoded
+  file.</li>
+
+  <li><b>Merge the postings.</b> During the indexing phase, each
+  reducer writes out its postings lists in a separate file.  This is
+  an optional step to merge all of the postings lists into a single
+  file.</li>
+
+<!--
+  <li><b>Extract document frequency and collection frequency data.</b>
+  In this optional phase, <i>df</i> and <i>cf</i> information are
+  extracted from the postings and written out into separate
+  binary-encoded files.  Although this isn't actually used by the SMRF
+  retrieval engine, these data files can be useful for other
+  purposes.</li>
+
+-->
+
+  <li><b>Build the term postings forward index.</b>  This forward
+  index allows the retrieval engine to look up and quickly access
+  postings on disk.  The forward index is simply an in-memory lookup
+  table from term to disk locations (file and byte offset).  To
+  control memory usage, a <i>df</i> filter can be applied to throw
+  away all terms with low document frequencies.</li>
+
+
+  <li><b>Build the document forward index.</b> This forward index
+  provides a mechanism for accessing the actual document text.  It's
+  essentially a big lookup table of docnos to byte offsets in the
+  collection file on disk (and also the length of each document).</li>
+
+</ol>
+
+<h3>Performing a Retrieval Run</h3>
+
+<p>Now you're ready to perform a batch retrieval run!  We're going to
+use topics from the TREC 2004 robust track.  In information retrieval
+parlance, topics define information needs, from which the actual
+queries derive.  In the docs/data/ directory, you'll find two
+configuration files:</p>
+
+<ul>
+
+  <li><a href="data/run_robust04.xml">docs/data/run_robust04.xml</a>:
+  this file tells the retrieval engine which retrieval models to use
+  (and associated configuration parameters).</li>
+
+  <li><a href="data/robust04_queries.xml">docs/data/robust04_queries.xml</a>:
+  this file tells the retrieval engine what queries to run.</li>
+
+</ul>
+
+<p>You'll see that the first configuration file specifies four
+different models:</p>
+
+<ul>
+
+  <li><b>robust04-lm-ql</b>: language modeling framework, simple query
+  likelihood.</li>
+
+  <li><b>robust04-lm-sd</b>: language modeling framework, sequential
+  dependencies using MRFs.</li>
+
+  <li><b>robust04-bm25-base</b>: <i>bm25</i> term weighting, simple
+  bag-of-words queries.</li>
+
+  <li><b>robust04-bm25-sd</b>: sequential dependencies using MRFs,
+  with <i>bm25</i> term weighting.</li>
+
+</ul>
+
+<p>The class <b>ivory.smrf.retrieval.RunQueryLocal</b> takes the XML
+configuration files as input and generates ranked lists in standard
+TREC format.</p>
+
+<p>You'll have to go
+into <a href="data/run_robust04.xml">docs/data/run_robust04.xml</a>
+and modify the location of your index (likely different from the
+default).  Then run the class (i.e., directly from within Eclipse),
+passing in the configuration filenames as command-line parameters.</p>
+
+<p>Alternatively, Ivory contains a generic launch script that
+automatically includes all the right classpaths, automatically
+generated by ant.  Open up a shell and change directory into Ivory.
+Type:</p>
+
+<pre>
+$ ant
+</pre>
+
+<p>Ant should automatically build ivory.jar and create a launch script
+in etc/, either run.sh or run.bat depending on your operating system.
+If you get errors you might want to look at <a href="start.html">this
+guide to downloading and setting up Ivory</a>.</p>
+
+<p>On the command line, here's the invocation to perform an <i>ad
+hoc</i> retrieval run:</p>
+
+<pre>
+$ etc/run.bat ivory.smrf.retrieval.RunQueryLocal docs/data/run_robust04.xml docs/data/robust04_queries.xml
+</pre>
+
+<p>Ivory (more precisely, the SMRF retrieval engine) should whirl to
+life and run the robust04 queries using the four different retrieval
+models.  After it's done, you should end up with four files:</p>
+
+<pre>
+$ ls -l *.ranking
+-rw-------+ 1 jimmylin None 5574433 Jul 14 21:36 robust04-bm25-base.ranking
+-rw-------+ 1 jimmylin None 5373781 Jul 14 21:37 robust04-bm25-sd.ranking
+-rw-------+ 1 jimmylin None 5326504 Jul 14 21:36 robust04-lm-ql.ranking
+-rw-------+ 1 jimmylin None 5326964 Jul 14 21:36 robust04-lm-sd.ranking
+</pre>
+
+<p>The first few lines of robust04-lm-ql.ranking should look like the
+following:</p>
+
+<pre>
+601 Q0 169829 1 -14.090268788470937 robust04-lm-ql
+601 Q0 292744 2 -14.400598975281312 robust04-lm-ql
+601 Q0 322324 3 -14.951631953705153 robust04-lm-ql
+601 Q0 122504 4 -15.035094304404174 robust04-lm-ql
+601 Q0 31919 5 -15.096709770158036 robust04-lm-ql
+601 Q0 200205 6 -15.10832966886381 robust04-lm-ql
+601 Q0 31917 7 -15.388110425436714 robust04-lm-ql
+601 Q0 169830 8 -15.518158934682525 robust04-lm-ql
+601 Q0 116293 9 -15.641473260350587 robust04-lm-ql
+601 Q0 317707 10 -15.753654209988563 robust04-lm-ql
+...
+</pre>
+
+<p>This is run output in the standard TREC format.  The first column
+is the topic number, the third column is the docno, the fourth column
+is the rank order, and the fifth column is the score (log probability,
+in this case).  Note that the docno is the sequentially-numbered
+integer, not the TREC alphanumeric docid.  For
+convenience <a href="data/docno-mapping.TREC45-noCRFR.txt.gz">this
+tarball</a> contains a mapping from sequentially-numbered docnos to
+TREC docids.  If you prepared the corpus exactly as described above
+(i.e., same ordering of files), you should have the same exact
+mapping.  Document relevance information (qrels) is included
+below:</p>
+
+<ul>
+
+  <li><a href="data/robust04.qrels.txt">docs/data/robust04.qrels.txt</a>:
+  Qrels file, with original alphanumeric TREC docids.</li>
+
+  <li><a href="data/robust04.qrels.TREC45-noCRFR.txt">docs/data/robust04.qrels.TREC45-noCRFR.txt</a>:
+  Qrels file, with alphanumeric TREC docids mapped into
+  sequentially-numbered docnos.</li>
+
+</ul>
+
+<p>With
+the <a href="http://trec.nist.gov/trec_eval/index.html">trec_eval</a>
+program, you should be able to evaluate the runs.  Sample
+invocation:</p>
+
+<pre>
+$ trec_eval docs/data/robust04.qrels.TREC45-noCRFR.txt robust04-lm-ql.ranking
+num_q           all     99
+num_ret         all     99000
+num_rel         all     3417
+num_rel_ret     all     2791
+map             all     0.3063
+gm_ap           all     0.2062
+R-prec          all     0.3322
+bpref           all     0.2914
+recip_rank      all     0.7340
+...
+</pre>
+
+<p>Mean average precision ("map" in results above) is the
+most-commonly reported single-point metric to characterize retrieval
+effectiveness.  For the four retrieval models listed above, here are
+the figures that you should be getting:</p>
+
+<pre>
+robust04-lm-ql          map     0.3063
+robust04-lm-sd          map     0.3194
+robust04-bm25-base      map     0.3033
+robust04-bm25-sd        map     0.3212
+</pre>
+
+<p>And that's it.  Congratulations, you've successfully performed a
+retrieval run with SMRF!</p>
+
+<h3>Searching Interactively</h3>
+
+<p>Now, what about interactive retrieval?  You'll of course know that
+MapReduce is designed for large batch jobs and is not suitable for
+real-time interactive applications.  Specifically, HDFS is designed
+for high-throughput streaming reads, not low-latency access to
+(relatively) small amounts of information.  But of course, interactive
+retrieval requires rapid access to postings corresponding to query
+terms...</p>
+
+<p>The standard solution is to pull the indexes out of HDFS into
+another architecture that supports low-latency operations
+(e.g., <a href="http://katta.sourceforge.net/about">Katta</a> is a
+framework for managing distributed Lucene indexes).  However, this
+presents a data-management challenging (copying large index files
+around), and naturally, you lose the benefits of HDFS (e.g.,
+redundancy through replication).</p>
+
+<p>As an experiment, we've been playing with retrieval engines <b>that
+directly read postings from HDFS</b>.  This may at first seem like a
+stupid idea, but this approach does have merits.  Sure, most likely
+you'll be reading postings from a remote datanode, but you gain the
+benefit of a homogeneous environment (everything is Hadoop).  Early
+indications suggest that this architecture give reasonable performance
+(we're working on some ideas that we believe will make this
+architecture just as fast as the alternative).</p>
+
+<p>In summary, the Ivory retrieval architecture looks like the
+following:</p>
+
+<p><img width="450" src="images/retrieval-hdfs.png" alt="Retrieval Server reading directly from HDFS" /></p>
+
+<p>What we've done is folded a retrieval engine into a webapp.  This
+is easy because Hadoop already
+uses <a href="http://www.mortbay.org/jetty/">Jetty</a> for its
+webapps.  Furthermore, we folded the webapp inside a mapper (albeit a
+degenerate one), so that we launch the retrieval sever like any other
+Hadoop job.  See following invocation:</p>
+
+<pre>
+$ hadoop jar ivory.jar ivory.http.server.RetrievalServer bm25 server-config/ /umd/indexes/trec45noCRFR.positional
+09/07/14 22:10:13 INFO server.RetrievalServer: Writing configuration to: server-config/config1-1.txt
+09/07/14 22:10:13 INFO server.RetrievalServer:  sid=1, index=/umd/indexes/trec45noCRFR.positional
+09/07/14 22:10:33 INFO mapred.FileInputFormat: Total input paths to process : 1
+09/07/14 22:10:35 INFO server.RetrievalServer: Waiting for host information (polling HDFS)...
+09/07/14 22:10:40 INFO server.RetrievalServer:  ...
+09/07/14 22:10:45 INFO server.RetrievalServer:  ...
+09/07/14 22:10:50 INFO server.RetrievalServer:  ...
+09/07/14 22:10:50 INFO server.RetrievalServer: Host information:
+09/07/14 22:10:50 INFO server.RetrievalServer:  sid=1, XXX.XXX.XXX.XXX:8001
+</pre>
+
+<p>What happens is that the mapper starts up, initializes the
+retrieval engine, and fires a webapp by creating a Jetty HTTP server
+listening on a particular port.  Of course, we have no idea which
+cluster node ran the mapper, so the webapp writes out its hostname and
+port to HDFS (yes, this should really be done in Zookeeper).
+Meanwhile, the client submitting the job polls HDFS waiting for the
+file to appear.  Once it does, the client reads the config file and
+tells you where the webapp is.  If you navigate to that hostname/port
+in a browser, you'll get access to a since search interface where you
+can put in a query and look at retrieved documents.</p>
+
+<p>More precisely, the first command-line argument is the retrieval
+model: "bm25" or "lm"; the second is the HDFS path where the server
+config information will be written.  The final command-line argument
+is the index path (as many of them as you want).  For every index, a
+separate retrieval server will be created (each inside its own
+mapper).  As a final note, Hadoop release 0.18.3 and before use Jetty
+5, whereas 0.20.0 uses Jetty 6.  There are API incompatibilities
+between the two Jetty versions, so unfortunately the above program
+does not yet run on Hadoop 0.20.0.</p>
+
+<p>Finally, there's a variant of the above program that will run in
+standalone mode on a local machine.  See below for a sample
+invocation:</p>
+
+<pre>
+hadoop jar ivory.jar ivory.http.server.LocalRetrievalServer \
+ -D mapred.job.tracker=local -D fs.default.name=file:/// \
+ bm25 /umd/indexes/trec45noCRFR.positional 9000
+</pre>
+
+<p>Once the program starts, you can navigate to http://localhost:9000/
+in a browser and access a simple search interface.</p>
+
+<p>And that's it.  We've covered indexing, batching retrieval, and
+interactive retrieval.  Enjoy!</p>
+
+<p style="padding-top: 25px"><a href="./index.html">Back to main page</a></p>
+
+</div>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" style="padding-top: 10px;">
+<tr><td valign="top" align="left">
+<small>
+This page, first created: 30 Jun 2009; last updated:
+<script language="JavaScript" type="text/javascript">
+<!--
+var LastUpdated = "$Date: 2009-07-18 13:37:57 -0400 (Sat, 18 Jul 2009) $";
+LastUpdated = LastUpdated.substring(LastUpdated.length-14, LastUpdated.length-3);
+document.writeln (LastUpdated);
+-->
+</script>
+</small>
+</td>
+<td valign="top" align="right">
+  <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/us/">
+  <img src="images/creative-commons.png" border="0" alt="Creative Commons: Attribution-Noncommercial-Share Alike 3.0 United States"/>
+  </a>
+  <a href="http://validator.w3.org/check/referer">
+  <img src="images/valid-xhtml10.gif" border="0"
+       alt="Valid XHTML 1.0!" height="31" width="88" />
+  </a>
+  <a href="http://jigsaw.w3.org/css-validator/check/referer">
+  <img style="border:0;width:88px;height:31px"
+       src="images/vcss.gif" 
+       alt="Valid CSS!" />
+  </a>
+</td></tr></table>
+
+
+</td></tr></tbody></table></center>
+
+</body></html>

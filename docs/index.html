@@ -1,0 +1,118 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head><title>Ivory: A Hadoop toolkit for Web-scale information retrieval</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+<center><table width="80%"><tbody><tr><td align="left">
+
+<h2>The Ivory Toolkit with the SMRF Retrieval Engine</h2>
+
+<div class="main">
+
+<p>Ivory is a Hadoop toolkit for Web-scale information retrieval
+research that features a retrieval engine based on Markov Random
+Fields, appropriately named SMRF (Searching with Markov Random
+Fields).  This open-source project began in Spring 2009 and represents
+a collaboration between the University of Maryland and
+Yahoo!&nbsp;Research.  Ivory takes full advantage of
+the <a href="http://hadoop.apache.org/core/">Hadoop</a> distributed
+environment (the MapReduce programming model and the underlying
+distributed file system) for both indexing and retrieval.</p>
+
+<p>In order to temper expectations, please note that Ivory is not
+meant to serve as a full-featured search engine (e.g., Lucene), but
+rather aimed at information retrieval researchers who need access to
+low-level data structures and who generally know their way around
+retrieval algorithms.  As a result, a lot of "niceties" are simply
+missing&mdash;for example, fancy interfaces or ingestion support for
+different file types.  It goes without saying that Ivory is a bit
+rough around the edges, but our philosophy is to release early and
+release often.  In short, Ivory is <b>experimental</b>!</p>
+
+<p>Ivory was specifically designed to work with Hadoop "out of the
+box" on
+the <a href="http://boston.lti.cs.cmu.edu/clueweb09/wiki/tiki-index.php?page=ClueWeb09%20Wiki">ClueWeb09
+collection</a>, a 1 billion page (25 TB) Web crawl distributed by
+Carnegie Mellon University.  The initial release of Ivory is meant to
+serve as a reference implementation of indexing and retrieval
+algorithms that can operate at the multi-terabyte scale.  Another
+interesting experimental aspect of Ivory is it's retrieval
+architecture: we've been playing with retrieval engines that directly
+read postings from HDFS.  The getting started guide
+with <a href="trec.html">TREC disks 4-5</a> provides more details.</p>
+
+<h3>Download</h3>
+
+<ul>
+
+  <li>Ivory, release 0.1 (July 18,
+  2009): <a href="ivory-0.1.tar.gz">ivory-r0.1.tar.gz</a> (xxx KB)</li>
+
+</ul>
+
+<h3>Documentation</h3>
+
+<ul>
+
+  <li><a href="javadoc/index.html">Ivory API javadoc</a></li>
+
+  <li><a href="start.html">Downloading and setting up</a> the Ivory toolkit</li>
+
+  <li>Getting started with <a href="trec.html">TREC disks 4-5</a></li>
+
+  <li>Getting started with <a href="clue.html">the ClueWeb09 collection</a></li>
+
+  <li>Other <a href="thirdparty.html">third-party libraries</a> on
+  which Ivory depends</li>
+
+  <li><a href="team.html">Project team</a></li>
+
+</ul>
+
+<p style="padding-top: 25px"><small>This work is or has been supported
+by the following sources: NSF under awards IIS-0836560 and
+IIS-0705832; Google and IBM under the Academic Cloud Computing
+Initiative (ACCI); the Intramural Research Program of the NIH,
+National Library of Medicine; DARPA/IPTO Contract No. HR0011-06-2-0001
+under the GALE program; and Amazon Web Services.  Any opinions,
+findings, conclusions, or recommendations expressed here do not
+necessarily reflect those of the sponsors.  </small></p>
+
+</div>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" style="padding-top: 10px;">
+<tr><td valign="top" align="left">
+<small>
+This page, first created: 16 Jun 2009; last updated:
+<script language="JavaScript" type="text/javascript">
+<!--
+var LastUpdated = "$Date: 2009-07-18 13:38:16 -0400 (Sat, 18 Jul 2009) $";
+LastUpdated = LastUpdated.substring(LastUpdated.length-14, LastUpdated.length-3);
+document.writeln (LastUpdated);
+-->
+</script>
+</small>
+</td>
+<td valign="top" align="right">
+  <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/us/">
+  <img src="images/creative-commons.png" border="0" alt="Creative Commons: Attribution-Noncommercial-Share Alike 3.0 United States"/>
+  </a>
+  <a href="http://validator.w3.org/check/referer">
+  <img src="images/valid-xhtml10.gif" border="0"
+       alt="Valid XHTML 1.0!" height="31" width="88" />
+  </a>
+  <a href="http://jigsaw.w3.org/css-validator/check/referer">
+  <img style="border:0;width:88px;height:31px"
+       src="images/vcss.gif" 
+       alt="Valid CSS!" />
+  </a>
+</td></tr></table>
+
+
+</td></tr></tbody></table></center>
+
+</body></html>

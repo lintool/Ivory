@@ -1,0 +1,3113 @@
+09/07/18 11:58:53 INFO demo.DriverBuildIndexTrec: Tool: DriverBuildIndexTrec
+09/07/18 11:58:53 INFO demo.DriverBuildIndexTrec:  - Collection path: /umd/collections/trec/trec4-5_noCRFR.xml
+09/07/18 11:58:53 INFO demo.DriverBuildIndexTrec:  - Index path: /umd/indexes/trec45noCRFR.positional/
+09/07/18 11:58:53 INFO demo.DriverBuildIndexTrec:  - Number of mappers: 100
+09/07/18 11:58:53 INFO demo.DriverBuildIndexTrec:  - Number of reducers: 1
+09/07/18 11:58:53 INFO demo.DriverBuildIndexTrec: Index path doesn't exist, creating...
+09/07/18 11:58:53 INFO demo.DriverBuildIndexTrec: docno-mapping.dat doesn't exist, creating...
+09/07/18 11:58:53 INFO trec.NumberTrecDocuments: Tool: NumberTrecDocuments
+09/07/18 11:58:53 INFO trec.NumberTrecDocuments:  - Input path: /umd/collections/trec/trec4-5_noCRFR.xml
+09/07/18 11:58:53 INFO trec.NumberTrecDocuments:  - Output path: /umd/indexes/trec45noCRFR.positional/docno-mapping/
+09/07/18 11:58:53 INFO trec.NumberTrecDocuments:  - Output file: /umd/indexes/trec45noCRFR.positional/docno-mapping.dat
+09/07/18 11:58:53 INFO trec.NumberTrecDocuments: Launching with 100 mappers...
+09/07/18 11:58:53 INFO jvm.JvmMetrics: Initializing JVM Metrics with processName=JobTracker, sessionId=
+09/07/18 11:58:54 INFO mapred.FileInputFormat: Total input paths to process : 1
+09/07/18 11:58:54 INFO mapred.JobClient: Running job: job_local_1
+09/07/18 11:58:55 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 11:58:55 INFO mapred.JobClient:  map 0% reduce 0%
+09/07/18 11:59:01 INFO mapred.LocalJobRunner: 
+09/07/18 11:59:01 INFO mapred.JobClient:  map 67% reduce 0%
+09/07/18 11:59:04 INFO mapred.LocalJobRunner: 
+09/07/18 11:59:04 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 11:59:06 INFO mapred.LocalJobRunner: 
+09/07/18 11:59:06 INFO mapred.TaskRunner: Task 'job_local_1_map_0000' done.
+09/07/18 11:59:06 INFO mapred.TaskRunner: Saved output of task 'job_local_1_map_0000' to file:/umd/indexes/trec45noCRFR.positional/docno-mapping
+09/07/18 11:59:06 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 11:59:07 INFO mapred.LocalJobRunner: 
+09/07/18 11:59:07 INFO mapred.JobClient:  map 50% reduce 0%
+09/07/18 11:59:12 INFO mapred.LocalJobRunner: 
+09/07/18 11:59:13 INFO mapred.JobClient:  map 88% reduce 0%
+09/07/18 11:59:14 INFO mapred.LocalJobRunner: 
+09/07/18 11:59:14 INFO mapred.TaskRunner: Task 'job_local_1_map_0001' done.
+09/07/18 11:59:14 INFO mapred.TaskRunner: Saved output of task 'job_local_1_map_0001' to file:/umd/indexes/trec45noCRFR.positional/docno-mapping
+09/07/18 11:59:14 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 11:59:14 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 11:59:15 INFO mapred.LocalJobRunner: 
+09/07/18 11:59:16 INFO mapred.JobClient:  map 66% reduce 0%
+09/07/18 11:59:20 INFO mapred.LocalJobRunner: 
+09/07/18 11:59:21 INFO mapred.JobClient:  map 91% reduce 0%
+09/07/18 11:59:23 INFO mapred.LocalJobRunner: 
+09/07/18 11:59:23 INFO mapred.TaskRunner: Task 'job_local_1_map_0002' done.
+09/07/18 11:59:23 INFO mapred.TaskRunner: Saved output of task 'job_local_1_map_0002' to file:/umd/indexes/trec45noCRFR.positional/docno-mapping
+09/07/18 11:59:23 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 11:59:23 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 11:59:23 INFO mapred.LocalJobRunner: 
+09/07/18 11:59:24 INFO mapred.JobClient:  map 75% reduce 0%
+09/07/18 11:59:29 INFO mapred.LocalJobRunner: 
+09/07/18 11:59:29 INFO mapred.JobClient:  map 96% reduce 0%
+09/07/18 11:59:30 INFO mapred.LocalJobRunner: 
+09/07/18 11:59:30 INFO mapred.TaskRunner: Task 'job_local_1_map_0003' done.
+09/07/18 11:59:30 INFO mapred.TaskRunner: Saved output of task 'job_local_1_map_0003' to file:/umd/indexes/trec45noCRFR.positional/docno-mapping
+09/07/18 11:59:30 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 11:59:30 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 11:59:32 INFO mapred.LocalJobRunner: 
+09/07/18 11:59:32 INFO mapred.JobClient:  map 80% reduce 0%
+09/07/18 11:59:36 INFO mapred.LocalJobRunner: 
+09/07/18 11:59:36 INFO mapred.JobClient:  map 95% reduce 0%
+09/07/18 11:59:38 INFO mapred.LocalJobRunner: 
+09/07/18 11:59:38 INFO mapred.TaskRunner: Task 'job_local_1_map_0004' done.
+09/07/18 11:59:38 INFO mapred.TaskRunner: Saved output of task 'job_local_1_map_0004' to file:/umd/indexes/trec45noCRFR.positional/docno-mapping
+09/07/18 11:59:38 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 11:59:38 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 11:59:39 INFO mapred.LocalJobRunner: 
+09/07/18 11:59:39 INFO mapred.JobClient:  map 83% reduce 0%
+09/07/18 11:59:44 INFO mapred.LocalJobRunner: 
+09/07/18 11:59:44 INFO mapred.JobClient:  map 95% reduce 0%
+09/07/18 11:59:46 INFO mapred.LocalJobRunner: 
+09/07/18 11:59:46 INFO mapred.TaskRunner: Task 'job_local_1_map_0005' done.
+09/07/18 11:59:46 INFO mapred.TaskRunner: Saved output of task 'job_local_1_map_0005' to file:/umd/indexes/trec45noCRFR.positional/docno-mapping
+09/07/18 11:59:47 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 11:59:47 INFO mapred.LocalJobRunner: 
+09/07/18 11:59:47 INFO mapred.JobClient:  map 85% reduce 0%
+09/07/18 11:59:53 INFO mapred.LocalJobRunner: 
+09/07/18 11:59:53 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 11:59:54 INFO mapred.LocalJobRunner: 
+09/07/18 11:59:54 INFO mapred.TaskRunner: Task 'job_local_1_map_0006' done.
+09/07/18 11:59:54 INFO mapred.TaskRunner: Saved output of task 'job_local_1_map_0006' to file:/umd/indexes/trec45noCRFR.positional/docno-mapping
+09/07/18 11:59:54 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 11:59:54 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 11:59:56 INFO mapred.LocalJobRunner: 
+09/07/18 11:59:56 INFO mapred.JobClient:  map 87% reduce 0%
+09/07/18 12:00:00 INFO mapred.LocalJobRunner: 
+09/07/18 12:00:00 INFO mapred.JobClient:  map 98% reduce 0%
+09/07/18 12:00:01 INFO mapred.LocalJobRunner: 
+09/07/18 12:00:01 INFO mapred.TaskRunner: Task 'job_local_1_map_0007' done.
+09/07/18 12:00:01 INFO mapred.TaskRunner: Saved output of task 'job_local_1_map_0007' to file:/umd/indexes/trec45noCRFR.positional/docno-mapping
+09/07/18 12:00:01 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:00:01 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:00:03 INFO mapred.LocalJobRunner: 
+09/07/18 12:00:03 INFO mapred.JobClient:  map 88% reduce 0%
+09/07/18 12:00:06 INFO mapred.LocalJobRunner: 
+09/07/18 12:00:06 INFO mapred.TaskRunner: Task 'job_local_1_map_0008' done.
+09/07/18 12:00:06 INFO mapred.TaskRunner: Saved output of task 'job_local_1_map_0008' to file:/umd/indexes/trec45noCRFR.positional/docno-mapping
+09/07/18 12:00:06 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:00:06 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:00:07 INFO mapred.LocalJobRunner: 
+09/07/18 12:00:07 INFO mapred.JobClient:  map 90% reduce 0%
+09/07/18 12:00:12 INFO mapred.LocalJobRunner: 
+09/07/18 12:00:12 INFO mapred.TaskRunner: Task 'job_local_1_map_0009' done.
+09/07/18 12:00:12 INFO mapred.TaskRunner: Saved output of task 'job_local_1_map_0009' to file:/umd/indexes/trec45noCRFR.positional/docno-mapping
+09/07/18 12:00:12 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:00:12 INFO mapred.LocalJobRunner: 
+09/07/18 12:00:17 INFO mapred.LocalJobRunner: 
+09/07/18 12:00:17 INFO mapred.TaskRunner: Task 'job_local_1_map_0010' done.
+09/07/18 12:00:17 INFO mapred.TaskRunner: Saved output of task 'job_local_1_map_0010' to file:/umd/indexes/trec45noCRFR.positional/docno-mapping
+09/07/18 12:00:17 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:00:17 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:00:18 INFO mapred.LocalJobRunner: 
+09/07/18 12:00:18 INFO mapred.JobClient:  map 91% reduce 0%
+09/07/18 12:00:22 INFO mapred.LocalJobRunner: 
+09/07/18 12:00:22 INFO mapred.TaskRunner: Task 'job_local_1_map_0011' done.
+09/07/18 12:00:22 INFO mapred.TaskRunner: Saved output of task 'job_local_1_map_0011' to file:/umd/indexes/trec45noCRFR.positional/docno-mapping
+09/07/18 12:00:22 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:00:22 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:00:23 INFO mapred.LocalJobRunner: 
+09/07/18 12:00:23 INFO mapred.JobClient:  map 92% reduce 0%
+09/07/18 12:00:28 INFO mapred.LocalJobRunner: 
+09/07/18 12:00:28 INFO mapred.JobClient:  map 99% reduce 0%
+09/07/18 12:00:29 INFO mapred.LocalJobRunner: 
+09/07/18 12:00:29 INFO mapred.TaskRunner: Task 'job_local_1_map_0012' done.
+09/07/18 12:00:29 INFO mapred.TaskRunner: Saved output of task 'job_local_1_map_0012' to file:/umd/indexes/trec45noCRFR.positional/docno-mapping
+09/07/18 12:00:29 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:00:29 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:00:31 INFO mapred.LocalJobRunner: 
+09/07/18 12:00:31 INFO mapred.JobClient:  map 92% reduce 0%
+09/07/18 12:00:35 INFO mapred.LocalJobRunner: 
+09/07/18 12:00:35 INFO mapred.LocalJobRunner: 
+09/07/18 12:00:35 INFO mapred.TaskRunner: Task 'job_local_1_map_0013' done.
+09/07/18 12:00:35 INFO mapred.TaskRunner: Saved output of task 'job_local_1_map_0013' to file:/umd/indexes/trec45noCRFR.positional/docno-mapping
+09/07/18 12:00:35 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:00:35 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:00:38 INFO mapred.LocalJobRunner: 
+09/07/18 12:00:38 INFO mapred.JobClient:  map 93% reduce 0%
+09/07/18 12:00:41 INFO mapred.LocalJobRunner: 
+09/07/18 12:00:41 INFO mapred.JobClient:  map 99% reduce 0%
+09/07/18 12:00:43 INFO mapred.LocalJobRunner: 
+09/07/18 12:00:43 INFO mapred.TaskRunner: Task 'job_local_1_map_0014' done.
+09/07/18 12:00:43 INFO mapred.TaskRunner: Saved output of task 'job_local_1_map_0014' to file:/umd/indexes/trec45noCRFR.positional/docno-mapping
+09/07/18 12:00:43 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:00:43 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:00:44 INFO mapred.LocalJobRunner: 
+09/07/18 12:00:44 INFO mapred.JobClient:  map 93% reduce 0%
+09/07/18 12:00:49 INFO mapred.LocalJobRunner: 
+09/07/18 12:00:49 INFO mapred.JobClient:  map 99% reduce 0%
+09/07/18 12:00:50 INFO mapred.LocalJobRunner: 
+09/07/18 12:00:50 INFO mapred.TaskRunner: Task 'job_local_1_map_0015' done.
+09/07/18 12:00:50 INFO mapred.TaskRunner: Saved output of task 'job_local_1_map_0015' to file:/umd/indexes/trec45noCRFR.positional/docno-mapping
+09/07/18 12:00:50 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:00:50 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:00:52 INFO mapred.LocalJobRunner: 
+09/07/18 12:00:52 INFO mapred.JobClient:  map 94% reduce 0%
+09/07/18 12:00:56 INFO mapred.LocalJobRunner: 
+09/07/18 12:00:56 INFO mapred.JobClient:  map 98% reduce 0%
+09/07/18 12:00:58 INFO mapred.LocalJobRunner: 
+09/07/18 12:00:58 INFO mapred.TaskRunner: Task 'job_local_1_map_0016' done.
+09/07/18 12:00:58 INFO mapred.TaskRunner: Saved output of task 'job_local_1_map_0016' to file:/umd/indexes/trec45noCRFR.positional/docno-mapping
+09/07/18 12:00:58 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:00:58 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:00:59 INFO mapred.LocalJobRunner: 
+09/07/18 12:00:59 INFO mapred.JobClient:  map 94% reduce 0%
+09/07/18 12:01:04 INFO mapred.LocalJobRunner: 
+09/07/18 12:01:04 INFO mapred.JobClient:  map 99% reduce 0%
+09/07/18 12:01:05 INFO mapred.LocalJobRunner: 
+09/07/18 12:01:05 INFO mapred.TaskRunner: Task 'job_local_1_map_0017' done.
+09/07/18 12:01:05 INFO mapred.TaskRunner: Saved output of task 'job_local_1_map_0017' to file:/umd/indexes/trec45noCRFR.positional/docno-mapping
+09/07/18 12:01:05 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:01:05 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:01:07 INFO mapred.LocalJobRunner: 
+09/07/18 12:01:07 INFO mapred.JobClient:  map 94% reduce 0%
+09/07/18 12:01:11 INFO mapred.LocalJobRunner: 
+09/07/18 12:01:11 INFO mapred.LocalJobRunner: 
+09/07/18 12:01:11 INFO mapred.TaskRunner: Task 'job_local_1_map_0018' done.
+09/07/18 12:01:11 INFO mapred.TaskRunner: Saved output of task 'job_local_1_map_0018' to file:/umd/indexes/trec45noCRFR.positional/docno-mapping
+09/07/18 12:01:11 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:01:11 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:01:14 INFO mapred.LocalJobRunner: 
+09/07/18 12:01:14 INFO mapred.JobClient:  map 95% reduce 0%
+09/07/18 12:01:17 INFO mapred.LocalJobRunner: 
+09/07/18 12:01:17 INFO mapred.TaskRunner: Task 'job_local_1_map_0019' done.
+09/07/18 12:01:17 INFO mapred.TaskRunner: Saved output of task 'job_local_1_map_0019' to file:/umd/indexes/trec45noCRFR.positional/docno-mapping
+09/07/18 12:01:17 INFO mapred.LocalJobRunner: 
+09/07/18 12:01:17 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:01:23 INFO mapred.LocalJobRunner: 
+09/07/18 12:01:23 INFO mapred.JobClient:  map 99% reduce 0%
+09/07/18 12:01:24 INFO mapred.LocalJobRunner: 
+09/07/18 12:01:24 INFO mapred.TaskRunner: Task 'job_local_1_map_0020' done.
+09/07/18 12:01:24 INFO mapred.TaskRunner: Saved output of task 'job_local_1_map_0020' to file:/umd/indexes/trec45noCRFR.positional/docno-mapping
+09/07/18 12:01:24 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:01:24 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:01:26 INFO mapred.LocalJobRunner: 
+09/07/18 12:01:26 INFO mapred.JobClient:  map 95% reduce 0%
+09/07/18 12:01:30 INFO mapred.LocalJobRunner: 
+09/07/18 12:01:30 INFO mapred.JobClient:  map 99% reduce 0%
+09/07/18 12:01:32 INFO mapred.LocalJobRunner: 
+09/07/18 12:01:32 INFO mapred.TaskRunner: Task 'job_local_1_map_0021' done.
+09/07/18 12:01:32 INFO mapred.TaskRunner: Saved output of task 'job_local_1_map_0021' to file:/umd/indexes/trec45noCRFR.positional/docno-mapping
+09/07/18 12:01:32 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:01:32 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:01:33 INFO mapred.LocalJobRunner: 
+09/07/18 12:01:33 INFO mapred.JobClient:  map 95% reduce 0%
+09/07/18 12:01:38 INFO mapred.LocalJobRunner: 
+09/07/18 12:01:38 INFO mapred.JobClient:  map 99% reduce 0%
+09/07/18 12:01:39 INFO mapred.LocalJobRunner: 
+09/07/18 12:01:39 INFO mapred.TaskRunner: Task 'job_local_1_map_0022' done.
+09/07/18 12:01:39 INFO mapred.TaskRunner: Saved output of task 'job_local_1_map_0022' to file:/umd/indexes/trec45noCRFR.positional/docno-mapping
+09/07/18 12:01:39 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:01:39 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:01:41 INFO mapred.LocalJobRunner: 
+09/07/18 12:01:41 INFO mapred.JobClient:  map 95% reduce 0%
+09/07/18 12:01:45 INFO mapred.LocalJobRunner: 
+09/07/18 12:01:45 INFO mapred.TaskRunner: Task 'job_local_1_map_0023' done.
+09/07/18 12:01:45 INFO mapred.TaskRunner: Saved output of task 'job_local_1_map_0023' to file:/umd/indexes/trec45noCRFR.positional/docno-mapping
+09/07/18 12:01:45 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:01:45 INFO mapred.LocalJobRunner: 
+09/07/18 12:01:45 INFO mapred.JobClient:  map 96% reduce 0%
+09/07/18 12:01:51 INFO mapred.LocalJobRunner: 
+09/07/18 12:01:51 INFO mapred.LocalJobRunner: 
+09/07/18 12:01:51 INFO mapred.TaskRunner: Task 'job_local_1_map_0024' done.
+09/07/18 12:01:51 INFO mapred.TaskRunner: Saved output of task 'job_local_1_map_0024' to file:/umd/indexes/trec45noCRFR.positional/docno-mapping
+09/07/18 12:01:51 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:01:51 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:01:54 INFO mapred.LocalJobRunner: 
+09/07/18 12:01:54 INFO mapred.JobClient:  map 96% reduce 0%
+09/07/18 12:01:57 INFO mapred.LocalJobRunner: 
+09/07/18 12:01:57 INFO mapred.LocalJobRunner: 
+09/07/18 12:01:57 INFO mapred.TaskRunner: Task 'job_local_1_map_0025' done.
+09/07/18 12:01:57 INFO mapred.TaskRunner: Saved output of task 'job_local_1_map_0025' to file:/umd/indexes/trec45noCRFR.positional/docno-mapping
+09/07/18 12:01:57 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:01:57 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:02:00 INFO mapred.LocalJobRunner: 
+09/07/18 12:02:00 INFO mapred.JobClient:  map 96% reduce 0%
+09/07/18 12:02:02 INFO mapred.LocalJobRunner: 
+09/07/18 12:02:02 INFO mapred.TaskRunner: Task 'job_local_1_map_0026' done.
+09/07/18 12:02:02 INFO mapred.TaskRunner: Saved output of task 'job_local_1_map_0026' to file:/umd/indexes/trec45noCRFR.positional/docno-mapping
+09/07/18 12:02:02 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:02:02 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:02:03 INFO mapred.LocalJobRunner: 
+09/07/18 12:02:03 INFO mapred.JobClient:  map 96% reduce 0%
+09/07/18 12:02:08 INFO mapred.LocalJobRunner: 
+09/07/18 12:02:08 INFO mapred.LocalJobRunner: 
+09/07/18 12:02:08 INFO mapred.TaskRunner: Task 'job_local_1_map_0027' done.
+09/07/18 12:02:08 INFO mapred.TaskRunner: Saved output of task 'job_local_1_map_0027' to file:/umd/indexes/trec45noCRFR.positional/docno-mapping
+09/07/18 12:02:08 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:02:08 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:02:11 INFO mapred.LocalJobRunner: 
+09/07/18 12:02:11 INFO mapred.JobClient:  map 96% reduce 0%
+09/07/18 12:02:14 INFO mapred.LocalJobRunner: 
+09/07/18 12:02:14 INFO mapred.TaskRunner: Task 'job_local_1_map_0028' done.
+09/07/18 12:02:14 INFO mapred.TaskRunner: Saved output of task 'job_local_1_map_0028' to file:/umd/indexes/trec45noCRFR.positional/docno-mapping
+09/07/18 12:02:14 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:02:14 INFO mapred.LocalJobRunner: 
+09/07/18 12:02:19 INFO mapred.LocalJobRunner: 
+09/07/18 12:02:19 INFO mapred.TaskRunner: Task 'job_local_1_map_0029' done.
+09/07/18 12:02:19 INFO mapred.TaskRunner: Saved output of task 'job_local_1_map_0029' to file:/umd/indexes/trec45noCRFR.positional/docno-mapping
+09/07/18 12:02:19 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:02:19 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:02:20 INFO mapred.LocalJobRunner: 
+09/07/18 12:02:20 INFO mapred.JobClient:  map 96% reduce 0%
+09/07/18 12:02:23 INFO mapred.LocalJobRunner: 
+09/07/18 12:02:23 INFO mapred.TaskRunner: Task 'job_local_1_map_0030' done.
+09/07/18 12:02:23 INFO mapred.TaskRunner: Saved output of task 'job_local_1_map_0030' to file:/umd/indexes/trec45noCRFR.positional/docno-mapping
+09/07/18 12:02:23 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:02:24 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:02:25 INFO mapred.LocalJobRunner: 
+09/07/18 12:02:25 INFO mapred.JobClient:  map 96% reduce 0%
+09/07/18 12:02:29 INFO mapred.LocalJobRunner: 
+09/07/18 12:02:29 INFO mapred.TaskRunner: Task 'job_local_1_map_0031' done.
+09/07/18 12:02:29 INFO mapred.TaskRunner: Saved output of task 'job_local_1_map_0031' to file:/umd/indexes/trec45noCRFR.positional/docno-mapping
+09/07/18 12:02:29 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:02:29 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:02:29 INFO mapred.LocalJobRunner: 
+09/07/18 12:02:30 INFO mapred.JobClient:  map 96% reduce 0%
+09/07/18 12:02:34 INFO mapred.LocalJobRunner: 
+09/07/18 12:02:34 INFO mapred.TaskRunner: Task 'job_local_1_map_0032' done.
+09/07/18 12:02:34 INFO mapred.TaskRunner: Saved output of task 'job_local_1_map_0032' to file:/umd/indexes/trec45noCRFR.positional/docno-mapping
+09/07/18 12:02:34 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:02:34 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:02:35 INFO mapred.LocalJobRunner: 
+09/07/18 12:02:35 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 12:02:39 INFO mapred.LocalJobRunner: 
+09/07/18 12:02:39 INFO mapred.TaskRunner: Task 'job_local_1_map_0033' done.
+09/07/18 12:02:39 INFO mapred.TaskRunner: Saved output of task 'job_local_1_map_0033' to file:/umd/indexes/trec45noCRFR.positional/docno-mapping
+09/07/18 12:02:39 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:02:39 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:02:40 INFO mapred.LocalJobRunner: 
+09/07/18 12:02:40 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 12:02:44 INFO mapred.LocalJobRunner: 
+09/07/18 12:02:44 INFO mapred.TaskRunner: Task 'job_local_1_map_0034' done.
+09/07/18 12:02:44 INFO mapred.TaskRunner: Saved output of task 'job_local_1_map_0034' to file:/umd/indexes/trec45noCRFR.positional/docno-mapping
+09/07/18 12:02:44 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:02:44 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:02:45 INFO mapred.LocalJobRunner: 
+09/07/18 12:02:45 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 12:02:48 INFO mapred.LocalJobRunner: 
+09/07/18 12:02:48 INFO mapred.TaskRunner: Task 'job_local_1_map_0035' done.
+09/07/18 12:02:48 INFO mapred.TaskRunner: Saved output of task 'job_local_1_map_0035' to file:/umd/indexes/trec45noCRFR.positional/docno-mapping
+09/07/18 12:02:49 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:02:49 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:02:50 INFO mapred.LocalJobRunner: 
+09/07/18 12:02:50 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 12:02:54 INFO mapred.LocalJobRunner: 
+09/07/18 12:02:54 INFO mapred.TaskRunner: Task 'job_local_1_map_0036' done.
+09/07/18 12:02:54 INFO mapred.TaskRunner: Saved output of task 'job_local_1_map_0036' to file:/umd/indexes/trec45noCRFR.positional/docno-mapping
+09/07/18 12:02:54 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:02:54 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:02:55 INFO mapred.LocalJobRunner: 
+09/07/18 12:02:55 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 12:02:59 INFO mapred.LocalJobRunner: 
+09/07/18 12:02:59 INFO mapred.TaskRunner: Task 'job_local_1_map_0037' done.
+09/07/18 12:02:59 INFO mapred.TaskRunner: Saved output of task 'job_local_1_map_0037' to file:/umd/indexes/trec45noCRFR.positional/docno-mapping
+09/07/18 12:02:59 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:02:59 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:03:00 INFO mapred.LocalJobRunner: 
+09/07/18 12:03:00 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 12:03:04 INFO mapred.LocalJobRunner: 
+09/07/18 12:03:04 INFO mapred.TaskRunner: Task 'job_local_1_map_0038' done.
+09/07/18 12:03:04 INFO mapred.TaskRunner: Saved output of task 'job_local_1_map_0038' to file:/umd/indexes/trec45noCRFR.positional/docno-mapping
+09/07/18 12:03:04 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:03:04 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:03:05 INFO mapred.LocalJobRunner: 
+09/07/18 12:03:05 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 12:03:09 INFO mapred.LocalJobRunner: 
+09/07/18 12:03:09 INFO mapred.TaskRunner: Task 'job_local_1_map_0039' done.
+09/07/18 12:03:09 INFO mapred.TaskRunner: Saved output of task 'job_local_1_map_0039' to file:/umd/indexes/trec45noCRFR.positional/docno-mapping
+09/07/18 12:03:09 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:03:09 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:03:10 INFO mapred.LocalJobRunner: 
+09/07/18 12:03:10 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 12:03:13 INFO mapred.LocalJobRunner: 
+09/07/18 12:03:13 INFO mapred.TaskRunner: Task 'job_local_1_map_0040' done.
+09/07/18 12:03:13 INFO mapred.TaskRunner: Saved output of task 'job_local_1_map_0040' to file:/umd/indexes/trec45noCRFR.positional/docno-mapping
+09/07/18 12:03:13 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:03:13 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:03:15 INFO mapred.LocalJobRunner: 
+09/07/18 12:03:15 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 12:03:18 INFO mapred.LocalJobRunner: 
+09/07/18 12:03:18 INFO mapred.TaskRunner: Task 'job_local_1_map_0041' done.
+09/07/18 12:03:18 INFO mapred.TaskRunner: Saved output of task 'job_local_1_map_0041' to file:/umd/indexes/trec45noCRFR.positional/docno-mapping
+09/07/18 12:03:18 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:03:18 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:03:19 INFO mapred.LocalJobRunner: 
+09/07/18 12:03:19 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 12:03:22 INFO mapred.LocalJobRunner: 
+09/07/18 12:03:22 INFO mapred.TaskRunner: Task 'job_local_1_map_0042' done.
+09/07/18 12:03:22 INFO mapred.TaskRunner: Saved output of task 'job_local_1_map_0042' to file:/umd/indexes/trec45noCRFR.positional/docno-mapping
+09/07/18 12:03:23 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:03:23 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:03:24 INFO mapred.LocalJobRunner: 
+09/07/18 12:03:24 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 12:03:27 INFO mapred.LocalJobRunner: 
+09/07/18 12:03:27 INFO mapred.TaskRunner: Task 'job_local_1_map_0043' done.
+09/07/18 12:03:27 INFO mapred.TaskRunner: Saved output of task 'job_local_1_map_0043' to file:/umd/indexes/trec45noCRFR.positional/docno-mapping
+09/07/18 12:03:28 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:03:28 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:03:29 INFO mapred.LocalJobRunner: 
+09/07/18 12:03:29 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 12:03:32 INFO mapred.LocalJobRunner: 
+09/07/18 12:03:32 INFO mapred.TaskRunner: Task 'job_local_1_map_0044' done.
+09/07/18 12:03:32 INFO mapred.TaskRunner: Saved output of task 'job_local_1_map_0044' to file:/umd/indexes/trec45noCRFR.positional/docno-mapping
+09/07/18 12:03:32 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:03:32 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:03:34 INFO mapred.LocalJobRunner: 
+09/07/18 12:03:34 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 12:03:37 INFO mapred.LocalJobRunner: 
+09/07/18 12:03:37 INFO mapred.TaskRunner: Task 'job_local_1_map_0045' done.
+09/07/18 12:03:37 INFO mapred.TaskRunner: Saved output of task 'job_local_1_map_0045' to file:/umd/indexes/trec45noCRFR.positional/docno-mapping
+09/07/18 12:03:37 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:03:37 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:03:38 INFO mapred.LocalJobRunner: 
+09/07/18 12:03:38 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 12:03:42 INFO mapred.LocalJobRunner: 
+09/07/18 12:03:42 INFO mapred.TaskRunner: Task 'job_local_1_map_0046' done.
+09/07/18 12:03:42 INFO mapred.TaskRunner: Saved output of task 'job_local_1_map_0046' to file:/umd/indexes/trec45noCRFR.positional/docno-mapping
+09/07/18 12:03:42 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:03:42 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:03:43 INFO mapred.LocalJobRunner: 
+09/07/18 12:03:43 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 12:03:44 INFO mapred.LocalJobRunner: 
+09/07/18 12:03:44 INFO mapred.TaskRunner: Task 'job_local_1_map_0047' done.
+09/07/18 12:03:44 INFO mapred.TaskRunner: Saved output of task 'job_local_1_map_0047' to file:/umd/indexes/trec45noCRFR.positional/docno-mapping
+09/07/18 12:03:44 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:03:49 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 12:03:49 INFO mapred.TaskRunner: Task 'reduce_1npdfs' done.
+09/07/18 12:03:49 INFO mapred.TaskRunner: Saved output of task 'reduce_1npdfs' to file:/umd/indexes/trec45noCRFR.positional/docno-mapping
+09/07/18 12:03:49 INFO mapred.JobClient: Job complete: job_local_1
+09/07/18 12:03:49 INFO mapred.JobClient: Counters: 12
+09/07/18 12:03:49 INFO mapred.JobClient:   File Systems
+09/07/18 12:03:49 INFO mapred.JobClient:     Local bytes read=41109584333
+09/07/18 12:03:49 INFO mapred.JobClient:     Local bytes written=398592776
+09/07/18 12:03:49 INFO mapred.JobClient:   edu.umd.cloud9.collection.trec.NumberTrecDocuments$Count
+09/07/18 12:03:49 INFO mapred.JobClient:     DOCS=472525
+09/07/18 12:03:49 INFO mapred.JobClient:   Map-Reduce Framework
+09/07/18 12:03:49 INFO mapred.JobClient:     Map input records=472525
+09/07/18 12:03:49 INFO mapred.JobClient:     Map output records=472525
+09/07/18 12:03:49 INFO mapred.JobClient:     Map input bytes=1584773983
+09/07/18 12:03:49 INFO mapred.JobClient:     Map output bytes=7662233
+09/07/18 12:03:49 INFO mapred.JobClient:     Combine input records=0
+09/07/18 12:03:49 INFO mapred.JobClient:     Combine output records=0
+09/07/18 12:03:49 INFO mapred.JobClient:     Reduce input groups=472525
+09/07/18 12:03:49 INFO mapred.JobClient:     Reduce input records=0
+09/07/18 12:03:49 INFO mapred.JobClient:     Reduce output records=472525
+09/07/18 12:03:49 INFO trec.TrecDocnoMapping: Writing docno data to /umd/indexes/trec45noCRFR.positional/docno-mapping.dat
+09/07/18 12:03:50 INFO trec.TrecDocnoMapping: Reading /umd/indexes/trec45noCRFR.positional/docno-mapping//part-00000
+09/07/18 12:03:50 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 12:03:50 INFO trec.TrecDocnoMapping: 100000 docs
+09/07/18 12:03:50 INFO trec.TrecDocnoMapping: 200000 docs
+09/07/18 12:03:50 INFO trec.TrecDocnoMapping: 300000 docs
+09/07/18 12:03:51 INFO trec.TrecDocnoMapping: 400000 docs
+09/07/18 12:03:51 INFO trec.TrecDocnoMapping: 472525 docs total. Done!
+09/07/18 12:03:51 INFO trec.TrecDocnoMapping: Writing /umd/indexes/trec45noCRFR.positional/docno-mapping.dat
+09/07/18 12:03:51 INFO trec.TrecDocnoMapping: 100000 docs
+09/07/18 12:03:51 INFO trec.TrecDocnoMapping: 200000 docs
+09/07/18 12:03:51 INFO trec.TrecDocnoMapping: 300000 docs
+09/07/18 12:03:51 INFO trec.TrecDocnoMapping: 400000 docs
+09/07/18 12:03:51 INFO trec.TrecDocnoMapping: 472525 docs total. Done!
+09/07/18 12:03:51 INFO index.BuildInvertedIndexDocSorted: PowerTool: BuildInvertedIndexDocSorted
+09/07/18 12:03:51 INFO index.BuildInvertedIndexDocSorted: Characteristics of the collection:
+09/07/18 12:03:51 INFO index.BuildInvertedIndexDocSorted:  - CollectionName: TREC_vol45
+09/07/18 12:03:51 INFO index.BuildInvertedIndexDocSorted:  - CollectionPath: /umd/collections/trec/trec4-5_noCRFR.xml
+09/07/18 12:03:51 INFO index.BuildInvertedIndexDocSorted:  - CollectionDocumentCount: 472525
+09/07/18 12:03:51 INFO index.BuildInvertedIndexDocSorted:  - InputputFormat: edu.umd.cloud9.collection.trec.TrecDocumentInputFormat
+09/07/18 12:03:51 INFO index.BuildInvertedIndexDocSorted:  - Tokenizer: ivory.util.GalagoTokenizer
+09/07/18 12:03:51 INFO index.BuildInvertedIndexDocSorted:  - DocnoMappingClass: edu.umd.cloud9.collection.trec.TrecDocnoMapping
+09/07/18 12:03:51 INFO index.BuildInvertedIndexDocSorted:  - Positional? true
+09/07/18 12:03:51 INFO index.BuildInvertedIndexDocSorted: Characteristics of the job:
+09/07/18 12:03:51 INFO index.BuildInvertedIndexDocSorted:  - NumMapTasks: 100
+09/07/18 12:03:51 INFO index.BuildInvertedIndexDocSorted:  - NumReduceTasks: 1
+09/07/18 12:03:51 INFO index.BuildInvertedIndexDocSorted:  - MinSplitSize: 0
+09/07/18 12:03:51 INFO index.BuildInvertedIndexDocSorted: Adding input path /umd/collections/trec/trec4-5_noCRFR.xml
+09/07/18 12:03:51 INFO jvm.JvmMetrics: Cannot initialize JVM Metrics with processName=JobTracker, sessionId= - already initialized
+09/07/18 12:03:51 INFO mapred.FileInputFormat: Total input paths to process : 1
+09/07/18 12:03:52 INFO mapred.JobClient: Running job: job_local_2
+09/07/18 12:03:52 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:03:53 INFO mapred.JobClient:  map 0% reduce 0%
+09/07/18 12:03:58 INFO mapred.LocalJobRunner: 
+09/07/18 12:03:59 INFO mapred.JobClient:  map 13% reduce 0%
+09/07/18 12:04:01 INFO mapred.LocalJobRunner: 
+09/07/18 12:04:02 INFO mapred.JobClient:  map 17% reduce 0%
+09/07/18 12:04:04 INFO mapred.LocalJobRunner: 
+09/07/18 12:04:05 INFO mapred.JobClient:  map 25% reduce 0%
+09/07/18 12:04:07 INFO mapred.LocalJobRunner: 
+09/07/18 12:04:08 INFO mapred.JobClient:  map 29% reduce 0%
+09/07/18 12:04:10 INFO mapred.LocalJobRunner: 
+09/07/18 12:04:10 INFO mapred.JobClient:  map 37% reduce 0%
+09/07/18 12:04:13 INFO mapred.LocalJobRunner: 
+09/07/18 12:04:13 INFO mapred.JobClient:  map 42% reduce 0%
+09/07/18 12:04:16 INFO mapred.LocalJobRunner: 
+09/07/18 12:04:16 INFO mapred.JobClient:  map 48% reduce 0%
+09/07/18 12:04:19 INFO mapred.LocalJobRunner: 
+09/07/18 12:04:19 INFO mapred.JobClient:  map 56% reduce 0%
+09/07/18 12:04:22 INFO mapred.LocalJobRunner: 
+09/07/18 12:04:22 INFO mapred.JobClient:  map 60% reduce 0%
+09/07/18 12:04:25 INFO mapred.LocalJobRunner: 
+09/07/18 12:04:25 INFO mapred.JobClient:  map 68% reduce 0%
+09/07/18 12:04:28 INFO mapred.LocalJobRunner: 
+09/07/18 12:04:28 INFO mapred.JobClient:  map 72% reduce 0%
+09/07/18 12:04:31 INFO mapred.LocalJobRunner: 
+09/07/18 12:04:31 INFO mapred.JobClient:  map 80% reduce 0%
+09/07/18 12:04:34 INFO mapred.LocalJobRunner: 
+09/07/18 12:04:34 INFO mapred.JobClient:  map 84% reduce 0%
+09/07/18 12:04:37 INFO mapred.LocalJobRunner: 
+09/07/18 12:04:37 INFO mapred.JobClient:  map 92% reduce 0%
+09/07/18 12:04:40 INFO mapred.LocalJobRunner: 
+09/07/18 12:04:40 INFO mapred.JobClient:  map 95% reduce 0%
+09/07/18 12:04:43 INFO mapred.LocalJobRunner: 
+09/07/18 12:04:43 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:04:46 INFO mapred.LocalJobRunner: 
+09/07/18 12:04:49 INFO mapred.LocalJobRunner: 
+09/07/18 12:04:52 INFO mapred.LocalJobRunner: 
+09/07/18 12:04:54 INFO mapred.LocalJobRunner: 
+09/07/18 12:04:54 INFO mapred.TaskRunner: Task 'job_local_2_map_0000' done.
+09/07/18 12:04:54 INFO mapred.TaskRunner: Saved output of task 'job_local_2_map_0000' to file:/umd/indexes/trec45noCRFR.positional/postings
+09/07/18 12:04:54 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:04:55 INFO mapred.LocalJobRunner: 
+09/07/18 12:04:55 INFO mapred.JobClient:  map 50% reduce 0%
+09/07/18 12:05:00 INFO mapred.LocalJobRunner: 
+09/07/18 12:05:01 INFO mapred.JobClient:  map 57% reduce 0%
+09/07/18 12:05:03 INFO mapred.LocalJobRunner: 
+09/07/18 12:05:04 INFO mapred.JobClient:  map 60% reduce 0%
+09/07/18 12:05:06 INFO mapred.LocalJobRunner: 
+09/07/18 12:05:07 INFO mapred.JobClient:  map 64% reduce 0%
+09/07/18 12:05:09 INFO mapred.LocalJobRunner: 
+09/07/18 12:05:10 INFO mapred.JobClient:  map 65% reduce 0%
+09/07/18 12:05:12 INFO mapred.LocalJobRunner: 
+09/07/18 12:05:13 INFO mapred.JobClient:  map 69% reduce 0%
+09/07/18 12:05:15 INFO mapred.LocalJobRunner: 
+09/07/18 12:05:16 INFO mapred.JobClient:  map 71% reduce 0%
+09/07/18 12:05:18 INFO mapred.LocalJobRunner: 
+09/07/18 12:05:19 INFO mapred.JobClient:  map 75% reduce 0%
+09/07/18 12:05:21 INFO mapred.LocalJobRunner: 
+09/07/18 12:05:22 INFO mapred.JobClient:  map 77% reduce 0%
+09/07/18 12:05:24 INFO mapred.LocalJobRunner: 
+09/07/18 12:05:25 INFO mapred.JobClient:  map 81% reduce 0%
+09/07/18 12:05:27 INFO mapred.LocalJobRunner: 
+09/07/18 12:05:28 INFO mapred.JobClient:  map 84% reduce 0%
+09/07/18 12:05:30 INFO mapred.LocalJobRunner: 
+09/07/18 12:05:31 INFO mapred.JobClient:  map 88% reduce 0%
+09/07/18 12:05:33 INFO mapred.LocalJobRunner: 
+09/07/18 12:05:34 INFO mapred.JobClient:  map 90% reduce 0%
+09/07/18 12:05:36 INFO mapred.LocalJobRunner: 
+09/07/18 12:05:37 INFO mapred.JobClient:  map 93% reduce 0%
+09/07/18 12:05:39 INFO mapred.LocalJobRunner: 
+09/07/18 12:05:40 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 12:05:42 INFO mapred.LocalJobRunner: 
+09/07/18 12:05:43 INFO mapred.JobClient:  map 99% reduce 0%
+09/07/18 12:05:45 INFO mapred.LocalJobRunner: 
+09/07/18 12:05:46 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:05:48 INFO mapred.LocalJobRunner: 
+09/07/18 12:05:51 INFO mapred.LocalJobRunner: 
+09/07/18 12:05:55 INFO mapred.LocalJobRunner: 
+09/07/18 12:05:56 INFO mapred.LocalJobRunner: 
+09/07/18 12:05:56 INFO mapred.TaskRunner: Task 'job_local_2_map_0001' done.
+09/07/18 12:05:56 INFO mapred.TaskRunner: Saved output of task 'job_local_2_map_0001' to file:/umd/indexes/trec45noCRFR.positional/postings
+09/07/18 12:05:56 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:05:58 INFO mapred.LocalJobRunner: 
+09/07/18 12:05:58 INFO mapred.JobClient:  map 66% reduce 0%
+09/07/18 12:06:02 INFO mapred.LocalJobRunner: 
+09/07/18 12:06:02 INFO mapred.JobClient:  map 71% reduce 0%
+09/07/18 12:06:05 INFO mapred.LocalJobRunner: 
+09/07/18 12:06:05 INFO mapred.JobClient:  map 72% reduce 0%
+09/07/18 12:06:08 INFO mapred.LocalJobRunner: 
+09/07/18 12:06:08 INFO mapred.JobClient:  map 74% reduce 0%
+09/07/18 12:06:11 INFO mapred.LocalJobRunner: 
+09/07/18 12:06:11 INFO mapred.JobClient:  map 76% reduce 0%
+09/07/18 12:06:14 INFO mapred.LocalJobRunner: 
+09/07/18 12:06:14 INFO mapred.JobClient:  map 77% reduce 0%
+09/07/18 12:06:17 INFO mapred.LocalJobRunner: 
+09/07/18 12:06:17 INFO mapred.JobClient:  map 79% reduce 0%
+09/07/18 12:06:20 INFO mapred.LocalJobRunner: 
+09/07/18 12:06:20 INFO mapred.JobClient:  map 80% reduce 0%
+09/07/18 12:06:23 INFO mapred.LocalJobRunner: 
+09/07/18 12:06:23 INFO mapred.JobClient:  map 82% reduce 0%
+09/07/18 12:06:26 INFO mapred.LocalJobRunner: 
+09/07/18 12:06:26 INFO mapred.JobClient:  map 85% reduce 0%
+09/07/18 12:06:29 INFO mapred.LocalJobRunner: 
+09/07/18 12:06:32 INFO mapred.LocalJobRunner: 
+09/07/18 12:06:32 INFO mapred.JobClient:  map 88% reduce 0%
+09/07/18 12:06:35 INFO mapred.LocalJobRunner: 
+09/07/18 12:06:35 INFO mapred.JobClient:  map 89% reduce 0%
+09/07/18 12:06:38 INFO mapred.LocalJobRunner: 
+09/07/18 12:06:38 INFO mapred.JobClient:  map 91% reduce 0%
+09/07/18 12:06:41 INFO mapred.LocalJobRunner: 
+09/07/18 12:06:41 INFO mapred.JobClient:  map 94% reduce 0%
+09/07/18 12:06:44 INFO mapred.LocalJobRunner: 
+09/07/18 12:06:44 INFO mapred.JobClient:  map 95% reduce 0%
+09/07/18 12:06:47 INFO mapred.LocalJobRunner: 
+09/07/18 12:06:47 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 12:06:50 INFO mapred.LocalJobRunner: 
+09/07/18 12:06:50 INFO mapred.JobClient:  map 98% reduce 0%
+09/07/18 12:06:53 INFO mapred.LocalJobRunner: 
+09/07/18 12:06:53 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:06:56 INFO mapred.LocalJobRunner: 
+09/07/18 12:06:59 INFO mapred.LocalJobRunner: 
+09/07/18 12:07:02 INFO mapred.LocalJobRunner: 
+09/07/18 12:07:05 INFO mapred.LocalJobRunner: 
+09/07/18 12:07:06 INFO mapred.LocalJobRunner: 
+09/07/18 12:07:06 INFO mapred.TaskRunner: Task 'job_local_2_map_0002' done.
+09/07/18 12:07:06 INFO mapred.TaskRunner: Saved output of task 'job_local_2_map_0002' to file:/umd/indexes/trec45noCRFR.positional/postings
+09/07/18 12:07:06 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:07:08 INFO mapred.LocalJobRunner: 
+09/07/18 12:07:08 INFO mapred.JobClient:  map 75% reduce 0%
+09/07/18 12:07:12 INFO mapred.LocalJobRunner: 
+09/07/18 12:07:12 INFO mapred.JobClient:  map 78% reduce 0%
+09/07/18 12:07:15 INFO mapred.LocalJobRunner: 
+09/07/18 12:07:15 INFO mapred.JobClient:  map 79% reduce 0%
+09/07/18 12:07:18 INFO mapred.LocalJobRunner: 
+09/07/18 12:07:18 INFO mapred.JobClient:  map 81% reduce 0%
+09/07/18 12:07:21 INFO mapred.LocalJobRunner: 
+09/07/18 12:07:21 INFO mapred.JobClient:  map 83% reduce 0%
+09/07/18 12:07:24 INFO mapred.LocalJobRunner: 
+09/07/18 12:07:24 INFO mapred.JobClient:  map 85% reduce 0%
+09/07/18 12:07:27 INFO mapred.LocalJobRunner: 
+09/07/18 12:07:30 INFO mapred.LocalJobRunner: 
+09/07/18 12:07:30 INFO mapred.JobClient:  map 88% reduce 0%
+09/07/18 12:07:33 INFO mapred.LocalJobRunner: 
+09/07/18 12:07:36 INFO mapred.LocalJobRunner: 
+09/07/18 12:07:36 INFO mapred.JobClient:  map 91% reduce 0%
+09/07/18 12:07:39 INFO mapred.LocalJobRunner: 
+09/07/18 12:07:39 INFO mapred.JobClient:  map 92% reduce 0%
+09/07/18 12:07:42 INFO mapred.LocalJobRunner: 
+09/07/18 12:07:42 INFO mapred.JobClient:  map 93% reduce 0%
+09/07/18 12:07:45 INFO mapred.LocalJobRunner: 
+09/07/18 12:07:45 INFO mapred.JobClient:  map 95% reduce 0%
+09/07/18 12:07:48 INFO mapred.LocalJobRunner: 
+09/07/18 12:07:48 INFO mapred.JobClient:  map 96% reduce 0%
+09/07/18 12:07:51 INFO mapred.LocalJobRunner: 
+09/07/18 12:07:51 INFO mapred.JobClient:  map 98% reduce 0%
+09/07/18 12:07:54 INFO mapred.LocalJobRunner: 
+09/07/18 12:07:54 INFO mapred.JobClient:  map 99% reduce 0%
+09/07/18 12:07:57 INFO mapred.LocalJobRunner: 
+09/07/18 12:07:57 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:08:00 INFO mapred.LocalJobRunner: 
+09/07/18 12:08:03 INFO mapred.LocalJobRunner: 
+09/07/18 12:08:06 INFO mapred.LocalJobRunner: 
+09/07/18 12:08:09 INFO mapred.LocalJobRunner: 
+09/07/18 12:08:11 INFO mapred.LocalJobRunner: 
+09/07/18 12:08:11 INFO mapred.TaskRunner: Task 'job_local_2_map_0003' done.
+09/07/18 12:08:11 INFO mapred.TaskRunner: Saved output of task 'job_local_2_map_0003' to file:/umd/indexes/trec45noCRFR.positional/postings
+09/07/18 12:08:11 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:08:12 INFO mapred.LocalJobRunner: 
+09/07/18 12:08:12 INFO mapred.JobClient:  map 80% reduce 0%
+09/07/18 12:08:17 INFO mapred.LocalJobRunner: 
+09/07/18 12:08:18 INFO mapred.JobClient:  map 83% reduce 0%
+09/07/18 12:08:20 INFO mapred.LocalJobRunner: 
+09/07/18 12:08:23 INFO mapred.LocalJobRunner: 
+09/07/18 12:08:24 INFO mapred.JobClient:  map 85% reduce 0%
+09/07/18 12:08:26 INFO mapred.LocalJobRunner: 
+09/07/18 12:08:27 INFO mapred.JobClient:  map 86% reduce 0%
+09/07/18 12:08:29 INFO mapred.LocalJobRunner: 
+09/07/18 12:08:30 INFO mapred.JobClient:  map 87% reduce 0%
+09/07/18 12:08:32 INFO mapred.LocalJobRunner: 
+09/07/18 12:08:33 INFO mapred.JobClient:  map 88% reduce 0%
+09/07/18 12:08:35 INFO mapred.LocalJobRunner: 
+09/07/18 12:08:36 INFO mapred.JobClient:  map 90% reduce 0%
+09/07/18 12:08:38 INFO mapred.LocalJobRunner: 
+09/07/18 12:08:39 INFO mapred.JobClient:  map 91% reduce 0%
+09/07/18 12:08:41 INFO mapred.LocalJobRunner: 
+09/07/18 12:08:42 INFO mapred.JobClient:  map 92% reduce 0%
+09/07/18 12:08:44 INFO mapred.LocalJobRunner: 
+09/07/18 12:08:45 INFO mapred.JobClient:  map 93% reduce 0%
+09/07/18 12:08:47 INFO mapred.LocalJobRunner: 
+09/07/18 12:08:48 INFO mapred.JobClient:  map 94% reduce 0%
+09/07/18 12:08:50 INFO mapred.LocalJobRunner: 
+09/07/18 12:08:51 INFO mapred.JobClient:  map 96% reduce 0%
+09/07/18 12:08:53 INFO mapred.LocalJobRunner: 
+09/07/18 12:08:54 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 12:08:56 INFO mapred.LocalJobRunner: 
+09/07/18 12:08:57 INFO mapred.JobClient:  map 98% reduce 0%
+09/07/18 12:08:59 INFO mapred.LocalJobRunner: 
+09/07/18 12:09:00 INFO mapred.JobClient:  map 99% reduce 0%
+09/07/18 12:09:02 INFO mapred.LocalJobRunner: 
+09/07/18 12:09:03 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:09:05 INFO mapred.LocalJobRunner: 
+09/07/18 12:09:08 INFO mapred.LocalJobRunner: 
+09/07/18 12:09:11 INFO mapred.LocalJobRunner: 
+09/07/18 12:09:12 INFO mapred.LocalJobRunner: 
+09/07/18 12:09:12 INFO mapred.TaskRunner: Task 'job_local_2_map_0004' done.
+09/07/18 12:09:12 INFO mapred.TaskRunner: Saved output of task 'job_local_2_map_0004' to file:/umd/indexes/trec45noCRFR.positional/postings
+09/07/18 12:09:12 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:09:14 INFO mapred.LocalJobRunner: 
+09/07/18 12:09:15 INFO mapred.JobClient:  map 83% reduce 0%
+09/07/18 12:09:18 INFO mapred.LocalJobRunner: 
+09/07/18 12:09:18 INFO mapred.JobClient:  map 85% reduce 0%
+09/07/18 12:09:21 INFO mapred.LocalJobRunner: 
+09/07/18 12:09:21 INFO mapred.JobClient:  map 86% reduce 0%
+09/07/18 12:09:24 INFO mapred.LocalJobRunner: 
+09/07/18 12:09:24 INFO mapred.JobClient:  map 87% reduce 0%
+09/07/18 12:09:27 INFO mapred.LocalJobRunner: 
+09/07/18 12:09:27 INFO mapred.JobClient:  map 88% reduce 0%
+09/07/18 12:09:30 INFO mapred.LocalJobRunner: 
+09/07/18 12:09:30 INFO mapred.JobClient:  map 89% reduce 0%
+09/07/18 12:09:33 INFO mapred.LocalJobRunner: 
+09/07/18 12:09:33 INFO mapred.JobClient:  map 90% reduce 0%
+09/07/18 12:09:36 INFO mapred.LocalJobRunner: 
+09/07/18 12:09:36 INFO mapred.JobClient:  map 91% reduce 0%
+09/07/18 12:09:39 INFO mapred.LocalJobRunner: 
+09/07/18 12:09:39 INFO mapred.JobClient:  map 92% reduce 0%
+09/07/18 12:09:42 INFO mapred.LocalJobRunner: 
+09/07/18 12:09:45 INFO mapred.LocalJobRunner: 
+09/07/18 12:09:45 INFO mapred.JobClient:  map 94% reduce 0%
+09/07/18 12:09:48 INFO mapred.LocalJobRunner: 
+09/07/18 12:09:51 INFO mapred.LocalJobRunner: 
+09/07/18 12:09:51 INFO mapred.JobClient:  map 95% reduce 0%
+09/07/18 12:09:54 INFO mapred.LocalJobRunner: 
+09/07/18 12:09:54 INFO mapred.JobClient:  map 96% reduce 0%
+09/07/18 12:09:57 INFO mapred.LocalJobRunner: 
+09/07/18 12:09:57 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 12:10:00 INFO mapred.LocalJobRunner: 
+09/07/18 12:10:00 INFO mapred.JobClient:  map 98% reduce 0%
+09/07/18 12:10:03 INFO mapred.LocalJobRunner: 
+09/07/18 12:10:03 INFO mapred.JobClient:  map 99% reduce 0%
+09/07/18 12:10:06 INFO mapred.LocalJobRunner: 
+09/07/18 12:10:06 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:10:09 INFO mapred.LocalJobRunner: 
+09/07/18 12:10:12 INFO mapred.LocalJobRunner: 
+09/07/18 12:10:14 INFO mapred.LocalJobRunner: 
+09/07/18 12:10:14 INFO mapred.TaskRunner: Task 'job_local_2_map_0005' done.
+09/07/18 12:10:14 INFO mapred.TaskRunner: Saved output of task 'job_local_2_map_0005' to file:/umd/indexes/trec45noCRFR.positional/postings
+09/07/18 12:10:14 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:10:15 INFO mapred.LocalJobRunner: 
+09/07/18 12:10:15 INFO mapred.JobClient:  map 85% reduce 0%
+09/07/18 12:10:20 INFO mapred.LocalJobRunner: 
+09/07/18 12:10:21 INFO mapred.JobClient:  map 87% reduce 0%
+09/07/18 12:10:23 INFO mapred.LocalJobRunner: 
+09/07/18 12:10:24 INFO mapred.JobClient:  map 88% reduce 0%
+09/07/18 12:10:26 INFO mapred.LocalJobRunner: 
+09/07/18 12:10:27 INFO mapred.JobClient:  map 89% reduce 0%
+09/07/18 12:10:30 INFO mapred.LocalJobRunner: 
+09/07/18 12:10:30 INFO mapred.JobClient:  map 90% reduce 0%
+09/07/18 12:10:33 INFO mapred.LocalJobRunner: 
+09/07/18 12:10:33 INFO mapred.JobClient:  map 91% reduce 0%
+09/07/18 12:10:36 INFO mapred.LocalJobRunner: 
+09/07/18 12:10:39 INFO mapred.LocalJobRunner: 
+09/07/18 12:10:39 INFO mapred.JobClient:  map 92% reduce 0%
+09/07/18 12:10:42 INFO mapred.LocalJobRunner: 
+09/07/18 12:10:42 INFO mapred.JobClient:  map 93% reduce 0%
+09/07/18 12:10:45 INFO mapred.LocalJobRunner: 
+09/07/18 12:10:45 INFO mapred.JobClient:  map 94% reduce 0%
+09/07/18 12:10:48 INFO mapred.LocalJobRunner: 
+09/07/18 12:10:48 INFO mapred.JobClient:  map 95% reduce 0%
+09/07/18 12:10:51 INFO mapred.LocalJobRunner: 
+09/07/18 12:10:54 INFO mapred.LocalJobRunner: 
+09/07/18 12:10:54 INFO mapred.JobClient:  map 96% reduce 0%
+09/07/18 12:10:57 INFO mapred.LocalJobRunner: 
+09/07/18 12:10:57 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 12:11:00 INFO mapred.LocalJobRunner: 
+09/07/18 12:11:00 INFO mapred.JobClient:  map 98% reduce 0%
+09/07/18 12:11:03 INFO mapred.LocalJobRunner: 
+09/07/18 12:11:03 INFO mapred.JobClient:  map 99% reduce 0%
+09/07/18 12:11:06 INFO mapred.LocalJobRunner: 
+09/07/18 12:11:09 INFO mapred.LocalJobRunner: 
+09/07/18 12:11:09 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:11:12 INFO mapred.LocalJobRunner: 
+09/07/18 12:11:15 INFO mapred.LocalJobRunner: 
+09/07/18 12:11:18 INFO mapred.LocalJobRunner: 
+09/07/18 12:11:18 INFO mapred.LocalJobRunner: 
+09/07/18 12:11:18 INFO mapred.TaskRunner: Task 'job_local_2_map_0006' done.
+09/07/18 12:11:18 INFO mapred.TaskRunner: Saved output of task 'job_local_2_map_0006' to file:/umd/indexes/trec45noCRFR.positional/postings
+09/07/18 12:11:18 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:11:21 INFO mapred.LocalJobRunner: 
+09/07/18 12:11:21 INFO mapred.JobClient:  map 87% reduce 0%
+09/07/18 12:11:24 INFO mapred.LocalJobRunner: 
+09/07/18 12:11:24 INFO mapred.JobClient:  map 89% reduce 0%
+09/07/18 12:11:27 INFO mapred.LocalJobRunner: 
+09/07/18 12:11:30 INFO mapred.LocalJobRunner: 
+09/07/18 12:11:30 INFO mapred.JobClient:  map 90% reduce 0%
+09/07/18 12:11:33 INFO mapred.LocalJobRunner: 
+09/07/18 12:11:33 INFO mapred.JobClient:  map 91% reduce 0%
+09/07/18 12:11:36 INFO mapred.LocalJobRunner: 
+09/07/18 12:11:36 INFO mapred.JobClient:  map 92% reduce 0%
+09/07/18 12:11:39 INFO mapred.LocalJobRunner: 
+09/07/18 12:11:42 INFO mapred.LocalJobRunner: 
+09/07/18 12:11:42 INFO mapred.JobClient:  map 93% reduce 0%
+09/07/18 12:11:45 INFO mapred.LocalJobRunner: 
+09/07/18 12:11:45 INFO mapred.JobClient:  map 94% reduce 0%
+09/07/18 12:11:48 INFO mapred.LocalJobRunner: 
+09/07/18 12:11:51 INFO mapred.LocalJobRunner: 
+09/07/18 12:11:51 INFO mapred.JobClient:  map 95% reduce 0%
+09/07/18 12:11:54 INFO mapred.LocalJobRunner: 
+09/07/18 12:11:57 INFO mapred.LocalJobRunner: 
+09/07/18 12:11:57 INFO mapred.JobClient:  map 96% reduce 0%
+09/07/18 12:12:00 INFO mapred.LocalJobRunner: 
+09/07/18 12:12:03 INFO mapred.LocalJobRunner: 
+09/07/18 12:12:03 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 12:12:06 INFO mapred.LocalJobRunner: 
+09/07/18 12:12:06 INFO mapred.JobClient:  map 98% reduce 0%
+09/07/18 12:12:09 INFO mapred.LocalJobRunner: 
+09/07/18 12:12:09 INFO mapred.JobClient:  map 99% reduce 0%
+09/07/18 12:12:12 INFO mapred.LocalJobRunner: 
+09/07/18 12:12:15 INFO mapred.LocalJobRunner: 
+09/07/18 12:12:15 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:12:18 INFO mapred.LocalJobRunner: 
+09/07/18 12:12:21 INFO mapred.LocalJobRunner: 
+09/07/18 12:12:24 INFO mapred.LocalJobRunner: 
+09/07/18 12:12:26 INFO mapred.LocalJobRunner: 
+09/07/18 12:12:26 INFO mapred.TaskRunner: Task 'job_local_2_map_0007' done.
+09/07/18 12:12:26 INFO mapred.TaskRunner: Saved output of task 'job_local_2_map_0007' to file:/umd/indexes/trec45noCRFR.positional/postings
+09/07/18 12:12:26 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:12:27 INFO mapred.LocalJobRunner: 
+09/07/18 12:12:27 INFO mapred.JobClient:  map 88% reduce 0%
+09/07/18 12:12:32 INFO mapred.LocalJobRunner: 
+09/07/18 12:12:32 INFO mapred.JobClient:  map 90% reduce 0%
+09/07/18 12:12:35 INFO mapred.LocalJobRunner: 
+09/07/18 12:12:38 INFO mapred.LocalJobRunner: 
+09/07/18 12:12:38 INFO mapred.JobClient:  map 91% reduce 0%
+09/07/18 12:12:41 INFO mapred.LocalJobRunner: 
+09/07/18 12:12:41 INFO mapred.JobClient:  map 92% reduce 0%
+09/07/18 12:12:44 INFO mapred.LocalJobRunner: 
+09/07/18 12:12:47 INFO mapred.LocalJobRunner: 
+09/07/18 12:12:47 INFO mapred.JobClient:  map 93% reduce 0%
+09/07/18 12:12:50 INFO mapred.LocalJobRunner: 
+09/07/18 12:12:50 INFO mapred.JobClient:  map 94% reduce 0%
+09/07/18 12:12:53 INFO mapred.LocalJobRunner: 
+09/07/18 12:12:56 INFO mapred.LocalJobRunner: 
+09/07/18 12:12:56 INFO mapred.JobClient:  map 95% reduce 0%
+09/07/18 12:12:59 INFO mapred.LocalJobRunner: 
+09/07/18 12:12:59 INFO mapred.JobClient:  map 96% reduce 0%
+09/07/18 12:13:02 INFO mapred.LocalJobRunner: 
+09/07/18 12:13:05 INFO mapred.LocalJobRunner: 
+09/07/18 12:13:05 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 12:13:08 INFO mapred.LocalJobRunner: 
+09/07/18 12:13:08 INFO mapred.JobClient:  map 98% reduce 0%
+09/07/18 12:13:11 INFO mapred.LocalJobRunner: 
+09/07/18 12:13:14 INFO mapred.LocalJobRunner: 
+09/07/18 12:13:14 INFO mapred.JobClient:  map 99% reduce 0%
+09/07/18 12:13:17 INFO mapred.LocalJobRunner: 
+09/07/18 12:13:20 INFO mapred.LocalJobRunner: 
+09/07/18 12:13:20 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:13:23 INFO mapred.LocalJobRunner: 
+09/07/18 12:13:26 INFO mapred.LocalJobRunner: 
+09/07/18 12:13:29 INFO mapred.LocalJobRunner: 
+09/07/18 12:13:30 INFO mapred.LocalJobRunner: 
+09/07/18 12:13:30 INFO mapred.TaskRunner: Task 'job_local_2_map_0008' done.
+09/07/18 12:13:30 INFO mapred.TaskRunner: Saved output of task 'job_local_2_map_0008' to file:/umd/indexes/trec45noCRFR.positional/postings
+09/07/18 12:13:30 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:13:32 INFO mapred.LocalJobRunner: 
+09/07/18 12:13:32 INFO mapred.JobClient:  map 90% reduce 0%
+09/07/18 12:13:36 INFO mapred.LocalJobRunner: 
+09/07/18 12:13:36 INFO mapred.JobClient:  map 91% reduce 0%
+09/07/18 12:13:39 INFO mapred.LocalJobRunner: 
+09/07/18 12:13:42 INFO mapred.LocalJobRunner: 
+09/07/18 12:13:42 INFO mapred.JobClient:  map 92% reduce 0%
+09/07/18 12:13:45 INFO mapred.LocalJobRunner: 
+09/07/18 12:13:45 INFO mapred.JobClient:  map 93% reduce 0%
+09/07/18 12:13:48 INFO mapred.LocalJobRunner: 
+09/07/18 12:13:51 INFO mapred.LocalJobRunner: 
+09/07/18 12:13:51 INFO mapred.JobClient:  map 94% reduce 0%
+09/07/18 12:13:54 INFO mapred.LocalJobRunner: 
+09/07/18 12:13:57 INFO mapred.LocalJobRunner: 
+09/07/18 12:13:57 INFO mapred.JobClient:  map 95% reduce 0%
+09/07/18 12:14:00 INFO mapred.LocalJobRunner: 
+09/07/18 12:14:00 INFO mapred.JobClient:  map 96% reduce 0%
+09/07/18 12:14:03 INFO mapred.LocalJobRunner: 
+09/07/18 12:14:06 INFO mapred.LocalJobRunner: 
+09/07/18 12:14:06 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 12:14:09 INFO mapred.LocalJobRunner: 
+09/07/18 12:14:12 INFO mapred.LocalJobRunner: 
+09/07/18 12:14:12 INFO mapred.JobClient:  map 98% reduce 0%
+09/07/18 12:14:15 INFO mapred.LocalJobRunner: 
+09/07/18 12:14:15 INFO mapred.JobClient:  map 99% reduce 0%
+09/07/18 12:14:18 INFO mapred.LocalJobRunner: 
+09/07/18 12:14:21 INFO mapred.LocalJobRunner: 
+09/07/18 12:14:21 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:14:24 INFO mapred.LocalJobRunner: 
+09/07/18 12:14:27 INFO mapred.LocalJobRunner: 
+09/07/18 12:14:30 INFO mapred.LocalJobRunner: 
+09/07/18 12:14:30 INFO mapred.TaskRunner: Task 'job_local_2_map_0009' done.
+09/07/18 12:14:30 INFO mapred.TaskRunner: Saved output of task 'job_local_2_map_0009' to file:/umd/indexes/trec45noCRFR.positional/postings
+09/07/18 12:14:30 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:14:30 INFO mapred.LocalJobRunner: 
+09/07/18 12:14:30 INFO mapred.JobClient:  map 90% reduce 0%
+09/07/18 12:14:36 INFO mapred.LocalJobRunner: 
+09/07/18 12:14:36 INFO mapred.JobClient:  map 92% reduce 0%
+09/07/18 12:14:39 INFO mapred.LocalJobRunner: 
+09/07/18 12:14:42 INFO mapred.LocalJobRunner: 
+09/07/18 12:14:42 INFO mapred.JobClient:  map 93% reduce 0%
+09/07/18 12:14:45 INFO mapred.LocalJobRunner: 
+09/07/18 12:14:48 INFO mapred.LocalJobRunner: 
+09/07/18 12:14:48 INFO mapred.JobClient:  map 94% reduce 0%
+09/07/18 12:14:51 INFO mapred.LocalJobRunner: 
+09/07/18 12:14:54 INFO mapred.LocalJobRunner: 
+09/07/18 12:14:54 INFO mapred.JobClient:  map 95% reduce 0%
+09/07/18 12:14:57 INFO mapred.LocalJobRunner: 
+09/07/18 12:15:00 INFO mapred.LocalJobRunner: 
+09/07/18 12:15:03 INFO mapred.LocalJobRunner: 
+09/07/18 12:15:03 INFO mapred.JobClient:  map 96% reduce 0%
+09/07/18 12:15:06 INFO mapred.LocalJobRunner: 
+09/07/18 12:15:06 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 12:15:09 INFO mapred.LocalJobRunner: 
+09/07/18 12:15:12 INFO mapred.LocalJobRunner: 
+09/07/18 12:15:13 INFO mapred.JobClient:  map 98% reduce 0%
+09/07/18 12:15:15 INFO mapred.LocalJobRunner: 
+09/07/18 12:15:18 INFO mapred.LocalJobRunner: 
+09/07/18 12:15:19 INFO mapred.JobClient:  map 99% reduce 0%
+09/07/18 12:15:21 INFO mapred.LocalJobRunner: 
+09/07/18 12:15:24 INFO mapred.LocalJobRunner: 
+09/07/18 12:15:25 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:15:27 INFO mapred.LocalJobRunner: 
+09/07/18 12:15:30 INFO mapred.LocalJobRunner: 
+09/07/18 12:15:33 INFO mapred.LocalJobRunner: 
+09/07/18 12:15:33 INFO mapred.TaskRunner: Task 'job_local_2_map_0010' done.
+09/07/18 12:15:33 INFO mapred.TaskRunner: Saved output of task 'job_local_2_map_0010' to file:/umd/indexes/trec45noCRFR.positional/postings
+09/07/18 12:15:33 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:15:33 INFO mapred.LocalJobRunner: 
+09/07/18 12:15:34 INFO mapred.JobClient:  map 91% reduce 0%
+09/07/18 12:15:39 INFO mapred.LocalJobRunner: 
+09/07/18 12:15:40 INFO mapred.JobClient:  map 92% reduce 0%
+09/07/18 12:15:42 INFO mapred.LocalJobRunner: 
+09/07/18 12:15:43 INFO mapred.JobClient:  map 93% reduce 0%
+09/07/18 12:15:45 INFO mapred.LocalJobRunner: 
+09/07/18 12:15:48 INFO mapred.LocalJobRunner: 
+09/07/18 12:15:49 INFO mapred.JobClient:  map 94% reduce 0%
+09/07/18 12:15:51 INFO mapred.LocalJobRunner: 
+09/07/18 12:15:54 INFO mapred.LocalJobRunner: 
+09/07/18 12:15:55 INFO mapred.JobClient:  map 95% reduce 0%
+09/07/18 12:15:57 INFO mapred.LocalJobRunner: 
+09/07/18 12:16:00 INFO mapred.LocalJobRunner: 
+09/07/18 12:16:01 INFO mapred.JobClient:  map 96% reduce 0%
+09/07/18 12:16:03 INFO mapred.LocalJobRunner: 
+09/07/18 12:16:06 INFO mapred.LocalJobRunner: 
+09/07/18 12:16:09 INFO mapred.LocalJobRunner: 
+09/07/18 12:16:10 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 12:16:12 INFO mapred.LocalJobRunner: 
+09/07/18 12:16:15 INFO mapred.LocalJobRunner: 
+09/07/18 12:16:16 INFO mapred.JobClient:  map 98% reduce 0%
+09/07/18 12:16:18 INFO mapred.LocalJobRunner: 
+09/07/18 12:16:21 INFO mapred.LocalJobRunner: 
+09/07/18 12:16:22 INFO mapred.JobClient:  map 99% reduce 0%
+09/07/18 12:16:24 INFO mapred.LocalJobRunner: 
+09/07/18 12:16:27 INFO mapred.LocalJobRunner: 
+09/07/18 12:16:28 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:16:30 INFO mapred.LocalJobRunner: 
+09/07/18 12:16:33 INFO mapred.LocalJobRunner: 
+09/07/18 12:16:35 INFO mapred.LocalJobRunner: 
+09/07/18 12:16:35 INFO mapred.TaskRunner: Task 'job_local_2_map_0011' done.
+09/07/18 12:16:35 INFO mapred.TaskRunner: Saved output of task 'job_local_2_map_0011' to file:/umd/indexes/trec45noCRFR.positional/postings
+09/07/18 12:16:35 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:16:36 INFO mapred.LocalJobRunner: 
+09/07/18 12:16:37 INFO mapred.JobClient:  map 92% reduce 0%
+09/07/18 12:16:41 INFO mapred.LocalJobRunner: 
+09/07/18 12:16:42 INFO mapred.JobClient:  map 93% reduce 0%
+09/07/18 12:16:44 INFO mapred.LocalJobRunner: 
+09/07/18 12:16:47 INFO mapred.LocalJobRunner: 
+09/07/18 12:16:48 INFO mapred.JobClient:  map 94% reduce 0%
+09/07/18 12:16:50 INFO mapred.LocalJobRunner: 
+09/07/18 12:16:53 INFO mapred.LocalJobRunner: 
+09/07/18 12:16:54 INFO mapred.JobClient:  map 95% reduce 0%
+09/07/18 12:16:56 INFO mapred.LocalJobRunner: 
+09/07/18 12:16:59 INFO mapred.LocalJobRunner: 
+09/07/18 12:17:00 INFO mapred.JobClient:  map 96% reduce 0%
+09/07/18 12:17:02 INFO mapred.LocalJobRunner: 
+09/07/18 12:17:05 INFO mapred.LocalJobRunner: 
+09/07/18 12:17:08 INFO mapred.LocalJobRunner: 
+09/07/18 12:17:09 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 12:17:11 INFO mapred.LocalJobRunner: 
+09/07/18 12:17:14 INFO mapred.LocalJobRunner: 
+09/07/18 12:17:15 INFO mapred.JobClient:  map 98% reduce 0%
+09/07/18 12:17:17 INFO mapred.LocalJobRunner: 
+09/07/18 12:17:20 INFO mapred.LocalJobRunner: 
+09/07/18 12:17:21 INFO mapred.JobClient:  map 99% reduce 0%
+09/07/18 12:17:23 INFO mapred.LocalJobRunner: 
+09/07/18 12:17:26 INFO mapred.LocalJobRunner: 
+09/07/18 12:17:27 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:17:29 INFO mapred.LocalJobRunner: 
+09/07/18 12:17:32 INFO mapred.LocalJobRunner: 
+09/07/18 12:17:35 INFO mapred.LocalJobRunner: 
+09/07/18 12:17:35 INFO mapred.TaskRunner: Task 'job_local_2_map_0012' done.
+09/07/18 12:17:35 INFO mapred.TaskRunner: Saved output of task 'job_local_2_map_0012' to file:/umd/indexes/trec45noCRFR.positional/postings
+09/07/18 12:17:35 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:17:35 INFO mapred.LocalJobRunner: 
+09/07/18 12:17:36 INFO mapred.JobClient:  map 92% reduce 0%
+09/07/18 12:17:41 INFO mapred.LocalJobRunner: 
+09/07/18 12:17:42 INFO mapred.JobClient:  map 93% reduce 0%
+09/07/18 12:17:44 INFO mapred.LocalJobRunner: 
+09/07/18 12:17:45 INFO mapred.JobClient:  map 94% reduce 0%
+09/07/18 12:17:47 INFO mapred.LocalJobRunner: 
+09/07/18 12:17:50 INFO mapred.LocalJobRunner: 
+09/07/18 12:17:51 INFO mapred.JobClient:  map 95% reduce 0%
+09/07/18 12:17:53 INFO mapred.LocalJobRunner: 
+09/07/18 12:17:56 INFO mapred.LocalJobRunner: 
+09/07/18 12:17:59 INFO mapred.LocalJobRunner: 
+09/07/18 12:18:00 INFO mapred.JobClient:  map 96% reduce 0%
+09/07/18 12:18:02 INFO mapred.LocalJobRunner: 
+09/07/18 12:18:05 INFO mapred.LocalJobRunner: 
+09/07/18 12:18:06 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 12:18:08 INFO mapred.LocalJobRunner: 
+09/07/18 12:18:11 INFO mapred.LocalJobRunner: 
+09/07/18 12:18:14 INFO mapred.LocalJobRunner: 
+09/07/18 12:18:15 INFO mapred.JobClient:  map 98% reduce 0%
+09/07/18 12:18:17 INFO mapred.LocalJobRunner: 
+09/07/18 12:18:20 INFO mapred.LocalJobRunner: 
+09/07/18 12:18:21 INFO mapred.JobClient:  map 99% reduce 0%
+09/07/18 12:18:23 INFO mapred.LocalJobRunner: 
+09/07/18 12:18:26 INFO mapred.LocalJobRunner: 
+09/07/18 12:18:29 INFO mapred.LocalJobRunner: 
+09/07/18 12:18:30 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:18:32 INFO mapred.LocalJobRunner: 
+09/07/18 12:18:35 INFO mapred.LocalJobRunner: 
+09/07/18 12:18:36 INFO mapred.LocalJobRunner: 
+09/07/18 12:18:36 INFO mapred.TaskRunner: Task 'job_local_2_map_0013' done.
+09/07/18 12:18:36 INFO mapred.TaskRunner: Saved output of task 'job_local_2_map_0013' to file:/umd/indexes/trec45noCRFR.positional/postings
+09/07/18 12:18:36 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:18:38 INFO mapred.LocalJobRunner: 
+09/07/18 12:18:39 INFO mapred.JobClient:  map 93% reduce 0%
+09/07/18 12:18:42 INFO mapred.LocalJobRunner: 
+09/07/18 12:18:42 INFO mapred.JobClient:  map 94% reduce 0%
+09/07/18 12:18:45 INFO mapred.LocalJobRunner: 
+09/07/18 12:18:48 INFO mapred.LocalJobRunner: 
+09/07/18 12:18:48 INFO mapred.JobClient:  map 95% reduce 0%
+09/07/18 12:18:51 INFO mapred.LocalJobRunner: 
+09/07/18 12:18:54 INFO mapred.LocalJobRunner: 
+09/07/18 12:18:57 INFO mapred.LocalJobRunner: 
+09/07/18 12:18:57 INFO mapred.JobClient:  map 96% reduce 0%
+09/07/18 12:19:00 INFO mapred.LocalJobRunner: 
+09/07/18 12:19:03 INFO mapred.LocalJobRunner: 
+09/07/18 12:19:06 INFO mapred.LocalJobRunner: 
+09/07/18 12:19:06 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 12:19:09 INFO mapred.LocalJobRunner: 
+09/07/18 12:19:12 INFO mapred.LocalJobRunner: 
+09/07/18 12:19:15 INFO mapred.LocalJobRunner: 
+09/07/18 12:19:15 INFO mapred.JobClient:  map 98% reduce 0%
+09/07/18 12:19:18 INFO mapred.LocalJobRunner: 
+09/07/18 12:19:21 INFO mapred.LocalJobRunner: 
+09/07/18 12:19:21 INFO mapred.JobClient:  map 99% reduce 0%
+09/07/18 12:19:24 INFO mapred.LocalJobRunner: 
+09/07/18 12:19:27 INFO mapred.LocalJobRunner: 
+09/07/18 12:19:30 INFO mapred.LocalJobRunner: 
+09/07/18 12:19:30 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:19:33 INFO mapred.LocalJobRunner: 
+09/07/18 12:19:36 INFO mapred.LocalJobRunner: 
+09/07/18 12:19:38 INFO mapred.LocalJobRunner: 
+09/07/18 12:19:38 INFO mapred.TaskRunner: Task 'job_local_2_map_0014' done.
+09/07/18 12:19:38 INFO mapred.TaskRunner: Saved output of task 'job_local_2_map_0014' to file:/umd/indexes/trec45noCRFR.positional/postings
+09/07/18 12:19:38 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:19:39 INFO mapred.LocalJobRunner: 
+09/07/18 12:19:39 INFO mapred.JobClient:  map 93% reduce 0%
+09/07/18 12:19:44 INFO mapred.LocalJobRunner: 
+09/07/18 12:19:45 INFO mapred.JobClient:  map 94% reduce 0%
+09/07/18 12:19:47 INFO mapred.LocalJobRunner: 
+09/07/18 12:19:50 INFO mapred.LocalJobRunner: 
+09/07/18 12:19:51 INFO mapred.JobClient:  map 95% reduce 0%
+09/07/18 12:19:53 INFO mapred.LocalJobRunner: 
+09/07/18 12:19:56 INFO mapred.LocalJobRunner: 
+09/07/18 12:19:57 INFO mapred.JobClient:  map 96% reduce 0%
+09/07/18 12:19:59 INFO mapred.LocalJobRunner: 
+09/07/18 12:20:02 INFO mapred.LocalJobRunner: 
+09/07/18 12:20:05 INFO mapred.LocalJobRunner: 
+09/07/18 12:20:06 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 12:20:08 INFO mapred.LocalJobRunner: 
+09/07/18 12:20:11 INFO mapred.LocalJobRunner: 
+09/07/18 12:20:14 INFO mapred.LocalJobRunner: 
+09/07/18 12:20:15 INFO mapred.JobClient:  map 98% reduce 0%
+09/07/18 12:20:17 INFO mapred.LocalJobRunner: 
+09/07/18 12:20:20 INFO mapred.LocalJobRunner: 
+09/07/18 12:20:23 INFO mapred.LocalJobRunner: 
+09/07/18 12:20:24 INFO mapred.JobClient:  map 99% reduce 0%
+09/07/18 12:20:26 INFO mapred.LocalJobRunner: 
+09/07/18 12:20:29 INFO mapred.LocalJobRunner: 
+09/07/18 12:20:32 INFO mapred.LocalJobRunner: 
+09/07/18 12:20:33 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:20:35 INFO mapred.LocalJobRunner: 
+09/07/18 12:20:38 INFO mapred.LocalJobRunner: 
+09/07/18 12:20:40 INFO mapred.LocalJobRunner: 
+09/07/18 12:20:40 INFO mapred.TaskRunner: Task 'job_local_2_map_0015' done.
+09/07/18 12:20:40 INFO mapred.TaskRunner: Saved output of task 'job_local_2_map_0015' to file:/umd/indexes/trec45noCRFR.positional/postings
+09/07/18 12:20:40 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:20:41 INFO mapred.LocalJobRunner: 
+09/07/18 12:20:42 INFO mapred.JobClient:  map 94% reduce 0%
+09/07/18 12:20:46 INFO mapred.LocalJobRunner: 
+09/07/18 12:20:46 INFO mapred.JobClient:  map 95% reduce 0%
+09/07/18 12:20:49 INFO mapred.LocalJobRunner: 
+09/07/18 12:20:52 INFO mapred.LocalJobRunner: 
+09/07/18 12:20:55 INFO mapred.LocalJobRunner: 
+09/07/18 12:20:58 INFO mapred.LocalJobRunner: 
+09/07/18 12:20:58 INFO mapred.JobClient:  map 96% reduce 0%
+09/07/18 12:21:01 INFO mapred.LocalJobRunner: 
+09/07/18 12:21:04 INFO mapred.LocalJobRunner: 
+09/07/18 12:21:07 INFO mapred.LocalJobRunner: 
+09/07/18 12:21:07 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 12:21:10 INFO mapred.LocalJobRunner: 
+09/07/18 12:21:13 INFO mapred.LocalJobRunner: 
+09/07/18 12:21:13 INFO mapred.JobClient:  map 98% reduce 0%
+09/07/18 12:21:16 INFO mapred.LocalJobRunner: 
+09/07/18 12:21:19 INFO mapred.LocalJobRunner: 
+09/07/18 12:21:22 INFO mapred.LocalJobRunner: 
+09/07/18 12:21:25 INFO mapred.LocalJobRunner: 
+09/07/18 12:21:25 INFO mapred.JobClient:  map 99% reduce 0%
+09/07/18 12:21:28 INFO mapred.LocalJobRunner: 
+09/07/18 12:21:31 INFO mapred.LocalJobRunner: 
+09/07/18 12:21:34 INFO mapred.LocalJobRunner: 
+09/07/18 12:21:34 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:21:37 INFO mapred.LocalJobRunner: 
+09/07/18 12:21:40 INFO mapred.LocalJobRunner: 
+09/07/18 12:21:41 INFO mapred.LocalJobRunner: 
+09/07/18 12:21:41 INFO mapred.TaskRunner: Task 'job_local_2_map_0016' done.
+09/07/18 12:21:41 INFO mapred.TaskRunner: Saved output of task 'job_local_2_map_0016' to file:/umd/indexes/trec45noCRFR.positional/postings
+09/07/18 12:21:41 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:21:43 INFO mapred.LocalJobRunner: 
+09/07/18 12:21:43 INFO mapred.JobClient:  map 94% reduce 0%
+09/07/18 12:21:47 INFO mapred.LocalJobRunner: 
+09/07/18 12:21:47 INFO mapred.JobClient:  map 95% reduce 0%
+09/07/18 12:21:50 INFO mapred.LocalJobRunner: 
+09/07/18 12:21:53 INFO mapred.LocalJobRunner: 
+09/07/18 12:21:56 INFO mapred.LocalJobRunner: 
+09/07/18 12:21:56 INFO mapred.JobClient:  map 96% reduce 0%
+09/07/18 12:21:59 INFO mapred.LocalJobRunner: 
+09/07/18 12:22:02 INFO mapred.LocalJobRunner: 
+09/07/18 12:22:05 INFO mapred.LocalJobRunner: 
+09/07/18 12:22:05 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 12:22:08 INFO mapred.LocalJobRunner: 
+09/07/18 12:22:11 INFO mapred.LocalJobRunner: 
+09/07/18 12:22:14 INFO mapred.LocalJobRunner: 
+09/07/18 12:22:14 INFO mapred.JobClient:  map 98% reduce 0%
+09/07/18 12:22:17 INFO mapred.LocalJobRunner: 
+09/07/18 12:22:20 INFO mapred.LocalJobRunner: 
+09/07/18 12:22:23 INFO mapred.LocalJobRunner: 
+09/07/18 12:22:23 INFO mapred.JobClient:  map 99% reduce 0%
+09/07/18 12:22:26 INFO mapred.LocalJobRunner: 
+09/07/18 12:22:29 INFO mapred.LocalJobRunner: 
+09/07/18 12:22:29 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:22:32 INFO mapred.LocalJobRunner: 
+09/07/18 12:22:35 INFO mapred.LocalJobRunner: 
+09/07/18 12:22:37 INFO mapred.LocalJobRunner: 
+09/07/18 12:22:37 INFO mapred.TaskRunner: Task 'job_local_2_map_0017' done.
+09/07/18 12:22:37 INFO mapred.TaskRunner: Saved output of task 'job_local_2_map_0017' to file:/umd/indexes/trec45noCRFR.positional/postings
+09/07/18 12:22:38 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:22:38 INFO mapred.LocalJobRunner: 
+09/07/18 12:22:38 INFO mapred.JobClient:  map 94% reduce 0%
+09/07/18 12:22:44 INFO mapred.LocalJobRunner: 
+09/07/18 12:22:44 INFO mapred.JobClient:  map 95% reduce 0%
+09/07/18 12:22:47 INFO mapred.LocalJobRunner: 
+09/07/18 12:22:50 INFO mapred.LocalJobRunner: 
+09/07/18 12:22:50 INFO mapred.JobClient:  map 96% reduce 0%
+09/07/18 12:22:53 INFO mapred.LocalJobRunner: 
+09/07/18 12:22:56 INFO mapred.LocalJobRunner: 
+09/07/18 12:22:56 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 12:22:59 INFO mapred.LocalJobRunner: 
+09/07/18 12:23:02 INFO mapred.LocalJobRunner: 
+09/07/18 12:23:05 INFO mapred.LocalJobRunner: 
+09/07/18 12:23:05 INFO mapred.JobClient:  map 98% reduce 0%
+09/07/18 12:23:08 INFO mapred.LocalJobRunner: 
+09/07/18 12:23:11 INFO mapred.LocalJobRunner: 
+09/07/18 12:23:14 INFO mapred.LocalJobRunner: 
+09/07/18 12:23:14 INFO mapred.JobClient:  map 99% reduce 0%
+09/07/18 12:23:17 INFO mapred.LocalJobRunner: 
+09/07/18 12:23:20 INFO mapred.LocalJobRunner: 
+09/07/18 12:23:23 INFO mapred.LocalJobRunner: 
+09/07/18 12:23:23 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:23:26 INFO mapred.LocalJobRunner: 
+09/07/18 12:23:28 INFO mapred.LocalJobRunner: 
+09/07/18 12:23:28 INFO mapred.TaskRunner: Task 'job_local_2_map_0018' done.
+09/07/18 12:23:28 INFO mapred.TaskRunner: Saved output of task 'job_local_2_map_0018' to file:/umd/indexes/trec45noCRFR.positional/postings
+09/07/18 12:23:28 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:23:29 INFO mapred.LocalJobRunner: 
+09/07/18 12:23:29 INFO mapred.JobClient:  map 95% reduce 0%
+09/07/18 12:23:34 INFO mapred.LocalJobRunner: 
+09/07/18 12:23:37 INFO mapred.LocalJobRunner: 
+09/07/18 12:23:38 INFO mapred.JobClient:  map 96% reduce 0%
+09/07/18 12:23:40 INFO mapred.LocalJobRunner: 
+09/07/18 12:23:43 INFO mapred.LocalJobRunner: 
+09/07/18 12:23:46 INFO mapred.LocalJobRunner: 
+09/07/18 12:23:47 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 12:23:49 INFO mapred.LocalJobRunner: 
+09/07/18 12:23:52 INFO mapred.LocalJobRunner: 
+09/07/18 12:23:55 INFO mapred.LocalJobRunner: 
+09/07/18 12:23:56 INFO mapred.JobClient:  map 98% reduce 0%
+09/07/18 12:23:58 INFO mapred.LocalJobRunner: 
+09/07/18 12:24:01 INFO mapred.LocalJobRunner: 
+09/07/18 12:24:04 INFO mapred.LocalJobRunner: 
+09/07/18 12:24:05 INFO mapred.JobClient:  map 99% reduce 0%
+09/07/18 12:24:07 INFO mapred.LocalJobRunner: 
+09/07/18 12:24:10 INFO mapred.LocalJobRunner: 
+09/07/18 12:24:13 INFO mapred.LocalJobRunner: 
+09/07/18 12:24:14 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:24:16 INFO mapred.LocalJobRunner: 
+09/07/18 12:24:19 INFO mapred.LocalJobRunner: 
+09/07/18 12:24:19 INFO mapred.TaskRunner: Task 'job_local_2_map_0019' done.
+09/07/18 12:24:19 INFO mapred.TaskRunner: Saved output of task 'job_local_2_map_0019' to file:/umd/indexes/trec45noCRFR.positional/postings
+09/07/18 12:24:19 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:24:19 INFO mapred.LocalJobRunner: 
+09/07/18 12:24:20 INFO mapred.JobClient:  map 95% reduce 0%
+09/07/18 12:24:25 INFO mapred.LocalJobRunner: 
+09/07/18 12:24:25 INFO mapred.JobClient:  map 96% reduce 0%
+09/07/18 12:24:28 INFO mapred.LocalJobRunner: 
+09/07/18 12:24:31 INFO mapred.LocalJobRunner: 
+09/07/18 12:24:34 INFO mapred.LocalJobRunner: 
+09/07/18 12:24:34 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 12:24:37 INFO mapred.LocalJobRunner: 
+09/07/18 12:24:40 INFO mapred.LocalJobRunner: 
+09/07/18 12:24:43 INFO mapred.LocalJobRunner: 
+09/07/18 12:24:43 INFO mapred.JobClient:  map 98% reduce 0%
+09/07/18 12:24:46 INFO mapred.LocalJobRunner: 
+09/07/18 12:24:49 INFO mapred.LocalJobRunner: 
+09/07/18 12:24:52 INFO mapred.LocalJobRunner: 
+09/07/18 12:24:52 INFO mapred.JobClient:  map 99% reduce 0%
+09/07/18 12:24:55 INFO mapred.LocalJobRunner: 
+09/07/18 12:24:58 INFO mapred.LocalJobRunner: 
+09/07/18 12:25:01 INFO mapred.LocalJobRunner: 
+09/07/18 12:25:01 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:25:04 INFO mapred.LocalJobRunner: 
+09/07/18 12:25:07 INFO mapred.LocalJobRunner: 
+09/07/18 12:25:09 INFO mapred.LocalJobRunner: 
+09/07/18 12:25:09 INFO mapred.TaskRunner: Task 'job_local_2_map_0020' done.
+09/07/18 12:25:09 INFO mapred.TaskRunner: Saved output of task 'job_local_2_map_0020' to file:/umd/indexes/trec45noCRFR.positional/postings
+09/07/18 12:25:09 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:25:10 INFO mapred.LocalJobRunner: 
+09/07/18 12:25:10 INFO mapred.JobClient:  map 95% reduce 0%
+09/07/18 12:25:15 INFO mapred.LocalJobRunner: 
+09/07/18 12:25:15 INFO mapred.JobClient:  map 96% reduce 0%
+09/07/18 12:25:18 INFO mapred.LocalJobRunner: 
+09/07/18 12:25:21 INFO mapred.LocalJobRunner: 
+09/07/18 12:25:24 INFO mapred.LocalJobRunner: 
+09/07/18 12:25:24 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 12:25:27 INFO mapred.LocalJobRunner: 
+09/07/18 12:25:30 INFO mapred.LocalJobRunner: 
+09/07/18 12:25:33 INFO mapred.LocalJobRunner: 
+09/07/18 12:25:36 INFO mapred.LocalJobRunner: 
+09/07/18 12:25:36 INFO mapred.JobClient:  map 98% reduce 0%
+09/07/18 12:25:39 INFO mapred.LocalJobRunner: 
+09/07/18 12:25:42 INFO mapred.LocalJobRunner: 
+09/07/18 12:25:45 INFO mapred.LocalJobRunner: 
+09/07/18 12:25:45 INFO mapred.JobClient:  map 99% reduce 0%
+09/07/18 12:25:48 INFO mapred.LocalJobRunner: 
+09/07/18 12:25:51 INFO mapred.LocalJobRunner: 
+09/07/18 12:25:54 INFO mapred.LocalJobRunner: 
+09/07/18 12:25:54 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:25:57 INFO mapred.LocalJobRunner: 
+09/07/18 12:26:00 INFO mapred.LocalJobRunner: 
+09/07/18 12:26:00 INFO mapred.LocalJobRunner: 
+09/07/18 12:26:00 INFO mapred.TaskRunner: Task 'job_local_2_map_0021' done.
+09/07/18 12:26:00 INFO mapred.TaskRunner: Saved output of task 'job_local_2_map_0021' to file:/umd/indexes/trec45noCRFR.positional/postings
+09/07/18 12:26:00 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:26:03 INFO mapred.LocalJobRunner: 
+09/07/18 12:26:03 INFO mapred.JobClient:  map 95% reduce 0%
+09/07/18 12:26:06 INFO mapred.LocalJobRunner: 
+09/07/18 12:26:06 INFO mapred.JobClient:  map 96% reduce 0%
+09/07/18 12:26:09 INFO mapred.LocalJobRunner: 
+09/07/18 12:26:12 INFO mapred.LocalJobRunner: 
+09/07/18 12:26:12 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 12:26:15 INFO mapred.LocalJobRunner: 
+09/07/18 12:26:18 INFO mapred.LocalJobRunner: 
+09/07/18 12:26:21 INFO mapred.LocalJobRunner: 
+09/07/18 12:26:21 INFO mapred.JobClient:  map 98% reduce 0%
+09/07/18 12:26:24 INFO mapred.LocalJobRunner: 
+09/07/18 12:26:27 INFO mapred.LocalJobRunner: 
+09/07/18 12:26:27 INFO mapred.JobClient:  map 99% reduce 0%
+09/07/18 12:26:30 INFO mapred.LocalJobRunner: 
+09/07/18 12:26:33 INFO mapred.LocalJobRunner: 
+09/07/18 12:26:36 INFO mapred.LocalJobRunner: 
+09/07/18 12:26:36 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:26:39 INFO mapred.LocalJobRunner: 
+09/07/18 12:26:42 INFO mapred.LocalJobRunner: 
+09/07/18 12:26:44 INFO mapred.LocalJobRunner: 
+09/07/18 12:26:44 INFO mapred.TaskRunner: Task 'job_local_2_map_0022' done.
+09/07/18 12:26:44 INFO mapred.TaskRunner: Saved output of task 'job_local_2_map_0022' to file:/umd/indexes/trec45noCRFR.positional/postings
+09/07/18 12:26:44 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:26:45 INFO mapred.LocalJobRunner: 
+09/07/18 12:26:45 INFO mapred.JobClient:  map 95% reduce 0%
+09/07/18 12:26:50 INFO mapred.LocalJobRunner: 
+09/07/18 12:26:50 INFO mapred.JobClient:  map 96% reduce 0%
+09/07/18 12:26:53 INFO mapred.LocalJobRunner: 
+09/07/18 12:26:56 INFO mapred.LocalJobRunner: 
+09/07/18 12:26:56 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 12:26:59 INFO mapred.LocalJobRunner: 
+09/07/18 12:27:02 INFO mapred.LocalJobRunner: 
+09/07/18 12:27:05 INFO mapred.LocalJobRunner: 
+09/07/18 12:27:05 INFO mapred.JobClient:  map 98% reduce 0%
+09/07/18 12:27:08 INFO mapred.LocalJobRunner: 
+09/07/18 12:27:11 INFO mapred.LocalJobRunner: 
+09/07/18 12:27:14 INFO mapred.LocalJobRunner: 
+09/07/18 12:27:17 INFO mapred.LocalJobRunner: 
+09/07/18 12:27:17 INFO mapred.JobClient:  map 99% reduce 0%
+09/07/18 12:27:20 INFO mapred.LocalJobRunner: 
+09/07/18 12:27:23 INFO mapred.LocalJobRunner: 
+09/07/18 12:27:26 INFO mapred.LocalJobRunner: 
+09/07/18 12:27:29 INFO mapred.LocalJobRunner: 
+09/07/18 12:27:29 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:27:32 INFO mapred.LocalJobRunner: 
+09/07/18 12:27:35 INFO mapred.LocalJobRunner: 
+09/07/18 12:27:38 INFO mapred.LocalJobRunner: 
+09/07/18 12:27:38 INFO mapred.TaskRunner: Task 'job_local_2_map_0023' done.
+09/07/18 12:27:38 INFO mapred.TaskRunner: Saved output of task 'job_local_2_map_0023' to file:/umd/indexes/trec45noCRFR.positional/postings
+09/07/18 12:27:38 INFO mapred.LocalJobRunner: 
+09/07/18 12:27:38 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:27:38 INFO mapred.JobClient:  map 96% reduce 0%
+09/07/18 12:27:44 INFO mapred.LocalJobRunner: 
+09/07/18 12:27:47 INFO mapred.LocalJobRunner: 
+09/07/18 12:27:50 INFO mapred.LocalJobRunner: 
+09/07/18 12:27:50 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 12:27:53 INFO mapred.LocalJobRunner: 
+09/07/18 12:27:56 INFO mapred.LocalJobRunner: 
+09/07/18 12:27:59 INFO mapred.LocalJobRunner: 
+09/07/18 12:27:59 INFO mapred.JobClient:  map 98% reduce 0%
+09/07/18 12:28:02 INFO mapred.LocalJobRunner: 
+09/07/18 12:28:05 INFO mapred.LocalJobRunner: 
+09/07/18 12:28:08 INFO mapred.LocalJobRunner: 
+09/07/18 12:28:08 INFO mapred.JobClient:  map 99% reduce 0%
+09/07/18 12:28:11 INFO mapred.LocalJobRunner: 
+09/07/18 12:28:14 INFO mapred.LocalJobRunner: 
+09/07/18 12:28:17 INFO mapred.LocalJobRunner: 
+09/07/18 12:28:17 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:28:20 INFO mapred.LocalJobRunner: 
+09/07/18 12:28:23 INFO mapred.LocalJobRunner: 
+09/07/18 12:28:23 INFO mapred.LocalJobRunner: 
+09/07/18 12:28:23 INFO mapred.TaskRunner: Task 'job_local_2_map_0024' done.
+09/07/18 12:28:23 INFO mapred.TaskRunner: Saved output of task 'job_local_2_map_0024' to file:/umd/indexes/trec45noCRFR.positional/postings
+09/07/18 12:28:23 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:28:26 INFO mapred.LocalJobRunner: 
+09/07/18 12:28:26 INFO mapred.JobClient:  map 96% reduce 0%
+09/07/18 12:28:30 INFO mapred.LocalJobRunner: 
+09/07/18 12:28:33 INFO mapred.LocalJobRunner: 
+09/07/18 12:28:33 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 12:28:36 INFO mapred.LocalJobRunner: 
+09/07/18 12:28:39 INFO mapred.LocalJobRunner: 
+09/07/18 12:28:42 INFO mapred.LocalJobRunner: 
+09/07/18 12:28:45 INFO mapred.LocalJobRunner: 
+09/07/18 12:28:45 INFO mapred.JobClient:  map 98% reduce 0%
+09/07/18 12:28:48 INFO mapred.LocalJobRunner: 
+09/07/18 12:28:51 INFO mapred.LocalJobRunner: 
+09/07/18 12:28:54 INFO mapred.LocalJobRunner: 
+09/07/18 12:28:54 INFO mapred.JobClient:  map 99% reduce 0%
+09/07/18 12:28:57 INFO mapred.LocalJobRunner: 
+09/07/18 12:29:00 INFO mapred.LocalJobRunner: 
+09/07/18 12:29:03 INFO mapred.LocalJobRunner: 
+09/07/18 12:29:06 INFO mapred.LocalJobRunner: 
+09/07/18 12:29:06 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:29:09 INFO mapred.LocalJobRunner: 
+09/07/18 12:29:12 INFO mapred.LocalJobRunner: 
+09/07/18 12:29:12 INFO mapred.LocalJobRunner: 
+09/07/18 12:29:12 INFO mapred.TaskRunner: Task 'job_local_2_map_0025' done.
+09/07/18 12:29:12 INFO mapred.TaskRunner: Saved output of task 'job_local_2_map_0025' to file:/umd/indexes/trec45noCRFR.positional/postings
+09/07/18 12:29:12 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:29:15 INFO mapred.LocalJobRunner: 
+09/07/18 12:29:15 INFO mapred.JobClient:  map 96% reduce 0%
+09/07/18 12:29:18 INFO mapred.LocalJobRunner: 
+09/07/18 12:29:21 INFO mapred.LocalJobRunner: 
+09/07/18 12:29:21 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 12:29:24 INFO mapred.LocalJobRunner: 
+09/07/18 12:29:27 INFO mapred.LocalJobRunner: 
+09/07/18 12:29:30 INFO mapred.LocalJobRunner: 
+09/07/18 12:29:33 INFO mapred.LocalJobRunner: 
+09/07/18 12:29:33 INFO mapred.JobClient:  map 98% reduce 0%
+09/07/18 12:29:36 INFO mapred.LocalJobRunner: 
+09/07/18 12:29:39 INFO mapred.LocalJobRunner: 
+09/07/18 12:29:42 INFO mapred.LocalJobRunner: 
+09/07/18 12:29:45 INFO mapred.LocalJobRunner: 
+09/07/18 12:29:45 INFO mapred.JobClient:  map 99% reduce 0%
+09/07/18 12:29:48 INFO mapred.LocalJobRunner: 
+09/07/18 12:29:51 INFO mapred.LocalJobRunner: 
+09/07/18 12:29:54 INFO mapred.LocalJobRunner: 
+09/07/18 12:29:54 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:29:57 INFO mapred.LocalJobRunner: 
+09/07/18 12:30:00 INFO mapred.LocalJobRunner: 
+09/07/18 12:30:00 INFO mapred.LocalJobRunner: 
+09/07/18 12:30:00 INFO mapred.TaskRunner: Task 'job_local_2_map_0026' done.
+09/07/18 12:30:00 INFO mapred.TaskRunner: Saved output of task 'job_local_2_map_0026' to file:/umd/indexes/trec45noCRFR.positional/postings
+09/07/18 12:30:00 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:30:03 INFO mapred.LocalJobRunner: 
+09/07/18 12:30:03 INFO mapred.JobClient:  map 96% reduce 0%
+09/07/18 12:30:06 INFO mapred.LocalJobRunner: 
+09/07/18 12:30:07 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 12:30:09 INFO mapred.LocalJobRunner: 
+09/07/18 12:30:12 INFO mapred.LocalJobRunner: 
+09/07/18 12:30:15 INFO mapred.LocalJobRunner: 
+09/07/18 12:30:18 INFO mapred.LocalJobRunner: 
+09/07/18 12:30:19 INFO mapred.JobClient:  map 98% reduce 0%
+09/07/18 12:30:21 INFO mapred.LocalJobRunner: 
+09/07/18 12:30:24 INFO mapred.LocalJobRunner: 
+09/07/18 12:30:27 INFO mapred.LocalJobRunner: 
+09/07/18 12:30:28 INFO mapred.JobClient:  map 99% reduce 0%
+09/07/18 12:30:30 INFO mapred.LocalJobRunner: 
+09/07/18 12:30:33 INFO mapred.LocalJobRunner: 
+09/07/18 12:30:36 INFO mapred.LocalJobRunner: 
+09/07/18 12:30:39 INFO mapred.LocalJobRunner: 
+09/07/18 12:30:42 INFO mapred.LocalJobRunner: 
+09/07/18 12:30:43 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:30:45 INFO mapred.LocalJobRunner: 
+09/07/18 12:30:48 INFO mapred.LocalJobRunner: 
+09/07/18 12:30:49 INFO mapred.LocalJobRunner: 
+09/07/18 12:30:49 INFO mapred.TaskRunner: Task 'job_local_2_map_0027' done.
+09/07/18 12:30:49 INFO mapred.TaskRunner: Saved output of task 'job_local_2_map_0027' to file:/umd/indexes/trec45noCRFR.positional/postings
+09/07/18 12:30:49 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:30:51 INFO mapred.LocalJobRunner: 
+09/07/18 12:30:52 INFO mapred.JobClient:  map 96% reduce 0%
+09/07/18 12:30:55 INFO mapred.LocalJobRunner: 
+09/07/18 12:30:55 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 12:30:58 INFO mapred.LocalJobRunner: 
+09/07/18 12:31:01 INFO mapred.LocalJobRunner: 
+09/07/18 12:31:04 INFO mapred.LocalJobRunner: 
+09/07/18 12:31:07 INFO mapred.LocalJobRunner: 
+09/07/18 12:31:07 INFO mapred.JobClient:  map 98% reduce 0%
+09/07/18 12:31:10 INFO mapred.LocalJobRunner: 
+09/07/18 12:31:13 INFO mapred.LocalJobRunner: 
+09/07/18 12:31:16 INFO mapred.LocalJobRunner: 
+09/07/18 12:31:19 INFO mapred.LocalJobRunner: 
+09/07/18 12:31:19 INFO mapred.JobClient:  map 99% reduce 0%
+09/07/18 12:31:22 INFO mapred.LocalJobRunner: 
+09/07/18 12:31:25 INFO mapred.LocalJobRunner: 
+09/07/18 12:31:28 INFO mapred.LocalJobRunner: 
+09/07/18 12:31:31 INFO mapred.LocalJobRunner: 
+09/07/18 12:31:34 INFO mapred.LocalJobRunner: 
+09/07/18 12:31:34 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:31:37 INFO mapred.LocalJobRunner: 
+09/07/18 12:31:40 INFO mapred.LocalJobRunner: 
+09/07/18 12:31:43 INFO mapred.LocalJobRunner: 
+09/07/18 12:31:45 INFO mapred.LocalJobRunner: 
+09/07/18 12:31:45 INFO mapred.TaskRunner: Task 'job_local_2_map_0028' done.
+09/07/18 12:31:45 INFO mapred.TaskRunner: Saved output of task 'job_local_2_map_0028' to file:/umd/indexes/trec45noCRFR.positional/postings
+09/07/18 12:31:45 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:31:46 INFO mapred.LocalJobRunner: 
+09/07/18 12:31:46 INFO mapred.JobClient:  map 96% reduce 0%
+09/07/18 12:31:51 INFO mapred.LocalJobRunner: 
+09/07/18 12:31:51 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 12:31:54 INFO mapred.LocalJobRunner: 
+09/07/18 12:31:57 INFO mapred.LocalJobRunner: 
+09/07/18 12:32:00 INFO mapred.LocalJobRunner: 
+09/07/18 12:32:03 INFO mapred.LocalJobRunner: 
+09/07/18 12:32:04 INFO mapred.JobClient:  map 98% reduce 0%
+09/07/18 12:32:06 INFO mapred.LocalJobRunner: 
+09/07/18 12:32:09 INFO mapred.LocalJobRunner: 
+09/07/18 12:32:12 INFO mapred.LocalJobRunner: 
+09/07/18 12:32:18 INFO mapred.LocalJobRunner: 
+09/07/18 12:32:19 INFO mapred.JobClient:  map 99% reduce 0%
+09/07/18 12:32:21 INFO mapred.LocalJobRunner: 
+09/07/18 12:32:24 INFO mapred.LocalJobRunner: 
+09/07/18 12:32:27 INFO mapred.LocalJobRunner: 
+09/07/18 12:32:30 INFO mapred.LocalJobRunner: 
+09/07/18 12:32:31 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:32:33 INFO mapred.LocalJobRunner: 
+09/07/18 12:32:36 INFO mapred.LocalJobRunner: 
+09/07/18 12:32:39 INFO mapred.LocalJobRunner: 
+09/07/18 12:32:42 INFO mapred.LocalJobRunner: 
+09/07/18 12:32:45 INFO mapred.LocalJobRunner: 
+09/07/18 12:32:48 INFO mapred.LocalJobRunner: 
+09/07/18 12:32:51 INFO mapred.LocalJobRunner: 
+09/07/18 12:32:54 INFO mapred.LocalJobRunner: 
+09/07/18 12:32:57 INFO mapred.LocalJobRunner: 
+09/07/18 12:33:00 INFO mapred.LocalJobRunner: 
+09/07/18 12:33:03 INFO mapred.LocalJobRunner: 
+09/07/18 12:33:06 INFO mapred.LocalJobRunner: 
+09/07/18 12:33:07 INFO mapred.LocalJobRunner: 
+09/07/18 12:33:07 INFO mapred.TaskRunner: Task 'job_local_2_map_0029' done.
+09/07/18 12:33:07 INFO mapred.TaskRunner: Saved output of task 'job_local_2_map_0029' to file:/umd/indexes/trec45noCRFR.positional/postings
+09/07/18 12:33:07 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:33:09 INFO mapred.LocalJobRunner: 
+09/07/18 12:33:10 INFO mapred.JobClient:  map 96% reduce 0%
+09/07/18 12:33:13 INFO mapred.LocalJobRunner: 
+09/07/18 12:33:14 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 12:33:16 INFO mapred.LocalJobRunner: 
+09/07/18 12:33:19 INFO mapred.LocalJobRunner: 
+09/07/18 12:33:22 INFO mapred.LocalJobRunner: 
+09/07/18 12:33:25 INFO mapred.LocalJobRunner: 
+09/07/18 12:33:26 INFO mapred.JobClient:  map 98% reduce 0%
+09/07/18 12:33:28 INFO mapred.LocalJobRunner: 
+09/07/18 12:33:31 INFO mapred.LocalJobRunner: 
+09/07/18 12:33:34 INFO mapred.LocalJobRunner: 
+09/07/18 12:33:37 INFO mapred.LocalJobRunner: 
+09/07/18 12:33:40 INFO mapred.LocalJobRunner: 
+09/07/18 12:33:43 INFO mapred.LocalJobRunner: 
+09/07/18 12:33:44 INFO mapred.JobClient:  map 99% reduce 0%
+09/07/18 12:33:46 INFO mapred.LocalJobRunner: 
+09/07/18 12:33:49 INFO mapred.LocalJobRunner: 
+09/07/18 12:33:52 INFO mapred.LocalJobRunner: 
+09/07/18 12:33:55 INFO mapred.LocalJobRunner: 
+09/07/18 12:33:58 INFO mapred.LocalJobRunner: 
+09/07/18 12:34:01 INFO mapred.LocalJobRunner: 
+09/07/18 12:34:04 INFO mapred.LocalJobRunner: 
+09/07/18 12:34:05 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:34:07 INFO mapred.LocalJobRunner: 
+09/07/18 12:34:10 INFO mapred.LocalJobRunner: 
+09/07/18 12:34:13 INFO mapred.LocalJobRunner: 
+09/07/18 12:34:16 INFO mapred.LocalJobRunner: 
+09/07/18 12:34:19 INFO mapred.LocalJobRunner: 
+09/07/18 12:34:22 INFO mapred.LocalJobRunner: 
+09/07/18 12:34:25 INFO mapred.LocalJobRunner: 
+09/07/18 12:34:28 INFO mapred.LocalJobRunner: 
+09/07/18 12:34:31 INFO mapred.LocalJobRunner: 
+09/07/18 12:34:34 INFO mapred.LocalJobRunner: 
+09/07/18 12:34:37 INFO mapred.LocalJobRunner: 
+09/07/18 12:34:40 INFO mapred.LocalJobRunner: 
+09/07/18 12:34:43 INFO mapred.LocalJobRunner: 
+09/07/18 12:34:45 INFO mapred.LocalJobRunner: 
+09/07/18 12:34:45 INFO mapred.TaskRunner: Task 'job_local_2_map_0030' done.
+09/07/18 12:34:45 INFO mapred.TaskRunner: Saved output of task 'job_local_2_map_0030' to file:/umd/indexes/trec45noCRFR.positional/postings
+09/07/18 12:34:45 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:34:46 INFO mapred.LocalJobRunner: 
+09/07/18 12:34:47 INFO mapred.JobClient:  map 96% reduce 0%
+09/07/18 12:34:51 INFO mapred.LocalJobRunner: 
+09/07/18 12:34:52 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 12:34:54 INFO mapred.LocalJobRunner: 
+09/07/18 12:34:57 INFO mapred.LocalJobRunner: 
+09/07/18 12:35:04 INFO mapred.LocalJobRunner: 
+09/07/18 12:35:04 INFO mapred.JobClient:  map 98% reduce 0%
+09/07/18 12:35:07 INFO mapred.LocalJobRunner: 
+09/07/18 12:35:10 INFO mapred.LocalJobRunner: 
+09/07/18 12:35:13 INFO mapred.LocalJobRunner: 
+09/07/18 12:35:16 INFO mapred.LocalJobRunner: 
+09/07/18 12:35:19 INFO mapred.LocalJobRunner: 
+09/07/18 12:35:22 INFO mapred.LocalJobRunner: 
+09/07/18 12:35:25 INFO mapred.LocalJobRunner: 
+09/07/18 12:35:25 INFO mapred.JobClient:  map 99% reduce 0%
+09/07/18 12:35:28 INFO mapred.LocalJobRunner: 
+09/07/18 12:35:34 INFO mapred.LocalJobRunner: 
+09/07/18 12:35:37 INFO mapred.LocalJobRunner: 
+09/07/18 12:35:40 INFO mapred.LocalJobRunner: 
+09/07/18 12:35:43 INFO mapred.LocalJobRunner: 
+09/07/18 12:35:46 INFO mapred.LocalJobRunner: 
+09/07/18 12:35:46 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:35:49 INFO mapred.LocalJobRunner: 
+09/07/18 12:35:55 INFO mapred.LocalJobRunner: 
+09/07/18 12:35:58 INFO mapred.LocalJobRunner: 
+09/07/18 12:36:01 INFO mapred.LocalJobRunner: 
+09/07/18 12:36:04 INFO mapred.LocalJobRunner: 
+09/07/18 12:36:07 INFO mapred.LocalJobRunner: 
+09/07/18 12:36:10 INFO mapred.LocalJobRunner: 
+09/07/18 12:36:13 INFO mapred.LocalJobRunner: 
+09/07/18 12:36:16 INFO mapred.LocalJobRunner: 
+09/07/18 12:36:19 INFO mapred.LocalJobRunner: 
+09/07/18 12:36:21 INFO mapred.LocalJobRunner: 
+09/07/18 12:36:21 INFO mapred.TaskRunner: Task 'job_local_2_map_0031' done.
+09/07/18 12:36:21 INFO mapred.TaskRunner: Saved output of task 'job_local_2_map_0031' to file:/umd/indexes/trec45noCRFR.positional/postings
+09/07/18 12:36:21 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:36:22 INFO mapred.LocalJobRunner: 
+09/07/18 12:36:22 INFO mapred.JobClient:  map 96% reduce 0%
+09/07/18 12:36:27 INFO mapred.LocalJobRunner: 
+09/07/18 12:36:28 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 12:36:30 INFO mapred.LocalJobRunner: 
+09/07/18 12:36:33 INFO mapred.LocalJobRunner: 
+09/07/18 12:36:36 INFO mapred.LocalJobRunner: 
+09/07/18 12:36:37 INFO mapred.JobClient:  map 98% reduce 0%
+09/07/18 12:36:39 INFO mapred.LocalJobRunner: 
+09/07/18 12:36:42 INFO mapred.LocalJobRunner: 
+09/07/18 12:36:45 INFO mapred.LocalJobRunner: 
+09/07/18 12:36:48 INFO mapred.LocalJobRunner: 
+09/07/18 12:36:51 INFO mapred.LocalJobRunner: 
+09/07/18 12:36:54 INFO mapred.LocalJobRunner: 
+09/07/18 12:36:55 INFO mapred.JobClient:  map 99% reduce 0%
+09/07/18 12:36:57 INFO mapred.LocalJobRunner: 
+09/07/18 12:37:00 INFO mapred.LocalJobRunner: 
+09/07/18 12:37:03 INFO mapred.LocalJobRunner: 
+09/07/18 12:37:06 INFO mapred.LocalJobRunner: 
+09/07/18 12:37:09 INFO mapred.LocalJobRunner: 
+09/07/18 12:37:12 INFO mapred.LocalJobRunner: 
+09/07/18 12:37:15 INFO mapred.LocalJobRunner: 
+09/07/18 12:37:16 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:37:18 INFO mapred.LocalJobRunner: 
+09/07/18 12:37:21 INFO mapred.LocalJobRunner: 
+09/07/18 12:37:24 INFO mapred.LocalJobRunner: 
+09/07/18 12:37:27 INFO mapred.LocalJobRunner: 
+09/07/18 12:37:30 INFO mapred.LocalJobRunner: 
+09/07/18 12:37:33 INFO mapred.LocalJobRunner: 
+09/07/18 12:37:35 INFO mapred.LocalJobRunner: 
+09/07/18 12:37:35 INFO mapred.TaskRunner: Task 'job_local_2_map_0032' done.
+09/07/18 12:37:35 INFO mapred.TaskRunner: Saved output of task 'job_local_2_map_0032' to file:/umd/indexes/trec45noCRFR.positional/postings
+09/07/18 12:37:35 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:37:36 INFO mapred.LocalJobRunner: 
+09/07/18 12:37:37 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 12:37:41 INFO mapred.LocalJobRunner: 
+09/07/18 12:37:44 INFO mapred.LocalJobRunner: 
+09/07/18 12:37:47 INFO mapred.LocalJobRunner: 
+09/07/18 12:37:53 INFO mapred.LocalJobRunner: 
+09/07/18 12:37:54 INFO mapred.JobClient:  map 98% reduce 0%
+09/07/18 12:37:56 INFO mapred.LocalJobRunner: 
+09/07/18 12:37:59 INFO mapred.LocalJobRunner: 
+09/07/18 12:38:02 INFO mapred.LocalJobRunner: 
+09/07/18 12:38:05 INFO mapred.LocalJobRunner: 
+09/07/18 12:38:08 INFO mapred.LocalJobRunner: 
+09/07/18 12:38:11 INFO mapred.LocalJobRunner: 
+09/07/18 12:38:14 INFO mapred.LocalJobRunner: 
+09/07/18 12:38:15 INFO mapred.JobClient:  map 99% reduce 0%
+09/07/18 12:38:17 INFO mapred.LocalJobRunner: 
+09/07/18 12:38:20 INFO mapred.LocalJobRunner: 
+09/07/18 12:38:23 INFO mapred.LocalJobRunner: 
+09/07/18 12:38:29 INFO mapred.LocalJobRunner: 
+09/07/18 12:38:32 INFO mapred.LocalJobRunner: 
+09/07/18 12:38:35 INFO mapred.LocalJobRunner: 
+09/07/18 12:38:38 INFO mapred.LocalJobRunner: 
+09/07/18 12:38:39 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:38:41 INFO mapred.LocalJobRunner: 
+09/07/18 12:38:44 INFO mapred.LocalJobRunner: 
+09/07/18 12:38:47 INFO mapred.LocalJobRunner: 
+09/07/18 12:38:50 INFO mapred.LocalJobRunner: 
+09/07/18 12:38:50 INFO mapred.TaskRunner: Task 'job_local_2_map_0033' done.
+09/07/18 12:38:50 INFO mapred.TaskRunner: Saved output of task 'job_local_2_map_0033' to file:/umd/indexes/trec45noCRFR.positional/postings
+09/07/18 12:38:50 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:38:50 INFO mapred.LocalJobRunner: 
+09/07/18 12:38:51 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 12:38:56 INFO mapred.LocalJobRunner: 
+09/07/18 12:38:59 INFO mapred.LocalJobRunner: 
+09/07/18 12:39:02 INFO mapred.LocalJobRunner: 
+09/07/18 12:39:05 INFO mapred.LocalJobRunner: 
+09/07/18 12:39:06 INFO mapred.JobClient:  map 98% reduce 0%
+09/07/18 12:39:08 INFO mapred.LocalJobRunner: 
+09/07/18 12:39:11 INFO mapred.LocalJobRunner: 
+09/07/18 12:39:14 INFO mapred.LocalJobRunner: 
+09/07/18 12:39:17 INFO mapred.LocalJobRunner: 
+09/07/18 12:39:20 INFO mapred.LocalJobRunner: 
+09/07/18 12:39:21 INFO mapred.JobClient:  map 99% reduce 0%
+09/07/18 12:39:23 INFO mapred.LocalJobRunner: 
+09/07/18 12:39:26 INFO mapred.LocalJobRunner: 
+09/07/18 12:39:29 INFO mapred.LocalJobRunner: 
+09/07/18 12:39:32 INFO mapred.LocalJobRunner: 
+09/07/18 12:39:35 INFO mapred.LocalJobRunner: 
+09/07/18 12:39:36 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:39:38 INFO mapred.LocalJobRunner: 
+09/07/18 12:39:41 INFO mapred.LocalJobRunner: 
+09/07/18 12:39:44 INFO mapred.LocalJobRunner: 
+09/07/18 12:39:45 INFO mapred.LocalJobRunner: 
+09/07/18 12:39:45 INFO mapred.TaskRunner: Task 'job_local_2_map_0034' done.
+09/07/18 12:39:45 INFO mapred.TaskRunner: Saved output of task 'job_local_2_map_0034' to file:/umd/indexes/trec45noCRFR.positional/postings
+09/07/18 12:39:45 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:39:47 INFO mapred.LocalJobRunner: 
+09/07/18 12:39:48 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 12:39:51 INFO mapred.LocalJobRunner: 
+09/07/18 12:39:54 INFO mapred.LocalJobRunner: 
+09/07/18 12:39:57 INFO mapred.LocalJobRunner: 
+09/07/18 12:39:58 INFO mapred.JobClient:  map 98% reduce 0%
+09/07/18 12:40:00 INFO mapred.LocalJobRunner: 
+09/07/18 12:40:03 INFO mapred.LocalJobRunner: 
+09/07/18 12:40:06 INFO mapred.LocalJobRunner: 
+09/07/18 12:40:09 INFO mapred.LocalJobRunner: 
+09/07/18 12:40:12 INFO mapred.LocalJobRunner: 
+09/07/18 12:40:13 INFO mapred.JobClient:  map 99% reduce 0%
+09/07/18 12:40:15 INFO mapred.LocalJobRunner: 
+09/07/18 12:40:18 INFO mapred.LocalJobRunner: 
+09/07/18 12:40:21 INFO mapred.LocalJobRunner: 
+09/07/18 12:40:24 INFO mapred.LocalJobRunner: 
+09/07/18 12:40:27 INFO mapred.LocalJobRunner: 
+09/07/18 12:40:28 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:40:30 INFO mapred.LocalJobRunner: 
+09/07/18 12:40:33 INFO mapred.LocalJobRunner: 
+09/07/18 12:40:36 INFO mapred.LocalJobRunner: 
+09/07/18 12:40:36 INFO mapred.TaskRunner: Task 'job_local_2_map_0035' done.
+09/07/18 12:40:36 INFO mapred.TaskRunner: Saved output of task 'job_local_2_map_0035' to file:/umd/indexes/trec45noCRFR.positional/postings
+09/07/18 12:40:36 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:40:36 INFO mapred.LocalJobRunner: 
+09/07/18 12:40:37 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 12:40:42 INFO mapred.LocalJobRunner: 
+09/07/18 12:40:45 INFO mapred.LocalJobRunner: 
+09/07/18 12:40:48 INFO mapred.LocalJobRunner: 
+09/07/18 12:40:48 INFO mapred.JobClient:  map 98% reduce 0%
+09/07/18 12:40:51 INFO mapred.LocalJobRunner: 
+09/07/18 12:40:54 INFO mapred.LocalJobRunner: 
+09/07/18 12:40:57 INFO mapred.LocalJobRunner: 
+09/07/18 12:41:00 INFO mapred.LocalJobRunner: 
+09/07/18 12:41:03 INFO mapred.LocalJobRunner: 
+09/07/18 12:41:03 INFO mapred.JobClient:  map 99% reduce 0%
+09/07/18 12:41:06 INFO mapred.LocalJobRunner: 
+09/07/18 12:41:09 INFO mapred.LocalJobRunner: 
+09/07/18 12:41:12 INFO mapred.LocalJobRunner: 
+09/07/18 12:41:15 INFO mapred.LocalJobRunner: 
+09/07/18 12:41:18 INFO mapred.LocalJobRunner: 
+09/07/18 12:41:18 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:41:21 INFO mapred.LocalJobRunner: 
+09/07/18 12:41:24 INFO mapred.LocalJobRunner: 
+09/07/18 12:41:27 INFO mapred.LocalJobRunner: 
+09/07/18 12:41:27 INFO mapred.LocalJobRunner: 
+09/07/18 12:41:27 INFO mapred.TaskRunner: Task 'job_local_2_map_0036' done.
+09/07/18 12:41:27 INFO mapred.TaskRunner: Saved output of task 'job_local_2_map_0036' to file:/umd/indexes/trec45noCRFR.positional/postings
+09/07/18 12:41:27 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:41:30 INFO mapred.LocalJobRunner: 
+09/07/18 12:41:30 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 12:41:33 INFO mapred.LocalJobRunner: 
+09/07/18 12:41:36 INFO mapred.LocalJobRunner: 
+09/07/18 12:41:39 INFO mapred.LocalJobRunner: 
+09/07/18 12:41:40 INFO mapred.JobClient:  map 98% reduce 0%
+09/07/18 12:41:42 INFO mapred.LocalJobRunner: 
+09/07/18 12:41:45 INFO mapred.LocalJobRunner: 
+09/07/18 12:41:48 INFO mapred.LocalJobRunner: 
+09/07/18 12:41:51 INFO mapred.LocalJobRunner: 
+09/07/18 12:41:54 INFO mapred.LocalJobRunner: 
+09/07/18 12:41:57 INFO mapred.LocalJobRunner: 
+09/07/18 12:42:00 INFO mapred.LocalJobRunner: 
+09/07/18 12:42:01 INFO mapred.JobClient:  map 99% reduce 0%
+09/07/18 12:42:03 INFO mapred.LocalJobRunner: 
+09/07/18 12:42:06 INFO mapred.LocalJobRunner: 
+09/07/18 12:42:09 INFO mapred.LocalJobRunner: 
+09/07/18 12:42:12 INFO mapred.LocalJobRunner: 
+09/07/18 12:42:15 INFO mapred.LocalJobRunner: 
+09/07/18 12:42:18 INFO mapred.LocalJobRunner: 
+09/07/18 12:42:19 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:42:21 INFO mapred.LocalJobRunner: 
+09/07/18 12:42:24 INFO mapred.LocalJobRunner: 
+09/07/18 12:42:26 INFO mapred.LocalJobRunner: 
+09/07/18 12:42:26 INFO mapred.TaskRunner: Task 'job_local_2_map_0037' done.
+09/07/18 12:42:26 INFO mapred.TaskRunner: Saved output of task 'job_local_2_map_0037' to file:/umd/indexes/trec45noCRFR.positional/postings
+09/07/18 12:42:26 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:42:27 INFO mapred.LocalJobRunner: 
+09/07/18 12:42:28 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 12:42:32 INFO mapred.LocalJobRunner: 
+09/07/18 12:42:35 INFO mapred.LocalJobRunner: 
+09/07/18 12:42:38 INFO mapred.LocalJobRunner: 
+09/07/18 12:42:39 INFO mapred.JobClient:  map 98% reduce 0%
+09/07/18 12:42:41 INFO mapred.LocalJobRunner: 
+09/07/18 12:42:44 INFO mapred.LocalJobRunner: 
+09/07/18 12:42:47 INFO mapred.LocalJobRunner: 
+09/07/18 12:42:50 INFO mapred.LocalJobRunner: 
+09/07/18 12:42:53 INFO mapred.LocalJobRunner: 
+09/07/18 12:42:54 INFO mapred.JobClient:  map 99% reduce 0%
+09/07/18 12:42:56 INFO mapred.LocalJobRunner: 
+09/07/18 12:42:59 INFO mapred.LocalJobRunner: 
+09/07/18 12:43:02 INFO mapred.LocalJobRunner: 
+09/07/18 12:43:05 INFO mapred.LocalJobRunner: 
+09/07/18 12:43:08 INFO mapred.LocalJobRunner: 
+09/07/18 12:43:11 INFO mapred.LocalJobRunner: 
+09/07/18 12:43:12 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:43:14 INFO mapred.LocalJobRunner: 
+09/07/18 12:43:17 INFO mapred.LocalJobRunner: 
+09/07/18 12:43:18 INFO mapred.LocalJobRunner: 
+09/07/18 12:43:18 INFO mapred.TaskRunner: Task 'job_local_2_map_0038' done.
+09/07/18 12:43:18 INFO mapred.TaskRunner: Saved output of task 'job_local_2_map_0038' to file:/umd/indexes/trec45noCRFR.positional/postings
+09/07/18 12:43:18 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:43:20 INFO mapred.LocalJobRunner: 
+09/07/18 12:43:21 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 12:43:24 INFO mapred.LocalJobRunner: 
+09/07/18 12:43:27 INFO mapred.LocalJobRunner: 
+09/07/18 12:43:28 INFO mapred.JobClient:  map 98% reduce 0%
+09/07/18 12:43:30 INFO mapred.LocalJobRunner: 
+09/07/18 12:43:33 INFO mapred.LocalJobRunner: 
+09/07/18 12:43:36 INFO mapred.LocalJobRunner: 
+09/07/18 12:43:39 INFO mapred.LocalJobRunner: 
+09/07/18 12:43:42 INFO mapred.LocalJobRunner: 
+09/07/18 12:43:45 INFO mapred.LocalJobRunner: 
+09/07/18 12:43:46 INFO mapred.JobClient:  map 99% reduce 0%
+09/07/18 12:43:48 INFO mapred.LocalJobRunner: 
+09/07/18 12:43:51 INFO mapred.LocalJobRunner: 
+09/07/18 12:43:54 INFO mapred.LocalJobRunner: 
+09/07/18 12:43:57 INFO mapred.LocalJobRunner: 
+09/07/18 12:44:00 INFO mapred.LocalJobRunner: 
+09/07/18 12:44:03 INFO mapred.LocalJobRunner: 
+09/07/18 12:44:04 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:44:06 INFO mapred.LocalJobRunner: 
+09/07/18 12:44:09 INFO mapred.LocalJobRunner: 
+09/07/18 12:44:12 INFO mapred.LocalJobRunner: 
+09/07/18 12:44:12 INFO mapred.TaskRunner: Task 'job_local_2_map_0039' done.
+09/07/18 12:44:12 INFO mapred.TaskRunner: Saved output of task 'job_local_2_map_0039' to file:/umd/indexes/trec45noCRFR.positional/postings
+09/07/18 12:44:12 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:44:12 INFO mapred.LocalJobRunner: 
+09/07/18 12:44:13 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 12:44:18 INFO mapred.LocalJobRunner: 
+09/07/18 12:44:21 INFO mapred.LocalJobRunner: 
+09/07/18 12:44:22 INFO mapred.JobClient:  map 98% reduce 0%
+09/07/18 12:44:24 INFO mapred.LocalJobRunner: 
+09/07/18 12:44:27 INFO mapred.LocalJobRunner: 
+09/07/18 12:44:30 INFO mapred.LocalJobRunner: 
+09/07/18 12:44:33 INFO mapred.LocalJobRunner: 
+09/07/18 12:44:36 INFO mapred.LocalJobRunner: 
+09/07/18 12:44:39 INFO mapred.LocalJobRunner: 
+09/07/18 12:44:42 INFO mapred.LocalJobRunner: 
+09/07/18 12:44:43 INFO mapred.JobClient:  map 99% reduce 0%
+09/07/18 12:44:45 INFO mapred.LocalJobRunner: 
+09/07/18 12:44:48 INFO mapred.LocalJobRunner: 
+09/07/18 12:44:51 INFO mapred.LocalJobRunner: 
+09/07/18 12:44:54 INFO mapred.LocalJobRunner: 
+09/07/18 12:44:57 INFO mapred.LocalJobRunner: 
+09/07/18 12:45:00 INFO mapred.LocalJobRunner: 
+09/07/18 12:45:03 INFO mapred.LocalJobRunner: 
+09/07/18 12:45:04 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:45:06 INFO mapred.LocalJobRunner: 
+09/07/18 12:45:09 INFO mapred.LocalJobRunner: 
+09/07/18 12:45:11 INFO mapred.LocalJobRunner: 
+09/07/18 12:45:11 INFO mapred.TaskRunner: Task 'job_local_2_map_0040' done.
+09/07/18 12:45:11 INFO mapred.TaskRunner: Saved output of task 'job_local_2_map_0040' to file:/umd/indexes/trec45noCRFR.positional/postings
+09/07/18 12:45:11 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:45:12 INFO mapred.LocalJobRunner: 
+09/07/18 12:45:13 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 12:45:17 INFO mapred.LocalJobRunner: 
+09/07/18 12:45:17 INFO mapred.JobClient:  map 98% reduce 0%
+09/07/18 12:45:20 INFO mapred.LocalJobRunner: 
+09/07/18 12:45:23 INFO mapred.LocalJobRunner: 
+09/07/18 12:45:26 INFO mapred.LocalJobRunner: 
+09/07/18 12:45:29 INFO mapred.LocalJobRunner: 
+09/07/18 12:45:32 INFO mapred.LocalJobRunner: 
+09/07/18 12:45:35 INFO mapred.LocalJobRunner: 
+09/07/18 12:45:38 INFO mapred.LocalJobRunner: 
+09/07/18 12:45:38 INFO mapred.JobClient:  map 99% reduce 0%
+09/07/18 12:45:41 INFO mapred.LocalJobRunner: 
+09/07/18 12:45:44 INFO mapred.LocalJobRunner: 
+09/07/18 12:45:47 INFO mapred.LocalJobRunner: 
+09/07/18 12:45:50 INFO mapred.LocalJobRunner: 
+09/07/18 12:45:53 INFO mapred.LocalJobRunner: 
+09/07/18 12:45:56 INFO mapred.LocalJobRunner: 
+09/07/18 12:45:56 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:45:59 INFO mapred.LocalJobRunner: 
+09/07/18 12:46:02 INFO mapred.LocalJobRunner: 
+09/07/18 12:46:05 INFO mapred.LocalJobRunner: 
+09/07/18 12:46:05 INFO mapred.TaskRunner: Task 'job_local_2_map_0041' done.
+09/07/18 12:46:05 INFO mapred.TaskRunner: Saved output of task 'job_local_2_map_0041' to file:/umd/indexes/trec45noCRFR.positional/postings
+09/07/18 12:46:05 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:46:05 INFO mapred.LocalJobRunner: 
+09/07/18 12:46:05 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 12:46:11 INFO mapred.LocalJobRunner: 
+09/07/18 12:46:11 INFO mapred.JobClient:  map 98% reduce 0%
+09/07/18 12:46:14 INFO mapred.LocalJobRunner: 
+09/07/18 12:46:17 INFO mapred.LocalJobRunner: 
+09/07/18 12:46:20 INFO mapred.LocalJobRunner: 
+09/07/18 12:46:23 INFO mapred.LocalJobRunner: 
+09/07/18 12:46:26 INFO mapred.LocalJobRunner: 
+09/07/18 12:46:29 INFO mapred.LocalJobRunner: 
+09/07/18 12:46:29 INFO mapred.JobClient:  map 99% reduce 0%
+09/07/18 12:46:32 INFO mapred.LocalJobRunner: 
+09/07/18 12:46:35 INFO mapred.LocalJobRunner: 
+09/07/18 12:46:38 INFO mapred.LocalJobRunner: 
+09/07/18 12:46:41 INFO mapred.LocalJobRunner: 
+09/07/18 12:46:44 INFO mapred.LocalJobRunner: 
+09/07/18 12:46:47 INFO mapred.LocalJobRunner: 
+09/07/18 12:46:50 INFO mapred.LocalJobRunner: 
+09/07/18 12:46:50 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:46:53 INFO mapred.LocalJobRunner: 
+09/07/18 12:46:56 INFO mapred.LocalJobRunner: 
+09/07/18 12:46:58 INFO mapred.LocalJobRunner: 
+09/07/18 12:46:58 INFO mapred.TaskRunner: Task 'job_local_2_map_0042' done.
+09/07/18 12:46:58 INFO mapred.TaskRunner: Saved output of task 'job_local_2_map_0042' to file:/umd/indexes/trec45noCRFR.positional/postings
+09/07/18 12:46:58 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:46:59 INFO mapred.LocalJobRunner: 
+09/07/18 12:46:59 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 12:47:04 INFO mapred.LocalJobRunner: 
+09/07/18 12:47:05 INFO mapred.JobClient:  map 98% reduce 0%
+09/07/18 12:47:07 INFO mapred.LocalJobRunner: 
+09/07/18 12:47:10 INFO mapred.LocalJobRunner: 
+09/07/18 12:47:13 INFO mapred.LocalJobRunner: 
+09/07/18 12:47:16 INFO mapred.LocalJobRunner: 
+09/07/18 12:47:19 INFO mapred.LocalJobRunner: 
+09/07/18 12:47:22 INFO mapred.LocalJobRunner: 
+09/07/18 12:47:25 INFO mapred.LocalJobRunner: 
+09/07/18 12:47:26 INFO mapred.JobClient:  map 99% reduce 0%
+09/07/18 12:47:28 INFO mapred.LocalJobRunner: 
+09/07/18 12:47:31 INFO mapred.LocalJobRunner: 
+09/07/18 12:47:34 INFO mapred.LocalJobRunner: 
+09/07/18 12:47:37 INFO mapred.LocalJobRunner: 
+09/07/18 12:47:40 INFO mapred.LocalJobRunner: 
+09/07/18 12:47:43 INFO mapred.LocalJobRunner: 
+09/07/18 12:47:46 INFO mapred.LocalJobRunner: 
+09/07/18 12:47:47 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:47:49 INFO mapred.LocalJobRunner: 
+09/07/18 12:47:52 INFO mapred.LocalJobRunner: 
+09/07/18 12:47:54 INFO mapred.LocalJobRunner: 
+09/07/18 12:47:54 INFO mapred.TaskRunner: Task 'job_local_2_map_0043' done.
+09/07/18 12:47:54 INFO mapred.TaskRunner: Saved output of task 'job_local_2_map_0043' to file:/umd/indexes/trec45noCRFR.positional/postings
+09/07/18 12:47:54 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:47:55 INFO mapred.LocalJobRunner: 
+09/07/18 12:47:56 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 12:48:00 INFO mapred.LocalJobRunner: 
+09/07/18 12:48:00 INFO mapred.JobClient:  map 98% reduce 0%
+09/07/18 12:48:03 INFO mapred.LocalJobRunner: 
+09/07/18 12:48:06 INFO mapred.LocalJobRunner: 
+09/07/18 12:48:09 INFO mapred.LocalJobRunner: 
+09/07/18 12:48:12 INFO mapred.LocalJobRunner: 
+09/07/18 12:48:15 INFO mapred.LocalJobRunner: 
+09/07/18 12:48:18 INFO mapred.LocalJobRunner: 
+09/07/18 12:48:21 INFO mapred.LocalJobRunner: 
+09/07/18 12:48:21 INFO mapred.JobClient:  map 99% reduce 0%
+09/07/18 12:48:24 INFO mapred.LocalJobRunner: 
+09/07/18 12:48:27 INFO mapred.LocalJobRunner: 
+09/07/18 12:48:30 INFO mapred.LocalJobRunner: 
+09/07/18 12:48:33 INFO mapred.LocalJobRunner: 
+09/07/18 12:48:36 INFO mapred.LocalJobRunner: 
+09/07/18 12:48:36 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:48:39 INFO mapred.LocalJobRunner: 
+09/07/18 12:48:42 INFO mapred.LocalJobRunner: 
+09/07/18 12:48:42 INFO mapred.TaskRunner: Task 'job_local_2_map_0044' done.
+09/07/18 12:48:42 INFO mapred.TaskRunner: Saved output of task 'job_local_2_map_0044' to file:/umd/indexes/trec45noCRFR.positional/postings
+09/07/18 12:48:42 INFO mapred.LocalJobRunner: 
+09/07/18 12:48:42 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:48:42 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 12:48:48 INFO mapred.LocalJobRunner: 
+09/07/18 12:48:48 INFO mapred.JobClient:  map 98% reduce 0%
+09/07/18 12:48:51 INFO mapred.LocalJobRunner: 
+09/07/18 12:48:54 INFO mapred.LocalJobRunner: 
+09/07/18 12:48:57 INFO mapred.LocalJobRunner: 
+09/07/18 12:49:00 INFO mapred.LocalJobRunner: 
+09/07/18 12:49:03 INFO mapred.LocalJobRunner: 
+09/07/18 12:49:06 INFO mapred.LocalJobRunner: 
+09/07/18 12:49:06 INFO mapred.JobClient:  map 99% reduce 0%
+09/07/18 12:49:09 INFO mapred.LocalJobRunner: 
+09/07/18 12:49:12 INFO mapred.LocalJobRunner: 
+09/07/18 12:49:15 INFO mapred.LocalJobRunner: 
+09/07/18 12:49:18 INFO mapred.LocalJobRunner: 
+09/07/18 12:49:21 INFO mapred.LocalJobRunner: 
+09/07/18 12:49:24 INFO mapred.LocalJobRunner: 
+09/07/18 12:49:27 INFO mapred.LocalJobRunner: 
+09/07/18 12:49:27 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:49:30 INFO mapred.LocalJobRunner: 
+09/07/18 12:49:32 INFO mapred.LocalJobRunner: 
+09/07/18 12:49:32 INFO mapred.TaskRunner: Task 'job_local_2_map_0045' done.
+09/07/18 12:49:32 INFO mapred.TaskRunner: Saved output of task 'job_local_2_map_0045' to file:/umd/indexes/trec45noCRFR.positional/postings
+09/07/18 12:49:32 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:49:33 INFO mapred.LocalJobRunner: 
+09/07/18 12:49:33 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 12:49:38 INFO mapred.LocalJobRunner: 
+09/07/18 12:49:38 INFO mapred.JobClient:  map 98% reduce 0%
+09/07/18 12:49:41 INFO mapred.LocalJobRunner: 
+09/07/18 12:49:44 INFO mapred.LocalJobRunner: 
+09/07/18 12:49:47 INFO mapred.LocalJobRunner: 
+09/07/18 12:49:50 INFO mapred.LocalJobRunner: 
+09/07/18 12:49:53 INFO mapred.LocalJobRunner: 
+09/07/18 12:49:53 INFO mapred.JobClient:  map 99% reduce 0%
+09/07/18 12:49:56 INFO mapred.LocalJobRunner: 
+09/07/18 12:49:59 INFO mapred.LocalJobRunner: 
+09/07/18 12:50:02 INFO mapred.LocalJobRunner: 
+09/07/18 12:50:05 INFO mapred.LocalJobRunner: 
+09/07/18 12:50:08 INFO mapred.LocalJobRunner: 
+09/07/18 12:50:11 INFO mapred.LocalJobRunner: 
+09/07/18 12:50:14 INFO mapred.LocalJobRunner: 
+09/07/18 12:50:17 INFO mapred.LocalJobRunner: 
+09/07/18 12:50:17 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:50:20 INFO mapred.LocalJobRunner: 
+09/07/18 12:50:23 INFO mapred.LocalJobRunner: 
+09/07/18 12:50:23 INFO mapred.LocalJobRunner: 
+09/07/18 12:50:23 INFO mapred.TaskRunner: Task 'job_local_2_map_0046' done.
+09/07/18 12:50:23 INFO mapred.TaskRunner: Saved output of task 'job_local_2_map_0046' to file:/umd/indexes/trec45noCRFR.positional/postings
+09/07/18 12:50:23 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 12:50:26 INFO mapred.LocalJobRunner: 
+09/07/18 12:50:26 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 12:50:29 INFO mapred.LocalJobRunner: 
+09/07/18 12:50:29 INFO mapred.JobClient:  map 99% reduce 0%
+09/07/18 12:50:32 INFO mapred.LocalJobRunner: 
+09/07/18 12:50:35 INFO mapred.LocalJobRunner: 
+09/07/18 12:50:35 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 12:50:36 INFO mapred.LocalJobRunner: 
+09/07/18 12:50:36 INFO mapred.TaskRunner: Task 'job_local_2_map_0047' done.
+09/07/18 12:50:36 INFO mapred.TaskRunner: Saved output of task 'job_local_2_map_0047' to file:/umd/indexes/trec45noCRFR.positional/postings
+09/07/18 12:50:38 INFO mapred.LocalJobRunner: 
+09/07/18 12:50:44 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:50:44 INFO mapred.JobClient:  map 100% reduce 33%
+09/07/18 12:50:47 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:50:50 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:50:53 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:50:56 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:50:59 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:51:02 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:51:05 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:51:08 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:51:11 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:51:14 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:51:17 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:51:20 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:51:23 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:51:26 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:51:29 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:51:32 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:51:35 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:51:38 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:51:41 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:51:44 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:51:47 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:51:50 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:51:53 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:51:56 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:51:59 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:52:02 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:52:05 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:52:08 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:52:11 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:52:14 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:52:17 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:52:20 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:52:23 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:52:26 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:52:30 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:52:33 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:52:36 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:52:39 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:52:42 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:52:45 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:52:48 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:52:51 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:52:54 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:52:57 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:53:00 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:53:03 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:53:06 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:53:09 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:53:12 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:53:15 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:53:18 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:53:21 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:53:24 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:53:27 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:53:30 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:53:33 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:53:36 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:53:39 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:53:42 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:53:45 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:53:48 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:53:51 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:53:54 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:53:57 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:54:00 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:54:03 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:54:06 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:54:09 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:54:12 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:54:15 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:54:18 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:54:21 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:54:24 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:54:27 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:54:30 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:54:33 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:54:36 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:54:39 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:54:42 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:54:45 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:54:48 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:54:51 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:54:54 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:54:57 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:55:00 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:55:03 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:55:06 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:55:09 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:55:12 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:55:15 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:55:18 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:55:21 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:55:24 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:55:27 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:55:30 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:55:33 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:55:36 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:55:39 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:55:42 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:55:45 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:55:48 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:55:51 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:55:54 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:55:57 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:56:00 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:56:03 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:56:06 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:56:09 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:56:12 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:56:15 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:56:18 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:56:21 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:56:24 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:56:27 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:56:30 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:56:33 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:56:36 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:56:39 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:56:42 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:56:45 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:56:48 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:56:51 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:56:54 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:56:57 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:57:00 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:57:03 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:57:06 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:57:09 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:57:12 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:57:15 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:57:18 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:57:21 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:57:24 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:57:27 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:57:30 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:57:33 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:57:36 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:57:39 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:57:42 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:57:45 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:57:48 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:57:51 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:57:54 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:57:57 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:58:00 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:58:03 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:58:06 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:58:09 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:58:12 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:58:15 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:58:18 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:58:21 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:58:24 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:58:27 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:58:30 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:58:33 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:58:36 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:58:39 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:58:42 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:58:45 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:58:48 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:58:51 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:58:54 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:58:57 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:59:00 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:59:03 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:59:06 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:59:09 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:59:12 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:59:15 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:59:18 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:59:21 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:59:24 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:59:27 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:59:30 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:59:33 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:59:36 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:59:39 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:59:42 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:59:45 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:59:48 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:59:51 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:59:54 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 12:59:57 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:00:00 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:00:03 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:00:06 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:00:09 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:00:12 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:00:15 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:00:18 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:00:21 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:00:24 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:00:27 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:00:30 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:00:33 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:00:36 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:00:39 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:00:42 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:00:45 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:00:48 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:00:51 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:00:54 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:00:57 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:01:00 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:01:03 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:01:06 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:01:09 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:01:12 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:01:15 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:01:18 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:01:21 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:01:24 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:01:27 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:01:30 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:01:33 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:01:36 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:01:39 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:01:42 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:01:45 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:01:48 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:01:51 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:01:54 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:01:57 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:02:00 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:02:03 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:02:06 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:02:09 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:02:12 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:02:15 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:02:18 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:02:21 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:02:24 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:02:27 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:02:30 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:02:33 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:02:36 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:02:39 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:02:42 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:02:45 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:02:48 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:02:51 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:02:54 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:02:57 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:03:00 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:03:03 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:03:06 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:03:09 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:03:12 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:03:15 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:03:18 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:03:21 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:03:24 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:03:27 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:03:30 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:03:33 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:03:36 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:03:39 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:03:42 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:03:45 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:03:48 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:03:51 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:03:54 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:03:57 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:04:00 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:04:03 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:04:06 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:04:09 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:04:12 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:04:15 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:04:18 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:04:21 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:04:24 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:04:27 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:04:30 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:04:33 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:04:36 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:04:39 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:04:42 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:04:45 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:04:48 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:04:51 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:04:54 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:04:57 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:05:00 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:05:03 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:05:06 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:05:09 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:05:12 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:05:15 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:05:18 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:05:21 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:05:24 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:05:27 INFO mapred.LocalJobRunner: reduce > sort
+09/07/18 13:05:30 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:05:30 INFO mapred.JobClient:  map 100% reduce 66%
+09/07/18 13:05:33 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:05:36 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:05:39 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:05:39 INFO mapred.JobClient:  map 100% reduce 67%
+09/07/18 13:05:42 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:05:45 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:05:48 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:05:51 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:05:54 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:05:57 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:06:00 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:06:00 INFO mapred.JobClient:  map 100% reduce 68%
+09/07/18 13:06:03 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:06:06 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:06:09 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:06:12 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:06:15 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:06:18 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:06:21 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:06:21 INFO mapred.JobClient:  map 100% reduce 69%
+09/07/18 13:06:24 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:06:27 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:06:30 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:06:33 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:06:36 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:06:39 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:06:42 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:06:45 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:06:45 INFO mapred.JobClient:  map 100% reduce 70%
+09/07/18 13:06:48 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:06:51 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:06:54 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:06:57 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:07:00 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:07:03 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:07:06 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:07:06 INFO mapred.JobClient:  map 100% reduce 71%
+09/07/18 13:07:09 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:07:12 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:07:15 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:07:18 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:07:21 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:07:24 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:07:27 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:07:27 INFO mapred.JobClient:  map 100% reduce 72%
+09/07/18 13:07:30 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:07:33 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:07:36 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:07:39 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:07:42 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:07:45 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:07:48 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:07:48 INFO mapred.JobClient:  map 100% reduce 73%
+09/07/18 13:07:51 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:07:54 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:07:57 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:08:00 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:08:03 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:08:06 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:08:09 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:08:09 INFO mapred.JobClient:  map 100% reduce 74%
+09/07/18 13:08:12 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:08:15 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:08:18 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:08:21 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:08:24 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:08:27 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:08:27 INFO mapred.JobClient:  map 100% reduce 75%
+09/07/18 13:08:30 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:08:33 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:08:36 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:08:39 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:08:42 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:08:45 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:08:48 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:08:48 INFO mapred.JobClient:  map 100% reduce 76%
+09/07/18 13:08:51 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:08:54 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:08:57 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:09:00 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:09:03 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:09:06 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:09:09 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:09:09 INFO mapred.JobClient:  map 100% reduce 77%
+09/07/18 13:09:12 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:09:15 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:09:18 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:09:21 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:09:24 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:09:27 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:09:27 INFO mapred.JobClient:  map 100% reduce 78%
+09/07/18 13:09:30 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:09:33 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:09:36 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:09:39 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:09:42 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:09:45 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:09:45 INFO mapred.JobClient:  map 100% reduce 79%
+09/07/18 13:09:48 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:09:51 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:09:54 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:09:57 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:10:00 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:10:03 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:10:06 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:10:06 INFO mapred.JobClient:  map 100% reduce 80%
+09/07/18 13:10:09 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:10:12 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:10:15 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:10:18 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:10:21 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:10:24 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:10:24 INFO mapred.JobClient:  map 100% reduce 81%
+09/07/18 13:10:27 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:10:30 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:10:33 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:10:36 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:10:39 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:10:42 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:10:42 INFO mapred.JobClient:  map 100% reduce 82%
+09/07/18 13:10:45 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:10:48 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:10:51 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:10:54 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:10:57 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:11:00 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:11:03 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:11:03 INFO mapred.JobClient:  map 100% reduce 83%
+09/07/18 13:11:06 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:11:09 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:11:12 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:11:15 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:11:18 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:11:21 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:11:21 INFO mapred.JobClient:  map 100% reduce 84%
+09/07/18 13:11:24 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:11:27 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:11:30 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:11:33 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:11:36 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:11:39 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:11:39 INFO mapred.JobClient:  map 100% reduce 85%
+09/07/18 13:11:42 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:11:45 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:11:48 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:11:51 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:11:54 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:11:57 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:12:00 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:12:03 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:12:06 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:12:09 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:12:12 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:12:12 INFO mapred.JobClient:  map 100% reduce 86%
+09/07/18 13:12:15 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:12:18 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:12:21 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:12:24 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:12:27 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:12:30 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:12:33 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:12:36 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:12:39 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:12:39 INFO mapred.JobClient:  map 100% reduce 87%
+09/07/18 13:12:42 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:12:45 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:12:48 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:12:51 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:12:54 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:12:57 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:13:00 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:13:03 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:13:06 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:13:06 INFO mapred.JobClient:  map 100% reduce 88%
+09/07/18 13:13:09 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:13:12 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:13:15 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:13:18 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:13:21 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:13:24 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:13:27 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:13:30 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:13:33 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:13:33 INFO mapred.JobClient:  map 100% reduce 89%
+09/07/18 13:13:36 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:13:39 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:13:42 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:13:45 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:13:48 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:13:51 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:13:54 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:13:57 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:14:00 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:14:03 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:14:03 INFO mapred.JobClient:  map 100% reduce 90%
+09/07/18 13:14:06 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:14:09 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:14:12 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:14:15 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:14:18 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:14:21 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:14:24 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:14:27 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:14:30 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:14:30 INFO mapred.JobClient:  map 100% reduce 91%
+09/07/18 13:14:33 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:14:36 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:14:39 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:14:42 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:14:45 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:14:48 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:14:51 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:14:54 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:14:56 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:14:56 INFO mapred.TaskRunner: Task 'reduce_eyvnyx' done.
+09/07/18 13:14:56 INFO mapred.TaskRunner: Saved output of task 'reduce_eyvnyx' to file:/umd/indexes/trec45noCRFR.positional/postings
+09/07/18 13:14:56 INFO mapred.JobClient: Job complete: job_local_2
+09/07/18 13:14:56 INFO mapred.JobClient: Counters: 21
+09/07/18 13:14:56 INFO mapred.JobClient:   ivory.index.BuildInvertedIndexDocSorted$Size
+09/07/18 13:14:56 INFO mapred.JobClient:     IndexedBytes=1583992399
+09/07/18 13:14:56 INFO mapred.JobClient:     IndexedTerms=134888069
+09/07/18 13:14:56 INFO mapred.JobClient:   File Systems
+09/07/18 13:14:56 INFO mapred.JobClient:     Local bytes read=211332809204
+09/07/18 13:14:56 INFO mapred.JobClient:     Local bytes written=162016712067
+09/07/18 13:14:56 INFO mapred.JobClient:   ivory.index.BuildInvertedIndexDocSorted$Terms
+09/07/18 13:14:56 INFO mapred.JobClient:     Total=978058
+09/07/18 13:14:56 INFO mapred.JobClient:   ivory.index.BuildInvertedIndexDocSorted$MapTime
+09/07/18 13:14:56 INFO mapred.JobClient:     Total=1917412
+09/07/18 13:14:56 INFO mapred.JobClient:     Parsing=294720
+09/07/18 13:14:56 INFO mapred.JobClient:   ivory.index.BuildInvertedIndexDocSorted$ReduceTime
+09/07/18 13:14:56 INFO mapred.JobClient:     Total=493803
+09/07/18 13:14:56 INFO mapred.JobClient:   ivory.index.BuildInvertedIndexDocSorted$DocLengths
+09/07/18 13:14:56 INFO mapred.JobClient:     Count=472525
+09/07/18 13:14:56 INFO mapred.JobClient:     SumOfDocLengths=134888069
+09/07/18 13:14:56 INFO mapred.JobClient:   ivory.index.BuildInvertedIndexDocSorted$Docs
+09/07/18 13:14:56 INFO mapred.JobClient:     Indexed=472525
+09/07/18 13:14:56 INFO mapred.JobClient:     Total=472525
+09/07/18 13:14:56 INFO mapred.JobClient:   Map-Reduce Framework
+09/07/18 13:14:56 INFO mapred.JobClient:     Map input records=472525
+09/07/18 13:14:56 INFO mapred.JobClient:     Map output records=86260489
+09/07/18 13:14:56 INFO mapred.JobClient:     Map input bytes=1584773983
+09/07/18 13:14:56 INFO mapred.JobClient:     Map output bytes=2179825782
+09/07/18 13:14:56 INFO mapred.JobClient:     Combine input records=0
+09/07/18 13:14:56 INFO mapred.JobClient:     Combine output records=0
+09/07/18 13:14:56 INFO mapred.JobClient:     Reduce input groups=83915872
+09/07/18 13:14:56 INFO mapred.JobClient:     Reduce input records=86260489
+09/07/18 13:14:56 INFO mapred.JobClient:     Reduce output records=978058
+09/07/18 13:14:57 INFO jvm.JvmMetrics: Cannot initialize JVM Metrics with processName=JobTracker, sessionId= - already initialized
+09/07/18 13:14:57 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:14:58 INFO mapred.JobClient: Running job: job_local_3
+09/07/18 13:14:58 INFO mapred.MapTask: numReduceTasks: 0
+09/07/18 13:14:59 INFO mapred.JobClient:  map 0% reduce 0%
+09/07/18 13:15:03 INFO mapred.LocalJobRunner: 
+09/07/18 13:15:03 INFO mapred.TaskRunner: Task 'job_local_3_map_0000' done.
+09/07/18 13:15:04 INFO mapred.JobClient: Job complete: job_local_3
+09/07/18 13:15:04 INFO mapred.JobClient: Counters: 7
+09/07/18 13:15:04 INFO mapred.JobClient:   File Systems
+09/07/18 13:15:04 INFO mapred.JobClient:     Local bytes read=11831709531
+09/07/18 13:15:04 INFO mapred.JobClient:     Local bytes written=8782911057
+09/07/18 13:15:04 INFO mapred.JobClient:   edu.umd.cloud9.mapred.NullMapper$Heartbeat
+09/07/18 13:15:04 INFO mapred.JobClient:     COUNT=1
+09/07/18 13:15:04 INFO mapred.JobClient:   ivory.index.BuildInvertedIndexDocSorted$DocLengths
+09/07/18 13:15:04 INFO mapred.JobClient:     Count=472525
+09/07/18 13:15:04 INFO mapred.JobClient:     SumOfDocLengths=134888069
+09/07/18 13:15:04 INFO mapred.JobClient:   Map-Reduce Framework
+09/07/18 13:15:04 INFO mapred.JobClient:     Map input records=1
+09/07/18 13:15:04 INFO mapred.JobClient:     Map input bytes=0
+09/07/18 13:15:04 INFO mapred.LocalJobRunner: 
+09/07/18 13:15:04 INFO index.MergePostings: PowerTool: MergePostings
+09/07/18 13:15:04 INFO jvm.JvmMetrics: Cannot initialize JVM Metrics with processName=JobTracker, sessionId= - already initialized
+09/07/18 13:15:04 INFO mapred.FileInputFormat: Total input paths to process : 1
+09/07/18 13:15:04 INFO mapred.JobClient: Running job: job_local_4
+09/07/18 13:15:04 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 13:15:05 INFO mapred.JobClient:  map 0% reduce 0%
+09/07/18 13:15:10 INFO mapred.LocalJobRunner: file:/umd/indexes/trec45noCRFR.positional/postings/part-00000:0+33554432
+09/07/18 13:15:10 INFO mapred.LocalJobRunner: file:/umd/indexes/trec45noCRFR.positional/postings/part-00000:0+33554432
+09/07/18 13:15:10 INFO mapred.TaskRunner: Task 'job_local_4_map_0000' done.
+09/07/18 13:15:10 INFO mapred.TaskRunner: Saved output of task 'job_local_4_map_0000' to file:/umd/indexes/trec45noCRFR.positional/tmp5186
+09/07/18 13:15:10 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 13:15:11 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 13:15:13 INFO mapred.LocalJobRunner: file:/umd/indexes/trec45noCRFR.positional/postings/part-00000:0+33554432
+09/07/18 13:15:14 INFO mapred.JobClient:  map 50% reduce 0%
+09/07/18 13:15:14 INFO mapred.LocalJobRunner: file:/umd/indexes/trec45noCRFR.positional/postings/part-00000:33554432+33554432
+09/07/18 13:15:14 INFO mapred.TaskRunner: Task 'job_local_4_map_0001' done.
+09/07/18 13:15:14 INFO mapred.TaskRunner: Saved output of task 'job_local_4_map_0001' to file:/umd/indexes/trec45noCRFR.positional/tmp5186
+09/07/18 13:15:14 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 13:15:15 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 13:15:16 INFO mapred.LocalJobRunner: file:/umd/indexes/trec45noCRFR.positional/postings/part-00000:33554432+33554432
+09/07/18 13:15:17 INFO mapred.JobClient:  map 66% reduce 0%
+09/07/18 13:15:20 INFO mapred.LocalJobRunner: file:/umd/indexes/trec45noCRFR.positional/postings/part-00000:67108864+33554432
+09/07/18 13:15:21 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 13:15:21 INFO mapred.LocalJobRunner: file:/umd/indexes/trec45noCRFR.positional/postings/part-00000:67108864+33554432
+09/07/18 13:15:21 INFO mapred.TaskRunner: Task 'job_local_4_map_0002' done.
+09/07/18 13:15:21 INFO mapred.TaskRunner: Saved output of task 'job_local_4_map_0002' to file:/umd/indexes/trec45noCRFR.positional/tmp5186
+09/07/18 13:15:21 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 13:15:27 INFO mapred.LocalJobRunner: file:/umd/indexes/trec45noCRFR.positional/postings/part-00000:100663296+33554432
+09/07/18 13:15:28 INFO mapred.LocalJobRunner: file:/umd/indexes/trec45noCRFR.positional/postings/part-00000:100663296+33554432
+09/07/18 13:15:28 INFO mapred.TaskRunner: Task 'job_local_4_map_0003' done.
+09/07/18 13:15:28 INFO mapred.TaskRunner: Saved output of task 'job_local_4_map_0003' to file:/umd/indexes/trec45noCRFR.positional/tmp5186
+09/07/18 13:15:28 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 13:15:33 INFO mapred.LocalJobRunner: file:/umd/indexes/trec45noCRFR.positional/postings/part-00000:134217728+33554432
+09/07/18 13:15:33 INFO mapred.TaskRunner: Task 'job_local_4_map_0004' done.
+09/07/18 13:15:33 INFO mapred.TaskRunner: Saved output of task 'job_local_4_map_0004' to file:/umd/indexes/trec45noCRFR.positional/tmp5186
+09/07/18 13:15:33 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 13:15:34 INFO mapred.LocalJobRunner: file:/umd/indexes/trec45noCRFR.positional/postings/part-00000:134217728+33554432
+09/07/18 13:15:34 INFO mapred.JobClient:  map 83% reduce 0%
+09/07/18 13:15:39 INFO mapred.LocalJobRunner: file:/umd/indexes/trec45noCRFR.positional/postings/part-00000:167772160+33554432
+09/07/18 13:15:39 INFO mapred.LocalJobRunner: file:/umd/indexes/trec45noCRFR.positional/postings/part-00000:167772160+33554432
+09/07/18 13:15:39 INFO mapred.TaskRunner: Task 'job_local_4_map_0005' done.
+09/07/18 13:15:39 INFO mapred.TaskRunner: Saved output of task 'job_local_4_map_0005' to file:/umd/indexes/trec45noCRFR.positional/tmp5186
+09/07/18 13:15:39 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 13:15:40 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 13:15:45 INFO mapred.LocalJobRunner: file:/umd/indexes/trec45noCRFR.positional/postings/part-00000:201326592+33554432
+09/07/18 13:15:45 INFO mapred.TaskRunner: Task 'job_local_4_map_0006' done.
+09/07/18 13:15:45 INFO mapred.TaskRunner: Saved output of task 'job_local_4_map_0006' to file:/umd/indexes/trec45noCRFR.positional/tmp5186
+09/07/18 13:15:45 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 13:15:45 INFO mapred.LocalJobRunner: file:/umd/indexes/trec45noCRFR.positional/postings/part-00000:201326592+33554432
+09/07/18 13:15:46 INFO mapred.JobClient:  map 87% reduce 0%
+09/07/18 13:15:51 INFO mapred.LocalJobRunner: file:/umd/indexes/trec45noCRFR.positional/postings/part-00000:234881024+33554432
+09/07/18 13:15:51 INFO mapred.TaskRunner: Task 'job_local_4_map_0007' done.
+09/07/18 13:15:51 INFO mapred.TaskRunner: Saved output of task 'job_local_4_map_0007' to file:/umd/indexes/trec45noCRFR.positional/tmp5186
+09/07/18 13:15:51 INFO mapred.LocalJobRunner: file:/umd/indexes/trec45noCRFR.positional/postings/part-00000:234881024+33554432
+09/07/18 13:15:51 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 13:15:52 INFO mapred.JobClient:  map 88% reduce 0%
+09/07/18 13:15:55 INFO mapred.LocalJobRunner: file:/umd/indexes/trec45noCRFR.positional/postings/part-00000:268435456+33554432
+09/07/18 13:15:55 INFO mapred.TaskRunner: Task 'job_local_4_map_0008' done.
+09/07/18 13:15:55 INFO mapred.TaskRunner: Saved output of task 'job_local_4_map_0008' to file:/umd/indexes/trec45noCRFR.positional/tmp5186
+09/07/18 13:15:55 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 13:15:56 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 13:15:57 INFO mapred.LocalJobRunner: file:/umd/indexes/trec45noCRFR.positional/postings/part-00000:268435456+33554432
+09/07/18 13:15:58 INFO mapred.JobClient:  map 90% reduce 0%
+09/07/18 13:15:59 INFO mapred.LocalJobRunner: file:/umd/indexes/trec45noCRFR.positional/postings/part-00000:301989888+33554432
+09/07/18 13:15:59 INFO mapred.TaskRunner: Task 'job_local_4_map_0009' done.
+09/07/18 13:15:59 INFO mapred.TaskRunner: Saved output of task 'job_local_4_map_0009' to file:/umd/indexes/trec45noCRFR.positional/tmp5186
+09/07/18 13:15:59 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 13:15:59 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 13:15:59 INFO mapred.LocalJobRunner: file:/umd/indexes/trec45noCRFR.positional/postings/part-00000:335544320+10928039
+09/07/18 13:15:59 INFO mapred.TaskRunner: Task 'job_local_4_map_0010' done.
+09/07/18 13:15:59 INFO mapred.TaskRunner: Saved output of task 'job_local_4_map_0010' to file:/umd/indexes/trec45noCRFR.positional/tmp5186
+09/07/18 13:16:01 INFO mapred.LocalJobRunner: file:/umd/indexes/trec45noCRFR.positional/postings/part-00000:301989888+33554432
+09/07/18 13:16:02 INFO mapred.JobClient:  map 90% reduce 0%
+09/07/18 13:16:05 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:16:06 INFO mapred.JobClient:  map 90% reduce 69%
+09/07/18 13:16:08 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:16:09 INFO mapred.JobClient:  map 90% reduce 71%
+09/07/18 13:16:11 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:16:12 INFO mapred.JobClient:  map 90% reduce 73%
+09/07/18 13:16:14 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:16:15 INFO mapred.JobClient:  map 90% reduce 76%
+09/07/18 13:16:17 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:16:18 INFO mapred.JobClient:  map 90% reduce 79%
+09/07/18 13:16:20 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:16:21 INFO mapred.JobClient:  map 90% reduce 81%
+09/07/18 13:16:23 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:16:24 INFO mapred.JobClient:  map 90% reduce 83%
+09/07/18 13:16:26 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:16:27 INFO mapred.JobClient:  map 90% reduce 84%
+09/07/18 13:16:29 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:16:30 INFO mapred.JobClient:  map 90% reduce 87%
+09/07/18 13:16:32 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:16:33 INFO mapred.JobClient:  map 90% reduce 90%
+09/07/18 13:16:35 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:16:36 INFO mapred.JobClient:  map 90% reduce 92%
+09/07/18 13:16:38 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:16:39 INFO mapred.JobClient:  map 90% reduce 94%
+09/07/18 13:16:41 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:16:42 INFO mapred.JobClient:  map 90% reduce 96%
+09/07/18 13:16:44 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:16:45 INFO mapred.JobClient:  map 90% reduce 98%
+09/07/18 13:16:46 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:16:46 INFO mapred.TaskRunner: Task 'reduce_gumpt9' done.
+09/07/18 13:16:46 INFO mapred.TaskRunner: Saved output of task 'reduce_gumpt9' to file:/umd/indexes/trec45noCRFR.positional/tmp5186
+09/07/18 13:16:46 INFO mapred.JobClient: Job complete: job_local_4
+09/07/18 13:16:46 INFO mapred.JobClient: Counters: 11
+09/07/18 13:16:46 INFO mapred.JobClient:   File Systems
+09/07/18 13:16:46 INFO mapred.JobClient:     Local bytes read=144933435991
+09/07/18 13:16:46 INFO mapred.JobClient:     Local bytes written=108362918961
+09/07/18 13:16:46 INFO mapred.JobClient:   Map-Reduce Framework
+09/07/18 13:16:46 INFO mapred.JobClient:     Map input records=978058
+09/07/18 13:16:46 INFO mapred.JobClient:     Map output records=978058
+09/07/18 13:16:46 INFO mapred.JobClient:     Map input bytes=346472264
+09/07/18 13:16:46 INFO mapred.JobClient:     Map output bytes=337990200
+09/07/18 13:16:46 INFO mapred.JobClient:     Combine input records=0
+09/07/18 13:16:46 INFO mapred.JobClient:     Combine output records=0
+09/07/18 13:16:46 INFO mapred.JobClient:     Reduce input groups=978058
+09/07/18 13:16:46 INFO mapred.JobClient:     Reduce input records=978058
+09/07/18 13:16:46 INFO mapred.JobClient:     Reduce output records=978058
+09/07/18 13:16:46 INFO index.MergePostings: Job Finished in 102.563 seconds
+09/07/18 13:16:46 INFO index.ComputeDictionarySize: Computing Dictionary Size...
+09/07/18 13:16:46 INFO index.ComputeDictionarySize:  - CollectionName: TREC_vol45
+09/07/18 13:16:46 INFO index.ComputeDictionarySize:  - IndexPath: /umd/indexes/trec45noCRFR.positional/
+09/07/18 13:16:46 INFO index.ComputeDictionarySize:  - DfThreshold: 0
+09/07/18 13:16:47 INFO jvm.JvmMetrics: Cannot initialize JVM Metrics with processName=JobTracker, sessionId= - already initialized
+09/07/18 13:16:47 INFO mapred.FileInputFormat: Total input paths to process : 1
+09/07/18 13:16:47 INFO mapred.JobClient: Running job: job_local_5
+09/07/18 13:16:47 INFO mapred.MapTask: numReduceTasks: 0
+09/07/18 13:16:47 INFO mapred.LocalJobRunner: file:/umd/indexes/trec45noCRFR.positional/postings/part-00000:0+33554432
+09/07/18 13:16:47 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:16:47 INFO mapred.TaskRunner: Task 'job_local_5_map_0000' done.
+09/07/18 13:16:47 INFO mapred.TaskRunner: Saved output of task 'job_local_5_map_0000' to file:/umd/indexes/trec45noCRFR.positional/tmp6863
+09/07/18 13:16:47 INFO mapred.MapTask: numReduceTasks: 0
+09/07/18 13:16:48 INFO mapred.LocalJobRunner: file:/umd/indexes/trec45noCRFR.positional/postings/part-00000:33554432+33554432
+09/07/18 13:16:48 INFO mapred.TaskRunner: Task 'job_local_5_map_0001' done.
+09/07/18 13:16:48 INFO mapred.TaskRunner: Saved output of task 'job_local_5_map_0001' to file:/umd/indexes/trec45noCRFR.positional/tmp6863
+09/07/18 13:16:48 INFO mapred.MapTask: numReduceTasks: 0
+09/07/18 13:16:48 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 13:16:48 INFO mapred.LocalJobRunner: file:/umd/indexes/trec45noCRFR.positional/postings/part-00000:67108864+33554432
+09/07/18 13:16:48 INFO mapred.TaskRunner: Task 'job_local_5_map_0002' done.
+09/07/18 13:16:48 INFO mapred.TaskRunner: Saved output of task 'job_local_5_map_0002' to file:/umd/indexes/trec45noCRFR.positional/tmp6863
+09/07/18 13:16:48 INFO mapred.MapTask: numReduceTasks: 0
+09/07/18 13:16:48 INFO mapred.LocalJobRunner: file:/umd/indexes/trec45noCRFR.positional/postings/part-00000:100663296+33554432
+09/07/18 13:16:48 INFO mapred.TaskRunner: Task 'job_local_5_map_0003' done.
+09/07/18 13:16:48 INFO mapred.TaskRunner: Saved output of task 'job_local_5_map_0003' to file:/umd/indexes/trec45noCRFR.positional/tmp6863
+09/07/18 13:16:48 INFO mapred.MapTask: numReduceTasks: 0
+09/07/18 13:16:49 INFO mapred.LocalJobRunner: file:/umd/indexes/trec45noCRFR.positional/postings/part-00000:134217728+33554432
+09/07/18 13:16:49 INFO mapred.TaskRunner: Task 'job_local_5_map_0004' done.
+09/07/18 13:16:49 INFO mapred.TaskRunner: Saved output of task 'job_local_5_map_0004' to file:/umd/indexes/trec45noCRFR.positional/tmp6863
+09/07/18 13:16:49 INFO mapred.MapTask: numReduceTasks: 0
+09/07/18 13:16:49 INFO mapred.LocalJobRunner: file:/umd/indexes/trec45noCRFR.positional/postings/part-00000:167772160+33554432
+09/07/18 13:16:49 INFO mapred.TaskRunner: Task 'job_local_5_map_0005' done.
+09/07/18 13:16:49 INFO mapred.TaskRunner: Saved output of task 'job_local_5_map_0005' to file:/umd/indexes/trec45noCRFR.positional/tmp6863
+09/07/18 13:16:49 INFO mapred.MapTask: numReduceTasks: 0
+09/07/18 13:16:49 INFO mapred.LocalJobRunner: file:/umd/indexes/trec45noCRFR.positional/postings/part-00000:201326592+33554432
+09/07/18 13:16:49 INFO mapred.TaskRunner: Task 'job_local_5_map_0006' done.
+09/07/18 13:16:49 INFO mapred.TaskRunner: Saved output of task 'job_local_5_map_0006' to file:/umd/indexes/trec45noCRFR.positional/tmp6863
+09/07/18 13:16:49 INFO mapred.MapTask: numReduceTasks: 0
+09/07/18 13:16:49 INFO mapred.LocalJobRunner: file:/umd/indexes/trec45noCRFR.positional/postings/part-00000:234881024+33554432
+09/07/18 13:16:49 INFO mapred.TaskRunner: Task 'job_local_5_map_0007' done.
+09/07/18 13:16:49 INFO mapred.TaskRunner: Saved output of task 'job_local_5_map_0007' to file:/umd/indexes/trec45noCRFR.positional/tmp6863
+09/07/18 13:16:49 INFO mapred.MapTask: numReduceTasks: 0
+09/07/18 13:16:49 INFO mapred.LocalJobRunner: file:/umd/indexes/trec45noCRFR.positional/postings/part-00000:268435456+33554432
+09/07/18 13:16:49 INFO mapred.TaskRunner: Task 'job_local_5_map_0008' done.
+09/07/18 13:16:49 INFO mapred.TaskRunner: Saved output of task 'job_local_5_map_0008' to file:/umd/indexes/trec45noCRFR.positional/tmp6863
+09/07/18 13:16:49 INFO mapred.MapTask: numReduceTasks: 0
+09/07/18 13:16:50 INFO mapred.LocalJobRunner: file:/umd/indexes/trec45noCRFR.positional/postings/part-00000:301989888+33554432
+09/07/18 13:16:50 INFO mapred.TaskRunner: Task 'job_local_5_map_0009' done.
+09/07/18 13:16:50 INFO mapred.TaskRunner: Saved output of task 'job_local_5_map_0009' to file:/umd/indexes/trec45noCRFR.positional/tmp6863
+09/07/18 13:16:50 INFO mapred.MapTask: numReduceTasks: 0
+09/07/18 13:16:50 INFO mapred.LocalJobRunner: file:/umd/indexes/trec45noCRFR.positional/postings/part-00000:335544320+10928039
+09/07/18 13:16:50 INFO mapred.TaskRunner: Task 'job_local_5_map_0010' done.
+09/07/18 13:16:50 INFO mapred.TaskRunner: Saved output of task 'job_local_5_map_0010' to file:/umd/indexes/trec45noCRFR.positional/tmp6863
+09/07/18 13:16:50 INFO mapred.JobClient: Job complete: job_local_5
+09/07/18 13:16:50 INFO mapred.JobClient: Counters: 5
+09/07/18 13:16:50 INFO mapred.JobClient:   File Systems
+09/07/18 13:16:50 INFO mapred.JobClient:     Local bytes read=140491887489
+09/07/18 13:16:50 INFO mapred.JobClient:     Local bytes written=104799856964
+09/07/18 13:16:50 INFO mapred.JobClient:   ivory.index.ComputeDictionarySize$Dictionary
+09/07/18 13:16:50 INFO mapred.JobClient:     Size=977542
+09/07/18 13:16:50 INFO mapred.JobClient:   Map-Reduce Framework
+09/07/18 13:16:50 INFO mapred.JobClient:     Map input records=978058
+09/07/18 13:16:50 INFO mapred.JobClient:     Map input bytes=346472264
+09/07/18 13:16:50 INFO demo.DriverBuildIndexTrec: Building terms to postings forward index with 977542 terms
+09/07/18 13:16:50 INFO index.BuildPostingsForwardIndex: Building terms to postings forward index...
+09/07/18 13:16:50 INFO index.BuildPostingsForwardIndex:  - CollectionName: TREC_vol45
+09/07/18 13:16:50 INFO index.BuildPostingsForwardIndex:  - IndexPath: /umd/indexes/trec45noCRFR.positional/
+09/07/18 13:16:50 INFO index.BuildPostingsForwardIndex:  - IndexNumberOfTerms: 977542
+09/07/18 13:16:50 INFO index.BuildPostingsForwardIndex:  - ForwardIndexWindow: 8
+09/07/18 13:16:50 INFO index.BuildPostingsForwardIndex:  - DfThreshold: 0
+09/07/18 13:16:50 INFO jvm.JvmMetrics: Cannot initialize JVM Metrics with processName=JobTracker, sessionId= - already initialized
+09/07/18 13:16:50 INFO mapred.FileInputFormat: Total input paths to process : 1
+09/07/18 13:16:50 INFO mapred.JobClient: Running job: job_local_6
+09/07/18 13:16:50 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 13:16:51 INFO mapred.JobClient:  map 0% reduce 0%
+09/07/18 13:16:53 INFO mapred.LocalJobRunner: file:/umd/indexes/trec45noCRFR.positional/postings/part-00000:0+33554432
+09/07/18 13:16:53 INFO mapred.TaskRunner: Task 'job_local_6_map_0000' done.
+09/07/18 13:16:53 INFO mapred.TaskRunner: Saved output of task 'job_local_6_map_0000' to file:/umd/indexes/trec45noCRFR.positional/tmp8949
+09/07/18 13:16:53 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 13:16:53 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 13:16:54 INFO mapred.LocalJobRunner: file:/umd/indexes/trec45noCRFR.positional/postings/part-00000:33554432+33554432
+09/07/18 13:16:54 INFO mapred.TaskRunner: Task 'job_local_6_map_0001' done.
+09/07/18 13:16:54 INFO mapred.TaskRunner: Saved output of task 'job_local_6_map_0001' to file:/umd/indexes/trec45noCRFR.positional/tmp8949
+09/07/18 13:16:54 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 13:16:55 INFO mapred.LocalJobRunner: file:/umd/indexes/trec45noCRFR.positional/postings/part-00000:67108864+33554432
+09/07/18 13:16:55 INFO mapred.TaskRunner: Task 'job_local_6_map_0002' done.
+09/07/18 13:16:55 INFO mapred.TaskRunner: Saved output of task 'job_local_6_map_0002' to file:/umd/indexes/trec45noCRFR.positional/tmp8949
+09/07/18 13:16:55 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 13:16:56 INFO mapred.LocalJobRunner: file:/umd/indexes/trec45noCRFR.positional/postings/part-00000:100663296+33554432
+09/07/18 13:16:56 INFO mapred.TaskRunner: Task 'job_local_6_map_0003' done.
+09/07/18 13:16:56 INFO mapred.TaskRunner: Saved output of task 'job_local_6_map_0003' to file:/umd/indexes/trec45noCRFR.positional/tmp8949
+09/07/18 13:16:56 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 13:16:57 INFO mapred.LocalJobRunner: file:/umd/indexes/trec45noCRFR.positional/postings/part-00000:134217728+33554432
+09/07/18 13:16:57 INFO mapred.TaskRunner: Task 'job_local_6_map_0004' done.
+09/07/18 13:16:57 INFO mapred.TaskRunner: Saved output of task 'job_local_6_map_0004' to file:/umd/indexes/trec45noCRFR.positional/tmp8949
+09/07/18 13:16:57 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 13:16:59 INFO mapred.LocalJobRunner: file:/umd/indexes/trec45noCRFR.positional/postings/part-00000:167772160+33554432
+09/07/18 13:16:59 INFO mapred.TaskRunner: Task 'job_local_6_map_0005' done.
+09/07/18 13:16:59 INFO mapred.TaskRunner: Saved output of task 'job_local_6_map_0005' to file:/umd/indexes/trec45noCRFR.positional/tmp8949
+09/07/18 13:16:59 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 13:16:59 INFO mapred.LocalJobRunner: file:/umd/indexes/trec45noCRFR.positional/postings/part-00000:201326592+33554432
+09/07/18 13:16:59 INFO mapred.TaskRunner: Task 'job_local_6_map_0006' done.
+09/07/18 13:16:59 INFO mapred.TaskRunner: Saved output of task 'job_local_6_map_0006' to file:/umd/indexes/trec45noCRFR.positional/tmp8949
+09/07/18 13:16:59 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 13:17:00 INFO mapred.LocalJobRunner: file:/umd/indexes/trec45noCRFR.positional/postings/part-00000:234881024+33554432
+09/07/18 13:17:00 INFO mapred.TaskRunner: Task 'job_local_6_map_0007' done.
+09/07/18 13:17:00 INFO mapred.TaskRunner: Saved output of task 'job_local_6_map_0007' to file:/umd/indexes/trec45noCRFR.positional/tmp8949
+09/07/18 13:17:00 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 13:17:01 INFO mapred.LocalJobRunner: file:/umd/indexes/trec45noCRFR.positional/postings/part-00000:268435456+33554432
+09/07/18 13:17:01 INFO mapred.TaskRunner: Task 'job_local_6_map_0008' done.
+09/07/18 13:17:01 INFO mapred.TaskRunner: Saved output of task 'job_local_6_map_0008' to file:/umd/indexes/trec45noCRFR.positional/tmp8949
+09/07/18 13:17:01 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 13:17:01 INFO mapred.LocalJobRunner: file:/umd/indexes/trec45noCRFR.positional/postings/part-00000:301989888+33554432
+09/07/18 13:17:01 INFO mapred.TaskRunner: Task 'job_local_6_map_0009' done.
+09/07/18 13:17:01 INFO mapred.TaskRunner: Saved output of task 'job_local_6_map_0009' to file:/umd/indexes/trec45noCRFR.positional/tmp8949
+09/07/18 13:17:01 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 13:17:02 INFO mapred.LocalJobRunner: file:/umd/indexes/trec45noCRFR.positional/postings/part-00000:335544320+10928039
+09/07/18 13:17:02 INFO mapred.TaskRunner: Task 'job_local_6_map_0010' done.
+09/07/18 13:17:02 INFO mapred.TaskRunner: Saved output of task 'job_local_6_map_0010' to file:/umd/indexes/trec45noCRFR.positional/tmp8949
+09/07/18 13:17:02 INFO index.BuildPostingsForwardIndex: Ivory.PrefixEncodedTermsFile: /umd/indexes/trec45noCRFR.positional/postings-index-terms.dat
+09/07/18 13:17:02 INFO index.BuildPostingsForwardIndex: Ivory.PostingsPositionsFile: /umd/indexes/trec45noCRFR.positional/postings-index-positions.dat
+09/07/18 13:17:02 INFO index.BuildPostingsForwardIndex: Ivory.IndexNumberOfTerms: 977542
+09/07/18 13:17:02 INFO index.BuildPostingsForwardIndex: Ivory.ForwardIndexWindow: 8
+09/07/18 13:17:08 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:17:08 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:17:08 INFO mapred.TaskRunner: Task 'reduce_39lapp' done.
+09/07/18 13:17:08 INFO mapred.TaskRunner: Saved output of task 'reduce_39lapp' to file:/umd/indexes/trec45noCRFR.positional/tmp8949
+09/07/18 13:17:08 INFO mapred.JobClient: Job complete: job_local_6
+09/07/18 13:17:08 INFO mapred.JobClient: Counters: 12
+09/07/18 13:17:08 INFO mapred.JobClient:   File Systems
+09/07/18 13:17:08 INFO mapred.JobClient:     Local bytes read=157635288206
+09/07/18 13:17:08 INFO mapred.JobClient:     Local bytes written=114595624593
+09/07/18 13:17:08 INFO mapred.JobClient:   ivory.index.BuildPostingsForwardIndex$Dictionary
+09/07/18 13:17:08 INFO mapred.JobClient:     Size=977542
+09/07/18 13:17:08 INFO mapred.JobClient:   Map-Reduce Framework
+09/07/18 13:17:08 INFO mapred.JobClient:     Map input records=978058
+09/07/18 13:17:08 INFO mapred.JobClient:     Map output records=977542
+09/07/18 13:17:08 INFO mapred.JobClient:     Map input bytes=346472264
+09/07/18 13:17:08 INFO mapred.JobClient:     Map output bytes=20070966
+09/07/18 13:17:08 INFO mapred.JobClient:     Combine input records=0
+09/07/18 13:17:08 INFO mapred.JobClient:     Combine output records=0
+09/07/18 13:17:08 INFO mapred.JobClient:     Reduce input groups=977542
+09/07/18 13:17:08 INFO mapred.JobClient:     Reduce input records=977542
+09/07/18 13:17:08 INFO mapred.JobClient:     Reduce output records=0
+09/07/18 13:17:09 INFO trec.BuildTrecForwardIndex: index path: /umd/indexes/trec45noCRFR.positional/
+09/07/18 13:17:09 INFO trec.BuildTrecForwardIndex: output path: /umd/indexes/trec45noCRFR.positional/doc-forward-index/
+09/07/18 13:17:09 INFO trec.BuildTrecForwardIndex: collection path: /umd/collections/trec/trec4-5_noCRFR.xml
+09/07/18 13:17:09 INFO trec.BuildTrecForwardIndex: mapping file: /umd/indexes/trec45noCRFR.positional/docno-mapping.dat
+09/07/18 13:17:09 INFO jvm.JvmMetrics: Cannot initialize JVM Metrics with processName=JobTracker, sessionId= - already initialized
+09/07/18 13:17:09 INFO mapred.FileInputFormat: Total input paths to process : 1
+09/07/18 13:17:09 INFO mapred.JobClient: Running job: job_local_7
+09/07/18 13:17:09 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 13:17:10 INFO mapred.JobClient:  map 0% reduce 0%
+09/07/18 13:17:11 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:17:15 INFO mapred.LocalJobRunner: 
+09/07/18 13:17:16 INFO mapred.JobClient:  map 80% reduce 0%
+09/07/18 13:17:17 INFO mapred.LocalJobRunner: 
+09/07/18 13:17:17 INFO mapred.TaskRunner: Task 'job_local_7_map_0000' done.
+09/07/18 13:17:17 INFO mapred.TaskRunner: Saved output of task 'job_local_7_map_0000' to file:/umd/indexes/trec45noCRFR.positional/doc-forward-index
+09/07/18 13:17:17 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 13:17:17 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 13:17:18 INFO mapred.LocalJobRunner: 
+09/07/18 13:17:19 INFO mapred.JobClient:  map 50% reduce 0%
+09/07/18 13:17:23 INFO mapred.LocalJobRunner: 
+09/07/18 13:17:23 INFO mapred.JobClient:  map 90% reduce 0%
+09/07/18 13:17:25 INFO mapred.LocalJobRunner: 
+09/07/18 13:17:25 INFO mapred.TaskRunner: Task 'job_local_7_map_0001' done.
+09/07/18 13:17:25 INFO mapred.TaskRunner: Saved output of task 'job_local_7_map_0001' to file:/umd/indexes/trec45noCRFR.positional/doc-forward-index
+09/07/18 13:17:25 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 13:17:25 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 13:17:26 INFO mapred.LocalJobRunner: 
+09/07/18 13:17:26 INFO mapred.JobClient:  map 66% reduce 0%
+09/07/18 13:17:31 INFO mapred.LocalJobRunner: 
+09/07/18 13:17:31 INFO mapred.JobClient:  map 89% reduce 0%
+09/07/18 13:17:33 INFO mapred.LocalJobRunner: 
+09/07/18 13:17:33 INFO mapred.TaskRunner: Task 'job_local_7_map_0002' done.
+09/07/18 13:17:33 INFO mapred.TaskRunner: Saved output of task 'job_local_7_map_0002' to file:/umd/indexes/trec45noCRFR.positional/doc-forward-index
+09/07/18 13:17:34 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 13:17:34 INFO mapred.LocalJobRunner: 
+09/07/18 13:17:34 INFO mapred.JobClient:  map 75% reduce 0%
+09/07/18 13:17:40 INFO mapred.LocalJobRunner: 
+09/07/18 13:17:40 INFO mapred.JobClient:  map 94% reduce 0%
+09/07/18 13:17:42 INFO mapred.LocalJobRunner: 
+09/07/18 13:17:42 INFO mapred.TaskRunner: Task 'job_local_7_map_0003' done.
+09/07/18 13:17:42 INFO mapred.TaskRunner: Saved output of task 'job_local_7_map_0003' to file:/umd/indexes/trec45noCRFR.positional/doc-forward-index
+09/07/18 13:17:42 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 13:17:42 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 13:17:43 INFO mapred.LocalJobRunner: 
+09/07/18 13:17:43 INFO mapred.JobClient:  map 80% reduce 0%
+09/07/18 13:17:48 INFO mapred.LocalJobRunner: 
+09/07/18 13:17:48 INFO mapred.JobClient:  map 95% reduce 0%
+09/07/18 13:17:50 INFO mapred.LocalJobRunner: 
+09/07/18 13:17:50 INFO mapred.TaskRunner: Task 'job_local_7_map_0004' done.
+09/07/18 13:17:50 INFO mapred.TaskRunner: Saved output of task 'job_local_7_map_0004' to file:/umd/indexes/trec45noCRFR.positional/doc-forward-index
+09/07/18 13:17:50 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 13:17:50 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 13:17:51 INFO mapred.LocalJobRunner: 
+09/07/18 13:17:51 INFO mapred.JobClient:  map 83% reduce 0%
+09/07/18 13:17:56 INFO mapred.LocalJobRunner: 
+09/07/18 13:17:56 INFO mapred.JobClient:  map 95% reduce 0%
+09/07/18 13:17:58 INFO mapred.LocalJobRunner: 
+09/07/18 13:17:58 INFO mapred.TaskRunner: Task 'job_local_7_map_0005' done.
+09/07/18 13:17:58 INFO mapred.TaskRunner: Saved output of task 'job_local_7_map_0005' to file:/umd/indexes/trec45noCRFR.positional/doc-forward-index
+09/07/18 13:17:58 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 13:17:58 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 13:17:59 INFO mapred.LocalJobRunner: 
+09/07/18 13:17:59 INFO mapred.JobClient:  map 85% reduce 0%
+09/07/18 13:18:04 INFO mapred.LocalJobRunner: 
+09/07/18 13:18:04 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 13:18:06 INFO mapred.LocalJobRunner: 
+09/07/18 13:18:06 INFO mapred.TaskRunner: Task 'job_local_7_map_0006' done.
+09/07/18 13:18:06 INFO mapred.TaskRunner: Saved output of task 'job_local_7_map_0006' to file:/umd/indexes/trec45noCRFR.positional/doc-forward-index
+09/07/18 13:18:06 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 13:18:06 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 13:18:07 INFO mapred.LocalJobRunner: 
+09/07/18 13:18:07 INFO mapred.JobClient:  map 87% reduce 0%
+09/07/18 13:18:12 INFO mapred.LocalJobRunner: 
+09/07/18 13:18:12 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 13:18:13 INFO mapred.LocalJobRunner: 
+09/07/18 13:18:13 INFO mapred.TaskRunner: Task 'job_local_7_map_0007' done.
+09/07/18 13:18:13 INFO mapred.TaskRunner: Saved output of task 'job_local_7_map_0007' to file:/umd/indexes/trec45noCRFR.positional/doc-forward-index
+09/07/18 13:18:13 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 13:18:13 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 13:18:15 INFO mapred.LocalJobRunner: 
+09/07/18 13:18:15 INFO mapred.JobClient:  map 88% reduce 0%
+09/07/18 13:18:18 INFO mapred.LocalJobRunner: 
+09/07/18 13:18:18 INFO mapred.TaskRunner: Task 'job_local_7_map_0008' done.
+09/07/18 13:18:18 INFO mapred.TaskRunner: Saved output of task 'job_local_7_map_0008' to file:/umd/indexes/trec45noCRFR.positional/doc-forward-index
+09/07/18 13:18:18 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 13:18:18 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 13:18:19 INFO mapred.LocalJobRunner: 
+09/07/18 13:18:19 INFO mapred.JobClient:  map 90% reduce 0%
+09/07/18 13:18:24 INFO mapred.LocalJobRunner: 
+09/07/18 13:18:24 INFO mapred.TaskRunner: Task 'job_local_7_map_0009' done.
+09/07/18 13:18:24 INFO mapred.TaskRunner: Saved output of task 'job_local_7_map_0009' to file:/umd/indexes/trec45noCRFR.positional/doc-forward-index
+09/07/18 13:18:24 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 13:18:24 INFO mapred.LocalJobRunner: 
+09/07/18 13:18:29 INFO mapred.LocalJobRunner: 
+09/07/18 13:18:29 INFO mapred.TaskRunner: Task 'job_local_7_map_0010' done.
+09/07/18 13:18:29 INFO mapred.TaskRunner: Saved output of task 'job_local_7_map_0010' to file:/umd/indexes/trec45noCRFR.positional/doc-forward-index
+09/07/18 13:18:29 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 13:18:29 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 13:18:30 INFO mapred.LocalJobRunner: 
+09/07/18 13:18:30 INFO mapred.JobClient:  map 91% reduce 0%
+09/07/18 13:18:34 INFO mapred.LocalJobRunner: 
+09/07/18 13:18:34 INFO mapred.TaskRunner: Task 'job_local_7_map_0011' done.
+09/07/18 13:18:34 INFO mapred.TaskRunner: Saved output of task 'job_local_7_map_0011' to file:/umd/indexes/trec45noCRFR.positional/doc-forward-index
+09/07/18 13:18:34 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 13:18:34 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 13:18:35 INFO mapred.LocalJobRunner: 
+09/07/18 13:18:35 INFO mapred.JobClient:  map 92% reduce 0%
+09/07/18 13:18:40 INFO mapred.LocalJobRunner: 
+09/07/18 13:18:40 INFO mapred.TaskRunner: Task 'job_local_7_map_0012' done.
+09/07/18 13:18:40 INFO mapred.TaskRunner: Saved output of task 'job_local_7_map_0012' to file:/umd/indexes/trec45noCRFR.positional/doc-forward-index
+09/07/18 13:18:40 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 13:18:40 INFO mapred.LocalJobRunner: 
+09/07/18 13:18:46 INFO mapred.LocalJobRunner: 
+09/07/18 13:18:46 INFO mapred.LocalJobRunner: 
+09/07/18 13:18:46 INFO mapred.TaskRunner: Task 'job_local_7_map_0013' done.
+09/07/18 13:18:46 INFO mapred.TaskRunner: Saved output of task 'job_local_7_map_0013' to file:/umd/indexes/trec45noCRFR.positional/doc-forward-index
+09/07/18 13:18:46 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 13:18:46 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 13:18:49 INFO mapred.LocalJobRunner: 
+09/07/18 13:18:49 INFO mapred.JobClient:  map 93% reduce 0%
+09/07/18 13:18:52 INFO mapred.LocalJobRunner: 
+09/07/18 13:18:52 INFO mapred.JobClient:  map 99% reduce 0%
+09/07/18 13:18:53 INFO mapred.LocalJobRunner: 
+09/07/18 13:18:53 INFO mapred.TaskRunner: Task 'job_local_7_map_0014' done.
+09/07/18 13:18:53 INFO mapred.TaskRunner: Saved output of task 'job_local_7_map_0014' to file:/umd/indexes/trec45noCRFR.positional/doc-forward-index
+09/07/18 13:18:53 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 13:18:53 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 13:18:55 INFO mapred.LocalJobRunner: 
+09/07/18 13:18:55 INFO mapred.JobClient:  map 93% reduce 0%
+09/07/18 13:18:59 INFO mapred.LocalJobRunner: 
+09/07/18 13:18:59 INFO mapred.JobClient:  map 99% reduce 0%
+09/07/18 13:19:00 INFO mapred.LocalJobRunner: 
+09/07/18 13:19:00 INFO mapred.TaskRunner: Task 'job_local_7_map_0015' done.
+09/07/18 13:19:00 INFO mapred.TaskRunner: Saved output of task 'job_local_7_map_0015' to file:/umd/indexes/trec45noCRFR.positional/doc-forward-index
+09/07/18 13:19:00 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 13:19:00 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 13:19:02 INFO mapred.LocalJobRunner: 
+09/07/18 13:19:02 INFO mapred.JobClient:  map 94% reduce 0%
+09/07/18 13:19:06 INFO mapred.LocalJobRunner: 
+09/07/18 13:19:06 INFO mapred.JobClient:  map 98% reduce 0%
+09/07/18 13:19:07 INFO mapred.LocalJobRunner: 
+09/07/18 13:19:07 INFO mapred.TaskRunner: Task 'job_local_7_map_0016' done.
+09/07/18 13:19:07 INFO mapred.TaskRunner: Saved output of task 'job_local_7_map_0016' to file:/umd/indexes/trec45noCRFR.positional/doc-forward-index
+09/07/18 13:19:07 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 13:19:08 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 13:19:09 INFO mapred.LocalJobRunner: 
+09/07/18 13:19:09 INFO mapred.JobClient:  map 94% reduce 0%
+09/07/18 13:19:13 INFO mapred.LocalJobRunner: 
+09/07/18 13:19:14 INFO mapred.JobClient:  map 98% reduce 0%
+09/07/18 13:19:15 INFO mapred.LocalJobRunner: 
+09/07/18 13:19:15 INFO mapred.TaskRunner: Task 'job_local_7_map_0017' done.
+09/07/18 13:19:15 INFO mapred.TaskRunner: Saved output of task 'job_local_7_map_0017' to file:/umd/indexes/trec45noCRFR.positional/doc-forward-index
+09/07/18 13:19:15 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 13:19:15 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 13:19:16 INFO mapred.LocalJobRunner: 
+09/07/18 13:19:17 INFO mapred.JobClient:  map 94% reduce 0%
+09/07/18 13:19:21 INFO mapred.LocalJobRunner: 
+09/07/18 13:19:21 INFO mapred.JobClient:  map 96% reduce 0%
+09/07/18 13:19:24 INFO mapred.LocalJobRunner: 
+09/07/18 13:19:24 INFO mapred.JobClient:  map 98% reduce 0%
+09/07/18 13:19:27 INFO mapred.LocalJobRunner: 
+09/07/18 13:19:27 INFO mapred.LocalJobRunner: 
+09/07/18 13:19:27 INFO mapred.TaskRunner: Task 'job_local_7_map_0018' done.
+09/07/18 13:19:27 INFO mapred.TaskRunner: Saved output of task 'job_local_7_map_0018' to file:/umd/indexes/trec45noCRFR.positional/doc-forward-index
+09/07/18 13:19:27 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 13:19:27 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 13:19:30 INFO mapred.LocalJobRunner: 
+09/07/18 13:19:30 INFO mapred.JobClient:  map 95% reduce 0%
+09/07/18 13:19:33 INFO mapred.LocalJobRunner: 
+09/07/18 13:19:33 INFO mapred.JobClient:  map 99% reduce 0%
+09/07/18 13:19:34 INFO mapred.LocalJobRunner: 
+09/07/18 13:19:34 INFO mapred.TaskRunner: Task 'job_local_7_map_0019' done.
+09/07/18 13:19:34 INFO mapred.TaskRunner: Saved output of task 'job_local_7_map_0019' to file:/umd/indexes/trec45noCRFR.positional/doc-forward-index
+09/07/18 13:19:34 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 13:19:34 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 13:19:36 INFO mapred.LocalJobRunner: 
+09/07/18 13:19:36 INFO mapred.JobClient:  map 95% reduce 0%
+09/07/18 13:19:40 INFO mapred.LocalJobRunner: 
+09/07/18 13:19:40 INFO mapred.JobClient:  map 98% reduce 0%
+09/07/18 13:19:41 INFO mapred.LocalJobRunner: 
+09/07/18 13:19:41 INFO mapred.TaskRunner: Task 'job_local_7_map_0020' done.
+09/07/18 13:19:41 INFO mapred.TaskRunner: Saved output of task 'job_local_7_map_0020' to file:/umd/indexes/trec45noCRFR.positional/doc-forward-index
+09/07/18 13:19:41 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 13:19:42 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 13:19:43 INFO mapred.LocalJobRunner: 
+09/07/18 13:19:43 INFO mapred.JobClient:  map 95% reduce 0%
+09/07/18 13:19:47 INFO mapred.LocalJobRunner: 
+09/07/18 13:19:48 INFO mapred.JobClient:  map 99% reduce 0%
+09/07/18 13:19:49 INFO mapred.LocalJobRunner: 
+09/07/18 13:19:49 INFO mapred.TaskRunner: Task 'job_local_7_map_0021' done.
+09/07/18 13:19:49 INFO mapred.TaskRunner: Saved output of task 'job_local_7_map_0021' to file:/umd/indexes/trec45noCRFR.positional/doc-forward-index
+09/07/18 13:19:49 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 13:19:49 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 13:19:50 INFO mapred.LocalJobRunner: 
+09/07/18 13:19:51 INFO mapred.JobClient:  map 95% reduce 0%
+09/07/18 13:19:55 INFO mapred.LocalJobRunner: 
+09/07/18 13:19:55 INFO mapred.JobClient:  map 99% reduce 0%
+09/07/18 13:19:56 INFO mapred.LocalJobRunner: 
+09/07/18 13:19:56 INFO mapred.TaskRunner: Task 'job_local_7_map_0022' done.
+09/07/18 13:19:56 INFO mapred.TaskRunner: Saved output of task 'job_local_7_map_0022' to file:/umd/indexes/trec45noCRFR.positional/doc-forward-index
+09/07/18 13:19:56 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 13:19:56 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 13:19:58 INFO mapred.LocalJobRunner: 
+09/07/18 13:19:58 INFO mapred.JobClient:  map 95% reduce 0%
+09/07/18 13:20:02 INFO mapred.LocalJobRunner: 
+09/07/18 13:20:02 INFO mapred.TaskRunner: Task 'job_local_7_map_0023' done.
+09/07/18 13:20:02 INFO mapred.TaskRunner: Saved output of task 'job_local_7_map_0023' to file:/umd/indexes/trec45noCRFR.positional/doc-forward-index
+09/07/18 13:20:02 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 13:20:02 INFO mapred.LocalJobRunner: 
+09/07/18 13:20:02 INFO mapred.JobClient:  map 96% reduce 0%
+09/07/18 13:20:08 INFO mapred.LocalJobRunner: 
+09/07/18 13:20:08 INFO mapred.LocalJobRunner: 
+09/07/18 13:20:08 INFO mapred.TaskRunner: Task 'job_local_7_map_0024' done.
+09/07/18 13:20:08 INFO mapred.TaskRunner: Saved output of task 'job_local_7_map_0024' to file:/umd/indexes/trec45noCRFR.positional/doc-forward-index
+09/07/18 13:20:08 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 13:20:08 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 13:20:11 INFO mapred.LocalJobRunner: 
+09/07/18 13:20:11 INFO mapred.JobClient:  map 96% reduce 0%
+09/07/18 13:20:14 INFO mapred.LocalJobRunner: 
+09/07/18 13:20:14 INFO mapred.JobClient:  map 99% reduce 0%
+09/07/18 13:20:15 INFO mapred.LocalJobRunner: 
+09/07/18 13:20:15 INFO mapred.TaskRunner: Task 'job_local_7_map_0025' done.
+09/07/18 13:20:15 INFO mapred.TaskRunner: Saved output of task 'job_local_7_map_0025' to file:/umd/indexes/trec45noCRFR.positional/doc-forward-index
+09/07/18 13:20:15 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 13:20:15 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 13:20:17 INFO mapred.LocalJobRunner: 
+09/07/18 13:20:17 INFO mapred.JobClient:  map 96% reduce 0%
+09/07/18 13:20:20 INFO mapred.LocalJobRunner: 
+09/07/18 13:20:20 INFO mapred.TaskRunner: Task 'job_local_7_map_0026' done.
+09/07/18 13:20:20 INFO mapred.TaskRunner: Saved output of task 'job_local_7_map_0026' to file:/umd/indexes/trec45noCRFR.positional/doc-forward-index
+09/07/18 13:20:20 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 13:20:20 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 13:20:21 INFO mapred.LocalJobRunner: 
+09/07/18 13:20:21 INFO mapred.JobClient:  map 96% reduce 0%
+09/07/18 13:20:26 INFO mapred.LocalJobRunner: 
+09/07/18 13:20:26 INFO mapred.LocalJobRunner: 
+09/07/18 13:20:26 INFO mapred.TaskRunner: Task 'job_local_7_map_0027' done.
+09/07/18 13:20:26 INFO mapred.TaskRunner: Saved output of task 'job_local_7_map_0027' to file:/umd/indexes/trec45noCRFR.positional/doc-forward-index
+09/07/18 13:20:26 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 13:20:26 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 13:20:29 INFO mapred.LocalJobRunner: 
+09/07/18 13:20:29 INFO mapred.JobClient:  map 96% reduce 0%
+09/07/18 13:20:32 INFO mapred.LocalJobRunner: 
+09/07/18 13:20:32 INFO mapred.TaskRunner: Task 'job_local_7_map_0028' done.
+09/07/18 13:20:32 INFO mapred.TaskRunner: Saved output of task 'job_local_7_map_0028' to file:/umd/indexes/trec45noCRFR.positional/doc-forward-index
+09/07/18 13:20:32 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 13:20:32 INFO mapred.LocalJobRunner: 
+09/07/18 13:20:38 INFO mapred.LocalJobRunner: 
+09/07/18 13:20:38 INFO mapred.JobClient:  map 99% reduce 0%
+09/07/18 13:20:40 INFO mapred.LocalJobRunner: 
+09/07/18 13:20:40 INFO mapred.TaskRunner: Task 'job_local_7_map_0029' done.
+09/07/18 13:20:40 INFO mapred.TaskRunner: Saved output of task 'job_local_7_map_0029' to file:/umd/indexes/trec45noCRFR.positional/doc-forward-index
+09/07/18 13:20:40 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 13:20:40 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 13:20:41 INFO mapred.LocalJobRunner: 
+09/07/18 13:20:41 INFO mapred.JobClient:  map 96% reduce 0%
+09/07/18 13:20:45 INFO mapred.LocalJobRunner: 
+09/07/18 13:20:45 INFO mapred.TaskRunner: Task 'job_local_7_map_0030' done.
+09/07/18 13:20:45 INFO mapred.TaskRunner: Saved output of task 'job_local_7_map_0030' to file:/umd/indexes/trec45noCRFR.positional/doc-forward-index
+09/07/18 13:20:45 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 13:20:45 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 13:20:46 INFO mapred.LocalJobRunner: 
+09/07/18 13:20:46 INFO mapred.JobClient:  map 96% reduce 0%
+09/07/18 13:20:50 INFO mapred.LocalJobRunner: 
+09/07/18 13:20:50 INFO mapred.TaskRunner: Task 'job_local_7_map_0031' done.
+09/07/18 13:20:50 INFO mapred.TaskRunner: Saved output of task 'job_local_7_map_0031' to file:/umd/indexes/trec45noCRFR.positional/doc-forward-index
+09/07/18 13:20:50 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 13:20:50 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 13:20:51 INFO mapred.LocalJobRunner: 
+09/07/18 13:20:51 INFO mapred.JobClient:  map 96% reduce 0%
+09/07/18 13:20:56 INFO mapred.LocalJobRunner: 
+09/07/18 13:20:56 INFO mapred.TaskRunner: Task 'job_local_7_map_0032' done.
+09/07/18 13:20:56 INFO mapred.TaskRunner: Saved output of task 'job_local_7_map_0032' to file:/umd/indexes/trec45noCRFR.positional/doc-forward-index
+09/07/18 13:20:56 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 13:20:56 INFO mapred.LocalJobRunner: 
+09/07/18 13:20:56 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 13:21:01 INFO mapred.LocalJobRunner: 
+09/07/18 13:21:01 INFO mapred.TaskRunner: Task 'job_local_7_map_0033' done.
+09/07/18 13:21:01 INFO mapred.TaskRunner: Saved output of task 'job_local_7_map_0033' to file:/umd/indexes/trec45noCRFR.positional/doc-forward-index
+09/07/18 13:21:01 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 13:21:01 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 13:21:02 INFO mapred.LocalJobRunner: 
+09/07/18 13:21:02 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 13:21:06 INFO mapred.LocalJobRunner: 
+09/07/18 13:21:06 INFO mapred.TaskRunner: Task 'job_local_7_map_0034' done.
+09/07/18 13:21:06 INFO mapred.TaskRunner: Saved output of task 'job_local_7_map_0034' to file:/umd/indexes/trec45noCRFR.positional/doc-forward-index
+09/07/18 13:21:06 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 13:21:06 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 13:21:07 INFO mapred.LocalJobRunner: 
+09/07/18 13:21:07 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 13:21:12 INFO mapred.LocalJobRunner: 
+09/07/18 13:21:12 INFO mapred.TaskRunner: Task 'job_local_7_map_0035' done.
+09/07/18 13:21:12 INFO mapred.TaskRunner: Saved output of task 'job_local_7_map_0035' to file:/umd/indexes/trec45noCRFR.positional/doc-forward-index
+09/07/18 13:21:12 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 13:21:12 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 13:21:12 INFO mapred.LocalJobRunner: 
+09/07/18 13:21:13 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 13:21:17 INFO mapred.LocalJobRunner: 
+09/07/18 13:21:17 INFO mapred.TaskRunner: Task 'job_local_7_map_0036' done.
+09/07/18 13:21:17 INFO mapred.TaskRunner: Saved output of task 'job_local_7_map_0036' to file:/umd/indexes/trec45noCRFR.positional/doc-forward-index
+09/07/18 13:21:17 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 13:21:17 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 13:21:18 INFO mapred.LocalJobRunner: 
+09/07/18 13:21:18 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 13:21:22 INFO mapred.LocalJobRunner: 
+09/07/18 13:21:22 INFO mapred.TaskRunner: Task 'job_local_7_map_0037' done.
+09/07/18 13:21:22 INFO mapred.TaskRunner: Saved output of task 'job_local_7_map_0037' to file:/umd/indexes/trec45noCRFR.positional/doc-forward-index
+09/07/18 13:21:22 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 13:21:22 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 13:21:23 INFO mapred.LocalJobRunner: 
+09/07/18 13:21:23 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 13:21:27 INFO mapred.LocalJobRunner: 
+09/07/18 13:21:27 INFO mapred.TaskRunner: Task 'job_local_7_map_0038' done.
+09/07/18 13:21:27 INFO mapred.TaskRunner: Saved output of task 'job_local_7_map_0038' to file:/umd/indexes/trec45noCRFR.positional/doc-forward-index
+09/07/18 13:21:27 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 13:21:27 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 13:21:28 INFO mapred.LocalJobRunner: 
+09/07/18 13:21:28 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 13:21:33 INFO mapred.LocalJobRunner: 
+09/07/18 13:21:33 INFO mapred.TaskRunner: Task 'job_local_7_map_0039' done.
+09/07/18 13:21:33 INFO mapred.TaskRunner: Saved output of task 'job_local_7_map_0039' to file:/umd/indexes/trec45noCRFR.positional/doc-forward-index
+09/07/18 13:21:33 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 13:21:33 INFO mapred.LocalJobRunner: 
+09/07/18 13:21:38 INFO mapred.LocalJobRunner: 
+09/07/18 13:21:38 INFO mapred.TaskRunner: Task 'job_local_7_map_0040' done.
+09/07/18 13:21:38 INFO mapred.TaskRunner: Saved output of task 'job_local_7_map_0040' to file:/umd/indexes/trec45noCRFR.positional/doc-forward-index
+09/07/18 13:21:38 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 13:21:38 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 13:21:39 INFO mapred.LocalJobRunner: 
+09/07/18 13:21:39 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 13:21:43 INFO mapred.LocalJobRunner: 
+09/07/18 13:21:43 INFO mapred.TaskRunner: Task 'job_local_7_map_0041' done.
+09/07/18 13:21:43 INFO mapred.TaskRunner: Saved output of task 'job_local_7_map_0041' to file:/umd/indexes/trec45noCRFR.positional/doc-forward-index
+09/07/18 13:21:43 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 13:21:43 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 13:21:44 INFO mapred.LocalJobRunner: 
+09/07/18 13:21:44 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 13:21:48 INFO mapred.LocalJobRunner: 
+09/07/18 13:21:48 INFO mapred.TaskRunner: Task 'job_local_7_map_0042' done.
+09/07/18 13:21:48 INFO mapred.TaskRunner: Saved output of task 'job_local_7_map_0042' to file:/umd/indexes/trec45noCRFR.positional/doc-forward-index
+09/07/18 13:21:48 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 13:21:48 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 13:21:49 INFO mapred.LocalJobRunner: 
+09/07/18 13:21:49 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 13:21:54 INFO mapred.LocalJobRunner: 
+09/07/18 13:21:54 INFO mapred.TaskRunner: Task 'job_local_7_map_0043' done.
+09/07/18 13:21:54 INFO mapred.TaskRunner: Saved output of task 'job_local_7_map_0043' to file:/umd/indexes/trec45noCRFR.positional/doc-forward-index
+09/07/18 13:21:54 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 13:21:54 INFO mapred.LocalJobRunner: 
+09/07/18 13:21:59 INFO mapred.LocalJobRunner: 
+09/07/18 13:21:59 INFO mapred.TaskRunner: Task 'job_local_7_map_0044' done.
+09/07/18 13:21:59 INFO mapred.TaskRunner: Saved output of task 'job_local_7_map_0044' to file:/umd/indexes/trec45noCRFR.positional/doc-forward-index
+09/07/18 13:21:59 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 13:21:59 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 13:22:00 INFO mapred.LocalJobRunner: 
+09/07/18 13:22:00 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 13:22:04 INFO mapred.LocalJobRunner: 
+09/07/18 13:22:04 INFO mapred.TaskRunner: Task 'job_local_7_map_0045' done.
+09/07/18 13:22:04 INFO mapred.TaskRunner: Saved output of task 'job_local_7_map_0045' to file:/umd/indexes/trec45noCRFR.positional/doc-forward-index
+09/07/18 13:22:04 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 13:22:04 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 13:22:05 INFO mapred.LocalJobRunner: 
+09/07/18 13:22:05 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 13:22:09 INFO mapred.LocalJobRunner: 
+09/07/18 13:22:09 INFO mapred.TaskRunner: Task 'job_local_7_map_0046' done.
+09/07/18 13:22:09 INFO mapred.TaskRunner: Saved output of task 'job_local_7_map_0046' to file:/umd/indexes/trec45noCRFR.positional/doc-forward-index
+09/07/18 13:22:09 INFO mapred.MapTask: numReduceTasks: 1
+09/07/18 13:22:09 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 13:22:10 INFO mapred.LocalJobRunner: 
+09/07/18 13:22:10 INFO mapred.JobClient:  map 97% reduce 0%
+09/07/18 13:22:11 INFO mapred.LocalJobRunner: 
+09/07/18 13:22:11 INFO mapred.TaskRunner: Task 'job_local_7_map_0047' done.
+09/07/18 13:22:11 INFO mapred.TaskRunner: Saved output of task 'job_local_7_map_0047' to file:/umd/indexes/trec45noCRFR.positional/doc-forward-index
+09/07/18 13:22:11 INFO mapred.JobClient:  map 100% reduce 0%
+09/07/18 13:22:16 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:22:16 INFO mapred.TaskRunner: Task 'reduce_eewjju' done.
+09/07/18 13:22:16 INFO mapred.TaskRunner: Saved output of task 'reduce_eewjju' to file:/umd/indexes/trec45noCRFR.positional/doc-forward-index
+09/07/18 13:22:16 INFO mapred.JobClient: Job complete: job_local_7
+09/07/18 13:22:16 INFO mapred.JobClient: Counters: 12
+09/07/18 13:22:16 INFO mapred.JobClient:   ivory.collection.trec.BuildTrecForwardIndex$Count
+09/07/18 13:22:16 INFO mapred.JobClient:     DOCS=472525
+09/07/18 13:22:16 INFO mapred.JobClient:   File Systems
+09/07/18 13:22:16 INFO mapred.JobClient:     Local bytes read=700446184228
+09/07/18 13:22:16 INFO mapred.JobClient:     Local bytes written=469457209312
+09/07/18 13:22:16 INFO mapred.JobClient:   Map-Reduce Framework
+09/07/18 13:22:16 INFO mapred.JobClient:     Map input records=472525
+09/07/18 13:22:16 INFO mapred.JobClient:     Map output records=472525
+09/07/18 13:22:16 INFO mapred.JobClient:     Map input bytes=1584773983
+09/07/18 13:22:16 INFO mapred.JobClient:     Map output bytes=9047732
+09/07/18 13:22:16 INFO mapred.JobClient:     Combine input records=0
+09/07/18 13:22:16 INFO mapred.JobClient:     Combine output records=0
+09/07/18 13:22:16 INFO mapred.JobClient:     Reduce input groups=472525
+09/07/18 13:22:16 INFO mapred.JobClient:     Reduce input records=472525
+09/07/18 13:22:16 INFO mapred.JobClient:     Reduce output records=472525
+09/07/18 13:22:16 INFO trec.BuildTrecForwardIndex: Writing doc offset data to /umd/indexes/trec45noCRFR.positional/doc-forward-index.dat
+09/07/18 13:22:17 INFO trec.BuildTrecForwardIndex: 100000 docs
+09/07/18 13:22:17 INFO mapred.LocalJobRunner: reduce > reduce
+09/07/18 13:22:17 INFO trec.BuildTrecForwardIndex: 200000 docs
+09/07/18 13:22:18 INFO trec.BuildTrecForwardIndex: 300000 docs
+09/07/18 13:22:18 INFO trec.BuildTrecForwardIndex: 400000 docs
+09/07/18 13:22:18 INFO trec.BuildTrecForwardIndex: 472525 docs total. Done!
