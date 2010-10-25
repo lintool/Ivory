@@ -134,7 +134,7 @@ public class GetTermCount extends PowerTool {
 	}
 
 	public static final String[] RequiredParameters = { "Ivory.NumMapTasks",
-			"Ivory.CollectionName", "Ivory.IndexPath", "Ivory.MinDf", "Ivory.MaxDf", };
+			"Ivory.CollectionName", "Ivory.IndexPath", "Ivory.MinDf", "Ivory.MaxDf" };
 
 	public String[] getRequiredParameters() {
 		return RequiredParameters;

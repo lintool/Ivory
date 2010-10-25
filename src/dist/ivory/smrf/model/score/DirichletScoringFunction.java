@@ -28,27 +28,27 @@ import org.w3c.dom.Node;
  */
 public class DirichletScoringFunction extends ScoringFunction {
 
-	// Smoothing parameter
-	private double mMu = 2500.0;
+	// Smoothing parameter.
+	private float mMu = 2500.0f;
 
-	// background probability
-	private double mBackgroundProb;
+	// Background probability.
+	private float mBackgroundProb;
 
 	// is this term OOV?
 	private boolean mOOV = false;
 
 	@Override
 	public void configure(Node domNode) {
-		double mu = XMLTools.getAttributeValue(domNode, "mu", 2500.0);
-		mMu = mu;
+		mMu = XMLTools.getAttributeValue(domNode, "mu", 2500.0f);
 	}
 
 	@Override
-	public double getScore(double tf, int docLen) {
+	public float getScore(int tf, int docLen) {
 		if (mOOV) {
-			return 0.0;
+			return 0.0f;
 		}
-		return Math.log((tf + mMu * mBackgroundProb) / (docLen + mMu));
+
+		return (float) Math.log(((float) tf + mMu * mBackgroundProb) / (docLen + mMu));
 	}
 
 	@Override
@@ -59,11 +59,12 @@ public class DirichletScoringFunction extends ScoringFunction {
 	@Override
 	public void initialize(GlobalTermEvidence termEvidence, GlobalEvidence globalEvidence) {
 		mOOV = termEvidence.cf == 0 ? true : false;
-		mBackgroundProb = (double) termEvidence.cf / (double) globalEvidence.collectionLength;
+		mBackgroundProb = (float) termEvidence.cf / (float) globalEvidence.collectionLength;
 	}
 
-	public double getMaxScore() {
+	@Override
+	public float getMaxScore() {
 		// TODO: make a tighter upper bound for this score
-		return 0.0;
+		return 0.0f;
 	}
 }

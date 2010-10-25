@@ -16,10 +16,13 @@
 
 package ivory.smrf.model.score;
 
+import ivory.exception.ConfigurationException;
 import ivory.smrf.model.GlobalEvidence;
 import ivory.smrf.model.GlobalTermEvidence;
 
 import org.w3c.dom.Node;
+
+import com.google.common.base.Preconditions;
 
 /**
  * @author Don Metzler
@@ -27,33 +30,26 @@ import org.w3c.dom.Node;
  */
 public abstract class ScoringFunction {
 
-	public abstract void configure(Node domNode);
+	public void configure(Node domNode) {
+	}
 
-	/**
-	 * @param termEvidence
-	 * @param globalEvidence
-	 */
-	public abstract void initialize(GlobalTermEvidence termEvidence, GlobalEvidence globalEvidence);
+	public void initialize(GlobalTermEvidence termEvidence, GlobalEvidence globalEvidence) {
+	}
 
-	/**
-	 * @param tf
-	 * @param docLen
-	 */
-	public abstract double getScore(double tf, int docLen);
+	public abstract float getScore(int tf, int docLen);
 
-	public double getMaxScore() {
-		return Double.POSITIVE_INFINITY;
+	public float getMaxScore() {
+		return Float.POSITIVE_INFINITY;
 	}
 
 	@SuppressWarnings("unchecked")
-	public static ScoringFunction create(String functionType, Node functionNode) throws Exception {
-		if (functionNode == null) {
-			throw new Exception("Unable to generate a ScoringFunction from a null node!");
-		}
+	public static ScoringFunction create(String functionType, Node functionNode)
+			throws ConfigurationException {
+		Preconditions.checkNotNull(functionType);
+		Preconditions.checkNotNull(functionNode);
 
 		try {
-			Class<? extends ScoringFunction> clz = (Class<? extends ScoringFunction>) Class
-					.forName(functionType);
+			Class<? extends ScoringFunction> clz = (Class<? extends ScoringFunction>) Class.forName(functionType);
 			ScoringFunction f = clz.newInstance();
 
 			f.configure(functionNode);
@@ -61,8 +57,7 @@ public abstract class ScoringFunction {
 			return f;
 		} catch (Exception e) {
 			e.printStackTrace();
-			throw new RuntimeException("Error: Unable to instantiate scoring function!");
+			throw new ConfigurationException("Unable to instantiate scoring function \"" + functionType + "\"!");
 		}
 	}
-
 }

@@ -17,6 +17,7 @@
 package ivory.server;
 
 import ivory.smrf.model.builder.MRFBuilder;
+import ivory.smrf.model.importance.ConceptImportanceModel;
 import ivory.smrf.retrieval.Accumulator;
 import ivory.smrf.retrieval.QueryRunner;
 import ivory.smrf.retrieval.ThreadedQueryRunner;
@@ -35,6 +36,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.Context;
@@ -53,15 +55,18 @@ import edu.umd.cloud9.collection.Indexable;
  */
 public class RetrievalServer {
 	private static final Logger sLogger = Logger.getLogger(RetrievalServer.class);
+	/*{
+		sLogger.setLevel(Level.INFO);
+	}*/
 
 	private QueryRunner mQueryRunner;
-	private RetrievalEnvironment mEnv;
+	private RetrievalEnvironment mEnv=null;
 	private DocnoMapping mDocnoMapping;
 	private DocumentForwardIndex<Indexable> mForwardIndex;
 	private String mSid;
 
-	@SuppressWarnings("unchecked")
 	public void initialize(String sid, String config, FileSystem fs) {
+		System.out.println("$$ Initializing RetrievalServer for \"" + sid + "\"...");
 		sLogger.info("Initializing RetrievalServer for \"" + sid + "\"...");
 
 		mSid = sid;
@@ -95,6 +100,15 @@ public class RetrievalServer {
 					sLogger.info(" - index: " + child.getTextContent().trim());
 
 					indexPath = child.getTextContent().trim();
+					if(mEnv == null){
+						try {
+							mEnv = new RetrievalEnvironment(indexPath, fs);
+							mEnv.initialize(true);
+						} catch (Exception e) {
+							e.printStackTrace();
+							throw new RuntimeException();
+						}
+					}
 				}
 
 				if ("findex".equals(child.getNodeName())) {
@@ -102,6 +116,63 @@ public class RetrievalServer {
 
 					// initialize forward index
 					findexPath = child.getTextContent().trim();
+				}
+
+				if ("docscore".equals(child.getNodeName())) {
+					sLogger.info(" - docscore: " + child.getTextContent().trim());
+
+					String type = XMLTools.getAttributeValue(child, "type", "");
+					String provider = XMLTools.getAttributeValue(child, "provider", "");
+					String path = child.getTextContent();
+
+					if (type.equals("") || provider.equals("") || path.equals("")) {
+						throw new RuntimeException("Invalid docscore!");
+					}
+					System.out.println("$$ Loading docscore: type=" + type + ", provider=" +
+							provider + ", path="
+							+ path);
+					sLogger.info("Loading docscore: type=" + type + ", provider=" +
+							provider + ", path="
+							+ path);
+
+					if(mEnv == null){
+						try {
+							mEnv = new RetrievalEnvironment(indexPath, fs);
+							mEnv.initialize(true);
+						} catch (Exception e) {
+							e.printStackTrace();
+							throw new RuntimeException();
+						}
+					}
+					mEnv.loadDocScore(type, provider, path);
+				}
+				
+				if("importancemodel".equals(child.getNodeName())) {
+					sLogger.info(" - importancemodel: " + child.getTextContent().trim());
+					
+					String importanceModelId = XMLTools.getAttributeValue(child, "id", null);
+					if(importanceModelId == null) {
+						throw new RuntimeException("Invalid importance model!");
+					}
+					
+					ConceptImportanceModel importanceModel = null;
+					try {
+						importanceModel = ConceptImportanceModel.get(child);
+					}
+					catch(Exception e) {
+						throw new RuntimeException(e);
+					}
+					
+					if(mEnv == null){
+						try {
+							mEnv = new RetrievalEnvironment(indexPath, fs);
+							mEnv.initialize(true);
+						} catch (Exception e) {
+							e.printStackTrace();
+							throw new RuntimeException();
+						}
+					}
+					mEnv.addImportanceModel(importanceModelId, importanceModel);
 				}
 
 			}
@@ -113,32 +184,14 @@ public class RetrievalServer {
 			if (findexPath == null)
 				sLogger.warn("forward index not specified: will not be able to access documents.");
 		}
-
-		try {
-			mEnv = new RetrievalEnvironment(indexPath, fs);
-			mEnv.initialize(true);
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new RuntimeException();
-		}
-
-		NodeList docscores = d.getElementsByTagName("docscore");
-		for (int j = 0; j < docscores.getLength(); j++) {
-			// model XML node
-			Node dscore = docscores.item(j);
-			
-			String type = XMLTools.getAttributeValue(dscore, "type", "");
-			String provider = XMLTools.getAttributeValue(dscore, "provider", "");
-			String path = dscore.getTextContent();
-
-			if (type.equals("") || provider.equals("") || path.equals("")) {
-				throw new RuntimeException("Invalid docscore!");
+		if(mEnv == null){
+			try {
+				mEnv = new RetrievalEnvironment(indexPath, fs);
+				mEnv.initialize(true);
+			} catch (Exception e) {
+				e.printStackTrace();
+				throw new RuntimeException();
 			}
-
-			 sLogger.info("Loading docscore: type=" + type + ", provider=" +
-			 provider + ", path="
-			 + path);
-			mEnv.loadDocScore(type, provider, path);
 		}
 
 		try {
@@ -146,11 +199,14 @@ public class RetrievalServer {
 
 			MRFBuilder builder = MRFBuilder.get(mEnv, modelNode.cloneNode(true));
 
-			// Set the number of hits to 2000 because that's what we had in our
+			
+			// Set the default number of hits to 2000 because that's what we had in our
 			// official TREC 2009 web track runs; otherwise, IF merging approach
 			// will give slightly different results, so we won't be able to
 			// replicate results...
-			mQueryRunner = new ThreadedQueryRunner(builder, null, 1, 2000);
+			//mQueryRunner = new ThreadedQueryRunner(builder, null, 1, 2000);
+			int hits = Integer.parseInt(XMLTools.getAttributeValue(modelNode, "hits", 2000+""));
+			mQueryRunner = new ThreadedQueryRunner(builder, null, 1, hits);
 
 			// load docno/docid mapping
 			try {
@@ -172,7 +228,7 @@ public class RetrievalServer {
 
 				try {
 					mForwardIndex = (DocumentForwardIndex<Indexable>) Class.forName(indexClass)
-							.newInstance();
+					.newInstance();
 					mForwardIndex.loadIndex(findexPath, mEnv
 							.getDocnoMappingData());
 				} catch (Exception e) {
@@ -275,12 +331,12 @@ public class RetrievalServer {
 		}
 
 		public void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException,
-				IOException {
+		IOException {
 			doPost(req, res);
 		}
 
 		public void doPost(HttpServletRequest req, HttpServletResponse res)
-				throws ServletException, IOException {
+		throws ServletException, IOException {
 			sLogger.info("Triggered servlet for direct querying");
 			res.setContentType("text/html");
 			PrintWriter out = res.getWriter();
@@ -339,12 +395,12 @@ public class RetrievalServer {
 		}
 
 		public void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException,
-				IOException {
+		IOException {
 			doPost(req, res);
 		}
 
 		public void doPost(HttpServletRequest req, HttpServletResponse res)
-				throws ServletException, IOException {
+		throws ServletException, IOException {
 			sLogger.info("Broker triggered servlet for running queries");
 			res.setContentType("text/html");
 
@@ -386,12 +442,12 @@ public class RetrievalServer {
 		}
 
 		public void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException,
-				IOException {
+		IOException {
 			doPost(req, res);
 		}
 
 		public void doPost(HttpServletRequest req, HttpServletResponse res)
-				throws ServletException, IOException {
+		throws ServletException, IOException {
 			sLogger.info("triggered servlet for fetching document by docno");
 
 			if (mForwardIndex == null) {

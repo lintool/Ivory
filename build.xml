@@ -35,6 +35,9 @@
 		</javac>
 		<javac classpathref="classpath" srcdir="${src}/dist-test" destdir="${build}" optimize="on" debug="on">
 		</javac>
+		<!-- javac classpathref="classpath" srcdir="${src}/sandbox" destdir="${build}" optimize="on" debug="on" -->
+			<!-- compilerarg value="-Xlint:unchecked"/ uncomment this to check for generics -->
+		<!-- /javac -->
 	</target>
 
 	<target name="lib" depends="compile" description="generate the distribution">
@@ -48,7 +51,7 @@
 
 	<target name="test" depends="lib" description="Execute Unit Tests">
 		<mkdir dir="${test}" />
-		<junit printsummary="yes" fork="yes" maxmemory="1024m">
+		<junit printsummary="yes" fork="yes" maxmemory="2048m">
 			<sysproperty key="java.library.path" path="${lib}" />
 			<sysproperty key="org.xml.sax.driver" value="org.apache.xerces.parsers.SAXParser" />
 			<classpath refid="classpath" />
@@ -58,6 +61,8 @@
 				<fileset dir="${build}">
 					<include name="**/*Test.class" />
 					<include name="ivory/regression/*.class" />
+					<exclude name="ivory/regression/GroundTruth*.class" />
+					<exclude name="ivory/regression/RegressionUtils.class" />
 				</fileset>
 			</batchtest>
 		</junit>

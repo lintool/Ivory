@@ -16,6 +16,7 @@
 
 package ivory.smrf.model.builder;
 
+import ivory.exception.ConfigurationException;
 import ivory.smrf.model.Clique;
 import ivory.smrf.model.DocumentNode;
 import ivory.smrf.model.GraphNode;
@@ -29,54 +30,60 @@ import java.util.ArrayList;
 
 import org.w3c.dom.Node;
 
+import com.google.common.base.Preconditions;
+
 /**
  * @author Don Metzler
- * 
  */
 public class TermCliqueSet extends CliqueSet {
 
+	public static final String TYPE = "Term";
+	
 	@Override
-	public void configure(RetrievalEnvironment env, String[] queryTerms, Node domNode)
-			throws Exception {
+	public void configure(RetrievalEnvironment env, String[] queryTerms, Node domNode) throws ConfigurationException {
+		Preconditions.checkNotNull(env);
+		Preconditions.checkNotNull(queryTerms);
+		Preconditions.checkNotNull(domNode);
+
 		boolean docDependent = XMLTools.getAttributeValue(domNode, "docDependent", true);
 
-		// initialize clique set
-		cliques = new ArrayList<Clique>();
+		// Initialize clique set.
+		clearCliques();
 
-		// the document node
+		// The document node.
 		DocumentNode docNode = new DocumentNode();
 
-		// default parameter associated with clique set
-		Parameter termParameter = new Parameter(Parameter.DEFAULT, 1.0);
+		// Default parameter associated with clique set.
+		Parameter termParameter = new Parameter(Parameter.DEFAULT, 1.0f);
 
-		// get potential type
+		// Get potential type.
 		String potentialType = XMLTools.getAttributeValue(domNode, "potential", null);
 		if (potentialType == null) {
-			throw new Exception(
-					"A potential attribute must be specified in order to generate a clique set!");
+			throw new ConfigurationException("A potential attribute must be specified in order to generate a CliqueSet!");
 		}
 
-		// add clique for each query term
+		// Add clique for each query term.
 		for (String element : queryTerms) {
-			// add term node
+			// Add term node.
 			TermNode termNode = new TermNode(element);
 
-			// add document/term clique
+			// Add document/term clique.
 			ArrayList<GraphNode> cliqueNodes = new ArrayList<GraphNode>();
 			if (docDependent) {
 				cliqueNodes.add(docNode);
 			}
 			cliqueNodes.add(termNode);
 
-			// get the potential function
+			// Get the potential function.
 			PotentialFunction potential = PotentialFunction.create(env, potentialType, domNode);
 
 			Clique c = new Clique(cliqueNodes, potential, termParameter);
-			cliques.add(c);
+			addClique(c);
 		}
 	}
 
+	@Override
 	public String getType() {
-		return "Term";
+		return TYPE;
 	}
 }

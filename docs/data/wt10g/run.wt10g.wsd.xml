@@ -2,12 +2,14 @@
 
      <index>/fs/clip-hadoop/indexes/wt10g</index>
      <!-- Dirichlet, WSD, sequential dependence -->
-     <model id="wt10g-wsd-sd" type="WSD" output="/tmp/ranking.wt10g-dir-wsd-sd.txt" hits="1000" collection="wt10g">
+     <model id="wt10g-wsd-sd" type="Feature" output="/tmp/ranking.wt10g-dir-wsd-sd.txt" hits="1000" collection="wt10g">
          
-         <metaFeature id="collection_freq" weight="0.0756" file="/fs/clip-trec/trunk1/docs/data/wt10g/stats.wt10g.cf.collection.txt" />
-         <metaFeature id="document_freq" weight = "0.6256" file="/fs/clip-trec/trunk1/docs/data/wt10g/stats.wt10g.df.collection.txt" />
-         <metaFeature id="clue_cf" weight = "0.000695" file="/fs/clip-trec/trunk1/docs/data/wt10g/stats.wt10g.cf.clue.txt" />
-         <metaFeature id="enwiki_cf" weight = "0.2980" file="/fs/clip-trec/trunk1/docs/data/wt10g/stats.wt10g.cf.enwiki.txt" />
+         <importancemodel type="ivory.smrf.model.importance.LinearImportanceModel">
+             <feature id="collection_freq" weight="0.0756" file="/fs/clip-trec/trunk1/docs/data/wt10g/stats.wt10g.cf.collection.txt.norm" default="0.0"/>
+	     <feature id="document_freq" weight = "0.6256" file="/fs/clip-trec/trunk1/docs/data/wt10g/stats.wt10g.df.collection.txt.norm" default="0.0114" />
+	     <feature id="clue_cf" weight = "0.000695" file="/fs/clip-trec/trunk1/docs/data/wt10g/stats.wt10g.cf.clue.txt.norm" default="0.0" />
+	     <feature id="enwiki_cf" weight = "0.2980" file="/fs/clip-trec/trunk1/docs/data/wt10g/stats.wt10g.cf.enwiki.txt.norm" default="0.)" />
+	 </importancemodel>
          
          <feature id="termWt" weight="0.82"
                   cliqueSet="ivory.smrf.model.builder.TermCliqueSet"   
@@ -27,12 +29,14 @@
      </model>     
 
      <!-- Dirichlet, WSD, full dependence -->
-     <model id="wt10g-wsd-fd" type="WSD" output="/tmp/ranking.wt10g-dir-wsd-fd.txt" hits="1000" collection="wt10g">
+     <model id="wt10g-wsd-fd" type="Feature" output="/tmp/ranking.wt10g-dir-wsd-fd.txt" hits="1000" collection="wt10g">
 
-         <metaFeature id="collection_freq" weight="0.0756" file="/fs/clip-trec/trunk1/docs/data/wt10g/stats.wt10g.cf.collection.txt" />
-         <metaFeature id="document_freq" weight = "0.6256" file="/fs/clip-trec/trunk1/docs/data/wt10g/stats.wt10g.df.collection.txt" />
-         <metaFeature id="clue_cf" weight = "0.000695" file="/fs/clip-trec/trunk1/docs/data/wt10g/stats.wt10g.cf.clue.txt" />
-         <metaFeature id="enwiki_cf" weight = "0.2980" file="/fs/clip-trec/trunk1/docs/data/wt10g/stats.wt10g.cf.enwiki.txt" />
+         <importancemodel type="ivory.smrf.model.importance.LinearImportanceModel">
+             <feature id="collection_freq" weight="0.0756" file="/fs/clip-trec/trunk1/docs/data/wt10g/stats.wt10g.cf.collection.txt.norm" default="0.0"/>
+	     <feature id="document_freq" weight = "0.6256" file="/fs/clip-trec/trunk1/docs/data/wt10g/stats.wt10g.df.collection.txt.norm" default="0.0114" />
+	     <feature id="clue_cf" weight = "0.000695" file="/fs/clip-trec/trunk1/docs/data/wt10g/stats.wt10g.cf.clue.txt.norm" default="0.0" />
+	     <feature id="enwiki_cf" weight = "0.2980" file="/fs/clip-trec/trunk1/docs/data/wt10g/stats.wt10g.cf.enwiki.txt.norm" default="0.0" />
+	 </importancemodel>
          
          <feature id="termWt" weight="0.82"
                   cliqueSet="ivory.smrf.model.builder.TermCliqueSet"

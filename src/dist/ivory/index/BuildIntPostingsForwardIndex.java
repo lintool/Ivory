@@ -92,15 +92,21 @@ public class BuildIntPostingsForwardIndex extends PowerTool {
 		int mCurKeyIndex = 0;
 
 		public void configure(JobConf job) {
-			FileSystem fS;
+			FileSystem fs;
 			try {
-				fS = FileSystem.get(job);
+				fs = FileSystem.get(job);
 			} catch (Exception e) {
-				throw new RuntimeException("Error in opening FileSystem!");
+				throw new RuntimeException("Error opening the FileSystem!");
 			}
 
 			String indexPath = job.get("Ivory.IndexPath");
-			RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fS);
+			
+			RetrievalEnvironment env = null;
+			try {
+				env = new RetrievalEnvironment(indexPath, fs);
+			} catch (IOException e) {
+				throw new RuntimeException("Unable to create RetrievalEnvironment!");
+			}
 
 			mPositionsFile = env.getPostingsIndexData();
 			mCollectionTermCount = env.readCollectionTermCount();
@@ -109,7 +115,7 @@ public class BuildIntPostingsForwardIndex extends PowerTool {
 			sLogger.info("Ivory.CollectionTermCount: " + mCollectionTermCount);
 
 			try {
-				mOut = fS.create(new Path(mPositionsFile), true);
+				mOut = fs.create(new Path(mPositionsFile), true);
 				mOut.writeInt(mCollectionTermCount);
 			} catch (Exception e) {
 				throw new RuntimeException("Error in creating files!");

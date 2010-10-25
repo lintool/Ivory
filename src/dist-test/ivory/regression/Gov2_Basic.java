@@ -1,8 +1,7 @@
 package ivory.regression;
 
-import static org.junit.Assert.assertEquals;
 import ivory.eval.Qrels;
-import ivory.eval.RankedListEvaluator;
+import ivory.regression.GroundTruth.Metric;
 import ivory.smrf.retrieval.Accumulator;
 import ivory.smrf.retrieval.BatchQueryRunner;
 
@@ -406,31 +405,29 @@ public class Gov2_Basic {
 			"1.0000", "844", "0.1000", "845", "0.7000", "846", "0.8000", "847", "0.9000", "848",
 			"0.4000", "849", "0.9000", "850", "0.7000" };
 
-	private static Qrels sQrels;
-	private static DocnoMapping sMapping;
-
 	@Test
 	public void runRegression() throws Exception {
+		Map<String, GroundTruth> g = new HashMap<String, GroundTruth>();
 
-		Map<String, Map<String, Float>> AllModelsAPScores = new HashMap<String, Map<String, Float>>();
+		// One topic didn't contain qrels, so trec_eval only picked up 149.
+		g.put("gov2-dir-base", new GroundTruth(Metric.AP, 149, sDirBaseRawAP, 0.3077f));
+		g.put("gov2-dir-sd", new GroundTruth(Metric.AP, 149, sDirSDRawAP, 0.3239f));
+		g.put("gov2-dir-fd", new GroundTruth(Metric.AP, 149, sDirFDRawAP, 0.3235f));
+		g.put("gov2-bm25-base", new GroundTruth(Metric.AP, 149, sBm25BaseRawAP, 0.2999f));
+		g.put("gov2-bm25-sd", new GroundTruth(Metric.AP, 149, sBm25SDRawAP, 0.3294f));
+		g.put("gov2-bm25-fd", new GroundTruth(Metric.AP, 149, sBm25FDRawAP, 0.3306f));
 
-		AllModelsAPScores.put("gov2-dir-base", loadScoresIntoMap(sDirBaseRawAP));
-		AllModelsAPScores.put("gov2-dir-sd", loadScoresIntoMap(sDirSDRawAP));
-		AllModelsAPScores.put("gov2-dir-fd", loadScoresIntoMap(sDirFDRawAP));
-		AllModelsAPScores.put("gov2-bm25-base", loadScoresIntoMap(sBm25BaseRawAP));
-		AllModelsAPScores.put("gov2-bm25-sd", loadScoresIntoMap(sBm25SDRawAP));
-		AllModelsAPScores.put("gov2-bm25-fd", loadScoresIntoMap(sBm25FDRawAP));
+		Map<String, GroundTruth> h = new HashMap<String, GroundTruth>();
 
-		Map<String, Map<String, Float>> AllModelsP10Scores = new HashMap<String, Map<String, Float>>();
+		// One topic didn't contain qrels, so trec_eval only picked up 149.
+		h.put("gov2-dir-base", new GroundTruth(Metric.P10, 149, sDirBaseRawP10, 0.5631f));
+		h.put("gov2-dir-sd", new GroundTruth(Metric.P10, 149, sDirSDRawP10, 0.6007f));
+		h.put("gov2-dir-fd", new GroundTruth(Metric.P10, 149, sDirFDRawP10, 0.5980f));
+		h.put("gov2-bm25-base", new GroundTruth(Metric.P10, 149, sBm25BaseRawP10, 0.5846f));
+		h.put("gov2-bm25-sd", new GroundTruth(Metric.P10, 149, sBm25SDRawP10, 0.6081f));
+		h.put("gov2-bm25-fd", new GroundTruth(Metric.P10, 149, sBm25FDRawP10, 0.6168f));
 
-		AllModelsP10Scores.put("gov2-dir-base", loadScoresIntoMap(sDirBaseRawP10));
-		AllModelsP10Scores.put("gov2-dir-sd", loadScoresIntoMap(sDirSDRawP10));
-		AllModelsP10Scores.put("gov2-dir-fd", loadScoresIntoMap(sDirFDRawP10));
-		AllModelsP10Scores.put("gov2-bm25-base", loadScoresIntoMap(sBm25BaseRawP10));
-		AllModelsP10Scores.put("gov2-bm25-sd", loadScoresIntoMap(sBm25SDRawP10));
-		AllModelsP10Scores.put("gov2-bm25-fd", loadScoresIntoMap(sBm25FDRawP10));
-
-		sQrels = new Qrels("docs/data/gov2/qrels.gov2.all");
+		Qrels qrels = new Qrels("docs/data/gov2/qrels.gov2.all");
 
 		String[] params = new String[] { "docs/data/gov2/run.gov2.basic.xml",
 				"docs/data/gov2/gov2.title.701-775",
@@ -446,74 +443,17 @@ public class Gov2_Basic {
 
 		sLogger.info("Total query time: " + (end - start) + "ms");
 
-		sMapping = qr.getDocnoMapping();
+		DocnoMapping mapping = qr.getDocnoMapping();
 
 		for (String model : qr.getModels()) {
 			sLogger.info("Verifying results of model \"" + model + "\"");
 
 			Map<String, Accumulator[]> results = qr.getResults(model);
-
-			verifyResults(model, results, AllModelsAPScores.get(model), AllModelsP10Scores
-					.get(model));
+			g.get(model).verify(results, mapping, qrels);
+			h.get(model).verify(results, mapping, qrels);
 
 			sLogger.info("Done!");
 		}
-
-	}
-
-	private static Map<String, Float> loadScoresIntoMap(String[] arr) {
-		Map<String, Float> scores = new HashMap<String, Float>();
-		for (int i = 0; i < arr.length; i += 2) {
-			scores.put(arr[i], Float.parseFloat(arr[i + 1]));
-		}
-
-		return scores;
-	}
-
-	private static void verifyResults(String model, Map<String, Accumulator[]> results,
-			Map<String, Float> apScores, Map<String, Float> p10Scores) {
-		float apSum = 0, p10Sum = 0;
-		for (String qid : results.keySet()) {
-			float ap = (float) RankedListEvaluator.computeAP(results.get(qid), sMapping, sQrels
-					.getReldocsForQid(qid));
-
-			float p10 = (float) RankedListEvaluator.computePN(10, results.get(qid), sMapping,
-					sQrels.getReldocsForQid(qid));
-
-			apSum += ap;
-			p10Sum += p10;
-
-			sLogger.info("verifying qid " + qid + " for model " + model);
-			assertEquals(apScores.get(qid), ap, 10e-6);
-			assertEquals(p10Scores.get(qid), p10, 10e-6);
-
-		}
-
-		// one topic didn't contain qrels, so trec_eval only picked up 149
-		// topics
-		float MAP = (float) RankedListEvaluator.roundTo4SigFigs(apSum / 149f);
-		float P10Avg = (float) RankedListEvaluator.roundTo4SigFigs(p10Sum / 149f);
-
-		if (model.equals("gov2-dir-base")) {
-			assertEquals(0.3077, MAP, 10e-5);
-			assertEquals(0.5631, P10Avg, 10e-5);
-		} else if (model.equals("gov2-dir-sd")) {
-			assertEquals(0.3239, MAP, 10e-5);
-			assertEquals(0.6007, P10Avg, 10e-5);
-		} else if (model.equals("gov2-dir-fd")) {
-			assertEquals(0.3235, MAP, 10e-5);
-			assertEquals(0.5980, P10Avg, 10e-5);
-		} else if (model.equals("gov2-bm25-base")) {
-			assertEquals(0.2999, MAP, 10e-5);
-			assertEquals(0.5846, P10Avg, 10e-5);
-		} else if (model.equals("gov2-bm25-sd")) {
-			assertEquals(0.3294, MAP, 10e-5);
-			assertEquals(0.6081, P10Avg, 10e-5);
-		} else if (model.equals("gov2-bm25-fd")) {
-			assertEquals(0.3306, MAP, 10e-5);
-			assertEquals(0.6168, P10Avg, 10e-5);
-		}
-
 	}
 
 	public static junit.framework.Test suite() {

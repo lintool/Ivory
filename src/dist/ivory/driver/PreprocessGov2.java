@@ -32,7 +32,6 @@ import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Logger;
 
-import edu.umd.cloud9.collection.trec.NumberTrecDocuments;
 import edu.umd.cloud9.collection.trecweb.NumberTrecWebDocuments;
 
 public class PreprocessGov2 extends Configured implements Tool {
@@ -48,7 +47,6 @@ public class PreprocessGov2 extends Configured implements Tool {
 	 * Runs this tool.
 	 */
 	public int run(String[] args) throws Exception {
-
 		if (args.length != 4) {
 			printUsage();
 			return -1;

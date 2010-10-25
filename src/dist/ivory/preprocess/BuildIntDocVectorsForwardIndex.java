@@ -99,11 +99,22 @@ public class BuildIntDocVectorsForwardIndex extends PowerTool {
 			}
 
 			String indexPath = job.get("Ivory.IndexPath");
-			RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fs);
-			mCollectionDocumentCount = env.readCollectionDocumentCount();
+
+			RetrievalEnvironment env = null;
+			try {
+				env = new RetrievalEnvironment(indexPath, fs);
+			} catch (IOException e) {
+				throw new RuntimeException("Unable to create RetrievalEnvironment!");
+			}
+
+			boolean buildWeighted = job.getBoolean ("Ivory.BuildWeighted", false);
+			String forwardIndexPath = (buildWeighted ? 
+									   env.getWeightedIntDocVectorsForwardIndex () :
+									   env.getIntDocVectorsForwardIndex ());
+			mCollectionDocumentCount = env.readCollectionDocumentCount ();
 
 			try {
-				mOut = fs.create(new Path(env.getIntDocVectorsForwardIndex()), true);
+				mOut = fs.create (new Path (forwardIndexPath), true);
 				mOut.writeInt(env.readDocnoOffset());
 				mOut.writeInt(mCollectionDocumentCount);
 			} catch (Exception e) {
@@ -116,7 +127,7 @@ public class BuildIntDocVectorsForwardIndex extends PowerTool {
 				OutputCollector<Text, Text> output, Reporter reporter) throws IOException {
 			String[] s = values.next().toString().split("\\s+");
 
-			sLogger.info(key + ": " + s[0] + " " + s[1]);
+			//sLogger.info (key + ": " + s[0] + " " + s[1]);
 			if (values.hasNext())
 				throw new RuntimeException("There shouldn't be more than one value, key=" + key);
 
@@ -158,25 +169,37 @@ public class BuildIntDocVectorsForwardIndex extends PowerTool {
 
 		int mapTasks = conf.getInt("Ivory.NumMapTasks", 0);
 		String collectionName = env.readCollectionName();
+		boolean buildWeighted = conf.getBoolean ("Ivory.BuildWeighted", false);
 
 		sLogger.info("Tool: BuildIntDocVectorsIndex");
 		sLogger.info(" - IndexPath: " + indexPath);
 		sLogger.info(" - CollectionName: " + collectionName);
+		sLogger.info(" - BuildWeighted: " + buildWeighted);
 		sLogger.info(" - NumMapTasks: " + mapTasks);
 
-		if (!fs.exists(new Path(env.getIntDocVectorsDirectory()))) {
+		String intDocVectorsPath;
+		String forwardIndexPath;
+		if (buildWeighted) {
+			intDocVectorsPath = env.getWeightedIntDocVectorsDirectory ();
+			forwardIndexPath = env.getWeightedIntDocVectorsForwardIndex ();
+		} else {
+			intDocVectorsPath = env.getIntDocVectorsDirectory ();
+			forwardIndexPath = env.getIntDocVectorsForwardIndex ();
+		}
+
+		if (!fs.exists(new Path(intDocVectorsPath))) {
 			sLogger.info("Error: IntDocVectors don't exist!");
 			return 0;
 		}
 
-		if (fs.exists(new Path(env.getIntDocVectorsForwardIndex()))) {
-			sLogger.info("IntDocVectorIndex already exists: skipping!");
+		if (fs.exists (new Path (forwardIndexPath))) {
+			sLogger.info ("IntDocVectorIndex already exists: skipping!");
 			return 0;
 		}
-		
+
 		conf.setJobName("BuildIntDocVectorsForwardIndex:" + collectionName);
 
-		Path inputPath = new Path(env.getIntDocVectorsDirectory());
+		Path inputPath = new Path(intDocVectorsPath);
 		FileInputFormat.setInputPaths(conf, inputPath);
 
 		conf.setNumMapTasks(mapTasks);

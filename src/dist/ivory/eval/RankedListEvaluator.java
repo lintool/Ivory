@@ -218,7 +218,7 @@ public class RankedListEvaluator {
 	 * @return the value rounded to four significant figures
 	 */
 	public static double roundTo4SigFigs(double d) {
-		return ((double) Math.round(d * 10000) / 10000);
+		return ((double) Math.round(d * 10000.0) / 10000.0);
 	}
 
 }

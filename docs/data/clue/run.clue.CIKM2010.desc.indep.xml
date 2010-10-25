@@ -1,0 +1,257 @@
+<parameters>
+
+     <!-- Note: query-independent features are ordered by their contributions to effectiveness for Indep model -->
+
+     <index>/fs/clip-clueweb/indexes/clue.en.01</index>
+
+     <importancemodel id="wsd" type="ivory.smrf.model.importance.LinearImportanceModel">
+         <feature id="collection_freq" weight="0.00099009900990099" file="docs/data/clue/stats.clue.cf.collection.desc.txt.norm" default="0.0"/>
+         <feature id="document_freq" weight="0.29819628396838" file="docs/data/clue/stats.clue.df.collection.desc.txt.norm" default="0.01408541"/>
+         <feature id="enwiki_cf" weight="0.700813617021719" file="docs/data/clue/stats.clue.cf.enwiki.desc.txt.norm" default="0.0"/>
+     </importancemodel>
+
+
+     <model id="indep-x1.0" type="GreedyConstrained" style="Indep" output="ranking.cikm2010-clue-desc-indep-x1.0.txt" hits="1000" qlMultiple="1" unigramAddThreshold="0" unigramRedundThreshold="0" bigramAddThreshold="0.003" bigramRedundThreshold="0" file="docs/data/clue/stats.clue.df.collection.desc.txt">
+
+       <constrainedmodel id="wsd" type="Feature" hits="1000">
+         <feature id="term" importance="wsd"
+                  cliqueSet="ivory.smrf.model.builder.TermCliqueSet"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.TermExpressionGenerator"
+                  scoreFunction="ivory.smrf.model.score.BM25ScoringFunction" k1="0.5" b="0.3" />
+         <feature id="orderedWt" importance="wsd"
+                  cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.OrderedWindowExpressionGenerator" width="4"
+                  scoreFunction="ivory.smrf.model.score.BM25ScoringFunction" k1="0.25" b="0.0" />
+         <feature id="termWt" importance="wsd"
+                  cliqueSet="ivory.smrf.model.builder.TermCliqueSet"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.TermExpressionGenerator"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1000.0" />
+         <feature id="orderedWt" importance="wsd"
+                  cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.OrderedWindowExpressionGenerator" width="1"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1000.0" />
+       </constrainedmodel>
+
+     </model>
+
+     <model id="indep-x1.5" type="GreedyConstrained" style="Indep" output="ranking.cikm2010-clue-desc-indep-x1.5.txt" hits="1000" qlMultiple="1.5" unigramAddThreshold="0" unigramRedundThreshold="0" bigramAddThreshold="0.003" bigramRedundThreshold="0" file="docs/data/clue/stats.clue.df.collection.desc.txt">
+
+       <constrainedmodel id="wsd" type="Feature" hits="1000">
+         <feature id="term" importance="wsd"
+                  cliqueSet="ivory.smrf.model.builder.TermCliqueSet"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.TermExpressionGenerator"
+                  scoreFunction="ivory.smrf.model.score.BM25ScoringFunction" k1="0.5" b="0.3" />
+         <feature id="orderedWt" importance="wsd"
+                  cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.OrderedWindowExpressionGenerator" width="4"
+                  scoreFunction="ivory.smrf.model.score.BM25ScoringFunction" k1="0.25" b="0.0" />
+         <feature id="termWt" importance="wsd"
+                  cliqueSet="ivory.smrf.model.builder.TermCliqueSet"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.TermExpressionGenerator"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1000.0" />
+         <feature id="orderedWt" importance="wsd"
+                  cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.OrderedWindowExpressionGenerator" width="1"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1000.0" />
+       </constrainedmodel>
+
+     </model>
+
+     <model id="indep-x2.0" type="GreedyConstrained" style="Indep" output="ranking.cikm2010-clue-desc-indep-x2.0.txt" hits="1000" qlMultiple="2.0" unigramAddThreshold="0" unigramRedundThreshold="0" bigramAddThreshold="0.003" bigramRedundThreshold="0" file="docs/data/clue/stats.clue.df.collection.desc.txt">
+
+       <constrainedmodel id="wsd" type="Feature" hits="1000">
+         <feature id="term" importance="wsd"
+                  cliqueSet="ivory.smrf.model.builder.TermCliqueSet"   
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.TermExpressionGenerator"
+                  scoreFunction="ivory.smrf.model.score.BM25ScoringFunction" k1="0.5" b="0.3" />
+         <feature id="orderedWt" importance="wsd"
+                  cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.OrderedWindowExpressionGenerator" width="4"
+                  scoreFunction="ivory.smrf.model.score.BM25ScoringFunction" k1="0.25" b="0.0" />
+         <feature id="termWt" importance="wsd"
+                  cliqueSet="ivory.smrf.model.builder.TermCliqueSet"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.TermExpressionGenerator"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1000.0" />
+         <feature id="orderedWt" importance="wsd"
+                  cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.OrderedWindowExpressionGenerator" width="1"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1000.0" />
+       </constrainedmodel>
+     
+     </model>
+
+     <model id="indep-x2.5" type="GreedyConstrained" style="Indep" output="ranking.cikm2010-clue-desc-indep-x2.5.txt" hits="1000" qlMultiple="2.5" unigramAddThreshold="0" unigramRedundThreshold="0" bigramAddThreshold="0.003" bigramRedundThreshold="0" file="docs/data/clue/stats.clue.df.collection.desc.txt">
+       <constrainedmodel id="wsd" type="Feature" hits="1000">
+         <feature id="term" importance="wsd"
+                  cliqueSet="ivory.smrf.model.builder.TermCliqueSet"   
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.TermExpressionGenerator"
+                  scoreFunction="ivory.smrf.model.score.BM25ScoringFunction" k1="0.5" b="0.3" />
+         <feature id="orderedWt" importance="wsd"
+                  cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.OrderedWindowExpressionGenerator" width="4"
+                  scoreFunction="ivory.smrf.model.score.BM25ScoringFunction" k1="0.25" b="0.0" />
+         <feature id="termWt" importance="wsd"
+                  cliqueSet="ivory.smrf.model.builder.TermCliqueSet"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.TermExpressionGenerator"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1000.0" />
+         <feature id="orderedWt" importance="wsd"
+                  cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.OrderedWindowExpressionGenerator" width="1"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1000.0" />
+       </constrainedmodel>
+     
+     </model>
+
+     <model id="indep-x3.0" type="GreedyConstrained" style="Indep" output="ranking.cikm2010-clue-desc-indep-x3.0.txt" hits="1000" qlMultiple="3.0" unigramAddThreshold="0" unigramRedundThreshold="0" bigramAddThreshold="0.003" bigramRedundThreshold="0" file="docs/data/clue/stats.clue.df.collection.desc.txt">
+
+       <constrainedmodel id="wsd" type="Feature" hits="1000">
+         <feature id="term" importance="wsd"
+                  cliqueSet="ivory.smrf.model.builder.TermCliqueSet"   
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.TermExpressionGenerator"
+                  scoreFunction="ivory.smrf.model.score.BM25ScoringFunction" k1="0.5" b="0.3" />
+         <feature id="orderedWt" importance="wsd"
+                  cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.OrderedWindowExpressionGenerator" width="4"
+                  scoreFunction="ivory.smrf.model.score.BM25ScoringFunction" k1="0.25" b="0.0" />
+         <feature id="termWt" importance="wsd"
+                  cliqueSet="ivory.smrf.model.builder.TermCliqueSet"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.TermExpressionGenerator"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1000.0" />
+         <feature id="orderedWt" importance="wsd"
+                  cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.OrderedWindowExpressionGenerator" width="1"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1000.0" />
+       </constrainedmodel>
+     
+     </model>
+
+     <model id="indep-x3.5" type="GreedyConstrained" style="Indep" output="ranking.cikm2010-clue-desc-indep-x3.5.txt" hits="1000" qlMultiple="3.5" unigramAddThreshold="0" unigramRedundThreshold="0" bigramAddThreshold="0.003" bigramRedundThreshold="0" file="docs/data/clue/stats.clue.df.collection.desc.txt">
+
+       <constrainedmodel id="wsd" type="Feature" hits="1000">
+         <feature id="term" importance="wsd"
+                  cliqueSet="ivory.smrf.model.builder.TermCliqueSet"   
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.TermExpressionGenerator"
+                  scoreFunction="ivory.smrf.model.score.BM25ScoringFunction" k1="0.5" b="0.3" />
+         <feature id="orderedWt" importance="wsd"
+                  cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.OrderedWindowExpressionGenerator" width="4"
+                  scoreFunction="ivory.smrf.model.score.BM25ScoringFunction" k1="0.25" b="0.0" />
+         <feature id="termWt" importance="wsd"
+                  cliqueSet="ivory.smrf.model.builder.TermCliqueSet"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.TermExpressionGenerator"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1000.0" />
+         <feature id="orderedWt" importance="wsd"
+                  cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.OrderedWindowExpressionGenerator" width="1"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1000.0" />
+       </constrainedmodel>
+     
+     </model>
+
+     <model id="indep-x4.0" type="GreedyConstrained" style="Indep" output="ranking.cikm2010-clue-desc-indep-x4.0.txt" hits="1000" qlMultiple="4.0" unigramAddThreshold="0" unigramRedundThreshold="0" bigramAddThreshold="0.003" bigramRedundThreshold="0" file="docs/data/clue/stats.clue.df.collection.desc.txt">
+
+       <constrainedmodel id="wsd" type="Feature" hits="1000">
+         <feature id="term" importance="wsd"
+                  cliqueSet="ivory.smrf.model.builder.TermCliqueSet"   
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.TermExpressionGenerator"
+                  scoreFunction="ivory.smrf.model.score.BM25ScoringFunction" k1="0.5" b="0.3" />
+         <feature id="orderedWt" importance="wsd"
+                  cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.OrderedWindowExpressionGenerator" width="4"
+                  scoreFunction="ivory.smrf.model.score.BM25ScoringFunction" k1="0.25" b="0.0" />
+         <feature id="termWt" importance="wsd"
+                  cliqueSet="ivory.smrf.model.builder.TermCliqueSet"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.TermExpressionGenerator"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1000.0" />
+         <feature id="orderedWt" importance="wsd"
+                  cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.OrderedWindowExpressionGenerator" width="1"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1000.0" />
+       </constrainedmodel>
+     
+     </model>
+
+     <model id="indep-x4.5" type="GreedyConstrained" style="Indep" output="ranking.cikm2010-clue-desc-indep-x4.5.txt" hits="1000" qlMultiple="4.5" unigramAddThreshold="0" unigramRedundThreshold="0" bigramAddThreshold="0.003" bigramRedundThreshold="0" file="docs/data/clue/stats.clue.df.collection.desc.txt">
+
+       <constrainedmodel id="wsd" type="Feature" hits="1000">
+         <feature id="term" importance="wsd"
+                  cliqueSet="ivory.smrf.model.builder.TermCliqueSet"   
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.TermExpressionGenerator"
+                  scoreFunction="ivory.smrf.model.score.BM25ScoringFunction" k1="0.5" b="0.3" />
+         <feature id="orderedWt" importance="wsd"
+                  cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.OrderedWindowExpressionGenerator" width="4"
+                  scoreFunction="ivory.smrf.model.score.BM25ScoringFunction" k1="0.25" b="0.0" />
+         <feature id="termWt" importance="wsd"
+                  cliqueSet="ivory.smrf.model.builder.TermCliqueSet"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.TermExpressionGenerator"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1000.0" />
+         <feature id="orderedWt" importance="wsd"
+                  cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.OrderedWindowExpressionGenerator" width="1"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1000.0" />
+       </constrainedmodel>
+     
+     </model>
+
+     <model id="indep-x5.0" type="GreedyConstrained" style="Indep" output="ranking.cikm2010-clue-desc-indep-x5.0.txt" hits="1000" qlMultiple="5.0" unigramAddThreshold="0" unigramRedundThreshold="0" bigramAddThreshold="0.003" bigramRedundThreshold="0" file="docs/data/clue/stats.clue.df.collection.desc.txt">
+
+       <constrainedmodel id="wsd" type="Feature" hits="1000">
+         <feature id="term" importance="wsd"
+                  cliqueSet="ivory.smrf.model.builder.TermCliqueSet"   
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.TermExpressionGenerator"
+                  scoreFunction="ivory.smrf.model.score.BM25ScoringFunction" k1="0.5" b="0.3" />
+         <feature id="orderedWt" importance="wsd"
+                  cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.OrderedWindowExpressionGenerator" width="4"
+                  scoreFunction="ivory.smrf.model.score.BM25ScoringFunction" k1="0.25" b="0.0" />
+         <feature id="termWt" importance="wsd"
+                  cliqueSet="ivory.smrf.model.builder.TermCliqueSet"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.TermExpressionGenerator"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1000.0" />
+         <feature id="orderedWt" importance="wsd"
+                  cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.OrderedWindowExpressionGenerator" width="1"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1000.0" />
+       </constrainedmodel>
+     
+     </model>
+
+</parameters>     
+

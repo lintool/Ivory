@@ -1,0 +1,868 @@
+bengal	964
+cat	26285
+bengal cat	20
+breed	6959
+cat breed	34
+normal	64926
+habitat	9544
+normal habitat	5
+beaver	4008
+habitat beaver	0
+note	203742
+beaver note	1
+except	27137
+note except	28
+find	261503
+document	131436
+find document	296
+discuss	67639
+document discuss	46
+organ	173929
+discuss organ	151
+group	250789
+organ group	589
+aid	13376
+group aid	11
+erad	938
+aid erad	0
+worldwid	44924
+erad worldwid	0
+hunger	4266
+worldwid hunger	9
+problem	192780
+hunger problem	16
+symptom	13574
+treatment	50279
+symptom treatment	81
+parkinson	1485
+treatment parkinson	3
+diseas	40789
+parkinson diseas	673
+segment	20405
+diseas segment	4
+popul	47648
+segment popul	4
+popul diseas	4
+jacki	4487
+document jacki	0
+robinson	10732
+jacki robinson	192
+made	219947
+robinson made	13
+major	169031
+made major	265
+leagu	28175
+major leagu	2498
+debut	9141
+leagu debut	48
+identifi	63366
+individu	141508
+identifi individu	294
+individu group	971
+predict	14170
+group predict	33
+end	188506
+predict end	6
+world	308221
+end world	69
+year	409436
+world year	44
+2000	53724
+year 2000	7920
+address	207551
+document address	68
+type	217455
+address type	618
+chevrolet	1581
+type chevrolet	0
+truck	20144
+chevrolet truck	36
+fast	62048
+discuss fast	1
+religi	24182
+fast religi	2
+reason	103345
+religi reason	142
+identifi document	49
+state	378773
+document state	208
+circumst	27109
+state circumst	8
+lender	4893
+circumst lender	2
+can	537961
+lender can	101
+legal	97563
+can legal	257
+foreclos	1006
+legal foreclos	0
+properti	95018
+foreclos properti	64
+biblic	4055
+discuss biblic	8
+figur	66518
+biblic figur	25
+mose	4150
+figur mose	1
+origin	123251
+discuss origin	2
+oper	205579
+origin oper	2
+lava	1928
+oper lava	0
+lamp	5998
+lava lamp	151
+contain	90819
+document contain	1099
+residenti	19431
+contain residenti	1
+real	237349
+residenti real	608
+estat	37975
+real estat	25162
+list	325135
+estat list	605
+new	692997
+list new	1665
+jersey	22714
+new jersey	19244
+scottish	6772
+find scottish	7
+tartan	541
+scottish tartan	22
+histori	137942
+tartan histori	1
+current	251492
+histori current	192
+current made	79
+wear	34533
+made wear	3
+citi	387683
+identifi citi	28
+citi state	18362
+ban	7255
+state ban	14
+display	70513
+ban display	1
+nativ	34116
+display nativ	5
+scene	36225
+nativ scene	175
+kind	96004
+kind diseas	0
+diseas can	628
+infect	2050
+can infect	200
+human	110396
+infect human	61
+due	91748
+human due	10
+contact	287202
+due contact	10
+deer	6120
+contact deer	0
+consumpt	13025
+deer consumpt	0
+consumpt deer	0
+meat	13236
+deer meat	8
+background	61914
+document background	89
+peer	17026
+background peer	0
+gynt	128
+peer gynt	127
+suit	73137
+gynt suit	60
+buy	21927
+contain buy	1
+dachshund	168
+buy dachshund	0
+dog	31838
+dachshund dog	3
+address histori	13
+incandesc	494
+histori incandesc	0
+light	99559
+incandesc light	97
+bulb	3272
+light bulb	1246
+steinbach	237
+discuss steinbach	0
+nutcrack	650
+steinbach nutcrack	4
+benefici	9333
+discuss benefici	2
+use	596693
+benefici use	309
+mistleto	283
+use mistleto	0
+popular	64663
+discuss popular	9
+appeal	32307
+popular appeal	96
+mexican	10381
+appeal mexican	2
+food	78413
+mexican food	475
+unit	132561
+food unit	4
+unit state	98247
+document identifi	101
+museum	36031
+identifi museum	2
+collector	10462
+museum collector	9
+dealer	21448
+collector dealer	58
+hold	106842
+dealer hold	12
+sell	71750
+hold sell	22
+restor	23566
+sell restor	9
+antiqu	10719
+restor antiqu	54
+electr	55894
+antiqu electr	4
+applianc	9699
+electr applianc	505
+toronto	24707
+discuss toronto	1
+film	57693
+toronto film	59
+festiv	21885
+film festiv	2207
+award	65605
+festiv award	57
+profit	11515
+discuss profit	3
+busi	48550
+profit busi	58
+busi sell	66
+product	248255
+sell product	1169
+internet	258809
+product internet	284
+store	101874
+internet store	265
+sale	134638
+store sale	499
+physic	88334
+document physic	11
+physic properti	1088
+zirconium	217
+properti zirconium	0
+movi	27526
+identifi movi	0
+televis	52852
+movi televis	205
+program	277096
+televis program	1786
+jennif	11995
+program jennif	14
+aniston	225
+jennif aniston	204
+ship	30299
+document ship	2
+ship oper	43
+royal	24548
+oper royal	0
+caribbean	8948
+royal caribbean	190
+cruis	14185
+caribbean cruis	295
+line	256782
+cruis line	755
+rccl	36
+line rccl	1
+who	375992
+individu who	10430
+serv	107402
+who serv	3394
+mayor	13994
+serv mayor	3
+baltimor	14088
+mayor baltimor	5
+explain	47074
+document explain	177
+kappa	3095
+explain kappa	0
+alpha	15714
+kappa alpha	346
+psi	3328
+alpha psi	266
+fratern	3548
+psi fratern	98
+soror	1527
+fratern soror	182
+school	205297
+soror school	9
+affili	20986
+school affili	69
+report	206663
+find report	75
+automobil	11428
+report automobil	1
+traffic	35972
+automobil traffic	67
+washington	104691
+traffic washington	2
+dc	55437
+washington dc	41190
+metropolitan	17225
+dc metropolitan	287
+area	258605
+metropolitan area	5490
+babe	4625
+discuss babe	0
+ruth	8201
+babe ruth	302
+basebal	15618
+ruth basebal	18
+accomplish	25311
+basebal accomplish	2
+1920	4627
+accomplish 1920	0
+give	208264
+document give	161
+growth	63705
+give growth	5
+rate	146666
+growth rate	4324
+pine	14748
+rate pine	1
+tree	46516
+pine tree	1006
+rose	38534
+identifi rose	1
+bowl	17210
+rose bowl	399
+parad	7645
+bowl parad	26
+prepar	31264
+parad prepar	1
+undertaken	9277
+prepar undertaken	1
+skoda	339
+heavi	34742
+skoda heavi	0
+industri	202829
+heavi industri	230
+complex	60671
+industri complex	428
+czechoslovakia	958
+complex czechoslovakia	0
+manufactur	53996
+czechoslovakia manufactur	0
+vehicl	38833
+manufactur vehicl	18
+clock	16632
+relianc	5875
+clock relianc	0
+import	141791
+relianc import	0
+consider	38001
+import consider	918
+consider oper	1
+global	64080
+oper global	34
+posit	55840
+global posit	917
+system	321952
+posit system	906
+gps	2627
+system gps	375
+entiti	23897
+gps entiti	1
+respons	111026
+entiti respons	103
+respons clock	0
+accuraci	16413
+clock accuraci	22
+accuraci accuraci	11
+eldorado	661
+el	20577
+eldorado el	1
+dorado	1177
+el dorado	947
+casino	6257
+dorado casino	0
+casino report	0
+locat	90474
+report locat	1
+reno	4786
+locat reno	1
+reno address	1
+patient	43956
+patient who	4338
+undergon	2597
+who undergon	0
+success	75364
+undergon success	11
+angioplasti	459
+success angioplasti	1
+procedur	65694
+angioplasti procedur	27
+requir	190769
+procedur requir	768
+repeat	16475
+requir repeat	24
+repeat angioplasti	3
+form	272400
+entertain	56283
+form entertain	8
+newport	5606
+entertain newport	0
+beach	38146
+newport beach	1192
+california	88289
+beach california	1031
+member	234715
+medic	92059
+member medic	59
+profess	34310
+medic profess	1109
+view	187916
+profess view	15
+effect	208053
+view effect	12
+calcium	3328
+effect calcium	1
+supplement	15297
+calcium supplement	91
+law	162428
+govern	17344
+law govern	1101
+motorcycl	5853
+govern motorcycl	0
+safeti	58097
+motorcycl safeti	86
+helmet	4251
+safeti helmet	71
+occurr	7348
+identifi occurr	4
+japanes	21964
+occurr japanes	0
+wave	28671
+japanes wave	1
+tsunami	774
+wave tsunami	8
+caus	105830
+tsunami caus	2
+loss	55988
+caus loss	239
+life	210770
+loss life	5
+damag	42368
+life damag	7
+need	88513
+address need	49
+decis	85641
+need decis	9
+purchas	77269
+decis purchas	4
+redempt	2892
+purchas redempt	11
+save	102365
+redempt save	1
+bond	29842
+save bond	453
+document list	1196
+retir	15536
+list retir	8
+communiti	174999
+retir communiti	604
+canada	74642
+communiti canada	9
+find member	34
+rock	51625
+member rock	12
+rock group	605
+nirvana	2195
+group nirvana	4
+decad	31819
+find decad	1
+1920s	3104
+decad 1920s	1
+known	96817
+1920s known	1
+roar	2382
+known roar	0
+twenti	30487
+roar twenti	104
+tmj	212
+syndrom	9901
+tmj syndrom	8
+syndrom caus	59
+caus symptom	210
+big	108973
+orchid	1908
+big orchid	0
+grow	54781
+orchid grow	34
+grow industri	354
+industri major	139
+grower	3161
+major grower	6
+grower big	1
+big industri	75
+dollar	53862
+industri dollar	6
+hair	24724
+transplant	4667
+hair transplant	61
+transplant procedur	50
+take	295818
+procedur take	163
+place	250869
+take place	23954
+place year	33
+cost	156225
+year cost	502
+cost procedur	68
+procedur success	17
+inher	10965
+success inher	0
+risk	62426
+inher risk	144
+search	268919
+search find	615
+find origin	3
+develop	187570
+origin develop	69
+select	61695
+develop select	21
+pool	29521
+select pool	9
+cue	3635
+pool cue	91
+seek	46233
+search seek	10
+seek state	48
+art	145208
+state art	336
+dna	8427
+art dna	1
+test	118769
+dna test	304
+goal	76752
+test goal	23
+differ	60360
+deduct	5691
+differ deduct	0
+induct	3191
+deduct induct	6
+process	168794
+induct process	15
+process reason	1
+prime	25062
+factor	57118
+prime factor	119
+hard	112546
+evid	45412
+hard evid	344
+prove	40027
+evid prove	124
+vike	3947
+prove vike	0
+visit	39880
+vike visit	0
+live	193506
+visit live	7
+scotland	10772
+live scotland	0
+diet	11304
+document diet	1
+manate	812
+diet manate	0
+edmund	3298
+who edmund	0
+hillari	3439
+edmund hillari	34
+skateboard	1217
+histori skateboard	0
+document report	125
+recal	20118
+report recal	12
+dodg	4722
+recal dodg	0
+dodg automobil	9
+automobil product	7
+find diseas	10
+diseas hair	1
+hair loss	426
+loss symptom	5
+steroid	2025
+effect steroid	4
+steroid human	1
+bodi	94592
+human bodi	2591
+biograph	4170
+find biograph	18
+data	174945
+biograph data	181
+robert	81644
+data robert	14
+oppenheim	752
+robert oppenheim	80
+smoke	27423
+diseas smoke	30
+smoke caus	105
+tornado	673
+tornado form	1
+earthquak	5475
+caus earthquak	16
+occur	44269
+earthquak occur	37
+financi	105107
+discuss financi	32
+aspect	54013
+financi aspect	315
+aspect retir	2
+plan	97575
+retir plan	670
+alexand	14669
+graham	13322
+alexand graham	252
+bell	28837
+graham bell	257
+invent	3773
+bell invent	6
+halloween	3520
+evolv	12762
+halloween evolv	0
+discuss reason	25
+reason problem	10
+lead	67786
+problem lead	56
+sink	8661
+lead sink	0
+titan	1037
+sink titan	4
+refer	106789
+document refer	254
+statist	71251
+refer statist	27
+statist data	1251
+data decis	23
+make	374298
+decis make	11966
+document habitat	1
+frog	4665
+habitat frog	1
+measur	64965
+taken	97670
+measur taken	440
+taken end	5
+black	85037
+end black	23
+plagu	5891
+black plagu	51
+best	223718
+identifi best	65
+best place	2825
+place live	57
+judg	37829
+live judg	8
+survey	54843
+judg survey	2
+magazin	90034
+survey magazin	5
+method	86134
+identifi method	44
+be	206679
+method be	120
+water	99800
+be water	5
+mojav	872
+water mojav	0
+desert	14499
+mojav desert	180
+region	60872
+desert region	116
+cloud	13643
+type cloud	7
+cloud form	18
+remov	13308
+method remov	4
+scar	7052
+remov scar	1
+tissu	12402
+scar tissu	287
+enter	88473
+water enter	51
+earth	48723
+enter earth	15
+atmospher	18906
+earth atmospher	561
+bmi	1179
+stand	89281
+bmi stand	0
+booker	1158
+data booker	0
+booker washington	11
+hygromet	78
+hygromet measur	1
+humid	4807
+measur humid	8
+humid atmospher	5
+account	104419
+find account	228
+account histori	122
+cambodia	1802
+histori cambodia	1
+scientif	39381
+scientif evid	1210
+suggest	49455
+evid suggest	1253
+pheromon	234
+suggest pheromon	0
+stimul	13352
+pheromon stimul	1
+opposit	14148
+stimul opposit	0
+sex	34509
+opposit sex	777
+proper	54173
+grammat	1485
+proper grammat	8
+grammat who	0
+whom	37805
+who whom	19
+document use	446
+hypnosi	861
+use hypnosi	21
+hypnosi report	0
+report effect	30
+effect hypnosi	1
+con	13059
+document con	11
+children	115763
+con children	1
+children wear	22
+uniform	18720
+wear uniform	19
+public	246205
+uniform public	5
+public school	10300
+item	111485
+find item	337
+referenc	1967
+item referenc	7
+artist	48589
+referenc artist	0
+artist who	2411
+die	23740
+who die	3203
+1700s	479
+die 1700s	0
+canadian	38929
+document canadian	18
+build	152163
+canadian build	8
+code	121034
+build code	1278
+eat	15945
+honey	6222
+eat honey	7
+affect	48359
+honey affect	0
+health	133444
+affect health	187
+babi	29504
+health babi	10
+sun	70484
+bed	30864
+sun bed	16
+detriment	2406
+bed detriment	0
+detriment health	5
+health individu	25
+feder	89559
+document feder	45
+hous	182982
+feder hous	431
+administr	70511
+hous administr	255
+fha	809
+administr fha	83
+fha origin	0
+establish	68695
+origin establish	188
+establish current	11
+mission	55751
+current mission	82
+author	166509
+suffer	24842
+author suffer	2
+depress	9072
+suffer depress	13
+descript	125548
+find descript	79
+studi	148920
+descript studi	37
+correl	4855
+studi correl	21
+stress	26311
+correl stress	0
+obes	1429
+stress obes	0
+instrument	34590
+forecast	17177
+instrument forecast	1
+weather	49032
+forecast weather	109
+posit effect	1120
+forest	31571
+effect forest	6
+fire	59641
+forest fire	579
+hazard	11754
+associ	117855
+hazard associ	279
+radiographi	470
+associ radiographi	0
+role	77515
+document role	5
+estrogen	1461
+role estrogen	2
+play	100618
+estrogen play	8
+play human	7
+peter	52087
+great	186586
+peter great	5
+great accomplish	1
+russia	14054
+accomplish russia	0
+benefit	102378
+recycl	9198
+benefit recycl	4
+recycl can	43
+camel	2319
+domest	590
+camel domest	0
+method use	521
+solar	9508
+use solar	75
+heat	24828
+solar heat	81
+warm	25871
+heat warm	31
+warm water	1003
+swim	15436
+water swim	220
+swim pool	5975
+contrast	21203
+document contrast	5
+cancer	23125
+contrast cancer	0
+cancer normal	9
+cell	29772
+normal cell	319
+reproduct	16464
+cell reproduct	15
+volcano	1440
+document volcano	2
+volcano form	0

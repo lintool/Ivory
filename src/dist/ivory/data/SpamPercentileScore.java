@@ -26,6 +26,8 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
 
+import com.google.common.base.Preconditions;
+
 import edu.umd.cloud9.debug.MemoryUsageUtils;
 
 public class SpamPercentileScore implements DocScoreTable {
@@ -36,45 +38,50 @@ public class SpamPercentileScore implements DocScoreTable {
 	protected int mDocnoOffset;
 
 	public SpamPercentileScore() {
-
 	}
 
 	public void initialize(String file, FileSystem fs) throws IOException {
+		Preconditions.checkNotNull(file);
+		Preconditions.checkNotNull(fs);
+
 		FSDataInputStream in = fs.open(new Path(file));
 
-		// docno offset
+		// Read the docno offset.
 		mDocnoOffset = in.readInt();
 
-		// this is the size of the document collection
+		// Read the size of the document collection.
 		int sz = in.readInt() + 1;
 
 		sLogger.info("Docno offset: " + mDocnoOffset);
 		sLogger.info("Number of docs: " + (sz - 1));
 
-		// initialize an array to hold all the doc scores
+		// Initialize an array to hold all the doc scores.
 		mScores = new byte[sz];
 
-		// read each doc length
+		// Read each doc length.
 		for (int i = 1; i < sz; i++) {
 			mScores[i] = in.readByte();
 			nDocs++;
 
-			if (i % 1000000 == 0)
+			if (i % 1000000 == 0) {
 				sLogger.info(i + " docscores read");
+			}
 		}
 
 		in.close();
 
 		sLogger.info("Total of " + nDocs + " docscores read");
-
 	}
 
 	/**
-	 * Returns the length of a document.
+	 * Returns the length of a document. Note that this method does not do any
+	 * bounds checking: it is the responsibility of the caller to specify a
+	 * valid docno.
 	 */
 	public float getScore(int docno) {
-		// docnos are numbered starting from one
-		return (float) Math.log(mScores[docno - mDocnoOffset]);
+		// Remember that docnos are numbered starting from one. We add one to
+		// avoid computing log(0).
+		return (float) Math.log(mScores[docno - mDocnoOffset] + 1);
 	}
 
 	public int getDocnoOffset() {
@@ -109,6 +116,5 @@ public class SpamPercentileScore implements DocScoreTable {
 			System.out.println(scores.getScore(Integer.parseInt(docno)));
 			System.out.print("Look up postings of term> ");
 		}
-
 	}
 }

@@ -2,25 +2,28 @@
 
      <index>/fs/clip-hadoop/indexes/trec</index>
 
+     <!-- Concept importance model definition -->
+     <importancemodel id="wsd" type="ivory.smrf.model.importance.LinearImportanceModel">
+         <feature id="collection_freq" weight="0.0688" file="docs/data/trec/stats.robust04.cf.collection.txt.norm" default="0.0"/>
+	 <feature id="document_freq" weight="0.4505" file="docs/data/trec/stats.robust04.df.collection.txt.norm" default="0.01039824"/>
+	 <feature id="clue_cf" weight="0.4272" file="docs/data/trec/stats.robust04.cf.clue.txt.norm" default="0.0" />
+	 <feature id="enwiki_cf" weight="0.0535" file="docs/data/trec/stats.robust04.cf.enwiki.txt.norm" default="0.0" />
+     </importancemodel>
+         
      <!-- Dirichlet, WSD, sequential dependence -->
-     <model id="robust04-dir-wsd-sd" type="WSD" output="ranking.robust04-dir-wsd-sd.txt" hits="1000" collection="trec45">
+     <model id="robust04-dir-wsd-sd" type="Feature" output="ranking.robust04-dir-wsd-sd.txt" hits="1000" collection="trec45">
          
-         <metaFeature id="collection_freq" weight="0.0688" file="docs/data/trec/stats.robust04.cf.collection.txt" />
-         <metaFeature id="document_freq" weight="0.4505" file="docs/data/trec/stats.robust04.df.collection.txt" />
-         <metaFeature id="clue_cf" weight="0.4272" file="docs/data/trec/stats.robust04.cf.clue.txt" />
-         <metaFeature id="enwiki_cf" weight="0.0535" file="docs/data/trec/stats.robust04.cf.enwiki.txt" />
-         
-         <feature id="termWt" weight="0.82"
+         <feature id="termWt" importance="wsd"
                   cliqueSet="ivory.smrf.model.builder.TermCliqueSet"   
                   potential="ivory.smrf.model.potential.QueryPotential"
                   generator="ivory.smrf.model.builder.TermExpressionGenerator"
                   scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1000.0" />
-         <feature id="orderedWt" weight="0.09"
+         <feature id="orderedWt" importance="wsd"
                   cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
                   potential="ivory.smrf.model.potential.QueryPotential"
                   generator="ivory.smrf.model.builder.OrderedWindowExpressionGenerator" width="1"
                   scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="750.0" />
-         <feature id="unorderedWt" weight="0.09"
+         <feature id="unorderedWt" importance="wsd"
                   cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
                   potential="ivory.smrf.model.potential.QueryPotential"
                   generator="ivory.smrf.model.builder.UnorderedWindowExpressionGenerator" width="4"
@@ -28,29 +31,24 @@
      </model>     
 
      <!-- Dirichlet, WSD, full dependence -->
-     <model id="robust04-dir-wsd-fd" type="WSD" output="ranking.robust04-dir-wsd-fd.txt" hits="1000" collection="trec45">
-     
-         <metaFeature id="collection_freq" weight="0.0688" file="docs/data/trec/stats.robust04.cf.collection.txt" />
-         <metaFeature id="document_freq" weight="0.4505" file="docs/data/trec/stats.robust04.df.collection.txt" />
-         <metaFeature id="clue_cf" weight="0.4272" file="docs/data/trec/stats.robust04.cf.clue.txt" />
-         <metaFeature id="enwiki_cf" weight="0.0535" file="docs/data/trec/stats.robust04.cf.enwiki.txt" />
-         
-         <feature id="termWt" weight="0.82"
+     <model id="robust04-dir-wsd-fd" type="Feature" output="ranking.robust04-dir-wsd-fd.txt" hits="1000" collection="trec45">
+
+         <feature id="termWt" importance="wsd"
                   cliqueSet="ivory.smrf.model.builder.TermCliqueSet"
                  potential="ivory.smrf.model.potential.QueryPotential"
                   generator="ivory.smrf.model.builder.TermExpressionGenerator"
                   scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1000.0" />
-         <feature id="orderedWt" weight="0.09"
+         <feature id="orderedWt" importance="wsd"
                   cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="full"
                   potential="ivory.smrf.model.potential.QueryPotential"
                   generator="ivory.smrf.model.builder.OrderedWindowExpressionGenerator" width="1"
                   scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="750.0" /> 
-         <feature id="unorderedWt" weight="0.09"
+         <feature id="unorderedWt" importance="wsd"
                   cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="full"
                   potential="ivory.smrf.model.potential.QueryPotential"
                   generator="ivory.smrf.model.builder.UnorderedWindowExpressionGenerator" width="4"
                   scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="750.0" />
-         <feature id="unorderedWt" weight="0.09"
+         <feature id="unorderedWt" importance="wsd"
                   cliqueSet="ivory.smrf.model.builder.UnorderedCliqueSet" dependence="full"
                   potential="ivory.smrf.model.potential.QueryPotential"
                   generator="ivory.smrf.model.builder.UnorderedWindowExpressionGenerator" width="4"

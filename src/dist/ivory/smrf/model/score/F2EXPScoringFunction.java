@@ -28,27 +28,26 @@ import org.w3c.dom.Node;
  */
 public class F2EXPScoringFunction extends ScoringFunction {
 
-	private double mS;
-	private double mK;
-	private double mAvgDocLen;
-	private double mIDF;
+	private float mS;
+	private float mK;
+	private float mAvgDocLen;
+	private float mIDF;
 
 	@Override
 	public void configure(Node domNode) {
-		mS = XMLTools.getAttributeValue(domNode, "s", 0.5);
-		mK = XMLTools.getAttributeValue(domNode, "k", 1.0);
+		mS = XMLTools.getAttributeValue(domNode, "s", 0.5f);
+		mK = XMLTools.getAttributeValue(domNode, "k", 1.0f);
 	}
 
 	@Override
-	public double getScore(double tf, int docLen) {
-		double f2expTF = tf / (tf + mS + mS * mAvgDocLen);
+	public float getScore(int tf, int docLen) {
+		float f2expTF = tf / (tf + mS + mS * mAvgDocLen);
 		return f2expTF * mIDF;
 	}
 
 	@Override
 	public void initialize(GlobalTermEvidence termEvidence, GlobalEvidence globalEvidence) {
-		mAvgDocLen = (double) globalEvidence.collectionLength / (double) globalEvidence.numDocs;
-		mIDF = Math.pow((globalEvidence.numDocs + 1.0) / (double) termEvidence.df, mK);
+		mAvgDocLen = (float) globalEvidence.collectionLength / (float) globalEvidence.numDocs;
+		mIDF = (float) Math.pow((globalEvidence.numDocs + 1.0f) / (float) termEvidence.df, mK);
 	}
-
 }

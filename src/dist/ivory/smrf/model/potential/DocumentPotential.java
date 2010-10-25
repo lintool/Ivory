@@ -16,6 +16,7 @@
 
 package ivory.smrf.model.potential;
 
+import ivory.exception.ConfigurationException;
 import ivory.smrf.model.DocumentNode;
 import ivory.smrf.model.GlobalEvidence;
 import ivory.smrf.model.GraphNode;
@@ -25,6 +26,8 @@ import ivory.util.XMLTools;
 import java.util.List;
 
 import org.w3c.dom.Node;
+
+import com.google.common.base.Preconditions;
 
 /**
  * @author Don Metzler
@@ -38,38 +41,44 @@ public class DocumentPotential extends PotentialFunction {
 	private String mType;
 
 	@Override
-	public void configure(RetrievalEnvironment env, Node domNode) throws Exception {
-		String type = XMLTools.getAttributeValue(domNode, "type", "");
-		if (type.equals("")) {
-			throw new Exception("A DocumentPotential requires a type attribute!");
+	public void configure(RetrievalEnvironment env, Node domNode) throws ConfigurationException {
+		Preconditions.checkNotNull(env);
+		Preconditions.checkNotNull(domNode);
+
+		String type = XMLTools.getAttributeValue(domNode, "type", null);
+		if (type == null) {
+			throw new ConfigurationException("A DocumentPotential requires a type attribute!");
 		}
 
 		mEnv = env;
 		mType = type;
 	}
 
-	public void initialize(List<GraphNode> nodes, GlobalEvidence globalEvidence) throws Exception {
+	@Override
+	public void initialize(List<GraphNode> nodes, GlobalEvidence globalEvidence)
+			throws ConfigurationException {
+		Preconditions.checkNotNull(nodes);
+		Preconditions.checkNotNull(globalEvidence);
+		
 		mDocNode = null;
 
 		for (GraphNode node : nodes) {
-			if (node.getType() == GraphNode.DOCUMENT && mDocNode != null) {
-				throw new Exception(
-						"Only one document node allowed in cliques associated with IndriExpressionPotential!");
-			} else if (node.getType() == GraphNode.DOCUMENT) {
+			if (node.getType().equals(GraphNode.Type.DOCUMENT) && mDocNode != null) {
+				throw new ConfigurationException("Only one document node allowed in DocumentPotential!");
+			} else if (node.getType().equals(GraphNode.Type.DOCUMENT)) {
 				mDocNode = (DocumentNode) node;
-			} else if (node.getType() == GraphNode.TERM) {
-				throw new Exception(
-						"TermNodes are not allowed in cliques associated with QueryPotential!");
+			} else if (node.getType().equals(GraphNode.Type.TERM)) {
+				throw new ConfigurationException("TermNodes are not allowed in DocumentPotential!");
 			}
 		}
-
 	}
 
 	@Override
-	public double computePotential() {
+	public float computePotential() {
 		return mEnv.getDocScore(mType, mDocNode.getDocno());
 	}
 
+	@Override
 	public int getNextCandidate() {
 		return Integer.MAX_VALUE;
 	}
@@ -88,7 +97,7 @@ public class DocumentPotential extends PotentialFunction {
 	}
 
 	@Override
-	public double getMaxScore() {
-		return Double.POSITIVE_INFINITY;
+	public float getMaxScore() {
+		return Float.POSITIVE_INFINITY;
 	}
 }

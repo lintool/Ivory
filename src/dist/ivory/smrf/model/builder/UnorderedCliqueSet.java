@@ -16,41 +16,45 @@
 
 package ivory.smrf.model.builder;
 
-import ivory.smrf.model.Clique;
+import ivory.exception.ConfigurationException;
 import ivory.util.RetrievalEnvironment;
 import ivory.util.XMLTools;
 
-import java.util.ArrayList;
-
 import org.w3c.dom.Node;
+
+import com.google.common.base.Preconditions;
 
 /**
  * @author Don Metzler
- * 
  */
 public class UnorderedCliqueSet extends CliqueSet {
 
+	public static final String TYPE = "Unordered";
+	
 	@Override
 	public void configure(RetrievalEnvironment env, String[] queryTerms, Node domNode)
-			throws Exception {
+			throws ConfigurationException {
+		Preconditions.checkNotNull(env);
+		Preconditions.checkNotNull(queryTerms);
+		Preconditions.checkNotNull(domNode);
+
 		String dependenceType = XMLTools.getAttributeValue(domNode, "dependence", "sequential");
 		boolean docDependent = XMLTools.getAttributeValue(domNode, "docDependent", true);
 
-		cliques = new ArrayList<Clique>();
+		// Initialize clique set.
+		clearCliques();
 
-		// generate clique set
 		if (dependenceType.equals("sequential")) {
-			throw new Exception(
-					"Unsupported operation: there are no unordered cliques within a sequentially dependent graph.");
+			throw new ConfigurationException("Unsupported operation: there are no unordered cliques within a sequentially dependent graph.");
 		} else if (dependenceType.equals("full")) {
-			cliques = CliqueFactory.getFullDependenceCliques(env, queryTerms, domNode, false,
-					docDependent);
+			addCliques(CliqueFactory.getFullDependenceCliques(env, queryTerms, domNode, false, docDependent));
 		} else {
-			throw new Exception("Unrecognized UnorderedCliqueSet type: " + dependenceType);
+			throw new ConfigurationException("Unrecognized UnorderedCliqueSet type: " + dependenceType);
 		}
 	}
 
+	@Override
 	public String getType() {
-		return "Unordered";
+		return TYPE;
 	}
 }

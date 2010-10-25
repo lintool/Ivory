@@ -39,12 +39,12 @@ public class Parameter {
 	/**
 	 * weight parameter
 	 */
-	public double weight;
+	public float weight;
 
 	/**
 	 * @param weight
 	 */
-	public Parameter(String id, double weight) {
+	public Parameter(String id, float weight) {
 		this.id = id;
 		this.weight = weight;
 	}

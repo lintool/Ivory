@@ -16,42 +16,48 @@
 
 package ivory.data;
 
-
 /**
  * <p>
- * Object that keeps track of the length of each document in the collection.
- * Document lengths are measured in number of terms.
+ * Interface representing an object that keeps track of the length of each
+ * document in the collection. Document lengths are measured in number of terms.
+ * The number of documents <i>n</i> is provided by {@link #getDocCount()}, and
+ * the documents are consecutively numbered, starting from <i>d</i> + 1, where
+ * <i>d</i> is the by value provided by {@link #getDocnoOffset()}.
  * </p>
  * 
  * <p>
- * Document length data is stored in a serialized data file, in the following
- * format: the data file consists of one long stream of integers. The first
- * integer in the stream specifies the number of documents in the collection (<i>n</i>).
- * Thereafter, the input stream contains exactly <i>n</i> integers, one for
- * every document in the collection. Since the documents are numbered
- * sequentially, each one of these integers corresponds to the length of
- * documents 1 ... <i>n</i> in the collection. Note that documents are numbered
- * starting from one because it is impossible to express zero in many
- * compression schemes (e.g., Golomb encoding).
+ * The notion of docno offset is necessary for large document collections that
+ * are partitioned, where docnos need to be consecutively numbered across
+ * partitions. For example, the first English segment of ClueWeb09 contains
+ * 50,220,423 documents, has a docno offset of 0, and contains documents
+ * numbered from 1 to 50,220,423. The second segment has a docno offset of
+ * 50,220,423 and begins with docno 50,220,424. By convention, docnos are
+ * numbered starting at one because it is impossible to code zero using certain
+ * schemes (e.g., gamma codes).
  * </p>
  * 
  * @author Jimmy Lin
  * 
  */
 public interface DocLengthTable {
-
 	/**
 	 * Returns the length of a document.
 	 */
 	public int getDocLength(int docno);
 
+	/**
+	 * Returns the first docno in this collection. All documents are number
+	 * consecutively from this value.
+	 */
 	public int getDocnoOffset();
 
+	/**
+	 * Returns the average document length.
+	 */
 	public float getAvgDocLength();
 
 	/**
 	 * Returns number of documents in the collection.
 	 */
 	public int getDocCount();
-
 }

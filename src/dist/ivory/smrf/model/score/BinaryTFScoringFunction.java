@@ -16,34 +16,13 @@
 
 package ivory.smrf.model.score;
 
-import ivory.smrf.model.GlobalEvidence;
-import ivory.smrf.model.GlobalTermEvidence;
-
-import org.w3c.dom.Node;
-
 /**
  * @author Don Metzler
  * 
  */
 public class BinaryTFScoringFunction extends ScoringFunction {
-
 	@Override
-	public void configure(Node domNode) {
-		// do nothing
+	public float getScore(int tf, int docLen) {
+		return tf > 0.0 ? 1.0f : 0.0f;
 	}
-
-	@Override
-	public double getScore(double tf, int docLen) {
-		if (tf > 0.0) {
-			return 1.0;
-		}
-
-		return 0.0;
-	}
-
-	@Override
-	public void initialize(GlobalTermEvidence termEvidence, GlobalEvidence globalEvidence) {
-		// do nothing
-	}
-
 }

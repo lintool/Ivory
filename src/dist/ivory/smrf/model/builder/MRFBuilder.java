@@ -16,54 +16,55 @@
 
 package ivory.smrf.model.builder;
 
+import java.io.IOException;
+
+import ivory.exception.ConfigurationException;
+import ivory.exception.RetrievalException;
 import ivory.smrf.model.MarkovRandomField;
+import ivory.smrf.model.constrained.GreedyConstrainedMRFBuilder;
 import ivory.util.RetrievalEnvironment;
 import ivory.util.XMLTools;
 
 import org.w3c.dom.Node;
 
+import com.google.common.base.Preconditions;
+
 /**
  * @author Don Metzler
- * 
  */
 public abstract class MRFBuilder {
 
 	protected RetrievalEnvironment mEnv = null;
 
 	public MRFBuilder(RetrievalEnvironment env) {
-		mEnv = env;
+		mEnv = Preconditions.checkNotNull(env);
 	}
 
-	public abstract MarkovRandomField buildMRF(String[] queryTerms) throws Exception;
+	public abstract MarkovRandomField buildMRF(String[] queryTerms) throws ConfigurationException;
 
-	public static MRFBuilder get(RetrievalEnvironment env, Node model) throws Exception {
-		if (model == null) {
-			throw new Exception("Unable to generate a MRFBuilder from a null node!");
-		}
+	public static MRFBuilder get(RetrievalEnvironment env, Node model) throws ConfigurationException {
+		Preconditions.checkNotNull(env);
+		Preconditions.checkNotNull(model);
 
-		// get model type
+		// Get model type.
 		String modelType = XMLTools.getAttributeValue(model, "type", null);
 		if (modelType == null) {
-			throw new Exception("Model type must be specified!");
+			throw new ConfigurationException("Model type must be specified!");
 		}
 
-		// build the builder
+		// Build the builder.
 		MRFBuilder builder = null;
 
-		System.out.println("The model type is .. "+modelType);
-
-		if (modelType.equals("Feature") || modelType.equals("WSD")) {
-			builder = new FeatureBasedMRFBuilder(env, model);
-
-		}
-		/* 
-		else if (modelType.equals("WSD")) { 
-			builder = new FeatureBasedWSDBuilder(env, model);
-		} 
-		*/
-
-		else {
-			throw new Exception("Unrecognized model type: " + modelType);
+		try {
+			if (modelType.equals("Feature")) {
+				builder = new FeatureBasedMRFBuilder(env, model);
+			} else if (modelType.equals("GreedyConstrained")) {
+				builder = new GreedyConstrainedMRFBuilder(env, model);
+			} else {
+				throw new ConfigurationException("Unrecognized model type: " + modelType);
+			}
+		} catch (IOException e) {
+			throw new RetrievalException("Error getting MRFBuilder: " + e);
 		}
 
 		return builder;

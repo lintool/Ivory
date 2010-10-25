@@ -61,15 +61,15 @@ public class XMLTools {
 	 * @param name
 	 * @param defaultValue
 	 */
-	public static double getAttributeValue(Node node, String name, double defaultValue) {
+	public static float getAttributeValue(Node node, String name, float defaultValue) {
 		String value = getAttributeValue(node, name, null);
 		if (value == null) {
 			setAttributeValue(node, name, defaultValue + "");
 			return defaultValue;
 		}
-		return Double.parseDouble(value);
+		return Float.parseFloat(value);
 	}
-
+	
 	/**
 	 * @param node
 	 * @param name
@@ -103,6 +103,9 @@ public class XMLTools {
 		return attributes.getNamedItem(name).getNodeValue();
 	}
 
+	public static String getStringAttributeValue(Node node, String name) {
+		return getAttributeValue(node, name, null);	}
+	
 	/**
 	 * @param node
 	 * @param name

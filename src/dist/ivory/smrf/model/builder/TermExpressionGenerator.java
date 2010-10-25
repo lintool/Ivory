@@ -18,21 +18,20 @@ package ivory.smrf.model.builder;
 
 import org.w3c.dom.Node;
 
+import com.google.common.base.Preconditions;
+
 /**
  * @author Don Metzler
- * 
  */
 public class TermExpressionGenerator extends ExpressionGenerator {
 
 	@Override
-	public void configure(Node domNode) throws Exception {
-	}
+	public void configure(Node domNode) {}
 
 	@Override
-	public String getExpression(String[] terms) {
-		// TODO: possibly add some error checking here to make sure this is
-		// actually a term
-		return terms[0];
+	public Expression getExpression(String[] terms) {
+		Preconditions.checkNotNull(terms);
+		return new Expression(terms[0]);
 	}
 
 	@Override

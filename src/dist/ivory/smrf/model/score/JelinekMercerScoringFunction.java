@@ -28,35 +28,35 @@ import org.w3c.dom.Node;
  */
 public class JelinekMercerScoringFunction extends ScoringFunction {
 
-	// smoothing parameter
-	private double mLambda = 0.7;
+	// Smoothing parameter.
+	private float mLambda = 0.7f;
 
-	// background probability
-	private double mBackgroundProb;
+	// Background probability.
+	private float mBackgroundProb;
 
-	// log of background probability (efficiency trick)
-	private double mLogBackgroundProb;
+	// Log of background probability (efficiency trick).
+	private float mLogBackgroundProb;
 
-	// maximum possible score
-	private double mMaxScore;
+	// Maximum possible score.
+	private float mMaxScore;
 
-	// is this term OOV?
+	// Is this term OOV?
 	private boolean mOOV = false;
 
 	@Override
 	public void configure(Node domNode) {
-		mLambda = XMLTools.getAttributeValue(domNode, "lambda", 0.5);
+		mLambda = XMLTools.getAttributeValue(domNode, "lambda", 0.7f);
 	}
 
 	@Override
-	public double getScore(double tf, int docLen) {
+	public float getScore(int tf, int docLen) {
 		if (mOOV) {
-			return 0.0;
+			return 0.0f;
 		}
 		if (tf == 0.0) {
 			return mLogBackgroundProb;
 		}
-		return Math.log((1.0 - mLambda) * (tf / docLen) + mLambda * mBackgroundProb);
+		return (float) Math.log((1.0f - mLambda) * (tf / docLen) + mLambda * mBackgroundProb);
 	}
 
 	@Override
@@ -68,21 +68,16 @@ public class JelinekMercerScoringFunction extends ScoringFunction {
 	public void initialize(GlobalTermEvidence termEvidence, GlobalEvidence globalEvidence) {
 		mOOV = termEvidence.cf == 0 ? true : false;
 		if (!mOOV) {
-			mBackgroundProb = (double) termEvidence.cf / (double) globalEvidence.collectionLength;
-			mLogBackgroundProb = Math.log(mLambda * mBackgroundProb);
-			mMaxScore = Math.log((1.0 - mLambda) + mLambda * mBackgroundProb);
+			mBackgroundProb = (float) termEvidence.cf / (float) globalEvidence.collectionLength;
+			mLogBackgroundProb = (float) Math.log(mLambda * mBackgroundProb);
+			mMaxScore = (float) Math.log((1.0f - mLambda) + mLambda * mBackgroundProb);
 		} else {
-			mMaxScore = 0.0;
+			mMaxScore = 0.0f;
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see ivory.smrf.model.score.ScoringFunction#getMaxScore()
-	 */
-	public double getMaxScore() {
+	@Override
+	public float getMaxScore() {
 		return mMaxScore;
 	}
-
 }

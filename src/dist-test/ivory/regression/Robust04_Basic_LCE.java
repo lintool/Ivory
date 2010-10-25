@@ -1,5 +1,6 @@
 package ivory.regression;
 
+import static ivory.regression.RegressionUtils.loadScoresIntoMap;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import ivory.eval.Qrels;
@@ -295,15 +296,6 @@ public class Robust04_Basic_LCE {
 			sLogger.info("Done!");
 		}
 
-	}
-
-	private static Map<String, Float> loadScoresIntoMap(String[] arr) {
-		Map<String, Float> scores = new HashMap<String, Float>();
-		for (int i = 0; i < arr.length; i += 2) {
-			scores.put(arr[i], Float.parseFloat(arr[i + 1]));
-		}
-
-		return scores;
 	}
 
 	private static void verifyResults(String model, Map<String, Accumulator[]> results,

@@ -17,38 +17,28 @@
 package ivory.smrf.retrieval;
 
 import java.io.Serializable;
+import java.util.Comparator;
+
+import com.google.common.base.Preconditions;
 
 /**
  * @author Don Metzler
- * 
  */
 public class Accumulator implements Comparable<Accumulator>, Serializable {
 
-	/**
-	 * serialization unique id
-	 */
 	private static final long serialVersionUID = -2003009119471096383L;
 
-	/**
-	 * docid associated with this accumulator
-	 */
 	public int docno = 0;
+	public float score = 0.0f;
 
-	/**
-	 * score associated with this accumulator
-	 */
-	public double score = 0.0;
-
-	/**
-	 * @param docno
-	 * @param score
-	 */
-	public Accumulator(int docno, double score) {
+	public Accumulator(int docno, float score) {
 		this.docno = docno;
 		this.score = score;
 	}
 
 	public int compareTo(Accumulator a) {
+		Preconditions.checkNotNull(a);
+		
 		if (score > a.score) {
 			return 1;
 		} else if (score < a.score) {
@@ -69,10 +59,28 @@ public class Accumulator implements Comparable<Accumulator>, Serializable {
 	}
 
 	public static int[] accumulatorsToDocnos(Accumulator[] results) {
+		Preconditions.checkNotNull(results);
+		
 		int[] ids = new int[results.length];
 		for (int i = 0; i < results.length; i++) {
 			ids[i] = results[i].docno;
 		}
 		return ids;
+	}
+	
+	public static class DocnoComparator implements Comparator<Accumulator> {
+		public int compare(Accumulator x, Accumulator y) {
+			Preconditions.checkNotNull(x);
+			Preconditions.checkNotNull(y);
+			
+			if( x.docno < y.docno ) {
+				return -1;
+			}
+			else if( x.docno > y.docno ) {
+				return 1;
+			}
+			
+			return 0;
+		}
 	}
 }

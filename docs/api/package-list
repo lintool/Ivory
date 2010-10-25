@@ -1,6 +1,7 @@
 ivory.data
 ivory.driver
 ivory.eval
+ivory.exception
 ivory.index
 ivory.preprocess
 ivory.pwsim
@@ -8,8 +9,11 @@ ivory.pwsim.score
 ivory.server
 ivory.smrf.model
 ivory.smrf.model.builder
+ivory.smrf.model.constrained
 ivory.smrf.model.expander
+ivory.smrf.model.importance
 ivory.smrf.model.potential
 ivory.smrf.model.score
 ivory.smrf.retrieval
+ivory.tokenize
 ivory.util

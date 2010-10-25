@@ -1,0 +1,1336 @@
+histori	2300690
+oil	479369
+histori oil	58
+industri	1476221
+oil industri	6378
+pearl	57850
+farm	599602
+pearl farm	47
+oper	3027718
+farm oper	12806
+actual	1109283
+oper actual	656
+actual farm	298
+cultur	265676
+oper cultur	27
+cultur pearl	5722
+japanes	116683
+pearl japanes	19
+japanes pearl	16
+product	1419834
+pearl product	28
+status	2947627
+product status	1722
+status pearl	2
+farm product	4543
+argument	307924
+use	8263707
+argument use	403
+join	236146
+use join	22
+intern	2241332
+join intern	138
+crimin	911248
+intern crimin	5061
+court	2102052
+crimin court	13979
+goal	1327936
+polit	430480
+goal polit	58
+view	5306013
+polit view	1930
+green	1485067
+view green	62
+parti	1333173
+green parti	2062
+identifi	2079923
+effort	1806490
+identifi effort	283
+propos	1653463
+effort propos	878
+undertaken	155988
+propos undertaken	2
+world	1235010
+undertaken world	18
+govern	3882574
+world govern	1073
+seek	528781
+govern seek	1882
+reduct	694088
+seek reduct	193
+iraq	111232
+reduct iraq	3
+foreign	882720
+iraq foreign	279
+debt	404159
+foreign debt	1855
+method	1432476
+control	3226643
+method control	639
+type	4648555
+control type	1971
+ii	1427240
+type ii	86933
+diabet	116658
+ii diabet	1574
+evid	778946
+aspirin	11609
+evid aspirin	1
+may	7535415
+aspirin may	218
+help	6599922
+may help	54692
+prevent	2514658
+help prevent	977807
+cancer	925738
+prevent cancer	1603
+sourc	3210213
+slate	52838
+sourc slate	18
+stone	222610
+slate stone	25
+decor	19742
+stone decor	42
+limit	1162842
+regul	2277823
+limit regul	753
+jockey	6348
+regul jockey	2
+weight	474847
+jockey weight	49
+hors	128560
+weight hors	6
+race	454153
+hors race	11956
+treatment	929908
+prostat	39236
+treatment prostat	78
+prostat cancer	23234
+secur	3725299
+measur	1763198
+secur measur	23367
+employ	841688
+measur employ	1168
+train	2079898
+employ train	3
+station	1622317
+train station	4241
+due	2243359
+station due	646
+heighten	35681
+due heighten	3
+heighten secur	2865
+concern	1456060
+secur concern	15984
+exampl	2443856
+actual exampl	687
+pyramid	24534
+exampl pyramid	13
+scheme	174055
+pyramid scheme	1780
+state	12089296
+maryland	777305
+state maryland	2996
+clean	466983
+maryland clean	485
+chesapeak	55907
+clean chesapeak	15
+bay	576042
+chesapeak bay	26483
+restrict	425596
+place	2382782
+restrict place	4691
+older	420753
+place older	193
+person	2133530
+older person	10693
+renew	124081
+person renew	219
+driver	439892
+renew driver	157
+licens	945470
+driver licens	93685
+organ	3605071
+privat	2188777
+organ privat	3853
+government	846734
+privat government	157
+develop	6483684
+government develop	2
+drug	715647
+develop drug	814
+combat	102320
+drug combat	12
+schizophrenia	18962
+combat schizophrenia	0
+spammer	3014
+arrest	61445
+spammer arrest	2
+su	28532
+arrest su	5
+send	1564668
+su send	1
+unsolicit	19738
+send unsolicit	755
+mail	3022147
+unsolicit mail	335
+local	3544725
+state local	436339
+offer	1822473
+local offer	51
+program	6936870
+offer program	3897
+gift	65866
+program gift	17501
+talent	38439
+gift talent	3005
+student	973099
+talent student	3103
+acid	305215
+control acid	346
+rain	231954
+acid rain	17276
+effect	2151279
+rain effect	170
+kind	505176
+harm	179384
+kind harm	0
+cruis	63392
+harm cruis	0
+ship	204706
+cruis ship	8392
+sea	466808
+ship sea	135
+life	1154862
+sea life	1525
+coral	61538
+life coral	33
+reef	57533
+coral reef	18060
+extent	1177533
+reef extent	6
+damag	602931
+extent damag	53
+find	4167345
+document	3422878
+find document	2405
+feder	4781770
+document feder	34529
+welfar	315423
+feder welfar	3528
+reform	499037
+welfar reform	28357
+legisl	802504
+reform legisl	9653
+legisl regul	7126
+polici	5884551
+regul polici	14517
+applic	3059359
+decenni	15891
+applic decenni	1
+census	916699
+decenni census	12908
+data	7721966
+census data	35100
+way	2458400
+iran	41389
+way iran	19
+support	4625392
+iran support	302
+terror	158254
+support terror	3030
+definit	2234859
+govern definit	809
+execut	2279379
+definit execut	169
+privileg	177338
+execut privileg	754
+contra	56086
+iran contra	665
+scandal	9913
+contra scandal	92
+consequ	382577
+scandal consequ	0
+caus	2067130
+lower	110611
+caus lower	150
+white	1582001
+lower white	10
+blood	300756
+white blood	8578
+cell	576628
+blood cell	35029
+count	1227893
+cell count	6881
+repair	518015
+made	2371859
+repair made	2378
+hubbl	17815
+made hubbl	2
+telescop	50725
+hubbl telescop	855
+specif	2914593
+identifi specif	23863
+instanc	419878
+specif instanc	6341
+church	169882
+instanc church	18
+arson	27824
+church arson	436
+what	3650339
+be	3015162
+what be	3204
+save	1387653
+be save	1218
+endang	160866
+save endang	527
+whale	28346
+endang whale	353
+revel	10109
+whistl	11143
+revel whistl	0
+blower	17460
+whistl blower	1856
+depart	6863421
+blower depart	0
+defens	637457
+depart defens	2556
+possibl	1643910
+complic	96613
+possibl complic	823
+potenti	1783023
+complic potenti	26
+danger	185413
+potenti danger	5880
+gastric	8571
+danger gastric	0
+bypass	79211
+gastric bypass	398
+surgeri	124613
+bypass surgeri	3929
+kurd	3775
+histori kurd	0
+chees	35295
+chees product	1050
+carri	1245740
+product carri	59
+airlin	78872
+regul airlin	41
+overbook	476
+airlin overbook	12
+recycl	269269
+project	4702590
+recycl project	2622
+success	741416
+project success	1791
+condit	4084892
+afghan	24758
+condit afghan	5
+women	954666
+afghan women	2112
+new	10220119
+women new	1701
+new govern	12778
+taliban	18884
+govern taliban	36
+anim	544320
+infect	66321
+anim infect	792
+bovin	17552
+infect bovin	37
+spongiform	5120
+bovin spongiform	3768
+encephalopathi	7765
+spongiform encephalopathi	4793
+known	1086038
+encephalopathi known	18
+bse	8987
+known bse	9
+mad	36158
+bse mad	257
+cow	153452
+mad cow	3236
+diseas	1525081
+cow diseas	2854
+found	2557318
+diseas found	820
+alleg	130259
+alleg made	3596
+enron	22500
+made enron	22
+culpabl	13207
+enron culpabl	0
+california	1794479
+culpabl california	0
+energi	2360194
+california energi	13018
+crisi	157903
+energi crisi	6478
+anthrax	23066
+exampl anthrax	59
+hoax	2605
+anthrax hoax	131
+habitat	308400
+organ habitat	154
+human	2242643
+habitat human	404
+activ	3918655
+human activ	34321
+involv	2611352
+activ involv	54647
+who	4074504
+who regul	926
+assist	201207
+regul assist	102
+live	1543674
+assist live	19199
+facil	2021352
+live facil	11062
+facil maryland	212
+artifici	122772
+intellig	268278
+artifici intellig	8518
+protect	2333609
+investor	111954
+protect investor	18
+fraud	521231
+investor fraud	84
+hedg	17866
+fraud hedg	1
+fund	1827936
+hedg fund	1606
+consider	832126
+regul consider	1145
+regist	1162015
+consider regist	34
+freighter	2855
+regist freighter	9
+countri	1649942
+freighter countri	0
+punish	50800
+sentenc	283495
+punish sentenc	48
+given	1530327
+sentenc given	493
+make	4293374
+given make	125
+sell	391117
+make sell	418
+counterfeit	24761
+sell counterfeit	201
+id	72998
+counterfeit id	15
+doomsday	890
+identifi doomsday	0
+cult	9077
+doomsday cult	57
+name	6200881
+cult name	0
+locat	5879210
+name locat	12050
+locat world	167
+job	1477513
+outsourc	7991
+job outsourc	17
+india	659589
+outsourc india	0
+oversight	641718
+control oversight	499
+comput	2447699
+oversight comput	17
+public	7817177
+comput public	186
+librari	5753093
+public librari	1376543
+name type	17386
+nuclear	575736
+type nuclear	177
+reactor	103471
+nuclear reactor	50814
+power	1005947
+reactor power	2010
+plant	1009418
+power plant	87527
+plant oper	17600
+unit	5788200
+oper unit	887
+unit state	3423258
+peopl	2781203
+puerto	338581
+peopl puerto	11
+rico	323873
+puerto rico	311247
+want	1186378
+rico want	10
+want state	473
+senat	249260
+john	1855717
+senat john	11517
+edward	333432
+john edward	3865
+posit	1757307
+edward posit	17
+posit women	188
+issu	3366097
+women issu	4821
+pay	1011877
+issu pay	334
+equiti	160518
+pay equiti	1824
+abort	30525
+equiti abort	0
+titl	3805776
+abort titl	14
+ix	195003
+titl ix	9160
+violenc	197073
+ix violenc	1
+violenc women	424
+give	1181157
+scrabbl	499
+give scrabbl	0
+player	124206
+scrabbl player	19
+player scrabbl	0
+play	1146141
+scrabbl play	0
+popular	196517
+play popular	8
+dam	165256
+remov	1505761
+dam remov	252
+environment	2713493
+remov environment	604
+impact	1116880
+environment impact	132925
+school	2227865
+program school	16235
+school prevent	287
+bulli	6000
+prevent bulli	153
+bulli student	31
+legal	1255529
+domest	982908
+legal domest	40
+domest human	1000
+adopt	388662
+human adopt	2
+histori locat	3327
+scottish	21269
+locat scottish	6
+highland	286139
+scottish highland	176
+game	323034
+highland game	110
+game unit	75
+volcan	599955
+locat volcan	6
+volcan activ	555773
+occur	1724066
+activ occur	10885
+present	2477523
+occur present	93
+day	3856858
+present day	19645
+boundari	414920
+day boundari	253
+territori	174983
+boundari territori	20
+show	1786683
+show exampl	2455
+mural	8580
+exampl mural	5
+embryon	11439
+stem	118887
+embryon stem	2769
+stem cell	18753
+cell restrict	40
+research	5152855
+place research	825
+civil	1255800
+war	349428
+civil war	47900
+battl	294838
+war battl	1613
+reenact	3625
+battl reenact	115
+held	1076355
+reenact held	5
+statist	1874731
+american	2764210
+statist american	454
+muslim	23342
+american muslim	1301
+mosqu	7252
+muslim mosqu	155
+mosqu school	106
+problem	1950112
+face	641551
+problem face	17660
+hmong	24285
+face hmong	2
+immigr	397387
+hmong immigr	60
+immigr unit	123
+consid	1308153
+who consid	987
+doctor	200123
+consid doctor	14
+first	3986277
+doctor first	763
+european	208061
+first european	2185
+settlement	365443
+european settlement	3408
+america	892189
+settlement america	16
+give human	173
+death	868615
+human death	805
+associ	2676736
+death associ	3018
+hunt	744953
+associ hunt	39
+hunt game	724
+increas	2081484
+be increas	2358
+mass	407247
+increas mass	753
+transit	195064
+mass transit	16560
+attribut	353610
+death attribut	1814
+attribut drug	28
+ephedra	2215
+drug ephedra	12
+ephedra known	2
+herbal	9049
+known herbal	4
+ingredi	76321
+herbal ingredi	122
+ma	421532
+ingredi ma	9
+huang	24532
+ma huang	345
+illicit	30905
+illicit activ	1406
+diamond	70669
+involv diamond	13
+includ	6961276
+diamond includ	69
+includ diamond	370
+smuggl	13125
+diamond smuggl	55
+requir	1891829
+pharmacist	50538
+requir pharmacist	44
+pharmacist licens	2040
+number	5989530
+number women	143
+women legisl	629
+percentag	570714
+legisl percentag	3
+total	3427408
+percentag total	1406
+total legisl	7
+legisl given	12
+given state	4209
+state women	1654
+employe	2436027
+identifi employe	1928
+kroll	3922
+employe kroll	0
+kroll associ	69
+kyrgyzstan	10722
+state kyrgyzstan	14
+kyrgyzstan unit	3
+relat	755571
+state relat	3008
+deform	19361
+deform found	15
+leopard	7031
+found leopard	2
+frog	26909
+leopard frog	2873
+rule	2026296
+guidelin	752120
+rule guidelin	1741
+display	2395876
+guidelin display	30
+display unit	71
+flag	189938
+state flag	6424
+legal status	17175
+slot	54835
+status slot	61
+machin	406914
+slot machin	4290
+gambl	60938
+machin gambl	67
+pennsylvania	751601
+gambl pennsylvania	1
+homeless	89270
+caus homeless	46
+commerci	1455306
+identifi commerci	740
+candi	27003
+commerci candi	48
+maker	988031
+candi maker	150
+maker give	70
+magnet	59162
+magnet school	4426
+school consid	336
+consid success	1246
+district	2210285
+success district	157
+creat	2034817
+district creat	4102
+hybrid	72446
+altern	840843
+hybrid altern	128
+fuel	520585
+altern fuel	23919
+passeng	171952
+fuel passeng	329
+car	349245
+passeng car	18250
+auto	193170
+car auto	349
+manufactur	327902
+auto manufactur	2088
+now	1682665
+manufactur now	507
+market	337318
+now market	335
+market develop	109
+futur	1689085
+develop futur	1733
+sale	1458462
+futur sale	2671
+golden	135407
+ratio	477766
+golden ratio	152
+formula	351935
+ratio formula	177
+descript	4315651
+formula descript	90
+descript exampl	3392
+javelina	1531
+collar	4515
+javelina collar	9
+peccari	442
+collar peccari	149
+geograph	1517734
+peccari geograph	0
+rang	2525638
+geograph rang	5204
+planet	632570
+earth	928750
+planet earth	6705
+arabl	3923
+earth arabl	10
+arabl present	0
+area	5128984
+present area	583
+water	2894031
+area water	10735
+sun	918007
+water sun	490
+soil	959293
+sun soil	44
+soil support	599
+support plant	1833
+plant life	8171
+step	1507930
+give step	727
+manag	1809857
+step manag	33
+manag control	783
+control protect	620
+squirrel	27926
+protect squirrel	2
+varieti	633884
+orang	292555
+varieti orang	129
+season	346262
+orang season	59
+mercuri	97536
+poison	57822
+mercuri poison	1325
+children	1293519
+poison children	949
+children occur	268
+occur school	40
+school measur	620
+measur be	3015
+taken	1051855
+be taken	32682
+taken prevent	16
+incid	291463
+prevent incid	708
+give definit	333
+definit descript	1802
+mersenn	94
+descript mersenn	0
+prime	179794
+mersenn prime	36
+prime number	2373
+histori present	574
+present status	5544
+ivori	11509
+status ivori	0
+bill	1659214
+ivori bill	290
+woodpeck	10584
+bill woodpeck	266
+yew	3274
+tree	511208
+yew tree	231
+grow	249729
+tree grow	1567
+globe	57625
+grow globe	1
+cultiv	22834
+give cultiv	0
+sunflow	27129
+cultiv sunflow	0
+revers	249729
+mortgag	144729
+revers mortgag	1889
+work	3996100
+mortgag work	71
+abandon	142310
+find abandon	57
+mine	681857
+abandon mine	13774
+reclam	164563
+mine reclam	14297
+reclam project	7140
+law	4055651
+descript law	142
+law restrict	702
+affect	1015645
+restrict affect	717
+saudi	45545
+affect saudi	10
+arabian	9407
+saudi arabian	2280
+arabian women	6
+right	2798498
+women right	7049
+histor	1593101
+background	2271233
+histor background	6171
+background present	240
+gullah	370
+status gullah	0
+geeche	73
+gullah geeche	41
+languag	1319709
+geeche languag	0
+languag cultur	1592
+social	1470529
+social secur	761535
+mean	2230339
+secur mean	1896
+test	2097106
+mean test	3437
+give exampl	6173
+bagpip	588
+exampl bagpip	0
+band	771185
+bagpip band	22
+pet	149458
+pet anim	1151
+therapi	381913
+anim therapi	73
+therapi human	203
+benefit	2031228
+human benefit	368
+refer	4777040
+notabl	100573
+refer notabl	32
+cocker	503
+notabl cocker	0
+spaniel	2653
+cocker spaniel	189
+bluegrass	11345
+histori bluegrass	2
+music	608108
+bluegrass music	455
+music give	62
+give locat	713
+locat bluegrass	0
+festiv	59801
+bluegrass festiv	215
+gray	772405
+wolv	9755
+gray wolv	1454
+reintroduc	13344
+wolv reintroduc	59
+wild	265260
+reintroduc wild	38
+histori develop	684
+develop locat	1491
+textil	84852
+locat textil	3
+mill	302404
+textil mill	17960
+massachusett	587966
+mill massachusett	13
+alzheim	163906
+anim alzheim	0
+alzheim research	378
+remedi	179861
+remedi treatment	27
+treatment given	2250
+lesson	188963
+given lesson	53
+lesson effect	3
+ovarian	20110
+effect ovarian	35
+ovarian cancer	11752
+origin	437240
+natur	2716427
+origin natur	247
+natur extent	4244
+spread	702585
+extent spread	15
+spread mean	105
+mean control	440
+kudzu	2024
+control kudzu	23
+volcano	31567
+impact volcano	1
+erupt	27328
+volcano erupt	544
+global	1263315
+erupt global	19
+temperatur	568739
+global temperatur	4180
+give histori	163
+holiday	243022
+histori holiday	344
+holiday way	3
+celebr	105333
+way celebr	21
+celebr may	177
+may day	5923
+resolut	1431335
+resolut propos	3284
+propos legisl	26229
+pass	891558
+legisl pass	11705
+ban	106832
+pass ban	33
+clone	81375
+ban clone	106
+clone human	2294
+rational	122794
+human rational	4
+rational ban	0
+theft	100764
+identifi theft	497
+passport	42722
+theft passport	34
+passport issu	812
+ident	199608
+issu ident	229
+ident theft	10942
+victim	240428
+theft victim	806
+victim show	64
+creditor	217865
+show creditor	6
+creditor law	188
+enforc	924278
+law enforc	401048
+offic	1057993
+enforc offic	60886
+question	99923
+offic question	301
+credit	914432
+question credit	6
+worthi	40814
+credit worthi	3630
+innoc	11714
+worthi innoc	0
+border	261982
+doctor border	5
+medecin	734
+border medecin	22
+frontier	836
+medecin frontier	0
+natur histori	3140
+sugar	111341
+histori sugar	16
+tariff	81264
+sugar tariff	164
+rate	1677725
+tariff rate	10405
+quota	45270
+rate quota	3781
+quota unit	16
+north	2648257
+involv north	25
+korean	79346
+north korean	9638
+korean govern	2145
+govern counterfeit	1
+currenc	83948
+counterfeit currenc	72
+wastewat	129363
+identifi wastewat	82
+wastewat treatment	57768
+treatment project	4099
+project involv	21944
+construct	253236
+involv construct	7
+construct natur	49
+wetland	203600
+natur wetland	2794
+timeshar	4223
+resal	47176
+timeshar resal	33
+recogn	793388
+state recogn	7144
+handwritten	18733
+recogn handwritten	30
+input	998883
+handwritten input	15
+input comput	120
+lead	881017
+condit lead	937
+lead doctor	24
+recommend	434840
+doctor recommend	729
+recommend total	162
+knee	32720
+total knee	962
+replac	338805
+knee replac	1259
+replac surgeri	768
+surgeri complic	1428
+can	5285794
+complic can	1013
+result	5223931
+can result	74210
+result surgeri	54
+atlant	365369
+intracoast	7476
+atlant intracoast	436
+waterway	76336
+intracoast waterway	3844
+johnstown	42419
+flood	228404
+johnstown flood	741
+flood johnstown	7
+johnstown pennsylvania	510
+account	1459094
+find account	118
+account actual	578
+coast	536019
+actual coast	16
+guard	262319
+coast guard	74440
+rescu	120585
+guard rescu	209
+effort made	9774
+usaid	46571
+made usaid	38
+usaid protect	12
+biodivers	35376
+protect biodivers	748
+galapago	4167
+biodivers galapago	0
+island	1066315
+galapago island	2627
+ecuador	38362
+island ecuador	461
+name right	1348
+sport	250060
+right sport	25
+stadium	26720
+sport stadium	1106
+acquir	980570
+stadium acquir	0
+known cultur	43
+cultur histori	2006
+chaco	2644
+histori chaco	3
+chaco peopl	5
+featur	1572511
+peopl featur	116
+featur chaco	3
+chaco cultur	875
+nation	7404485
+cultur nation	1231
+nation histor	48608
+park	1517343
+histor park	21682
+1890	204932
+known 1890	1
+1890 census	275
+import	91432
+fire	1265727
+import fire	1426
+ant	86890
+fire ant	2938
+ant can	248
+can control	39
+home	10804458
+work home	78609
+scam	18380
+home scam	147
+promot	1039639
+scam promot	14
+internet	1463712
+promot internet	313
+histori battl	86
+littl	1070672
+battl littl	12
+big	463998
+littl big	1102
+horn	183145
+big horn	15431
+june	2426139
+horn june	16
+25	4967657
+june 25	61784
+26	3545860
+25 26	510901
+1876	184508
+26 1876	114
+1876 refer	2
+custer	54485
+refer custer	0
+last	8232389
+custer last	252
+stand	570489
+last stand	847
+servic	8445392
+featur servic	1624
+continu	2457185
+servic continu	13599
+care	1466569
+continu care	9391
+retir	807921
+care retir	3295
+communiti	3273790
+retir communiti	5895
+ccrcs	1395
+communiti ccrcs	358
+current	4670815
+role	1509753
+current role	1904
+role civil	34
+air	1521853
+civil air	18799
+patrol	129205
+air patrol	18856
+patrol train	709
+particip	471558
+train particip	2671
+receiv	3399010
+particip receiv	8041
+deploy	126021
+deploy nation	222
+nation guard	65690
+guard unit	4889
+unit iraq	10
+relationship	1652758
+seminol	72199
+relationship seminol	0
+indian	796766
+seminol indian	861
+florida	907827
+indian florida	77
+descript applic	1352
+hidden	68650
+applic hidden	10
+markov	3585
+hidden markov	534
+model	2999515
+markov model	68
+algorithm	126271
+model algorithm	411
+compani	2009629
+compani organ	6706
+secret	109407
+organ secret	20
+mysteri	197948
+secret mysteri	5
+shopper	8811
+mysteri shopper	294
+materi	2555639
+kind materi	134
+materi intern	1160
+intern support	3951
+side	813005
+support side	207
+spanish	677398
+side spanish	58
+spanish civil	424
+past	977654
+locat past	87
+past present	17962
+present model	1427
+railroad	367605
+model railroad	272
+layout	110752
+railroad layout	12
+dull	8822
+measur dull	1
+dull intern	1804
+airport	240467
+intern airport	44288
+virginia	897579
+airport virginia	90
+labor	1041637
+involv labor	400
+union	799726
+labor union	23044
+union taken	27
+taken place	39796
+1980	1177949
+place 1980	31
+iceland	24648
+govern iceland	10
+global posit	28873
+system	5929055
+posit system	27911
+gps	95557
+system gps	16687
+gps research	48
+monitor	1342998
+research monitor	5887
+earthquak	116670
+monitor earthquak	206
+boston	270372
+central	1743973
+boston central	316
+arteri	27615
+central arteri	733
+arteri project	127
+project known	2069
+known big	20
+dig	32352
+big dig	545
+character	368485
+dig character	0
+pork	24582
+character pork	0
+level	3257501
+wage	381488
+level wage	2317
+paid	1057945
+wage paid	15421
+illeg	193751
+paid illeg	39
+illeg immigr	3509
+pre	725319
+1500	162329
+pre 1500	10
+1500 histori	49
+eskimo	11752
+histori eskimo	5
+inuit	1415
+eskimo inuit	18
+inuit peopl	94
+respond	838020
+human respond	3
+respond respond	3
+appear	774532
+respond appear	0
+coyot	26589
+appear coyot	10
+urban	1323660
+coyot urban	6
+suburban	117219
+urban suburban	15832
+suburban area	8026
+explain	440766
+techniqu	568253
+explain techniqu	96
+dye	12908
+techniqu dye	1
+dye textil	87
+textil identifi	4
+advantag	350850
+identifi advantag	160
+disadvantag	239837
+advantag disadvantag	2260
+definit locat	344
+characterist	1170529
+locat characterist	897
+geyser	4887
+characterist geyser	2
+camel	8040
+camel north	0
+north america	187041
+prehistor	19771
+america prehistor	29
+modern	193153
+prehistor modern	0
+time	5978146
+modern time	2968
+david	660003
+give david	44
+mccullough	9987
+david mccullough	523
+author	3746722
+mccullough author	15
+author life	301
+life work	3031
+award	1029322
+work award	738
+pol	69506
+who pol	1
+pot	53583
+pol pot	257
+segment	2998
+give segment	0
+duplic	497216
+segment duplic	36
+genom	333578
+duplic genom	1
+tomato	14381
+tomato farm	76
+product new	1422
+jersey	711818
+new jersey	695766
+hered	10607
+evid hered	0
+hered play	55
+play role	1055
+obes	30816
+role obes	0
+portug	41564
+role portug	2
+portug world	13
+world war	90513
+war ii	67904
+radio	469821
+identifi radio	81
+radio station	32926
+call	4137890
+station call	1675
+letter	924452
+call letter	2520
+letter locat	159
+ownership	286102
+locat ownership	476
+scalabl	17869
+vector	157193
+scalabl vector	212
+graphic	697412
+vector graphic	626
+frequent	1438021
+mississippi	538802
+frequent mississippi	2
+river	1435439
+mississippi river	35580
+river flood	6514
+bank	793791
+flood bank	23

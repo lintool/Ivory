@@ -235,6 +235,7 @@ public class RunDistributedRetrievalServers extends Configured implements Tool {
 		conf.set("Ivory.ConfigFile", configFile);
 		conf.set("Ivory.ConfigPath", configPath);
 		conf.setJobName("RetrievalServers");
+		//conf.set("mapred.child.java.opts", "-Xmx2048m");
 		conf.set("mapred.child.java.opts", "-Xmx2048m");
 		// conf.set("mapred.job.queue.name", "search");
 

@@ -40,6 +40,8 @@ public class Qrels {
 
 	private Map<String, Map<String, Boolean>> mQrels;
 
+	private float topics = 0;
+
 	/**
 	 * Creates a <code>Qrels</code> object from a file
 	 * 
@@ -58,7 +60,6 @@ public class Qrels {
 		}
 
 		String[] arr;
-
 		while ((arr = iter.nextValues()) != null) {
 			String qno = arr[0];
 			String docno = arr[2];
@@ -73,6 +74,8 @@ public class Qrels {
 			}
 		}
 	}
+
+	
 
 	/**
 	 * Determines if a document is relevant for a particular information need.
@@ -108,6 +111,8 @@ public class Qrels {
 		if (!mQrels.containsKey(qid))
 			return set;
 
+		topics++;
+
 		for (Entry<String, Boolean> e : mQrels.get(qid).entrySet()) {
 			if (e.getValue()) {
 				set.add(e.getKey());
@@ -128,4 +133,13 @@ public class Qrels {
 		return mQrels.keySet();
 	}
 
+
+	/**                     
+         * Used with RunQueryHDFSTrainWSD class
+	 *
+         * @return number of topics needed by RunQueryHDFSTrainWSD to compute effectiveness scores
+         */
+	public float helperHDFSTrainWSDTopics(){
+		return topics;
+	}
 }

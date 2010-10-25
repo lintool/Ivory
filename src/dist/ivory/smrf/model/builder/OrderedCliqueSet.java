@@ -16,42 +16,46 @@
 
 package ivory.smrf.model.builder;
 
-import ivory.smrf.model.Clique;
+import ivory.exception.ConfigurationException;
 import ivory.util.RetrievalEnvironment;
 import ivory.util.XMLTools;
 
-import java.util.ArrayList;
-
 import org.w3c.dom.Node;
+
+import com.google.common.base.Preconditions;
 
 /**
  * @author Don Metzler
- * 
  */
 public class OrderedCliqueSet extends CliqueSet {
 
+	public static final String TYPE = "Ordered";
+	
 	@Override
 	public void configure(RetrievalEnvironment env, String[] queryTerms, Node domNode)
-			throws Exception {
+			throws ConfigurationException {
+		Preconditions.checkNotNull(env);
+		Preconditions.checkNotNull(queryTerms);
+		Preconditions.checkNotNull(domNode);
+
 		String dependenceType = XMLTools.getAttributeValue(domNode, "dependence", "sequential");
 		boolean docDependent = XMLTools.getAttributeValue(domNode, "docDependent", true);
 
-		// initialize clique set
-		cliques = new ArrayList<Clique>();
+		// Initialize clique set.
+		clearCliques();
 
 		// generate clique set
 		if (dependenceType.equals("sequential")) {
-			cliques = CliqueFactory.getSequentialDependenceCliques(env, queryTerms, domNode,
-					docDependent);
+			addCliques(CliqueFactory.getSequentialDependenceCliques(env, queryTerms, domNode, docDependent));
 		} else if (dependenceType.equals("full")) {
-			cliques = CliqueFactory.getFullDependenceCliques(env, queryTerms, domNode, true,
-					docDependent);
+			addCliques(CliqueFactory.getFullDependenceCliques(env, queryTerms, domNode, true, docDependent));
 		} else {
-			throw new Exception("Unrecognized OrderedCliqueSet type: " + dependenceType);
+			throw new ConfigurationException("Unrecognized OrderedCliqueSet type \"" + dependenceType + "\"!");
 		}
 	}
 
+	@Override
 	public String getType() {
-		return "Ordered";
+		return TYPE;
 	}
 }

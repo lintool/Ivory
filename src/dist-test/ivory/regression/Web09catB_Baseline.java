@@ -1,8 +1,7 @@
 package ivory.regression;
 
-import static org.junit.Assert.assertEquals;
 import ivory.eval.Qrels;
-import ivory.eval.RankedListEvaluator;
+import ivory.regression.GroundTruth.Metric;
 import ivory.smrf.retrieval.Accumulator;
 import ivory.smrf.retrieval.BatchQueryRunner;
 
@@ -22,17 +21,17 @@ public class Web09catB_Baseline {
 
 	private static final Logger sLogger = Logger.getLogger(Web09catB_Baseline.class);
 
-	private static String[] bm25_rawAP = new String[] { "1", "0.5212", "2", "0.5116", "3",
-			"0.0007", "4", "0.0597", "5", "0.0779", "6", "0.1209", "7", "0.1247", "8", "0.0242",
-			"9", "0.1250", "10", "0.0174", "11", "0.4282", "12", "0.1549", "13", "0.0600", "14",
-			"0.0806", "15", "0.3438", "16", "0.3469", "17", "0.1294", "18", "0.1609", "19",
-			"0.0000", "20", "0.0000", "21", "0.4137", "22", "0.4806", "23", "0.0080", "24",
-			"0.1639", "25", "0.2739", "26", "0.0527", "27", "0.1993", "28", "0.2890", "29",
-			"0.0119", "30", "0.2322", "31", "0.4254", "32", "0.0734", "33", "0.4791", "34",
-			"0.0246", "35", "0.4572", "36", "0.1041", "37", "0.0624", "38", "0.1022", "39",
-			"0.1413", "40", "0.1838", "41", "0.2528", "42", "0.0180", "43", "0.4975", "44",
-			"0.0502", "45", "0.2768", "46", "0.7204", "47", "0.5047", "48", "0.1471", "49",
-			"0.2433", "50", "0.0779" };
+	private static String[] bm25_rawAP = new String[] { 
+			 "1", "0.5212",  "2", "0.5116",  "3", "0.0007",  "4", "0.0597",  "5", "0.0779", 
+			 "6", "0.1209",  "7", "0.1247",  "8", "0.0242",  "9", "0.1250", "10", "0.0174", 
+			"11", "0.4282", "12", "0.1549", "13", "0.0600", "14", "0.0806", "15", "0.3438",
+			"16", "0.3469", "17", "0.1294", "18", "0.1609", "19", "0.0000", "20", "0.0000",
+			"21", "0.4137", "22", "0.4806", "23", "0.0080", "24", "0.1639", "25", "0.2739",
+			"26", "0.0527", "27", "0.1993", "28", "0.2890", "29", "0.0119", "30", "0.2322",
+			"31", "0.4254", "32", "0.0734", "33", "0.4791", "34", "0.0246", "35", "0.4572",
+			"36", "0.1041", "37", "0.0624", "38", "0.1022", "39", "0.1413", "40", "0.1838",
+			"41", "0.2528", "42", "0.0180", "43", "0.4975", "44", "0.0502", "45", "0.2768",
+			"46", "0.7204", "47", "0.5047", "48", "0.1471", "49", "0.2433", "50", "0.0779" };
 
 	private static String[] bm25_rawP10 = new String[] { "1", "0.8000", "2", "1.0000", "3",
 			"0.0000", "4", "0.2000", "5", "0.1000", "6", "0.1000", "7", "0.4000", "8", "0.0000",
@@ -70,23 +69,19 @@ public class Web09catB_Baseline {
 			"0.4000", "45", "0.3000", "46", "0.8000", "47", "0.6000", "48", "0.1000", "49",
 			"0.4000", "50", "0.0000" };
 
-	private static Qrels sQrels;
-	private static DocnoMapping sMapping;
-
 	@Test
 	public void runRegression() throws Exception {
+		Map<String, GroundTruth> g = new HashMap<String, GroundTruth>();
 
-		Map<String, Map<String, Float>> AllModelsAPScores = new HashMap<String, Map<String, Float>>();
+		g.put("UMHOO-BM25-catB", new GroundTruth(Metric.AP, 50, bm25_rawAP, 0.2051f));
+		g.put("UMHOO-QL-catB", new GroundTruth(Metric.AP, 50, ql_rawAP, 0.1931f));
 
-		AllModelsAPScores.put("UMHOO-BM25-catB", loadScoresIntoMap(bm25_rawAP));
-		AllModelsAPScores.put("UMHOO-QL-catB", loadScoresIntoMap(ql_rawAP));
+		Map<String, GroundTruth> h = new HashMap<String, GroundTruth>();
 
-		Map<String, Map<String, Float>> AllModelsP10Scores = new HashMap<String, Map<String, Float>>();
+		h.put("UMHOO-BM25-catB", new GroundTruth(Metric.P10, 50, bm25_rawP10, 0.3720f));
+		h.put("UMHOO-QL-catB", new GroundTruth(Metric.P10, 50, ql_rawP10, 0.3380f));
 
-		AllModelsP10Scores.put("UMHOO-BM25-catB", loadScoresIntoMap(bm25_rawP10));
-		AllModelsP10Scores.put("UMHOO-QL-catB", loadScoresIntoMap(ql_rawP10));
-
-		sQrels = new Qrels("docs/data/clue/qrels.web09catB.txt");
+		Qrels qrels = new Qrels("docs/data/clue/qrels.web09catB.txt");
 
 		String[] params = new String[] { "docs/data/clue/run.web09catB.xml",
 				"docs/data/clue/queries.web09.xml" };
@@ -101,59 +96,17 @@ public class Web09catB_Baseline {
 
 		sLogger.info("Total query time: " + (end - start) + "ms");
 
-		sMapping = qr.getDocnoMapping();
+		DocnoMapping mapping = qr.getDocnoMapping();
 
 		for (String model : qr.getModels()) {
 			sLogger.info("Verifying results of model \"" + model + "\"");
 
 			Map<String, Accumulator[]> results = qr.getResults(model);
-
-			verifyResults(model, results, AllModelsAPScores.get(model), AllModelsP10Scores
-					.get(model));
+			g.get(model).verify(results, mapping, qrels);
+			h.get(model).verify(results, mapping, qrels);
 
 			sLogger.info("Done!");
 		}
-
-	}
-
-	private static Map<String, Float> loadScoresIntoMap(String[] arr) {
-		Map<String, Float> scores = new HashMap<String, Float>();
-		for (int i = 0; i < arr.length; i += 2) {
-			scores.put(arr[i], Float.parseFloat(arr[i + 1]));
-		}
-
-		return scores;
-	}
-
-	private static void verifyResults(String model, Map<String, Accumulator[]> results,
-			Map<String, Float> apScores, Map<String, Float> p10Scores) {
-		float apSum = 0, p10Sum = 0;
-		for (String qid : results.keySet()) {
-			float ap = (float) RankedListEvaluator.computeAP(results.get(qid), sMapping, sQrels
-					.getReldocsForQid(qid));
-
-			float p10 = (float) RankedListEvaluator.computePN(10, results.get(qid), sMapping,
-					sQrels.getReldocsForQid(qid));
-
-			apSum += ap;
-			p10Sum += p10;
-
-			sLogger.info("verifying qid " + qid + " for model " + model);
-			assertEquals(apScores.get(qid), ap, 10e-6);
-			assertEquals(p10Scores.get(qid), p10, 10e-6);
-		}
-
-		float MAP = (float) RankedListEvaluator.roundTo4SigFigs(apSum / 50.0f);
-		float P10Avg = (float) RankedListEvaluator.roundTo4SigFigs(p10Sum / 50.0f);
-
-		if (model.equals("UMHOO-BM25-catB")) {
-			assertEquals(0.2051, MAP, 10e-5);
-			assertEquals(0.3720, P10Avg, 10e-5);
-		} else if (model.equals("UMHOO-QL-catB")) {
-			assertEquals(0.1931, MAP, 10e-5);
-			assertEquals(0.3380, P10Avg, 10e-5);
-		}
-
 	}
 
 	public static junit.framework.Test suite() {

@@ -394,7 +394,7 @@ public class RunRetrievalBroker extends Configured implements Tool {
 			}
 
 			public Accumulator[] getZNormalizedResults() {
-				double sum = 0, sumSq = 0;
+				float sum = 0, sumSq = 0;
 				if (textResults == null)
 					return null;
 				String[] lines = textResults.split("\t");
@@ -410,7 +410,7 @@ public class RunRetrievalBroker extends Configured implements Tool {
 						continue;
 					}
 					i++;
-					double score = Double.parseDouble(lines[i]);
+					float score = Float.parseFloat(lines[i]);
 					sum += score;
 					sumSq += score * score;
 					i++;
@@ -422,8 +422,8 @@ public class RunRetrievalBroker extends Configured implements Tool {
 
 				}
 				int n = results.length;
-				double muo = sum / n;
-				double sigma = Math.sqrt((sumSq - n * muo * muo) / (n - 1));
+				float muo = sum / n;
+				float sigma = (float) Math.sqrt((sumSq - n * muo * muo) / (n - 1));
 
 				for (Accumulator a : results) {
 					a.score = (a.score - muo) / sigma;
@@ -433,7 +433,7 @@ public class RunRetrievalBroker extends Configured implements Tool {
 			}
 
 			public Accumulator[] getMaxMinNormalizedResults() {
-				double min = Double.MAX_VALUE, max = Double.MIN_VALUE;
+				float min = Float.MAX_VALUE, max = Float.MIN_VALUE;
 				if (textResults == null)
 					return null;
 				String[] lines = textResults.split("\t");
@@ -449,7 +449,7 @@ public class RunRetrievalBroker extends Configured implements Tool {
 						continue;
 					}
 					i++;
-					double score = Double.parseDouble(lines[i]);
+					float score = Float.parseFloat(lines[i]);
 					if (score > max)
 						max = score;
 					else if (score < min)
@@ -462,7 +462,7 @@ public class RunRetrievalBroker extends Configured implements Tool {
 					j++;
 
 				}
-				double d = max - min;
+				float d = max - min;
 				for (Accumulator a : results) {
 					a.score = (a.score - min) / d;
 				}
@@ -486,7 +486,7 @@ public class RunRetrievalBroker extends Configured implements Tool {
 						continue;
 					}
 					i++;
-					double score = Double.parseDouble(lines[i]);
+					float score = Float.parseFloat(lines[i]);
 					i++;
 					String originalDocID = lines[i];
 					docnoMapping.put(new Integer(docid), originalDocID);
@@ -536,7 +536,8 @@ public class RunRetrievalBroker extends Configured implements Tool {
 				}
 				sb.append(a.docno + "\t" + a.score + "\t" + origDocID + "\n");
 				k++;
-				if (k >= 2000)
+				//if (k >= 2000)
+				if (k >= 10000)
 					break;
 			}
 			return sb.toString();

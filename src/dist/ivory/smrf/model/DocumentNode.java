@@ -42,8 +42,9 @@ public class DocumentNode extends GraphNode {
 		mDocno = docno;
 	}
 
-	public int getType() {
-		return DOCUMENT;
+	@Override
+	public Type getType() {
+		return Type.DOCUMENT;
 	}
 
 	@Override

@@ -16,13 +16,12 @@
 
 package ivory.smrf.retrieval;
 
+import ivory.exception.ConfigurationException;
 import ivory.smrf.model.MarkovRandomField;
-import ivory.smrf.model.TermNode;
 import ivory.smrf.model.builder.MRFBuilder;
 import ivory.smrf.model.expander.MRFExpander;
 
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -32,9 +31,13 @@ import java.util.concurrent.Future;
 
 import org.apache.log4j.Logger;
 
+import com.google.common.base.Preconditions;
+
 /**
- * @author Don Metzler
+ * Multi-threaded implementation of class to run queries.
  * 
+ * @author Don Metzler
+ * @author Jimmy Lin
  */
 public class ThreadedQueryRunner implements QueryRunner {
 	private static final Logger sLogger = Logger.getLogger(ThreadedQueryRunner.class);
@@ -46,6 +49,11 @@ public class ThreadedQueryRunner implements QueryRunner {
 	private int mNumHits;
 
 	public ThreadedQueryRunner(MRFBuilder builder, MRFExpander expander, int numThreads, int numHits) {
+		Preconditions.checkNotNull(builder);
+
+		assert (numThreads > 0);
+		assert (numHits > 0);
+
 		mBuilder = builder;
 		mExpander = expander;
 		mThreadPool = Executors.newFixedThreadPool(numThreads);
@@ -53,15 +61,27 @@ public class ThreadedQueryRunner implements QueryRunner {
 		mNumHits = numHits;
 	}
 
+	/**
+	 * Runs a query asynchronously. Results can be fetched using
+	 * {@link getResults}.
+	 */
 	public void runQuery(String qid, String[] query) {
+		Preconditions.checkNotNull(qid);
+		Preconditions.checkNotNull(query);
+
 		Future<Accumulator[]> future = mThreadPool.submit(new ThreadTask(query, mBuilder,
-				mExpander, mNumHits));
+				mExpander, qid, mNumHits));
 		mQueryResults.put(qid, future);
 	}
 
+	/**
+	 * Runs a query synchronously, waiting until completion.
+	 */
 	public Accumulator[] runQuery(String[] query) {
+		Preconditions.checkNotNull(query);
+
 		Future<Accumulator[]> future = mThreadPool.submit(new ThreadTask(query, mBuilder,
-				mExpander, mNumHits));
+				mExpander, "query", mNumHits));
 		Accumulator[] results = null;
 		try {
 			results = future.get();
@@ -72,7 +92,11 @@ public class ThreadedQueryRunner implements QueryRunner {
 	}
 
 	/**
+	 * Fetches the results of a query. If necessary, waits until completion of
+	 * the query.
+	 * 
 	 * @param qid
+	 *            query id
 	 */
 	public Accumulator[] getResults(String qid) {
 		try {
@@ -86,15 +110,26 @@ public class ThreadedQueryRunner implements QueryRunner {
 		}
 	}
 
+	/**
+	 * Clears all stored results.
+	 */
 	public void clearResults() {
 		mQueryResults.clear();
 	}
 
+	/**
+	 * Returns results of all queries executed.
+	 */
 	public Map<String, Accumulator[]> getResults() {
 		Map<String, Accumulator[]> results = new LinkedHashMap<String, Accumulator[]>();
 		for (Map.Entry<String, Future<Accumulator[]>> e : mQueryResults.entrySet()) {
 			try {
-				results.put(e.getKey(), e.getValue().get());
+				Accumulator[] a = e.getValue().get();
+				
+				if ( a != null) {
+					results.put(e.getKey(), e.getValue().get());
+				}
+				
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}
@@ -102,74 +137,63 @@ public class ThreadedQueryRunner implements QueryRunner {
 		return results;
 	}
 
-	public class ThreadTask implements Callable<Accumulator[]> {
+	// Thread for running a query.  No need to expose implementation.
+	private class ThreadTask implements Callable<Accumulator[]> {
 		private String[] mQuery;
 		private MRFBuilder mBuilder;
 		private MRFExpander mExpander;
+		private String mQid;
 		private int mNumHits;
 
-		/**
-		 * @param query
-		 * @param builder
-		 * @param expander
-		 */
-		public ThreadTask(String[] query, MRFBuilder builder, MRFExpander expander, int numHits) {
+		public ThreadTask(String[] query, MRFBuilder builder, MRFExpander expander, String qid, int numHits) {
 			mQuery = query;
 			mBuilder = builder;
 			mExpander = expander;
+			mQid = qid;
 			mNumHits = numHits;
 		}
 
-		public Accumulator[] call() throws Exception {
-			long startTime;
-			long endTime;
-
+		public Accumulator[] call() {
 			try {
+				long startTime;
+				long endTime;
+
 				startTime = System.currentTimeMillis();
 
-				// build the MRF for this query
+				// Build the MRF for this query.
 				MarkovRandomField mrf = mBuilder.buildMRF(mQuery);
-				endTime = System.currentTimeMillis();
 
-				sLogger.info("MRF initialization time (ms): " + (endTime - startTime));
-
-				// retrieve documents using this MRF
-				startTime = System.currentTimeMillis();
+				// Retrieve documents using this MRF.
 				MRFDocumentRanker ranker = new MRFDocumentRanker(mrf, mNumHits);
 
-				// run initial query, if necessary
+				// Run initial query, if necessary.
 				Accumulator[] results = null;
 				if (mExpander != null) {
 					results = ranker.rank();
 				}
 
-				// perform pseudo-relevance feedback, if requested
+				// Perform pseudo-relevance feedback, if requested.
 				if (mExpander != null) {
-					// get expanded MRF
+					// Get expanded MRF.
 					MarkovRandomField expandedMRF = mExpander.getExpandedMRF(mrf, results);
 
-					// re-rank documents according to expanded MRF
+					// Re-rank documents according to expanded MRF.
 					ranker = new MRFDocumentRanker(expandedMRF, mNumHits);
 				}
 
-
-				endTime = System.currentTimeMillis();
-				sLogger.info("MRF document ranker initialization time (ms): "
-						+ (endTime - startTime));
-
-				// rank the documents
-				startTime = System.currentTimeMillis();
+				// Rank the documents.
 				results = ranker.rank();
+				
 				endTime = System.currentTimeMillis();
-				sLogger.info("MRF document ranking time (ms): " + (endTime - startTime));
+				sLogger.info("Processed query " + mQid + " in " + (endTime - startTime) + " ms.");
 
 				return results;
-			} catch (Exception e) {
+			} catch (ConfigurationException e) {
 				e.printStackTrace();
+				sLogger.error(e.getMessage());
+				
 				return null;
 			}
 		}
-
 	}
-
 }

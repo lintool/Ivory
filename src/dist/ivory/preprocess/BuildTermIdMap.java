@@ -69,15 +69,20 @@ public class BuildTermIdMap extends PowerTool {
 
 		public void configure(JobConf job) {
 			FileSystem fs;
-
 			try {
 				fs = FileSystem.get(job);
 			} catch (IOException e) {
-				throw new RuntimeException("error in creating files");
+				throw new RuntimeException("Error opening the FileSystem!");
 			}
 
 			String indexPath = job.get("Ivory.IndexPath");
-			RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fs);
+			
+			RetrievalEnvironment env = null;
+			try {
+				env = new RetrievalEnvironment(indexPath, fs);
+			} catch (IOException e) {
+				throw new RuntimeException("Unable to create RetrievalEnvironment!");
+			}
 
 			String termsFile = env.getIndexTermsData();
 			String idsFile = env.getIndexTermIdsData();

@@ -20,6 +20,11 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
+import org.apache.hadoop.fs.FSDataInputStream;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.mapred.JobConf;
+
 
 /**
  * A reader for processing delimited data files.  Typical usage pattern:
@@ -38,9 +43,11 @@ import java.io.InputStreamReader;
 public class DelimitedValuesFileReader {
 	public static final String DEFAULT_DELIMITER = "\t";
 	
-	private FileInputStream mStream;
+	//private FileInputStream mStream;
 
-	private BufferedReader mReader;
+	//private BufferedReader mReader;
+
+	private FSDataInputStream in;
 
 	private String mDelimiter;
 
@@ -57,9 +64,14 @@ public class DelimitedValuesFileReader {
 
 	public DelimitedValuesFileReader(String filename, String delimiter) {
 		mDelimiter = delimiter;
+
+		JobConf conf = new JobConf(DelimitedValuesFileReader.class);
+
 		try {
-			mStream = new FileInputStream(new File(filename));
-			mReader = new BufferedReader(new InputStreamReader(mStream));
+			in = FileSystem.get(conf).open(new Path(filename));
+
+			//mStream = new FileInputStream(new File(filename));
+			//mReader = new BufferedReader(new InputStreamReader(mStream));
 		} catch (Exception e) {
 			throw new RuntimeException("Error: '" + filename + "' not found");
 		}
@@ -75,7 +87,10 @@ public class DelimitedValuesFileReader {
 		String line = null;
 
 		try {
-			line = mReader.readLine();
+			//line = mReader.readLine();
+
+			line = in.readLine();
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -91,8 +106,8 @@ public class DelimitedValuesFileReader {
 	 */
 	public void destruct() {
 		try {
-			mReader.close();
-			mStream.close();
+			//mReader.close();
+			//mStream.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

@@ -24,13 +24,15 @@ import ivory.data.IntDocVectorsForwardIndex;
 import ivory.data.IntPostingsForwardIndex;
 import ivory.data.Posting;
 import ivory.data.PostingsList;
-import ivory.data.PostingsListDocSortedPositional;
 import ivory.data.PostingsReader;
-import ivory.data.PrefixEncodedTermIDMapWithIndex;
-import ivory.data.ProximityPostingsListOrderedWindow;
-import ivory.data.ProximityPostingsListUnorderedWindow;
+import ivory.data.ProximityPostingsReaderOrderedWindow;
+import ivory.data.ProximityPostingsReaderUnorderedWindow;
 import ivory.data.TermDocVector;
 import ivory.data.TermDocVectorsForwardIndex;
+import ivory.data.TermIdMapWithCache;
+import ivory.smrf.model.builder.Expression;
+import ivory.smrf.model.importance.ConceptImportanceModel;
+import ivory.tokenize.Tokenizer;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -57,15 +59,10 @@ import edu.umd.cloud9.util.FSProperty;
  */
 public class RetrievalEnvironment {
 
-	/**
-	 * logger
-	 */
-	private static final Logger LOGGER = Logger.getLogger(RetrievalEnvironment.class);
+	private static final Logger LOG = Logger.getLogger(RetrievalEnvironment.class);
 
-	/**
-	 * postings reader cache
-	 */
-	Map<String, ivory.data.PostingsListDocSortedPositional.PostingsReader> mPostingsReaderCache = null;
+	// postings reader cache
+	Map<String, PostingsReader> mPostingsReaderCache = null;
 
 	/**
 	 * default df value
@@ -109,17 +106,28 @@ public class RetrievalEnvironment {
 	 */
 	private IntPostingsForwardIndex mTermPostingsIndex;
 
-	private PrefixEncodedTermIDMapWithIndex mTermIdMap;
+	private TermIdMapWithCache mTermIdMap;
 
 	private FileSystem mFs;
 	private String mIndexPath;
 
 	private IntDocVectorsForwardIndex mIntDocVectorsIndex;
-	// private TermDocVectorsIndex mTermDocVectorsIndex;
 
-	private Map<String, DocScoreTable> mDocScores = new HashMap<String, DocScoreTable>();
+	/**
+	 * (globally-defined) query-independent document priors
+	 */
+	private final Map<String, DocScoreTable> mDocScores = new HashMap<String, DocScoreTable>();
 
-	public RetrievalEnvironment(String indexPath, FileSystem fs) {
+	/**
+	 * (globally-defined) concept importance models
+	 */
+	private final Map<String, ConceptImportanceModel> mImportanceModels = new HashMap<String, ConceptImportanceModel>();
+	
+	public RetrievalEnvironment(String indexPath, FileSystem fs) throws IOException {
+		if (!fs.exists(new Path(indexPath))) {
+			throw new IOException("Index path " + indexPath + " doesn't exist!");
+		}
+
 		mIndexPath = indexPath;
 		mFs = fs;
 	}
@@ -142,7 +150,7 @@ public class RetrievalEnvironment {
 
 		// read the table of doc lengths
 		if (loadDoclengths) {
-			LOGGER.info("Loading doclengths table...");
+			LOG.info("Loading doclengths table...");
 			mDocumentLengths = new DocLengthTable2B(getDoclengthsData(), mFs);
 		}
 
@@ -152,33 +160,40 @@ public class RetrievalEnvironment {
 		// read collection frequencies
 		mDefaultCf = mDefaultDf * 2; // heuristic
 
-		LOGGER.info("IndexPath: " + mIndexPath);
-		LOGGER.info("PostingsType: " + mPostingsType);
-		LOGGER.info("Collection document count: " + mDocumentCount);
-		LOGGER.info("Collection length: " + mCollectionLength);
+		LOG.info("IndexPath: " + mIndexPath);
+		LOG.info("PostingsType: " + mPostingsType);
+		LOG.info("Collection document count: " + mDocumentCount);
+		LOG.info("Collection length: " + mCollectionLength);
 
 		// initialize the tokenizer; this information is stored along with the
 		// index since we need to use the same tokenizer to parse queries
 		try {
 			String tokenizer = readTokenizerClass();
-			LOGGER.info("Tokenizer: " + tokenizer);
+
+			if (tokenizer.startsWith("ivory.util.GalagoTokenizer")) {
+				LOG
+						.warn("Warning: GalagoTokenizer has been refactored to ivory.tokenize.GalagoTokenizer!");
+				tokenizer = "ivory.tokenize.GalagoTokenizer";
+			}
+
+			LOG.info("Tokenizer: " + tokenizer);
 			mTokenizer = (Tokenizer) Class.forName(tokenizer).newInstance();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
-		LOGGER.info("Loading postings index...");
+		LOG.info("Loading postings index...");
 
 		long termCnt = readCollectionTermCount();
 
-		LOGGER.info("Number of terms: " + termCnt);
+		LOG.info("Number of terms: " + termCnt);
 		mTermPostingsIndex = new IntPostingsForwardIndex(mIndexPath, mFs);
-		LOGGER.info("Done!");
+		LOG.info("Done!");
 
 		try {
-			mTermIdMap = new PrefixEncodedTermIDMapWithIndex(new Path(getIndexTermsData()),
+			mTermIdMap = new TermIdMapWithCache(new Path(getIndexTermsData()),
 					new Path(getIndexTermIdsData()), new Path(getIndexTermIdMappingData()), 0.2f,
-					true, mFs);
+					mFs);
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new RuntimeException("Error initializing Term to Id map!");
@@ -187,26 +202,30 @@ public class RetrievalEnvironment {
 		try {
 			mIntDocVectorsIndex = new IntDocVectorsForwardIndex(mIndexPath, mFs);
 		} catch (Exception e) {
-			LOGGER
+			LOG
 					.warn("Unable to load IntDocVectorsForwardIndex: relevance feedback will not be available.");
 		}
 
-		mPostingsReaderCache = new HashMap<String, ivory.data.PostingsListDocSortedPositional.PostingsReader>();
+		mPostingsReaderCache = new HashMap<String, PostingsReader>();
 	}
 
 	@SuppressWarnings("unchecked")
 	public void loadDocScore(String type, String provider, String path) {
+		// LOGGER.setLevel(Level.ALL);
+		LOG.info("Loading doc scores of type: " + type + ", from: " + path + ", prvider: "
+				+ provider);
 		try {
 			Class<? extends DocScoreTable> clz = (Class<? extends DocScoreTable>) Class
 					.forName(provider);
 			DocScoreTable s = clz.newInstance();
 			s.initialize(path, mFs);
-
 			mDocScores.put(type, s);
+			LOG.info(s.getDocCount() + ", " + s.getDocnoOffset());
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new RuntimeException();
 		}
+		LOG.info("Loading done.");
 	}
 
 	public float getDocScore(String type, int docno) {
@@ -216,6 +235,14 @@ public class RetrievalEnvironment {
 		return mDocScores.get(type).getScore(docno);
 	}
 
+	public void addImportanceModel(String key, ConceptImportanceModel m) {
+		mImportanceModels.put(key, m);
+	}
+
+	public ConceptImportanceModel getImportanceModel(String id) {
+		return mImportanceModels.get(id);
+	}
+	
 	public void loadIntDocVectorsIndex() {
 		// mIntDocVectorsIndex
 	}
@@ -236,6 +263,45 @@ public class RetrievalEnvironment {
 		return mCollectionLength;
 	}
 
+	public PostingsReader getPostingsReader(Expression exp) {
+		PostingsReader postings = null;
+		try {
+			if (exp.getType().equals(Expression.Type.OD)) {
+				int gapSize = exp.getWindow();
+				String[] terms = exp.getTerms();
+
+				List<PostingsReader> readers = new ArrayList<PostingsReader>();
+				for (int i = 0; i < terms.length; i++) {
+					PostingsReader reader = constructPostingsReader(terms[i]);
+					readers.add(reader);
+				}
+
+				postings = new ProximityPostingsReaderOrderedWindow(readers
+						.toArray(new PostingsReader[0]), gapSize);
+			} else if (exp.getType().equals(Expression.Type.UW)) {
+				int windowSize = exp.getWindow();
+				String[] terms = exp.getTerms();
+
+				List<PostingsReader> readers = new ArrayList<PostingsReader>();
+				for (int i = 0; i < terms.length; i++) {
+					PostingsReader reader = constructPostingsReader(terms[i]);
+					readers.add(reader);
+				}
+
+				postings = new ProximityPostingsReaderUnorderedWindow(readers
+						.toArray(new PostingsReader[0]), windowSize);
+			} else {
+				postings = constructPostingsReader(exp.getTerms()[0]);
+			}
+		} catch (Exception e) {
+			LOG.error("Unable to initialize PostingsReader!");
+
+			e.printStackTrace();
+		}
+
+		return postings;
+	}
+	
 	/**
 	 * @param expression
 	 */
@@ -250,55 +316,55 @@ public class RetrievalEnvironment {
 						expression.indexOf(')')).trim();
 				String[] terms = expression.split(" ");
 
-				List<PostingsListDocSortedPositional.PostingsReader> readers = new ArrayList<PostingsListDocSortedPositional.PostingsReader>();
+				List<PostingsReader> readers = new ArrayList<PostingsReader>();
 				for (int i = 0; i < terms.length; i++) {
-					PostingsListDocSortedPositional.PostingsReader reader = constructPostingsReader(terms[i]);
+					PostingsReader reader = constructPostingsReader(terms[i]);
 					readers.add(reader);
 				}
 
-				postings = new ProximityPostingsListOrderedWindow(readers
-						.toArray(new PostingsListDocSortedPositional.PostingsReader[0]), gapSize);
+				postings = new ProximityPostingsReaderOrderedWindow(readers
+						.toArray(new PostingsReader[0]), gapSize);
 			} else if (expression.startsWith("#uw")) {
 				int windowSize = Integer.parseInt(expression.substring(3, expression.indexOf('(')));
 				expression = expression.substring(expression.indexOf('(') + 1,
 						expression.indexOf(')')).trim();
 				String[] terms = expression.split(" ");
 
-				List<PostingsListDocSortedPositional.PostingsReader> readers = new ArrayList<PostingsListDocSortedPositional.PostingsReader>();
+				List<PostingsReader> readers = new ArrayList<PostingsReader>();
 				for (int i = 0; i < terms.length; i++) {
-					PostingsListDocSortedPositional.PostingsReader reader = constructPostingsReader(terms[i]);
+					PostingsReader reader = constructPostingsReader(terms[i]);
 					readers.add(reader);
 				}
 
-				postings = new ProximityPostingsListUnorderedWindow(readers
-						.toArray(new PostingsListDocSortedPositional.PostingsReader[0]), windowSize);
+				postings = new ProximityPostingsReaderUnorderedWindow(readers
+						.toArray(new PostingsReader[0]), windowSize);
 			} else {
 				postings = constructPostingsReader(expression);
 			}
 		} catch (Exception e) {
-			LOGGER.error("Error: unable to initialize PostingsReader");
+			LOG.error("Unable to initialize PostingsReader!");
+
 			e.printStackTrace();
 		}
 
 		return postings;
 	}
 
-	private ivory.data.PostingsListDocSortedPositional.PostingsReader constructPostingsReader(
-			String expression) throws Exception {
-		PostingsListDocSortedPositional.PostingsReader reader = null;
+	private PostingsReader constructPostingsReader(String expression) throws Exception {
+		PostingsReader reader = null;
+
 		if (mPostingsReaderCache != null) {
 			reader = mPostingsReaderCache.get(expression);
 		}
+
 		if (reader == null) {
 			PostingsList list = getPostingsList(expression);
 			if (list == null) {
 				return null;
 			}
-			reader = (PostingsListDocSortedPositional.PostingsReader) list.getPostingsReader();
-			// reader = (PostingsListDocSortedPositional.PostingsReader)
-			// mPostingsReaderConstructor.newInstance(list.getRawBytes(),
-			// list.getNumberOfPostings(), mDocumentLengths.getDocCount(),
-			// list);
+
+			reader = (PostingsReader) list.getPostingsReader();
+
 			if (mPostingsReaderCache != null) {
 				mPostingsReaderCache.put(expression, reader);
 			}
@@ -311,27 +377,27 @@ public class RetrievalEnvironment {
 		mPostingsReaderCache.clear();
 	}
 
-	/**
-	 * @throws IOException
-	 * @throws InstantiationException
-	 * @throws IllegalAccessException
-	 * @throws ClassNotFoundException
-	 */
-	private PostingsList getPostingsList(String term) throws IOException, InstantiationException,
-			IllegalAccessException, ClassNotFoundException {
+	private PostingsList getPostingsList(String term) {
 
-		// long start = System.currentTimeMillis();
 		int termid = mTermIdMap.getID(term);
 
 		if (termid == -1) {
-			throw new RuntimeException("couldn't find term id for query term \"" + term + "\"");
+			LOG.error("couldn't find term id for term \"" + term + "\"");
+			return null;
 		}
 
-		PostingsList value = mTermPostingsIndex.getPostingsList(termid);
-		// long duration = System.currentTimeMillis() - start;
+		PostingsList value;
+		try {
+			value = mTermPostingsIndex.getPostingsList(termid);
 
-		if (value == null)
+			if (value == null) {
+				LOG.error("couldn't find PostingsList for term \"" + term + "\"");
+				return null;
+			}
+		} catch (IOException e) {
+			LOG.error("couldn't find PostingsList for term \"" + term + "\"");
 			return null;
+		}
 
 		if (mDocumentCountLocal != -1) {
 			value.setCollectionDocumentCount(mDocumentCountLocal);
@@ -339,18 +405,19 @@ public class RetrievalEnvironment {
 			value.setCollectionDocumentCount(mDocumentCount);
 		}
 
-		// LOGGER.info("fetched \"" + term + "\" in " + duration + "ms (cf=" +
-		// value.getCf() + ", df="
-		// + value.getDf() + ")");
-
 		return value;
 	}
 
-	public IntDocVector[] documentVectors(int[] docSet) throws IOException {
+	public IntDocVector[] documentVectors(int[] docSet) {
 		IntDocVector[] dvs = new IntDocVector[docSet.length];
 
-		for (int i = 0; i < docSet.length; i++) {
-			dvs[i] = mIntDocVectorsIndex.getDocVector(docSet[i]);
+		try {
+			for (int i = 0; i < docSet.length; i++) {
+				dvs[i] = mIntDocVectorsIndex.getDocVector(docSet[i]);
+			}
+		} catch (IOException e) {
+			LOG.error("Unable to retrieve document vectors!");
+			return null;
 		}
 
 		return dvs;
@@ -359,9 +426,8 @@ public class RetrievalEnvironment {
 	/**
 	 * Returns the collection frequency of a particular expression.
 	 */
-	public long collectionFrequency(String expression) throws Exception {
-		// this is a heuristic: we currently don't support cf for proximity
-		// expressions
+	public long collectionFrequency(String expression) {
+		// Heuristic: we currently don't support cf for proximity expressions.
 		if (expression.startsWith("#od")) {
 			return mDefaultCf;
 		} else if (expression.startsWith("#uw")) {
@@ -371,16 +437,16 @@ public class RetrievalEnvironment {
 		try {
 			return getPostingsList(expression).getCf();
 		} catch (Exception e) {
-			throw new Exception(e);
+			LOG.error("Unable to get cf for " + expression);
+			return 0;
 		}
 	}
 
 	/**
 	 * Returns the document frequency of a particular expression.
 	 */
-	public int documentFrequency(String expression) throws Exception {
-		// this is a heuristic: we currently don't support df for proximity
-		// expressions
+	public int documentFrequency(String expression) {
+		// Heuristic: we currently don't support df for proximity expressions.
 		if (expression.startsWith("#od")) {
 			return mDefaultDf;
 		} else if (expression.startsWith("#uw")) {
@@ -390,7 +456,8 @@ public class RetrievalEnvironment {
 		try {
 			return getPostingsList(expression).getDf();
 		} catch (Exception e) {
-			throw new Exception(e);
+			LOG.error("Unable to get cf for " + expression);
+			return 0;
 		}
 	}
 
@@ -474,7 +541,8 @@ public class RetrievalEnvironment {
 	/**
 	 * Returns file that contains an index into the {@link IntDocVector}
 	 * representation of the collection. This file serves as input to
-	 * {@link IntDocVectorsForwardIndex}, which provides random access to the document
+	 * {@link IntDocVectorsForwardIndex}, which provides random access to the
+	 * document
 	 * vectors.
 	 */
 	public String getIntDocVectorsForwardIndex() {
@@ -501,6 +569,17 @@ public class RetrievalEnvironment {
 
 	public String getWeightedTermDocVectorsDirectory() {
 		return appendPath(mIndexPath, "wt-term-doc-vectors/");
+	}
+
+	/**
+	 * Returns file that contains an index into the {@link WeightedIntDocVector}
+	 * representation of the collection. This file serves as input to
+	 * {@link WeightedIntDocVectorsForwardIndex}, which provides random access to the
+	 * document
+	 * vectors.
+	 */
+	public String getWeightedIntDocVectorsForwardIndex() {
+		return appendPath(mIndexPath, "wt-int-doc-vectors-forward-index.dat");
 	}
 
 	public String getWeightedIntDocVectorsDirectory() {
@@ -587,7 +666,8 @@ public class RetrievalEnvironment {
 
 	/**
 	 * Returns file that contains an index into the postings. This file serves
-	 * as input to {@link IntPostingsForwardIndex}, which provides random access to
+	 * as input to {@link IntPostingsForwardIndex}, which provides random access
+	 * to
 	 * postings lists.
 	 */
 	public String getPostingsIndexData() {
@@ -721,10 +801,10 @@ public class RetrievalEnvironment {
 		String termOrig = term;
 		String termTokenized = env.tokenize(termOrig)[0];
 
-		LOGGER.info("term=" + termOrig + ", tokenized=" + termTokenized);
+		LOG.info("term=" + termOrig + ", tokenized=" + termTokenized);
 		reader = env.getPostingsReader(termTokenized);
 		df = reader.getNumberOfPostings();
-		LOGGER.info("First ten postings: ");
+		LOG.info("First ten postings: ");
 		for (int i = 0; i < (df < 10 ? df : 10); i++) {
 			reader.nextPosting(p);
 			System.out.print(p);
@@ -737,35 +817,29 @@ public class RetrievalEnvironment {
 		System.out.println("total time: " + (endTime - startTime) + "ms");
 	}
 
-	public static DocnoMapping loadDocnoMapping(String indexPath, FileSystem fs) {
+	public DocnoMapping getDocnoMapping() throws IOException {
+		return loadDocnoMapping(mIndexPath, mFs);
+	}
+
+	public static DocnoMapping loadDocnoMapping(String indexPath, FileSystem fs) throws IOException {
 		DocnoMapping mDocMapping = null;
 		// load the docid to docno mappings
 		try {
-			LOGGER.info("Loading DocnoMapping file ...");
+			LOG.info("Loading DocnoMapping file ...");
 			RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fs);
 
 			String className = env.readDocnoMappingClass();
-			LOGGER.info(" Class name: " + className);
+			LOG.info(" Class name: " + className);
 			mDocMapping = (DocnoMapping) Class.forName(className).newInstance();
 
 			String mappingFile = env.getDocnoMappingData();
-			LOGGER.info(" File name: " + mappingFile);
+			LOG.info(" File name: " + mappingFile);
 			mDocMapping.loadMapping(new Path(mappingFile), fs);
-			LOGGER.info("Loading Done.");
+			LOG.info("Loading Done.");
 		} catch (Exception e) {
-			e.printStackTrace();
-			throw new RuntimeException("Error initializing DocnoMapping!");
+			throw new IOException("Error initializing DocnoMapping!");
 		}
 		return mDocMapping;
-	}
-
-	public static DocnoMapping loadDocnoMapping(String indexPath) {
-		try {
-			return loadDocnoMapping(indexPath, FileSystem.get(new Configuration()));
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new RuntimeException("Error initializing DocnoMapping!");
-		}
 	}
 
 	public static void main(String[] args) throws Exception {
@@ -794,4 +868,5 @@ public class RetrievalEnvironment {
 		}
 
 	}
+
 }

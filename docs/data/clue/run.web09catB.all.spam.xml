@@ -1,0 +1,129 @@
+<parameters>
+
+     <index>/fs/clip-clueweb/indexes/clue.en.01</index>
+
+     <docscore type="spam" provider="ivory.data.SpamPercentileScore">/fs/clip-clueweb/indexes/clue.en.01/docscores-spam.dat</docscore>
+     
+     <model id="ql-base" type="Feature" output="ranking.web09catB.spam.ql.base.txt" hits="1000" >
+         <feature id="termWt" weight="1.0" 
+                  cliqueSet="ivory.smrf.model.builder.TermCliqueSet"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.TermExpressionGenerator"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1000.0" />
+         <feature id="docscore" type="spam" weight="0.5" 
+		  cliqueSet="ivory.smrf.model.builder.DocumentCliqueSet"
+		  potential="ivory.smrf.model.potential.DocumentPotential" />
+     </model>
+     
+	 
+     <model id="ql-sd" type="Feature" output="ranking.web09catB.spam.ql.sd.txt" hits="1000" >
+         <feature id="termWt" weight="0.82"
+                  cliqueSet="ivory.smrf.model.builder.TermCliqueSet"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.TermExpressionGenerator"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1000.0" />
+         <feature id="orderedWt" weight="0.09" 
+                  cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.OrderedWindowExpressionGenerator" width="1"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="750.0" />
+         <feature id="unorderedWt" weight="0.09"
+                  cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.UnorderedWindowExpressionGenerator" width="4"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="750.0" />
+	 <feature id="docscore" type="spam" weight="0.5"
+		  cliqueSet="ivory.smrf.model.builder.DocumentCliqueSet"
+		  potential="ivory.smrf.model.potential.DocumentPotential"/>
+     </model>
+
+     <importancemodel id="ql-importance" type="ivory.smrf.model.importance.LinearImportanceModel">
+         <feature id="collection_freq" weight="0.05094905094905" file="docs/data/clue/stats.clue.cf.collection.txt.norm" default="0.0"/>
+         <feature id="document_freq" weight="0.947984616861826" file="docs/data/clue/stats.clue.df.collection.txt.norm" default="0.01408541"/>
+         <feature id="enwiki_cf" weight="0.0010663321891229" file="docs/data/clue/stats.clue.cf.enwiki.txt.norm" default="0.0"/>
+     </importancemodel>
+	 
+     <model id="ql-wsd" type="Feature" output="ranking.web09catB.spam.ql.wsd.txt" hits="1000" normalizeImportance="true">
+          
+         <feature id="termWt" importance="ql-importance"
+                  cliqueSet="ivory.smrf.model.builder.TermCliqueSet"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.TermExpressionGenerator"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1000.0" />
+         <feature id="orderedWt" importance="ql-importance"
+                  cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.OrderedWindowExpressionGenerator" width="1"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="750.0" />  
+         <feature id="unorderedWt" importance="ql-importance"
+                  cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.UnorderedWindowExpressionGenerator" width="4"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="750.0" />
+         <feature id="docscore" type="spam" weight="0.3"
+		  cliqueSet="ivory.smrf.model.builder.DocumentCliqueSet"
+                  potential="ivory.smrf.model.potential.DocumentPotential" />
+     </model>
+	 
+     <model id="bm25-base" type="Feature" output="ranking.web09catB.spam.bm25.base.txt" hits="1000" >
+         <feature id="term" weight="1.0"
+                  cliqueSet="ivory.smrf.model.builder.TermCliqueSet"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.TermExpressionGenerator"
+                  scoreFunction="ivory.smrf.model.score.BM25ScoringFunction" k1="0.5" b="0.3" />
+         <feature id="docscore" type="spam" weight="0.02"	
+		  cliqueSet="ivory.smrf.model.builder.DocumentCliqueSet"
+		  potential="ivory.smrf.model.potential.DocumentPotential"/>
+     </model>
+
+     <model id="bm25-sd" type="Feature" output="ranking.web09catB.spam.bm25.sd.txt" hits="1000" >
+         <feature id="term" weight="0.82"
+                  cliqueSet="ivory.smrf.model.builder.TermCliqueSet"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.TermExpressionGenerator"
+                  scoreFunction="ivory.smrf.model.score.BM25ScoringFunction" k1="0.5" b="0.3" />
+         <feature id="orderedWt" weight="0.09"
+                  cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet"
+                  dependence="sequential"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.OrderedWindowExpressionGenerator" width="1"
+                  scoreFunction="ivory.smrf.model.score.BM25ScoringFunction" k1="0.25" b="0.0" />
+         <feature id="unorderedWt" weight="0.09"
+                  cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet"
+                  dependence="sequential"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.UnorderedWindowExpressionGenerator" width="4"
+                  scoreFunction="ivory.smrf.model.score.BM25ScoringFunction" k1="0.25" b="0.0" />
+         <feature id="docscore" type="spam" weight="0.02"	
+		  cliqueSet="ivory.smrf.model.builder.DocumentCliqueSet"
+		  potential="ivory.smrf.model.potential.DocumentPotential" />
+     </model>
+
+     <importancemodel id="bm25-importance" type="ivory.smrf.model.importance.LinearImportanceModel">
+          <feature id="collection_freq" weight="0.79129799252949" file="docs/data/clue/stats.clue.cf.collection.txt.norm" default="0.0"/>
+          <feature id="document_freq" weight="0.10780290657140" file="docs/data/clue/stats.clue.df.collection.txt.norm" default="0.01408541"/>
+          <feature id="enwiki_cf" weight="0.10089910089910" file="docs/data/clue/stats.clue.cf.enwiki.txt.norm" default="0.0"/>
+     </importancemodel>
+
+     <model id="bm25-wsd" type="Feature" output="ranking.web09catB.spam.bm25.wsd.txt" hits="1000" normalizeImportance="true">
+         <feature id="term" importance="bm25-importance"
+                  cliqueSet="ivory.smrf.model.builder.TermCliqueSet"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.TermExpressionGenerator"
+                  scoreFunction="ivory.smrf.model.score.BM25ScoringFunction" k1="0.5" b="0.3" />
+         <feature id="orderedWt" importance="bm25-importance"
+                  cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.OrderedWindowExpressionGenerator" width="1"
+                  scoreFunction="ivory.smrf.model.score.BM25ScoringFunction" k1="0.25" b="0.0" />
+         <feature id="unorderedWt" importance="bm25-importance"
+                  cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.UnorderedWindowExpressionGenerator" width="4"
+                  scoreFunction="ivory.smrf.model.score.BM25ScoringFunction" k1="0.25" b="0.0" />
+         <feature id="docscore" type="spam" weight="0.03"
+		  cliqueSet="ivory.smrf.model.builder.DocumentCliqueSet"
+		  potential="ivory.smrf.model.potential.DocumentPotential" />
+     </model>
+	 
+</parameters>

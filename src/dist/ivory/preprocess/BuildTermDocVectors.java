@@ -18,9 +18,9 @@ package ivory.preprocess;
 
 import ivory.data.LazyTermDocVector;
 import ivory.data.TermDocVector;
-import ivory.util.DocumentProcessingUtils;
+import ivory.tokenize.DocumentProcessingUtils;
+import ivory.tokenize.Tokenizer;
 import ivory.util.RetrievalEnvironment;
-import ivory.util.Tokenizer;
 
 import java.io.IOException;
 import java.net.URI;
@@ -64,6 +64,9 @@ import edu.umd.cloud9.util.PowerTool;
 
 public class BuildTermDocVectors extends PowerTool {
 	private static final Logger sLogger = Logger.getLogger(BuildTermDocVectors.class);
+	static {
+		sLogger.setLevel(Level.WARN);
+	}
 
 	protected static enum Docs {
 		Skipped, Total, Empty, Exception, Started, Created, Read
@@ -172,7 +175,9 @@ public class BuildTermDocVectors extends PowerTool {
 			if (termPositionsMap.size() == 0) {
 				reporter.incrCounter(Docs.Empty, 1);
 			}
+			sLogger.info ("in BuildTermDocVectors map, created term positions map: " + termPositionsMap);
 			TermDocVector docVector = new LazyTermDocVector(termPositionsMap);
+			sLogger.info ("in BuildTermDocVectors map, created term doc vector:" + docVector);
 			startTime = System.currentTimeMillis();
 			keyOut.set(mDocno);
 			reporter.incrCounter(Docs.Created, 1);
@@ -181,6 +186,7 @@ public class BuildTermDocVectors extends PowerTool {
 			reporter.incrCounter(Docs.Total, 1);
 			int dl = DocumentProcessingUtils.getDocLengthFromPositionsMap(termPositionsMap);
 			// record the document length
+			sLogger.info ("in BuildTermDocVectors map, outputting mDocno: " + mDocno + ", dl: " + dl);
 			mDocLengths.put(mDocno, dl);
 		}
 

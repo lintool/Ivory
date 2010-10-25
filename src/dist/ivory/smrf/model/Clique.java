@@ -16,9 +16,13 @@
 
 package ivory.smrf.model;
 
+import ivory.exception.ConfigurationException;
 import ivory.smrf.model.potential.PotentialFunction;
 
+import java.util.Comparator;
 import java.util.List;
+
+import com.google.common.base.Preconditions;
 
 /**
  * @author Don Metzler
@@ -27,85 +31,71 @@ import java.util.List;
 public class Clique {
 
 	/**
-	 * potential function scale factor
-	 */
-	protected double mScaleFactor;
-
-	/**
 	 * nodes associated with this clique
 	 */
-	protected List<GraphNode> mNodes = null;
+	private List<GraphNode> mNodes = null;
 
 	/**
 	 * potential function associated with this clique
 	 */
-	protected PotentialFunction mFunction = null;
+	private PotentialFunction mFunction = null;
 
 	/**
 	 * parameter associated with this clique
 	 */
-	protected Parameter mParam = null;
+	private Parameter mParam = null;
 
 	/**
 	 * whether or not this clique is document dependent cliques it is up to the
 	 * user to keep track of this!
 	 */
-	protected boolean mDocDependent = true;
+	private boolean mDocDependent = true;
 
 	/**
-	 * query-dependent weight
+	 * combined weight = parameter weight * clique importance
 	 */
-	protected double cliqueWgt;
-
+	private float mCombinedWeight;
+	
 	/**
-	 * terms of this clique
+	 * query-dependent clique importance
 	 */
-	protected String cliqueTerms = null;
+	private float mImportance;
 
 	/**
 	 * clique type
 	 */
-	protected String cliqueType;
+	private String mType;
 
+	/**
+	 * textual representation of the term nodes in this clique
+	 */
+	private String mConcept;
+	
 	/**
 	 * @param nodes
 	 * @param f
 	 */
 	public Clique(List<GraphNode> nodes, PotentialFunction f, Parameter weight) {
-		mScaleFactor = 1.0;
-		mNodes = nodes;
-		mParam = weight;
-		cliqueWgt = mParam.weight;
-		mFunction = f;
-		mDocDependent = true;
+		this(nodes, f, weight, 1.0f, null, true);
 	}
 
-	/**
-	 * @param nodes
-	 * @param f
-	 * @param weight
-	 * @param docDependent
-	 * @throws Exception
-	 */
-	public Clique(List<GraphNode> nodes, PotentialFunction f, Parameter weight, boolean docDependent) {
-		mScaleFactor = 1.0;
-		mNodes = nodes;
-		mParam = weight;
-		cliqueWgt = mParam.weight;
-		mFunction = f;
+	public Clique(List<GraphNode> nodes, PotentialFunction f, Parameter param, float importance, String type, boolean docDependent) {
+		mNodes = Preconditions.checkNotNull(nodes);
+		mParam = Preconditions.checkNotNull(param);
+		mFunction = Preconditions.checkNotNull(f);
+
+		mImportance = importance;
+		mCombinedWeight = param.weight * importance;
+		mType = type;
 		mDocDependent = docDependent;
+		
+		mConcept = generateConcept();
 	}
 
-	public void initialize(GlobalEvidence globalEvidence) throws Exception {
+	public void initialize(GlobalEvidence globalEvidence) throws ConfigurationException {
+		Preconditions.checkNotNull(globalEvidence);
+		
 		mFunction.initialize(mNodes, globalEvidence);
-	}
-
-	/**
-	 * @return Returns the clique potential given the current configuration.
-	 * @throws Exception
-	 */
-	public double getPotential() throws Exception {
-		return mScaleFactor * mParam.weight * mFunction.getPotential();
 	}
 
 	/**
@@ -113,22 +103,8 @@ public class Clique {
 	 *         configuration.
 	 * @throws Exception
 	 */
-	public double getPotential2() throws Exception {
-		return mScaleFactor * mFunction.getPotential();
-	}
-
-	/**
-	 * @param scale
-	 */
-	public void setScaleFactor(double scale) {
-		mScaleFactor = scale;
-	}
-
-	/**
-	 * @return scale factor of clique
-	 */
-	public double getScaleFactor() {
-		return mScaleFactor;
+	public float getPotential() {
+		return mFunction.computePotential();
 	}
 
 	/**
@@ -141,45 +117,51 @@ public class Clique {
 	/**
 	 * @param id
 	 */
-	public void setParameterID(String id) {
+	public void setParameterId(String id) {
 		mParam.id = id;
 	}
 
 	/**
 	 * @return weight associated with this clique
 	 */
-	public double getWeight() {
-		return mParam.weight;
+	public float getWeight() {
+		return mCombinedWeight;
 	}
 
+	/**
+	 * @return clique-dependent importance
+	 */
+	public float getImportance() {
+		return mImportance;
+	}
+	
 	/**
 	 * @param weight
 	 */
-	public void setWeight(double weight) {
+	public void setParameterWeight(float weight) {
 		mParam.weight = weight;
+		mCombinedWeight = mParam.weight * mImportance;
 	}
 
-	/**
-	 * @return query-dependent weight associated with this clique
-	 */
-	public double getCliqueWeight() {
-		return cliqueWgt;
-	}
-
-	public void setCliqueWeight(double w) {
-		cliqueWgt = w;
+	public void setImportance(float w) {
+		mImportance = w;
+		mCombinedWeight = mParam.weight * w;
 	}
 
 	/**
 	 * @return clique terms
 	 */
-	public String getCliqueTerms() {
-		if (cliqueTerms != null)
-			return cliqueTerms;
-
+	public String getConcept() {
+		return mConcept;
+	}
+	
+	/**
+	 * @return textual representation of the term nodes in this clique
+	 */
+	private String generateConcept() {
 		StringBuilder sb = new StringBuilder();
 		for (GraphNode n : mNodes) {
-			if (n instanceof TermNode) {
+			if (n.getType() == GraphNode.Type.TERM) {
 				sb.append(((TermNode) n).getTerm()).append(" ");
 			}
 		}
@@ -187,19 +169,15 @@ public class Clique {
 		return sb.toString().trim();
 	}
 
-	public void setCliqueTerms(String ct) {
-		cliqueTerms = ct;
-	}
-
 	/**
 	 * @return clique type
 	 */
-	public String getCliqueType() {
-		return cliqueType;
+	public String getType() {
+		return mType;
 	}
 
-	public void setCliqueType(String t) {
-		cliqueType = t;
+	public void setType(String t) {
+		mType = t;
 	}
 
 	/**
@@ -230,12 +208,15 @@ public class Clique {
 
 	public String toString(boolean verbose) {
 		StringBuilder s = new StringBuilder();
-		s.append("<clique type=\"").append(cliqueType).append("\">");
+		s.append("<clique type=\"").append(mType).append("\">");
 
 		if (verbose) {
+			s.append("<docdependent>").append(mDocDependent).append("</docdependent>");
+			s.append("<weight>").append(mCombinedWeight).append("</weight>");
 			s.append(mFunction.toString());
+			s.append("<maxscore>").append(mFunction.getMaxScore()).append("</maxscore>");
 		} else {
-			s.append("<terms>").append(getCliqueTerms()).append("</terms>");
+			s.append("<terms>").append(getConcept()).append("</terms>");
 		}
 
 		s.append("</clique>");
@@ -243,18 +224,33 @@ public class Clique {
 		return s.toString();
 	}
 
-    //	public double getMaxScore() {
-    //		return mScaleFactor * mParam.weight * mFunction.getMaxScore();
-    //	}
-
-    public double getMaxScore() {
-	return mScaleFactor * cliqueWgt * mFunction.getMaxScore();
-    } 
+	public float getMaxScore() {
+		return mCombinedWeight * mFunction.getMaxScore();
+	}
 
 	/**
 	 * @param docid
 	 */
 	public void setNextCandidate(int docid) {
 		mFunction.setNextCandidate(docid);
+	}
+	
+	public static class MaxScoreComparator implements Comparator<Clique> {
+		public int compare(Clique a, Clique b) {
+			double maxScoreA = a.getMaxScore();
+			double maxScoreB = b.getMaxScore();
+			if (maxScoreA == maxScoreB) {
+				return 0;
+			} else if (maxScoreA < maxScoreB) {
+				return 1;
+			} else {
+				return -1;
+			}
+		}
+
+	}
+
+	public PotentialFunction getScoringFunction() {
+		return mFunction;
 	}
 }

@@ -16,14 +16,16 @@
 
 package ivory.smrf.model.potential;
 
-import ivory.data.ProximityPostingsReader;
 import ivory.data.Posting;
 import ivory.data.PostingsReader;
+import ivory.data.ProximityPostingsReader;
+import ivory.exception.ConfigurationException;
 import ivory.smrf.model.DocumentNode;
 import ivory.smrf.model.GlobalEvidence;
 import ivory.smrf.model.GlobalTermEvidence;
 import ivory.smrf.model.GraphNode;
 import ivory.smrf.model.TermNode;
+import ivory.smrf.model.builder.Expression;
 import ivory.smrf.model.builder.ExpressionGenerator;
 import ivory.smrf.model.score.ScoringFunction;
 import ivory.util.RetrievalEnvironment;
@@ -34,100 +36,64 @@ import java.util.List;
 
 import org.w3c.dom.Node;
 
+import com.google.common.base.Preconditions;
+
 /**
  * @author Don Metzler
  * 
  */
 public class QueryPotential extends PotentialFunction {
 
-	/**
-	 * default score for potentials with no postings
-	 */
-	private static final double DEFAULT_SCORE = 0.0;
+	// Default score for potentials with no postings.
+	private static final float DEFAULT_SCORE = 0.0f;
 
-	/**
-	 * query environment associated with this potential
-	 */
 	private RetrievalEnvironment mEnv = null;
-
-	/**
-	 * Class used to score terms/general expressions
-	 */
 	private ScoringFunction mScoringFunction = null;
-
-	/**
-	 * Class used to generate Indri expressions from clique settings
-	 */
 	private ExpressionGenerator mExpressionGenerator = null;
 
-	/**
-	 * Document node associated with this potential
-	 */
 	private DocumentNode mDocNode = null;
-
-	/**
-	 * Term nodes associated with this potential
-	 */
-	private List<TermNode> mTermNodes = null;
-
-	/**
-	 * Current postings reader
-	 */
+	private final List<TermNode> mTermNodes = new ArrayList<TermNode>();
+	private final GlobalTermEvidence mTermEvidence = new GlobalTermEvidence();
+	
 	private PostingsReader mPostingsReader = null;
-
-	/**
-	 * Current posting
-	 */
 	private Posting mCurPosting = null;
 
-	/**
-	 * document frequency of current expression
-	 */
-	private int mDf = 0;
-
-	/**
-	 * collection frequency of current expression
-	 */
-	private long mCf = 0;
-
-	/**
-	 * whether we're at the end of the postings list or not
-	 */
+	// Whether we're at the end of the postings list or not.
 	private boolean mEndOfList = true;
 
-	/**
-	 * docno of last document scored
-	 */
-	private int mLastScoredDocno = -1;
+	// Docno of last document scored.
+	private int mLastScoredDocno = 0;
 
 	public QueryPotential() {
 	}
-	
-	/**
-	 * @param env
-	 * @param generator
-	 * @param scoringFunction
-	 */
-	public QueryPotential(RetrievalEnvironment env, ExpressionGenerator generator, ScoringFunction scoringFunction) {
+
+	public QueryPotential(RetrievalEnvironment env, ExpressionGenerator generator,
+			ScoringFunction scoringFunction) {
+		Preconditions.checkNotNull(env);
+		Preconditions.checkNotNull(generator);
+		Preconditions.checkNotNull(scoringFunction);
+
 		mEnv = env;
 		mExpressionGenerator = generator;
 		mScoringFunction = scoringFunction;
+
 		mCurPosting = new Posting();
 	}
-	
-	public void configure(RetrievalEnvironment env, Node domNode) throws Exception {
-		// get expression generator type
+
+	public void configure(RetrievalEnvironment env, Node domNode) throws ConfigurationException {
+		Preconditions.checkNotNull(env);
+		Preconditions.checkNotNull(domNode);
+
 		String generatorType = XMLTools.getAttributeValue(domNode, "generator", null);
 		if (generatorType == null) {
-			throw new Exception(
+			throw new ConfigurationException(
 					"A generator attribute must be specified in order to generate a potential function!");
 		}
 		mExpressionGenerator = ExpressionGenerator.create(generatorType, domNode);
 
-		// get score function
 		String scoreFunctionType = XMLTools.getAttributeValue(domNode, "scoreFunction", null);
 		if (scoreFunctionType == null) {
-			throw new Exception(
+			throw new ConfigurationException(
 					"A scoreFunction attribute must be specified in order to generate a potential function!");
 		}
 		mScoringFunction = ScoringFunction.create(scoreFunctionType, domNode);
@@ -136,21 +102,23 @@ public class QueryPotential extends PotentialFunction {
 		mCurPosting = new Posting();
 	}
 
-	public void initialize(List<GraphNode> nodes, GlobalEvidence globalEvidence) throws Exception {
+	public void initialize(List<GraphNode> nodes, GlobalEvidence globalEvidence)
+			throws ConfigurationException {
+		Preconditions.checkNotNull(nodes);
+		Preconditions.checkNotNull(globalEvidence);
+
 		mDocNode = null;
-		mTermNodes = new ArrayList<TermNode>();
+		mTermNodes.clear();
 
 		for (GraphNode node : nodes) {
-			if (node.getType() == GraphNode.DOCUMENT && mDocNode != null) {
-				throw new Exception(
-						"Only one document node allowed in cliques associated with QueryPotential!");
-			} else if (node.getType() == GraphNode.DOCUMENT) {
+			if (node.getType() == GraphNode.Type.DOCUMENT && mDocNode != null) {
+				throw new ConfigurationException("Only one document node allowed in QueryPotential!");
+			} else if (node.getType() == GraphNode.Type.DOCUMENT) {
 				mDocNode = (DocumentNode) node;
-			} else if (node.getType() == GraphNode.TERM) {
+			} else if (node.getType() == GraphNode.Type.TERM) {
 				mTermNodes.add((TermNode) node);
 			} else {
-				throw new Exception(
-						"Unrecognized node type in clique associated with QueryPotential!");
+				throw new ConfigurationException("Unrecognized node type in clique associated with QueryPotential!");
 			}
 		}
 
@@ -159,120 +127,119 @@ public class QueryPotential extends PotentialFunction {
 			terms[i] = mTermNodes.get(i).getTerm();
 		}
 
-		String expression = mExpressionGenerator.getExpression(terms);
+		Expression expression = mExpressionGenerator.getExpression(terms);
 
-		// get inverted list for this expression
+		// Get inverted list for this expression.
 		mPostingsReader = mEnv.getPostingsReader(expression);
 
-		// get collection statistics for the expression
+		// Get collection statistics for the expression.
 		if (mPostingsReader == null) {
-			mDf = 0;
-			mCf = 0;
+			mTermEvidence.df = 0;
+			mTermEvidence.cf = 0;
 		} else if (mPostingsReader instanceof ProximityPostingsReader) {
-			mDf = mEnv.getDefaultDf();
-			mCf = mEnv.getDefaultCf();
+			mTermEvidence.df = mEnv.getDefaultDf();
+			mTermEvidence.cf = mEnv.getDefaultCf();
 		} else {
-			mDf = mPostingsReader.getPostingsList().getDf();
-			mCf = mPostingsReader.getPostingsList().getCf();
+			mTermEvidence.df = mPostingsReader.getPostingsList().getDf();
+			mTermEvidence.cf = mPostingsReader.getPostingsList().getCf();
 		}
 
-		// set global term evidence in scorer
-		GlobalTermEvidence termEvidence = new GlobalTermEvidence(mDf, mCf);
-		mScoringFunction.initialize(termEvidence, globalEvidence);
+		// Set global term evidence in scoring function.
+		mScoringFunction.initialize(mTermEvidence, globalEvidence);
 
-		// read first posting
+		// Read first posting.
 		mEndOfList = false;
 		if (mPostingsReader == null) {
-				//|| (mPostingsReader != null && !mPostingsReader.nextPosting(mCurPosting))) {
 			mEndOfList = true;
 		}
-		
+
 		mLastScoredDocno = 0;
 	}
 
 	@Override
-	public double computePotential() {
-		// if there are no postings associated with this potential
-		// then just return the default score
+	public float computePotential() {
+		// If there are no postings associated with this potential then just
+		// return the default score.
 		if (mPostingsReader == null) {
 			return DEFAULT_SCORE;
 		}
 
-		// advance postings reader
-		// invariant: mCurPosting will always point to the next
-		// posting that has not yet been scored
+		// Advance postings reader. Invariant: mCurPosting will always point to
+		// the next posting that has not yet been scored.
 		while (!mEndOfList && mPostingsReader.getDocno() < mDocNode.getDocno()) {
 			if (!mPostingsReader.nextPosting(mCurPosting)) {
 				mEndOfList = true;
 			}
 		}
 
-		// compute term frequency
-		double tf = 0.0;
+		// Compute term frequency.
+		int tf = 0;
 		if (mDocNode.getDocno() == mPostingsReader.getDocno()) {
-			tf = mPostingsReader.getScore(); //mCurPosting.getScore();
+			tf = mPostingsReader.getScore();
 		}
 
 		int docLen = mEnv.documentLength(mDocNode.getDocno());
-
-		double score = mScoringFunction.getScore(tf, docLen);
-		
+		float score = mScoringFunction.getScore(tf, docLen);
 		mLastScoredDocno = mDocNode.getDocno();
-		
+
 		return score;
 	}
 
+	@Override
 	public int getNextCandidate() {
-		if (mPostingsReader == null || mEndOfList) { // just getting started
+		if (mPostingsReader == null || mEndOfList) { // Just getting started.
 			return Integer.MAX_VALUE;
 		}
+
 		int nextDocno = mPostingsReader.getDocno();
-		if(nextDocno == mLastScoredDocno) {
-			if (!mPostingsReader.nextPosting(mCurPosting)) { // advance reader
+
+		if (nextDocno == mLastScoredDocno) {
+			if (!mPostingsReader.nextPosting(mCurPosting)) { // Advance reader.
 				mEndOfList = true;
 				return Integer.MAX_VALUE;
-			}
-			else {
+			} else {
 				return mPostingsReader.getDocno();
 			}
 		}
+
 		return nextDocno;
 	}
 
 	@Override
 	public String toString() {
-		String ret = new String();
-		ret = "<potential type=\"QueryPotential\">\n";
-		ret += mScoringFunction;
-		ret += mExpressionGenerator;
-		ret += "<nodes>\n";
-		ret += mDocNode;
+		StringBuilder ret = new StringBuilder();
+
+		ret.append("<potential type=\"QueryPotential\">\n");
+		ret.append(mScoringFunction);
+		ret.append(mExpressionGenerator);
+		ret.append("<nodes>\n");
+		ret.append(mDocNode);
+
 		for (GraphNode n : mTermNodes) {
-			ret += n;
+			ret.append(n);
 		}
 
-		ret += "</nodes>\n";
-		return ret + "</potential>\n";
+		ret.append("</nodes>\n");
+		ret.append("</potential>\n");
+
+		return ret.toString();
 	}
 
 	@Override
 	public void reset() {
 		mEndOfList = false;
-		mDf = 0;
-		mCf = 0;
 		mLastScoredDocno = -1;
 	}
 
 	@Override
-	public double getMaxScore() {
+	public float getMaxScore() {
 		return mScoringFunction.getMaxScore();
 	}
 
 	@Override
 	public void setNextCandidate(int docno) {
-		// advance postings reader
-		// invariant: mCurPosting will always point to the next
-		// posting that has not yet been scored
+		// Advance postings reader. Invariant: mCurPosting will always point to
+		// the next posting that has not yet been scored.
 		while (!mEndOfList && mPostingsReader.getDocno() < docno) {
 			if (!mPostingsReader.nextPosting(mCurPosting)) {
 				mEndOfList = true;

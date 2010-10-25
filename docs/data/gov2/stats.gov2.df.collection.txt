@@ -1,720 +1,720 @@
-oil 474500
-industri 2442190
-oil industri 7999
-histori 2250062
-industri histori 1281
-pearl 57895
-farm 600485
-pearl farm 42
-intern 2808895
-crimin 911378
-intern crimin 5104
-court 1821344
-crimin court 13966
-green 1678957
-parti 1337816
-green parti 2068
-polit 436344
-parti polit 1748
-view 6567446
-polit view 1922
-iraq 108688
-foreign 883806
-iraq foreign 273
-debt 398430
-foreign debt 1856
-reduct 692980
-debt reduct 4852
-control 2912336
-type 4834435
-control type 2528
-ii 1413881
-type ii 86602
-diabet 123511
-ii diabet 1651
-aspirin 11417
-cancer 920526
-aspirin cancer 5
-prevent 3263341
-cancer prevent 163844
-decor 1296021
-slate 52457
-decor slate 3
-sourc 3228881
-slate sourc 1
-hors 124635
-race 453854
-hors race 11936
-jockey 6763
-race jockey 28
-weight 1872220
-jockey weight 49
-prostat 40371
-cancer 920526
-prostat cancer 23322
-treatment 925174
-cancer treatment 15274
-train 1922700
-station 1637806
-train station 4850
-secur 3969512
-station secur 405
-measur 1992768
-secur measur 23559
-pyramid 26230
-scheme 173340
-pyramid scheme 1778
-chesapeak 54896
-bay 574307
-chesapeak bay 26389
-maryland 775641
-bay maryland 1071
-clean 610304
-maryland clean 489
-licens 1090596
-restrict 730276
-licens restrict 2697
-older 421024
-restrict older 16
-driver 434631
-older driver 2525
-schizophrenia 18734
-drug 712162
-schizophrenia drug 277
-spammer 3011
-arrest 317526
-spammer arrest 2
-sue 97102
-arrest sue 1
-gift 231661
-talent 89398
-gift talent 3069
-student 978285
-talent student 3146
-program 7016266
-student program 8375
-control 2912336
-acid 311284
-control acid 479
-rain 240753
-acid rain 17100
-cruis 62542
-ship 358989
-cruis ship 8376
-damag 602828
-ship damag 303
-sea 458723
-damag sea 40
-life 1148431
-sea life 1497
-feder 4961176
-welfar 314565
-feder welfar 3524
-reform 509441
-welfar reform 28513
-census 807093
-data 7743306
-census data 34668
-applic 3655084
-data applic 555890
-iran 43076
-terror 160867
-iran terror 26
-execut 2612719
-privileg 177024
-execut privileg 912
-iran 43076
-contra 55928
-iran contra 664
-low 1230534
-white 1863916
-low white 391
-blood 303112
-white blood 8389
-cell 578191
-blood cell 34690
-count 1297690
-cell count 6681
-hubbl 19590
-telescop 52666
-hubbl telescop 851
-repair 558486
-telescop repair 68
-church 191222
-arson 27848
-church arson 430
-whale 27221
-save 1380421
-whale save 4
-endang 184421
-save endang 527
-whistl 13335
-blower 16594
-whistl blower 1831
-depart 6898497
-blower depart 0
-defens 666530
-gastric 8366
-bypass 83511
-gastric bypass 393
-complic 224092
-bypass complic 42
-kurd 3850
-histori 2250062
-kurd histori 7
-chees 35063
-product 3623186
-chees product 1985
-airlin 81905
-overbook 527
-airlin overbook 20
-recycl 344654
-success 1478084
-recycl success 273
-afghan 23887
-women 947492
-afghan women 2069
-condit 4178136
-women condit 54
-locat 5422171
-bse 8760
-locat bse 0
-infect 196637
-bse infect 352
-enron 22369
-california 1787728
-enron california 18
-energi 2353248
-california energi 12959
-crisi 157291
-energi crisi 6443
-anthrax 22555
-hoax 5037
-anthrax hoax 202
-habitat 306661
-human 2269396
-regul 2083892
-assist 2788492
-regul assist 1111
-live 1539605
-assist live 19475
-maryland 775641
-live maryland 42
-artifici 121438
-intellig 320874
-artifici intellig 8564
-hedg 21337
-fund 1939224
-hedg fund 1604
-fraud 521233
-fund fraud 212
-protect 2193002
-fraud protect 507
-freighter 2840
-ship 358989
-freighter ship 14
-registr 1212473
-ship registr 56
-counterfeit 22438
-id 1486719
-counterfeit id 41
-punish 194335
-id punish 6
-doomsday 842
-cult 8093
-doomsday cult 57
-outsourc 16844
-job 1475473
-outsourc job 55
-india 658186
-job india 0
-librari 5559626
-comput 2832539
-librari comput 2227
-oversight 640895
-comput oversight 18
-nuclear 575479
-reactor 103116
-nuclear reactor 50713
-type 4834435
-reactor type 493
-puerto 338109
-rico 320895
-puerto rico 310628
-state 11112525
-rico state 469
-john 1848793
-edward 327296
-john edward 3809
-women 947492
-edward women 4
-issu 3363498
-women issu 4817
-scrabbl 509
-player 124024
-scrabbl player 19
-dam 163742
-remov 1698202
-dam remov 3398
-bulli 11038
-prevent 3263341
-bulli prevent 528
-program 7016266
-prevent program 66538
-domest 986929
-adopt 1171052
-domest adopt 138
-law 4052727
-adopt law 2085
-scottish 21022
-highland 286397
-scottish highland 220
-game 320415
-highland game 111
-volcan 601800
-activ 4042500
-volcan activ 555730
-mural 11128
-embryon 12117
-stem 143842
-embryon stem 2782
-cell 578191
-stem cell 18678
-civil 1280347
-war 344298
-civil war 47459
-battl 299057
-war battl 1611
-reenact 15995
-battl reenact 117
-american 2758301
-muslim 23254
-american muslim 1301
-mosqu 7302
-muslim mosqu 154
-school 2226688
-mosqu school 105
-problem 1949364
-hmong 24252
-immigr 467137
-hmong immigr 64
-histori 2250062
-physician 369564
-america 875737
-hunt 744332
-death 865618
-hunt death 23
-increas 2078801
-mass 963125
-increas mass 728
-transit 566693
-mass transit 16541
-ephedra 2204
-ma 415779
-ephedra ma 54
-huang 24098
-ma huang 341
-death 865618
-huang death 0
-diamond 69709
-smuggl 16419
-diamond smuggl 58
-pharmacist 50369
-licens 1090596
-pharmacist licens 2128
-requir 4539062
-licens requir 42397
-women 947492
-state 11112525
-legislatur 478528
-state legislatur 140580
-kroll 3868
-associ 3953192
-kroll associ 69
-employe 2432405
-associ employe 1132
-kyrgyzstan 10708
-unit 4655030
-kyrgyzstan unit 3
-state 11112525
-unit state 3361714
-relat 5652143
-state relat 10847
-deform 57940
-leopard 6784
-deform leopard 8
-frog 26340
-leopard frog 2829
-flag 212377
-display 3177931
-flag display 948
-rule 2016178
-display rule 256
-pennsylvania 759187
-slot 59111
-pennsylvania slot 0
-machin 411429
-slot machin 4315
-gambl 76928
-machin gambl 67
-caus 2066935
-homeless 79654
-commerci 1470668
-candi 28262
-commerci candi 48
-maker 987211
-candi maker 145
-magnet 378516
-school 2226688
-magnet school 4407
-success 1478084
-school success 3512
-hybrid 89687
-altern 1045763
-hybrid altern 134
-fuel 538186
-altern fuel 27686
-car 338863
-fuel car 440
-golden 134603
-ratio 471237
-golden ratio 145
-javelina 1515
-rang 2710595
-javelina rang 1
-descript 4966064
-arabl 3913
-land 2194309
-arabl land 2952
-squirrel 27553
-control 2912336
-squirrel control 58
-protect 2193002
-orang 293938
-varieti 631790
-orang varieti 89
-season 585005
-varieti season 24
-school 2226688
-mercuri 99721
-school mercuri 255
-poison 108604
-mercuri poison 1312
-mersenn 89
-prime 175713
-mersenn prime 35
-ivori 12253
-bill 1640258
-ivori bill 292
-woodpeck 10507
-bill woodpeck 267
-yew 3215
-tree 510171
-yew tree 227
-sunflow 26795
-cultiv 56151
-sunflow cultiv 9
-revers 773301
-mortgag 144474
-revers mortgag 1885
-abandon 188651
-mine 679076
-abandon mine 13759
-reclam 164761
-mine reclam 14275
-women 947492
-right 3123908
-women right 7023
-saudi 45433
-arabia 44643
-saudi arabia 41803
-gullah 368
-geeche 73
-gullah geeche 41
-languag 1332918
-geeche languag 0
-cultur 520212
-languag cultur 2120
-social 1471443
-secur 3969512
-social secur 762436
-mean 2354046
-secur mean 3022
-test 2213547
-mean test 10650
-bagpip 692
-band 778586
-bagpip band 22
-pet 147865
-therapi 376288
-pet therapi 263
-notabl 99365
-cocker 473
-notabl cocker 0
-spaniel 2608
-cocker spaniel 187
-blue 1136606
-grass 606863
-blue grass 1918
-music 605054
-grass music 17
-festiv 67986
-music festiv 2027
-histori 2250062
-festiv histori 38
-reintroduct 12248
-gray 776502
-wolv 9255
-gray wolv 1449
-massachusett 585423
-textil 84398
-massachusett textil 8
-mill 313193
-textil mill 17925
-anim 623896
-alzheim 162193
-research 5251756
-alzheim research 397
-ovarian 19937
-cancer 920526
-ovarian cancer 11723
-treatment 925174
-cancer treatment 15274
-kudzu 1996
-pueraria 411
-kudzu pueraria 201
-lobata 994
-pueraria lobata 211
-volcano 48594
-erupt 36959
-volcano erupt 1309
-global 1268120
-erupt global 20
-temperatur 566337
-global temperatur 4202
-may 7580965
-day 3972984
-may day 1111
-ban 128429
-human 2269396
-clone 81670
-human clone 2346
-ident 361108
-theft 100465
-ident theft 10914
-passport 41739
-theft passport 31
-doctor 244924
-border 900820
-sugar 110998
-tariff 81437
-sugar tariff 162
-rate 1630122
-tariff rate 9638
-quota 44994
-rate quota 3777
-north 2636149
-korean 78507
-north korean 9636
-counterfeit 22438
-korean counterfeit 9
-wetland 202051
-wastewat 128684
-wetland wastewat 148
-treatment 925174
-wastewat treatment 57497
-timeshar 4195
-resal 47413
-timeshar resal 33
-handwrit 8303
-recognit 265137
-handwrit recognit 167
-total 2842439
-knee 32073
-total knee 927
-replac 1348900
-knee replac 1249
-surgeri 120954
-replac surgeri 780
-atlant 364704
-intracoast 7456
-atlant intracoast 436
-waterway 75697
-intracoast waterway 3762
-johnstown 42360
-flood 282710
-johnstown flood 742
-coast 541276
-guard 269089
-coast guard 74161
-rescu 114873
-guard rescu 208
-usaid 43091
-assist 2788492
-usaid assist 5067
-galapago 4059
-sport 251246
-stadium 26686
-sport stadium 1096
-name 6268999
-stadium name 44
-right 3123908
-name right 1449
-chaco 2569
-cultur 520212
-chaco cultur 881
-nation 7617586
-cultur nation 1349
-park 1535798
-nation park 233524
-1890 214633
-census 807093
-1890 census 271
-import 2323074
-fire 1277143
-import fire 1744
-ant 115735
-fire ant 2914
-internet 1565131
-work 4075039
-internet work 890
-home 10535478
-scam 18574
-home scam 146
-custer 53868
-last 8274557
-custer last 252
-stand 569468
-last stand 844
-continu 2802096
-care 1556700
-continu care 10565
-retir 921083
-care retir 3348
-communiti 4934445
-retir communiti 6028
-civil 1280347
-air 1537876
-civil air 18794
-patrol 136046
-air patrol 18851
-nation 7617586
-guard 269089
-nation guard 65515
-involv 2138679
-guard involv 142
-iraq 108688
-florida 904952
-seminol 70685
-florida seminol 202
-indian 794925
-seminol indian 859
-hidden 118897
-markov 3875
-hidden markov 530
-model 2251745
-markov model 931
-hmm 3994
-model hmm 121
-secret 135893
-shopper 8672
-secret shopper 133
-spanish 657415
-civil 1280347
-spanish civil 427
-war 344298
-civil war 47459
-support 4828920
-war support 113
-model 2251745
-railroad 364383
-model railroad 397
-dull 18975
-airport 239221
-dull airport 1409
-secur 3969512
-airport secur 5505
-labor 1074357
-union 797699
-labor union 23314
-activ 4042500
-union activ 7593
-iceland 29863
-govern 4104416
-iceland govern 65
-global 1268120
-posit 2060411
-global posit 29662
-system 6365876
-posit system 28831
-earthquak 105033
-system earthquak 98
-big 460165
-dig 49307
-big dig 536
-pork 24310
-dig pork 0
-illeg 202736
-immigr 467137
-illeg immigr 6532
-wage 377792
-immigr wage 11
-eskimo 11284
-histori 2250062
-eskimo histori 19
-urban 1338654
-suburban 117305
-urban suburban 15763
-coyot 25844
-suburban coyot 10
-textil 84398
-dye 50104
-textil dye 497
-techniqu 563313
-dye techniqu 43
-geyser 6867
-camel 6821
-north 2636149
-camel north 3
-america 875737
-north america 184317
-david 649004
-mccullough 9896
-david mccullough 517
-pol 34057
-pot 54030
-pol pot 251
-segment 321531
-duplic 705768
-segment duplic 65
-new 10334379
-jersey 710678
-new jersey 692970
-tomato 24653
-jersey tomato 47
-hered 10617
-obes 33115
-portug 41294
-world 1222101
-portug world 11
-war 344298
-world war 90183
-ii 1413881
-war ii 67830
-radio 469975
-station 1637806
-radio station 32715
-call 4187107
-station call 1648
-letter 930406
-call letter 2498
-scalabl 18414
-vector 156608
-scalabl vector 214
-graphic 709643
-vector graphic 631
-mississippi 536539
-river 1436726
-mississippi river 35166
-flood 282710
-river flood 8141
+oil	474500
+industri	2442190
+oil industri	7999
+histori	2250062
+industri histori	1281
+pearl	57895
+farm	600485
+pearl farm	42
+intern	2808895
+crimin	911378
+intern crimin	5104
+court	1821344
+crimin court	13966
+green	1678957
+parti	1337816
+green parti	2068
+polit	436344
+parti polit	1748
+view	6567446
+polit view	1922
+iraq	108688
+foreign	883806
+iraq foreign	273
+debt	398430
+foreign debt	1856
+reduct	692980
+debt reduct	4852
+control	2912336
+type	4834435
+control type	2528
+ii	1413881
+type ii	86602
+diabet	123511
+ii diabet	1651
+aspirin	11417
+cancer	920526
+aspirin cancer	5
+prevent	3263341
+cancer prevent	163844
+decor	1296021
+slate	52457
+decor slate	3
+sourc	3228881
+slate sourc	1
+hors	124635
+race	453854
+hors race	11936
+jockey	6763
+race jockey	28
+weight	1872220
+jockey weight	49
+prostat	40371
+cancer	920526
+prostat cancer	23322
+treatment	925174
+cancer treatment	15274
+train	1922700
+station	1637806
+train station	4850
+secur	3969512
+station secur	405
+measur	1992768
+secur measur	23559
+pyramid	26230
+scheme	173340
+pyramid scheme	1778
+chesapeak	54896
+bay	574307
+chesapeak bay	26389
+maryland	775641
+bay maryland	1071
+clean	610304
+maryland clean	489
+licens	1090596
+restrict	730276
+licens restrict	2697
+older	421024
+restrict older	16
+driver	434631
+older driver	2525
+schizophrenia	18734
+drug	712162
+schizophrenia drug	277
+spammer	3011
+arrest	317526
+spammer arrest	2
+sue	97102
+arrest sue	1
+gift	231661
+talent	89398
+gift talent	3069
+student	978285
+talent student	3146
+program	7016266
+student program	8375
+control	2912336
+acid	311284
+control acid	479
+rain	240753
+acid rain	17100
+cruis	62542
+ship	358989
+cruis ship	8376
+damag	602828
+ship damag	303
+sea	458723
+damag sea	40
+life	1148431
+sea life	1497
+feder	4961176
+welfar	314565
+feder welfar	3524
+reform	509441
+welfar reform	28513
+census	807093
+data	7743306
+census data	34668
+applic	3655084
+data applic	555890
+iran	43076
+terror	160867
+iran terror	26
+execut	2612719
+privileg	177024
+execut privileg	912
+iran	43076
+contra	55928
+iran contra	664
+low	1230534
+white	1863916
+low white	391
+blood	303112
+white blood	8389
+cell	578191
+blood cell	34690
+count	1297690
+cell count	6681
+hubbl	19590
+telescop	52666
+hubbl telescop	851
+repair	558486
+telescop repair	68
+church	191222
+arson	27848
+church arson	430
+whale	27221
+save	1380421
+whale save	4
+endang	184421
+save endang	527
+whistl	13335
+blower	16594
+whistl blower	1831
+depart	6898497
+blower depart	0
+defens	666530
+gastric	8366
+bypass	83511
+gastric bypass	393
+complic	224092
+bypass complic	42
+kurd	3850
+histori	2250062
+kurd histori	7
+chees	35063
+product	3623186
+chees product	1985
+airlin	81905
+overbook	527
+airlin overbook	20
+recycl	344654
+success	1478084
+recycl success	273
+afghan	23887
+women	947492
+afghan women	2069
+condit	4178136
+women condit	54
+locat	5422171
+bse	8760
+locat bse	0
+infect	196637
+bse infect	352
+enron	22369
+california	1787728
+enron california	18
+energi	2353248
+california energi	12959
+crisi	157291
+energi crisi	6443
+anthrax	22555
+hoax	5037
+anthrax hoax	202
+habitat	306661
+human	2269396
+regul	2083892
+assist	2788492
+regul assist	1111
+live	1539605
+assist live	19475
+maryland	775641
+live maryland	42
+artifici	121438
+intellig	320874
+artifici intellig	8564
+hedg	21337
+fund	1939224
+hedg fund	1604
+fraud	521233
+fund fraud	212
+protect	2193002
+fraud protect	507
+freighter	2840
+ship	358989
+freighter ship	14
+registr	1212473
+ship registr	56
+counterfeit	22438
+id	1486719
+counterfeit id	41
+punish	194335
+id punish	6
+doomsday	842
+cult	8093
+doomsday cult	57
+outsourc	16844
+job	1475473
+outsourc job	55
+india	658186
+job india	0
+librari	5559626
+comput	2832539
+librari comput	2227
+oversight	640895
+comput oversight	18
+nuclear	575479
+reactor	103116
+nuclear reactor	50713
+type	4834435
+reactor type	493
+puerto	338109
+rico	320895
+puerto rico	310628
+state	11112525
+rico state	469
+john	1848793
+edward	327296
+john edward	3809
+women	947492
+edward women	4
+issu	3363498
+women issu	4817
+scrabbl	509
+player	124024
+scrabbl player	19
+dam	163742
+remov	1698202
+dam remov	3398
+bulli	11038
+prevent	3263341
+bulli prevent	528
+program	7016266
+prevent program	66538
+domest	986929
+adopt	1171052
+domest adopt	138
+law	4052727
+adopt law	2085
+scottish	21022
+highland	286397
+scottish highland	220
+game	320415
+highland game	111
+volcan	601800
+activ	4042500
+volcan activ	555730
+mural	11128
+embryon	12117
+stem	143842
+embryon stem	2782
+cell	578191
+stem cell	18678
+civil	1280347
+war	344298
+civil war	47459
+battl	299057
+war battl	1611
+reenact	15995
+battl reenact	117
+american	2758301
+muslim	23254
+american muslim	1301
+mosqu	7302
+muslim mosqu	154
+school	2226688
+mosqu school	105
+problem	1949364
+hmong	24252
+immigr	467137
+hmong immigr	64
+histori	2250062
+physician	369564
+america	875737
+hunt	744332
+death	865618
+hunt death	23
+increas	2078801
+mass	963125
+increas mass	728
+transit	566693
+mass transit	16541
+ephedra	2204
+ma	415779
+ephedra ma	54
+huang	24098
+ma huang	341
+death	865618
+huang death	0
+diamond	69709
+smuggl	16419
+diamond smuggl	58
+pharmacist	50369
+licens	1090596
+pharmacist licens	2128
+requir	4539062
+licens requir	42397
+women	947492
+state	11112525
+legislatur	478528
+state legislatur	140580
+kroll	3868
+associ	3953192
+kroll associ	69
+employe	2432405
+associ employe	1132
+kyrgyzstan	10708
+unit	4655030
+kyrgyzstan unit	3
+state	11112525
+unit state	3361714
+relat	5652143
+state relat	10847
+deform	57940
+leopard	6784
+deform leopard	8
+frog	26340
+leopard frog	2829
+flag	212377
+display	3177931
+flag display	948
+rule	2016178
+display rule	256
+pennsylvania	759187
+slot	59111
+pennsylvania slot	0
+machin	411429
+slot machin	4315
+gambl	76928
+machin gambl	67
+caus	2066935
+homeless	79654
+commerci	1470668
+candi	28262
+commerci candi	48
+maker	987211
+candi maker	145
+magnet	378516
+school	2226688
+magnet school	4407
+success	1478084
+school success	3512
+hybrid	89687
+altern	1045763
+hybrid altern	134
+fuel	538186
+altern fuel	27686
+car	338863
+fuel car	440
+golden	134603
+ratio	471237
+golden ratio	145
+javelina	1515
+rang	2710595
+javelina rang	1
+descript	4966064
+arabl	3913
+land	2194309
+arabl land	2952
+squirrel	27553
+control	2912336
+squirrel control	58
+protect	2193002
+orang	293938
+varieti	631790
+orang varieti	89
+season	585005
+varieti season	24
+school	2226688
+mercuri	99721
+school mercuri	255
+poison	108604
+mercuri poison	1312
+mersenn	89
+prime	175713
+mersenn prime	35
+ivori	12253
+bill	1640258
+ivori bill	292
+woodpeck	10507
+bill woodpeck	267
+yew	3215
+tree	510171
+yew tree	227
+sunflow	26795
+cultiv	56151
+sunflow cultiv	9
+revers	773301
+mortgag	144474
+revers mortgag	1885
+abandon	188651
+mine	679076
+abandon mine	13759
+reclam	164761
+mine reclam	14275
+women	947492
+right	3123908
+women right	7023
+saudi	45433
+arabia	44643
+saudi arabia	41803
+gullah	368
+geeche	73
+gullah geeche	41
+languag	1332918
+geeche languag	0
+cultur	520212
+languag cultur	2120
+social	1471443
+secur	3969512
+social secur	762436
+mean	2354046
+secur mean	3022
+test	2213547
+mean test	10650
+bagpip	692
+band	778586
+bagpip band	22
+pet	147865
+therapi	376288
+pet therapi	263
+notabl	99365
+cocker	473
+notabl cocker	0
+spaniel	2608
+cocker spaniel	187
+blue	1136606
+grass	606863
+blue grass	1918
+music	605054
+grass music	17
+festiv	67986
+music festiv	2027
+histori	2250062
+festiv histori	38
+reintroduct	12248
+gray	776502
+wolv	9255
+gray wolv	1449
+massachusett	585423
+textil	84398
+massachusett textil	8
+mill	313193
+textil mill	17925
+anim	623896
+alzheim	162193
+research	5251756
+alzheim research	397
+ovarian	19937
+cancer	920526
+ovarian cancer	11723
+treatment	925174
+cancer treatment	15274
+kudzu	1996
+pueraria	411
+kudzu pueraria	201
+lobata	994
+pueraria lobata	211
+volcano	48594
+erupt	36959
+volcano erupt	1309
+global	1268120
+erupt global	20
+temperatur	566337
+global temperatur	4202
+may	7580965
+day	3972984
+may day	1111
+ban	128429
+human	2269396
+clone	81670
+human clone	2346
+ident	361108
+theft	100465
+ident theft	10914
+passport	41739
+theft passport	31
+doctor	244924
+border	900820
+sugar	110998
+tariff	81437
+sugar tariff	162
+rate	1630122
+tariff rate	9638
+quota	44994
+rate quota	3777
+north	2636149
+korean	78507
+north korean	9636
+counterfeit	22438
+korean counterfeit	9
+wetland	202051
+wastewat	128684
+wetland wastewat	148
+treatment	925174
+wastewat treatment	57497
+timeshar	4195
+resal	47413
+timeshar resal	33
+handwrit	8303
+recognit	265137
+handwrit recognit	167
+total	2842439
+knee	32073
+total knee	927
+replac	1348900
+knee replac	1249
+surgeri	120954
+replac surgeri	780
+atlant	364704
+intracoast	7456
+atlant intracoast	436
+waterway	75697
+intracoast waterway	3762
+johnstown	42360
+flood	282710
+johnstown flood	742
+coast	541276
+guard	269089
+coast guard	74161
+rescu	114873
+guard rescu	208
+usaid	43091
+assist	2788492
+usaid assist	5067
+galapago	4059
+sport	251246
+stadium	26686
+sport stadium	1096
+name	6268999
+stadium name	44
+right	3123908
+name right	1449
+chaco	2569
+cultur	520212
+chaco cultur	881
+nation	7617586
+cultur nation	1349
+park	1535798
+nation park	233524
+1890	214633
+census	807093
+1890 census	271
+import	2323074
+fire	1277143
+import fire	1744
+ant	115735
+fire ant	2914
+internet	1565131
+work	4075039
+internet work	890
+home	10535478
+scam	18574
+home scam	146
+custer	53868
+last	8274557
+custer last	252
+stand	569468
+last stand	844
+continu	2802096
+care	1556700
+continu care	10565
+retir	921083
+care retir	3348
+communiti	4934445
+retir communiti	6028
+civil	1280347
+air	1537876
+civil air	18794
+patrol	136046
+air patrol	18851
+nation	7617586
+guard	269089
+nation guard	65515
+involv	2138679
+guard involv	142
+iraq	108688
+florida	904952
+seminol	70685
+florida seminol	202
+indian	794925
+seminol indian	859
+hidden	118897
+markov	3875
+hidden markov	530
+model	2251745
+markov model	931
+hmm	3994
+model hmm	121
+secret	135893
+shopper	8672
+secret shopper	133
+spanish	657415
+civil	1280347
+spanish civil	427
+war	344298
+civil war	47459
+support	4828920
+war support	113
+model	2251745
+railroad	364383
+model railroad	397
+dull	18975
+airport	239221
+dull airport	1409
+secur	3969512
+airport secur	5505
+labor	1074357
+union	797699
+labor union	23314
+activ	4042500
+union activ	7593
+iceland	29863
+govern	4104416
+iceland govern	65
+global	1268120
+posit	2060411
+global posit	29662
+system	6365876
+posit system	28831
+earthquak	105033
+system earthquak	98
+big	460165
+dig	49307
+big dig	536
+pork	24310
+dig pork	0
+illeg	202736
+immigr	467137
+illeg immigr	6532
+wage	377792
+immigr wage	11
+eskimo	11284
+histori	2250062
+eskimo histori	19
+urban	1338654
+suburban	117305
+urban suburban	15763
+coyot	25844
+suburban coyot	10
+textil	84398
+dye	50104
+textil dye	497
+techniqu	563313
+dye techniqu	43
+geyser	6867
+camel	6821
+north	2636149
+camel north	3
+america	875737
+north america	184317
+david	649004
+mccullough	9896
+david mccullough	517
+pol	34057
+pot	54030
+pol pot	251
+segment	321531
+duplic	705768
+segment duplic	65
+new	10334379
+jersey	710678
+new jersey	692970
+tomato	24653
+jersey tomato	47
+hered	10617
+obes	33115
+portug	41294
+world	1222101
+portug world	11
+war	344298
+world war	90183
+ii	1413881
+war ii	67830
+radio	469975
+station	1637806
+radio station	32715
+call	4187107
+station call	1648
+letter	930406
+call letter	2498
+scalabl	18414
+vector	156608
+scalabl vector	214
+graphic	709643
+vector graphic	631
+mississippi	536539
+river	1436726
+mississippi river	35166
+flood	282710
+river flood	8141

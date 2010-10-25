@@ -20,61 +20,37 @@ import java.util.Map.Entry;
 
 /**
  * @author Don Metzler
- *
  */
 public class VocabFrequencyPair implements Entry<String, Integer>, Comparable<VocabFrequencyPair> {
 
-	/**
-	 * entry key
-	 */
+	// key
 	private String mKey = null;
-	
-	/**
-	 * entry value
-	 */
+
+	// value
 	private Integer mValue = null;
-	
-	/**
-	 * @param key
-	 * @param value
-	 */
+
 	public VocabFrequencyPair(String key, Integer value) {
 		mKey = key;
 		mValue = value;
 	}
-		
-	/* (non-Javadoc)
-	 * @see java.util.Map$Entry#getKey()
-	 */
+
 	public String getKey() {
 		return mKey;
 	}
 
-	/* (non-Javadoc)
-	 * @see java.util.Map$Entry#getValue()
-	 */
 	public Integer getValue() {
 		return mValue;
 	}
 
-	/* (non-Javadoc)
-	 * @see java.util.Map$Entry#setValue(java.lang.Object)
-	 */
 	public Integer setValue(Integer value) {
 		mValue = value;
 		return mValue;
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Comparable#compareTo(java.lang.Object)
-	 */
 	public int compareTo(VocabFrequencyPair o) {
 		return o.getValue().compareTo(this.getValue());
 	}
-	
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
+
 	@Override
 	public String toString() {
 		return mKey + "\t" + mValue;

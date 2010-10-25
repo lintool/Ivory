@@ -16,15 +16,12 @@
 
 package ivory.smrf.retrieval;
 
-
 import java.util.Map;
 
 public interface QueryRunner {
-
-	public Accumulator [] runQuery(String[] query);
+	public Accumulator[] runQuery(String[] query);
 	public void runQuery(String qid, String[] query);
-	public Accumulator [] getResults(String qid);
+	public Accumulator[] getResults(String qid);
 	public Map<String, Accumulator[]> getResults();
 	public void clearResults();
-	
 }

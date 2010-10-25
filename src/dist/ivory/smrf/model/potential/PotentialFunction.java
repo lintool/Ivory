@@ -16,6 +16,7 @@
 
 package ivory.smrf.model.potential;
 
+import ivory.exception.ConfigurationException;
 import ivory.smrf.model.GlobalEvidence;
 import ivory.smrf.model.GraphNode;
 import ivory.util.RetrievalEnvironment;
@@ -24,62 +25,46 @@ import java.util.List;
 
 import org.w3c.dom.Node;
 
+import com.google.common.base.Preconditions;
+
 /**
  * @author Don Metzler
  * 
  */
 public abstract class PotentialFunction {
 
-	public abstract void configure(RetrievalEnvironment env, Node domNode) throws Exception;
+	public abstract void configure(RetrievalEnvironment env, Node domNode)
+			throws ConfigurationException;
 
 	public abstract void initialize(List<GraphNode> nodes, GlobalEvidence evidence)
-			throws Exception;
+			throws ConfigurationException;
 
-	/**
-	 * @return potential
-	 * @throws Exception
-	 */
-	public double getPotential() {
-		return computePotential();
-	}
+	public abstract float computePotential();
 
-	/**
-	 * @return potential
-	 */
-	public abstract double computePotential();
-
-	/**
-	 * @return next candidate
-	 */
 	public abstract int getNextCandidate();
 
 	public abstract void reset();
 
-	public abstract double getMaxScore();
+	public abstract float getMaxScore();
 
-	/**
-	 * @param docno
-	 */
 	public abstract void setNextCandidate(int docno);
 
 	@SuppressWarnings("unchecked")
 	public static PotentialFunction create(RetrievalEnvironment env, String type, Node functionNode)
-			throws Exception {
-		if (functionNode == null) {
-			throw new Exception("Unable to generate a PotentialFunction from a null node!");
-		}
+			throws ConfigurationException {
+		Preconditions.checkNotNull(env);
+		Preconditions.checkNotNull(type);
+		Preconditions.checkNotNull(functionNode);
 
 		try {
-			Class<? extends PotentialFunction> clz = (Class<? extends PotentialFunction>) Class
-					.forName(type);
+			Class<? extends PotentialFunction> clz = (Class<? extends PotentialFunction>) Class.forName(type);
 			PotentialFunction f = clz.newInstance();
 
 			f.configure(env, functionNode);
 
 			return f;
 		} catch (Exception e) {
-			e.printStackTrace();
-			throw new RuntimeException("Error: Unable to instantiate scoring function!");
+			throw new ConfigurationException("Unable to instantiate scoring function \"" + type	+ "\"!");
 		}
 	}
 }

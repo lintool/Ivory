@@ -402,6 +402,10 @@ public class PostingsListDocSortedPositional implements PostingsList {
 		}
 
 		public boolean nextPosting(Posting p) {
+		    if(!hasMorePostings()) {
+		    	return false;
+		    }
+
 			try {
 				if (mNeedToReadPositions) {
 					skipPositions(mPrevTf);
@@ -412,9 +416,6 @@ public class PostingsListDocSortedPositional implements PostingsList {
 					p.setDocno(mBitsIn.readBinary(MAX_DOCNO_BITS));
 					p.setScore((short) mBitsIn.readGamma());
 				} else {
-					if (mCnt >= mInnerNumPostings)
-						return false;
-
 					p.setDocno(mPrevDocno + mBitsIn.readGolomb(mInnerGolombParam));
 					p.setScore((short) mBitsIn.readGamma());
 				}

@@ -99,7 +99,14 @@ public class BuildTermDocVectorsForwardIndex extends PowerTool {
 			}
 
 			String indexPath = job.get("Ivory.IndexPath");
-			RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fs);
+			
+			RetrievalEnvironment env = null;
+			try {
+				env = new RetrievalEnvironment(indexPath, fs);
+			} catch (IOException e) {
+				throw new RuntimeException("Unable to create RetrievalEnvironment!");
+			}
+			
 			mCollectionDocumentCount = env.readCollectionDocumentCount();
 
 			try {

@@ -1,5 +1,6 @@
 package ivory.regression;
 
+import static ivory.regression.RegressionUtils.loadScoresIntoMap;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import ivory.eval.Qrels;
@@ -341,15 +342,6 @@ public class Robust04_Basic {
 
 	}
 
-	private static Map<String, Float> loadScoresIntoMap(String[] arr) {
-		Map<String, Float> scores = new HashMap<String, Float>();
-		for (int i = 0; i < arr.length; i += 2) {
-			scores.put(arr[i], Float.parseFloat(arr[i + 1]));
-		}
-
-		return scores;
-	}
-
 	private static void verifyResults(String model, Map<String, Accumulator[]> results,
 			Map<String, Float> apScores, Map<String, Float> p10Scores) {
 		float apSum = 0, p10Sum = 0;
@@ -369,8 +361,7 @@ public class Robust04_Basic {
 			if (qid.equals("684") && model.equals("robust04-bm25-sd")) {
 				assertTrue(Math.abs(ap - 0.1005) < 10e-6 || Math.abs(ap - 0.1016) < 10e-6);
 				assertEquals(p10Scores.get(qid), p10, 10e-6);
-			}
-			else if (qid.equals("684") && model.equals("robust04-bm25-fd")) {
+			} else if (qid.equals("684") && model.equals("robust04-bm25-fd")) {
 				assertTrue(Math.abs(ap - 0.0800) < 10e-6 || Math.abs(ap - 0.0803) < 10e-6);
 				assertEquals(p10Scores.get(qid), p10, 10e-6);
 			} else {

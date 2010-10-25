@@ -17,23 +17,34 @@
 package ivory.smrf.model;
 
 /**
+ * <p>
+ * Object encapsulating collection-level term evidence (df and cf).
+ * </p>
  * 
  * @author Don Metzler
- *
  */
 public class GlobalTermEvidence {
 
+	/**
+	 * Document frequency.
+	 */
 	public int df;
+
+	/**
+	 * Collection frequency.
+	 */
 	public long cf;
-	
-	public GlobalTermEvidence(){
+
+	public GlobalTermEvidence() {
+		df = 0;
+		cf = 0L;
 	}
-	
+
 	public GlobalTermEvidence(int df, long cf) {
 		this.df = df;
 		this.cf = cf;
 	}
-	
+
 	public void set(int df, long cf) {
 		this.df = df;
 		this.cf = cf;

@@ -16,50 +16,35 @@
 
 package ivory.smrf.model.builder;
 
+import ivory.smrf.model.builder.Expression.Type;
 import ivory.util.XMLTools;
 
 import org.w3c.dom.Node;
 
+import com.google.common.base.Preconditions;
+
 /**
  * @author Don Metzler
- * 
  */
 public class UnorderedWindowExpressionGenerator extends ExpressionGenerator {
 
-	/**
-	 * width of unordered window
-	 */
+	// width of unordered window
 	private int mWidth;
 
 	@Override
-	public void configure(Node domNode) throws Exception {
+	public void configure(Node domNode) {
+		Preconditions.checkNotNull(domNode);
 		mWidth = XMLTools.getAttributeValue(domNode, "width", 4);
 	}
 
 	@Override
-	public String getExpression(String[] terms) {
-		int numTerms = terms.length;
-		if (mWidth == 0) {
-			return "#uw( " + join(terms, " ") + " )";
-		}
-		return "#uw" + (numTerms * mWidth) + "( " + join(terms, " ") + " )";
+	public Expression getExpression(String[] terms) {
+		Preconditions.checkNotNull(terms);
+		return new Expression(Type.UW, terms.length*mWidth, terms);
 	}
 
 	@Override
 	public String toString() {
 		return "<expressiongenerator type=\"Unordered\" width=\"" + mWidth + "\"/>\n";
 	}
-
-	private static String join(String[] terms, String sep) {
-		StringBuilder sb = new StringBuilder();
-
-		for (int i = 0; i < terms.length; i++) {
-			sb.append(terms[i]);
-			if (i < terms.length - 1)
-				sb.append(sep);
-		}
-
-		return sb.toString();
-	}
-
 }

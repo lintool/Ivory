@@ -47,7 +47,6 @@ public class PreprocessMedline extends Configured implements Tool {
 	 * Runs this tool.
 	 */
 	public int run(String[] args) throws Exception {
-
 		if (args.length != 4) {
 			printUsage();
 			return -1;

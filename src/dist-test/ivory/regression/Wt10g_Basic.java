@@ -1,8 +1,7 @@
 package ivory.regression;
 
-import static org.junit.Assert.assertEquals;
 import ivory.eval.Qrels;
-import ivory.eval.RankedListEvaluator;
+import ivory.regression.GroundTruth.Metric;
 import ivory.smrf.retrieval.Accumulator;
 import ivory.smrf.retrieval.BatchQueryRunner;
 
@@ -286,31 +285,29 @@ public class Wt10g_Basic {
 			"0.0000", "544", "1.0000", "545", "0.3000", "546", "0.3000", "547", "0.2000", "548",
 			"0.2000", "549", "0.6000", "550", "0.4000" };
 
-	private static Qrels sQrels;
-	private static DocnoMapping sMapping;
-
 	@Test
 	public void runRegression() throws Exception {
+		Map<String, GroundTruth> g = new HashMap<String, GroundTruth>();
 
-		Map<String, Map<String, Float>> AllModelsAPScores = new HashMap<String, Map<String, Float>>();
+		// One topic didn't contain qrels, so trec_eval only picked up 99.
+		g.put("wt10g-dir-base", new GroundTruth(Metric.AP, 99, sDirBaseRawAP, 0.2093f));
+		g.put("wt10g-dir-sd", new GroundTruth(Metric.AP, 99, sDirSDRawAP, 0.2187f));
+		g.put("wt10g-dir-fd", new GroundTruth(Metric.AP, 99, sDirFDRawAP, 0.2200f));
+		g.put("wt10g-bm25-base", new GroundTruth(Metric.AP, 99, sBm25BaseRawAP, 0.2105f));
+		g.put("wt10g-bm25-sd", new GroundTruth(Metric.AP, 99, sBm25SDRawAP, 0.2248f));
+		g.put("wt10g-bm25-fd", new GroundTruth(Metric.AP, 99, sBm25FDRawAP, 0.2228f));
 
-		AllModelsAPScores.put("wt10g-dir-base", loadScoresIntoMap(sDirBaseRawAP));
-		AllModelsAPScores.put("wt10g-dir-sd", loadScoresIntoMap(sDirSDRawAP));
-		AllModelsAPScores.put("wt10g-dir-fd", loadScoresIntoMap(sDirFDRawAP));
-		AllModelsAPScores.put("wt10g-bm25-base", loadScoresIntoMap(sBm25BaseRawAP));
-		AllModelsAPScores.put("wt10g-bm25-sd", loadScoresIntoMap(sBm25SDRawAP));
-		AllModelsAPScores.put("wt10g-bm25-fd", loadScoresIntoMap(sBm25FDRawAP));
+		Map<String, GroundTruth> h = new HashMap<String, GroundTruth>();
 
-		Map<String, Map<String, Float>> AllModelsP10Scores = new HashMap<String, Map<String, Float>>();
+		// One topic didn't contain qrels, so trec_eval only picked up 99.
+		h.put("wt10g-dir-base", new GroundTruth(Metric.P10, 99, sDirBaseRawP10, 0.3131f));
+		h.put("wt10g-dir-sd", new GroundTruth(Metric.P10, 99, sDirSDRawP10, 0.3192f));
+		h.put("wt10g-dir-fd", new GroundTruth(Metric.P10, 99, sDirFDRawP10, 0.3242f));
+		h.put("wt10g-bm25-base", new GroundTruth(Metric.P10, 99, sBm25BaseRawP10, 0.3202f));
+		h.put("wt10g-bm25-sd", new GroundTruth(Metric.P10, 99, sBm25SDRawP10, 0.3333f));
+		h.put("wt10g-bm25-fd", new GroundTruth(Metric.P10, 99, sBm25FDRawP10, 0.3424f));
 
-		AllModelsP10Scores.put("wt10g-dir-base", loadScoresIntoMap(sDirBaseRawP10));
-		AllModelsP10Scores.put("wt10g-dir-sd", loadScoresIntoMap(sDirSDRawP10));
-		AllModelsP10Scores.put("wt10g-dir-fd", loadScoresIntoMap(sDirFDRawP10));
-		AllModelsP10Scores.put("wt10g-bm25-base", loadScoresIntoMap(sBm25BaseRawP10));
-		AllModelsP10Scores.put("wt10g-bm25-sd", loadScoresIntoMap(sBm25SDRawP10));
-		AllModelsP10Scores.put("wt10g-bm25-fd", loadScoresIntoMap(sBm25FDRawP10));
-
-		sQrels = new Qrels("docs/data/wt10g/qrels.wt10g");
+		Qrels qrels = new Qrels("docs/data/wt10g/qrels.wt10g");
 
 		String[] params = new String[] { "docs/data/wt10g/run.wt10g.basic.xml",
 				"docs/data/wt10g/wt10g_queries_451-500.xml",
@@ -326,73 +323,17 @@ public class Wt10g_Basic {
 
 		sLogger.info("Total query time: " + (end - start) + "ms");
 
-		sMapping = qr.getDocnoMapping();
+		DocnoMapping mapping = qr.getDocnoMapping();
 
 		for (String model : qr.getModels()) {
 			sLogger.info("Verifying results of model \"" + model + "\"");
 
 			Map<String, Accumulator[]> results = qr.getResults(model);
-
-			verifyResults(model, results, AllModelsAPScores.get(model), AllModelsP10Scores
-					.get(model));
+			g.get(model).verify(results, mapping, qrels);
+			h.get(model).verify(results, mapping, qrels);
 
 			sLogger.info("Done!");
 		}
-
-	}
-
-	private static Map<String, Float> loadScoresIntoMap(String[] arr) {
-		Map<String, Float> scores = new HashMap<String, Float>();
-		for (int i = 0; i < arr.length; i += 2) {
-			scores.put(arr[i], Float.parseFloat(arr[i + 1]));
-		}
-
-		return scores;
-	}
-
-	private static void verifyResults(String model, Map<String, Accumulator[]> results,
-			Map<String, Float> apScores, Map<String, Float> p10Scores) {
-		float apSum = 0, p10Sum = 0;
-		for (String qid : results.keySet()) {
-			float ap = (float) RankedListEvaluator.computeAP(results.get(qid), sMapping, sQrels
-					.getReldocsForQid(qid));
-
-			float p10 = (float) RankedListEvaluator.computePN(10, results.get(qid), sMapping,
-					sQrels.getReldocsForQid(qid));
-
-			apSum += ap;
-			p10Sum += p10;
-
-			sLogger.info("verifying qid " + qid + " for model " + model);
-			assertEquals(apScores.get(qid), ap, 10e-6);
-			assertEquals(p10Scores.get(qid), p10, 10e-6);
-
-		}
-
-		// one topic didn't contain qrels, so trec_eval only picked up 99 topics
-		float MAP = (float) RankedListEvaluator.roundTo4SigFigs(apSum / 99f);
-		float P10Avg = (float) RankedListEvaluator.roundTo4SigFigs(p10Sum / 99f);
-
-		if (model.equals("wt10g-dir-base")) {
-			assertEquals(0.2093, MAP, 10e-5);
-			assertEquals(0.3131, P10Avg, 10e-5);
-		} else if (model.equals("wt10g-dir-sd")) {
-			assertEquals(0.2187, MAP, 10e-5);
-			assertEquals(0.3192, P10Avg, 10e-5);
-		} else if (model.equals("wt10g-dir-fd")) {
-			assertEquals(0.2200, MAP, 10e-5);
-			assertEquals(0.3242, P10Avg, 10e-5);
-		} else if (model.equals("wt10g-bm25-base")) {
-			assertEquals(0.2105, MAP, 10e-5);
-			assertEquals(0.3202, P10Avg, 10e-5);
-		} else if (model.equals("wt10g-bm25-sd")) {
-			assertEquals(0.2248, MAP, 10e-5);
-			assertEquals(0.3333, P10Avg, 10e-5);
-		} else if (model.equals("wt10g-bm25-fd")) {
-			assertEquals(0.2228, MAP, 10e-5);
-			assertEquals(0.3424, P10Avg, 10e-5);
-		}
-
 	}
 
 	public static junit.framework.Test suite() {

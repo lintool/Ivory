@@ -16,30 +16,29 @@
 
 package ivory.smrf.model.builder;
 
+import ivory.exception.ConfigurationException;
+
 import org.w3c.dom.Node;
+
+import com.google.common.base.Preconditions;
 
 /**
  * @author Don Metzler
- * 
  */
 public abstract class ExpressionGenerator {
 
-	public abstract void configure(Node domNode) throws Exception;
+	public abstract void configure(Node domNode) throws ConfigurationException;
 
-	/**
-	 * @param terms
-	 */
-	public abstract String getExpression(String[] terms);
+	public abstract Expression getExpression(String[] terms);
 
 	@SuppressWarnings("unchecked")
-	public static ExpressionGenerator create(String type, Node domNode) throws Exception {
-		if (domNode == null) {
-			throw new Exception("Unable to generate a ExpressionGenerator from a null node!");
-		}
+	public static ExpressionGenerator create(String type, Node domNode)
+			throws ConfigurationException {
+		Preconditions.checkNotNull(type);
+		Preconditions.checkNotNull(domNode);
 
 		try {
-			Class<? extends ExpressionGenerator> clz = (Class<? extends ExpressionGenerator>) Class
-					.forName(type);
+			Class<? extends ExpressionGenerator> clz = (Class<? extends ExpressionGenerator>) Class.forName(type);
 			ExpressionGenerator f = clz.newInstance();
 
 			f.configure(domNode);
@@ -47,7 +46,7 @@ public abstract class ExpressionGenerator {
 			return f;
 		} catch (Exception e) {
 			e.printStackTrace();
-			throw new RuntimeException("Error: Unable to instantiate ExpressionGenerator!");
+			throw new ConfigurationException("Unable to instantiate ExpressionGenerator \"" + type + "\"!");
 		}
 	}
 }

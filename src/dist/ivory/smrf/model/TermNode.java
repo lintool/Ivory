@@ -28,7 +28,7 @@ public class TermNode extends GraphNode {
 	protected String mTerm = null;
 
 	/**
-	 * Creates a <code>TermNode</code> for a particular term
+	 * Creates a <code>TermNode</code> for a particular term.
 	 * 
 	 * @param term
 	 *            the term
@@ -58,8 +58,9 @@ public class TermNode extends GraphNode {
 		return new TermNode(mTerm);
 	}
 
-	public int getType() {
-		return TERM;
+	@Override
+	public Type getType() {
+		return Type.TERM;
 	}
 
 	@Override

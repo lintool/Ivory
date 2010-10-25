@@ -1,5 +1,6 @@
 package ivory.regression;
 
+import static ivory.regression.RegressionUtils.loadScoresIntoMap;
 import static org.junit.Assert.assertEquals;
 import ivory.eval.Qrels;
 import ivory.eval.RankedListEvaluator;
@@ -156,15 +157,6 @@ public class Robust04_WSD {
 
 	}
 
-	private static Map<String, Float> loadScoresIntoMap(String[] arr) {
-		Map<String, Float> scores = new HashMap<String, Float>();
-		for (int i = 0; i < arr.length; i += 2) {
-			scores.put(arr[i], Float.parseFloat(arr[i + 1]));
-		}
-
-		return scores;
-	}
-
 	private static void verifyResults(String model, Map<String, Accumulator[]> results,
 			Map<String, Float> apScores, Map<String, Float> p10Scores) {
 		float apSum = 0, p10Sum = 0;
@@ -179,8 +171,8 @@ public class Robust04_WSD {
 			p10Sum += p10;
 
 			sLogger.info("verifying qid " + qid + " for model " + model);
-			assertEquals(apScores.get(qid), ap, 10e-6);
-			assertEquals(p10Scores.get(qid), p10, 10e-6);
+			assertEquals(apScores.get(qid), ap, 10e-5);
+			assertEquals(p10Scores.get(qid), p10, 10e-5);
 
 		}
 

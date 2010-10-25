@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -36,9 +35,6 @@ import edu.umd.cloud9.util.FSLineReader;
 
 public class PrefixEncodedTermSet implements Writable {
 
-	/**
-	 * logger
-	 */
 	private static final Logger LOGGER = Logger.getLogger(PrefixEncodedTermSet.class);
 	static {
 		LOGGER.setLevel(Level.WARN);

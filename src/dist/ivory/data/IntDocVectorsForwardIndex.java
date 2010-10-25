@@ -31,6 +31,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.SequenceFile;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import edu.umd.cloud9.debug.MemoryUsageUtils;
@@ -47,6 +48,9 @@ import edu.umd.cloud9.debug.MemoryUsageUtils;
 public class IntDocVectorsForwardIndex {
 
 	private static final Logger sLogger = Logger.getLogger(IntDocVectorsForwardIndex.class);
+	{
+		sLogger.setLevel (Level.WARN);
+	}
 
 	private static final NumberFormat sFormatW5 = new DecimalFormat("00000");
 
@@ -70,13 +74,21 @@ public class IntDocVectorsForwardIndex {
 	 * @throws IOException
 	 */
 	public IntDocVectorsForwardIndex(String indexPath, FileSystem fs) throws IOException {
+		this(indexPath, fs, false);
+	}
+
+
+	public IntDocVectorsForwardIndex(String indexPath, FileSystem fs, boolean weighted) throws IOException {
 		mFs = fs;
 		mConf = fs.getConf();
 
-		RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fs);
-		mPath = env.getIntDocVectorsDirectory();
+		RetrievalEnvironment env = new RetrievalEnvironment (indexPath, fs);
+		mPath = (weighted ? env.getWeightedIntDocVectorsDirectory () : env.getIntDocVectorsDirectory ());
+		sLogger.debug ("mPath: " + mPath);
 
-		FSDataInputStream posInput = fs.open(new Path(env.getIntDocVectorsForwardIndex()));
+		String forwardIndexPath = (weighted ? env.getWeightedIntDocVectorsForwardIndex () : env.getIntDocVectorsForwardIndex ());
+		sLogger.debug ("forwardIndexPath: " + forwardIndexPath);
+		FSDataInputStream posInput = fs.open (new Path (forwardIndexPath));
 
 		mDocnoOffset = posInput.readInt();
 		mCollectionDocumentCount = posInput.readInt();

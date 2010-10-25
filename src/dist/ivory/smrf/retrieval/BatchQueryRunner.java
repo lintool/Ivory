@@ -16,15 +16,15 @@
 
 package ivory.smrf.retrieval;
 
+import ivory.exception.ConfigurationException;
 import ivory.smrf.model.builder.MRFBuilder;
 import ivory.smrf.model.expander.MRFExpander;
+import ivory.smrf.model.importance.ConceptImportanceModel;
 import ivory.util.ResultWriter;
 import ivory.util.RetrievalEnvironment;
 import ivory.util.XMLTools;
 
 import java.io.IOException;
-import java.rmi.NotBoundException;
-import java.rmi.RemoteException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -42,86 +42,81 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import com.google.common.base.Preconditions;
+
 import edu.umd.cloud9.collection.DocnoMapping;
 
 public class BatchQueryRunner {
 	private static final Logger LOGGER = Logger.getLogger(BatchQueryRunner.class);
 
 	private DocnoMapping mDocnoMapping = null;
-	private FileSystem mFileSystem = null;
+	private FileSystem mFs = null;
 	private String mIndexPath = null;
 	private RetrievalEnvironment mEnv = null;
 
 	private Map<String, String> mQueries = new LinkedHashMap<String, String>();
+	private Map<String, Node> mImportanceModels = new LinkedHashMap<String, Node>();
 	private Map<String, Node> mModels = new LinkedHashMap<String, Node>();
 	private Map<String, Node> mDocscores = new LinkedHashMap<String, Node>();
 	private Map<String, Node> mExpanders = new HashMap<String, Node>();
-	private HashSet<String> mStopwords = new HashSet<String>();
+	private Set<String> mStopwords = new HashSet<String>();
+	private Map<String, Map<String, Double>> mJudgments = new HashMap<String, Map<String, Double>>();
 
 	private Map<String, QueryRunner> mQueryRunners = new LinkedHashMap<String, QueryRunner>();
 
-	/**
-	 * @param args
-	 * @throws SAXException
-	 * @throws IOException
-	 * @throws ParserConfigurationException
-	 * @throws SMRFException
-	 * @throws NotBoundException
-	 */
-	public BatchQueryRunner(String[] args, FileSystem fs) throws SAXException, IOException,
-			ParserConfigurationException, Exception, NotBoundException {
-		mFileSystem = fs;
+	public BatchQueryRunner(String[] args, FileSystem fs) throws ConfigurationException {
+		Preconditions.checkNotNull(fs);
+		Preconditions.checkNotNull(args);
+
+		mFs = fs;
 		parseParameters(args);
 
-		// make sure we have an index to run against
-		if (mIndexPath == null) {
-			throw new Exception("Must specify an index!");
+		try {
+			mEnv = new RetrievalEnvironment(mIndexPath, fs);
+			mEnv.initialize(true);
+
+			mDocnoMapping = RetrievalEnvironment.loadDocnoMapping(mIndexPath, fs);
+		} catch (IOException e) {
+			throw new ConfigurationException("Failed to instantiate RetrievalEnvironment: "
+					+ e.getMessage());
 		}
 
-		mDocnoMapping = RetrievalEnvironment.loadDocnoMapping(mIndexPath);
-		mEnv = new RetrievalEnvironment(mIndexPath, fs);
-		mEnv.initialize(true);
+		// Load static concept importance models
+		for(Map.Entry<String, Node> n : mImportanceModels.entrySet()) {
+			ConceptImportanceModel m = ConceptImportanceModel.get(n.getValue());
+			mEnv.addImportanceModel(n.getKey(), m);
+		}
 
+		// Load static docscores (e.g., spam score, PageRank, etc.).
 		for (Map.Entry<String, Node> n : mDocscores.entrySet()) {
 			String type = XMLTools.getAttributeValue(n.getValue(), "type", "");
 			String provider = XMLTools.getAttributeValue(n.getValue(), "provider", "");
 			String path = n.getValue().getTextContent();
 
 			if (type.equals("") || provider.equals("") || path.equals("")) {
-				throw new Exception("Invalid docscore!");
+				throw new ConfigurationException("Invalid docscore!");
 			}
 
 			LOGGER.info("Loading docscore: type=" + type + ", provider=" + provider + ", path="
 					+ path);
 			mEnv.loadDocScore(type, provider, path);
-		}
-
-		// make sure there are models that need evaluated
-		if (mModels.size() == 0) {
-			throw new Exception("Must specify at least one model!");
-		}
-
-		// make sure we have some queries to run
-		if (mQueries.size() == 0) {
-			throw new Exception("Must specify at least one query!");
-		}
+		}		
 	}
 
-	public void runQueries() throws Exception {
+	public void runQueries() {
 		for (String modelID : mModels.keySet()) {
-
 			Node modelNode = mModels.get(modelID);
 			Node expanderNode = mExpanders.get(modelID);
 
-			// initialize retrieval environment variables
+			// Initialize retrieval environment variables.
 			QueryRunner runner = null;
 			MRFBuilder builder = null;
 			MRFExpander expander = null;
 			try {
-				// get the MRF builder
+				// Get the MRF builder.
 				builder = MRFBuilder.get(mEnv, modelNode.cloneNode(true));
 
-				// get the MRF expander
+				// Get the MRF expander.
 				expander = null;
 				if (expanderNode != null) {
 					expander = MRFExpander.getExpander(mEnv, expanderNode.cloneNode(true));
@@ -133,11 +128,12 @@ public class BatchQueryRunner {
 				int numHits = XMLTools.getAttributeValue(modelNode, "hits", 1000);
 
 				LOGGER.info("number of hits: " + numHits);
+
+				// Multi-threaded query evaluation still a bit unstable; setting
+				// thread=1 for now.
 				runner = new ThreadedQueryRunner(builder, expander, 1, numHits);
 
 				mQueryRunners.put(modelID, runner);
-				// multi-threaded query evaluation still a bit unstable, setting
-				// thread=1 for now
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -146,27 +142,46 @@ public class BatchQueryRunner {
 				String rawQueryText = mQueries.get(queryID);
 				String[] queryTokens = mEnv.tokenize(rawQueryText);
 
-				LOGGER.info("query id:" + queryID + ", query:" + rawQueryText);
+				LOGGER.info(String.format("query id: %s, query: \"%s\"", queryID, rawQueryText));
 
-				// execute the query
+				// Execute the query.
 				runner.runQuery(queryID, queryTokens);
 			}
 
-			// where should we output these results?
-			ResultWriter resultWriter = null;
+			// Where should we output these results?
 			Node model = mModels.get(modelID);
 			String fileName = XMLTools.getAttributeValue(model, "output", null);
 			boolean compress = XMLTools.getAttributeValue(model, "compress", false);
-			resultWriter = getResultWriter(fileName, compress);
-			printResults(modelID, runner, resultWriter);
-			// flush the result writer
-			resultWriter.flush();
+
+			try {
+				ResultWriter resultWriter = new ResultWriter(fileName, compress, mFs);
+				printResults(modelID, runner, resultWriter);
+				resultWriter.flush();
+			} catch (IOException e) {
+				throw new RuntimeException("Error: Unable to write results!");
+			}
 		}
 
 	}
 
 	public Set<String> getModels() {
 		return mModels.keySet();
+	}
+
+	public Node getModel(String modelName) {
+		return mModels.get(modelName);
+	}
+
+	public RetrievalEnvironment getRetrievalEnvironment() {
+		return mEnv;
+	}
+
+	public Map<String, String> getQueries() {
+		return mQueries;
+	}
+
+	public Map<String, Double> getJudgmentSet(String qid) {
+		return mJudgments.get(qid);
 	}
 
 	public Map<String, Accumulator[]> getResults(String model) {
@@ -177,15 +192,11 @@ public class BatchQueryRunner {
 		return mDocnoMapping;
 	}
 
-	public ResultWriter getResultWriter(String fileName, boolean compress) throws Exception {
-		return new ResultWriter(fileName, compress, mFileSystem);
-	}
-
 	private void printResults(String modelID, QueryRunner runner, ResultWriter resultWriter)
-			throws Exception {
+			throws IOException {
 
 		for (String queryID : mQueries.keySet()) {
-			// get the ranked list for this query
+			// Get the ranked list for this query.
 			Accumulator[] list = runner.getResults(queryID);
 			if (list == null) {
 				LOGGER.info("null results for: " + queryID);
@@ -193,12 +204,14 @@ public class BatchQueryRunner {
 			}
 
 			if (mDocnoMapping == null) {
-				// print the results
+				// Print results with internal docnos if unable to translate to
+				// external docids.
 				for (int i = 0; i < list.length; i++) {
 					resultWriter.println(queryID + " Q0 " + list[i].docno + " " + (i + 1) + " "
 							+ list[i].score + " " + modelID);
 				}
 			} else {
+				// Translate internal docnos to external docids.
 				for (int i = 0; i < list.length; i++) {
 					resultWriter.println(queryID + " Q0 " + mDocnoMapping.getDocid(list[i].docno)
 							+ " " + (i + 1) + " " + list[i].score + " " + modelID);
@@ -207,110 +220,167 @@ public class BatchQueryRunner {
 		}
 	}
 
-	private void parseParameters(String[] args) throws Exception {
+	private void parseParameters(String[] args) throws ConfigurationException {
 		for (int i = 0; i < args.length; i++) {
 			String element = args[i];
 			Document d = null;
-			d = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(
-					mFileSystem.open(new Path(element)));
-			parseParameters(d);
+
+			try {
+				d = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(
+							mFs.open(new Path(element)));
+			} catch (SAXException e) {
+				throw new ConfigurationException(e.getMessage());
+			} catch (IOException e) {
+				throw new ConfigurationException(e.getMessage());
+			} catch (ParserConfigurationException e) {
+				throw new ConfigurationException(e.getMessage());
+			}
+
+			parseQueries(d);
+			parseImportanceModels(d);
+			parseModels(d);
+			parseStopwords(d);
+			parseIndexLocation(d);
+			parseDocscores(d);
+			parseJudgments(d);
+		}
+
+		// Make sure we have some queries to run.
+		if (mQueries.isEmpty()) {
+			throw new ConfigurationException("Must specify at least one query!");
+		}
+
+		// Make sure there are models that need evaluated.
+		if (mModels.isEmpty()) {
+			throw new ConfigurationException("Must specify at least one model!");
+		}
+
+		// Make sure we have an index to run against.
+		if (mIndexPath == null) {
+			throw new ConfigurationException("Must specify an index!");
 		}
 	}
 
-	private void parseParameters(Document d) throws Exception, RemoteException, NotBoundException {
-		// parse query elements
+	private void parseQueries(Document d) throws ConfigurationException {
 		NodeList queries = d.getElementsByTagName("query");
+
 		for (int i = 0; i < queries.getLength(); i++) {
-			// query XML node
+			// Get query XML node.
 			Node node = queries.item(i);
 
-			// get query id
+			// Get query id.
 			String queryID = XMLTools.getAttributeValue(node, "id", null);
 			if (queryID == null) {
-				throw new Exception("Must specify a query id attribute for every query!");
+				throw new ConfigurationException(
+						"Must specify a query id attribute for every query!");
 			}
 
-			// get query text
+			// Get query text.
 			String queryText = node.getTextContent();
 
-			// add query to lookup
+			// Add query to internal map.
 			if (mQueries.get(queryID) != null) {
-				throw new Exception(
+				throw new ConfigurationException(
 						"Duplicate query ids not allowed! Already parsed query with id=" + queryID);
 			}
 			mQueries.put(queryID, queryText);
 		}
+	}
 
-		// parse model elements
-		NodeList models = d.getElementsByTagName("model");
-		for (int i = 0; i < models.getLength(); i++) {
-			// model XML node
-			Node node = models.item(i);
-
-			// get model id
-			String modelID = XMLTools.getAttributeValue(node, "id", null);
-			if (modelID == null) {
-				throw new Exception("Must specify a model id for every model!");
+	private void parseImportanceModels(Document d) throws ConfigurationException {
+		NodeList importanceModels = d.getElementsByTagName("importancemodel");
+		
+		for(int i = 0; i < importanceModels.getLength(); i++) {
+			// Get model XML node
+			Node node = importanceModels.item(i);
+			
+			String modelId = XMLTools.getAttributeValue(node, "id", "");
+			if (modelId.equals("")) {
+				throw new ConfigurationException("Must specify an id for every importancemodel!");
 			}
 
-			// parse parent nodes
+			// Add model to internal map.
+			if (mImportanceModels.get(modelId) != null) {
+				throw new ConfigurationException(
+						"Duplicate importancemodel ids not allowed! Already parsed model with id="
+								+ modelId);
+			}
+			mImportanceModels.put(modelId, node);			
+		}
+	}
+	
+	private void parseModels(Document d) throws ConfigurationException {
+		NodeList models = d.getElementsByTagName("model");
+
+		for (int i = 0; i < models.getLength(); i++) {
+			// Get model XML node.
+			Node node = models.item(i);
+
+			// Get model id
+			String modelID = XMLTools.getAttributeValue(node, "id", null);
+			if (modelID == null) {
+				throw new ConfigurationException("Must specify a model id for every model!");
+			}
+
+			// Parse parent nodes.
 			NodeList children = node.getChildNodes();
 			for (int j = 0; j < children.getLength(); j++) {
 				Node child = children.item(j);
 				if ("expander".equals(child.getNodeName())) {
 					if (mExpanders.containsKey(modelID)) {
-						throw new Exception("Only one expander allowed per model!");
+						throw new ConfigurationException("Only one expander allowed per model!");
 					}
 					mExpanders.put(modelID, child);
 				}
 			}
 
-			// add model to lookup
+			// Add model to internal map.
 			if (mModels.get(modelID) != null) {
-				throw new Exception(
+				throw new ConfigurationException(
 						"Duplicate model ids not allowed! Already parsed model with id=" + modelID);
 			}
 			mModels.put(modelID, node);
 		}
+	}
 
-		// parse stopwords
+	private void parseStopwords(Document d) {
 		NodeList stopwords = d.getElementsByTagName("stopword");
-		for (int i = 0; i < stopwords.getLength(); i++) {
-			// stopword node
-			Node node = stopwords.item(i);
 
-			// get stopword
+		for (int i = 0; i < stopwords.getLength(); i++) {
+			Node node = stopwords.item(i);
 			String stopword = node.getTextContent();
 
-			// add stopword to lookup
+			// Add stopword to internal map.
 			mStopwords.add(stopword);
 		}
+	}
 
-		// parse index
+	private void parseIndexLocation(Document d) throws ConfigurationException {
 		NodeList index = d.getElementsByTagName("index");
+
 		if (index.getLength() > 0) {
 			if (mIndexPath != null) {
-				throw new Exception(
+				throw new ConfigurationException(
 						"Must specify only one index! There is no support for multiple indexes!");
 			}
 			mIndexPath = index.item(0).getTextContent();
 		}
+	}
 
-		// parse model elements
+	private void parseDocscores(Document d) throws ConfigurationException {
 		NodeList docscores = d.getElementsByTagName("docscore");
+
 		for (int i = 0; i < docscores.getLength(); i++) {
-			// model XML node
 			Node node = docscores.item(i);
 
-			// get model id
 			String docscoreType = XMLTools.getAttributeValue(node, "type", "");
 			if (docscoreType.equals("")) {
-				throw new Exception("Must specify a type for every docscore!");
+				throw new ConfigurationException("Must specify a type for every docscore!");
 			}
 
-			// add model to lookup
+			// Add model to internal map.
 			if (mDocscores.get(docscoreType) != null) {
-				throw new Exception(
+				throw new ConfigurationException(
 						"Duplicate docscore types not allowed! Already parsed model with id="
 								+ docscoreType);
 			}
@@ -318,4 +388,37 @@ public class BatchQueryRunner {
 		}
 	}
 
+	private void parseJudgments(Document d) throws ConfigurationException {
+		NodeList judgments = d.getElementsByTagName("judgment");
+
+		for (int i = 0; i < judgments.getLength(); i++) {
+			// Get XML node.
+			Node node = judgments.item(i);
+
+			// Get query, document, and judgment.
+			String qid = XMLTools.getAttributeValue(node, "qid", null);
+			String docname = XMLTools.getAttributeValue(node, "doc", null);
+			String grade = XMLTools.getAttributeValue(node, "grade", null);
+
+			if (qid == null) {
+				throw new ConfigurationException("Each judgment must specify a qid attribute!");
+			}
+
+			if (docname == null) {
+				throw new ConfigurationException("Each judgment must specify a doc attribute!");
+			}
+
+			if (grade == null) {
+				throw new ConfigurationException("Each judgment must specify a grade attribute!");
+			}
+
+			Map<String, Double> queryJudgments = mJudgments.get(qid);
+			if (queryJudgments == null) {
+				queryJudgments = new HashMap<String, Double>();
+				mJudgments.put(qid, queryJudgments);
+			}
+
+			queryJudgments.put(docname, Double.parseDouble(grade));
+		}
+	}
 }

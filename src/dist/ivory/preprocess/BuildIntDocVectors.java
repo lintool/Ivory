@@ -18,9 +18,9 @@ package ivory.preprocess;
 
 import ivory.data.IntDocVector;
 import ivory.data.LazyIntDocVector;
-import ivory.data.PrefixEncodedTermIDMapWithIndex;
+import ivory.data.TermIdMapWithCache;
 import ivory.data.TermDocVector;
-import ivory.util.DocumentProcessingUtils;
+import ivory.tokenize.DocumentProcessingUtils;
 import ivory.util.RetrievalEnvironment;
 
 import java.io.IOException;
@@ -63,7 +63,7 @@ public class BuildIntDocVectors extends PowerTool {
 	private static class MyMapper extends MapReduceBase implements
 			Mapper<IntWritable, TermDocVector, IntWritable, IntDocVector> {
 
-		private PrefixEncodedTermIDMapWithIndex termIDMap = null;
+		private TermIdMapWithCache termIDMap = null;
 
 		public void configure(JobConf job) {
 
@@ -85,8 +85,8 @@ public class BuildIntDocVectors extends PowerTool {
 					termIDsFile = env.getIndexTermIdsData();
 					idToTermFile = env.getIndexTermIdMappingData();
 					try {
-						termIDMap = new PrefixEncodedTermIDMapWithIndex(new Path(termsFile),
-								new Path(termIDsFile), new Path(idToTermFile), 0.2f, false, fs);
+						termIDMap = new TermIdMapWithCache(new Path(termsFile),
+								new Path(termIDsFile), new Path(idToTermFile), 0.2f, fs);
 					} catch (Exception e) {
 						e.printStackTrace();
 						throw new RuntimeException("Error initializing Term to Id map!");
@@ -94,8 +94,8 @@ public class BuildIntDocVectors extends PowerTool {
 				} else {
 					Path[] localFiles = DistributedCache.getLocalCacheFiles(job);
 					try {
-						termIDMap = new PrefixEncodedTermIDMapWithIndex(localFiles[0],
-								localFiles[1], localFiles[2], 0.3f, false, FileSystem.getLocal(job));
+						termIDMap = new TermIdMapWithCache(localFiles[0],
+								localFiles[1], localFiles[2], 0.3f, FileSystem.getLocal(job));
 					} catch (Exception e) {
 						e.printStackTrace();
 						throw new RuntimeException("Error initializing Term to Id map!");

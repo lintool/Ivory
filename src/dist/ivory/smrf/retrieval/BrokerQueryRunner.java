@@ -107,7 +107,7 @@ public class BrokerQueryRunner implements QueryRunner {
 			}
 			String[] s = lines[i].split("\t");
 
-			r.add(new Accumulator(Integer.parseInt(s[0]), Double.parseDouble(s[1])));
+			r.add(new Accumulator(Integer.parseInt(s[0]), Float.parseFloat(s[1])));
 			docnoMapping.put(Integer.parseInt(s[0]), s[2]);
 		}
 		Accumulator[] results = new Accumulator[r.size()];

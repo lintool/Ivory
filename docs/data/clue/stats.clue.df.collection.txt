@@ -1,134 +1,134 @@
-cell phone  788446
-inuyasha  39908
-adopt  1641667
-resort  1397137
-car  4669922
-dog  2126582
-secret garden  18258
-euclid  47403
-pamper  103427
-dog adopt  11727
-starbuck  141617
-design  11464739
-unit state  5263732
-diabet educ  10684
-djs  173978
-counti convent  10903
-index annuiti  1565
-fish  2322324
-famili  8111176
-divers  1661459
-2  22901603
-rate  7195406
-organ  7018964
-obama  1139557
-ellipt trainer  12224
-design host  135779
-cell  2173888
-class  5134231
-hospit  2155968
-colleg  4376557
-poker  474188
-heart rate  83294
-espn  198053
-convent center  143745
-lick resort  536
-cheap  1408319
-wed  2505438
-dog heat  1853
-flame design  843
-annuiti  65480
-mitchel  422790
-chef  475542
-calcul  1573917
-phone  5891533
-map unit  25187
-solar  694059
-defend  1089537
-2 game  98681
-kcs  9351
-center  8597609
-dinosaur  238196
-unit  9316551
-internet  6634789
-tree  2247801
-alexian  1509
-ps  508146
-cheap internet  4549
-secret  2170823
-prep  327706
-orang  1299373
-obama famili  8830
-rick warren  25247
-diabet  548833
-budget calcul  9074
-pamper chef  4850
-educ  8219913
-car part  74377
-ellipt  77277
-michwork  132
-brother  2005153
-resort casino  25272
-gmat  26181
-arizona  1246133
-poker tournament  31922
-music  7800061
-hotel  3864484
-disneyland hotel  3650
-wilson antenna  313
-espn sport  5012
-sport  7112565
-host  4024555
-yahoo  2430950
-mitchel colleg  1710
-websit design  517866
-hoboken  35202
-gmat prep  2654
-casino  798926
-lick  215260
-lower  2403293
-current  13579041
-rick  540635
-air travel  124764
-convent  1674184
-man  4816834
-antenna  229145
-alexian brother  737
-warren  507142
-solar panel  54770
-panel  1390660
-flame  541838
-wilson  837254
-prep class  2683
-brother hospit  1064
-gps  602567
-tournament  753858
-heat  1684007
-map  11087888
-disneyland  83244
-apprais  272760
-websit  9861334
-index  4969900
-french lick  2636
-state  12993928
-french  3238145
-garden  3112165
-orang counti  218451
-atari  102399
-game fish  40035
-music man  15547
-budget  1733674
-lower heart  2581
-volvo  153926
-toilet  338338
-ps 2  19620
-arizona game  2637
-part  10920510
-famili tree  110651
-game  7922310
-counti  3160028
-travel  7234909
-trainer  526167
-heart  3452445
-wed budget  5389
-air  4610732
+cell phone	788446
+inuyasha	39908
+adopt	1641667
+resort	1397137
+car	4669922
+dog	2126582
+secret garden	18258
+euclid	47403
+pamper	103427
+dog adopt	11727
+starbuck	141617
+design	11464739
+unit state	5263732
+diabet educ	10684
+djs	173978
+counti convent	10903
+index annuiti	1565
+fish	2322324
+famili	8111176
+divers	1661459
+2	22901603
+rate	7195406
+organ	7018964
+obama	1139557
+ellipt trainer	12224
+design host	135779
+cell	2173888
+class	5134231
+hospit	2155968
+colleg	4376557
+poker	474188
+heart rate	83294
+espn	198053
+convent center	143745
+lick resort	536
+cheap	1408319
+wed	2505438
+dog heat	1853
+flame design	843
+annuiti	65480
+mitchel	422790
+chef	475542
+calcul	1573917
+phone	5891533
+map unit	25187
+solar	694059
+defend	1089537
+2 game	98681
+kcs	9351
+center	8597609
+dinosaur	238196
+unit	9316551
+internet	6634789
+tree	2247801
+alexian	1509
+ps	508146
+cheap internet	4549
+secret	2170823
+prep	327706
+orang	1299373
+obama famili	8830
+rick warren	25247
+diabet	548833
+budget calcul	9074
+pamper chef	4850
+educ	8219913
+car part	74377
+ellipt	77277
+michwork	132
+brother	2005153
+resort casino	25272
+gmat	26181
+arizona	1246133
+poker tournament	31922
+music	7800061
+hotel	3864484
+disneyland hotel	3650
+wilson antenna	313
+espn sport	5012
+sport	7112565
+host	4024555
+yahoo	2430950
+mitchel colleg	1710
+websit design	517866
+hoboken	35202
+gmat prep	2654
+casino	798926
+lick	215260
+lower	2403293
+current	13579041
+rick	540635
+air travel	124764
+convent	1674184
+man	4816834
+antenna	229145
+alexian brother	737
+warren	507142
+solar panel	54770
+panel	1390660
+flame	541838
+wilson	837254
+prep class	2683
+brother hospit	1064
+gps	602567
+tournament	753858
+heat	1684007
+map	11087888
+disneyland	83244
+apprais	272760
+websit	9861334
+index	4969900
+french lick	2636
+state	12993928
+french	3238145
+garden	3112165
+orang counti	218451
+atari	102399
+game fish	40035
+music man	15547
+budget	1733674
+lower heart	2581
+volvo	153926
+toilet	338338
+ps 2	19620
+arizona game	2637
+part	10920510
+famili tree	110651
+game	7922310
+counti	3160028
+travel	7234909
+trainer	526167
+heart	3452445
+wed budget	5389
+air	4610732

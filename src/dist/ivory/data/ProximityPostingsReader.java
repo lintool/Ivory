@@ -18,27 +18,30 @@ package ivory.data;
 
 import ivory.index.TermPositions;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.Arrays;
 
 /**
  * @author Don Metzler
- *
+ * 
  */
-public abstract class ProximityPostingsReader implements ivory.data.PostingsReader {	
+public abstract class ProximityPostingsReader implements PostingsReader {
+
+	private static final int BUFFER_SIZE = 4096;
+
 	/**
 	 * readers for terms that make up ordered window
 	 */
-	protected ivory.data.PostingsListDocSortedPositional.PostingsReader [] mReaders = null;
+	private PostingsReader[] mReaders = null;
+
+	private int [] newPositions = new int[BUFFER_SIZE];
+	private int [] newIds = new int[BUFFER_SIZE];
 
 	/**
 	 * size of ordered window
 	 */
 	protected int mSize;
 
-	public ProximityPostingsReader(ivory.data.PostingsListDocSortedPositional.PostingsReader[] readers, int size) {
+	public ProximityPostingsReader(PostingsReader[] readers, int size) {
 		mReaders = readers;
 		mSize = size;
 	}
@@ -48,13 +51,13 @@ public abstract class ProximityPostingsReader implements ivory.data.PostingsRead
 	 */
 	private boolean isMatching() {
 		int target = -1;
-		for(ivory.data.PostingsListDocSortedPositional.PostingsReader reader : mReaders) {
-			if(target == -1) {
+		for (PostingsReader reader : mReaders) {
+			if (target == -1) {
 				target = reader.getDocno();
 			}
 
 			// did we match our target docid?
-			if(reader.getDocno() != target) {
+			if (reader.getDocno() != target) {
 				return false;
 			}
 		}
@@ -66,125 +69,129 @@ public abstract class ProximityPostingsReader implements ivory.data.PostingsRead
 		int matches = 0;
 
 		// merge all position lists into single stream
-		List<TermPosition> allPositions = new ArrayList<TermPosition>();
-		for(int i = 0; i < mReaders.length; i++) {
-			int [] positions = mReaders[i].getPositions();
-			for(int j = 0; j < positions.length; j++ ) {
-				allPositions.add(new TermPosition(i, positions[j]));
+		int[] positions = mReaders[0].getPositions();
+		int[] ids = new int[positions.length];
+		Arrays.fill(ids, 0);
+		int length = positions.length;
+
+		for (int id = 1; id < mReaders.length; id++) {
+			int [] p = mReaders[id].getPositions();
+
+			if(length + p.length > newPositions.length) {
+				newPositions = new int[length + p.length];
+				newIds = new int[length + p.length];
 			}
+
+			int posA = 0;
+			int posB = 0;
+			int i = 0;
+			while(i < length + p.length) {
+				if(posB == p.length || (posA < length && positions[posA] <= p[posB])) {
+					newPositions[i] = positions[posA];
+					newIds[i] = ids[posA];
+					posA++;
+				}
+				else {
+					newPositions[i] = p[posB];
+					newIds[i] = id;
+					posB++;
+				}
+				i++;
+			}
+
+			length += p.length;
+			positions = Arrays.copyOf(newPositions, length);
+			ids = Arrays.copyOf(newIds, length);
 		}
-		Collections.sort(allPositions, new TermPositionComparator());
 
 		// count matches
-		matches = countMatches(allPositions);
+		matches = countMatches(positions, ids);
 
 		// truncate tf to Short.MAX_VALUE
-		if( matches > Short.MAX_VALUE ) {
+		if (matches > Short.MAX_VALUE) {
 			matches = Short.MAX_VALUE;
 		}
 
-		return (short)matches;
+		return (short) matches;
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.umd.ivory.data.PostingsReader#getPositions()
-	 */
 	public int[] getPositions() {
 		throw new UnsupportedOperationException();
 	}
 
-	public boolean getPositions(TermPositions tp){
+	public boolean getPositions(TermPositions tp) {
 		throw new UnsupportedOperationException();
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.umd.ivory.data.PostingsReader#hasMorePostings()
-	 */
 	public boolean hasMorePostings() {
-		for(ivory.data.PostingsListDocSortedPositional.PostingsReader reader : mReaders) {
-			if(!reader.hasMorePostings()) {
+		for (PostingsReader reader : mReaders) {
+			if (!reader.hasMorePostings()) {
 				return false;
 			}
 		}
 		return true;
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.umd.ivory.data.PostingsReader#nextPosting(edu.umd.ivory.data.Posting)
-	 */
 	public boolean nextPosting(Posting posting) {
 		// advance the reader at the minimum docno
-		ivory.data.PostingsListDocSortedPositional.PostingsReader minReader = null;
-		ivory.data.PostingsListDocSortedPositional.PostingsReader maxReader = null;
-		for(ivory.data.PostingsListDocSortedPositional.PostingsReader reader : mReaders) {
+		PostingsReader minReader = null;
+		PostingsReader maxReader = null;
+		for (PostingsReader reader : mReaders) {
 			int docno = reader.getDocno();
-			if(minReader == null || docno < minReader.getDocno()) {
+			if (minReader == null || docno < minReader.getDocno()) {
 				minReader = reader;
 			}
-			if(maxReader == null || docno > maxReader.getDocno()) {
+			if (maxReader == null || docno > maxReader.getDocno()) {
 				maxReader = reader;
 			}
 		}
-		if(minReader != null && minReader.hasMorePostings() && minReader.nextPosting(posting)) {
-			if(posting.getDocno() > maxReader.getDocno()) {
+		if (minReader != null && minReader.hasMorePostings() && minReader.nextPosting(posting)) {
+			if (posting.getDocno() > maxReader.getDocno()) {
 				maxReader = minReader;
 			}
-		}
-		else {
+		} else {
 			return false;
 		}
 
-		// docno = max( mReaders.getDocno() )
 		posting.setDocno(maxReader.getDocno());
-		if(isMatching()) {
+		if (isMatching()) {
 			posting.setScore(countMatches());
-		}
-		else {
-			posting.setScore((short)0);
+		} else {
+			posting.setScore((short) 0);
 		}
 
 		return true;
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.umd.ivory.data.PostingsReader#peekNextDocno()
-	 */
 	public int peekNextDocno() {
 		throw new UnsupportedOperationException();
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.umd.ivory.data.PostingsReader#peekNextScore()
-	 */
 	public short peekNextScore() {
 		throw new UnsupportedOperationException();
 	}
 
 	public int getDocno() {
 		int maxDocno = Integer.MIN_VALUE;
-		for(ivory.data.PostingsListDocSortedPositional.PostingsReader reader : mReaders) {
+		for (PostingsReader reader : mReaders) {
 			int docno = reader.getDocno();
-			if(docno > maxDocno) {
+			if (docno > maxDocno) {
 				maxDocno = docno;
 			}
 		}
-		//System.err.println("[proximity] getDocno() = " + maxDocno);
+
 		return maxDocno;
 	}
-	
+
 	public short getScore() {
-		if(isMatching()) {
+		if (isMatching()) {
 			return countMatches();
 		}
 		return 0;
 	}
-	
-	/* (non-Javadoc)
-	 * @see edu.umd.ivory.data.PostingsReader#reset()
-	 */
+
 	public void reset() {
-		// reset posting list readers
-		for(ivory.data.PostingsListDocSortedPositional.PostingsReader reader : mReaders) {
+		for (PostingsReader reader : mReaders) {
 			reader.reset();
 		}
 	}
@@ -197,50 +204,5 @@ public abstract class ProximityPostingsReader implements ivory.data.PostingsRead
 		throw new UnsupportedOperationException();
 	}
 
-	/**
-	 * @author metzler
-	 *
-	 */
-	public class TermPosition {
-		public int position;
-		public int id;
-
-		/**
-		 * @param id
-		 * @param position
-		 */
-		public TermPosition(int id, int position) {
-			this.id = id;
-			this.position = position;
-		}
-
-		/* (non-Javadoc)
-		 * @see java.lang.Object#toString()
-		 */
-		public String toString() {
-			return "position: " + position + ", id: " + id;
-		}
-	}
-
-	/**
-	 * @author metzler
-	 *
-	 */
-	public class TermPositionComparator implements Comparator<TermPosition> {
-
-		/* (non-Javadoc)
-		 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
-		 */
-		public int compare(TermPosition o1, TermPosition o2) {
-			if( o1.position < o2.position )
-				return -1;
-			else if( o1.position > o2.position )
-				return 1;
-			else
-				return 0;			
-		}
-
-	}
-
-	public abstract int countMatches(List<TermPosition> positions);
+	protected abstract int countMatches(int[] positions, int[] ids);
 }

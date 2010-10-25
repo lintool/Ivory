@@ -28,6 +28,8 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.hadoop.io.WritableUtils;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 import uk.ac.gla.terrier.compression.BitInputStream;
 import uk.ac.gla.terrier.compression.BitOutputStream;
@@ -40,6 +42,11 @@ import uk.ac.gla.terrier.compression.BitOutputStream;
  * 
  */
 public class LazyIntDocVector implements IntDocVector {
+
+	private static final Logger sLogger = Logger.getLogger (LazyIntDocVector.class);
+	{
+		sLogger.setLevel (Level.WARN);
+	}
 
 	// Term to list of positions
 	// notice that this is an ArrayListOfInts, not ArrayList<Integer>
@@ -57,21 +64,37 @@ public class LazyIntDocVector implements IntDocVector {
 		this.termPositionsMap = termPositionsMap;
 	}
 
-	public void write(DataOutput out) throws IOException {
-		nTerms = termPositionsMap.size();
-		// write # of terms
-		WritableUtils.writeVInt(out, nTerms);
-		if (nTerms == 0)
-			return;
-
-		if (mRawBytes != null) {
+	public void write (DataOutput out) throws IOException {
+		if (mRawBytes != null) 
 			// this would happen if we're reading in an already-encoded
 			// doc vector; if that's the case, simply write out the byte array
-			WritableUtils.writeVInt(out, mRawBytes.length);
-			out.write(mRawBytes);
-			return;
-		}
+			writeRawBytes (out);
+		else if (termPositionsMap != null)
+			writeTermPositionsMap (out);
+		else 
+			sLogger.error ("LazyIntDocVector has neither mRawBytes nor termPositionsMap; unable to write");
+	}
+
+	private void writeRawBytes (DataOutput out) {
+		sLogger.debug ("in write (), writing mRawBytes to out: " + out);
 		try {
+			WritableUtils.writeVInt (out, mRawBytes.length);
+			out.write (mRawBytes);
+		} catch (IOException e) {
+			e.printStackTrace ();
+			throw new RuntimeException ("Error writing LazyIntDocVector raw bytes");
+		}
+	}
+
+	private void writeTermPositionsMap (DataOutput out) {
+		sLogger.debug ("in write (), writing termPositionsMap to out: " + out);
+		try {
+			nTerms = termPositionsMap.size();
+			// write # of terms
+			WritableUtils.writeVInt(out, nTerms);
+			if (nTerms == 0)
+				return;
+
 			mBytesOut = new ByteArrayOutputStream();
 			mBitsOut = new BitOutputStream(mBytesOut);
 
@@ -95,7 +118,7 @@ public class LazyIntDocVector implements IntDocVector {
 				int tgap = curTerm - lastTerm;
 				if (tgap <= 0) {
 					throw new RuntimeException("Error: encountered invalid t-gap. termid="
-							+ curTerm);
+											   + curTerm);
 				}
 				// write out the gap
 				mBitsOut.writeGamma(tgap);
@@ -113,7 +136,7 @@ public class LazyIntDocVector implements IntDocVector {
 			out.write(bytes);
 		} catch (IOException e) {
 			e.printStackTrace();
-			throw new RuntimeException("Error adding postings.");
+			throw new RuntimeException ("Error writing LazyIntDocVector term positions map");
 		} catch (ArithmeticException e) {
 			e.printStackTrace();
 			throw new RuntimeException("ArithmeticException caught \"" + e.getMessage());
@@ -186,7 +209,7 @@ public class LazyIntDocVector implements IntDocVector {
 		return s.toString();
 	}
 
-	public String toStringWithTerms(PrefixEncodedTermIDMapWithIndex map) {
+	public String toStringWithTerms(TermIdMapWithCache map) {
 		StringBuffer s = new StringBuffer("");
 		try {
 			IntDocVectorReader r = this.getDocVectorReader();

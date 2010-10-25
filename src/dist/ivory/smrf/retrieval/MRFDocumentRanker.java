@@ -16,14 +16,15 @@
 
 package ivory.smrf.retrieval;
 
+import ivory.exception.ConfigurationException;
 import ivory.smrf.model.Clique;
 import ivory.smrf.model.DocumentNode;
 import ivory.smrf.model.GraphNode;
 import ivory.smrf.model.MarkovRandomField;
-import ivory.smrf.model.MaxScoreCliqueSorter;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.PriorityQueue;
 
@@ -43,181 +44,173 @@ public class MRFDocumentRanker {
 	}
 
 	/**
-	 * markov random field that we are using to generate the ranking
+	 * Pool of accumulators.
+	 */
+	private Accumulator[] mAccumulators = null;
+
+	/**
+	 * Sorted list of accumulators.
+	 */
+	private final PriorityQueue<Accumulator> mSortedAccumulators = new PriorityQueue<Accumulator>();
+
+	/**
+	 * Comparator used to sort cliques by their max score.
+	 */
+	private final Comparator<Clique> mMaxScoreComparator = new Clique.MaxScoreComparator();
+
+	/**
+	 * Markov Random Field that we are using to generate the ranking.
 	 */
 	private MarkovRandomField mMRF = null;
 
 	/**
-	 * if defined, only documents within this set will be scored
+	 * If defined, only documents within this set will be scored.
 	 */
-	private int [] mDocSet = null;
-	
+	private int[] mDocSet = null;
+
 	/**
-	 * 'document' nodes associated with the MRF
+	 * MRF document nodes.
 	 */
 	private List<DocumentNode> mDocNodes = null;
 
 	/**
-	 * maximum number of results to return
+	 * Maximum number of results to return.
 	 */
-	private int mNumResults = 1000;
+	private int mNumResults;
 
-	/**
-	 * @param mrf
-	 * @param numResults
-	 */
 	public MRFDocumentRanker(MarkovRandomField mrf, int numResults) {
-		mMRF = mrf;
-		mDocSet = null;
-		mNumResults = numResults;
-		mDocNodes = getDocNodes();
+		this(mrf, null, numResults);
 	}
 
-	/**
-	 * @param mrf
-	 * @param docSet
-	 * @param numResults
-	 */
 	public MRFDocumentRanker(MarkovRandomField mrf, int[] docSet, int numResults) {
 		mMRF = mrf;
 		mDocSet = docSet;
 		mNumResults = numResults;
 		mDocNodes = getDocNodes();
+
+		// Create single pool of reusable accumulators.
+		mAccumulators = new Accumulator[numResults + 1];
+		for (int i = 0; i < numResults + 1; i++) {
+			mAccumulators[i] = new Accumulator(0, 0.0f);
+		}
 	}
 
-	/**
-	 * @throws Exception
-	 */
-	public Accumulator[] rank() throws Exception {
-		// use a priority queue for producing the ranking
-		PriorityQueue<Accumulator> sortedAccumulators = new PriorityQueue<Accumulator>();
+	public Accumulator[] rank() {
+		// Clear priority queue.
+		mSortedAccumulators.clear();
 
-		// cliques associated with the MRF
+		// Cliques associated with the MRF.
 		List<Clique> cliques = mMRF.getCliques();
 
-		// initialize the MRF
-		mMRF.initialize();
-		
-		// maximum possible score that this MRF can achieve
-		double mrfMaxScore = 0.0;
+		// Current accumulator.
+		Accumulator a = mAccumulators[0];
+
+		// Initialize the MRF.
+		try {
+			mMRF.initialize();
+		} catch (ConfigurationException e) {
+			sLogger.error("Error initializing MRF. Aborting ranking!");
+			return null;
+		}
+
+		// Maximum possible score that this MRF can achieve.
+		float mrfMaxScore = 0.0f;
 		for (Clique c : cliques) {
 			mrfMaxScore += c.getMaxScore();
 		}
 
-		// sort cliques according to their max scores
-		Collections.sort(cliques, new MaxScoreCliqueSorter());
+		// Sort cliques according to their max scores.
+		Collections.sort(cliques, mMaxScoreComparator);
 
-		sLogger.info(mMRF.toString(true));
-
-		// score that must be achieved to enter result set
+		// Score that must be achieved to enter result set.
 		double scoreThreshold = Double.NEGATIVE_INFINITY;
 
-		System.out.println("In MRFDocumentRanker, set of cliques to be used is :");
-                for (Clique c : cliques){
-                        System.out.println(c.getCliqueWeight()+" "+c);
-                }
-
-		// offset into document set we're currently at (if applicable)
+		// Offset into document set we're currently at (if applicable).
 		int docsetOffset = 0;
 		
-		int docid = 0;
-		if(mDocSet != null) {
-			if(docsetOffset < mDocSet.length) {
-				docid = mDocSet[docsetOffset++];
-			}
-			else {
-				docid = Integer.MAX_VALUE;
-			}
-		}
-		else {
-			docid = mMRF.getNextCandidate();
+		int docno = 0;
+		if (mDocSet != null) {
+			docno = docsetOffset < mDocSet.length ? mDocSet[docsetOffset++] : Integer.MAX_VALUE;
+		} else {
+			docno = mMRF.getNextCandidate();
 		}
 
-		while (docid < Integer.MAX_VALUE) {
-			// get accumulator for this document
-			Accumulator a = new Accumulator(docid, 0.0);
+		while (docno < Integer.MAX_VALUE) {
+			float score = 0.0f;
 
-			// score this clique for each document in the document set
 			for (DocumentNode documentNode : mDocNodes) {
-				documentNode.setDocno(docid);
+				documentNode.setDocno(docno);
 			}
 
-			// document-at-a-time scoring
-			double docMaxScore = mrfMaxScore;
+			// Document-at-a-time scoring.
+			float docMaxScore = mrfMaxScore;
 			boolean skipped = false;
 			for (int i = 0; i < cliques.size(); i++) {
-				// current clique that we're scoring
+				// Current clique that we're scoring.
 				Clique c = cliques.get(i);
 
-				// if there's no way that this document can enter the result set
-				// then exit
-				if (a.score + docMaxScore <= scoreThreshold) {
-					// advance postings readers (but don't score)
+				// If there's no way that this document can enter the result set
+				// then exit.
+				if (score + docMaxScore <= scoreThreshold) {
+					// Advance postings readers (but don't score).
 					for (int j = i; j < cliques.size(); j++) {
-						cliques.get(j).setNextCandidate(docid + 1);
+						cliques.get(j).setNextCandidate(docno + 1);
 					}
 					skipped = true;
 					break;
 				}
 
-				// document independent cliques do not affect the ranking
+				// Document independent cliques do not affect the ranking.
 				if (!c.isDocDependent()) {
 					continue;
 				}
 
-				// update document score
-				// a.score += c.getPotential();
+				// Update document score.
+				score += c.getWeight() * c.getPotential();
 
-				// value of feature function only
-                                double cliqueScore = c.getPotential2();
-
-				a.score += cliqueScore * c.getCliqueWeight();
-
-				// update the max score for the rest of the cliques
+				// Update the max score for the rest of the cliques.
 				docMaxScore -= c.getMaxScore();
 			}
 
-			// keep track of _numResults best accumulators
-			if (!skipped && a.score > scoreThreshold) {
-				sortedAccumulators.add(a);
-				if (sortedAccumulators.size() == mNumResults + 1) {
-					sortedAccumulators.poll();
-					scoreThreshold = sortedAccumulators.peek().score;
+			// Keep track of mNumResults best accumulators.
+			if (!skipped && score > scoreThreshold) {
+				a.docno = docno;
+				a.score = score;
+				mSortedAccumulators.add(a);
+
+				if (mSortedAccumulators.size() == mNumResults + 1) {
+					a = mSortedAccumulators.poll();
+					scoreThreshold = mSortedAccumulators.peek().score;
+				} else {
+					a = mAccumulators[mSortedAccumulators.size()];
 				}
 			}
 
-			if(mDocSet != null) {
-				if(docsetOffset < mDocSet.length) {
-					docid = mDocSet[docsetOffset++];
-				}
-				else {
-					docid = Integer.MAX_VALUE;
-				}
-			}
-			else {
-				docid = mMRF.getNextCandidate();
+			if (mDocSet != null) {
+				docno = docsetOffset < mDocSet.length ? mDocSet[docsetOffset++] : Integer.MAX_VALUE;
+			} else {
+				docno = mMRF.getNextCandidate();
 			}
 		}
 
-		// grab the accumulators off the stack, in (reverse) order
-		Accumulator[] results = new Accumulator[Math.min(mNumResults, sortedAccumulators.size())];
+		// Grab the accumulators off the stack, in (reverse) order.
+		Accumulator[] results = new Accumulator[Math.min(mNumResults, mSortedAccumulators.size())];
 		for (int i = 0; i < results.length; i++) {
-			results[results.length - 1 - i] = sortedAccumulators.poll();
+			results[results.length - 1 - i] = mSortedAccumulators.poll();
 		}
 
 		return results;
 	}
 
 	/**
-	 * @return returns the markov random field associated with this ranker
+	 * Returns the Markov Random Field associated with this ranker.
 	 */
 	public MarkovRandomField getMRF() {
 		return mMRF;
 	}
 
 	/**
-	 * @param numResults
-	 *            number of results to return
+	 * Sets the number of results to return.
 	 */
 	public void setNumResults(int numResults) {
 		mNumResults = numResults;
@@ -226,10 +219,10 @@ public class MRFDocumentRanker {
 	private List<DocumentNode> getDocNodes() {
 		ArrayList<DocumentNode> docNodes = new ArrayList<DocumentNode>();
 
-		// check which of the nodes are DocumentNodes
+		// Check which of the nodes are DocumentNodes.
 		List<GraphNode> nodes = mMRF.getNodes();
 		for (GraphNode node : nodes) {
-			if (node instanceof DocumentNode) {
+			if (node.getType() == GraphNode.Type.DOCUMENT) {
 				docNodes.add((DocumentNode) node);
 			}
 		}

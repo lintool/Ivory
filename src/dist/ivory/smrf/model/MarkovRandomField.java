@@ -16,12 +16,15 @@
 
 package ivory.smrf.model;
 
+import ivory.exception.ConfigurationException;
 import ivory.util.RetrievalEnvironment;
 import ivory.util.XMLTools;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import com.google.common.base.Preconditions;
 
 /**
  * <p>
@@ -33,7 +36,7 @@ import java.util.List;
 public class MarkovRandomField {
 
 	/**
-	 * Retrieval environment
+	 * Retrieval environment.
 	 */
 	protected RetrievalEnvironment mEnv = null;
 
@@ -63,39 +66,26 @@ public class MarkovRandomField {
 	 *            retrieval environment (for global evidence)
 	 */
 	public MarkovRandomField(String[] queryTerms, RetrievalEnvironment env) {
-		mEnv = env;
+		Preconditions.checkNotNull(queryTerms);
+		Preconditions.checkNotNull(env);
 		
+		mEnv = env;
 		mQueryTerms = queryTerms;
 
-		// initialize cliques
+		// Initialize cliques.
 		mCliques = new ArrayList<Clique>();
 
-		// set global evidence
-		mGlobalEvidence = new GlobalEvidence(env.documentCount(), env.termCount(),
-				queryTerms.length);
+		// Set global evidence.
+		mGlobalEvidence = new GlobalEvidence(env.documentCount(), env.termCount(), queryTerms.length);
 	}
 
-	public void initialize() throws Exception {
+	public void initialize() throws ConfigurationException {
 		mEnv.clearPostingsReaderCache();
 		for(Clique c : mCliques) {
 			c.initialize(mGlobalEvidence);
 		}
 	}
 	
-	/**
-	 * Returns the log of the unnormalized joint probability of the current
-	 * graph configuration.
-	 */
-	public double getLogUnormalizedProb() throws Exception {
-		double prob = 0.0;
-
-		for (Clique c : mCliques) {
-			prob += c.getPotential();
-		}
-
-		return prob;
-	}
-
 	/**
 	 * Returns the nodes associated with this MRF.
 	 */
@@ -170,6 +160,4 @@ public class MarkovRandomField {
 		}
 		return XMLTools.format(sb.append("</mrf>").toString());
 	}
-
-
 }

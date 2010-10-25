@@ -16,43 +16,55 @@
 
 package ivory.smrf.model.builder;
 
+import ivory.exception.ConfigurationException;
 import ivory.smrf.model.Clique;
 import ivory.util.RetrievalEnvironment;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.w3c.dom.Node;
 
+import com.google.common.base.Preconditions;
+
 /**
  * @author Don Metzler
- * 
  */
 public abstract class CliqueSet {
-
-	public static enum DEPENDENCE_TYPE {
-		SEQUENTIAL, FULL;
-	}
-
-	public abstract void configure(RetrievalEnvironment env, String[] queryTerms, Node domNode)
-			throws Exception;
 
 	/**
 	 * cliques that make up this clique set
 	 */
-	protected List<Clique> cliques = null;
+	private final List<Clique> mCliques = new ArrayList<Clique>();
 
-	public List<Clique> getCliques() {
-		return cliques;
+	public abstract void configure(RetrievalEnvironment env, String[] queryTerms, Node domNode)
+			throws ConfigurationException;
+
+	protected void addClique(Clique c) {
+		mCliques.add(c);
 	}
 
+	protected void addCliques(List<Clique> cliques) {
+		mCliques.addAll(cliques);
+	}
+
+	public List<Clique> getCliques() {
+		return mCliques;
+	}
+
+	protected void clearCliques() {
+		mCliques.clear();
+	}
+	
 	public abstract String getType();
 
 	@SuppressWarnings("unchecked")
-	public static CliqueSet create(String type, RetrievalEnvironment env, String[] queryTerms,
-			Node domNode) throws Exception {
-		if (domNode == null) {
-			throw new Exception("Unable to generate a CliqueSet from a null node!");
-		}
+	public static CliqueSet create(String type, RetrievalEnvironment env, String[] queryTerms, Node domNode)
+			throws ConfigurationException {
+		Preconditions.checkNotNull(type);
+		Preconditions.checkNotNull(env);
+		Preconditions.checkNotNull(queryTerms);
+		Preconditions.checkNotNull(domNode);
 
 		try {
 			Class<? extends CliqueSet> clz = (Class<? extends CliqueSet>) Class.forName(type);
@@ -63,7 +75,7 @@ public abstract class CliqueSet {
 			return f;
 		} catch (Exception e) {
 			e.printStackTrace();
-			throw new RuntimeException("Error: Unable to instantiate CliqueSet!");
+			throw new RuntimeException("Unable to instantiate CliqueSet!");
 		}
 	}
 }

@@ -28,49 +28,50 @@ import org.w3c.dom.Node;
  */
 public class BM25ScoringFunction extends ScoringFunction {
 
-	private double mK1;
-	private double mB;
-	private double mAvgDocLen;
+	private float mK1;
+	private float mB;
+	private float mAvgDocLen;
 	private String mIdfType;
-	private double mIDF;
+	private float mIdf;
 
 	@Override
 	public void configure(Node domNode) {
-		mK1 = XMLTools.getAttributeValue(domNode, "k1", 1.2);
-		mB = XMLTools.getAttributeValue(domNode, "b", 0.75);
+		mK1 = XMLTools.getAttributeValue(domNode, "k1", 1.2f);
+		mB = XMLTools.getAttributeValue(domNode, "b", 0.75f);
 		mIdfType = XMLTools.getAttributeValue(domNode, "idf", "okapi");
 	}
 
 	@Override
-	public double getScore(double tf, int docLen) {
-		double bm25TF = ((mK1 + 1.0) * tf) / (mK1 * ((1.0 - mB) + mB * docLen / mAvgDocLen) + tf);
-		return bm25TF * mIDF;
+	public float getScore(int tf, int docLen) {
+		float bm25TF = ((mK1 + 1.0f) * tf) / (mK1 * ((1.0f - mB) + mB * docLen / mAvgDocLen) + tf);
+		return bm25TF * mIdf;
 	}
 
+	@Override
 	public String toString() {
 		return "<scoringfunction>BM25</scoringfunction>\n";
 	}
 
 	@Override
 	public void initialize(GlobalTermEvidence termEvidence, GlobalEvidence globalEvidence) {
-		// avg. document length
-		mAvgDocLen = (double) globalEvidence.collectionLength / (double) globalEvidence.numDocs;
+		mAvgDocLen = (float) globalEvidence.collectionLength / (float) globalEvidence.numDocs;
 
-		// idf
 		if ("none".equals(mIdfType)) {
-			mIDF = 1;
+			mIdf = 1;
 		} else if ("classic".equals(mIdfType)) {
-			mIDF = Math.log((double) globalEvidence.numDocs / (double) termEvidence.df);
+			mIdf = (float) Math.log((float) globalEvidence.numDocs / (float) termEvidence.df);
 		} else if ("okapi-positive".equals(mIdfType)) {
-			mIDF = Math.log(((double) globalEvidence.numDocs + 0.5)
-					/ ((double) termEvidence.df + 0.5));
-		} else { // defaults to "okapi" IDF
-			mIDF = Math.log(((double) globalEvidence.numDocs - (double) termEvidence.df + 0.5)
-					/ ((double) termEvidence.df + 0.5));
+			mIdf = (float) Math.log(((float) globalEvidence.numDocs + 0.5f)
+					/ ((float) termEvidence.df + 0.5f));
+		} else {
+			// Defaults to "Okapi" idf.
+			mIdf = (float) Math.log(((float) globalEvidence.numDocs - (float) termEvidence.df + 0.5f)
+					/ ((float) termEvidence.df + 0.5f));
 		}
 	}
 
-	public double getMaxScore() {
-		return (mK1 + 1.0) * mIDF;
+	@Override
+	public float getMaxScore() {
+		return (mK1 + 1.0f) * mIdf;
 	}
 }

@@ -17,25 +17,41 @@
 package ivory.smrf.model;
 
 /**
+ * <p>
+ * Object encapsulating collection-level global evidence for ranking purposes.
+ * </p>
+ * 
  * @author Don Metzler
- *
  */
 public class GlobalEvidence {
 
-	// global evidence for the MRF
+	/**
+	 * Number of documents in the collection.
+	 */
 	public long numDocs;
+
+	/**
+	 * Collection length.
+	 */
 	public long collectionLength;
+
+	/**
+	 * Query length.
+	 */
 	public int queryLength;
-	
+
 	/**
 	 * @param ndocs
+	 *            number of documents in the collection
 	 * @param collen
+	 *            collection length
 	 * @param querylen
+	 *            query length
 	 */
 	public GlobalEvidence(long ndocs, long collen, int querylen) {
 		numDocs = ndocs;
 		collectionLength = collen;
 		queryLength = querylen;
 	}
-	
+
 }

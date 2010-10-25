@@ -16,6 +16,7 @@
 
 package ivory.smrf.model.builder;
 
+import ivory.exception.ConfigurationException;
 import ivory.smrf.model.Clique;
 import ivory.smrf.model.DocumentNode;
 import ivory.smrf.model.GraphNode;
@@ -30,80 +31,61 @@ import java.util.List;
 
 import org.w3c.dom.Node;
 
+import com.google.common.collect.Lists;
+
 /**
  * @author Don Metzler
- * 
  */
 public class CliqueFactory {
 
-	public static Clique buildDocumentClique(RetrievalEnvironment env, Node domNode)
-			throws Exception {
-		DocumentNode docNode = new DocumentNode();
-		ArrayList<GraphNode> cliqueNodes = new ArrayList<GraphNode>();
-		cliqueNodes.add(docNode);
-
-		double weight = XMLTools.getAttributeValue(domNode, "weight", 1.0);
-		Parameter parameter = new Parameter(Parameter.DEFAULT, weight);
-
-		String potentialType = XMLTools.getAttributeValue(domNode, "potential", "");
-
-		PotentialFunction potential = PotentialFunction.create(env, potentialType, domNode);
-
-		Clique c = new Clique(cliqueNodes, potential, parameter);
-		c.setCliqueType("Document");
-
-		return c;
-	}
-
 	public static List<Clique> getSequentialDependenceCliques(RetrievalEnvironment env,
-			String[] queryTerms, Node domNode, boolean docDependent) throws Exception {
-		// clique set
-		List<Clique> cliques = new ArrayList<Clique>();
+			String[] queryTerms, Node domNode, boolean docDependent) throws ConfigurationException {
+		// Clique set.
+		List<Clique> cliques = Lists.newArrayList();
 
-		// the document node
+		// The document node.
 		DocumentNode docNode = new DocumentNode();
 
-		// if there are no terms, then return an empty MRF
+		// If there are no terms, then return an empty MRF.
 		if (queryTerms.length == 0) {
 			return cliques;
 		}
 
-		// default parameter associated with clique set
-		Parameter parameter = new Parameter(Parameter.DEFAULT, 1.0);
+		// Default parameter associated with CliqueSet.
+		Parameter parameter = new Parameter(Parameter.DEFAULT, 1.0f);
 
-		// get potential type
+		// Get potential type.
 		String potentialType = XMLTools.getAttributeValue(domNode, "potential", null);
 		if (potentialType == null) {
-			throw new Exception(
-					"A potential attribute must be specified in order to generate a clique set!");
+			throw new ConfigurationException("A potential attribute must be specified in order to generate a clique set!");
 		}
 
-		// if there is more than one term, then add appropriate cliques
-		ArrayList<GraphNode> cliqueNodes = null;
+		// If there is more than one term, then add appropriate cliques.
+		List<GraphNode> cliqueNodes = null;
 		Clique c = null;
 		TermNode lastTermNode = null;
 
 		for (String element : queryTerms) {
-			// term node
+			// Term node.
 			TermNode termNode = new TermNode(element);
 
-			// add sequential cliques
+			// Add sequential cliques.
 			if (lastTermNode != null) {
-				cliqueNodes = new ArrayList<GraphNode>();
+				cliqueNodes = Lists.newArrayList();
 				if (docDependent) {
 					cliqueNodes.add(docNode);
 				}
 				cliqueNodes.add(lastTermNode);
 				cliqueNodes.add(termNode);
 
-				// get the potential function
+				// Get the potential function.
 				PotentialFunction potential = PotentialFunction.create(env, potentialType, domNode);
 
 				c = new Clique(cliqueNodes, potential, parameter);
 				cliques.add(c);
 			}
 
-			// update last term node
+			// Update last term node.
 			lastTermNode = termNode;
 		}
 
@@ -112,28 +94,27 @@ public class CliqueFactory {
 
 	public static List<Clique> getFullDependenceCliques(RetrievalEnvironment env,
 			String[] queryTerms, Node domNode, boolean ordered, boolean docDependent)
-			throws Exception {
-		// clique set
-		List<Clique> cliques = new ArrayList<Clique>();
+			throws ConfigurationException {
+		// Clique set.
+		List<Clique> cliques = Lists.newArrayList();
 
-		// the document node
+		// The document node.
 		DocumentNode docNode = new DocumentNode();
 
-		// if there are no terms, then return an empty MRF
+		// If there are no terms, then return an empty MRF.
 		if (queryTerms.length == 0) {
 			return cliques;
 		}
 
-		// default parameter associated with clique set
-		Parameter parameter = new Parameter(Parameter.DEFAULT, 1.0);
+		// Default parameter associated with CliqueSet.
+		Parameter parameter = new Parameter(Parameter.DEFAULT, 1.0f);
 
-		// get potential type
+		// Get potential type.
 		String potentialType = XMLTools.getAttributeValue(domNode, "potential", null);
 		if (potentialType == null) {
-			throw new Exception(
-					"A potential attribute must be specified in order to generate a clique set!");
+			throw new ConfigurationException("A potential attribute must be specified in order to generate a clique set!");
 		}
-		// if there is more than one term, then add appropriate cliques
+		// If there is more than one term, then add appropriate cliques.
 		ArrayList<GraphNode> cliqueNodes = null;
 		Clique c = null;
 
@@ -161,7 +142,7 @@ public class CliqueFactory {
 			}
 
 			if (ordered && !singleTerm && contiguous) {
-				cliqueNodes = new ArrayList<GraphNode>();
+				cliqueNodes = Lists.newArrayList();
 				if (docDependent) {
 					cliqueNodes.add(docNode);
 				}
@@ -170,13 +151,13 @@ public class CliqueFactory {
 					cliqueNodes.add(termNode);
 				}
 
-				// get the potential function
+				// Get the potential function.
 				PotentialFunction potential = PotentialFunction.create(env, potentialType, domNode);
 
 				c = new Clique(cliqueNodes, potential, parameter);
 				cliques.add(c);
 			} else if (!ordered && !singleTerm && !contiguous) {
-				cliqueNodes = new ArrayList<GraphNode>();
+				cliqueNodes = Lists.newArrayList();
 				if (docDependent) {
 					cliqueNodes.add(docNode);
 				}
@@ -187,7 +168,7 @@ public class CliqueFactory {
 					}
 				}
 
-				// get the potential function
+				// Get the potential function.
 				PotentialFunction potential = PotentialFunction.create(env, potentialType, domNode);
 
 				c = new Clique(cliqueNodes, potential, parameter);
@@ -197,5 +178,4 @@ public class CliqueFactory {
 
 		return cliques;
 	}
-
 }
