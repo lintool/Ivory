@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src/java/main"/>
+	<classpathentry kind="src" path="src/java/regression"/>
+	<classpathentry kind="src" path="src/java/test"/>
+	<classpathentry kind="lib" path="packages/cloud9.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="packages/guava-r07.jar"/>
+	<classpathentry kind="lib" path="packages/hadoop-0.20.1-core.jar"/>
+	<classpathentry kind="lib" path="packages/commons-logging-1.1.jar"/>
+	<classpathentry kind="lib" path="packages/log4j-1.2.13.jar"/>
+	<classpathentry kind="lib" path="packages/jetty-6.1.14.jar"/>
+	<classpathentry kind="lib" path="packages/jetty-util-6.1.14.jar"/>
+	<classpathentry kind="lib" path="packages/servlet-api-2.5-6.1.14.jar"/>
+	<classpathentry kind="lib" path="packages/junit-4.4.jar"/>
+	<classpathentry kind="lib" path="packages/xercesImpl.jar"/>
+	<classpathentry kind="output" path="build"/>
+</classpath>

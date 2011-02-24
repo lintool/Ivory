@@ -1,0 +1,6 @@
+*~
+.*crc
+build/
+docs/api/
+regression-quick/
+ivory.jar

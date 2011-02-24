@@ -4,6 +4,8 @@
 	<property name="src" location="src" />
 	<property name="build" location="build" />
 	<property name="test" location="test" />
+	<property name="regression-complete" location="regression-complete" />
+	<property name="regression-quick" location="regression-quick" />
 
 	<path id="classpath">
 		<fileset dir=".">
@@ -34,6 +36,8 @@
 			<!-- compilerarg value="-Xlint:unchecked"/ uncomment this to check for generics -->
 		</javac>
 		<javac classpathref="classpath" srcdir="${src}/java/test" destdir="${build}" optimize="on" debug="on">
+		</javac>
+		<javac classpathref="classpath" srcdir="${src}/java/regression" destdir="${build}" optimize="on" debug="on">
 		</javac>
 		<!-- javac classpathref="classpath" srcdir="${src}/sandbox" destdir="${build}" optimize="on" debug="on" -->
 			<!-- compilerarg value="-Xlint:unchecked"/ uncomment this to check for generics -->
@@ -72,7 +76,7 @@
 			<batchtest todir="${test}">
 				<fileset dir="${build}">
 					<include name="**/*Test.class" />
-					<include name="ivory/regression/*.class" />
+					<exclude name="ivory/regression/*.class" />
 					<exclude name="ivory/regression/GroundTruth*.class" />
 					<exclude name="ivory/regression/RegressionUtils.class" />
 				</fileset>
@@ -86,19 +90,49 @@
 			<report format="noframes" styledir="etc/" todir="${test}" />
 		</junitreport>
 
-                <mail messageMimeType="text/html" messageFile="${test}/junit-noframes.html" tolist="umd-ivory@googlegroups.com" subject= "JUnit Test Results: Ivory" mailhost="smtp.umiacs.umd.edu" from= "jimmylin@umd.edu" />
+                <!-- mail messageMimeType="text/html" messageFile="${test}/junit-noframes.html" tolist="umd-ivory@googlegroups.com" subject= "JUnit Test Results: Ivory" mailhost="smtp.umiacs.umd.edu" from= "jimmylin@umd.edu" / -->
+
+	</target>
+
+	<target name="regression-quick" depends="lib" description="Run regression tests">
+		<mkdir dir="${regression-quick}" />
+		<junit printsummary="yes" fork="yes" maxmemory="2048m">
+			<sysproperty key="java.library.path" path="${lib}" />
+			<sysproperty key="org.xml.sax.driver" value="org.apache.xerces.parsers.SAXParser" />
+			<classpath refid="classpath" />
+
+			<formatter type="xml" />
+			<batchtest todir="${regression-quick}">
+				<fileset dir="${build}">
+					<include name="ivory/regression/Robust04_Basic.class" />
+					<include name="ivory/regression/Robust04_WSD.class" />
+					<include name="ivory/regression/Wt10g_Basic.class" />
+					<include name="ivory/regression/Gov2_Basic.class" />
+					<include name="ivory/regression/Web09catB_All.class" />
+				</fileset>
+			</batchtest>
+		</junit>
+
+		<junitreport todir="${regression-quick}">
+			<fileset dir="${regression-quick}">
+				<include name="TEST-*.xml" />
+			</fileset>
+			<report format="noframes" styledir="etc/" todir="${regression-quick}" />
+		</junitreport>
+
+                <!-- mail messageMimeType="text/html" messageFile="${test}/junit-noframes.html" tolist="umd-ivory@googlegroups.com" subject= "JUnit Test Results: Ivory" mailhost="smtp.umiacs.umd.edu" from= "jimmylin@umd.edu" / -->
 
 	</target>
 
 	<target name="javadoc">
 		<javadoc destdir="docs/api/" access="public" use="false" notree="false" nonavbar="false" noindex="false" splitindex="no" author="true" version="true" nodeprecatedlist="true" nodeprecated="true" classpathref="classpath">
 			<fileset dir="src">
-				<include name="dist/**/*.java" />
-				<exclude name="dist/ivory/util/AnnotateClueRunAllWithURLs.java" />
-				<exclude name="dist/ivory/util/AnnotateClueRunWithURLs.java" />
-				<exclude name="dist/**/*Test.java" />
-				<exclude name="dist/uk/**/*.java" />
-				<exclude name="dist/org/**/*.java" />
+				<include name="java/main/**/*.java" />
+				<exclude name="java/main/ivory/util/AnnotateClueRunAllWithURLs.java" />
+				<exclude name="java/main/ivory/util/AnnotateClueRunWithURLs.java" />
+				<exclude name="java/main/**/*Test.java" />
+				<exclude name="java/main/uk/**/*.java" />
+				<exclude name="java/main/org/**/*.java" />
 			</fileset>
 			<link href="http://java.sun.com/javase/6/docs/api/" />
 			<link href="http://hadoop.apache.org/common/docs/current/api/" />
