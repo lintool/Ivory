@@ -220,10 +220,10 @@
          <feature id="antispam" type="antispam"
                   cliqueSet="ivory.smrf.model.builder.DocumentCliqueSet"
                   potential="ivory.smrf.model.potential.DocumentPotential"/>
-         <feature id="docscore"
-                  cliqueSet="ivory.smrf.model.builder.DocumentCliqueSet" type="spam"
+         <feature id="spam" type="spam"
+                  cliqueSet="ivory.smrf.model.builder.DocumentCliqueSet"
                   potential="ivory.smrf.model.potential.DocumentPotential"/>
-         <feature id="docscore" type="pagerank"
+         <feature id="pagerank" type="pagerank"
                   cliqueSet="ivory.smrf.model.builder.DocumentCliqueSet"
                   potential="ivory.smrf.model.potential.DocumentPotential"/>
      </model>

@@ -30,19 +30,31 @@
 
 	<target name="compile" depends="init" description="compile the source">
 		<!-- echo message="${toString:classpath}"/ -->
-		<javac classpathref="classpath" srcdir="${src}/dist" destdir="${build}" optimize="on" debug="on">
+		<javac classpathref="classpath" srcdir="${src}/java/main" destdir="${build}" optimize="on" debug="on">
 			<!-- compilerarg value="-Xlint:unchecked"/ uncomment this to check for generics -->
 		</javac>
-		<javac classpathref="classpath" srcdir="${src}/dist-test" destdir="${build}" optimize="on" debug="on">
+		<javac classpathref="classpath" srcdir="${src}/java/test" destdir="${build}" optimize="on" debug="on">
 		</javac>
 		<!-- javac classpathref="classpath" srcdir="${src}/sandbox" destdir="${build}" optimize="on" debug="on" -->
 			<!-- compilerarg value="-Xlint:unchecked"/ uncomment this to check for generics -->
 		<!-- /javac -->
+		<!--copy todir="${build}">
+			<fileset dir="${src}/dist" excludes="**/*.java" />
+			<fileset dir="${src}/private" excludes="**/*.java" />
+		</copy-->
 	</target>
 
 	<target name="lib" depends="compile" description="generate the distribution">
 		<jar jarfile="ivory.jar" basedir="${build}" />
 	</target>
+
+        <target name="jarjar" depends="compile">
+                <taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask"
+                         classpath="lib/jarjar-1.0.jar"/>
+                <jarjar jarfile="ivory-dist.jar">
+                  <fileset dir="${build}"/>
+                </jarjar>
+        </target>
 
 	<target name="clean" description="clean up">
 		<delete dir="${test}" />
@@ -73,6 +85,8 @@
 			</fileset>
 			<report format="noframes" styledir="etc/" todir="${test}" />
 		</junitreport>
+
+                <mail messageMimeType="text/html" messageFile="${test}/junit-noframes.html" tolist="umd-ivory@googlegroups.com" subject= "JUnit Test Results: Ivory" mailhost="smtp.umiacs.umd.edu" from= "jimmylin@umd.edu" />
 
 	</target>
 

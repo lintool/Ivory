@@ -1,0 +1,28 @@
+<parameters>
+
+     <index>/fs/clip-hadoop/indexes/wt10g_new</index>
+
+	 <!-- Dirichlet, sequential dependence -->
+     <model id="wt10g-dir-sd" type="Feature" output="ranking.wt10g-dir-sd.txt" hits="1000">
+         <feature id="termWt" weight="0.73"
+                  cliqueSet="ivory.smrf.model.builder.TermCliqueSet"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.TermExpressionGenerator"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1000.0" />
+         <feature id="sameBinWt" weight="0.09"
+                  cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.SameBinApproxExpressionGenerator" width="1"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="750.0" />
+         <feature id="orderedWt" weight="0.09"
+                  cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.OrderedWindowApproxExpressionGenerator" width="1"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="750.0" />
+         <feature id="unorderedWt" weight="0.09"
+                  cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.UnorderedWindowApproxExpressionGenerator" width="2"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="750.0" />
+     </model>
+</parameters>

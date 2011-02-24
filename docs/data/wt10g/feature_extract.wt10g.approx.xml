@@ -1,0 +1,147 @@
+<parameters>
+
+     <index>/fs/clip-hadoop/indexes/wt10g_new</index>
+
+	<!--  
+     <docscore type="antispam" provider="ivory.data.SpamPercentileScore">/research/indexes/clueweb_english_1/docscores-antispam.dat.en.01</docscore>
+     <docscore type="spam" provider="ivory.data.SpamPercentileScore">/research/indexes/clueweb_english_1/docscores-waterloospam.dat.en.01</docscore>
+     <docscore type="pagerank" provider="ivory.data.DocLengthTable4BF">/research/indexes/clueweb_english_1/docscores-pagerank.dat</docscore>
+     -->
+
+     <model id="feat" type="Feature" output="/dev/null">
+     <!-- LM Features -->
+         <feature id="lm-term"
+                  cliqueSet="ivory.smrf.model.builder.TermCliqueSet"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.TermExpressionGenerator"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1000.0" />             
+         <feature id="lm-x-sameBinWt"
+                  cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.SameBinApproxExpressionGenerator" width="1"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="750.0" />
+	   <!-- LM-Ordered Features -->
+         <feature id="lm-x-orderedWt-1"
+                  cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.OrderedWindowApproxExpressionGenerator" width="1"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="750.0" />
+         <feature id="lm-x-orderedWt-2"
+                  cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.OrderedWindowApproxExpressionGenerator" width="2"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="750.0" />
+         <feature id="lm-x-orderedWt-3"
+                  cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.OrderedWindowApproxExpressionGenerator" width="3"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="750.0" />
+         <feature id="lm-x-orderedWt-4"
+                  cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.OrderedWindowApproxExpressionGenerator" width="4"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="750.0" />
+         <feature id="lm-x-orderedWt-5"
+                  cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.OrderedWindowApproxExpressionGenerator" width="5"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="750.0" />
+	   <!-- LM-Unordered Features -->
+	     <feature id="lm-x-unorderedWt-1"
+                  cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.UnorderedWindowApproxExpressionGenerator" width="1"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="750.0" />
+         <feature id="lm-x-unorderedWt-2"
+                  cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.UnorderedWindowApproxExpressionGenerator" width="2"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="750.0" />
+         <feature id="lm-x-unorderedWt-3"
+                  cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.UnorderedWindowApproxExpressionGenerator" width="3"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="750.0" />
+         <feature id="lm-x-unorderedWt-4"
+                  cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.UnorderedWindowApproxExpressionGenerator" width="4"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="750.0" />
+         <feature id="lm-x-unorderedWt-5"
+                  cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.UnorderedWindowApproxExpressionGenerator" width="5"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="750.0" />
+	 <!-- BM25 Features -->          
+         <feature id="bm25-term"
+                  cliqueSet="ivory.smrf.model.builder.TermCliqueSet"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.TermExpressionGenerator"
+                  scoreFunction="ivory.smrf.model.score.BM25ScoringFunction" k1="0.5" b="0.3" />
+          <feature id="bm25-x-sameBinWt"
+                  cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.SameBinApproxExpressionGenerator" width="1"
+                  scoreFunction="ivory.smrf.model.score.BM25ScoringFunction" k1="0.25" b="0.0" />
+	   <!-- BM25-Ordered Features -->
+         <feature id="bm25-x-orderedWt-1"
+                  cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.OrderedWindowApproxExpressionGenerator" width="1"
+                  scoreFunction="ivory.smrf.model.score.BM25ScoringFunction" k1="0.25" b="0.0" />
+         <feature id="bm25-x-orderedWt-2"
+                  cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.OrderedWindowApproxExpressionGenerator" width="2"
+                  scoreFunction="ivory.smrf.model.score.BM25ScoringFunction" k1="0.25" b="0.0" />
+         <feature id="bm25-x-orderedWt-3"
+                  cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.OrderedWindowApproxExpressionGenerator" width="3"
+                  scoreFunction="ivory.smrf.model.score.BM25ScoringFunction" k1="0.25" b="0.0" />
+         <feature id="bm25-x-orderedWt-4"
+                  cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.OrderedWindowApproxExpressionGenerator" width="4"
+                  scoreFunction="ivory.smrf.model.score.BM25ScoringFunction" k1="0.25" b="0.0" />
+         <feature id="bm25-x-orderedWt-5"
+                  cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.OrderedWindowApproxExpressionGenerator" width="5"
+                  scoreFunction="ivory.smrf.model.score.BM25ScoringFunction" k1="0.25" b="0.0" />
+	   <!-- BM25-Unordered Features -->
+         <feature id="bm25-x-unorderedWt-1"
+                  cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.UnorderedWindowApproxExpressionGenerator" width="1"
+                  scoreFunction="ivory.smrf.model.score.BM25ScoringFunction" k1="0.25" b="0.0" />
+         <feature id="bm25-x-unorderedWt-2"
+                  cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.UnorderedWindowApproxExpressionGenerator" width="2"
+                  scoreFunction="ivory.smrf.model.score.BM25ScoringFunction" k1="0.25" b="0.0" />
+         <feature id="bm25-x-unorderedWt-3"
+                  cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.UnorderedWindowApproxExpressionGenerator" width="3"
+                  scoreFunction="ivory.smrf.model.score.BM25ScoringFunction" k1="0.25" b="0.0" />
+         <feature id="bm25-x-unorderedWt-4"
+                  cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.UnorderedWindowApproxExpressionGenerator" width="4"
+                  scoreFunction="ivory.smrf.model.score.BM25ScoringFunction" k1="0.25" b="0.0" />
+         <feature id="bm25-x-unorderedWt-5"
+                  cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.UnorderedWindowApproxExpressionGenerator" width="5"
+                  scoreFunction="ivory.smrf.model.score.BM25ScoringFunction" k1="0.25" b="0.0" />
+          <!--<feature id="antispam"
+                  potential="ivory.smrf.model.potential.DocumentPotential" type="antispam" />
+         <feature id="docscore"
+                  potential="ivory.smrf.model.potential.DocumentPotential" type="spam" />
+         <feature id="docscore"
+                  potential="ivory.smrf.model.potential.DocumentPotential" type="pagerank" />
+                  -->
+     </model>
+
+</parameters>
