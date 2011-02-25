@@ -77,8 +77,6 @@
 				<fileset dir="${build}">
 					<include name="**/*Test.class" />
 					<exclude name="ivory/regression/*.class" />
-					<exclude name="ivory/regression/GroundTruth*.class" />
-					<exclude name="ivory/regression/RegressionUtils.class" />
 				</fileset>
 			</batchtest>
 		</junit>
@@ -89,9 +87,6 @@
 			</fileset>
 			<report format="noframes" styledir="etc/" todir="${test}" />
 		</junitreport>
-
-                <!-- mail messageMimeType="text/html" messageFile="${test}/junit-noframes.html" tolist="umd-ivory@googlegroups.com" subject= "JUnit Test Results: Ivory" mailhost="smtp.umiacs.umd.edu" from= "jimmylin@umd.edu" / -->
-
 	</target>
 
 	<target name="regression-quick" depends="lib" description="Run regression tests">
@@ -120,7 +115,35 @@
 			<report format="noframes" styledir="etc/" todir="${regression-quick}" />
 		</junitreport>
 
-                <!-- mail messageMimeType="text/html" messageFile="${test}/junit-noframes.html" tolist="umd-ivory@googlegroups.com" subject= "JUnit Test Results: Ivory" mailhost="smtp.umiacs.umd.edu" from= "jimmylin@umd.edu" / -->
+                <mail messageMimeType="text/html" messageFile="${regression-quick}/junit-noframes.html" tolist="umd-ivory@googlegroups.com" subject= "JUnit Test Results: Ivory" mailhost="smtp.umiacs.umd.edu" from= "jimmylin@umd.edu" />
+
+	</target>
+
+	<target name="regression-complete" depends="lib" description="Run regression tests">
+		<mkdir dir="${regression-complete}" />
+		<junit printsummary="yes" fork="yes" maxmemory="2048m">
+			<sysproperty key="java.library.path" path="${lib}" />
+			<sysproperty key="org.xml.sax.driver" value="org.apache.xerces.parsers.SAXParser" />
+			<classpath refid="classpath" />
+
+			<formatter type="xml" />
+			<batchtest todir="${regression-complete}">
+				<fileset dir="${build}">
+                                        <include name="ivory/regression/*.class" />
+                                        <exclude name="ivory/regression/GroundTruth*.class" />
+                                        <exclude name="ivory/regression/RegressionUtils.class" />
+				</fileset>
+			</batchtest>
+		</junit>
+
+		<junitreport todir="${regression-complete}">
+			<fileset dir="${regression-complete}">
+				<include name="TEST-*.xml" />
+			</fileset>
+			<report format="noframes" styledir="etc/" todir="${regression-complete}" />
+		</junitreport>
+
+                <mail messageMimeType="text/html" messageFile="${regression-complete}/junit-noframes.html" tolist="umd-ivory@googlegroups.com" subject= "JUnit Test Results: Ivory" mailhost="smtp.umiacs.umd.edu" from= "jimmylin@umd.edu" />
 
 	</target>
 

@@ -3,4 +3,7 @@
 build/
 docs/api/
 regression-quick/
+regression-complete/
 ivory.jar
+etc/junit.sh
+etc/run.sh
