@@ -16,6 +16,8 @@
 
 package ivory.util;
 
+import ivory.exception.ConfigurationException;
+
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -96,7 +98,25 @@ public class XMLTools {
 
 		return attributes.getNamedItem(name).getNodeValue();
 	}
-	
+
+  /**
+   * Returns the value of an attribute, and if the attribute is not found, throws an
+   * ConfigurationException with the specified message.
+   */
+  public static String getAttributeValueOrThrowException(Node node, String name, String errMsg)
+      throws ConfigurationException {
+    if (node == null || !node.hasAttributes()) {
+      throw new ConfigurationException(errMsg);
+    }
+
+    NamedNodeMap attributes = node.getAttributes();
+    if (attributes.getNamedItem(name) == null) {
+      throw new ConfigurationException(errMsg);
+    }
+
+    return attributes.getNamedItem(name).getNodeValue();
+  }
+
 	/**
 	 * @param node
 	 * @param name

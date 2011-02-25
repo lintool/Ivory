@@ -26,11 +26,12 @@ import ivory.smrf.model.potential.PotentialFunction;
 import ivory.util.RetrievalEnvironment;
 import ivory.util.XMLTools;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import org.w3c.dom.Node;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 
 /**
  * @author Don Metzler
@@ -54,10 +55,8 @@ public class TermCliqueSet extends CliqueSet {
 		Parameter termParameter = new Parameter(Parameter.DEFAULT, 1.0f);
 
 		// Get potential type.
-		String potentialType = XMLTools.getAttributeValue(domNode, "potential");
-		if (potentialType == null) {
-			throw new ConfigurationException("A potential attribute must be specified in order to generate a CliqueSet!");
-		}
+		String potentialType = XMLTools.getAttributeValueOrThrowException(domNode, "potential",
+		    "A potential attribute must be specified in order to generate a CliqueSet!");
 
 		// Add clique for each query term.
 		for (String element : queryTerms) {
@@ -65,7 +64,7 @@ public class TermCliqueSet extends CliqueSet {
 			TermNode termNode = new TermNode(element);
 
 			// Add document/term clique.
-			ArrayList<GraphNode> cliqueNodes = new ArrayList<GraphNode>();
+			List<GraphNode> cliqueNodes = Lists.newArrayList();
 			if (docDependent) {
 				cliqueNodes.add(docNode);
 			}

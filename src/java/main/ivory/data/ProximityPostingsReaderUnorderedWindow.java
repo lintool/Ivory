@@ -41,13 +41,13 @@ public class ProximityPostingsReaderUnorderedWindow extends ProximityPostingsRea
 		int matches = 0;
 
 		// merge all position lists into single stream
-		int[] positions = mReaders[0].getPositions();
+		int[] positions = readers[0].getPositions();
 		int[] ids = new int[positions.length];
 		Arrays.fill(ids, 0);
 		int length = positions.length;
 
-		for (int id = 1; id < mReaders.length; id++) {
-			int [] p = mReaders[id].getPositions();
+		for (int id = 1; id < readers.length; id++) {
+			int [] p = readers[id].getPositions();
 
 			if(length + p.length > newPositions.length) {
 				newPositions = new int[length + p.length];
@@ -107,7 +107,7 @@ public class ProximityPostingsReaderUnorderedWindow extends ProximityPostingsRea
 				}
 				
 				// stop looking if we've exceeded the maximum window size
-				if(windowSize > mSize ) {
+				if(windowSize > size ) {
 					break;
 				}
 				

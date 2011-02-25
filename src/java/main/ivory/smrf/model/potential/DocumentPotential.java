@@ -45,10 +45,8 @@ public class DocumentPotential extends PotentialFunction {
 		this.env = Preconditions.checkNotNull(env);
 		Preconditions.checkNotNull(domNode);
 
-		String type = XMLTools.getAttributeValue(domNode, "type", null);
-		if (type == null) {
-			throw new ConfigurationException("A DocumentPotential requires a type attribute!");
-		}
+		String type = XMLTools.getAttributeValueOrThrowException(domNode, "type",
+		    "A DocumentPotential requires a type attribute!");
 
 		this.type = type;
 	}

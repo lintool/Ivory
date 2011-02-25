@@ -54,10 +54,8 @@ public class CliqueFactory {
 		Parameter parameter = new Parameter(Parameter.DEFAULT, 1.0f);
 
 		// Get potential type.
-		String potentialType = XMLTools.getAttributeValue(domNode, "potential", null);
-		if (potentialType == null) {
-			throw new ConfigurationException("A potential attribute must be specified in order to generate a clique set!");
-		}
+		String potentialType = XMLTools.getAttributeValueOrThrowException(domNode, "potential",
+		    "A potential attribute must be specified in order to generate a clique set!");
 
 		// If there is more than one term, then add appropriate cliques.
 		List<GraphNode> cliqueNodes = null;
@@ -109,10 +107,9 @@ public class CliqueFactory {
 		Parameter parameter = new Parameter(Parameter.DEFAULT, 1.0f);
 
 		// Get potential type.
-		String potentialType = XMLTools.getAttributeValue(domNode, "potential", null);
-		if (potentialType == null) {
-			throw new ConfigurationException("A potential attribute must be specified in order to generate a clique set!");
-		}
+		String potentialType = XMLTools.getAttributeValueOrThrowException(domNode, "potential",
+		    "A potential attribute must be specified in order to generate a clique set!");
+
 		// If there is more than one term, then add appropriate cliques.
 		ArrayList<GraphNode> cliqueNodes = null;
 		Clique c = null;

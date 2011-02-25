@@ -48,17 +48,14 @@ public class DocumentCliqueSet extends CliqueSet {
 		ArrayList<GraphNode> cliqueNodes = Lists.newArrayList();
 		cliqueNodes.add(docNode);
 
-		String paramId = XMLTools.getAttributeValue(domNode, "id");
-		if (paramId == null) {
-			throw new ConfigurationException("Error: A potential attribute must be specified in order to generate a clique set!");
-		}
+		String paramId = XMLTools.getAttributeValueOrThrowException(domNode, "id",
+		    "Error: A potential attribute must be specified in order to generate a clique set!");
 
 		float weight = XMLTools.getAttributeValue(domNode, "weight", 1.0f);
 		Parameter parameter = new Parameter(paramId, weight);
-		String potentialType = XMLTools.getAttributeValue(domNode, "potential");
-		if (potentialType == null) {
-			throw new ConfigurationException("Error: A potential type must be specified!");
-		}
+		String potentialType = XMLTools.getAttributeValueOrThrowException(domNode, "potential",
+		    "Error: A potential type must be specified!");
+
 		PotentialFunction potential = PotentialFunction.create(env, potentialType, domNode);
 
 		Clique c = new Clique(cliqueNodes, potential, parameter, 1.0f, getType(), true);

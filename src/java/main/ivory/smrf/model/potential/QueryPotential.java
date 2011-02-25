@@ -59,7 +59,7 @@ public class QueryPotential extends PotentialFunction {
 	private PostingsReader postingsReader = null;
 
 	private boolean endOfList = true;  	// Whether or not we're at the end of the postings list.
-	private int lastScoredDocno = 0;    // Whether or not we're at the end of the postings list.
+	private int lastScoredDocno = 0;
 
 	public QueryPotential() {}  // Note, must have zero-arg constructor for creation by factory method in PotentialFunction
 
@@ -74,16 +74,12 @@ public class QueryPotential extends PotentialFunction {
 		this.env = Preconditions.checkNotNull(env);
 		Preconditions.checkNotNull(domNode);
 
-		String generatorType = XMLTools.getAttributeValue(domNode, "generator");
-		if (generatorType == null) {
-			throw new ConfigurationException("A generator attribute must be specified in order to generate a potential function!");
-		}
+		String generatorType = XMLTools.getAttributeValueOrThrowException(domNode, "generator",
+		    "A generator attribute must be specified in order to generate a potential function!");
 		expressionGenerator = ExpressionGenerator.create(generatorType, domNode);
 
-		String scoreFunctionType = XMLTools.getAttributeValue(domNode, "scoreFunction");
-		if (scoreFunctionType == null) {
-			throw new ConfigurationException("A scoreFunction attribute must be specified in order to generate a potential function!");
-		}
+		String scoreFunctionType = XMLTools.getAttributeValue(domNode, "scoreFunction",
+		    "A scoreFunction attribute must be specified in order to generate a potential function!");
 		scoringFunction = ScoringFunction.create(scoreFunctionType, domNode);
 	}
 
@@ -146,7 +142,7 @@ public class QueryPotential extends PotentialFunction {
 			return DEFAULT_SCORE;
 		}
 
-		// Advance postings reader. Invariant: mCurPosting will always point to
+		// Advance postings reader. Invariant: curPosting will always point to
 		// the next posting that has not yet been scored.
 		while (!endOfList && postingsReader.getDocno() < docNode.getDocno()) {
 			if (!postingsReader.nextPosting(curPosting)) {
@@ -175,7 +171,6 @@ public class QueryPotential extends PotentialFunction {
 		}
 
 		int nextDocno = postingsReader.getDocno();
-		//System.out.println("\tnextDocno = "+nextDocno);
 		if (nextDocno == lastScoredDocno) {
 			if (!postingsReader.nextPosting(curPosting)) { // Advance reader.
 				endOfList = true;
@@ -226,7 +221,7 @@ public class QueryPotential extends PotentialFunction {
 
 	@Override
 	public void setNextCandidate(int docno) {
-		// Advance postings reader. Invariant: mCurPosting will always point to
+		// Advance postings reader. Invariant: curPosting will always point to
 		// the next posting that has not yet been scored.
 		while (!endOfList && postingsReader.getDocno() < docno) {
 			if (!postingsReader.nextPosting(curPosting)) {

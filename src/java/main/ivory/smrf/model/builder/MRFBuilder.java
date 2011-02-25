@@ -46,22 +46,20 @@ public abstract class MRFBuilder {
 		Preconditions.checkNotNull(model);
 
 		// Get model type.
-		String modelType = XMLTools.getAttributeValue(model, "type", null);
-		if (modelType == null) {
-			throw new ConfigurationException("Model type must be specified!");
-		}
+		String modelType = XMLTools.getAttributeValueOrThrowException(model, "type",
+		    "Model type must be specified!");
 
 		// Build the builder.
 		MRFBuilder builder = null;
 
 		try {
-			if (modelType.equals("Feature")) {
-				builder = new FeatureBasedMRFBuilder(env, model);
-			} else if (modelType.equals("GreedyConstrained")) {
-				builder = new GreedyConstrainedMRFBuilder(env, model);
-			} else {
-				throw new ConfigurationException("Unrecognized model type: " + modelType);
-			}
+      if ("Feature".equals(modelType)) {
+        builder = new FeatureBasedMRFBuilder(env, model);
+      } else if ("GreedyConstrained".equals(modelType)) {
+        builder = new GreedyConstrainedMRFBuilder(env, model);
+      } else {
+        throw new ConfigurationException("Unrecognized model type: " + modelType);
+      }
 		} catch (IOException e) {
 			throw new RetrievalException("Error getting MRFBuilder: " + e);
 		}
