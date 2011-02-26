@@ -65,10 +65,10 @@ public class Wt10g_SIGIR2010 {
 		g.put("wt10g-sd", new GroundTruth("wt10g-sd", Metric.AP, 50, SD, 0.2242f));
 		g.put("wt10g-wsd-sd", new GroundTruth("wt10g-wsd-sd", Metric.AP, 50, WSD_SD, 0.2411f));
 
-		Qrels qrels = new Qrels("docs/data/wt10g/qrels.wt10g");
+		Qrels qrels = new Qrels("docs/data/wt10g/qrels.wt10g.all");
 
 		String[] params = new String[] { "docs/data/wt10g/run.wt10g.SIGIR2010.xml",
-				"docs/data/wt10g/wt10g_queries_501-550.xml" };
+				"docs/data/wt10g/queries.wt10g.501-550.xml" };
 
 		FileSystem fs = FileSystem.getLocal(new Configuration());
 

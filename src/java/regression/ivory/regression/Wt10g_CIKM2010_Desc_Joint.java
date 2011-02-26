@@ -145,10 +145,10 @@ public class Wt10g_CIKM2010_Desc_Joint {
 		g.put("joint-x4.5", new GroundTruth("joint-x4.5", Metric.AP, 50, x45_rawAP, 0.2226f));
 		g.put("joint-x5.0", new GroundTruth("joint-x5.0", Metric.AP, 50, x50_rawAP, 0.2175f));
 
-		Qrels qrels = new Qrels("docs/data/wt10g/qrels.wt10g");
+		Qrels qrels = new Qrels("docs/data/wt10g/qrels.wt10g.all");
 
 		String[] params = new String[] { "docs/data/wt10g/run.wt10g.CIKM2010.desc.joint.xml",
-				"docs/data/wt10g/wt10g_queries_501-550_desc.xml" };
+				"docs/data/wt10g/queries.wt10g.501-550.desc.xml" };
 
 		FileSystem fs = FileSystem.getLocal(new Configuration());
 
