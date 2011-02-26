@@ -27,8 +27,7 @@ import org.apache.log4j.Logger;
 import org.xml.sax.SAXException;
 
 public class RunQueryLocal {
-
-	private static final Logger sLogger = Logger.getLogger(RunQueryLocal.class);
+	private static final Logger LOG = Logger.getLogger(RunQueryLocal.class);
 
 	private BatchQueryRunner runner = null;
 
@@ -37,7 +36,7 @@ public class RunQueryLocal {
 		Configuration conf = new Configuration();
 		FileSystem fs = FileSystem.getLocal(conf);
 		try {
-			sLogger.info("initilaize runquery ...");
+			LOG.info("initilaize runquery ...");
 			runner = new BatchQueryRunner(args, fs);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -49,12 +48,12 @@ public class RunQueryLocal {
 	 */
 	public void runQueries() throws Exception {
 		// run the queries
-		sLogger.info("run the queries ...");
+		LOG.info("run the queries ...");
 		long start = System.currentTimeMillis();
 		runner.runQueries();
 		long end = System.currentTimeMillis();
 
-		sLogger.info("Total query time: " + (end - start) + "ms");
+		LOG.info("Total query time: " + (end - start) + "ms");
 		System.out.println("Total\t" + (end - start) + " ms");
 	}
 

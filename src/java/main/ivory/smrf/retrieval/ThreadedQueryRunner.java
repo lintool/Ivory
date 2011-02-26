@@ -91,9 +91,8 @@ public class ThreadedQueryRunner implements QueryRunner {
 	/**
 	 * Fetches the results of a query. If necessary, waits until completion of
 	 * the query.
-	 * 
-	 * @param qid
-	 *            query id
+	 *
+	 * @param qid query id
 	 */
 	public Accumulator[] getResults(String qid) {
 		try {
@@ -119,22 +118,21 @@ public class ThreadedQueryRunner implements QueryRunner {
 	 */
 	public Map<String, Accumulator[]> getResults() {
 		Map<String, Accumulator[]> results = new LinkedHashMap<String, Accumulator[]>();
-		for (Map.Entry<String, Future<Accumulator[]>> e : queryResults.entrySet()) {
+		for (Map.Entry<String, Future<Accumulator[]>> entry : queryResults.entrySet()) {
 			try {
-				Accumulator[] a = e.getValue().get();
+				Accumulator[] a = entry.getValue().get();
 				
 				if ( a != null) {
-					results.put(e.getKey(), e.getValue().get());
+					results.put(entry.getKey(), a);
 				}
-				
-			} catch (Exception ex) {
-				ex.printStackTrace();
+			} catch (Exception e) {
+				throw new RuntimeException(e);
 			}
 		}
 		return results;
 	}
 
-	// Thread for running a query.  No need to expose implementation.
+	// Thread for running a query. No need to expose implementation.
 	private class ThreadTask implements Callable<Accumulator[]> {
 		private final String[] query;
 		private final MRFBuilder builder;

@@ -41,9 +41,9 @@ public class UnorderedCliqueSet extends CliqueSet {
 		// Initialize clique set.
 		clearCliques();
 
-		if (dependenceType.equals("sequential")) {
+		if ("sequential".equals(dependenceType)) {
 			throw new ConfigurationException("Unsupported operation: there are no unordered cliques within a sequentially dependent graph.");
-		} else if (dependenceType.equals("full")) {
+		} else if ("full".equals(dependenceType)) {
 			addCliques(CliqueFactory.getFullDependenceCliques(env, queryTerms, domNode, false, docDependent));
 		} else {
 			throw new ConfigurationException("Unrecognized UnorderedCliqueSet type: " + dependenceType);

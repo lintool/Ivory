@@ -31,12 +31,12 @@ import ivory.smrf.model.score.ScoringFunction;
 import ivory.util.RetrievalEnvironment;
 import ivory.util.XMLTools;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.w3c.dom.Node;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 
 /**
  * Query potential.
@@ -48,13 +48,13 @@ public class QueryPotential extends PotentialFunction {
 	// Default score for potentials with no postings.
 	private static final float DEFAULT_SCORE = 0.0f;
 
-	private final List<TermNode> termNodes = new ArrayList<TermNode>();
+	private final List<TermNode> termNodes = Lists.newArrayList();
 	private final GlobalTermEvidence termEvidence = new GlobalTermEvidence();
 	private final Posting curPosting = new Posting();
 
-	private RetrievalEnvironment env = null;
-	private ScoringFunction scoringFunction = null;
-	private ExpressionGenerator expressionGenerator = null;
+	private RetrievalEnvironment env;
+	private ExpressionGenerator expressionGenerator;
+	private ScoringFunction scoringFunction;
 	private DocumentNode docNode = null;
 	private PostingsReader postingsReader = null;
 

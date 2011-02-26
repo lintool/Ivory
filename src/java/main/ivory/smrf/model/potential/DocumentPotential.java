@@ -36,8 +36,8 @@ import com.google.common.base.Preconditions;
  *
  */
 public class DocumentPotential extends PotentialFunction {
-	private RetrievalEnvironment env = null;
-	private DocumentNode docNode = null;
+	private RetrievalEnvironment env;
+	private DocumentNode docNode;
 	private String type;
 
 	@Override

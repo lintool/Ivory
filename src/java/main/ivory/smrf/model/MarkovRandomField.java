@@ -20,7 +20,6 @@ import ivory.exception.ConfigurationException;
 import ivory.util.RetrievalEnvironment;
 import ivory.util.XMLTools;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -31,13 +30,14 @@ import com.google.common.collect.Lists;
  * A Markov Random Field.
  *
  * @author Don Metzler
+ *
  */
 public class MarkovRandomField {
-	private final List<Clique> cliques = new ArrayList<Clique>();
+	private final List<Clique> cliques = Lists.newArrayList();
 	private final RetrievalEnvironment env;
 	private final GlobalEvidence globalEvidence;
 	private final String[] queryTerms;
-	
+
 	/**
 	 * Creates a <code>MarkovRandomField</code> object.
 	 *

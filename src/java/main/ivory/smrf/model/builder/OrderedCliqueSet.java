@@ -42,9 +42,9 @@ public class OrderedCliqueSet extends CliqueSet {
 		clearCliques();
 
 		// generate clique set
-		if (dependenceType.equals("sequential")) {
+    if ("sequential".equals(dependenceType)) {
 			addCliques(CliqueFactory.getSequentialDependenceCliques(env, queryTerms, domNode, docDependent));
-		} else if (dependenceType.equals("full")) {
+		} else if ("full".equals(dependenceType)) {
 			addCliques(CliqueFactory.getFullDependenceCliques(env, queryTerms, domNode, true, docDependent));
 		} else {
 			throw new ConfigurationException("Unrecognized OrderedCliqueSet type \"" + dependenceType + "\"!");

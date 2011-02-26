@@ -20,20 +20,21 @@ import ivory.exception.ConfigurationException;
 import ivory.smrf.model.Clique;
 import ivory.util.RetrievalEnvironment;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.w3c.dom.Node;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 
 /**
  * @author Don Metzler
  */
 public abstract class CliqueSet {
-	private final List<Clique> cliques = new ArrayList<Clique>();
+	private final List<Clique> cliques = Lists.newArrayList();
 
-	public abstract void configure(RetrievalEnvironment env, String[] queryTerms, Node domNode)	throws ConfigurationException;
+  public abstract void configure(RetrievalEnvironment env, String[] queryTerms, Node domNode)
+      throws ConfigurationException;
 
 	protected void addClique(Clique c) {
 		cliques.add(c);
