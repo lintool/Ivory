@@ -115,7 +115,7 @@
 			<report format="noframes" styledir="etc/" todir="${regression-quick}" />
 		</junitreport>
 
-                <mail messageMimeType="text/html" messageFile="${regression-quick}/junit-noframes.html" tolist="umd-ivory@googlegroups.com" subject= "JUnit Test Results: Ivory" mailhost="smtp.umiacs.umd.edu" from= "jimmylin@umd.edu" />
+                <mail messageMimeType="text/html" messageFile="${regression-quick}/junit-noframes.html" tolist="umd-ivory@googlegroups.com" subject="Ivory regression test results (quick)" mailhost="smtp.umiacs.umd.edu" from= "jimmylin@umd.edu" />
 
 	</target>
 
@@ -143,7 +143,7 @@
 			<report format="noframes" styledir="etc/" todir="${regression-complete}" />
 		</junitreport>
 
-                <mail messageMimeType="text/html" messageFile="${regression-complete}/junit-noframes.html" tolist="umd-ivory@googlegroups.com" subject= "JUnit Test Results: Ivory" mailhost="smtp.umiacs.umd.edu" from= "jimmylin@umd.edu" />
+                <mail messageMimeType="text/html" messageFile="${regression-complete}/junit-noframes.html" tolist="umd-ivory@googlegroups.com" subject="Ivory regression test results (complete)" mailhost="smtp.umiacs.umd.edu" from= "jimmylin@umd.edu" />
 
 	</target>
 
