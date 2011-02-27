@@ -17,7 +17,6 @@
 package ivory.preprocess;
 
 import ivory.data.TermDocVector;
-import ivory.data.TermDocVectorReader;
 import ivory.util.Constants;
 import ivory.util.RetrievalEnvironment;
 
@@ -69,7 +68,7 @@ public class GetTermCount extends PowerTool {
 		public void map(IntWritable key, TermDocVector doc,
 				OutputCollector<Text, PairOfIntLong> output, Reporter reporter) throws IOException {
 
-			TermDocVectorReader r = doc.getDocVectorReader();
+			TermDocVector.Reader r = doc.getReader();
 			reporter.setStatus("d" + key.get());
 			int dl = 0;
 			int tf;

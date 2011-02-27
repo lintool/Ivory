@@ -1,11 +1,11 @@
 /*
  * Ivory: A Hadoop toolkit for Web-scale information retrieval
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You may
  * obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0 
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -36,7 +36,7 @@ import uk.ac.gla.terrier.compression.BitOutputStream;
  * of ints, where each int represents a term position. These objects serve as
  * intermediate values in building document-sorted inverted indexes.
  * </p>
- * 
+ *
  * <p>
  * In serialized form, term positions are represented as first-order differences
  * (i.e., position gaps or <i>p</i>-gaps) using Gamma encoding. As an example,
@@ -46,73 +46,68 @@ import uk.ac.gla.terrier.compression.BitOutputStream;
  * except the first represents the difference between the previous term position
  * and the current term position.
  * </p>
- * 
+ *
  * @author Jimmy Lin
- * 
+ *
  */
 public class TermPositions implements Writable {
-	private int[] mPos;
-	private byte[] mBytes;
-	private short mTf;
-	private int mTotalBits;
+	private int[] positions;
+	private byte[] bytes;
+	private short tf;
+	private int totalBits;
 
 	/**
 	 * Creates an empty <code>TermPositions</code> object.
 	 */
-	public TermPositions() {
-	}
+	public TermPositions() {}
 
 	/**
 	 * Creates a <code>TermPositions</code> object with initial parameters.
 	 * Note that the length of the term positions array does not need to be the
 	 * term frequency; this supports reusing arrays of mismatching sizes.
-	 * 
-	 * @param pos
-	 *            array of term positions
-	 * @param tf
-	 *            the term frequency
+	 *
+	 * @param pos  array of term positions
+	 * @param tf   the term frequency
 	 */
 	public TermPositions(int[] pos, short tf) {
-		mPos = pos;
-		mTf = tf;
+		this.positions = pos;
+		this.tf = tf;
 	}
 
 	/**
 	 * Sets the term positions and term frequency of this object. Note that the
 	 * length of the term positions array does not need to be the term
 	 * frequency; this supports reusing arrays of mismatching sizes.
-	 * 
-	 * @param pos
-	 *            array of term positions
-	 * @param tf
-	 *            the term frequency
+	 *
+	 * @param pos  array of term positions
+	 * @param tf   the term frequency
 	 */
 	public void set(int[] pos, short tf) {
-		mPos = pos;
-		mTf = tf;
-		// reset so we will recompute encoded size
-		mTotalBits = 0;
+		this.positions = pos;
+		this.tf = tf;
+		// Reset so we will recompute encoded size.
+		totalBits = 0;
 	}
 
 	/**
 	 * Deserializes this object.
 	 */
 	public void readFields(DataInput in) throws IOException {
-		mPos = null;
-		mBytes = new byte[in.readInt()];
-		mTf = in.readShort();
-		mTotalBits = in.readInt();
-		in.readFully(mBytes);
+		positions = null;
+		bytes = new byte[in.readInt()];
+		tf = in.readShort();
+		totalBits = in.readInt();
+		in.readFully(bytes);
 
-		ByteArrayInputStream byteStream = new ByteArrayInputStream(mBytes);
+		ByteArrayInputStream byteStream = new ByteArrayInputStream(bytes);
 		BitInputStream bitStream = new BitInputStream(byteStream);
 
-		mPos = new int[mTf];
-		for (int i = 0; i < mTf; i++) {
+		positions = new int[tf];
+		for (int i = 0; i < tf; i++) {
 			if (i == 0) {
-				mPos[i] = bitStream.readGamma();
+				positions[i] = bitStream.readGamma();
 			} else {
-				mPos[i] = (mPos[i - 1] + bitStream.readGamma());
+				positions[i] = (positions[i - 1] + bitStream.readGamma());
 			}
 		}
 	}
@@ -123,12 +118,12 @@ public class TermPositions implements Writable {
 	public void write(DataOutput out) throws IOException {
 		ByteArrayOutputStream b = new ByteArrayOutputStream();
 		BitOutputStream t = new BitOutputStream(b);
-		for (int i = 0; i < mTf; i++) {
+		for (int i = 0; i < tf; i++) {
 			if (i == 0) {
-				t.writeGamma(mPos[0]);
+				t.writeGamma(positions[0]);
 			} else {
-				int pgap = mPos[i] - mPos[i - 1];
-				if (mPos[i] <= 0 || pgap == 0) {
+				int pgap = positions[i] - positions[i - 1];
+				if (positions[i] <= 0 || pgap == 0) {
 					throw new RuntimeException("Error: invalid term positions " + toString());
 				}
 
@@ -143,7 +138,7 @@ public class TermPositions implements Writable {
 
 		byte[] bytes = b.toByteArray();
 		out.writeInt(bytes.length);
-		out.writeShort(mTf);
+		out.writeShort(tf);
 		out.writeInt(byteOffset * 8 + bitOffset);
 		out.write(bytes);
 	}
@@ -162,9 +157,8 @@ public class TermPositions implements Writable {
 
 	/**
 	 * Factory method for creating <code>TermPositions</code> objects.
-	 * 
-	 * @param in
-	 *            source to read from
+	 *
+	 * @param in source to read from
 	 * @return newly created <code>TermPositions</code> object
 	 * @throws IOException
 	 */
@@ -177,9 +171,8 @@ public class TermPositions implements Writable {
 
 	/**
 	 * Factory method for creating <code>TermPositions</code> objects.
-	 * 
-	 * @param bytes
-	 *            raw serialized form
+	 *
+	 * @param bytes raw serialized form
 	 * @return newly created <code>TermPositions</code> object
 	 * @throws IOException
 	 */
@@ -191,14 +184,14 @@ public class TermPositions implements Writable {
 	 * Returns the array of term positions.
 	 */
 	public int[] getPositions() {
-		return mPos;
+		return positions;
 	}
 
 	/**
 	 * Returns the term frequency.
 	 */
 	public short getTf() {
-		return mTf;
+		return tf;
 	}
 
 	/**
@@ -209,18 +202,17 @@ public class TermPositions implements Writable {
 		// encoded size yet, since this is done as part of the deserialization
 		// process... if this is the case, then run through a mock encoding to
 		// compute the encoded size.
-		if (mTotalBits == 0) {
+		if (totalBits == 0) {
 			try {
 				ByteArrayOutputStream b = new ByteArrayOutputStream();
 				BitOutputStream t = new BitOutputStream(b);
-				for (int i = 0; i < mTf; i++) {
+				for (int i = 0; i < tf; i++) {
 					if (i == 0) {
-						t.writeGamma(mPos[0]);
+						t.writeGamma(positions[0]);
 					} else {
-						int pgap = mPos[i] - mPos[i - 1];
-						if (mPos[i] <= 0 || pgap == 0) {
-							throw new RuntimeException("Error: invalid term positions "
-									+ toString());
+						int pgap = positions[i] - positions[i - 1];
+						if (positions[i] <= 0 || pgap == 0) {
+							throw new RuntimeException("Error: invalid term positions " + toString());
 						}
 
 						t.writeGamma(pgap);
@@ -232,13 +224,13 @@ public class TermPositions implements Writable {
 				t.padAndFlush();
 				t.close();
 
-				mTotalBits = byteOffset * 8 + bitOffset;
+				totalBits = byteOffset * 8 + bitOffset;
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
 
-		return mTotalBits;
+		return totalBits;
 	}
 
 	/**
@@ -247,11 +239,11 @@ public class TermPositions implements Writable {
 	public String toString() {
 		StringBuffer sb = new StringBuffer();
 		sb.append("[");
-		//for (int i = 0; i < mTf; i++) {
-		for (int i = 0; i < mPos.length; i++) {
-			if (i != 0)
+    for (int i = 0; i < tf; i++) {
+			if (i != 0) {
 				sb.append(", ");
-			sb.append(mPos[i]);
+			}
+			sb.append(positions[i]);
 		}
 		sb.append("]");
 
@@ -264,7 +256,7 @@ public class TermPositions implements Writable {
 	 */
 	public TermPositions clone() {
 		TermPositions that = new TermPositions();
-		that.set(mPos, mTf);
+		that.set(positions, tf);
 
 		return that;
 	}

@@ -16,7 +16,6 @@
 
 package ivory.data;
 
-import ivory.tokenize.Tokenizer;
 import ivory.util.RetrievalEnvironment;
 
 import java.io.BufferedReader;
@@ -29,8 +28,8 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.SequenceFile;
-import org.apache.log4j.Logger;
 import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 import edu.umd.cloud9.debug.MemoryUsageUtils;
 

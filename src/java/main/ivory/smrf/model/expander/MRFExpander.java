@@ -17,7 +17,7 @@
 package ivory.smrf.model.expander;
 
 import ivory.data.IntDocVector;
-import ivory.data.IntDocVectorReader;
+import ivory.data.IntDocVector.Reader;
 import ivory.exception.ConfigurationException;
 import ivory.exception.RetrievalException;
 import ivory.smrf.model.MarkovRandomField;
@@ -239,7 +239,7 @@ public abstract class MRFExpander {
 			Map<String, Short> docTfs = new HashMap<String, Short>();
 			int doclen = 0;
 
-			IntDocVectorReader dvReader = doc.getDocVectorReader();
+			Reader dvReader = doc.getReader();
 			while (dvReader.hasMoreTerms()) {
 				int termid = dvReader.nextTerm();
 				String stem = mEnv.getTermFromId(termid);
@@ -287,7 +287,7 @@ public abstract class MRFExpander {
 			HMapIV<String> termMap = new HMapIV<String>();
 			int maxPos = Integer.MIN_VALUE;
 
-			IntDocVectorReader dvReader = doc.getDocVectorReader();
+			Reader dvReader = doc.getReader();
 			while (dvReader.hasMoreTerms()) {
 				int termid = dvReader.nextTerm();
 				String stem = mEnv.getTermFromId(termid);

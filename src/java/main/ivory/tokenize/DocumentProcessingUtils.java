@@ -17,7 +17,6 @@
 package ivory.tokenize;
 
 import ivory.data.TermDocVector;
-import ivory.data.TermDocVectorReader;
 import ivory.data.TermIdMapWithCache;
 
 import java.io.IOException;
@@ -57,9 +56,9 @@ public class DocumentProcessingUtils {
 		// for storing the positions
 		Map<String, int[]> strPositions = new HashMap<String, int[]>();
 		
-		TermDocVectorReader r = null;
+		TermDocVector.Reader r = null;
 		try {
-			r = doc.getDocVectorReader();
+			r = doc.getReader();
 		} catch (IOException e1) {
 			throw new RuntimeException("Error getting TermDocVectorReader: "+e1.getMessage());
 		}
@@ -150,9 +149,9 @@ public class DocumentProcessingUtils {
 		// for storing the positions
 		TreeMap<String, ArrayListOfInts> strPositions = new TreeMap<String, ArrayListOfInts>();
 		
-		TermDocVectorReader r = null;
+		TermDocVector.Reader r = null;
 		try {
-			r = doc.getDocVectorReader();
+			r = doc.getReader();
 		} catch (IOException e1) {
 			throw new RuntimeException("Error getting TermDocVectorReader: "+e1.getMessage());
 		}

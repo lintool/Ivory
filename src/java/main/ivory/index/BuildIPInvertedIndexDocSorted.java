@@ -17,9 +17,9 @@
 package ivory.index;
 
 import ivory.data.IntDocVector;
-import ivory.data.IntDocVectorReader;
 import ivory.data.PostingsList;
 import ivory.data.PostingsListDocSortedPositional;
+import ivory.data.IntDocVector.Reader;
 import ivory.util.RetrievalEnvironment;
 
 import java.io.IOException;
@@ -81,7 +81,7 @@ public class BuildIPInvertedIndexDocSorted extends PowerTool {
 			docno = key.get();
 
 			long startTime = System.currentTimeMillis();
-			IntDocVectorReader r = doc.getDocVectorReader();
+			Reader r = doc.getReader();
 
 			int dl = 0;
 			while (r.hasMoreTerms()) {
