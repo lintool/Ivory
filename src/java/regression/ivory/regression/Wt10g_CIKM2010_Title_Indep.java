@@ -146,10 +146,11 @@ public class Wt10g_CIKM2010_Title_Indep {
 		g.put("indep-x4.5", new GroundTruth("indep-x4.5", Metric.AP, 50, x45_rawAP, 0.2413f));
 		g.put("indep-x5.0", new GroundTruth("indep-x5.0", Metric.AP, 50, x50_rawAP, 0.2422f));
 
-		Qrels qrels = new Qrels("docs/data/wt10g/qrels.wt10g.all");
+		Qrels qrels = new Qrels("data/wt10g/qrels.wt10g.all");
 
-		String[] params = new String[] { "docs/data/wt10g/run.wt10g.CIKM2010.title.indep.xml",
-				"docs/data/wt10g/queries.wt10g.501-550.xml" };
+    String[] params = new String[] {
+            "data/wt10g/run.wt10g.CIKM2010.title.indep.xml",
+            "data/wt10g/queries.wt10g.501-550.xml" };
 
 		FileSystem fs = FileSystem.getLocal(new Configuration());
 

@@ -127,10 +127,11 @@ public class Robust04_WSD {
 		AllModelsP10Scores.put("robust04-dir-wsd-sd", loadScoresIntoMap(sDir_WSD_SD_RawP10));
 		AllModelsP10Scores.put("robust04-dir-wsd-fd", loadScoresIntoMap(sDir_WSD_FD_RawP10));
 
-		sQrels = new Qrels("docs/data/trec/qrels.robust04.noCRFR.txt");
+		sQrels = new Qrels("data/trec/qrels.robust04.noCRFR.txt");
 
-		String[] params = new String[] { "docs/data/trec/run.robust04.wsd.xml",
-				"docs/data/trec/queries.robust04.xml" };
+    String[] params = new String[] {
+            "data/trec/run.robust04.wsd.xml",
+            "data/trec/queries.robust04.xml" };
 
 		FileSystem fs = FileSystem.getLocal(new Configuration());
 

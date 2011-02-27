@@ -50,10 +50,11 @@ public class Web09catB_SIGIR2010 {
 		g.put("clue-sd", new GroundTruth("clue-sd", Metric.AP, 25, sd_rawAP, 0.2208f));
 		g.put("clue-wsd-sd", new GroundTruth("clue-wsd-sd", Metric.AP, 25, wsd_sd_rawAP, 0.2212f));
 
-		Qrels qrels = new Qrels("docs/data/clue/qrels.web09catB.txt");
+		Qrels qrels = new Qrels("data/clue/qrels.web09catB.txt");
 
-		String[] params = new String[] { "docs/data/clue/run.web09catB.SIGIR2010.xml",
-				"docs/data/clue/queries.web09.26-50.xml" };
+    String[] params = new String[] {
+            "data/clue/run.web09catB.SIGIR2010.xml",
+            "data/clue/queries.web09.26-50.xml" };
 
 		FileSystem fs = FileSystem.getLocal(new Configuration());
 

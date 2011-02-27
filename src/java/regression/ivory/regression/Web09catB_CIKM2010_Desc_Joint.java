@@ -100,10 +100,11 @@ public class Web09catB_CIKM2010_Desc_Joint {
 		g.put("joint-x4.5", new GroundTruth("joint-x4.5", Metric.AP, 25, x45_rawAP, 0.1567f));
 		g.put("joint-x5.0", new GroundTruth("joint-x5.0", Metric.AP, 25, x50_rawAP, 0.1561f));
 
-		Qrels qrels = new Qrels("docs/data/clue/qrels.web09catB.txt");
+    Qrels qrels = new Qrels("data/clue/qrels.web09catB.txt");
 
-		String[] params = new String[] { "docs/data/clue/run.clue.CIKM2010.desc.joint.xml",
-				"docs/data/clue/queries.web09.26-50.desc.xml" };
+    String[] params = new String[] {
+            "data/clue/run.clue.CIKM2010.desc.joint.xml",
+            "data/clue/queries.web09.26-50.desc.xml" };
 
 		FileSystem fs = FileSystem.getLocal(new Configuration());
 

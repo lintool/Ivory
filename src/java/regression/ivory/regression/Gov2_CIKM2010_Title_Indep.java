@@ -190,10 +190,11 @@ public class Gov2_CIKM2010_Title_Indep {
 		g.put("indep-x4.5", new GroundTruth("indep-x4.5", Metric.AP, 75, x45_rawAP, 0.3540f));
 		g.put("indep-x5.0", new GroundTruth("indep-x5.0", Metric.AP, 75, x50_rawAP, 0.3550f));
 
-		Qrels qrels = new Qrels("docs/data/gov2/qrels.gov2.all");
+		Qrels qrels = new Qrels("data/gov2/qrels.gov2.all");
 
-		String[] params = new String[] { "docs/data/gov2/run.gov2.CIKM2010.title.indep.xml",
-				"docs/data/gov2/gov2.title.776-850" };
+		String[] params = new String[] {
+		    "data/gov2/run.gov2.CIKM2010.title.indep.xml",
+				"data/gov2/gov2.title.776-850" };
 
 		FileSystem fs = FileSystem.getLocal(new Configuration());
 
