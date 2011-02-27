@@ -36,7 +36,7 @@ import org.w3c.dom.NodeList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-import edu.umd.cloud9.util.HMapKF;
+import edu.umd.cloud9.util.map.HMapKF;
 
 /**
  * @author Don Metzler

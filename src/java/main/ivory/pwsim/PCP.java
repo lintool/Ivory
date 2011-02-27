@@ -9,7 +9,6 @@ import ivory.pwsim.score.ScoringModel;
 import ivory.util.RetrievalEnvironment;
 
 import java.io.IOException;
-import java.net.URI;
 import java.util.Iterator;
 
 import org.apache.hadoop.conf.Configuration;
@@ -32,9 +31,9 @@ import org.apache.hadoop.mapred.lib.IdentityReducer;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
-import edu.umd.cloud9.io.HMapIFW;
-import edu.umd.cloud9.util.MapIF;
+import edu.umd.cloud9.io.map.HMapIFW;
 import edu.umd.cloud9.util.PowerTool;
+import edu.umd.cloud9.util.map.MapIF;
 
 /**
  * <p>

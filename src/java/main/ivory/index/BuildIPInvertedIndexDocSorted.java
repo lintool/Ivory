@@ -45,10 +45,10 @@ import org.apache.hadoop.mapred.SequenceFileOutputFormat;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
-import edu.umd.cloud9.io.PairOfInts;
-import edu.umd.cloud9.util.HMapII;
-import edu.umd.cloud9.util.MapII;
+import edu.umd.cloud9.io.pair.PairOfInts;
 import edu.umd.cloud9.util.PowerTool;
+import edu.umd.cloud9.util.map.HMapII;
+import edu.umd.cloud9.util.map.MapII;
 
 /**
  * Indexer for building document-sorted inverted indexes.

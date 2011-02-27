@@ -20,14 +20,14 @@ import ivory.util.RetrievalEnvironment;
 
 import java.io.IOException;
 
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.WritableUtils;
-import org.apache.hadoop.conf.Configuration;
 import org.apache.log4j.Logger;
 
-import edu.umd.cloud9.io.PairOfIntLong;
+import edu.umd.cloud9.io.pair.PairOfIntLong;
 
 public class PrefixEncodedGlobalStats {
 

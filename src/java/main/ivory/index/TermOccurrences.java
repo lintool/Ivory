@@ -16,9 +16,9 @@
 
 package ivory.index;
 
-import edu.umd.cloud9.util.ArrayListOfInts;
-
 import java.util.ArrayList;
+
+import edu.umd.cloud9.util.array.ArrayListOfInts;
 /**
  * @author Tamer
  *

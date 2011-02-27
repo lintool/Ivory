@@ -45,7 +45,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-import edu.umd.cloud9.util.HMapIV;
+import edu.umd.cloud9.util.map.HMapIV;
 
 /**
  * @author Don Metzler

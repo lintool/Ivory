@@ -29,7 +29,7 @@ import org.apache.hadoop.io.WritableUtils;
 
 import uk.ac.gla.terrier.compression.BitInputStream;
 import uk.ac.gla.terrier.compression.BitOutputStream;
-import edu.umd.cloud9.util.ArrayListOfInts;
+import edu.umd.cloud9.util.array.ArrayListOfInts;
 
 /**
  * Implementation of {@link TermDocVector} that lazily decodes term and
