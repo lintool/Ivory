@@ -312,10 +312,11 @@ public class Robust04_Basic {
 		AllModelsP10Scores.put("robust04-bm25-sd", loadScoresIntoMap(sBm25SDRawP10));
 		AllModelsP10Scores.put("robust04-bm25-fd", loadScoresIntoMap(sBm25FDRawP10));
 
-		sQrels = new Qrels("docs/data/trec/qrels.robust04.noCRFR.txt");
+		sQrels = new Qrels("data/trec/qrels.robust04.noCRFR.txt");
 
-		String[] params = new String[] { "docs/data/trec/run.robust04.basic.xml",
-				"docs/data/trec/queries.robust04.xml" };
+		String[] params = new String[] {
+		    "data/trec/run.robust04.basic.xml",
+				"data/trec/queries.robust04.xml" };
 
 		FileSystem fs = FileSystem.getLocal(new Configuration());
 
@@ -334,8 +335,7 @@ public class Robust04_Basic {
 
 			Map<String, Accumulator[]> results = qr.getResults(model);
 
-			verifyResults(model, results, AllModelsAPScores.get(model), AllModelsP10Scores
-					.get(model));
+			verifyResults(model, results, AllModelsAPScores.get(model), AllModelsP10Scores.get(model));
 
 			sLogger.info("Done!");
 		}

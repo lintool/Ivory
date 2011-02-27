@@ -256,8 +256,7 @@ public class Robust04_Basic_LCE {
 		AllModelsAPScores.put("robust04-dir-rm3-s", loadScoresIntoMap(dir_rm3_s_rawAP));
 		AllModelsAPScores.put("robust04-dir-sd-lce-f", loadScoresIntoMap(dir_sd_lce_f_rawAP));
 		AllModelsAPScores.put("robust04-dir-sd-lce-s", loadScoresIntoMap(dir_sd_lce_s_rawAP));
-		AllModelsAPScores.put("robust04-dir-sd-lce-bigram",
-				loadScoresIntoMap(dir_sd_lce_bigram_rawAP));
+		AllModelsAPScores.put("robust04-dir-sd-lce-bigram", loadScoresIntoMap(dir_sd_lce_bigram_rawAP));
 
 		Map<String, Map<String, Float>> AllModelsP10Scores = new HashMap<String, Map<String, Float>>();
 
@@ -265,13 +264,13 @@ public class Robust04_Basic_LCE {
 		AllModelsP10Scores.put("robust04-dir-rm3-s", loadScoresIntoMap(dir_rm3_s_rawP10));
 		AllModelsP10Scores.put("robust04-dir-sd-lce-f", loadScoresIntoMap(dir_sd_lce_f_RawP10));
 		AllModelsP10Scores.put("robust04-dir-sd-lce-s", loadScoresIntoMap(dir_sd_lce_s_RawP10));
-		AllModelsP10Scores.put("robust04-dir-sd-lce-bigram",
-				loadScoresIntoMap(dir_sd_lce_bigram_rawP10));
+		AllModelsP10Scores.put("robust04-dir-sd-lce-bigram", loadScoresIntoMap(dir_sd_lce_bigram_rawP10));
 
-		sQrels = new Qrels("docs/data/trec/qrels.robust04.noCRFR.txt");
+		sQrels = new Qrels("data/trec/qrels.robust04.noCRFR.txt");
 
-		String[] params = new String[] { "docs/data/trec/run.robust04.basic.lce.xml",
-				"docs/data/trec/queries.robust04.xml" };
+		String[] params = new String[] {
+		    "data/trec/run.robust04.basic.lce.xml",
+				"data/trec/queries.robust04.xml" };
 
 		FileSystem fs = FileSystem.getLocal(new Configuration());
 
@@ -290,8 +289,7 @@ public class Robust04_Basic_LCE {
 
 			Map<String, Accumulator[]> results = qr.getResults(model);
 
-			verifyResults(model, results, AllModelsAPScores.get(model), AllModelsP10Scores
-					.get(model));
+			verifyResults(model, results, AllModelsAPScores.get(model), AllModelsP10Scores.get(model));
 
 			sLogger.info("Done!");
 		}

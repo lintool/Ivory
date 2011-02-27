@@ -100,10 +100,11 @@ public class Web09catB_CIKM2010_Title_Indep {
 		g.put("indep-x4.5", new GroundTruth("indep-x4.5", Metric.AP, 25, x45_rawAP, 0.2248f));
 		g.put("indep-x5.0", new GroundTruth("indep-x5.0", Metric.AP, 25, x50_rawAP, 0.2250f));
 
-		Qrels qrels = new Qrels("docs/data/clue/qrels.web09catB.txt");
+		Qrels qrels = new Qrels("data/clue/qrels.web09catB.txt");
 
-		String[] params = new String[] { "docs/data/clue/run.clue.CIKM2010.title.indep.xml",
-				"docs/data/clue/queries.web09.26-50.xml" };
+		String[] params = new String[] {
+		    "data/clue/run.clue.CIKM2010.title.indep.xml",
+				"data/clue/queries.web09.26-50.xml" };
 
 		FileSystem fs = FileSystem.getLocal(new Configuration());
 

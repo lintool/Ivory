@@ -80,10 +80,11 @@ public class Gov2_SIGIR2010 {
 		g.put("gov2-sd", new GroundTruth("gov2-sd", Metric.AP, 75, SD, 0.3357f));
 		g.put("gov2-wsd-sd", new GroundTruth("gov2-wsd-sd", Metric.AP, 75, WSD_SD, 0.3435f));
 
-		Qrels qrels = new Qrels("docs/data/gov2/qrels.gov2.all");
+		Qrels qrels = new Qrels("data/gov2/qrels.gov2.all");
 
-		String[] params = new String[] { "docs/data/gov2/run.gov2.SIGIR2010.xml",
-				"docs/data/gov2/gov2.title.776-850" };
+		String[] params = new String[] {
+		    "data/gov2/run.gov2.SIGIR2010.xml",
+				"data/gov2/gov2.title.776-850" };
 
 		FileSystem fs = FileSystem.getLocal(new Configuration());
 

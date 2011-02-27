@@ -307,11 +307,12 @@ public class Wt10g_Basic {
 		h.put("wt10g-bm25-sd", new GroundTruth(Metric.P10, 99, sBm25SDRawP10, 0.3333f));
 		h.put("wt10g-bm25-fd", new GroundTruth(Metric.P10, 99, sBm25FDRawP10, 0.3424f));
 
-		Qrels qrels = new Qrels("docs/data/wt10g/qrels.wt10g.all");
+		Qrels qrels = new Qrels("data/wt10g/qrels.wt10g.all");
 
-		String[] params = new String[] { "docs/data/wt10g/run.wt10g.basic.xml",
-				"docs/data/wt10g/queries.wt10g.451-500.xml",
-				"docs/data/wt10g/queries.wt10g.501-550.xml" };
+    String[] params = new String[] {
+            "data/wt10g/run.wt10g.basic.xml",
+            "data/wt10g/queries.wt10g.451-500.xml",
+            "data/wt10g/queries.wt10g.501-550.xml" };
 
 		FileSystem fs = FileSystem.getLocal(new Configuration());
 
