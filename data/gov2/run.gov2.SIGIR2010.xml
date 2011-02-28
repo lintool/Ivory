@@ -4,10 +4,10 @@
 
      <!-- Concept importance model definition -->
      <importancemodel id="wsd" type="ivory.smrf.model.importance.LinearImportanceModel">
-         <feature id="collection_freq" weight="0.1862" file="docs/data/gov2/stats.gov2.cf.collection.txt.norm" default="0.0"/>
-         <feature id="document_freq" weight="0.7137" file="docs/data/gov2/stats.gov2.df.collection.txt.norm" default="0.01354153" />
-         <feature id="clue_cf" weight="0" file="docs/data/gov2/stats.gov2.cf.clue.txt.norm" default="0.0"/>
-         <feature id="enwiki_cf" weight="0.1" file="docs/data/gov2/stats.gov2.cf.enwiki.txt.norm" default="0.0"/>
+         <feature id="collection_freq" weight="0.1862" file="data/gov2/stats.gov2.cf.collection.txt.norm" default="0.0"/>
+         <feature id="document_freq" weight="0.7137" file="data/gov2/stats.gov2.df.collection.txt.norm" default="0.01354153" />
+         <feature id="clue_cf" weight="0" file="data/gov2/stats.gov2.cf.clue.txt.norm" default="0.0"/>
+         <feature id="enwiki_cf" weight="0.1" file="data/gov2/stats.gov2.cf.enwiki.txt.norm" default="0.0"/>
      </importancemodel>
 
      <!-- Dirichlet, full independence -->

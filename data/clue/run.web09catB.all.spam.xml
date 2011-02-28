@@ -38,9 +38,9 @@
      </model>
 
      <importancemodel id="ql-importance" type="ivory.smrf.model.importance.LinearImportanceModel">
-         <feature id="collection_freq" weight="0.05094905094905" file="docs/data/clue/stats.clue.cf.collection.txt.norm" default="0.0"/>
-         <feature id="document_freq" weight="0.947984616861826" file="docs/data/clue/stats.clue.df.collection.txt.norm" default="0.01408541"/>
-         <feature id="enwiki_cf" weight="0.0010663321891229" file="docs/data/clue/stats.clue.cf.enwiki.txt.norm" default="0.0"/>
+         <feature id="collection_freq" weight="0.05094905094905" file="data/clue/stats.clue.cf.collection.txt.norm" default="0.0"/>
+         <feature id="document_freq" weight="0.947984616861826" file="data/clue/stats.clue.df.collection.txt.norm" default="0.01408541"/>
+         <feature id="enwiki_cf" weight="0.0010663321891229" file="data/clue/stats.clue.cf.enwiki.txt.norm" default="0.0"/>
      </importancemodel>
 	 
      <model id="ql-wsd" type="Feature" output="ranking.web09catB.spam.ql.wsd.txt" hits="1000" normalizeImportance="true">
@@ -100,9 +100,9 @@
      </model>
 
      <importancemodel id="bm25-importance" type="ivory.smrf.model.importance.LinearImportanceModel">
-          <feature id="collection_freq" weight="0.79129799252949" file="docs/data/clue/stats.clue.cf.collection.txt.norm" default="0.0"/>
-          <feature id="document_freq" weight="0.10780290657140" file="docs/data/clue/stats.clue.df.collection.txt.norm" default="0.01408541"/>
-          <feature id="enwiki_cf" weight="0.10089910089910" file="docs/data/clue/stats.clue.cf.enwiki.txt.norm" default="0.0"/>
+          <feature id="collection_freq" weight="0.79129799252949" file="data/clue/stats.clue.cf.collection.txt.norm" default="0.0"/>
+          <feature id="document_freq" weight="0.10780290657140" file="data/clue/stats.clue.df.collection.txt.norm" default="0.01408541"/>
+          <feature id="enwiki_cf" weight="0.10089910089910" file="data/clue/stats.clue.cf.enwiki.txt.norm" default="0.0"/>
      </importancemodel>
 
      <model id="bm25-wsd" type="Feature" output="ranking.web09catB.spam.bm25.wsd.txt" hits="1000" normalizeImportance="true">

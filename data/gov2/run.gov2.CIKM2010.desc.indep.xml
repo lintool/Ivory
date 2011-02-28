@@ -6,13 +6,13 @@
 
      <!-- Concept importance model definition -->
      <importancemodel id="wsd" type="ivory.smrf.model.importance.LinearImportanceModel">
-         <feature id="collection_freq" weight="0.00207788781666549" file="docs/data/gov2/stats.gov2.cf.collection.desc.txt.norm" default="0.0"/>
-         <feature id="document_freq" weight="0.298019801980198" file="docs/data/gov2/stats.gov2.df.collection.desc.txt.norm" default="0.01354153"/>
-         <feature id="clue_cf" weight="0.00103937453131141" file="docs/data/gov2/stats.gov2.cf.clue.desc.txt.norm" default="0.0"/>
-         <feature id="enwiki_cf" weight="0.698862935671825" file="docs/data/gov2/stats.gov2.cf.enwiki.desc.txt.norm" default="0.0"/>
+         <feature id="collection_freq" weight="0.00207788781666549" file="data/gov2/stats.gov2.cf.collection.desc.txt.norm" default="0.0"/>
+         <feature id="document_freq" weight="0.298019801980198" file="data/gov2/stats.gov2.df.collection.desc.txt.norm" default="0.01354153"/>
+         <feature id="clue_cf" weight="0.00103937453131141" file="data/gov2/stats.gov2.cf.clue.desc.txt.norm" default="0.0"/>
+         <feature id="enwiki_cf" weight="0.698862935671825" file="data/gov2/stats.gov2.cf.enwiki.desc.txt.norm" default="0.0"/>
      </importancemodel>
 
-     <model id="indep-x1.0" type="GreedyConstrained" style="Indep" output="ranking.cikm2010-gov2-desc-indep-x1.0.txt" hits="1000" qlMultiple="1" unigramAddThreshold="0" unigramRedundThreshold="0" bigramAddThreshold="0" bigramRedundThreshold="0" file="docs/data/gov2/stats.gov2.df.collection.desc.txt">
+     <model id="indep-x1.0" type="GreedyConstrained" style="Indep" output="ranking.cikm2010-gov2-desc-indep-x1.0.txt" hits="1000" qlMultiple="1" unigramAddThreshold="0" unigramRedundThreshold="0" bigramAddThreshold="0" bigramRedundThreshold="0" file="data/gov2/stats.gov2.df.collection.desc.txt">
        
        <constrainedmodel id="wsd" type="Feature" hits="1000">
 
@@ -41,7 +41,7 @@
     </model>
 
 
-     <model id="indep-x1.5" type="GreedyConstrained" style="Indep" output="ranking.cikm2010-gov2-desc-indep-x1.5.txt" hits="1000" qlMultiple="1.5" unigramAddThreshold="0" unigramRedundThreshold="0" bigramAddThreshold="0" bigramRedundThreshold="0" file="docs/data/gov2/stats.gov2.df.collection.desc.txt">
+     <model id="indep-x1.5" type="GreedyConstrained" style="Indep" output="ranking.cikm2010-gov2-desc-indep-x1.5.txt" hits="1000" qlMultiple="1.5" unigramAddThreshold="0" unigramRedundThreshold="0" bigramAddThreshold="0" bigramRedundThreshold="0" file="data/gov2/stats.gov2.df.collection.desc.txt">
        
        <constrainedmodel id="wsd" type="Feature" hits="1000">
 
@@ -69,7 +69,7 @@
 
     </model>
 
-     <model id="indep-x2.0" type="GreedyConstrained" style="Indep" output="ranking.cikm2010-gov2-desc-indep-x2.0.txt" hits="1000" qlMultiple="2.0" unigramAddThreshold="0" unigramRedundThreshold="0" bigramAddThreshold="0" bigramRedundThreshold="0" file="docs/data/gov2/stats.gov2.df.collection.desc.txt">
+     <model id="indep-x2.0" type="GreedyConstrained" style="Indep" output="ranking.cikm2010-gov2-desc-indep-x2.0.txt" hits="1000" qlMultiple="2.0" unigramAddThreshold="0" unigramRedundThreshold="0" bigramAddThreshold="0" bigramRedundThreshold="0" file="data/gov2/stats.gov2.df.collection.desc.txt">
        
        <constrainedmodel id="wsd" type="Feature" hits="1000">
 
@@ -97,7 +97,7 @@
 
     </model>
 
-     <model id="indep-x2.5" type="GreedyConstrained" style="Indep" output="ranking.cikm2010-gov2-desc-indep-x2.5.txt" hits="1000" qlMultiple="2.5" unigramAddThreshold="0" unigramRedundThreshold="0" bigramAddThreshold="0" bigramRedundThreshold="0" file="docs/data/gov2/stats.gov2.df.collection.desc.txt">
+     <model id="indep-x2.5" type="GreedyConstrained" style="Indep" output="ranking.cikm2010-gov2-desc-indep-x2.5.txt" hits="1000" qlMultiple="2.5" unigramAddThreshold="0" unigramRedundThreshold="0" bigramAddThreshold="0" bigramRedundThreshold="0" file="data/gov2/stats.gov2.df.collection.desc.txt">
        
        <constrainedmodel id="wsd" type="Feature" hits="1000">
 
@@ -125,7 +125,7 @@
 
     </model>
 
-     <model id="indep-x3.0" type="GreedyConstrained" style="Indep" output="ranking.cikm2010-gov2-desc-indep-x3.0.txt" hits="1000" qlMultiple="3.0" unigramAddThreshold="0" unigramRedundThreshold="0" bigramAddThreshold="0" bigramRedundThreshold="0" file="docs/data/gov2/stats.gov2.df.collection.desc.txt">
+     <model id="indep-x3.0" type="GreedyConstrained" style="Indep" output="ranking.cikm2010-gov2-desc-indep-x3.0.txt" hits="1000" qlMultiple="3.0" unigramAddThreshold="0" unigramRedundThreshold="0" bigramAddThreshold="0" bigramRedundThreshold="0" file="data/gov2/stats.gov2.df.collection.desc.txt">
        
        <constrainedmodel id="wsd" type="Feature" hits="1000">
 
@@ -153,7 +153,7 @@
 
     </model>
 
-     <model id="indep-x3.5" type="GreedyConstrained" style="Indep" output="ranking.cikm2010-gov2-desc-indep-x3.5.txt" hits="1000" qlMultiple="3.5" unigramAddThreshold="0" unigramRedundThreshold="0" bigramAddThreshold="0" bigramRedundThreshold="0" file="docs/data/gov2/stats.gov2.df.collection.desc.txt">
+     <model id="indep-x3.5" type="GreedyConstrained" style="Indep" output="ranking.cikm2010-gov2-desc-indep-x3.5.txt" hits="1000" qlMultiple="3.5" unigramAddThreshold="0" unigramRedundThreshold="0" bigramAddThreshold="0" bigramRedundThreshold="0" file="data/gov2/stats.gov2.df.collection.desc.txt">
        
        <constrainedmodel id="wsd" type="Feature" hits="1000">
 
@@ -181,7 +181,7 @@
 
     </model>
 
-     <model id="indep-x4.0" type="GreedyConstrained" style="Indep" output="ranking.cikm2010-gov2-desc-indep-x4.0.txt" hits="1000" qlMultiple="4.0" unigramAddThreshold="0" unigramRedundThreshold="0" bigramAddThreshold="0" bigramRedundThreshold="0" file="docs/data/gov2/stats.gov2.df.collection.desc.txt">
+     <model id="indep-x4.0" type="GreedyConstrained" style="Indep" output="ranking.cikm2010-gov2-desc-indep-x4.0.txt" hits="1000" qlMultiple="4.0" unigramAddThreshold="0" unigramRedundThreshold="0" bigramAddThreshold="0" bigramRedundThreshold="0" file="data/gov2/stats.gov2.df.collection.desc.txt">
        
        <constrainedmodel id="wsd" type="Feature" hits="1000">
 
@@ -209,7 +209,7 @@
 
     </model>
 
-     <model id="indep-x4.5" type="GreedyConstrained" style="Indep" output="ranking.cikm2010-gov2-desc-indep-x4.5.txt" hits="1000" qlMultiple="4.5" unigramAddThreshold="0" unigramRedundThreshold="0" bigramAddThreshold="0" bigramRedundThreshold="0" file="docs/data/gov2/stats.gov2.df.collection.desc.txt">
+     <model id="indep-x4.5" type="GreedyConstrained" style="Indep" output="ranking.cikm2010-gov2-desc-indep-x4.5.txt" hits="1000" qlMultiple="4.5" unigramAddThreshold="0" unigramRedundThreshold="0" bigramAddThreshold="0" bigramRedundThreshold="0" file="data/gov2/stats.gov2.df.collection.desc.txt">
        
        <constrainedmodel id="wsd" type="Feature" hits="1000">
 
@@ -237,8 +237,7 @@
 
     </model>
 
-     <model id="indep-x5.0" type="GreedyConstrained" style="Indep" output="ranking.cikm2010-gov2-desc-indep-x5.0.txt" hits="1000" qlMultiple="5.0" unigramAddThreshold="0" unigramRedundThreshold="0" bigramAddThreshold="0" bigramRedundThreshold="0" file="docs/data/gov2/stats.gov2.df.collection.desc.txt">
-
+     <model id="indep-x5.0" type="GreedyConstrained" style="Indep" output="ranking.cikm2010-gov2-desc-indep-x5.0.txt" hits="1000" qlMultiple="5.0" unigramAddThreshold="0" unigramRedundThreshold="0" bigramAddThreshold="0" bigramRedundThreshold="0" file="data/gov2/stats.gov2.df.collection.desc.txt">
        
        <constrainedmodel id="wsd" type="Feature" hits="1000">
 
