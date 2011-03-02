@@ -25,7 +25,6 @@ import com.google.common.base.Preconditions;
  * @author Don Metzler
  */
 public class Accumulator implements Comparable<Accumulator>, Serializable {
-
 	private static final long serialVersionUID = -2003009119471096383L;
 
 	public int docno = 0;

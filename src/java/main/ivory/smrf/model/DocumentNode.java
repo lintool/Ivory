@@ -46,6 +46,6 @@ public class DocumentNode extends GraphNode {
 
 	@Override
 	public String toString() {
-		return new StringBuilder("<node type=\"Document\" docid=\"").append(docno).append("\" />\n").toString();
+	  return String.format("<node type=\"Document\" docno=\"%d\" />\n", docno);
 	}
 }

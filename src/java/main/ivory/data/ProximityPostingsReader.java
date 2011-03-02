@@ -1,11 +1,11 @@
 /*
  * Ivory: A Hadoop toolkit for Web-scale information retrieval
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You may
  * obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0 
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,47 +16,38 @@
 
 package ivory.data;
 
-import ivory.index.TermPositions;
+import com.google.common.base.Preconditions;
 
-import java.util.Arrays;
+import ivory.index.TermPositions;
 
 /**
  * @author Don Metzler
  * 
  */
 public abstract class ProximityPostingsReader implements PostingsReader {
+  // Readers for terms that make up ordered window.
+	protected final PostingsReader[] readers;
 
-	
-
-	/**
-	 * readers for terms that make up ordered window
-	 */
-	protected PostingsReader[] mReaders = null;
-
-	//protected int [] newPositions = new int[BUFFER_SIZE];
-	//protected int [] newIds = new int[BUFFER_SIZE];
-
-	/**
-	 * size of ordered window
-	 */
-	protected int mSize;
+	// Size of ordered window.
+	protected final int size;
 
 	public ProximityPostingsReader(PostingsReader[] readers, int size) {
-		mReaders = readers;
-		mSize = size;
+	  Preconditions.checkArgument(size > 0);
+		this.readers = Preconditions.checkNotNull(readers);
+		this.size = size;
 	}
 
 	/**
-	 * @return true if current reader configuration represents a match
+	 * Returns <code>true</code> if current reader configuration represents a match.
 	 */
 	private boolean isMatching() {
 		int target = -1;
-		for (PostingsReader reader : mReaders) {
+		for (PostingsReader reader : readers) {
 			if (target == -1) {
 				target = reader.getDocno();
 			}
 
-			// did we match our target docid?
+			// Did we match our target docid?
 			if (reader.getDocno() != target) {
 				return false;
 			}
@@ -64,57 +55,6 @@ public abstract class ProximityPostingsReader implements PostingsReader {
 
 		return true;
 	}
-
-	abstract protected short countMatches();
-	/*{
-		int matches = 0;
-
-		// merge all position lists into single stream
-		int[] positions = mReaders[0].getPositions();
-		int[] ids = new int[positions.length];
-		Arrays.fill(ids, 0);
-		int length = positions.length;
-
-		for (int id = 1; id < mReaders.length; id++) {
-			int [] p = mReaders[id].getPositions();
-
-			if(length + p.length > newPositions.length) {
-				newPositions = new int[length + p.length];
-				newIds = new int[length + p.length];
-			}
-
-			int posA = 0;
-			int posB = 0;
-			int i = 0;
-			while(i < length + p.length) {
-				if(posB == p.length || (posA < length && positions[posA] <= p[posB])) {
-					newPositions[i] = positions[posA];
-					newIds[i] = ids[posA];
-					posA++;
-				}
-				else {
-					newPositions[i] = p[posB];
-					newIds[i] = id;
-					posB++;
-				}
-				i++;
-			}
-
-			length += p.length;
-			positions = Arrays.copyOf(newPositions, length);
-			ids = Arrays.copyOf(newIds, length);
-		}
-
-		// count matches
-		matches = countMatches(positions, ids);
-
-		// truncate tf to Short.MAX_VALUE
-		if (matches > Short.MAX_VALUE) {
-			matches = Short.MAX_VALUE;
-		}
-
-		return (short) matches;
-	}*/
 
 	public int[] getPositions() {
 		throw new UnsupportedOperationException();
@@ -129,7 +69,7 @@ public abstract class ProximityPostingsReader implements PostingsReader {
 	}
 	
 	public boolean hasMorePostings() {
-		for (PostingsReader reader : mReaders) {
+		for (PostingsReader reader : readers) {
 			if (!reader.hasMorePostings()) {
 				return false;
 			}
@@ -138,17 +78,11 @@ public abstract class ProximityPostingsReader implements PostingsReader {
 	}
 
 	public boolean nextPosting(Posting posting) {
-		// advance the reader at the minimum docno
+		// Advance the reader at the minimum docno.
 		PostingsReader minReader = null;
 		PostingsReader maxReader = null;
-		for (PostingsReader reader : mReaders) {
+		for (PostingsReader reader : readers) {
 			int docno = reader.getDocno();
-			//-------
-			/*if(docno<=0){
-				reader.nextPosting(posting);
-				docno = reader.getDocno();	
-			}*/
-			//-------
 			if (minReader == null || docno < minReader.getDocno()) {
 				minReader = reader;
 			}
@@ -184,7 +118,7 @@ public abstract class ProximityPostingsReader implements PostingsReader {
 
 	public int getDocno() {
 		int maxDocno = Integer.MIN_VALUE;
-		for (PostingsReader reader : mReaders) {
+		for (PostingsReader reader : readers) {
 			int docno = reader.getDocno();
 			if (docno > maxDocno) {
 				maxDocno = docno;
@@ -202,9 +136,9 @@ public abstract class ProximityPostingsReader implements PostingsReader {
 	}
 
 	public void reset() {
-		for (PostingsReader reader : mReaders) {
-			reader.reset();
-		}
+    for (PostingsReader reader : readers) {
+      reader.reset();
+    }
 	}
 
 	public int getNumberOfPostings() {
@@ -215,5 +149,6 @@ public abstract class ProximityPostingsReader implements PostingsReader {
 		throw new UnsupportedOperationException();
 	}
 
+	abstract protected short countMatches();
 	protected abstract int countMatches(int[] positions, int[] ids);
 }

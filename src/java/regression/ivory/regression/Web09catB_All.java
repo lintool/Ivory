@@ -44,9 +44,11 @@ public class Web09catB_All {
 		g.put("bm25-sd", new GroundTruth("bm25-sd", Metric.AP, 50, bm25_sd_rawAP, 0.2188f));
 		g.put("bm25-wsd", new GroundTruth("bm25-wsd", Metric.AP, 50, bm25_wsd_rawAP, 0.2207f));
 
-		Qrels qrels = new Qrels("docs/data/clue/qrels.web09catB.txt");
+		Qrels qrels = new Qrels("data/clue/qrels.web09catB.txt");
 
-		String[] params = new String[] { "docs/data/clue/run.web09catB.all.xml", "docs/data/clue/queries.web09.xml" };
+    String[] params = new String[] {
+            "data/clue/run.web09catB.all.xml",
+            "data/clue/queries.web09.xml" };
 
 		FileSystem fs = FileSystem.getLocal(new Configuration());
 

@@ -21,17 +21,17 @@ import ivory.util.RetrievalEnvironment;
 import java.io.IOException;
 import java.util.NoSuchElementException;
 
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.WritableUtils;
-import org.apache.hadoop.conf.Configuration;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
-import edu.umd.cloud9.io.PairOfIntLong;
-import edu.umd.cloud9.util.HMapKI;
-import edu.umd.cloud9.util.HMapKL;
+import edu.umd.cloud9.io.pair.PairOfIntLong;
+import edu.umd.cloud9.util.map.HMapKI;
+import edu.umd.cloud9.util.map.HMapKL;
 
 public class PrefixEncodedGlobalStatsWithIndex {
 

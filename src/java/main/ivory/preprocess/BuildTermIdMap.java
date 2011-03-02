@@ -44,7 +44,7 @@ import org.apache.hadoop.mapred.SequenceFileOutputFormat;
 import org.apache.hadoop.mapred.lib.IdentityMapper;
 import org.apache.log4j.Logger;
 
-import edu.umd.cloud9.io.PairOfIntLong;
+import edu.umd.cloud9.io.pair.PairOfIntLong;
 import edu.umd.cloud9.util.PowerTool;
 
 @SuppressWarnings("deprecation")

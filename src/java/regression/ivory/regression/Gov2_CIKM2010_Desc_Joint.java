@@ -190,10 +190,11 @@ public class Gov2_CIKM2010_Desc_Joint {
 		g.put("joint-x4.5", new GroundTruth("joint-x4.5", Metric.AP, 75, x45_rawAP, 0.3302f));
 		g.put("joint-x5.0", new GroundTruth("joint-x5.0", Metric.AP, 75, x50_rawAP, 0.3294f));
 
-		Qrels qrels = new Qrels("docs/data/gov2/qrels.gov2.all");
+		Qrels qrels = new Qrels("data/gov2/qrels.gov2.all");
 
-		String[] params = new String[] { "docs/data/gov2/run.gov2.CIKM2010.desc.joint.xml",
-				"docs/data/gov2/gov2.desc.776-850" };
+    String[] params = new String[] {
+            "data/gov2/run.gov2.CIKM2010.desc.joint.xml",
+            "data/gov2/gov2.desc.776-850" };
 
 		FileSystem fs = FileSystem.getLocal(new Configuration());
 

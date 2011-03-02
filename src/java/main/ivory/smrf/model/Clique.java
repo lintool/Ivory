@@ -75,7 +75,7 @@ public class Clique {
 	 */
 	public void initialize(GlobalEvidence globalEvidence) throws ConfigurationException {
 		Preconditions.checkNotNull(globalEvidence);
-		potential.initialize(nodes, globalEvidence);
+		this.potential.initialize(nodes, globalEvidence);
 	}
 
 	/**
@@ -103,15 +103,15 @@ public class Clique {
 	 * Sets the parameter name.
 	 */
 	public void setParameterName(String name) {
-		param.setName(name);
+		this.param.setName(name);
 	}
 
 	/**
 	 * Sets the parameter weight.
 	 */
 	public void setParameterWeight(float weight) {
-		param.setWeight(weight);
-		combinedWeight = weight * importance;
+		this.param.setWeight(weight);
+		this.combinedWeight = weight * importance;
 	}
 
 	/**
@@ -132,8 +132,8 @@ public class Clique {
 	 * Sets the clique-dependent importance.
 	 */
 	public void setImportance(float w) {
-		importance = w;
-		combinedWeight = param.getWeight() * w;
+		this.importance = w;
+		this.combinedWeight = param.getWeight() * w;
 	}
 
 	/**
@@ -175,28 +175,27 @@ public class Clique {
 	 * Returns the next candidate document.
 	 */
 	public int getNextCandidate() {
-		return potential.getNextCandidate();
+		return this.potential.getNextCandidate();
 	}
 
 	/**
 	 * Returns the max score.
 	 */
 	public float getMaxScore() {
-		if(combinedWeight == 0.0) {
-			return 0.0f;
-		} else if(combinedWeight < 0.0) {
-			return combinedWeight * potential.getMinScore();
-		}
-		else {
-			return combinedWeight * potential.getMaxScore();			
-		}
+    if (combinedWeight == 0.0) {
+      return 0.0f;
+    } else if (combinedWeight < 0.0) {
+      return combinedWeight * potential.getMinScore();
+    } else {
+      return combinedWeight * potential.getMaxScore();
+    }
 	}
 
 	/**
 	 * Sets the next candidate for evaluation.
 	 */
 	public void setNextCandidate(int docid) {
-		potential.setNextCandidate(docid);
+		this.potential.setNextCandidate(docid);
 	}
 
 	@Override

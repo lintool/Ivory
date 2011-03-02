@@ -2,277 +2,273 @@
 
      <!-- Note: query-independent features are ordered by their contributions to effectiveness for Joint model -->
 
-     <index>/fs/clip-clueweb/indexes/gov2</index>
+     <index>/fs/clip-clueweb/indexes/clue.en.01</index>
 
-     <!-- Concept importance model definition -->
      <importancemodel id="wsd" type="ivory.smrf.model.importance.LinearImportanceModel">
-         <feature id="collection_freq" weight="0.00207788781666549" file="docs/data/gov2/stats.gov2.cf.collection.desc.txt.norm" default="0.0"/>
-         <feature id="document_freq" weight="0.298019801980198" file="docs/data/gov2/stats.gov2.df.collection.desc.txt.norm" default="0.01354153"/>
-         <feature id="clue_cf" weight="0.00103937453131141" file="docs/data/gov2/stats.gov2.cf.clue.desc.txt.norm" default="0.0"/>
-         <feature id="enwiki_cf" weight="0.698862935671825" file="docs/data/gov2/stats.gov2.cf.enwiki.desc.txt.norm" default="0.0"/>
+         <feature id="collection_freq" weight="0.401232569862391" file="data/clue/stats.clue.cf.collection.txt.norm" default="0.0"/>
+         <feature id="document_freq" weight="0.399757529147509" file="data/clue/stats.clue.df.collection.txt.norm" default="0.01408541"/>
+         <feature id="enwiki_cf" weight="0.199009900990099" file="data/clue/stats.clue.cf.enwiki.txt.norm" default="0.0"/>
      </importancemodel>
 
-     <model id="joint-x1.0" type="GreedyConstrained" style="Joint" output="ranking.cikm2010-gov2-desc-joint-x1.0.txt" hits="1000" qlMultiple="1" unigramAddThreshold="0" unigramRedundThreshold="0.02" bigramAddThreshold="0" bigramRedundThreshold="0.0025" beta="0" file="docs/data/gov2/stats.gov2.df.collection.desc.txt" >
+     <model id="joint-x1.0" type="GreedyConstrained" style="Joint" output="ranking.cikm2010-clue-title-joint-x1.0.txt" hits="1000" qlMultiple="1" unigramAddThreshold="0" unigramRedundThreshold="0.04" bigramAddThreshold="0" bigramRedundThreshold="0" beta="100" file="data/clue/stats.clue.df.collection.txt" >
 
        <constrainedmodel id="wsd" type="Feature" hits="1000">
 
-         <feature id="termWt" importance="wsd"
-                  cliqueSet="ivory.smrf.model.builder.TermCliqueSet"
-                  potential="ivory.smrf.model.potential.QueryPotential"
-                  generator="ivory.smrf.model.builder.TermExpressionGenerator"
-                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1000.0" />
-         <feature id="term" importance="wsd"
+	 <feature id="term" importance="wsd"
                   cliqueSet="ivory.smrf.model.builder.TermCliqueSet"
                   potential="ivory.smrf.model.potential.QueryPotential"
                   generator="ivory.smrf.model.builder.TermExpressionGenerator"
                   scoreFunction="ivory.smrf.model.score.BM25ScoringFunction" k1="0.5" b="0.3" />
-         <feature id="orderedWt" importance="wsd"
+	 <feature id="orderedWt" importance="wsd"
                   cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
                   potential="ivory.smrf.model.potential.QueryPotential"
                   generator="ivory.smrf.model.builder.OrderedWindowExpressionGenerator" width="4"
-                  scoreFunction="ivory.smrf.model.score.BM25ScoringFunction" k1="0.25" b="0.0" />
+                  scoreFunction="ivory.smrf.model.score.BM25ScoringFunction" k1="0.25" b="0.0" />         
+         <feature id="termWt" importance="wsd"
+                  cliqueSet="ivory.smrf.model.builder.TermCliqueSet"   
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.TermExpressionGenerator"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1000.0" />
          <feature id="orderedWt" importance="wsd"
                   cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
                   potential="ivory.smrf.model.potential.QueryPotential"
                   generator="ivory.smrf.model.builder.OrderedWindowExpressionGenerator" width="1"
                   scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1000.0" />
-   
+
        </constrainedmodel>
-     
-     </model>
 
+     </model>     
 
-     <model id="joint-x1.5" type="GreedyConstrained" style="Joint" output="ranking.cikm2010-gov2-desc-joint-x1.5.txt" hits="1000" qlMultiple="1.5" unigramAddThreshold="0" unigramRedundThreshold="0.02" bigramAddThreshold="0" bigramRedundThreshold="0.0025" beta="0" file="docs/data/gov2/stats.gov2.df.collection.desc.txt" >
-
+     <model id="joint-x1.5" type="GreedyConstrained" style="Joint" output="ranking.cikm2010-clue-title-joint-x1.5.txt" hits="1000" qlMultiple="1.5" unigramAddThreshold="0" unigramRedundThreshold="0.04" bigramAddThreshold="0" bigramRedundThreshold="0" beta="100" file="data/clue/stats.clue.df.collection.txt" >
+         
        <constrainedmodel id="wsd" type="Feature" hits="1000">
 
-         <feature id="termWt" importance="wsd"
-                  cliqueSet="ivory.smrf.model.builder.TermCliqueSet"
-                  potential="ivory.smrf.model.potential.QueryPotential"
-                  generator="ivory.smrf.model.builder.TermExpressionGenerator"
-                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1000.0" />
-         <feature id="term" importance="wsd"
+	 <feature id="term" importance="wsd"
                   cliqueSet="ivory.smrf.model.builder.TermCliqueSet"
                   potential="ivory.smrf.model.potential.QueryPotential"
                   generator="ivory.smrf.model.builder.TermExpressionGenerator"
                   scoreFunction="ivory.smrf.model.score.BM25ScoringFunction" k1="0.5" b="0.3" />
-         <feature id="orderedWt" importance="wsd"
+	 <feature id="orderedWt" importance="wsd"
                   cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
                   potential="ivory.smrf.model.potential.QueryPotential"
                   generator="ivory.smrf.model.builder.OrderedWindowExpressionGenerator" width="4"
-                  scoreFunction="ivory.smrf.model.score.BM25ScoringFunction" k1="0.25" b="0.0" />
+                  scoreFunction="ivory.smrf.model.score.BM25ScoringFunction" k1="0.25" b="0.0" />         
+         <feature id="termWt" importance="wsd"
+                  cliqueSet="ivory.smrf.model.builder.TermCliqueSet"   
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.TermExpressionGenerator"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1000.0" />
          <feature id="orderedWt" importance="wsd"
                   cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
                   potential="ivory.smrf.model.potential.QueryPotential"
                   generator="ivory.smrf.model.builder.OrderedWindowExpressionGenerator" width="1"
                   scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1000.0" />
-   
+
        </constrainedmodel>
-     
-     </model>
 
-     <model id="joint-x2.0" type="GreedyConstrained" style="Joint" output="ranking.cikm2010-gov2-desc-joint-x2.0.txt" hits="1000" qlMultiple="2.0" unigramAddThreshold="0" unigramRedundThreshold="0.02" bigramAddThreshold="0" bigramRedundThreshold="0.0025" beta="0" file="docs/data/gov2/stats.gov2.df.collection.desc.txt" >
+     </model>     
 
+     <model id="joint-x2.0" type="GreedyConstrained" style="Joint" output="ranking.cikm2010-clue-title-joint-x2.0.txt" hits="1000" qlMultiple="2" unigramAddThreshold="0" unigramRedundThreshold="0.04" bigramAddThreshold="0" bigramRedundThreshold="0" beta="100" file="data/clue/stats.clue.df.collection.txt" >
+         
        <constrainedmodel id="wsd" type="Feature" hits="1000">
 
-         <feature id="termWt" importance="wsd"
-                  cliqueSet="ivory.smrf.model.builder.TermCliqueSet"
-                  potential="ivory.smrf.model.potential.QueryPotential"
-                  generator="ivory.smrf.model.builder.TermExpressionGenerator"
-                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1000.0" />
-         <feature id="term" importance="wsd"
+	 <feature id="term" importance="wsd"
                   cliqueSet="ivory.smrf.model.builder.TermCliqueSet"
                   potential="ivory.smrf.model.potential.QueryPotential"
                   generator="ivory.smrf.model.builder.TermExpressionGenerator"
                   scoreFunction="ivory.smrf.model.score.BM25ScoringFunction" k1="0.5" b="0.3" />
-         <feature id="orderedWt" importance="wsd"
+	 <feature id="orderedWt" importance="wsd"
                   cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
                   potential="ivory.smrf.model.potential.QueryPotential"
                   generator="ivory.smrf.model.builder.OrderedWindowExpressionGenerator" width="4"
-                  scoreFunction="ivory.smrf.model.score.BM25ScoringFunction" k1="0.25" b="0.0" />
+                  scoreFunction="ivory.smrf.model.score.BM25ScoringFunction" k1="0.25" b="0.0" />         
+         <feature id="termWt" importance="wsd"
+                  cliqueSet="ivory.smrf.model.builder.TermCliqueSet"   
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.TermExpressionGenerator"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1000.0" />
          <feature id="orderedWt" importance="wsd"
                   cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
                   potential="ivory.smrf.model.potential.QueryPotential"
                   generator="ivory.smrf.model.builder.OrderedWindowExpressionGenerator" width="1"
                   scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1000.0" />
-   
+
        </constrainedmodel>
-     
-     </model>
 
-     <model id="joint-x2.5" type="GreedyConstrained" style="Joint" output="ranking.cikm2010-gov2-desc-joint-x2.5.txt" hits="1000" qlMultiple="2.5" unigramAddThreshold="0" unigramRedundThreshold="0.02" bigramAddThreshold="0" bigramRedundThreshold="0.0025" beta="0" file="docs/data/gov2/stats.gov2.df.collection.desc.txt" >
+     </model>     
 
+     <model id="joint-x2.5" type="GreedyConstrained" style="Joint" output="ranking.cikm2010-clue-title-joint-x2.5.txt" hits="1000" qlMultiple="2.5" unigramAddThreshold="0" unigramRedundThreshold="0.04" bigramAddThreshold="0" bigramRedundThreshold="0" beta="100" file="data/clue/stats.clue.df.collection.txt" >
+         
        <constrainedmodel id="wsd" type="Feature" hits="1000">
 
-         <feature id="termWt" importance="wsd"
-                  cliqueSet="ivory.smrf.model.builder.TermCliqueSet"
-                  potential="ivory.smrf.model.potential.QueryPotential"
-                  generator="ivory.smrf.model.builder.TermExpressionGenerator"
-                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1000.0" />
-         <feature id="term" importance="wsd"
+	 <feature id="term" importance="wsd"
                   cliqueSet="ivory.smrf.model.builder.TermCliqueSet"
                   potential="ivory.smrf.model.potential.QueryPotential"
                   generator="ivory.smrf.model.builder.TermExpressionGenerator"
                   scoreFunction="ivory.smrf.model.score.BM25ScoringFunction" k1="0.5" b="0.3" />
-         <feature id="orderedWt" importance="wsd"
+	 <feature id="orderedWt" importance="wsd"
                   cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
                   potential="ivory.smrf.model.potential.QueryPotential"
                   generator="ivory.smrf.model.builder.OrderedWindowExpressionGenerator" width="4"
-                  scoreFunction="ivory.smrf.model.score.BM25ScoringFunction" k1="0.25" b="0.0" />
+                  scoreFunction="ivory.smrf.model.score.BM25ScoringFunction" k1="0.25" b="0.0" />         
+         <feature id="termWt" importance="wsd"
+                  cliqueSet="ivory.smrf.model.builder.TermCliqueSet"   
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.TermExpressionGenerator"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1000.0" />
          <feature id="orderedWt" importance="wsd"
                   cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
                   potential="ivory.smrf.model.potential.QueryPotential"
                   generator="ivory.smrf.model.builder.OrderedWindowExpressionGenerator" width="1"
                   scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1000.0" />
-   
+
        </constrainedmodel>
-     
-     </model>
 
-     <model id="joint-x3.0" type="GreedyConstrained" style="Joint" output="ranking.cikm2010-gov2-desc-joint-x3.0.txt" hits="1000" qlMultiple="3.0" unigramAddThreshold="0" unigramRedundThreshold="0.02" bigramAddThreshold="0" bigramRedundThreshold="0.0025" beta="0" file="docs/data/gov2/stats.gov2.df.collection.desc.txt" >
+     </model>     
 
+     <model id="joint-x3.0" type="GreedyConstrained" style="Joint" output="ranking.cikm2010-clue-title-joint-x3.0.txt" hits="1000" qlMultiple="3" unigramAddThreshold="0" unigramRedundThreshold="0.04" bigramAddThreshold="0" bigramRedundThreshold="0" beta="100" file="data/clue/stats.clue.df.collection.txt" >
+        
        <constrainedmodel id="wsd" type="Feature" hits="1000">
 
-         <feature id="termWt" importance="wsd"
-                  cliqueSet="ivory.smrf.model.builder.TermCliqueSet"
-                  potential="ivory.smrf.model.potential.QueryPotential"
-                  generator="ivory.smrf.model.builder.TermExpressionGenerator"
-                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1000.0" />
-         <feature id="term" importance="wsd"
+	 <feature id="term" importance="wsd"
                   cliqueSet="ivory.smrf.model.builder.TermCliqueSet"
                   potential="ivory.smrf.model.potential.QueryPotential"
                   generator="ivory.smrf.model.builder.TermExpressionGenerator"
                   scoreFunction="ivory.smrf.model.score.BM25ScoringFunction" k1="0.5" b="0.3" />
-         <feature id="orderedWt" importance="wsd"
+	 <feature id="orderedWt" importance="wsd"
                   cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
                   potential="ivory.smrf.model.potential.QueryPotential"
                   generator="ivory.smrf.model.builder.OrderedWindowExpressionGenerator" width="4"
-                  scoreFunction="ivory.smrf.model.score.BM25ScoringFunction" k1="0.25" b="0.0" />
+                  scoreFunction="ivory.smrf.model.score.BM25ScoringFunction" k1="0.25" b="0.0" />         
+         <feature id="termWt" importance="wsd"
+                  cliqueSet="ivory.smrf.model.builder.TermCliqueSet"   
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.TermExpressionGenerator"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1000.0" />
          <feature id="orderedWt" importance="wsd"
                   cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
                   potential="ivory.smrf.model.potential.QueryPotential"
                   generator="ivory.smrf.model.builder.OrderedWindowExpressionGenerator" width="1"
                   scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1000.0" />
-   
+
        </constrainedmodel>
-     
-     </model>
 
-     <model id="joint-x3.5" type="GreedyConstrained" style="Joint" output="ranking.cikm2010-gov2-desc-joint-x3.5.txt" hits="1000" qlMultiple="3.5" unigramAddThreshold="0" unigramRedundThreshold="0.02" bigramAddThreshold="0" bigramRedundThreshold="0.0025" beta="0" file="docs/data/gov2/stats.gov2.df.collection.desc.txt" >
+     </model>     
 
+     <model id="joint-x3.5" type="GreedyConstrained" style="Joint" output="ranking.cikm2010-clue-title-joint-x3.5.txt" hits="1000" qlMultiple="3.5" unigramAddThreshold="0" unigramRedundThreshold="0.04" bigramAddThreshold="0" bigramRedundThreshold="0" beta="100" file="data/clue/stats.clue.df.collection.txt" >
+         
        <constrainedmodel id="wsd" type="Feature" hits="1000">
 
-         <feature id="termWt" importance="wsd"
-                  cliqueSet="ivory.smrf.model.builder.TermCliqueSet"
-                  potential="ivory.smrf.model.potential.QueryPotential"
-                  generator="ivory.smrf.model.builder.TermExpressionGenerator"
-                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1000.0" />
-         <feature id="term" importance="wsd"
+	 <feature id="term" importance="wsd"
                   cliqueSet="ivory.smrf.model.builder.TermCliqueSet"
                   potential="ivory.smrf.model.potential.QueryPotential"
                   generator="ivory.smrf.model.builder.TermExpressionGenerator"
                   scoreFunction="ivory.smrf.model.score.BM25ScoringFunction" k1="0.5" b="0.3" />
-         <feature id="orderedWt" importance="wsd"
+	 <feature id="orderedWt" importance="wsd"
                   cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
                   potential="ivory.smrf.model.potential.QueryPotential"
                   generator="ivory.smrf.model.builder.OrderedWindowExpressionGenerator" width="4"
-                  scoreFunction="ivory.smrf.model.score.BM25ScoringFunction" k1="0.25" b="0.0" />
+                  scoreFunction="ivory.smrf.model.score.BM25ScoringFunction" k1="0.25" b="0.0" />         
+         <feature id="termWt" importance="wsd"
+                  cliqueSet="ivory.smrf.model.builder.TermCliqueSet"   
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.TermExpressionGenerator"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1000.0" />
          <feature id="orderedWt" importance="wsd"
                   cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
                   potential="ivory.smrf.model.potential.QueryPotential"
                   generator="ivory.smrf.model.builder.OrderedWindowExpressionGenerator" width="1"
                   scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1000.0" />
-   
+
        </constrainedmodel>
-     
-     </model>
 
-     <model id="joint-x4.0" type="GreedyConstrained" style="Joint" output="ranking.cikm2010-gov2-desc-joint-x4.0.txt" hits="1000" qlMultiple="4.0" unigramAddThreshold="0" unigramRedundThreshold="0.02" bigramAddThreshold="0" bigramRedundThreshold="0.0025" beta="0" file="docs/data/gov2/stats.gov2.df.collection.desc.txt" >
+     </model>     
 
+     <model id="joint-x4.0" type="GreedyConstrained" style="Joint" output="ranking.cikm2010-clue-title-joint-x4.0.txt" hits="1000" qlMultiple="4" unigramAddThreshold="0" unigramRedundThreshold="0.04" bigramAddThreshold="0" bigramRedundThreshold="0" beta="100" file="data/clue/stats.clue.df.collection.txt" >
+         
        <constrainedmodel id="wsd" type="Feature" hits="1000">
 
-         <feature id="termWt" importance="wsd"
-                  cliqueSet="ivory.smrf.model.builder.TermCliqueSet"
-                  potential="ivory.smrf.model.potential.QueryPotential"
-                  generator="ivory.smrf.model.builder.TermExpressionGenerator"
-                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1000.0" />
-         <feature id="term" importance="wsd"
+	 <feature id="term" importance="wsd"
                   cliqueSet="ivory.smrf.model.builder.TermCliqueSet"
                   potential="ivory.smrf.model.potential.QueryPotential"
                   generator="ivory.smrf.model.builder.TermExpressionGenerator"
                   scoreFunction="ivory.smrf.model.score.BM25ScoringFunction" k1="0.5" b="0.3" />
-         <feature id="orderedWt" importance="wsd"
+	 <feature id="orderedWt" importance="wsd"
                   cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
                   potential="ivory.smrf.model.potential.QueryPotential"
                   generator="ivory.smrf.model.builder.OrderedWindowExpressionGenerator" width="4"
-                  scoreFunction="ivory.smrf.model.score.BM25ScoringFunction" k1="0.25" b="0.0" />
+                  scoreFunction="ivory.smrf.model.score.BM25ScoringFunction" k1="0.25" b="0.0" />         
+         <feature id="termWt" importance="wsd"
+                  cliqueSet="ivory.smrf.model.builder.TermCliqueSet"   
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.TermExpressionGenerator"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1000.0" />
          <feature id="orderedWt" importance="wsd"
                   cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
                   potential="ivory.smrf.model.potential.QueryPotential"
                   generator="ivory.smrf.model.builder.OrderedWindowExpressionGenerator" width="1"
                   scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1000.0" />
-   
+
        </constrainedmodel>
-     
-     </model>
 
-     <model id="joint-x4.5" type="GreedyConstrained" style="Joint" output="ranking.cikm2010-gov2-desc-joint-x4.5.txt" hits="1000" qlMultiple="4.5" unigramAddThreshold="0" unigramRedundThreshold="0.02" bigramAddThreshold="0" bigramRedundThreshold="0.0025" beta="0" file="docs/data/gov2/stats.gov2.df.collection.desc.txt" >
+     </model>     
 
+     <model id="joint-x4.5" type="GreedyConstrained" style="Joint" output="ranking.cikm2010-clue-title-joint-x4.5.txt" hits="1000" qlMultiple="4.5" unigramAddThreshold="0" unigramRedundThreshold="0.04" bigramAddThreshold="0" bigramRedundThreshold="0" beta="100" file="data/clue/stats.clue.df.collection.txt" >
+         
        <constrainedmodel id="wsd" type="Feature" hits="1000">
 
-         <feature id="termWt" importance="wsd"
-                  cliqueSet="ivory.smrf.model.builder.TermCliqueSet"
-                  potential="ivory.smrf.model.potential.QueryPotential"
-                  generator="ivory.smrf.model.builder.TermExpressionGenerator"
-                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1000.0" />
-         <feature id="term" importance="wsd"
+	 <feature id="term" importance="wsd"
                   cliqueSet="ivory.smrf.model.builder.TermCliqueSet"
                   potential="ivory.smrf.model.potential.QueryPotential"
                   generator="ivory.smrf.model.builder.TermExpressionGenerator"
                   scoreFunction="ivory.smrf.model.score.BM25ScoringFunction" k1="0.5" b="0.3" />
-         <feature id="orderedWt" importance="wsd"
+	 <feature id="orderedWt" importance="wsd"
                   cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
                   potential="ivory.smrf.model.potential.QueryPotential"
                   generator="ivory.smrf.model.builder.OrderedWindowExpressionGenerator" width="4"
-                  scoreFunction="ivory.smrf.model.score.BM25ScoringFunction" k1="0.25" b="0.0" />
+                  scoreFunction="ivory.smrf.model.score.BM25ScoringFunction" k1="0.25" b="0.0" />         
+         <feature id="termWt" importance="wsd"
+                  cliqueSet="ivory.smrf.model.builder.TermCliqueSet"   
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.TermExpressionGenerator"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1000.0" />
          <feature id="orderedWt" importance="wsd"
                   cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
                   potential="ivory.smrf.model.potential.QueryPotential"
                   generator="ivory.smrf.model.builder.OrderedWindowExpressionGenerator" width="1"
                   scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1000.0" />
-   
+
        </constrainedmodel>
-     
-     </model>
 
-     <model id="joint-x5.0" type="GreedyConstrained" style="Joint" output="ranking.cikm2010-gov2-desc-joint-x5.0.txt" hits="1000" qlMultiple="5.0" unigramAddThreshold="0" unigramRedundThreshold="0.02" bigramAddThreshold="0" bigramRedundThreshold="0.0025" beta="0" file="docs/data/gov2/stats.gov2.df.collection.desc.txt" >
+     </model>     
 
+     <model id="joint-x5.0" type="GreedyConstrained" style="Joint" output="ranking.cikm2010-clue-title-joint-x5.0.txt" hits="1000" qlMultiple="5" unigramAddThreshold="0" unigramRedundThreshold="0.04" bigramAddThreshold="0" bigramRedundThreshold="0" beta="100" file="data/clue/stats.clue.df.collection.txt" >
+        
        <constrainedmodel id="wsd" type="Feature" hits="1000">
 
-         <feature id="termWt" importance="wsd"
-                  cliqueSet="ivory.smrf.model.builder.TermCliqueSet"
-                  potential="ivory.smrf.model.potential.QueryPotential"
-                  generator="ivory.smrf.model.builder.TermExpressionGenerator"
-                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1000.0" />
-         <feature id="term" importance="wsd"
+	 <feature id="term" importance="wsd"
                   cliqueSet="ivory.smrf.model.builder.TermCliqueSet"
                   potential="ivory.smrf.model.potential.QueryPotential"
                   generator="ivory.smrf.model.builder.TermExpressionGenerator"
                   scoreFunction="ivory.smrf.model.score.BM25ScoringFunction" k1="0.5" b="0.3" />
-         <feature id="orderedWt" importance="wsd"
+	 <feature id="orderedWt" importance="wsd"
                   cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
                   potential="ivory.smrf.model.potential.QueryPotential"
                   generator="ivory.smrf.model.builder.OrderedWindowExpressionGenerator" width="4"
-                  scoreFunction="ivory.smrf.model.score.BM25ScoringFunction" k1="0.25" b="0.0" />
+                  scoreFunction="ivory.smrf.model.score.BM25ScoringFunction" k1="0.25" b="0.0" />         
+         <feature id="termWt" importance="wsd"
+                  cliqueSet="ivory.smrf.model.builder.TermCliqueSet"   
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.TermExpressionGenerator"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1000.0" />
          <feature id="orderedWt" importance="wsd"
                   cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
                   potential="ivory.smrf.model.potential.QueryPotential"
                   generator="ivory.smrf.model.builder.OrderedWindowExpressionGenerator" width="1"
                   scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1000.0" />
-   
+
        </constrainedmodel>
-     
-     </model>
+
+     </model>     
 
 </parameters>
-

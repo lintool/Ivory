@@ -37,8 +37,8 @@ public class UnorderedWindowExpressionGenerator extends ExpressionGenerator {
 
 	@Override
 	public Expression getExpression(String[] terms) {
-		Preconditions.checkNotNull(terms);
-		return new Expression(Type.UW, terms.length*width, terms);
+    Preconditions.checkNotNull(terms);
+    return new Expression(Type.UW, terms.length * width, terms);
 	}
 
 	@Override

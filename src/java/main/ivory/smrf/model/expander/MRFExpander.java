@@ -42,45 +42,26 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
-import edu.umd.cloud9.util.HMapIV;
+import edu.umd.cloud9.util.map.HMapIV;
 
 /**
  * @author Don Metzler
- * 
  */
 public abstract class MRFExpander {
+	protected RetrievalEnvironment env = null;  // Ivory retrieval environment.
+	protected int numFeedbackDocs;              // Number of feedback documents.
+	protected int numFeedbackTerms;             // Number of feedback terms.
+	protected Set<String> stopwords = null;     // Stopwords list.
 
-	/**
-	 * Ivory retrieval environment.
-	 */
-	protected RetrievalEnvironment mEnv = null;
-
-	/**
-	 * Number of feedback documents.
-	 */
-	protected int mFbDocs;
-
-	/**
-	 * Number of feedback terms.
-	 */
-	protected int mFbTerms;
-
-	/**
-	 * The expansion MRF cliques should be scaled according to this weight
-	 */
-	protected float mExpanderWeight;
+	// The expansion MRF cliques should be scaled according to this weight.
+	protected float expanderWeight;
 	
-	/**
-	 * Stopwords list.
-	 */
-	protected Set<String> mStopwords = null;
-
-	/**
-	 * Maximum number of candidates to consider for expansion non-positive
-	 * numbers result in all candidates being considered.
-	 */
-	protected int mMaxCandidates = 0;
+  // Maximum number of candidates to consider for expansion; non-positive numbers result in all
+  // candidates being considered.
+	protected int maxCandidates = 0;
 
 	/**
 	 * @param mrf
@@ -94,14 +75,11 @@ public abstract class MRFExpander {
 	 *            list of words to ignore when constructing expansion concepts
 	 */
 	public void setStopwordList(Set<String> words) {
-		mStopwords = Preconditions.checkNotNull(words);
+		this.stopwords = Preconditions.checkNotNull(words);
 	}
 
-	/**
-	 * @param maxCandidates
-	 */
 	public void setMaxCandidates(int maxCandidates) {
-		mMaxCandidates = maxCandidates;
+		this.maxCandidates = maxCandidates;
 	}
 
 	/**
@@ -109,15 +87,14 @@ public abstract class MRFExpander {
 	 * @param model
 	 * @throws Exception
 	 */
-	public static MRFExpander getExpander(RetrievalEnvironment env, Node model)	throws ConfigurationException {
+  public static MRFExpander getExpander(RetrievalEnvironment env, Node model)
+      throws ConfigurationException {
 		Preconditions.checkNotNull(env);
 		Preconditions.checkNotNull(model);
 
 		// get model type
-		String expanderType = XMLTools.getAttributeValue(model, "type", null);
-		if (expanderType == null) {
-			throw new ConfigurationException("Expander type must be specified!");
-		}
+		String expanderType = XMLTools.getAttributeValueOrThrowException(model, "type",
+		    "Expander type must be specified!");
 
 		// get normalized model type
 		String normExpanderType = expanderType.toLowerCase().trim();
@@ -130,9 +107,9 @@ public abstract class MRFExpander {
 			int fbTerms = XMLTools.getAttributeValue(model, "fbTerms", 10);
 			float expanderWeight = XMLTools.getAttributeValue(model, "weight", 1.0f);
 
-			List<Parameter> parameters = new ArrayList<Parameter>();
-			List<Node> scoreFunctionNodes = new ArrayList<Node>();
-			List<ConceptImportanceModel> importanceModels = new ArrayList<ConceptImportanceModel>();
+			List<Parameter> parameters = Lists.newArrayList();
+			List<Node> scoreFunctionNodes = Lists.newArrayList();
+			List<ConceptImportanceModel> importanceModels = Lists.newArrayList();
 
 			// get the expandermodel, which describes how to actually
 			// build the expanded MRF
@@ -140,10 +117,8 @@ public abstract class MRFExpander {
 			for (int i = 0; i < children.getLength(); i++) {
 				Node child = children.item(i);
 				if ("conceptscore".equals(child.getNodeName())) {
-					String paramID = XMLTools.getAttributeValue(child, "id", null);
-					if (paramID == null) {
-						throw new ConfigurationException("conceptscore node must specify an id attribute!");
-					}
+					String paramID = XMLTools.getAttributeValueOrThrowException(child, "id",
+					    "conceptscore node must specify an id attribute!");
 
 					float weight = XMLTools.getAttributeValue(child, "weight", 1.0f);
 
@@ -153,12 +128,12 @@ public abstract class MRFExpander {
 					// get concept importance source (if applicable)
 					ConceptImportanceModel importanceModel = null;
 					String importanceSource = XMLTools.getAttributeValue(child, "importance", null);
-					if(importanceSource != null) {
-						importanceModel = env.getImportanceModel(importanceSource);
-						if(importanceModel == null) {
-							throw new RetrievalException("Error: importancemodel " + importanceSource +" not found!");
-						}
-					}
+          if (importanceSource != null) {
+            importanceModel = env.getImportanceModel(importanceSource);
+            if (importanceModel == null) {
+              throw new RetrievalException("Error: importancemodel " + importanceSource + " not found!");
+            }
+          }
 					importanceModels.add(importanceModel);
 				}
 			}
@@ -229,7 +204,7 @@ public abstract class MRFExpander {
 	protected TFDoclenStatistics getTFDoclenStatistics(IntDocVector[] docVecs) throws IOException {
 		Preconditions.checkNotNull(docVecs);
 		
-		Map<String, Integer> vocab = new HashMap<String, Integer>();
+		Map<String, Integer> vocab = Maps.newHashMap();
 		Map<String, Short>[] tfs = new HashMap[docVecs.length];
 		int[] doclens = new int[docVecs.length];
 
@@ -242,12 +217,12 @@ public abstract class MRFExpander {
 			Reader dvReader = doc.getReader();
 			while (dvReader.hasMoreTerms()) {
 				int termid = dvReader.nextTerm();
-				String stem = mEnv.getTermFromId(termid);
+				String stem = env.getTermFromId(termid);
 				short tf = dvReader.getTf();
 
 				doclen += tf;
 
-				if (stem != null && (mStopwords == null || !mStopwords.contains(stem))) {
+				if (stem != null && (stopwords == null || !stopwords.contains(stem))) {
 					Integer df = vocab.get(stem);
 					if (df != null) {
 						vocab.put(stem, df + 1);
@@ -290,7 +265,7 @@ public abstract class MRFExpander {
 			Reader dvReader = doc.getReader();
 			while (dvReader.hasMoreTerms()) {
 				int termid = dvReader.nextTerm();
-				String stem = mEnv.getTermFromId(termid);
+				String stem = env.getTermFromId(termid);
 				int[] pos = dvReader.getPositions();
 				for (int i = 0; i < pos.length; i++) {
 					termMap.put(pos[i], stem);
@@ -308,7 +283,7 @@ public abstract class MRFExpander {
 				for (int offset = 0; offset < gramSize; offset++) {
 					String stem = termMap.get(pos + offset);
 					
-					if (stem == null || (mStopwords != null && mStopwords.contains(stem))) {
+					if (stem == null || (stopwords != null && stopwords.contains(stem))) {
 						toAdd = false;
 						break;
 					}
@@ -366,6 +341,5 @@ public abstract class MRFExpander {
 		public int[] getDoclens() {
 			return mDoclens;
 		}
-
 	}
 }

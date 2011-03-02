@@ -34,7 +34,6 @@ import org.apache.log4j.Logger;
 import edu.umd.cloud9.debug.MemoryUsageUtils;
 
 public class IntPostingsForwardIndex {
-
 	private static final Logger sLogger = Logger.getLogger(IntPostingsForwardIndex.class);
 	public static final long BIG_LONG_NUMBER = 1000000000;
 
@@ -66,38 +65,41 @@ public class IntPostingsForwardIndex {
 		}
 	}
 	
-	public IntPostingsForwardIndex(String postsPath, String fwindexPath, FileSystem fs, String type) throws IOException {
-		mFs = fs;
-		conf = fs.getConf();
-		postingsPath = postsPath;
-		postingsType = type;
-		sLogger.info("Loading forward index from: "+fwindexPath);
-		FSDataInputStream posInput = mFs.open(new Path(fwindexPath));
-
-		int l = posInput.readInt();
-		positions = new long[l];
-		for (int i = 0; i < l; i++) {
-			positions[i] = posInput.readLong();
-			//sLogger.info(positions[i]);
-		}
-	}
+//	public IntPostingsForwardIndex(String postsPath, String fwindexPath, FileSystem fs, String type) throws IOException {
+//		mFs = fs;
+//		conf = fs.getConf();
+//		postingsPath = postsPath;
+//		postingsType = type;
+//		sLogger.info("Loading forward index from: "+fwindexPath);
+//		FSDataInputStream posInput = mFs.open(new Path(fwindexPath));
+//
+//		int l = posInput.readInt();
+//		positions = new long[l];
+//		for (int i = 0; i < l; i++) {
+//			positions[i] = posInput.readLong();
+//			//sLogger.info(positions[i]);
+//		}
+//	}
 	
-	public IntPostingsForwardIndex(String postsPath, FileSystem postsFS, String fwindexPath, FileSystem fwindexFS) throws IOException {
-		mFs = postsFS;
-		conf = postsFS.getConf();
-		postingsPath = postsPath;
-
-		FSDataInputStream posInput = fwindexFS.open(new Path(fwindexPath));
-
-		int l = posInput.readInt();
-		positions = new long[l];
-		for (int i = 0; i < l; i++) {
-			positions[i] = posInput.readLong();
-			//sLogger.info(positions[i]);
-		}
-	}
+//	public IntPostingsForwardIndex(String postsPath, FileSystem postsFS, String fwindexPath, FileSystem fwindexFS) throws IOException {
+//		mFs = postsFS;
+//		conf = postsFS.getConf();
+//		postingsPath = postsPath;
+//
+//		FSDataInputStream posInput = fwindexFS.open(new Path(fwindexPath));
+//
+//		int l = posInput.readInt();
+//		positions = new long[l];
+//		for (int i = 0; i < l; i++) {
+//			positions[i] = posInput.readLong();
+//			//sLogger.info(positions[i]);
+//		}
+//	}
 
 	public PostingsList getPostingsList(int termid) throws IOException {
+    // TODO: This method re-opens the SequenceFile on every access. Would be more efficient to cache
+    // the file handles.
+
 		//sLogger.info("getPostingsList("+termid+")");
 		long pos = positions[termid - 1];
 

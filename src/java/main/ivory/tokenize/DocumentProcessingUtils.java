@@ -30,7 +30,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import edu.umd.cloud9.collection.Indexable;
-import edu.umd.cloud9.util.ArrayListOfInts;
+import edu.umd.cloud9.util.array.ArrayListOfInts;
 
 /**
  * @author Tamer

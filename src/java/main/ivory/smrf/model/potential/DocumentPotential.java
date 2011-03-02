@@ -36,8 +36,8 @@ import com.google.common.base.Preconditions;
  *
  */
 public class DocumentPotential extends PotentialFunction {
-	private RetrievalEnvironment env = null;
-	private DocumentNode docNode = null;
+	private RetrievalEnvironment env;
+	private DocumentNode docNode;
 	private String type;
 
 	@Override
@@ -45,10 +45,8 @@ public class DocumentPotential extends PotentialFunction {
 		this.env = Preconditions.checkNotNull(env);
 		Preconditions.checkNotNull(domNode);
 
-		String type = XMLTools.getAttributeValue(domNode, "type", null);
-		if (type == null) {
-			throw new ConfigurationException("A DocumentPotential requires a type attribute!");
-		}
+		String type = XMLTools.getAttributeValueOrThrowException(domNode, "type",
+		    "A DocumentPotential requires a type attribute!");
 
 		this.type = type;
 	}

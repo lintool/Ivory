@@ -36,51 +36,27 @@ import com.google.common.base.Preconditions;
 
 /**
  * @author Don Metzler
- * 
  */
 public class NGramLatentConceptExpander extends MRFExpander {
+	private List<Integer> gramSizes = null;   // Gram sizes associated with each expansionmodel.
+	private List<Integer> fbDocList = null;   // Number of documents to expand with.
+	private List<Integer> fbTermList = null;  // Number of concepts to expand with.
+	private List<MRFBuilder> builders = null; // Builders used to build MRFs from expansion concepts.
 
-	/**
-	 * gram sizes associated with each expansionmodel
-	 */
-	private List<Integer> mGramSizes = null;
-
-	/**
-	 * number of documents to expand with
-	 */
-	private List<Integer> mFbDocList = null;
-
-	/**
-	 * number of concepts to expand with
-	 */
-	private List<Integer> mFbTermList = null;
-
-	/**
-	 * builders used to build MRFs from expansion concepts
-	 */
-	private List<MRFBuilder> mBuilders = null;
-
-	/**
-	 * @param env
-	 * @param gramList
-	 * @param builderList
-	 * @param fbDocsList
-	 * @param fbTermsList
-	 */
 	public NGramLatentConceptExpander(RetrievalEnvironment env, List<Integer> gramList,
 			List<MRFBuilder> builderList, List<Integer> fbDocsList, List<Integer> fbTermsList) {
-		mEnv = Preconditions.checkNotNull(env);
-		mGramSizes = Preconditions.checkNotNull(gramList);
-		mBuilders = Preconditions.checkNotNull(builderList);
-		mFbDocList = Preconditions.checkNotNull(fbDocsList);
-		mFbTermList = Preconditions.checkNotNull(fbTermsList);
+		this.env = Preconditions.checkNotNull(env);
+		this.gramSizes = Preconditions.checkNotNull(gramList);
+		this.builders = Preconditions.checkNotNull(builderList);
+		this.fbDocList = Preconditions.checkNotNull(fbDocsList);
+		this.fbTermList = Preconditions.checkNotNull(fbTermsList);
 	}
 
 	@Override
 	public MarkovRandomField getExpandedMRF(MarkovRandomField mrf, Accumulator[] results)
 			throws ConfigurationException {
 		// begin constructing the expanded MRF
-		MarkovRandomField expandedMRF = new MarkovRandomField(mrf.getQueryTerms(), mEnv);
+		MarkovRandomField expandedMRF = new MarkovRandomField(mrf.getQueryTerms(), env);
 
 		// add cliques corresponding to original MRF
 		List<Clique> cliques = mrf.getCliques();
@@ -89,12 +65,12 @@ public class NGramLatentConceptExpander extends MRFExpander {
 		}
 
 		// find the best concepts for each of the expansion models
-		for (int modelNum = 0; modelNum < mBuilders.size(); modelNum++) {
+		for (int modelNum = 0; modelNum < builders.size(); modelNum++) {
 			// get the information about this expansion model
-			int curGramSize = mGramSizes.get(modelNum);
-			MRFBuilder curBuilder = mBuilders.get(modelNum);
-			int curFbDocs = mFbDocList.get(modelNum);
-			int curFbTerms = mFbTermList.get(modelNum);
+			int curGramSize = gramSizes.get(modelNum);
+			MRFBuilder curBuilder = builders.get(modelNum);
+			int curFbDocs = fbDocList.get(modelNum);
+			int curFbTerms = fbTermList.get(modelNum);
 
 			// gather Accumulators we're actually going to use for feedback
 			// purposes
@@ -110,7 +86,7 @@ public class NGramLatentConceptExpander extends MRFExpander {
 			int[] docSet = Accumulator.accumulatorsToDocnos(fbResults);
 
 			// get document vectors for results
-			IntDocVector[] docVecs = mEnv.documentVectors(docSet);
+			IntDocVector[] docVecs = env.documentVectors(docSet);
 
 			// extract vocabulary from results
 			VocabFrequencyPair[] vocab = null;
@@ -126,7 +102,7 @@ public class NGramLatentConceptExpander extends MRFExpander {
 			// score each concept
 			for (int conceptID = 0; conceptID < vocab.length; conceptID++) {
 				// only consider _maxCandidates
-				if (mMaxCandidates > 0 && conceptID >= mMaxCandidates) {
+				if (maxCandidates > 0 && conceptID >= maxCandidates) {
 					break;
 				}
 
@@ -155,8 +131,6 @@ public class NGramLatentConceptExpander extends MRFExpander {
 					}
 					sortedConcepts.add(new Accumulator(conceptID, score));
 				}
-				// System.out.println( vocab[ conceptID ].getKey() + "\t" +
-				// vocab[ conceptID ].getValue() + "\t" + score );
 			}
 
 			// compute the weights of the expanded terms
@@ -190,9 +164,6 @@ public class NGramLatentConceptExpander extends MRFExpander {
 						expandedMRF.addClique(c);
 					}
 				}
-
-				// System.out.println( "*\t" + vocab[a.docno] + "\t" + (a.score
-				// / totalWt) );
 			}
 		}
 

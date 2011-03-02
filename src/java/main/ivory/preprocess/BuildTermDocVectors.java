@@ -56,10 +56,10 @@ import edu.umd.cloud9.io.FSLineReader;
 import edu.umd.cloud9.mapred.NullInputFormat;
 import edu.umd.cloud9.mapred.NullMapper;
 import edu.umd.cloud9.mapred.NullOutputFormat;
-import edu.umd.cloud9.util.ArrayListOfInts;
-import edu.umd.cloud9.util.HMapII;
-import edu.umd.cloud9.util.MapII;
 import edu.umd.cloud9.util.PowerTool;
+import edu.umd.cloud9.util.array.ArrayListOfInts;
+import edu.umd.cloud9.util.map.HMapII;
+import edu.umd.cloud9.util.map.MapII;
 
 @SuppressWarnings("deprecation")
 public class BuildTermDocVectors extends PowerTool {

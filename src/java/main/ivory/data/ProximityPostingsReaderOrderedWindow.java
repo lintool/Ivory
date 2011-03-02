@@ -42,13 +42,13 @@ public class ProximityPostingsReaderOrderedWindow extends ProximityPostingsReade
 		int matches = 0;
 
 		// merge all position lists into single stream
-		int[] positions = mReaders[0].getPositions();
+		int[] positions = readers[0].getPositions();
 		int[] ids = new int[positions.length];
 		Arrays.fill(ids, 0);
 		int length = positions.length;
 
-		for (int id = 1; id < mReaders.length; id++) {
-			int [] p = mReaders[id].getPositions();
+		for (int id = 1; id < readers.length; id++) {
+			int [] p = readers[id].getPositions();
 
 			if(length + p.length > newPositions.length) {
 				newPositions = new int[length + p.length];
@@ -119,7 +119,7 @@ public class ProximityPostingsReaderOrderedWindow extends ProximityPostingsReade
 				
 				// stop looking if the maximum gap is too large
 				// or the terms appear out of order
-				if(maxGap > mSize || !ordered) {
+				if(maxGap > size || !ordered) {
 					break;
 				}
 				

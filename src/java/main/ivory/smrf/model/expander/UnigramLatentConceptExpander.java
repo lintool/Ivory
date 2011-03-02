@@ -42,7 +42,6 @@ import ivory.util.RetrievalEnvironment;
 import ivory.util.XMLTools;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -51,28 +50,29 @@ import java.util.PriorityQueue;
 import org.w3c.dom.Node;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 
 /**
- * @author metzler
+ * @author Don Metzler
  * @author Lidan Wang
  */
 public class UnigramLatentConceptExpander extends MRFExpander {
 
-	private List<Parameter> mParameters = null;
-	private List<Node> mScoringFunctionNodes = null;
-	private List<ConceptImportanceModel> mImportanceModels = null;
+	private List<Parameter> parameters = null;
+	private List<Node> scoringFunctionNodes = null;
+	private List<ConceptImportanceModel> importanceModels = null;
 	
-	private final GlobalTermEvidence mTermEvidence = new GlobalTermEvidence();
+	private final GlobalTermEvidence termEvidence = new GlobalTermEvidence();
 	
 	public UnigramLatentConceptExpander(RetrievalEnvironment env, int fbDocs, int fbTerms, float expanderWeight,
 			List<Parameter> params, List<Node> scoringFunctionNodes, List<ConceptImportanceModel> importanceModels) {
-		mEnv = Preconditions.checkNotNull(env);
-		mFbDocs = Preconditions.checkNotNull(fbDocs);
-		mFbTerms = Preconditions.checkNotNull(fbTerms);
-		mExpanderWeight = Preconditions.checkNotNull(expanderWeight);
-		mParameters = Preconditions.checkNotNull(params);
-		mScoringFunctionNodes = Preconditions.checkNotNull(scoringFunctionNodes);
-		mImportanceModels = importanceModels;
+		this.env = Preconditions.checkNotNull(env);
+		this.numFeedbackDocs = Preconditions.checkNotNull(fbDocs);
+		this.numFeedbackTerms = Preconditions.checkNotNull(fbTerms);
+		this.expanderWeight = Preconditions.checkNotNull(expanderWeight);
+		this.parameters = Preconditions.checkNotNull(params);
+		this.scoringFunctionNodes = Preconditions.checkNotNull(scoringFunctionNodes);
+		this.importanceModels = importanceModels;
 	}
 
 	@Override
@@ -82,7 +82,7 @@ public class UnigramLatentConceptExpander extends MRFExpander {
 		Preconditions.checkNotNull(results);
 
 		// begin constructing the expanded MRF
-		MarkovRandomField expandedMRF = new MarkovRandomField(mrf.getQueryTerms(), mEnv);
+		MarkovRandomField expandedMRF = new MarkovRandomField(mrf.getQueryTerms(), env);
 
 		// add cliques corresponding to original MRF
 		List<Clique> cliques = mrf.getCliques();
@@ -94,8 +94,8 @@ public class UnigramLatentConceptExpander extends MRFExpander {
 		GlobalEvidence globalEvidence = mrf.getGlobalEvidence();
 
 		// gather Accumulators we're actually going to use for feedback purposes
-		Accumulator[] fbResults = new Accumulator[Math.min(results.length, mFbDocs)];
-		for (int i = 0; i < Math.min(results.length, mFbDocs); i++) {
+		Accumulator[] fbResults = new Accumulator[Math.min(results.length, numFeedbackDocs)];
+		for (int i = 0; i < Math.min(results.length, numFeedbackDocs); i++) {
 			fbResults[i] = results[i];
 		}
 
@@ -106,7 +106,7 @@ public class UnigramLatentConceptExpander extends MRFExpander {
 		int[] docSet = Accumulator.accumulatorsToDocnos(fbResults);
 
 		// get document vectors for results
-		IntDocVector[] docVecs = mEnv.documentVectors(docSet);
+		IntDocVector[] docVecs = env.documentVectors(docSet);
 
 		// extract tf and doclen information from document vectors
 		TFDoclenStatistics stats = null;
@@ -125,21 +125,18 @@ public class UnigramLatentConceptExpander extends MRFExpander {
 		PriorityQueue<Accumulator> sortedConcepts = new PriorityQueue<Accumulator>();
 
 		// create scoring functions
-		ScoringFunction[] scoringFunctions = new ScoringFunction[mScoringFunctionNodes.size()];
-		for (int i = 0; i < mScoringFunctionNodes.size(); i++) {
-			Node functionNode = mScoringFunctionNodes.get(i);
-			String functionType = XMLTools.getAttributeValue(functionNode, "scoreFunction", null);
-			if (functionType == null) {
-				throw new RetrievalException(
-						"Error: conceptscore node must specify a scorefunction attribute!");
-			}
+		ScoringFunction[] scoringFunctions = new ScoringFunction[scoringFunctionNodes.size()];
+		for (int i = 0; i < scoringFunctionNodes.size(); i++) {
+			Node functionNode = scoringFunctionNodes.get(i);
+			String functionType = XMLTools.getAttributeValueOrThrowException(functionNode, "scoreFunction",
+						"conceptscore node must specify a scorefunction attribute!");
 			scoringFunctions[i] = ScoringFunction.create(functionType, functionNode);
 		}
 
 		// score each concept
 		for (int conceptID = 0; conceptID < vocab.length; conceptID++) {
-			// only consider _maxCandidates
-			if (mMaxCandidates > 0 && conceptID >= mMaxCandidates) {
+			// only consider maxCandidates
+			if (maxCandidates > 0 && conceptID >= maxCandidates) {
 				break;
 			}
 
@@ -147,30 +144,30 @@ public class UnigramLatentConceptExpander extends MRFExpander {
 			String concept = vocab[conceptID].getKey();
 
 			// get df and cf information for the concept
-			PostingsReader reader = mEnv.getPostingsReader(new Expression(concept));
+			PostingsReader reader = env.getPostingsReader(new Expression(concept));
 			if (reader == null) {
 				continue;
 			}
 			PostingsList list = reader.getPostingsList();
 			int df = list.getDf();
 			long cf = list.getCf();
-			mEnv.clearPostingsReaderCache();
+			env.clearPostingsReaderCache();
 
 			// construct concept evidence
-			mTermEvidence.set(df, cf);
+			termEvidence.set(df, cf);
 
 			// score the concept
 			float score = 0.0f;
 			for (int i = 0; i < fbResults.length; i++) {
 				float docScore = 0.0f;
 				for (int j = 0; j < scoringFunctions.length; j++) {
-					float weight = mParameters.get(j).getWeight();
-					ConceptImportanceModel importanceModel = mImportanceModels.get(j);
-					if(importanceModel != null) {
-						weight *= importanceModel.getConceptWeight(concept);
-					}
+					float weight = parameters.get(j).getWeight();
+					ConceptImportanceModel importanceModel = importanceModels.get(j);
+          if (importanceModel != null) {
+            weight *= importanceModel.getConceptWeight(concept);
+          }
 					ScoringFunction fn = scoringFunctions[j];
-					fn.initialize(mTermEvidence, globalEvidence);
+					fn.initialize(termEvidence, globalEvidence);
 
 					Short tf = tfs[i].get(vocab[conceptID].getKey());
 					if (tf == null) {
@@ -184,8 +181,8 @@ public class UnigramLatentConceptExpander extends MRFExpander {
 			}
 
 			int size = sortedConcepts.size();
-			if (size < mFbTerms || sortedConcepts.peek().score < score) {
-				if (size == mFbTerms) {
+			if (size < numFeedbackTerms || sortedConcepts.peek().score < score) {
+				if (size == numFeedbackTerms) {
 					sortedConcepts.poll(); // remove worst concept
 				}
 				sortedConcepts.add(new Accumulator(conceptID, score));
@@ -193,7 +190,7 @@ public class UnigramLatentConceptExpander extends MRFExpander {
 		}
 
 		// compute the weights of the expanded terms
-		int numTerms = Math.min(mFbTerms, sortedConcepts.size());
+		int numTerms = Math.min(numFeedbackTerms, sortedConcepts.size());
 		float totalWt = 0.0f;
 		Accumulator[] bestConcepts = new Accumulator[numTerms];
 		for (int i = 0; i < numTerms; i++) {
@@ -217,38 +214,35 @@ public class UnigramLatentConceptExpander extends MRFExpander {
 			// construct the MRF corresponding to this concept
 			String concept = vocab[a.docno].getKey();
 
-			for (int j = 0; j < mScoringFunctionNodes.size(); j++) {
-				Node functionNode = mScoringFunctionNodes.get(j);
+			for (int j = 0; j < scoringFunctionNodes.size(); j++) {
+				Node functionNode = scoringFunctionNodes.get(j);
 				String functionType = XMLTools.getAttributeValue(functionNode, "scoreFunction", null);
 				ScoringFunction fn = ScoringFunction.create(functionType, functionNode);
 
-				Parameter parameter = mParameters.get(j);
-				ConceptImportanceModel importanceModel = mImportanceModels.get(j);
+				Parameter parameter = parameters.get(j);
+				ConceptImportanceModel importanceModel = importanceModels.get(j);
 
-				List<GraphNode> cliqueNodes = new ArrayList<GraphNode>();
+				List<GraphNode> cliqueNodes = Lists.newArrayList();
 				cliqueNodes.add(docNode);
 
 				TermNode termNode = new TermNode(concept);
 				cliqueNodes.add(termNode);
 
-				PotentialFunction potential = new QueryPotential(mEnv, generator, fn);
+				PotentialFunction potential = new QueryPotential(env, generator, fn);
 
 				Clique c = new Clique(cliqueNodes, potential, parameter);
 				c.setType(Clique.Type.Term);
 
 				// scale importances by lce likelihood
-				float normalizedScore = mExpanderWeight * (a.score / totalWt);
-				if(importanceModel != null) {
-					c.setImportance(normalizedScore * importanceModel.getCliqueWeight(c));
-				}
-				else {
-					c.setImportance(normalizedScore);
-				}
+				float normalizedScore = expanderWeight * (a.score / totalWt);
+        if (importanceModel != null) {
+          c.setImportance(normalizedScore * importanceModel.getCliqueWeight(c));
+        } else {
+          c.setImportance(normalizedScore);
+        }
 
 				expandedMRF.addClique(c);
 			}
-
-//			 System.out.println( "*\t" + vocab[a.docno] + "\t" + (a.score / totalWt) );
 		}
 
 		return expandedMRF;

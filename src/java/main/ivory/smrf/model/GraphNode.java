@@ -24,7 +24,7 @@ package ivory.smrf.model;
  */
 public abstract class GraphNode {
 	public static enum Type { DOCUMENT, TERM };
-	
+
 	@Override
 	public String toString() {
 		return "<node type=\"GraphNode\" />\n";

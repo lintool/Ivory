@@ -110,15 +110,15 @@ work.</p>
 
 <pre>
 # command-line
-etc/run.sh ivory.smrf.retrieval.RunQueryLocal docs/data/trec/run.robust04.basic.xml docs/data/trec/queries.robust04.xml
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/trec/run.robust04.basic.xml data/trec/queries.robust04.xml
 
 # evaluating effectiveness
-trec_eval docs/data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-base.txt
-trec_eval docs/data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-sd.txt
-trec_eval docs/data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-fd.txt
-trec_eval docs/data/trec/qrels.robust04.noCRFR.txt ranking.robust04-bm25-base.txt
-trec_eval docs/data/trec/qrels.robust04.noCRFR.txt ranking.robust04-bm25-sd.txt
-trec_eval docs/data/trec/qrels.robust04.noCRFR.txt ranking.robust04-bm25-fd.txt
+trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-base.txt
+trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-sd.txt
+trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-fd.txt
+trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-bm25-base.txt
+trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-bm25-sd.txt
+trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-bm25-fd.txt
 
 # junit
 etc/junit.sh ivory.regression.Robust04_Basic
@@ -168,11 +168,11 @@ etc/junit.sh ivory.regression.Robust04_Basic
 
 <pre>
 # command-line
-etc/run.sh ivory.smrf.retrieval.RunQueryLocal docs/data/trec/run.robust04.wsd.xml docs/data/trec/queries.robust04.xml
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/trec/run.robust04.wsd.xml data/trec/queries.robust04.xml
 
 # evaluating effectiveness
-trec_eval docs/data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-wsd-sd.txt
-trec_eval docs/data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-wsd-fd.txt
+trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-wsd-sd.txt
+trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-wsd-fd.txt
 
 # junit
 etc/junit.sh ivory.regression.Robust04_WSD
@@ -205,14 +205,14 @@ on our production machine).</p>
 
 <pre>
 # command-line
-etc/run.sh ivory.smrf.retrieval.RunQueryLocal docs/data/trec/run.robust04.basic.lce.xml docs/data/trec/queries.robust04.xml
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/trec/run.robust04.basic.lce.xml data/trec/queries.robust04.xml
 
 # evaluating effectiveness
-trec_eval docs/data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-rm3-f.txt
-trec_eval docs/data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-rm3-s.txt
-trec_eval docs/data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-sd-lce-f.txt
-trec_eval docs/data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-sd-lce-s.txt
-trec_eval docs/data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-sd-lce-bigram.txt
+trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-rm3-f.txt
+trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-rm3-s.txt
+trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-sd-lce-f.txt
+trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-sd-lce-s.txt
+trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-sd-lce-bigram.txt
 
 # junit
 etc/junit.sh ivory.regression.Robust04_Basic_LCE
@@ -257,10 +257,10 @@ etc/junit.sh ivory.regression.Robust04_Basic_LCE
 
 <pre>
 # command-line
-etc/run.sh ivory.smrf.retrieval.RunQueryLocal docs/data/trec/run.robust04.wsd.lce.xml docs/data/trec/queries.robust04.xml
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/trec/run.robust04.wsd.lce.xml data/trec/queries.robust04.xml
 
 # evaluating effectiveness
-trec_eval docs/data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-wsd-lce.txt
+trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-wsd-lce.txt
 
 # junit
 etc/junit.sh ivory.regression.Robust04_WSD_LCE
@@ -292,15 +292,15 @@ etc/junit.sh ivory.regression.Robust04_WSD_LCE
 <pre>
 # command-line
 etc/run.sh ivory.smrf.retrieval.RunQueryLocal \
-  docs/data/wt10g/run.wt10g.basic.xml docs/data/wt10g/wt10g_queries_451-500.xml docs/data/wt10g/wt10g_queries_501-550.xml
+  data/wt10g/run.wt10g.basic.xml data/wt10g/wt10g_queries_451-500.xml data/wt10g/wt10g_queries_501-550.xml
 
 # evaluating effectiveness
-trec_eval docs/data/wt10g/qrels.wt10g ranking.wt10g-dir-base.txt
-trec_eval docs/data/wt10g/qrels.wt10g ranking.wt10g-dir-sd.txt
-trec_eval docs/data/wt10g/qrels.wt10g ranking.wt10g-dir-fd.txt
-trec_eval docs/data/wt10g/qrels.wt10g ranking.wt10g-bm25-base.txt
-trec_eval docs/data/wt10g/qrels.wt10g ranking.wt10g-bm25-sd.txt
-trec_eval docs/data/wt10g/qrels.wt10g ranking.wt10g-bm25-fd.txt
+trec_eval data/wt10g/qrels.wt10g ranking.wt10g-dir-base.txt
+trec_eval data/wt10g/qrels.wt10g ranking.wt10g-dir-sd.txt
+trec_eval data/wt10g/qrels.wt10g ranking.wt10g-dir-fd.txt
+trec_eval data/wt10g/qrels.wt10g ranking.wt10g-bm25-base.txt
+trec_eval data/wt10g/qrels.wt10g ranking.wt10g-bm25-sd.txt
+trec_eval data/wt10g/qrels.wt10g ranking.wt10g-bm25-fd.txt
 
 # junit
 etc/junit.sh ivory.regression.Wt10g_Basic
@@ -355,15 +355,15 @@ etc/junit.sh ivory.regression.Wt10g_Basic
 <pre>
 # command-line
 etc/run.sh ivory.smrf.retrieval.RunQueryLocal \
-  docs/data/gov2/run.gov2.basic.xml docs/data/gov2/gov2.title.701-775 docs/data/gov2/gov2.title.776-850
+  data/gov2/run.gov2.basic.xml data/gov2/gov2.title.701-775 data/gov2/gov2.title.776-850
 
 # evaluating effectiveness
-trec_eval docs/data/gov2/qrels.gov2.all ranking.gov2-dir-base.txt
-trec_eval docs/data/gov2/qrels.gov2.all ranking.gov2-dir-sd.txt
-trec_eval docs/data/gov2/qrels.gov2.all ranking.gov2-dir-fd.txt
-trec_eval docs/data/gov2/qrels.gov2.all ranking.gov2-bm25-base.txt
-trec_eval docs/data/gov2/qrels.gov2.all ranking.gov2-bm25-sd.txt
-trec_eval docs/data/gov2/qrels.gov2.all ranking.gov2-bm25-fd.txt
+trec_eval data/gov2/qrels.gov2.all ranking.gov2-dir-base.txt
+trec_eval data/gov2/qrels.gov2.all ranking.gov2-dir-sd.txt
+trec_eval data/gov2/qrels.gov2.all ranking.gov2-dir-fd.txt
+trec_eval data/gov2/qrels.gov2.all ranking.gov2-bm25-base.txt
+trec_eval data/gov2/qrels.gov2.all ranking.gov2-bm25-sd.txt
+trec_eval data/gov2/qrels.gov2.all ranking.gov2-bm25-fd.txt
 
 # junit
 etc/junit.sh ivory.regression.Gov2_Basic
@@ -420,12 +420,12 @@ track.</p>
 
 <pre>
 # command-line 
-etc/run.sh ivory.smrf.retrieval.RunQueryLocal docs/data/clue/run.web09catB.xml \
-   docs/data/clue/queries.web09.xml
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/clue/run.web09catB.xml \
+   data/clue/queries.web09.xml
 
 # evaluating effectiveness
-trec_eval docs/data/clue/qrels.web09catB.txt ranking.web09catB-bm25.txt 
-trec_eval docs/data/clue/qrels.web09catB.txt ranking.web09catB-ql.txt 
+trec_eval data/clue/qrels.web09catB.txt ranking.web09catB-bm25.txt
+trec_eval data/clue/qrels.web09catB.txt ranking.web09catB-ql.txt
 
 # junit
 etc/junit.sh ivory.regression.Web09catB_Baseline
@@ -463,16 +463,16 @@ high, since we're testing on the training set.</p>
 
 <pre>
 # command-line
-etc/run.sh ivory.smrf.retrieval.RunQueryLocal docs/data/clue/run.web09catB.all.xml \
- docs/data/clue/queries.web09.xml
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/clue/run.web09catB.all.xml \
+ data/clue/queries.web09.xml
 
 # evaluating effectiveness
-trec_eval docs/data/clue/qrels.web09catB.txt ranking.web09catB.all.ql.base.txt
-trec_eval docs/data/clue/qrels.web09catB.txt ranking.web09catB.all.ql.sd.txt
-trec_eval docs/data/clue/qrels.web09catB.txt ranking.web09catB.all.ql.wsd.txt
-trec_eval docs/data/clue/qrels.web09catB.txt ranking.web09catB.all.bm25.base.txt
-trec_eval docs/data/clue/qrels.web09catB.txt ranking.web09catB.all.bm25.sd.txt
-trec_eval docs/data/clue/qrels.web09catB.txt ranking.web09catB.all.bm25.wsd.txt
+trec_eval data/clue/qrels.web09catB.txt ranking.web09catB.all.ql.base.txt
+trec_eval data/clue/qrels.web09catB.txt ranking.web09catB.all.ql.sd.txt
+trec_eval data/clue/qrels.web09catB.txt ranking.web09catB.all.ql.wsd.txt
+trec_eval data/clue/qrels.web09catB.txt ranking.web09catB.all.bm25.base.txt
+trec_eval data/clue/qrels.web09catB.txt ranking.web09catB.all.bm25.sd.txt
+trec_eval data/clue/qrels.web09catB.txt ranking.web09catB.all.bm25.wsd.txt
 
 # junit
 etc/junit.sh ivory.regression.Web09catB_All
@@ -527,16 +527,16 @@ training set.</p>
 
 <pre>
 # command-line
-etc/run.sh ivory.smrf.retrieval.RunQueryLocal docs/data/clue/run.web09catB.all.spam.xml \
- docs/data/clue/queries.web09.xml
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/clue/run.web09catB.all.spam.xml \
+ data/clue/queries.web09.xml
 
 # evaluating effectiveness
-trec_eval docs/data/clue/qrels.web09catB.txt ranking.web09catB.spam.ql.base.txt
-trec_eval docs/data/clue/qrels.web09catB.txt ranking.web09catB.spam.ql.sd.txt
-trec_eval docs/data/clue/qrels.web09catB.txt ranking.web09catB.spam.ql.wsd.txt
-trec_eval docs/data/clue/qrels.web09catB.txt ranking.web09catB.spam.bm25.base.txt
-trec_eval docs/data/clue/qrels.web09catB.txt ranking.web09catB.spam.bm25.sd.txt
-trec_eval docs/data/clue/qrels.web09catB.txt ranking.web09catB.spam.bm25.wsd.txt
+trec_eval data/clue/qrels.web09catB.txt ranking.web09catB.spam.ql.base.txt
+trec_eval data/clue/qrels.web09catB.txt ranking.web09catB.spam.ql.sd.txt
+trec_eval data/clue/qrels.web09catB.txt ranking.web09catB.spam.ql.wsd.txt
+trec_eval data/clue/qrels.web09catB.txt ranking.web09catB.spam.bm25.base.txt
+trec_eval data/clue/qrels.web09catB.txt ranking.web09catB.spam.bm25.sd.txt
+trec_eval data/clue/qrels.web09catB.txt ranking.web09catB.spam.bm25.wsd.txt
 
 # junit
 etc/junit.sh ivory.regression.Web09catB_All_Spam
@@ -599,13 +599,13 @@ represent results in Tables 5 and 6 of the paper.</p>
 
 <pre>
 # command-line
-etc/run.sh ivory.smrf.retrieval.RunQueryLocal docs/data/wt10g/run.wt10g.SIGIR2010.xml \
-  docs/data/wt10g/wt10g_queries_501-550.xml
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/wt10g/run.wt10g.SIGIR2010.xml \
+  data/wt10g/wt10g_queries_501-550.xml
 
 # evaluating effectiveness
-trec_eval docs/data/wt10g/qrels.wt10g ranking.sigir2010-wt10g-ql.txt
-trec_eval docs/data/wt10g/qrels.wt10g ranking.sigir2010-wt10g-sd.txt
-trec_eval docs/data/wt10g/qrels.wt10g ranking.sigir2010-wt10g-wsd-sd.txt
+trec_eval data/wt10g/qrels.wt10g ranking.sigir2010-wt10g-ql.txt
+trec_eval data/wt10g/qrels.wt10g ranking.sigir2010-wt10g-sd.txt
+trec_eval data/wt10g/qrels.wt10g ranking.sigir2010-wt10g-wsd-sd.txt
 
 # junit
 etc/junit.sh ivory.regression.Wt10g_SIGIR2010
@@ -638,13 +638,13 @@ etc/junit.sh ivory.regression.Wt10g_SIGIR2010
     
 <pre>
 # command-line
-etc/run.sh ivory.smrf.retrieval.RunQueryLocal docs/data/gov2/run.gov2.SIGIR2010.xml  \
-  docs/data/gov2/gov2.title.776-850 
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/gov2/run.gov2.SIGIR2010.xml  \
+  data/gov2/gov2.title.776-850
     
 # evaluating effectiveness
-trec_eval docs/data/gov2/qrels.gov2.all ranking.sigir2010-gov2-ql.txt
-trec_eval docs/data/gov2/qrels.gov2.all ranking.sigir2010-gov2-sd.txt
-trec_eval docs/data/gov2/qrels.gov2.all ranking.sigir2010-gov2-wsd-sd.txt
+trec_eval data/gov2/qrels.gov2.all ranking.sigir2010-gov2-ql.txt
+trec_eval data/gov2/qrels.gov2.all ranking.sigir2010-gov2-sd.txt
+trec_eval data/gov2/qrels.gov2.all ranking.sigir2010-gov2-wsd-sd.txt
     
 # junit
 etc/junit.sh ivory.regression.Gov2_SIGIR2010
@@ -678,17 +678,17 @@ etc/junit.sh ivory.regression.Gov2_SIGIR2010
 
 <pre>
 # command-line
-etc/run.sh ivory.smrf.retrieval.RunQueryLocal docs/data/clue/run.web09catB.SIGIR2010.xml \
-  docs/data/clue/queries.web09.26-50.xml
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/clue/run.web09catB.SIGIR2010.xml \
+  data/clue/queries.web09.26-50.xml
 
 # evaluating effectiveness
-trec_eval docs/data/clue/qrels.web09catB.txt ranking.sigir2010-web09catB-ql.txt 
-trec_eval docs/data/clue/qrels.web09catB.txt ranking.sigir2010-web09catB-sd.txt 
-trec_eval docs/data/clue/qrels.web09catB.txt ranking.sigir2010-web09catB-wsd-sd.txt
+trec_eval data/clue/qrels.web09catB.txt ranking.sigir2010-web09catB-ql.txt
+trec_eval data/clue/qrels.web09catB.txt ranking.sigir2010-web09catB-sd.txt
+trec_eval data/clue/qrels.web09catB.txt ranking.sigir2010-web09catB-wsd-sd.txt
 
-perl etc/statAP_MQ_eval_v3.pl docs/data/clue/prels.web09catB.txt ranking.sigir2010-web09catB-ql.txt
-perl etc/statAP_MQ_eval_v3.pl docs/data/clue/prels.web09catB.txt ranking.sigir2010-web09catB-sd.txt
-perl etc/statAP_MQ_eval_v3.pl docs/data/clue/prels.web09catB.txt ranking.sigir2010-web09catB-wsd-sd.txt
+perl etc/statAP_MQ_eval_v3.pl data/clue/prels.web09catB.txt ranking.sigir2010-web09catB-ql.txt
+perl etc/statAP_MQ_eval_v3.pl data/clue/prels.web09catB.txt ranking.sigir2010-web09catB-sd.txt
+perl etc/statAP_MQ_eval_v3.pl data/clue/prels.web09catB.txt ranking.sigir2010-web09catB-wsd-sd.txt
 
 # junit
 etc/junit.sh ivory.regression.Web09catB_SIGIR2010
@@ -734,58 +734,58 @@ etc/junit.sh ivory.regression.Web09catB_SIGIR2010
 
 <pre>
 # command-line
-etc/run.sh ivory.smrf.retrieval.RunQueryLocal docs/data/wt10g/run.wt10g.CIKM2010.title.indep.xml \
-  docs/data/wt10g/wt10g_queries_501-550.xml
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/wt10g/run.wt10g.CIKM2010.title.indep.xml \
+  data/wt10g/wt10g_queries_501-550.xml
 
-etc/run.sh ivory.smrf.retrieval.RunQueryLocal docs/data/wt10g/run.wt10g.CIKM2010.title.joint.xml \
-  docs/data/wt10g/wt10g_queries_501-550.xml
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/wt10g/run.wt10g.CIKM2010.title.joint.xml \
+  data/wt10g/wt10g_queries_501-550.xml
 
-etc/run.sh ivory.smrf.retrieval.RunQueryLocal docs/data/wt10g/run.wt10g.CIKM2010.desc.indep.xml \
-  docs/data/wt10g/wt10g_queries_501-550_desc.xml
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/wt10g/run.wt10g.CIKM2010.desc.indep.xml \
+  data/wt10g/wt10g_queries_501-550_desc.xml
 
-etc/run.sh ivory.smrf.retrieval.RunQueryLocal docs/data/wt10g/run.wt10g.CIKM2010.desc.joint.xml \
-  docs/data/wt10g/wt10g_queries_501-550_desc.xml
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/wt10g/run.wt10g.CIKM2010.desc.joint.xml \
+  data/wt10g/wt10g_queries_501-550_desc.xml
  
 # evaluating effectiveness
-trec_eval docs/data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-title-indep-x1.0.txt
-trec_eval docs/data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-title-indep-x1.5.txt
-trec_eval docs/data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-title-indep-x2.0.txt
-trec_eval docs/data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-title-indep-x2.5.txt
-trec_eval docs/data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-title-indep-x3.0.txt
-trec_eval docs/data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-title-indep-x3.5.txt
-trec_eval docs/data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-title-indep-x4.0.txt
-trec_eval docs/data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-title-indep-x4.5.txt
-trec_eval docs/data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-title-indep-x5.0.txt
+trec_eval data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-title-indep-x1.0.txt
+trec_eval data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-title-indep-x1.5.txt
+trec_eval data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-title-indep-x2.0.txt
+trec_eval data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-title-indep-x2.5.txt
+trec_eval data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-title-indep-x3.0.txt
+trec_eval data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-title-indep-x3.5.txt
+trec_eval data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-title-indep-x4.0.txt
+trec_eval data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-title-indep-x4.5.txt
+trec_eval data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-title-indep-x5.0.txt
 
-trec_eval docs/data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-title-joint-x1.0.txt
-trec_eval docs/data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-title-joint-x1.5.txt
-trec_eval docs/data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-title-joint-x2.0.txt
-trec_eval docs/data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-title-joint-x2.5.txt
-trec_eval docs/data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-title-joint-x3.0.txt
-trec_eval docs/data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-title-joint-x3.5.txt
-trec_eval docs/data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-title-joint-x4.0.txt
-trec_eval docs/data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-title-joint-x4.5.txt
-trec_eval docs/data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-title-joint-x5.0.txt
+trec_eval data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-title-joint-x1.0.txt
+trec_eval data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-title-joint-x1.5.txt
+trec_eval data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-title-joint-x2.0.txt
+trec_eval data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-title-joint-x2.5.txt
+trec_eval data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-title-joint-x3.0.txt
+trec_eval data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-title-joint-x3.5.txt
+trec_eval data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-title-joint-x4.0.txt
+trec_eval data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-title-joint-x4.5.txt
+trec_eval data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-title-joint-x5.0.txt
 
-trec_eval docs/data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-desc-indep-x1.0.txt
-trec_eval docs/data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-desc-indep-x1.5.txt
-trec_eval docs/data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-desc-indep-x2.0.txt
-trec_eval docs/data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-desc-indep-x2.5.txt
-trec_eval docs/data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-desc-indep-x3.0.txt
-trec_eval docs/data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-desc-indep-x3.5.txt
-trec_eval docs/data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-desc-indep-x4.0.txt
-trec_eval docs/data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-desc-indep-x4.5.txt
-trec_eval docs/data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-desc-indep-x5.0.txt
+trec_eval data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-desc-indep-x1.0.txt
+trec_eval data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-desc-indep-x1.5.txt
+trec_eval data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-desc-indep-x2.0.txt
+trec_eval data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-desc-indep-x2.5.txt
+trec_eval data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-desc-indep-x3.0.txt
+trec_eval data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-desc-indep-x3.5.txt
+trec_eval data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-desc-indep-x4.0.txt
+trec_eval data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-desc-indep-x4.5.txt
+trec_eval data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-desc-indep-x5.0.txt
 
-trec_eval docs/data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-desc-joint-x1.0.txt
-trec_eval docs/data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-desc-joint-x1.5.txt
-trec_eval docs/data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-desc-joint-x2.0.txt
-trec_eval docs/data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-desc-joint-x2.5.txt
-trec_eval docs/data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-desc-joint-x3.0.txt
-trec_eval docs/data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-desc-joint-x3.5.txt
-trec_eval docs/data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-desc-joint-x4.0.txt
-trec_eval docs/data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-desc-joint-x4.5.txt
-trec_eval docs/data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-desc-joint-x5.0.txt
+trec_eval data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-desc-joint-x1.0.txt
+trec_eval data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-desc-joint-x1.5.txt
+trec_eval data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-desc-joint-x2.0.txt
+trec_eval data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-desc-joint-x2.5.txt
+trec_eval data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-desc-joint-x3.0.txt
+trec_eval data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-desc-joint-x3.5.txt
+trec_eval data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-desc-joint-x4.0.txt
+trec_eval data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-desc-joint-x4.5.txt
+trec_eval data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-desc-joint-x5.0.txt
 
 # junit
 etc/junit.sh ivory.regression.Wt10g_CIKM2010_Title_Indep
@@ -848,58 +848,58 @@ etc/junit.sh ivory.regression.Wt10g_CIKM2010_Desc_Joint
 
 <pre>
 # command-line
-etc/run.sh ivory.smrf.retrieval.RunQueryLocal docs/data/gov2/run.gov2.CIKM2010.title.indep.xml \
-  docs/data/gov2/gov2.title.776-850
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/gov2/run.gov2.CIKM2010.title.indep.xml \
+  data/gov2/gov2.title.776-850
 
-etc/run.sh ivory.smrf.retrieval.RunQueryLocal docs/data/gov2/run.gov2.CIKM2010.title.joint.xml \
-  docs/data/gov2/gov2.title.776-850
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/gov2/run.gov2.CIKM2010.title.joint.xml \
+  data/gov2/gov2.title.776-850
 
-etc/run.sh ivory.smrf.retrieval.RunQueryLocal docs/data/gov2/run.gov2.CIKM2010.desc.indep.xml \
-  docs/data/gov2/gov2.desc.776-850
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/gov2/run.gov2.CIKM2010.desc.indep.xml \
+  data/gov2/gov2.desc.776-850
 
-etc/run.sh ivory.smrf.retrieval.RunQueryLocal docs/data/gov2/run.gov2.CIKM2010.desc.joint.xml \
-  docs/data/gov2/gov2.desc.776-850
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/gov2/run.gov2.CIKM2010.desc.joint.xml \
+  data/gov2/gov2.desc.776-850
 
 # evaluating effectiveness
-trec_eval docs/data/gov2/qrels.gov2.all ranking.cikm2010-gov2-title-indep-x1.0.txt
-trec_eval docs/data/gov2/qrels.gov2.all ranking.cikm2010-gov2-title-indep-x1.5.txt
-trec_eval docs/data/gov2/qrels.gov2.all ranking.cikm2010-gov2-title-indep-x2.0.txt
-trec_eval docs/data/gov2/qrels.gov2.all ranking.cikm2010-gov2-title-indep-x2.5.txt
-trec_eval docs/data/gov2/qrels.gov2.all ranking.cikm2010-gov2-title-indep-x3.0.txt
-trec_eval docs/data/gov2/qrels.gov2.all ranking.cikm2010-gov2-title-indep-x3.5.txt
-trec_eval docs/data/gov2/qrels.gov2.all ranking.cikm2010-gov2-title-indep-x4.0.txt
-trec_eval docs/data/gov2/qrels.gov2.all ranking.cikm2010-gov2-title-indep-x4.5.txt
-trec_eval docs/data/gov2/qrels.gov2.all ranking.cikm2010-gov2-title-indep-x5.0.txt
+trec_eval data/gov2/qrels.gov2.all ranking.cikm2010-gov2-title-indep-x1.0.txt
+trec_eval data/gov2/qrels.gov2.all ranking.cikm2010-gov2-title-indep-x1.5.txt
+trec_eval data/gov2/qrels.gov2.all ranking.cikm2010-gov2-title-indep-x2.0.txt
+trec_eval data/gov2/qrels.gov2.all ranking.cikm2010-gov2-title-indep-x2.5.txt
+trec_eval data/gov2/qrels.gov2.all ranking.cikm2010-gov2-title-indep-x3.0.txt
+trec_eval data/gov2/qrels.gov2.all ranking.cikm2010-gov2-title-indep-x3.5.txt
+trec_eval data/gov2/qrels.gov2.all ranking.cikm2010-gov2-title-indep-x4.0.txt
+trec_eval data/gov2/qrels.gov2.all ranking.cikm2010-gov2-title-indep-x4.5.txt
+trec_eval data/gov2/qrels.gov2.all ranking.cikm2010-gov2-title-indep-x5.0.txt
 
-trec_eval docs/data/gov2/qrels.gov2.all ranking.cikm2010-gov2-title-joint-x1.0.txt
-trec_eval docs/data/gov2/qrels.gov2.all ranking.cikm2010-gov2-title-joint-x1.5.txt
-trec_eval docs/data/gov2/qrels.gov2.all ranking.cikm2010-gov2-title-joint-x2.0.txt
-trec_eval docs/data/gov2/qrels.gov2.all ranking.cikm2010-gov2-title-joint-x2.5.txt
-trec_eval docs/data/gov2/qrels.gov2.all ranking.cikm2010-gov2-title-joint-x3.0.txt
-trec_eval docs/data/gov2/qrels.gov2.all ranking.cikm2010-gov2-title-joint-x3.5.txt
-trec_eval docs/data/gov2/qrels.gov2.all ranking.cikm2010-gov2-title-joint-x4.0.txt
-trec_eval docs/data/gov2/qrels.gov2.all ranking.cikm2010-gov2-title-joint-x4.5.txt
-trec_eval docs/data/gov2/qrels.gov2.all ranking.cikm2010-gov2-title-joint-x5.0.txt
+trec_eval data/gov2/qrels.gov2.all ranking.cikm2010-gov2-title-joint-x1.0.txt
+trec_eval data/gov2/qrels.gov2.all ranking.cikm2010-gov2-title-joint-x1.5.txt
+trec_eval data/gov2/qrels.gov2.all ranking.cikm2010-gov2-title-joint-x2.0.txt
+trec_eval data/gov2/qrels.gov2.all ranking.cikm2010-gov2-title-joint-x2.5.txt
+trec_eval data/gov2/qrels.gov2.all ranking.cikm2010-gov2-title-joint-x3.0.txt
+trec_eval data/gov2/qrels.gov2.all ranking.cikm2010-gov2-title-joint-x3.5.txt
+trec_eval data/gov2/qrels.gov2.all ranking.cikm2010-gov2-title-joint-x4.0.txt
+trec_eval data/gov2/qrels.gov2.all ranking.cikm2010-gov2-title-joint-x4.5.txt
+trec_eval data/gov2/qrels.gov2.all ranking.cikm2010-gov2-title-joint-x5.0.txt
 
-trec_eval docs/data/gov2/qrels.gov2.all ranking.cikm2010-gov2-desc-indep-x1.0.txt
-trec_eval docs/data/gov2/qrels.gov2.all ranking.cikm2010-gov2-desc-indep-x1.5.txt
-trec_eval docs/data/gov2/qrels.gov2.all ranking.cikm2010-gov2-desc-indep-x2.0.txt
-trec_eval docs/data/gov2/qrels.gov2.all ranking.cikm2010-gov2-desc-indep-x2.5.txt
-trec_eval docs/data/gov2/qrels.gov2.all ranking.cikm2010-gov2-desc-indep-x3.0.txt
-trec_eval docs/data/gov2/qrels.gov2.all ranking.cikm2010-gov2-desc-indep-x3.5.txt
-trec_eval docs/data/gov2/qrels.gov2.all ranking.cikm2010-gov2-desc-indep-x4.0.txt
-trec_eval docs/data/gov2/qrels.gov2.all ranking.cikm2010-gov2-desc-indep-x4.5.txt
-trec_eval docs/data/gov2/qrels.gov2.all ranking.cikm2010-gov2-desc-indep-x5.0.txt
+trec_eval data/gov2/qrels.gov2.all ranking.cikm2010-gov2-desc-indep-x1.0.txt
+trec_eval data/gov2/qrels.gov2.all ranking.cikm2010-gov2-desc-indep-x1.5.txt
+trec_eval data/gov2/qrels.gov2.all ranking.cikm2010-gov2-desc-indep-x2.0.txt
+trec_eval data/gov2/qrels.gov2.all ranking.cikm2010-gov2-desc-indep-x2.5.txt
+trec_eval data/gov2/qrels.gov2.all ranking.cikm2010-gov2-desc-indep-x3.0.txt
+trec_eval data/gov2/qrels.gov2.all ranking.cikm2010-gov2-desc-indep-x3.5.txt
+trec_eval data/gov2/qrels.gov2.all ranking.cikm2010-gov2-desc-indep-x4.0.txt
+trec_eval data/gov2/qrels.gov2.all ranking.cikm2010-gov2-desc-indep-x4.5.txt
+trec_eval data/gov2/qrels.gov2.all ranking.cikm2010-gov2-desc-indep-x5.0.txt
 
-trec_eval docs/data/gov2/qrels.gov2.all ranking.cikm2010-gov2-desc-joint-x1.0.txt
-trec_eval docs/data/gov2/qrels.gov2.all ranking.cikm2010-gov2-desc-joint-x1.5.txt
-trec_eval docs/data/gov2/qrels.gov2.all ranking.cikm2010-gov2-desc-joint-x2.0.txt
-trec_eval docs/data/gov2/qrels.gov2.all ranking.cikm2010-gov2-desc-joint-x2.5.txt
-trec_eval docs/data/gov2/qrels.gov2.all ranking.cikm2010-gov2-desc-joint-x3.0.txt
-trec_eval docs/data/gov2/qrels.gov2.all ranking.cikm2010-gov2-desc-joint-x3.5.txt
-trec_eval docs/data/gov2/qrels.gov2.all ranking.cikm2010-gov2-desc-joint-x4.0.txt
-trec_eval docs/data/gov2/qrels.gov2.all ranking.cikm2010-gov2-desc-joint-x4.5.txt
-trec_eval docs/data/gov2/qrels.gov2.all ranking.cikm2010-gov2-desc-joint-x5.0.txt
+trec_eval data/gov2/qrels.gov2.all ranking.cikm2010-gov2-desc-joint-x1.0.txt
+trec_eval data/gov2/qrels.gov2.all ranking.cikm2010-gov2-desc-joint-x1.5.txt
+trec_eval data/gov2/qrels.gov2.all ranking.cikm2010-gov2-desc-joint-x2.0.txt
+trec_eval data/gov2/qrels.gov2.all ranking.cikm2010-gov2-desc-joint-x2.5.txt
+trec_eval data/gov2/qrels.gov2.all ranking.cikm2010-gov2-desc-joint-x3.0.txt
+trec_eval data/gov2/qrels.gov2.all ranking.cikm2010-gov2-desc-joint-x3.5.txt
+trec_eval data/gov2/qrels.gov2.all ranking.cikm2010-gov2-desc-joint-x4.0.txt
+trec_eval data/gov2/qrels.gov2.all ranking.cikm2010-gov2-desc-joint-x4.5.txt
+trec_eval data/gov2/qrels.gov2.all ranking.cikm2010-gov2-desc-joint-x5.0.txt
 
 # junit
 etc/junit.sh ivory.regression.Gov2_CIKM2010_Title_Indep
@@ -963,58 +963,58 @@ etc/junit.sh ivory.regression.Gov2_CIKM2010_Desc_Joint
 <pre>
 
 # command-line
-etc/run.sh ivory.smrf.retrieval.RunQueryLocal docs/data/clue/run.clue.CIKM2010.title.indep.xml \
-  docs/data/clue/queries.web09.26-50.xml
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/clue/run.clue.CIKM2010.title.indep.xml \
+  data/clue/queries.web09.26-50.xml
 
-etc/run.sh ivory.smrf.retrieval.RunQueryLocal docs/data/clue/run.clue.CIKM2010.title.joint.xml \
-  docs/data/clue/queries.web09.26-50.xml
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/clue/run.clue.CIKM2010.title.joint.xml \
+  data/clue/queries.web09.26-50.xml
 
-etc/run.sh ivory.smrf.retrieval.RunQueryLocal docs/data/clue/run.clue.CIKM2010.desc.indep.xml \
-  docs/data/clue/queries.web09.26-50.desc.xml
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/clue/run.clue.CIKM2010.desc.indep.xml \
+  data/clue/queries.web09.26-50.desc.xml
 
-etc/run.sh ivory.smrf.retrieval.RunQueryLocal docs/data/clue/run.clue.CIKM2010.desc.joint.xml \
-  docs/data/clue/queries.web09.26-50.desc.xml
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/clue/run.clue.CIKM2010.desc.joint.xml \
+  data/clue/queries.web09.26-50.desc.xml
 
 # evaluating effectiveness
-trec_eval docs/data/clue/qrels.web09catB.txt ranking.cikm2010-clue-title-indep-x1.0.txt
-trec_eval docs/data/clue/qrels.web09catB.txt ranking.cikm2010-clue-title-indep-x1.5.txt
-trec_eval docs/data/clue/qrels.web09catB.txt ranking.cikm2010-clue-title-indep-x2.0.txt
-trec_eval docs/data/clue/qrels.web09catB.txt ranking.cikm2010-clue-title-indep-x2.5.txt
-trec_eval docs/data/clue/qrels.web09catB.txt ranking.cikm2010-clue-title-indep-x3.0.txt
-trec_eval docs/data/clue/qrels.web09catB.txt ranking.cikm2010-clue-title-indep-x3.5.txt
-trec_eval docs/data/clue/qrels.web09catB.txt ranking.cikm2010-clue-title-indep-x4.0.txt
-trec_eval docs/data/clue/qrels.web09catB.txt ranking.cikm2010-clue-title-indep-x4.5.txt
-trec_eval docs/data/clue/qrels.web09catB.txt ranking.cikm2010-clue-title-indep-x5.0.txt
+trec_eval data/clue/qrels.web09catB.txt ranking.cikm2010-clue-title-indep-x1.0.txt
+trec_eval data/clue/qrels.web09catB.txt ranking.cikm2010-clue-title-indep-x1.5.txt
+trec_eval data/clue/qrels.web09catB.txt ranking.cikm2010-clue-title-indep-x2.0.txt
+trec_eval data/clue/qrels.web09catB.txt ranking.cikm2010-clue-title-indep-x2.5.txt
+trec_eval data/clue/qrels.web09catB.txt ranking.cikm2010-clue-title-indep-x3.0.txt
+trec_eval data/clue/qrels.web09catB.txt ranking.cikm2010-clue-title-indep-x3.5.txt
+trec_eval data/clue/qrels.web09catB.txt ranking.cikm2010-clue-title-indep-x4.0.txt
+trec_eval data/clue/qrels.web09catB.txt ranking.cikm2010-clue-title-indep-x4.5.txt
+trec_eval data/clue/qrels.web09catB.txt ranking.cikm2010-clue-title-indep-x5.0.txt
 
-trec_eval docs/data/clue/qrels.web09catB.txt ranking.cikm2010-clue-title-joint-x1.0.txt
-trec_eval docs/data/clue/qrels.web09catB.txt ranking.cikm2010-clue-title-joint-x1.5.txt
-trec_eval docs/data/clue/qrels.web09catB.txt ranking.cikm2010-clue-title-joint-x2.0.txt
-trec_eval docs/data/clue/qrels.web09catB.txt ranking.cikm2010-clue-title-joint-x2.5.txt
-trec_eval docs/data/clue/qrels.web09catB.txt ranking.cikm2010-clue-title-joint-x3.0.txt
-trec_eval docs/data/clue/qrels.web09catB.txt ranking.cikm2010-clue-title-joint-x3.5.txt
-trec_eval docs/data/clue/qrels.web09catB.txt ranking.cikm2010-clue-title-joint-x4.0.txt
-trec_eval docs/data/clue/qrels.web09catB.txt ranking.cikm2010-clue-title-joint-x4.5.txt
-trec_eval docs/data/clue/qrels.web09catB.txt ranking.cikm2010-clue-title-joint-x5.0.txt
+trec_eval data/clue/qrels.web09catB.txt ranking.cikm2010-clue-title-joint-x1.0.txt
+trec_eval data/clue/qrels.web09catB.txt ranking.cikm2010-clue-title-joint-x1.5.txt
+trec_eval data/clue/qrels.web09catB.txt ranking.cikm2010-clue-title-joint-x2.0.txt
+trec_eval data/clue/qrels.web09catB.txt ranking.cikm2010-clue-title-joint-x2.5.txt
+trec_eval data/clue/qrels.web09catB.txt ranking.cikm2010-clue-title-joint-x3.0.txt
+trec_eval data/clue/qrels.web09catB.txt ranking.cikm2010-clue-title-joint-x3.5.txt
+trec_eval data/clue/qrels.web09catB.txt ranking.cikm2010-clue-title-joint-x4.0.txt
+trec_eval data/clue/qrels.web09catB.txt ranking.cikm2010-clue-title-joint-x4.5.txt
+trec_eval data/clue/qrels.web09catB.txt ranking.cikm2010-clue-title-joint-x5.0.txt
 
-trec_eval docs/data/clue/qrels.web09catB.txt ranking.cikm2010-clue-desc-indep-x1.0.txt
-trec_eval docs/data/clue/qrels.web09catB.txt ranking.cikm2010-clue-desc-indep-x1.5.txt
-trec_eval docs/data/clue/qrels.web09catB.txt ranking.cikm2010-clue-desc-indep-x2.0.txt
-trec_eval docs/data/clue/qrels.web09catB.txt ranking.cikm2010-clue-desc-indep-x2.5.txt
-trec_eval docs/data/clue/qrels.web09catB.txt ranking.cikm2010-clue-desc-indep-x3.0.txt
-trec_eval docs/data/clue/qrels.web09catB.txt ranking.cikm2010-clue-desc-indep-x3.5.txt
-trec_eval docs/data/clue/qrels.web09catB.txt ranking.cikm2010-clue-desc-indep-x4.0.txt
-trec_eval docs/data/clue/qrels.web09catB.txt ranking.cikm2010-clue-desc-indep-x4.5.txt
-trec_eval docs/data/clue/qrels.web09catB.txt ranking.cikm2010-clue-desc-indep-x5.0.txt
+trec_eval data/clue/qrels.web09catB.txt ranking.cikm2010-clue-desc-indep-x1.0.txt
+trec_eval data/clue/qrels.web09catB.txt ranking.cikm2010-clue-desc-indep-x1.5.txt
+trec_eval data/clue/qrels.web09catB.txt ranking.cikm2010-clue-desc-indep-x2.0.txt
+trec_eval data/clue/qrels.web09catB.txt ranking.cikm2010-clue-desc-indep-x2.5.txt
+trec_eval data/clue/qrels.web09catB.txt ranking.cikm2010-clue-desc-indep-x3.0.txt
+trec_eval data/clue/qrels.web09catB.txt ranking.cikm2010-clue-desc-indep-x3.5.txt
+trec_eval data/clue/qrels.web09catB.txt ranking.cikm2010-clue-desc-indep-x4.0.txt
+trec_eval data/clue/qrels.web09catB.txt ranking.cikm2010-clue-desc-indep-x4.5.txt
+trec_eval data/clue/qrels.web09catB.txt ranking.cikm2010-clue-desc-indep-x5.0.txt
 
-trec_eval docs/data/clue/qrels.web09catB.txt ranking.cikm2010-clue-desc-joint-x1.0.txt
-trec_eval docs/data/clue/qrels.web09catB.txt ranking.cikm2010-clue-desc-joint-x1.5.txt
-trec_eval docs/data/clue/qrels.web09catB.txt ranking.cikm2010-clue-desc-joint-x2.0.txt
-trec_eval docs/data/clue/qrels.web09catB.txt ranking.cikm2010-clue-desc-joint-x2.5.txt
-trec_eval docs/data/clue/qrels.web09catB.txt ranking.cikm2010-clue-desc-joint-x3.0.txt
-trec_eval docs/data/clue/qrels.web09catB.txt ranking.cikm2010-clue-desc-joint-x3.5.txt
-trec_eval docs/data/clue/qrels.web09catB.txt ranking.cikm2010-clue-desc-joint-x4.0.txt
-trec_eval docs/data/clue/qrels.web09catB.txt ranking.cikm2010-clue-desc-joint-x4.5.txt
-trec_eval docs/data/clue/qrels.web09catB.txt ranking.cikm2010-clue-desc-joint-x5.0.txt
+trec_eval data/clue/qrels.web09catB.txt ranking.cikm2010-clue-desc-joint-x1.0.txt
+trec_eval data/clue/qrels.web09catB.txt ranking.cikm2010-clue-desc-joint-x1.5.txt
+trec_eval data/clue/qrels.web09catB.txt ranking.cikm2010-clue-desc-joint-x2.0.txt
+trec_eval data/clue/qrels.web09catB.txt ranking.cikm2010-clue-desc-joint-x2.5.txt
+trec_eval data/clue/qrels.web09catB.txt ranking.cikm2010-clue-desc-joint-x3.0.txt
+trec_eval data/clue/qrels.web09catB.txt ranking.cikm2010-clue-desc-joint-x3.5.txt
+trec_eval data/clue/qrels.web09catB.txt ranking.cikm2010-clue-desc-joint-x4.0.txt
+trec_eval data/clue/qrels.web09catB.txt ranking.cikm2010-clue-desc-joint-x4.5.txt
+trec_eval data/clue/qrels.web09catB.txt ranking.cikm2010-clue-desc-joint-x5.0.txt
 
 # junit
 etc/junit.sh ivory.regression.Web09catB_CIKM2010_Title_Indep 

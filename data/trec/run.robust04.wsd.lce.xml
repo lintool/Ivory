@@ -3,10 +3,10 @@
      <index>/fs/clip-hadoop/indexes/trec</index>
 
      <importancemodel id="wsd" type="ivory.smrf.model.importance.LinearImportanceModel">
-         <feature id="collection_freq" weight="0.0688" file="docs/data/trec/stats.robust04.cf.collection.txt.norm" default="0.0" />
-	 <feature id="document_freq" weight="0.4505" file="docs/data/trec/stats.robust04.df.collection.txt.norm" default="0.01039824" />
-	 <feature id="clue_cf" weight="0.4272" file="docs/data/trec/stats.robust04.cf.clue.txt.norm" default="0.0" />
-	 <feature id="enwiki_cf" weight="0.0535" file="docs/data/trec/stats.robust04.cf.enwiki.txt.norm" default="0.0" />
+         <feature id="collection_freq" weight="0.0688" file="data/trec/stats.robust04.cf.collection.txt.norm" default="0.0" />
+	 <feature id="document_freq" weight="0.4505" file="data/trec/stats.robust04.df.collection.txt.norm" default="0.01039824" />
+	 <feature id="clue_cf" weight="0.4272" file="data/trec/stats.robust04.cf.clue.txt.norm" default="0.0" />
+	 <feature id="enwiki_cf" weight="0.0535" file="data/trec/stats.robust04.cf.enwiki.txt.norm" default="0.0" />
      </importancemodel>
 
      <!-- Dirichlet, WSD, Latent Concept Expansion (unigram concepts) (Fast Version) -->
