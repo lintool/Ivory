@@ -122,7 +122,7 @@ public class LinearImportanceModel extends ConceptImportanceModel {
 		return getConceptWeight(c.getConcept());
 	}
 
-	private float computeFeatureVal(String cliqueTerms, MetaFeature f) {
+	public float computeFeatureVal(String cliqueTerms, MetaFeature f) {
 		float count;
 
 		// Get meta-feature values for f.
@@ -136,6 +136,10 @@ public class LinearImportanceModel extends ConceptImportanceModel {
 		}
 
 		return count;
+	}
+
+	public List<MetaFeature> getMetaFeatures() {
+		return mMetaFeatures;
 	}
 
 	// Reads MetaFeature statistics from a file,

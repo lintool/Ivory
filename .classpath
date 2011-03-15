@@ -14,5 +14,6 @@
 	<classpathentry kind="lib" path="packages/servlet-api-2.5-6.1.14.jar"/>
 	<classpathentry kind="lib" path="packages/junit-4.4.jar"/>
 	<classpathentry kind="lib" path="packages/xercesImpl.jar"/>
+	<classpathentry kind="lib" path="packages/commons-cli-1.2.jar"/>
 	<classpathentry kind="output" path="build"/>
 </classpath>
