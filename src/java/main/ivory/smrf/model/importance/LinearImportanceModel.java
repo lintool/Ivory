@@ -44,19 +44,19 @@ import edu.umd.cloud9.util.map.HMapKF;
 public class LinearImportanceModel extends ConceptImportanceModel {
 
 	// MetaFeatures.
-	private final List<MetaFeature> metaFeatures = Lists.newArrayList();
+	private final List<MetaFeature> mMetaFeatures = Lists.newArrayList();
 
 	// MetaFeature values.
-	private final Map<MetaFeature, HMapKF<String>> metaFeatureValues = Maps.newHashMap();
+	private final Map<MetaFeature, HMapKF<String>> mMetaFeatureValues = Maps.newHashMap();
 
-	// Default feature values for each MetaFeature.
-	private final HMapKF<String> defaultValues = new HMapKF<String>();
+	// Default feature values for each meta feature.
+	private final HMapKF<String> mDefaultValues = new HMapKF<String>();
 
 	public void configure(Node model) throws ConfigurationException {
 		// Clear meta-feature data.
-		metaFeatures.clear();
-		metaFeatureValues.clear();
-		defaultValues.clear();
+		mMetaFeatures.clear();
+		mMetaFeatureValues.clear();
+		mDefaultValues.clear();
 
 		// Construct MRF feature by feature.
 		NodeList children = model.getChildNodes();
@@ -71,12 +71,12 @@ public class LinearImportanceModel extends ConceptImportanceModel {
 				String metaFeatureName = XMLTools.getAttributeValue(child, "id", "");
 				float metaFeatureWeight = XMLTools.getAttributeValue(child, "weight", -1.0f);
 
-        if ("".equals(metaFeatureName) || metaFeatureWeight == -1) {
-          throw new ConfigurationException("Must specify metafeature name and weight.");
-        }
+				if (metaFeatureName == "" || metaFeatureWeight == -1) {
+					throw new ConfigurationException("Must specify metafeature name and weight.");
+				}
 
 				MetaFeature mf = new MetaFeature(metaFeatureName, metaFeatureWeight);
-				metaFeatures.add(mf);
+				mMetaFeatures.add(mf);
 
 				totalMetaFeatureWeight += metaFeatureWeight;
 
@@ -86,19 +86,19 @@ public class LinearImportanceModel extends ConceptImportanceModel {
 				}
 
 				try {
-					metaFeatureValues.put(mf, readDataStats(file));
+					mMetaFeatureValues.put(mf, readDataStats(file));
 				} catch (IOException e) {
 					throw new RetrievalException("Error: " + e);
 				}
 
 				float defaultValue = XMLTools.getAttributeValue(child, "default", 0.0f);
-				defaultValues.put(mf.getName(), defaultValue);
+				mDefaultValues.put(mf.getName(), defaultValue);
 			}
 		}
 
 		// Normalize meta feature weights.
-		for (int i = 0; i < metaFeatures.size(); i++) {
-			MetaFeature mf = (MetaFeature) metaFeatures.get(i);
+		for (int i = 0; i < mMetaFeatures.size(); i++) {
+			MetaFeature mf = (MetaFeature) mMetaFeatures.get(i);
 			float w = mf.getWeight() / totalMetaFeatureWeight;
 			mf.setWeight(w);
 		}
@@ -108,7 +108,7 @@ public class LinearImportanceModel extends ConceptImportanceModel {
 	public float getConceptWeight(String concept) {
 		// Compute query-dependent clique weight.
 		float weight = 0.0f;
-		for (MetaFeature mf : metaFeatures) {
+		for (MetaFeature mf : mMetaFeatures) {
 			float metaWeight = mf.getWeight();
 			float cliqueFeatureVal = computeFeatureVal(concept, mf);
 			weight += metaWeight * cliqueFeatureVal;
@@ -122,25 +122,28 @@ public class LinearImportanceModel extends ConceptImportanceModel {
 		return getConceptWeight(c.getConcept());
 	}
 
-	private float computeFeatureVal(String cliqueTerms, MetaFeature f) {
+	public float computeFeatureVal(String cliqueTerms, MetaFeature f) {
 		float count;
 
 		// Get meta-feature values for f.
-		HMapKF<String> mfValues = metaFeatureValues.get(f);
+		HMapKF<String> mfValues = mMetaFeatureValues.get(f);
 
 		// Look up value for clique terms.
 		if (mfValues != null && mfValues.containsKey(cliqueTerms)) {
 			count = mfValues.get(cliqueTerms);
 		} else {
-			count = defaultValues.get(f.getName());
+			count = mDefaultValues.get(f.getName());
 		}
 
 		return count;
 	}
 
+	public List<MetaFeature> getMetaFeatures() {
+		return mMetaFeatures;
+	}
+
 	// Reads MetaFeature statistics from a file,
 	public static HMapKF<String> readDataStats(String file) throws IOException {
-	  // TODO: This is a bit dangerous, as we should be passing in a handle to the FS from outside.
 		Configuration conf = new Configuration();
 		HMapKF<String> values = new HMapKF<String>();
 
@@ -160,3 +163,4 @@ public class LinearImportanceModel extends ConceptImportanceModel {
 		return values;
 	}
 }
+
