@@ -14,5 +14,6 @@
 	<classpathentry kind="lib" path="packages/junit-4.4.jar"/>
 	<classpathentry kind="lib" path="packages/xercesImpl.jar"/>
 	<classpathentry kind="lib" path="packages/cloud9-5a07e866cfb12b4a558382f9c890e2a3fb70bf57.jar"/>
+	<classpathentry kind="lib" path="packages/commons-cli-1.2.jar"/>
 	<classpathentry kind="output" path="build"/>
 </classpath>

@@ -39,6 +39,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -197,6 +198,10 @@ public class RetrievalEnvironment {
 
 	public ConceptImportanceModel getImportanceModel(String id) {
 		return importanceModels.get(id);
+	}
+
+	public Collection<ConceptImportanceModel> getImportanceModels() {
+		return importanceModels.values();
 	}
 
 	public long getDocumentCount() {
@@ -690,4 +695,5 @@ public class RetrievalEnvironment {
 		}
 
 	}
+
 }
