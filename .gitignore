@@ -1,9 +1,11 @@
 *~
 .*crc
 build/
+dist/
 docs/api/
-regression-quick/
-regression-complete/
-ivory.jar
 etc/junit.sh
 etc/run.sh
+ivy/ivy.jar
+lib/
+test/
+ranking.*

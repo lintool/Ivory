@@ -1,20 +1,58 @@
-<project name="ivory" default="scripts" basedir=".">
-	<description>Ivory</description>
+<project name="ivory" default="scripts" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
+  <description>Ivory</description>
 
-	<property name="src" location="src" />
-	<property name="build" location="build" />
-	<property name="test" location="test" />
-	<property name="regression-complete" location="regression-complete" />
-	<property name="regression-quick" location="regression-quick" />
+  <property name="lib.dir" value="lib" />
+  <property name="build.dir" value="build"/>
+  <property name="src.dir" value="src"/>
+  <property name="dist.dir" value="dist"/>
+  <property name="test.dir" value="test"/>
+  <property name="test.junit.dir" location="${test.dir}/junit" />
+  <property name="regression.complete.dir" location="${test.dir}/regression.complete" />
+  <property name="regression.quick.dir" location="${test.dir}/regression.quick" />
 
-	<path id="classpath">
-		<fileset dir=".">
-			<include name="ivory.jar" />
-		</fileset>
-		<fileset dir="packages/">
-			<include name="**/*.jar" />
-		</fileset>
-	</path>
+  <property name="version" value="0.5.0"/>
+
+  <!-- paths used for compilation and run  -->
+  <path id="lib.path.id">
+    <fileset dir="${lib.dir}" />
+  </path>
+  <path id="run.path.id">
+    <path refid="lib.path.id" />
+    <path location="${build.dir}" />
+  </path>
+
+  <property name="ivy.install.version" value="2.2.0"/>
+  <property name="ivy.jar.dir" value="${basedir}/ivy"/>
+  <property name="ivy.jar.file" value="${ivy.jar.dir}/ivy.jar"/>
+  <property name="ivy.settings.file" value="${basedir}/ivy/ivysettings.xml" />
+  <property name="ivy.dep.file" value="${basedir}/ivy/ivy.xml" />
+
+  <target name="download-ivy" unless="skip.download">
+    <mkdir dir="${ivy.jar.dir}"/>
+    <!-- download Ivy from web site so that it can be used even without any special installation -->
+    <echo message="installing ivy..."/>
+    <get src="http://repo1.maven.org/maven2/org/apache/ivy/ivy/${ivy.install.version}/ivy-${ivy.install.version}.jar"
+         dest="${ivy.jar.file}" usetimestamp="true"/>
+  </target>
+
+  <target name="install-ivy" depends="download-ivy" description="--> install ivy">
+  <!-- try to load ivy here from local ivy dir, in case the user has not already dropped
+       it into ant's lib dir (note that the latter copy will always take precedence).
+       We will not fail as long as local lib dir exists (it may be empty) and
+       ivy is in at least one of ant's lib dir or the local lib dir. -->
+    <path id="ivy.lib.path">
+      <fileset dir="${ivy.jar.dir}" includes="*.jar"/>
+    </path>
+    <taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant" classpathref="ivy.lib.path"/>
+  </target>
+
+  <target name="resolve" depends="install-ivy" description="--> retreive dependencies with ivy">
+    <ivy:retrieve/>
+  </target>
+
+  <target name="report" depends="resolve" description="--> generates a report of dependencies">
+      <ivy:report todir="${build.dir}"/>
+  </target>
 
 	<target name="init">
 		<tstamp />
@@ -27,78 +65,84 @@
 		<condition property="platform" value="windows">
 			<os family="windows" />
 		</condition>
-		<mkdir dir="${build}" />
+		<mkdir dir="${build.dir}" />
 	</target>
 
-	<target name="compile" depends="init" description="compile the source">
+	<target name="compile" depends="init,resolve" description="compile the source">
 		<!-- echo message="${toString:classpath}"/ -->
-		<javac classpathref="classpath" srcdir="${src}/java/main" destdir="${build}" optimize="on" debug="on">
+		<javac classpathref="lib.path.id" srcdir="${src.dir}/java/main" destdir="${build.dir}" optimize="on" debug="on">
 			<!-- compilerarg value="-Xlint:unchecked"/ uncomment this to check for generics -->
 		</javac>
-		<javac classpathref="classpath" srcdir="${src}/java/test" destdir="${build}" optimize="on" debug="on">
+		<javac classpathref="lib.path.id" srcdir="${src.dir}/java/test" destdir="${build.dir}" optimize="on" debug="on">
 		</javac>
-		<javac classpathref="classpath" srcdir="${src}/java/regression" destdir="${build}" optimize="on" debug="on">
+		<javac classpathref="lib.path.id" srcdir="${src.dir}/java/regression" destdir="${build.dir}" optimize="on" debug="on">
 		</javac>
-		<!-- javac classpathref="classpath" srcdir="${src}/sandbox" destdir="${build}" optimize="on" debug="on" -->
+		<!-- javac classpathref="classpath" srcdir="${src.dir}/sandbox" destdir="${build.dir}" optimize="on" debug="on" -->
 			<!-- compilerarg value="-Xlint:unchecked"/ uncomment this to check for generics -->
 		<!-- /javac -->
-		<!--copy todir="${build}">
-			<fileset dir="${src}/dist" excludes="**/*.java" />
-			<fileset dir="${src}/private" excludes="**/*.java" />
+		<!--copy todir="${build.dir}">
+			<fileset dir="${src.dir}/dist" excludes="**/*.java" />
+			<fileset dir="${src.dir}/private" excludes="**/*.java" />
 		</copy-->
 	</target>
 
-	<target name="lib" depends="compile" description="generate the distribution">
-		<jar jarfile="ivory.jar" basedir="${build}" />
+	<target name="jar" depends="compile" description="generate the distribution">
+		<jar jarfile="${dist.dir}/ivory-${version}.jar" basedir="${build.dir}" />
 	</target>
 
         <target name="jarjar" depends="compile">
                 <taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask"
                          classpath="lib/jarjar-1.0.jar"/>
                 <jarjar jarfile="ivory-dist.jar">
-                  <fileset dir="${build}"/>
+                  <fileset dir="${build.dir}"/>
                 </jarjar>
         </target>
 
 	<target name="clean" description="clean up">
-		<delete dir="${test}" />
-		<delete dir="${build}" />
+		<delete dir="${build.dir}" />
+		<delete dir="${dist.dir}" />
+		<delete dir="${lib.dir}" />
+		<delete dir="${test.dir}" />
 	</target>
 
-	<target name="test" depends="lib" description="Execute Unit Tests">
-		<mkdir dir="${test}" />
+	<target name="test" depends="jar" description="Execute Unit Tests">
+		<mkdir dir="${test.junit.dir}" />
 		<junit printsummary="yes" fork="yes" maxmemory="2048m">
-			<sysproperty key="java.library.path" path="${lib}" />
+			<sysproperty key="java.library.path" path="${lib.dir}" />
 			<sysproperty key="org.xml.sax.driver" value="org.apache.xerces.parsers.SAXParser" />
-			<classpath refid="classpath" />
+			<classpath refid="run.path.id" />
 
 			<formatter type="xml" />
-			<batchtest todir="${test}">
-				<fileset dir="${build}">
+			<batchtest todir="${test.junit.dir}">
+				<fileset dir="${build.dir}">
 					<include name="**/*Test.class" />
 					<exclude name="ivory/regression/*.class" />
 				</fileset>
 			</batchtest>
 		</junit>
 
-		<junitreport todir="${test}">
-			<fileset dir="${test}">
+		<junitreport todir="${test.junit.dir}">
+			<fileset dir="${test.junit.dir}">
 				<include name="TEST-*.xml" />
 			</fileset>
-			<report format="noframes" styledir="etc/" todir="${test}" />
+			<report format="noframes" styledir="etc/" todir="${test.junit.dir}" />
 		</junitreport>
+
+<!-- tmp for testing -->
+                <mail messageMimeType="text/html" messageFile="${regression.quick.dir}/junit-noframes.html" tolist="jimmylin@umd.edu" subject="Ivory regression test results (quick)" mailhost="smtp.umiacs.umd.edu" from="jimmylin@umd.edu" />
+
 	</target>
 
-	<target name="regression-quick" depends="lib" description="Run regression tests">
-		<mkdir dir="${regression-quick}" />
+	<target name="regression-quick" depends="jar" description="Run regression tests">
+		<mkdir dir="${regression.quick.dir}" />
 		<junit printsummary="yes" fork="yes" maxmemory="2048m">
-			<sysproperty key="java.library.path" path="${lib}" />
+			<sysproperty key="java.library.path" path="${lib.dir}" />
 			<sysproperty key="org.xml.sax.driver" value="org.apache.xerces.parsers.SAXParser" />
-			<classpath refid="classpath" />
+			<classpath refid="run.path.id" />
 
 			<formatter type="xml" />
-			<batchtest todir="${regression-quick}">
-				<fileset dir="${build}">
+			<batchtest todir="${regression.quick.dir}">
+				<fileset dir="${build.dir}">
 					<include name="ivory/regression/Robust04_Basic.class" />
 					<include name="ivory/regression/Robust04_WSD.class" />
 					<include name="ivory/regression/Wt10g_Basic.class" />
@@ -108,27 +152,27 @@
 			</batchtest>
 		</junit>
 
-		<junitreport todir="${regression-quick}">
-			<fileset dir="${regression-quick}">
+		<junitreport todir="${regression.quick.dir}">
+			<fileset dir="${regression.quick.dir}">
 				<include name="TEST-*.xml" />
 			</fileset>
-			<report format="noframes" styledir="etc/" todir="${regression-quick}" />
+			<report format="noframes" styledir="etc/" todir="${regression.quick.dir}" />
 		</junitreport>
 
-                <mail messageMimeType="text/html" messageFile="${regression-quick}/junit-noframes.html" tolist="umd-ivory@googlegroups.com" subject="Ivory regression test results (quick)" mailhost="smtp.umiacs.umd.edu" from= "jimmylin@umd.edu" />
+                <mail messageMimeType="text/html" messageFile="${regression.quick.dir}/junit-noframes.html" tolist="umd-ivory@googlegroups.com" subject="Ivory regression test results (quick)" mailhost="smtp.umiacs.umd.edu" from="jimmylin@umd.edu" />
 
 	</target>
 
-	<target name="regression-complete" depends="lib" description="Run regression tests">
-		<mkdir dir="${regression-complete}" />
+	<target name="regression.complete.dir" depends="jar" description="Run regression tests">
+		<mkdir dir="${regression.complete.dir}" />
 		<junit printsummary="yes" fork="yes" maxmemory="2048m">
-			<sysproperty key="java.library.path" path="${lib}" />
+			<sysproperty key="java.library.path" path="${lib.dir}" />
 			<sysproperty key="org.xml.sax.driver" value="org.apache.xerces.parsers.SAXParser" />
-			<classpath refid="classpath" />
+			<classpath refid="run.path.id" />
 
 			<formatter type="xml" />
-			<batchtest todir="${regression-complete}">
-				<fileset dir="${build}">
+			<batchtest todir="${regression.complete.dir}">
+				<fileset dir="${build.dir}">
                                         <include name="ivory/regression/*.class" />
                                         <exclude name="ivory/regression/GroundTruth*.class" />
                                         <exclude name="ivory/regression/RegressionUtils.class" />
@@ -136,14 +180,14 @@
 			</batchtest>
 		</junit>
 
-		<junitreport todir="${regression-complete}">
-			<fileset dir="${regression-complete}">
+		<junitreport todir="${regression.complete.dir}">
+			<fileset dir="${regression.complete.dir}">
 				<include name="TEST-*.xml" />
 			</fileset>
-			<report format="noframes" styledir="etc/" todir="${regression-complete}" />
+			<report format="noframes" styledir="etc/" todir="${regression.complete.dir}" />
 		</junitreport>
 
-                <mail messageMimeType="text/html" messageFile="${regression-complete}/junit-noframes.html" tolist="umd-ivory@googlegroups.com" subject="Ivory regression test results (complete)" mailhost="smtp.umiacs.umd.edu" from= "jimmylin@umd.edu" />
+                <mail messageMimeType="text/html" messageFile="${regression.complete.dir}/junit-noframes.html" tolist="umd-ivory@googlegroups.com" subject="Ivory regression test results (complete)" mailhost="smtp.umiacs.umd.edu" from="jimmylin@umd.edu" />
 
 	</target>
 
@@ -163,8 +207,8 @@
 		</javadoc>
 	</target>
 
-	<target name="scripts" depends="lib">
-		<pathconvert property="classpath" refid="classpath" targetos="${platform}" />
+	<target name="scripts" depends="jar">
+		<pathconvert property="run.path.id" refid="run.path.id" targetos="${platform}" />
 
 		<condition property="suffix" value="sh">
 			<equals arg1="${platform}" arg2="unix" />
@@ -194,7 +238,7 @@
 			<equals arg1="${platform}" arg2="windows" />
 		</condition>
 
-		<property name="java_command" value="${java} -Xmx2g -classpath &quot;${classpath}&quot;" />
+		<property name="java_command" value="${java} -Xmx2g -classpath &quot;${run.path.id}&quot;" />
 
 		<condition property="script_prefix" value="#!/bin/sh${line.separator}if test -s ~/.bashrc${line.separator}then${line.separator}source ~/.bashrc${line.separator}fi${line.separator}">
 			<equals arg1="${platform}" arg2="unix" />
