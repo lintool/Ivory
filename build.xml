@@ -66,6 +66,8 @@
 			<os family="windows" />
 		</condition>
 		<mkdir dir="${build.dir}" />
+		<mkdir dir="${dist.dir}" />
+		<mkdir dir="${lib.dir}" />
 	</target>
 
 	<target name="compile" depends="init,resolve" description="compile the source">
@@ -127,10 +129,6 @@
 			</fileset>
 			<report format="noframes" styledir="etc/" todir="${test.junit.dir}" />
 		</junitreport>
-
-<!-- tmp for testing -->
-                <mail messageMimeType="text/html" messageFile="${regression.quick.dir}/junit-noframes.html" tolist="jimmylin@umd.edu" subject="Ivory regression test results (quick)" mailhost="smtp.umiacs.umd.edu" from="jimmylin@umd.edu" />
-
 	</target>
 
 	<target name="regression-quick" depends="jar" description="Run regression tests">
@@ -163,7 +161,7 @@
 
 	</target>
 
-	<target name="regression.complete.dir" depends="jar" description="Run regression tests">
+	<target name="regression-complete" depends="jar" description="Run regression tests">
 		<mkdir dir="${regression.complete.dir}" />
 		<junit printsummary="yes" fork="yes" maxmemory="2048m">
 			<sysproperty key="java.library.path" path="${lib.dir}" />
