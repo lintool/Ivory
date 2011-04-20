@@ -9,7 +9,7 @@
       <ibiblio name="cloudera" m2compatible="true" root="https://repository.cloudera.com/content/groups/cdh-releases-rcs/"/>
       <!-- for bliki -->
       <ibiblio name="bliki" m2compatible="true" root="http://gwtwiki.googlecode.com/svn/maven-repository/"/>
-
+ 	  <ibiblio name="opennlp" m2compatible="true" root="http://opennlp.sourceforge.net/maven2/"/>
       <filesystem name="libraries">
         <artifact pattern="${basedir}/ivy/local-repo/[artifact]-[revision].[ext]" />
       </filesystem>
