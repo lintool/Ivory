@@ -123,15 +123,13 @@ public class BuildTargetLangWeightedIntDocVectors extends PowerTool {
 				weightedVector.put(e, score);
 			}
 			sLogger.debug("===================================END READ DOC");
+			
+			weightedVectorOut.setWeightedTerms(weightedVector);
 			if(normalize){
 				/*length-normalize doc vectors*/
 				sum2 = (float) Math.sqrt(sum2);
-				for(MapIF.Entry e : weightedVector.entrySet()){
-					float score = weightedVector.get(e.getKey());
-					weightedVector.put(e.getKey(), score/sum2);
-				}
+				weightedVectorOut.normalizeWith(sum2);
 			}
-			weightedVectorOut.mWeightedTerms = weightedVector;
 			output.collect(mDocno, weightedVectorOut);
 			reporter.incrCounter(Docs.Total, 1);
 		}
@@ -139,7 +137,6 @@ public class BuildTargetLangWeightedIntDocVectors extends PowerTool {
 
 	public static final String[] RequiredParameters = { "Ivory.NumMapTasks",
 		"Ivory.IndexPath", 
-		//"Ivory.OutputPath",
 		"Ivory.ScoringModel", 
 		"Ivory.Normalize",
 		};
@@ -180,7 +177,7 @@ public class BuildTargetLangWeightedIntDocVectors extends PowerTool {
 		String vocabFile = conf.get("Ivory.FinalVocab");
 		DistributedCache.addCacheFile(new URI(vocabFile), conf);
 
-		Path inputPath = new Path(PwsimEnvironment.getFileNameWithPars(indexPath, "TermDocs"));//new Path(RetrievalEnvironment.getIntDocVectorsDirectory(indexPath));
+		Path inputPath = new Path(PwsimEnvironment.getFileNameWithPars(indexPath, "TermDocs"));
 		Path weightedVectorsPath = new Path(outputPath);
 
 		if (fs.exists(weightedVectorsPath)) {

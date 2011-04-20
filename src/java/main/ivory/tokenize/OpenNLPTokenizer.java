@@ -28,14 +28,12 @@ public class OpenNLPTokenizer implements ivory.tokenize.Tokenizer {
 	Tokenizer tokenizer;
 	SnowballStemmer stemmer;
 	String lang;
-//	boolean isWiki;
 	protected static int NUM_PREDS, MIN_LENGTH = 2, MAX_LENGTH = 50;
 	String delims = "`~!@#$%^&*()-_=+]}[{\\|'\";:/?.>,<";
 	VocabularyWritable vocab;
 
 	public OpenNLPTokenizer(){
 		super();
-//		isWiki = false;
 	}
 
 	public void configure(Configuration mJobConf){
@@ -48,7 +46,6 @@ public class OpenNLPTokenizer implements ivory.tokenize.Tokenizer {
 		} 
 		setTokenizer(fs, new Path(mJobConf.get("Ivory.TokenizerModel")));
 		setLanguageAndStemmer(mJobConf.get("Ivory.Lang"));
-//		setIsWiki(mJobConf.getBoolean("Ivory.IsWiki", true));
 		VocabularyWritable vocab;
 		try {
 			vocab = (VocabularyWritable) CLIRUtils.loadVocab(new Path(mJobConf.get("Ivory.CollectionVocab")), fs);
@@ -96,18 +93,11 @@ public class OpenNLPTokenizer implements ivory.tokenize.Tokenizer {
 		} 
 	}
 
-//	public void setIsWiki(boolean b){
-//		isWiki = b;
-//	}
-
 	public void setVocab(VocabularyWritable v){
 		vocab = v;
 	}
 
 	public String[] processContent(String text) {
-//		if(isWiki){
-//			text = WikipediaPage.parseAndCleanPage(text).trim();
-//		}
 		String[] tokens = tokenizer.tokenize(text);
 		List<String> stemmedTokens = new ArrayList<String>();
 		for(String token : tokens){
@@ -173,70 +163,4 @@ public class OpenNLPTokenizer implements ivory.tokenize.Tokenizer {
 		String[] ss = eTokenizer.processContent(s);
 		System.out.println();
 	}
-
-
-	//	/**
-	//	 * Following code in opennlp.tools.lang.english.Tokenizer, I copied code from opennlp.maxent.io.GISModelReader to suit reading from HDFS.
-	//	 * @param fs
-	//	 * @param path
-	//	 * @return
-	//	 */
-	//	public static GISModel createMaxentModel(FileSystem fs, Path path) {
-	//		GISModel model = null;
-	//		try {
-	//			FSDataInputStream in = fs.open(path);
-	//			String modelType = in.readUTF();
-	//			if (!modelType.equals("GIS"))
-	//				System.out.println("Error: attempting to load a "+modelType+
-	//						" model as a GIS model."+
-	//				" You should expect problems.");
-	//
-	//			int correctionConstant = in.readInt();
-	//			double correctionParam = in.readDouble();
-	//			int numOutcomes = in.readInt();
-	//			String[] outcomeLabels = new String[numOutcomes];
-	//			for (int i=0; i<numOutcomes; i++) outcomeLabels[i] = in.readUTF();
-	//			int numOCTypes =  in.readInt();
-	//			int[][] outcomePatterns = new int[numOCTypes][];
-	//			for (int i=0; i<numOCTypes; i++) {
-	//				StringTokenizer tok = new StringTokenizer( in.readUTF(), " ");
-	//				int[] infoInts = new int[tok.countTokens()];
-	//				for (int j = 0; tok.hasMoreTokens(); j++) {
-	//					infoInts[j] = Integer.parseInt(tok.nextToken());
-	//				}
-	//				outcomePatterns[i] = infoInts;
-	//			}
-	//			NUM_PREDS = in.readInt();
-	//			String[] predLabels = new String[NUM_PREDS];
-	//			for (int i=0; i<NUM_PREDS; i++)
-	//				predLabels[i] = in.readUTF();
-	//			Context[] params = new Context[NUM_PREDS];
-	//			int pid=0;
-	//			for (int i=0; i<outcomePatterns.length; i++) {
-	//				//construct outcome pattern
-	//				int[] outcomePattern = new int[outcomePatterns[i].length-1];
-	//				for (int k=1; k<outcomePatterns[i].length; k++) {
-	//					outcomePattern[k-1] = outcomePatterns[i][k];
-	//				}
-	//				//populate parameters for each context which uses this outcome pattern. 
-	//				for (int j=0; j<outcomePatterns[i][0]; j++) {
-	//					double[] contextParameters = new double[outcomePatterns[i].length-1];
-	//					for (int k=1; k<outcomePatterns[i].length; k++) {
-	//						contextParameters[k-1] = in.readDouble();
-	//					}
-	//					params[pid] = new Context(outcomePattern,contextParameters);
-	//					pid++;
-	//				}
-	//			}
-	//			model =  new GISModel(params,
-	//					predLabels,
-	//					outcomeLabels,
-	//					correctionConstant,
-	//					correctionParam);
-	//		} catch (IOException e) {
-	//			e.printStackTrace();
-	//		}	
-	//		return model;
-	//	}
-
 }

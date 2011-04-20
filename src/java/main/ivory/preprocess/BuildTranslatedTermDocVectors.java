@@ -47,7 +47,7 @@ for Cross-Language Information Retrieval, SIGIR'06, Jianqiang Wang and Douglas W
  */
 @SuppressWarnings( "deprecation")
 public class BuildTranslatedTermDocVectors extends PowerTool {
-	private static final Logger sLogger = Logger.getLogger(BuildTranslatedTermDocVectors.class);
+	private static final Logger LOG = Logger.getLogger(BuildTranslatedTermDocVectors.class);
 	private static int SAMPLING = 1;
 
 	protected static enum Docs {
@@ -61,7 +61,7 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
 	private static class MyMapperTrans extends MapReduceBase implements
 	Mapper<IntWritable, TermDocVector, IntWritable, HMapSFW> {
 
-		private ScoringModel mModel;
+		private ScoringModel model;
 		private HMapIFW transDfTable;
 		// eVocabSrc is the English vocabulary for probability table e2f_Probs.
 		// engVocabTrgis the English vocabulary for probability table f2e_Probs.
@@ -76,12 +76,12 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
 		int MIN_SIZE = 0;	// minimum document size, to avoid noise in Wikipedia due to stubs/very short articles etc.
 		
 		public void configure(JobConf job) {
-			//			sLogger.setLevel(Level.DEBUG);
+			//			LOG.setLevel(Level.DEBUG);
 			numDocs = job.getInt("Ivory.CollectionDocumentCount", -1);
 			avgDocLen = job.getFloat("Ivory.AvgDocLen", -1);
 			isNormalize = job.getBoolean("Ivory.Normalize", false);
 			language = job.get("Ivory.Lang");
-			sLogger.debug(numDocs+" "+avgDocLen);
+			LOG.debug(numDocs+" "+avgDocLen);
 			MIN_SIZE = job.getInt("Ivory.MinNumTerms", 0);
 
 			FileSystem localFs=null;
@@ -101,7 +101,7 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
 			try {
 				transDfTable = CLIRUtils.readTransDfTable(localFiles[0], localFs);
 			} catch (Exception e) {
-				sLogger.info(e.getMessage());
+				LOG.info(e.getMessage());
 				throw new RuntimeException("Error initializing DfTable!");
 			}
 
@@ -119,21 +119,21 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
 			}	
 
 			try {
-				mModel = (ScoringModel) Class.forName(job.get("Ivory.ScoringModel")).newInstance();
+				model = (ScoringModel) Class.forName(job.get("Ivory.ScoringModel")).newInstance();
 			} catch (Exception e) {
 				throw new RuntimeException("Error initializing Ivory.ScoringModel!");
 			}
 
 			// this only needs to be set once for the entire collection
-			mModel.setDocCount(numDocs);
-			mModel.setAvgDocLength(avgDocLen);
+			model.setDocCount(numDocs);
+			model.setAvgDocLength(avgDocLen);
 
 			if(job.get("debug")!=null){
-				sLogger.setLevel(Level.DEBUG);
+				LOG.setLevel(Level.DEBUG);
 			}
-			sLogger.debug(numDocs);
-			sLogger.debug(avgDocLen);
-			sLogger.debug("---------");
+			LOG.debug(numDocs);
+			LOG.debug(avgDocLen);
+			LOG.debug("---------");
 		}
 
 		public void map(IntWritable docno, TermDocVector doc,
@@ -149,8 +149,8 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
 			//translate doc vector		
 			HMapIFW tfS = new HMapIFW();
 			
-			int docLen = CLIRUtils.translateTFs(doc, tfS, eVocabSrc, eVocabTrg, fVocabSrc, fVocabTrg, e2f_Probs, f2e_Probs, sLogger);
-			HMapSFW v = CLIRUtils.createTranslatedVector(docLen, tfS, eVocabSrc, mModel, transDfTable, isNormalize, sLogger);
+			int docLen = CLIRUtils.translateTFs(doc, tfS, eVocabSrc, eVocabTrg, fVocabSrc, fVocabTrg, e2f_Probs, f2e_Probs, LOG);
+			HMapSFW v = CLIRUtils.createTranslatedVector(docLen, tfS, eVocabSrc, model, transDfTable, isNormalize, LOG);
 			
 			// if no translation of any word is in the target vocab, remove document i.e., our model wasn't capable of translating it.
 			if(v.isEmpty() ){
@@ -190,46 +190,25 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
 		String eVocab_e2f  = getConf().get("Ivory.E_Vocab_E2F");		//en from P(f|e)
 		String fVocab_e2f  = getConf().get("Ivory.F_Vocab_E2F");		//de from P(f|e)
 		String ttable_e2f= getConf().get("Ivory.TTable_E2F");			//P(f|e)
-
-		JobConf conf2 = new JobConf(getConf(), BuildTranslatedTermDocVectors.class);
-		conf2.setJobName("BuildTranslatedDfTable");
-		FileSystem fs2 = FileSystem.get(conf2);
-
-		if(fs2.exists(new Path(transDfFile))){
-			sLogger.info("Translated Df file already exists! Nothing to do for this job...");
-		}else{			
-			sLogger.info("Creating translated Df file ...");
-			conf2.set("mapred.child.java.opts", "-Xmx2048m");
-			conf2.setInt("mapred.map.max.attempts", 10);
-			conf2.setInt("mapred.reduce.max.attempts", 10);
-			conf2.setInt("mapred.task.timeout", 6000000);
-			conf2.set("TransDfFile", transDfFile);
-			conf2.setSpeculativeExecution(false);
-			conf2.setNumMapTasks(1);
-			conf2.setNumReduceTasks(0);
-			conf2.setInputFormat(NullInputFormat.class);
-			conf2.setOutputFormat(NullOutputFormat.class);
-			conf2.setMapperClass(DataWriterMapper.class);
-			JobClient.runJob(conf2);			
-			sLogger.info("Done");
-		}
+	
+		createTranslatedDFFile(transDfFile);
 
 		JobConf conf = new JobConf(getConf(), BuildTranslatedTermDocVectors.class);
 		conf.setJobName("BuildTranslatedTermDocVectors");
 		FileSystem fs = FileSystem.get(conf);
 
 		if(fs.exists(new Path(outputPath))){
-			sLogger.info(outputPath+": Translated term doc vectors already exist! Nothing to do for this job...");
+			LOG.info(outputPath+": Translated term doc vectors already exist! Nothing to do for this job...");
 			return 0;
 		}
 
 		String collectionName = getConf().get("Ivory.CollectionName");
 		String inputPath = env.getTermDocVectorsDirectory();
 
-		sLogger.info("Preparing to build document vectors using " + scoringModel);
-		sLogger.info("Document vectors to be stored in " + outputPath);
-		sLogger.info("CollectionName: " + collectionName);
-		sLogger.info("Input path: " + inputPath);
+		LOG.info("Preparing to build document vectors using " + scoringModel);
+		LOG.info("Document vectors to be stored in " + outputPath);
+		LOG.info("CollectionName: " + collectionName);
+		LOG.info("Input path: " + inputPath);
 
 		///////Configuration setup
 
@@ -241,8 +220,8 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
 		} catch (IOException e1) {
 			throw new RuntimeException("Error initializing Doclengths file");
 		}
-		sLogger.info(mDLTable.getAvgDocLength()+" is average doc len.");
-		sLogger.info(mDLTable.getDocCount()+" is num docs.");
+		LOG.info(mDLTable.getAvgDocLength()+" is average doc len.");
+		LOG.info(mDLTable.getDocCount()+" is num docs.");
 
 		conf.setFloat("Ivory.AvgDocLen", mDLTable.getAvgDocLength());
 		conf.setInt("Ivory.CollectionDocumentCount", env.readCollectionDocumentCount());
@@ -278,9 +257,38 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
 
 		long startTime = System.currentTimeMillis();
 		JobClient.runJob(conf);
-		sLogger.info("Job finished in "+(System.currentTimeMillis()-startTime)/1000.0+" seconds");
+		LOG.info("Job finished in "+(System.currentTimeMillis()-startTime)/1000.0+" seconds");
 
 		return 0;
+	}
+
+	private void createTranslatedDFFile(String transDfFile) {
+		try {
+			JobConf conf2 = new JobConf(getConf(), BuildTranslatedTermDocVectors.class);
+			conf2.setJobName("BuildTranslatedDfTable");
+			FileSystem fs2 = FileSystem.get(conf2);
+
+			if(fs2.exists(new Path(transDfFile))){
+				LOG.info("Translated Df file already exists! Nothing to do for this job...");
+			}else{		
+				LOG.info("Creating translated Df file ...");
+				conf2.set("mapred.child.java.opts", "-Xmx2048m");
+				conf2.setInt("mapred.map.max.attempts", 10);
+				conf2.setInt("mapred.reduce.max.attempts", 10);
+				conf2.setInt("mapred.task.timeout", 6000000);
+				conf2.set("TransDfFile", transDfFile);
+				conf2.setSpeculativeExecution(false);
+				conf2.setNumMapTasks(1);
+				conf2.setNumReduceTasks(0);
+				conf2.setInputFormat(NullInputFormat.class);
+				conf2.setOutputFormat(NullOutputFormat.class);
+				conf2.setMapperClass(DataWriterMapper.class);
+				JobClient.runJob(conf2);		
+				LOG.info("Done");
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	private static class DataWriterMapper extends NullMapper {

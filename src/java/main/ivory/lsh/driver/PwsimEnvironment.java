@@ -77,8 +77,6 @@ public abstract class PwsimEnvironment extends Configured {
 			return dir + "/sample-docnos_"+sampleSize;
 		}else if(fileName.equals("RandomVectors")){
 			return dir + "/randomvectors_D="+numOfBits;
-		/*}else if(fileName.equals("PartitionedSignatures")){
-			return dir + "/partitioned-sigs";*/
 		}else if(fileName.equals("SignaturesSimhash")){
 			if(numBatchFiles>0){
 				return dir + "/signatures-simhash_D="+numOfBits+"_batch="+numBatchFiles;
