@@ -150,7 +150,7 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
 			HMapIFW tfS = new HMapIFW();
 			
 			int docLen = CLIRUtils.translateTFs(doc, tfS, eVocabSrc, eVocabTrg, fVocabSrc, fVocabTrg, e2f_Probs, f2e_Probs, LOG);
-			HMapSFW v = CLIRUtils.createTranslatedVector(docLen, tfS, eVocabSrc, model, transDfTable, isNormalize, LOG);
+			HMapSFW v = CLIRUtils.createTermDocVector(docLen, tfS, eVocabSrc, model, transDfTable, isNormalize, LOG);
 			
 			// if no translation of any word is in the target vocab, remove document i.e., our model wasn't capable of translating it.
 			if(v.isEmpty() ){
