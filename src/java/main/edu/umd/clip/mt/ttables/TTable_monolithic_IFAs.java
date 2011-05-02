@@ -92,7 +92,7 @@ public class TTable_monolithic_IFAs extends TTable implements Cloneable {
 	}
 		
 	public float get(int e, int f) {
-		return _data[e].getLazy(f);
+		return _data[e].get(f);
 		
 	/*	catch (Exception ex) {
 			throw new RuntimeException("e=" + e + " f="+f + "\n"+ _data[e] +"\nCaught " + ex);
