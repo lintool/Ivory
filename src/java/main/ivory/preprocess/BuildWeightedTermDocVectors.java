@@ -50,8 +50,8 @@ import org.apache.hadoop.mapred.SequenceFileOutputFormat;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
-import edu.umd.clip.mt.Vocab;
-import edu.umd.clip.mt.ttables.TTable_monolithic_IFAs;
+import edu.umd.hooka.Vocab;
+import edu.umd.hooka.ttables.TTable_monolithic_IFAs;
 import edu.umd.cloud9.io.map.HMapSFW;
 import edu.umd.cloud9.mapred.NullInputFormat;
 import edu.umd.cloud9.mapred.NullMapper;

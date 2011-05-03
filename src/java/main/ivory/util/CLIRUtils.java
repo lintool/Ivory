@@ -33,11 +33,11 @@ import org.apache.hadoop.io.SequenceFile;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
-import edu.umd.clip.mt.Vocab;
-import edu.umd.clip.mt.VocabularyWritable;
-import edu.umd.clip.mt.alignment.HadoopAlign;
-import edu.umd.clip.mt.alignment.IndexedFloatArray;
-import edu.umd.clip.mt.ttables.TTable_monolithic_IFAs;
+import edu.umd.hooka.Vocab;
+import edu.umd.hooka.VocabularyWritable;
+import edu.umd.hooka.alignment.HadoopAlign;
+import edu.umd.hooka.alignment.IndexedFloatArray;
+import edu.umd.hooka.ttables.TTable_monolithic_IFAs;
 import edu.umd.cloud9.io.map.HMapIFW;
 import edu.umd.cloud9.io.map.HMapSFW;
 import edu.umd.cloud9.io.map.HMapSIW;

@@ -18,7 +18,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.tartarus.snowball.SnowballStemmer;
 
-import edu.umd.clip.mt.VocabularyWritable;
+import edu.umd.hooka.VocabularyWritable;
 
 public class OpenNLPTokenizer implements ivory.tokenize.Tokenizer {
 	private static final Logger sLogger = Logger.getLogger(DocumentProcessingUtils.class);
