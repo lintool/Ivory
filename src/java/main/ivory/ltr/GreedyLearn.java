@@ -140,6 +140,9 @@ public class GreedyLearn {
 
 			// add best model feature pairs to pool
 			models = new ArrayList<Model>();
+
+			//Lidan: here consider top-K features, rather than just the best one
+
 			for(int i = 0; i < numModels; i++) {
 				Model model = modelFeaturePairs.get(i).model;
 				Feature feature = modelFeaturePairs.get(i).feature;

@@ -139,9 +139,9 @@ public class Instances {
 		while((line = in.readLine()) != null) {
 			String [] fvals = line.split("\t");
 			if(fvals.length != numCols) {
-				throw new ConfigurationException("Line -- " + line + " has the incorrect number of columns!");
+				throw new ConfigurationException("Line -- " + line + " has the incorrect number of columns! "+fvals.length+" "+numCols);
 			}
-			
+		
 			queryIds[rowNum] = new String(fvals[qidCol]);
 			docIds[rowNum] = new String(fvals[docidCol]);
 			grades[rowNum] = Float.parseFloat(fvals[gradeCol]);
