@@ -91,6 +91,11 @@ public interface PostingsReader {
 	 * @return returns the score corresponding to the current posting
 	 */
 	public short getScore();
+
+	/**
+         * @return the window size of term proximity features
+	 */
+	public int getWindowSize();
 	
 	/**
 	 * @return returns the docno corresponding to the current posting

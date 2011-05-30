@@ -144,8 +144,7 @@ public class QueryPotential_cascade extends QueryPotential {
 	}
 
 	public int getWindowSize(){
-		return -1;
-		//return postingsReader.getWindowSize();
+		return postingsReader.getWindowSize();
 	}
 
         public String getScoringFunctionName(){

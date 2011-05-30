@@ -486,6 +486,12 @@ public class PostingsListDocSortedPositional implements PostingsList {
 			throw new UnsupportedOperationException();
 		}
 
+		public int getWindowSize(){
+                        //System.out.println("Not supported! getWindowSize() for term features.");
+                        //System.exit(-1);
+                        return -1;
+                }
+
 		private void skipPositions(int tf) throws IOException {
 			if (tf == 1) {
 				mBitsIn.readGamma();

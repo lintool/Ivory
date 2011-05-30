@@ -37,6 +37,10 @@ public abstract class ProximityPostingsReader implements PostingsReader {
 		this.size = size;
 	}
 
+        public int getWindowSize(){
+                return size;
+        }
+
 	/**
 	 * Returns <code>true</code> if current reader configuration represents a match.
 	 */
