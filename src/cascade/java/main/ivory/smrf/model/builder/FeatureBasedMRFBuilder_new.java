@@ -125,10 +125,6 @@ public class FeatureBasedMRFBuilder_new extends FeatureBasedMRFBuilder {
 				if (cascadeStage != -1){
 					RetrievalEnvironment.setIsNew(true);
 
-					if (!importanceSource.equals("")) {
-						//System.out.println("The boosting alg should learn the weight, shouldn't use WSD weights!");
-						//System.exit(-1);
-					}
 				}
 				else{
 					RetrievalEnvironment.setIsNew(false);
@@ -214,13 +210,6 @@ public class FeatureBasedMRFBuilder_new extends FeatureBasedMRFBuilder {
 					if (!importanceSource.equals("")) {
 
 						float importance = importanceModel.getCliqueWeight(c);						
-	
-						if (weightScale != -1.0f){ //if weightScale == -1, then importance and weight will be multiplied without weighting
-							if (weight!=-1.0f){ 
-								c.setParameterWeight((float) (Math.pow(weight, weightScale)));
-								importance = (float)(Math.pow(importance, (1.0f-weightScale)));
-							}
-						}
 
 						if (weight == -1.0f){ //default value. 
 							c.setParameterWeight(1.0f);
