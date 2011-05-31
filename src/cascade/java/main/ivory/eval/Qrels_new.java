@@ -36,12 +36,9 @@ import java.util.Map.Entry;
  * @author Jimmy Lin
  * @author Lidan Wang
  */
-public class Qrels_new {
-
-	//private Map<String, Map<String, Boolean>> mQrels;
+public class Qrels_new extends Qrels{
 
 	private Map<String, Map<String, String>> mQrels;
-
 
 	private float topics = 0;
 
@@ -52,6 +49,9 @@ public class Qrels_new {
 	 *            file that contains the relevance judgments
 	 */
 	public Qrels_new(String file) {
+
+		super (file);
+
 		//mQrels = new TreeMap<String, Map<String, Boolean>>();
 
 		mQrels = new TreeMap<String, Map<String, String>>();
@@ -142,26 +142,5 @@ public class Qrels_new {
 		return set;
 	}
 
-
-
-	/**
-	 * Returns a set containing the ids of information needs in this
-	 * <code>Qrels</code> object.
-	 * 
-	 * @return a set containing the ids of information needs in this
-	 *         <code>Qrels</code> object
-	 */
-	public Set<String> getQids() {
-		return mQrels.keySet();
-	}
-
-
-	/**                     
-         * Used with RunQueryHDFSTrainWSD class
-	 *
-         * @return number of topics needed by RunQueryHDFSTrainWSD to compute effectiveness scores
-         */
-	public float helperHDFSTrainWSDTopics(){
-		return topics;
-	}
 }
+
