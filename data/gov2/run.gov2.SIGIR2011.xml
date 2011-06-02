@@ -1,5 +1,5 @@
 <parameters>
-     <index>/Users/jimmy/data/indexes/gov2</index>
+     <index>/scratch0/gov2</index>
 
      <!-- Concept importance model for binning -->
      <importancemodel id="wsd" type="ivory.smrf.model.importance.LinearImportanceModel">
