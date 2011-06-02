@@ -1,11 +1,11 @@
 package ivory.regression;
 
 import ivory.eval.Qrels;
-import ivory.eval.Qrels_new;
+import ivory.eval.GradedQrels;
 import ivory.regression.GroundTruth.Metric;
 import ivory.smrf.retrieval.Accumulator;
 import ivory.smrf.retrieval.BatchQueryRunner;
-import ivory.smrf.retrieval.CascadeBatchQueryRunner;
+import ivory.smrf.retrieval.cascade.CascadeBatchQueryRunner;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -107,7 +107,7 @@ public class Gov2_SIGIR2011 {
 
 		g.put("gov2-featureprune", new GroundTruth("gov2-featureprune", Metric.NDCG20, 75, featurePrune, 0.4716f));
 
-		Qrels_new qrels = new Qrels_new("data/gov2/qrels.gov2.all");
+		GradedQrels qrels = new GradedQrels("data/gov2/qrels.gov2.all");
 
     String[] params = new String[] {
             "data/gov2/run.gov2.SIGIR2011.xml",

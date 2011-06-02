@@ -14,7 +14,7 @@
  * permissions and limitations under the License.
  */
 
-package ivory.smrf.retrieval;
+package ivory.smrf.retrieval.cascade;
 
 import ivory.exception.ConfigurationException;
 import ivory.smrf.model.Clique;
@@ -25,6 +25,7 @@ import ivory.smrf.model.MarkovRandomField;
 import ivory.util.RetrievalEnvironment;
 import ivory.smrf.model.score.CascadeDirichletScoringFunction;
 import ivory.smrf.model.score.CascadeBM25ScoringFunction;
+import ivory.smrf.retrieval.Accumulator;
 
 import java.util.Arrays;
 import java.util.ArrayList;

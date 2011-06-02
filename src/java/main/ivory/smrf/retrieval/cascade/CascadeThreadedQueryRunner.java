@@ -14,12 +14,14 @@
  * permissions and limitations under the License.
  */
 
-package ivory.smrf.retrieval;
+package ivory.smrf.retrieval.cascade;
 
 import ivory.exception.ConfigurationException;
 import ivory.smrf.model.MarkovRandomField;
 import ivory.smrf.model.builder.MRFBuilder;
 import ivory.smrf.model.expander.MRFExpander;
+import ivory.smrf.retrieval.Accumulator;
+import ivory.smrf.retrieval.MRFDocumentRanker;
 import ivory.util.RetrievalEnvironment;
 
 import java.util.HashMap;

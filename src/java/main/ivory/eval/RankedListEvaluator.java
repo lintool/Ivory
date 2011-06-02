@@ -19,6 +19,7 @@ package ivory.eval;
 import ivory.smrf.retrieval.Accumulator;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -84,6 +85,7 @@ public class RankedListEvaluator {
 			} else if (metrics[i].equals("num_rel")) {
 				results.put("num_rel", computeNumRelevant(docs, mapping, reldocs));
 			} else {
+		     //TODO: add dispatch to NDCG here.
 				logger.warn("Warning: Unknown metric '" + metrics[i] + "'");
 			}
 		}
@@ -207,6 +209,82 @@ public class RankedListEvaluator {
 
 		return computePN(reldocs.size(), docs, mapping, reldocs);
 	}
+
+	 public static double computeDCG (int n, double [] gain){
+	    double score = 0;
+
+	    for (int i=0; i<gain.length && i < n; i++){
+	      score += (Math.pow(2.0, gain[i]) - 1)/(Math.log(i+2) / Math.log(2));
+	    }
+
+	    return score;
+	  }
+
+	  /**
+	         * Computes ndcg (NDCG) of a ranked list (1 query only !!)
+	         * 
+	         * @param docs
+	         *            the list of results
+	         * @param reldocs
+	         *            set of the ids of the relevant documents
+	         * @return ndcg
+	         */
+
+	  public static double computeNDCG(int n, Accumulator[] docs, DocnoMapping mapping, Set<String> reldocs){
+	    if (reldocs.size()==0){
+	      return 0d;
+	    }
+
+	    double [] ratings = new double[reldocs.size()];
+	    double [] ratings_2 = new double[docs.length];
+
+	    HashMap doc_to_rating = new HashMap();
+	    
+	    int cnt = 0;
+	    int [] order = new int[reldocs.size()];
+
+	    for (Iterator<String> it = reldocs.iterator(); it.hasNext(); ){
+	      String s = it.next();     
+
+	      String [] tokens = s.trim().split("\\s+");
+	      if (tokens.length!=2){
+	        System.out.println("Should have both docid and rating for this relevant doc!");
+	        System.exit(-1);
+	      }
+
+	      int rating = Integer.parseInt(tokens[1]);
+	      doc_to_rating.put(tokens[0], rating+"");
+
+	      if (rating == 0){
+	        System.out.println("Should only have relevant documents here.");
+	        System.exit(-1);
+	      }
+	      ratings[cnt] = rating;
+	      cnt++;
+	    }
+
+	    ivory.smrf.model.constrained.ConstraintModel.Quicksort(ratings, order, 0, order.length-1);
+
+	    double [] ratings_descending = new double[ratings.length];
+	    for (int i=0; i<ratings_descending.length; i++){
+	      ratings_descending[i] = ratings[ratings.length-i-1];    
+	    }
+
+	    double idealDCG = computeDCG (n, ratings_descending);
+
+
+	    for (int i=0; i<docs.length; i++){
+	      String docno = mapping.getDocid(docs[i].docno);
+	      String r = (String)(doc_to_rating.get(docno));
+	      ratings_2[i] = 0;
+	      if (r!=null){
+	        ratings_2[i] = Integer.parseInt(r);
+	      }
+	    }
+	    double dcg = computeDCG (n, ratings_2);
+
+	    return roundTo4SigFigs(dcg/idealDCG);
+	  }
 
 	/**
 	 * Returns a double value to four significant figures. This follows the NIST
