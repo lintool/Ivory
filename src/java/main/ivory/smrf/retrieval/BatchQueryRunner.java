@@ -48,19 +48,19 @@ import edu.umd.cloud9.collection.DocnoMapping;
 public class BatchQueryRunner {
 	private static final Logger LOG = Logger.getLogger(BatchQueryRunner.class);
 
-	private DocnoMapping docnoMapping = null;
+	protected DocnoMapping docnoMapping = null;
 	protected FileSystem fs = null;
 	protected String indexPath = null;
 	protected RetrievalEnvironment env = null;
 
-	private final Map<String, String> queries = Maps.newLinkedHashMap();
-	private final Map<String, Node> importanceModels = Maps.newLinkedHashMap();
-	private final Map<String, Node> models = Maps.newLinkedHashMap();
-	private final Map<String, Node> docscores = Maps.newLinkedHashMap();
-	private final Map<String, Node> expanders = Maps.newHashMap();
-	private final Map<String, Map<String, Double>> judgments = Maps.newHashMap();
-	private final Map<String, QueryRunner> queryRunners = Maps.newLinkedHashMap();
-	private final Set<String> stopwords = Sets.newHashSet();
+	protected final Map<String, String> queries = Maps.newLinkedHashMap();
+	protected final Map<String, Node> importanceModels = Maps.newLinkedHashMap();
+	protected final Map<String, Node> models = Maps.newLinkedHashMap();
+	protected final Map<String, Node> docscores = Maps.newLinkedHashMap();
+	protected final Map<String, Node> expanders = Maps.newHashMap();
+	protected final Map<String, Map<String, Double>> judgments = Maps.newHashMap();
+	protected final Map<String, QueryRunner> queryRunners = Maps.newLinkedHashMap();
+	protected final Set<String> stopwords = Sets.newHashSet();
 
 	public BatchQueryRunner(String[] args, FileSystem fs) throws ConfigurationException {
 		init(args,fs);

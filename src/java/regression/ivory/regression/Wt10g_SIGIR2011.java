@@ -5,7 +5,7 @@ import ivory.eval.Qrels_new;
 import ivory.regression.GroundTruth.Metric;
 import ivory.smrf.retrieval.Accumulator;
 import ivory.smrf.retrieval.BatchQueryRunner;
-import ivory.smrf.retrieval.BatchQueryRunner_cascade;
+import ivory.smrf.retrieval.CascadeBatchQueryRunner;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -95,7 +95,7 @@ public class Wt10g_SIGIR2011 {
 
 		FileSystem fs = FileSystem.getLocal(new Configuration());
 
-		BatchQueryRunner_cascade qr = new BatchQueryRunner_cascade(params, fs);
+		CascadeBatchQueryRunner qr = new CascadeBatchQueryRunner(params, fs);
 
 		long start = System.currentTimeMillis();
 		qr.runQueries();

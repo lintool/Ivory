@@ -38,8 +38,8 @@ import com.google.common.base.Preconditions;
 /**
  * @author Lidan Wang
  */
-public class ThreadedQueryRunner_cascade implements QueryRunner_cascade {
-	private static final Logger sLogger = Logger.getLogger(ThreadedQueryRunner_cascade.class);
+public class CascadeThreadedQueryRunner implements CascadeQueryRunner {
+	private static final Logger sLogger = Logger.getLogger(CascadeThreadedQueryRunner.class);
 
 	private MRFBuilder mBuilder;
 	private MRFExpander mExpander;
@@ -53,7 +53,7 @@ public class ThreadedQueryRunner_cascade implements QueryRunner_cascade {
 	private float [] cascadeCostAllQueries = new float[1000];
 	private float [] cascadeCostAllQueries_lastStage = new float[1000];
 
-	public ThreadedQueryRunner_cascade(MRFBuilder builder, MRFExpander expander, int numThreads, int numHits, HashMap savedResults, int K) {
+	public CascadeThreadedQueryRunner(MRFBuilder builder, MRFExpander expander, int numThreads, int numHits, HashMap savedResults, int K) {
 		Preconditions.checkNotNull(builder);
 
 		assert (numThreads > 0);

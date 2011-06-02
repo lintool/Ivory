@@ -29,7 +29,7 @@ import com.google.common.base.Preconditions;
  * @author Don Metzler
  * @author Lidan Wang
  */
-public class OrderedCliqueSet_cascade extends CliqueSet_cascade {
+public class CascadeOrderedCliqueSet extends CascadeCliqueSet {
 
 	public static final String TYPE = "Ordered";
 	
@@ -48,9 +48,9 @@ public class OrderedCliqueSet_cascade extends CliqueSet_cascade {
 
 		// generate clique set
 		if (dependenceType.equals("sequential")) {
-			addCliques(CliqueFactory_cascade.getSequentialDependenceCliques(env, queryTerms, domNode, docDependent, cascadeStage, pruner_and_params));
+			addCliques(CascadeCliqueFactory.getSequentialDependenceCliques(env, queryTerms, domNode, docDependent, cascadeStage, pruner_and_params));
 		} else if (dependenceType.equals("full")) {
-			addCliques(CliqueFactory_cascade.getFullDependenceCliques(env, queryTerms, domNode, true, docDependent, cascadeStage, pruner_and_params));
+			addCliques(CascadeCliqueFactory.getFullDependenceCliques(env, queryTerms, domNode, true, docDependent, cascadeStage, pruner_and_params));
 		} else {
 			throw new ConfigurationException("Unrecognized OrderedCliqueSet type \"" + dependenceType + "\"!");
 		}

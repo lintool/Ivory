@@ -24,12 +24,12 @@ import com.google.common.base.Preconditions;
 /**
  * @author Lidan Wang
  */
-public class Accumulator_cascade extends Accumulator{ 
+public class CascadeAccumulator extends Accumulator{ 
 
 	//index into the kept docs array that will be passed through the cascade
 	public int index_into_keptDocs = -1;
 
-	public Accumulator_cascade(int docno, float score) {
+	public CascadeAccumulator(int docno, float score) {
 		super(docno, score);
 	}
 }

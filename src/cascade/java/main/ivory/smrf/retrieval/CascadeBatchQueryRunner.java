@@ -59,7 +59,8 @@ import edu.umd.cloud9.collection.DocnoMapping;
  * @author Lidan Wang
  */
 
-public class BatchQueryRunner_cascade extends BatchQueryRunner{
+public class CascadeBatchQueryRunner extends BatchQueryRunner{
+  private static final Logger LOG = Logger.getLogger(CascadeBatchQueryRunner.class);
 
 	//For each model (as key), store the cascade costs for all queries (as value)
 	private HashMap cascadeCosts = new HashMap();
@@ -74,7 +75,7 @@ public class BatchQueryRunner_cascade extends BatchQueryRunner{
 	private int K_val;
 	private int kVal;
 
-	public BatchQueryRunner_cascade(String[] args, FileSystem fs) throws ConfigurationException {
+	public CascadeBatchQueryRunner(String[] args, FileSystem fs) throws ConfigurationException {
 		super (args, fs);
 		parseParameters(args);
 
@@ -86,7 +87,7 @@ public class BatchQueryRunner_cascade extends BatchQueryRunner{
 		if (internalInputFile!=null){
 			BufferedReader in;
 			try{
-				in = new BufferedReader(new InputStreamReader(mFs.open(new Path(internalInputFile))));
+				in = new BufferedReader(new InputStreamReader(fs.open(new Path(internalInputFile))));
 				String line;
 				 //Docnos and scores for a given query
 				LinkedList results = new LinkedList();
@@ -158,15 +159,15 @@ public class BatchQueryRunner_cascade extends BatchQueryRunner{
 
 		int modelCnt = 0;
 
-		for (String modelID : mModels.keySet()) {
+		for (String modelID : models.keySet()) {
 
 			String internalInputFile = internalInputFiles[modelCnt];
 
 			//Initialize mDocSet for each query if there is internalInputFile
 			HashMap savedResults_prevStage = readInternalInputFile(internalInputFile);
 
-			Node modelNode = mModels.get(modelID);
-			Node expanderNode = mExpanders.get(modelID);
+			Node modelNode = models.get(modelID);
+			Node expanderNode = expanders.get(modelID);
 
    			//K value for cascade
                         K_val = XMLTools.getAttributeValue(modelNode, "K", 0);
@@ -179,51 +180,51 @@ public class BatchQueryRunner_cascade extends BatchQueryRunner{
 			RetrievalEnvironment.topK = kVal;
 
 			// Initialize retrieval environment variables.
-			QueryRunner_cascade runner = null;
+			CascadeQueryRunner runner = null;
 			MRFBuilder builder = null;
 			MRFExpander expander = null;
 
 			try {
 				// Get the MRF builder.
-				builder = MRFBuilder.get(mEnv, modelNode.cloneNode(true));
+				builder = MRFBuilder.get(env, modelNode.cloneNode(true));
 
 				// Get the MRF expander.
 				expander = null;
 				if (expanderNode != null) {
-					expander = MRFExpander.getExpander(mEnv, expanderNode.cloneNode(true));
+					expander = MRFExpander.getExpander(env, expanderNode.cloneNode(true));
 				}
-				if (mStopwords != null && mStopwords.size() != 0) {
-					expander.setStopwordList(mStopwords);
+				if (stopwords != null && stopwords.size() != 0) {
+					expander.setStopwordList(stopwords);
 				}
 
 				int numHits = XMLTools.getAttributeValue(modelNode, "hits", 1000);
 				if (K_val!=0){
 					numHits = K_val;
 				}				
-				LOGGER.info("number of hits: " + numHits);
+				LOG.info("number of hits: " + numHits);
 
 				// Multi-threaded query evaluation still a bit unstable; setting
 				// thread=1 for now.
-				runner = new ThreadedQueryRunner_cascade(builder, expander, 1, numHits, savedResults_prevStage, K_val);
+				runner = new CascadeThreadedQueryRunner(builder, expander, 1, numHits, savedResults_prevStage, K_val);
 
-				mQueryRunners.put(modelID, (QueryRunner)runner);
+				queryRunners.put(modelID, (QueryRunner)runner);
 
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 
-			for (String queryID : mQueries.keySet()) {
-				String rawQueryText = mQueries.get(queryID);
-				String[] queryTokens = mEnv.tokenize(rawQueryText);
+			for (String queryID : queries.keySet()) {
+				String rawQueryText = queries.get(queryID);
+				String[] queryTokens = env.tokenize(rawQueryText);
 
-				LOGGER.info(String.format("query id: %s, query: \"%s\"", queryID, rawQueryText));
+				LOG.info(String.format("query id: %s, query: \"%s\"", queryID, rawQueryText));
 
 				// Execute the query.
 				runner.runQuery(queryID, queryTokens);
 			}
 
 			// Where should we output these results?
-			Node model = mModels.get(modelID);
+			Node model = models.get(modelID);
 			String fileName = XMLTools.getAttributeValue(model, "output", null);
 			boolean compress = XMLTools.getAttributeValue(model, "compress", false);
 
@@ -231,12 +232,12 @@ public class BatchQueryRunner_cascade extends BatchQueryRunner{
 			String internalOutputFile = internalOutputFiles[modelCnt];
 
 			try {
-				ResultWriter resultWriter = new ResultWriter(fileName, compress, mFs);
+				ResultWriter resultWriter = new ResultWriter(fileName, compress, fs);
 
 				//print out representation that uses internal docno for next cascade stage if doing boosting training
 				if (internalOutputFile!=null){
 
-					ResultWriter resultWriter2 = new ResultWriter(internalOutputFile, compress, mFs);
+					ResultWriter resultWriter2 = new ResultWriter(internalOutputFile, compress, fs);
 					printResults(modelID, runner, resultWriter2, true);
 					resultWriter2.flush();
 				}
@@ -285,7 +286,7 @@ public class BatchQueryRunner_cascade extends BatchQueryRunner{
 		return allQueryCosts_lastStage[Integer.parseInt(qid)];
 	}
 
-	private void printResults(String modelID, QueryRunner_cascade runner, ResultWriter resultWriter, boolean internalDocno)
+	private void printResults(String modelID, CascadeQueryRunner runner, ResultWriter resultWriter, boolean internalDocno)
 			throws IOException {
 
 		float ndcgSum = 0;
@@ -293,37 +294,43 @@ public class BatchQueryRunner_cascade extends BatchQueryRunner{
 
 		//Set up qrelsPath. 
 		if (dataCollection.indexOf("wt10g")!=-1){
-			if (mFs.exists(new Path("/user/lidan/qrels/qrels.wt10g"))){
+			if (fs.exists(new Path("/user/lidan/qrels/qrels.wt10g"))){
 				qrelsPath = "/user/lidan/qrels/qrels.wt10g";
 			}
-			else if (mFs.exists(new Path("/umd-lin/lidan/qrels/qrels.wt10g"))){
+			else if (fs.exists(new Path("/umd-lin/lidan/qrels/qrels.wt10g"))){
 				qrelsPath = "/umd-lin/lidan/qrels/qrels.wt10g";
 			}
-			else if (mFs.exists(new Path("/fs/clip-trec/trunk_new/docs/data/wt10g/qrels.wt10g"))){
+			else if (fs.exists(new Path("/fs/clip-trec/trunk_new/docs/data/wt10g/qrels.wt10g"))){
 				qrelsPath = "/fs/clip-trec/trunk_new/docs/data/wt10g/qrels.wt10g";
-			}
+			}      else if (fs.exists(new Path("data/wt10g/qrels.wt10g.all"))){
+        qrelsPath = "data/wt10g/qrels.wt10g.all";
+      }
 		}
 		else if (dataCollection.indexOf("gov2")!=-1){
-			if (mFs.exists(new Path("/user/lidan/qrels/qrels.gov2.all"))){
+			if (fs.exists(new Path("/user/lidan/qrels/qrels.gov2.all"))){
 				qrelsPath = "/user/lidan/qrels/qrels.gov2.all";
 			}			
-			else if (mFs.exists(new Path("/umd-lin/lidan/qrels/qrels.gov2.all"))){
+			else if (fs.exists(new Path("/umd-lin/lidan/qrels/qrels.gov2.all"))){
 				qrelsPath = "/umd-lin/lidan/qrels/qrels.gov2.all";
 			}
-			else if (mFs.exists(new Path("/fs/clip-trec/trunk_new/docs/data/gov2/qrels.gov2.all"))){
+			else if (fs.exists(new Path("/fs/clip-trec/trunk_new/docs/data/gov2/qrels.gov2.all"))){
 				qrelsPath = "/fs/clip-trec/trunk_new/docs/data/gov2/qrels.gov2.all";
-			}
+			} else if (fs.exists(new Path("data/gov2/qrels.gov2.all"))){
+        qrelsPath = "data/gov2/qrels.gov2.all";
+      } 
 		}
 		else if (dataCollection.indexOf("clue")!=-1){
-			if (mFs.exists(new Path("/user/lidan/qrels/qrels.web09catB.txt"))){
+			if (fs.exists(new Path("/user/lidan/qrels/qrels.web09catB.txt"))){
 				qrelsPath = "/user/lidan/qrels/qrels.web09catB.txt";
 			}
-			else if (mFs.exists(new Path("/umd-lin/lidan/qrels/qrels.web09catB.txt"))){
+			else if (fs.exists(new Path("/umd-lin/lidan/qrels/qrels.web09catB.txt"))){
 				qrelsPath = "/umd-lin/lidan/qrels/qrels.web09catB.txt";
 			}
-			else if (mFs.exists(new Path("/fs/clip-trec/trunk_new/docs/data/clue/qrels.web09catB.txt"))){
+			else if (fs.exists(new Path("/fs/clip-trec/trunk_new/docs/data/clue/qrels.web09catB.txt"))){
 				qrelsPath = "/fs/clip-trec/trunk_new/docs/data/clue/qrels.web09catB.txt";
-			}
+			} else if (fs.exists(new Path("data/clue/qrels.web09catB.txt"))){
+        qrelsPath = "data/clue/qrels.web09catB.txt";
+      }
 
 		}
 
@@ -339,11 +346,11 @@ public class BatchQueryRunner_cascade extends BatchQueryRunner{
 			//System.out.println("K value should be set already.");
 			//System.exit(-1);
 		}
-		for (String queryID : mQueries.keySet()) {
+		for (String queryID : queries.keySet()) {
 			// Get the ranked list for this query.
 			Accumulator[] list = runner.getResults(queryID);
 			if (list == null) {
-				LOGGER.info("null results for: " + queryID);
+				LOG.info("null results for: " + queryID);
 				continue;
 			}
 
@@ -365,7 +372,7 @@ public class BatchQueryRunner_cascade extends BatchQueryRunner{
 				}
 			}
 
-			else if (mDocnoMapping == null) {
+			else if (docnoMapping == null) {
 				// Print results with internal docnos if unable to translate to
 				// external docids.
 				for (int i = 0; i < list.length; i++) {
@@ -375,7 +382,7 @@ public class BatchQueryRunner_cascade extends BatchQueryRunner{
 			} else {
 				// Translate internal docnos to external docids.
 				for (int i = 0; i < list.length; i++) {
-					resultWriter.println(queryID + " Q0 " + mDocnoMapping.getDocid(list[i].docno)
+					resultWriter.println(queryID + " Q0 " + docnoMapping.getDocid(list[i].docno)
 							+ " " + (i + 1) + " " + list[i].score + " " + modelID);
 
 				}
@@ -393,7 +400,7 @@ public class BatchQueryRunner_cascade extends BatchQueryRunner{
                         try {
       
                           d = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(
-                                                        mFs.open(new Path(element)));
+                                                        fs.open(new Path(element)));
                         } catch (SAXException e) {
                                 throw new ConfigurationException(e.getMessage());
                         } catch (IOException e) {
@@ -407,17 +414,17 @@ public class BatchQueryRunner_cascade extends BatchQueryRunner{
                 }
                                 
                 // Make sure we have some queries to run.
-                if (mQueries.isEmpty()) {
+                if (queries.isEmpty()) {
                         throw new ConfigurationException("Must specify at least one query!");
                 }
                         
                 // Make sure there are models that need evaluated.
-                if (mModels.isEmpty()) {
+                if (models.isEmpty()) {
                         throw new ConfigurationException("Must specify at least one model!");
                 }
                                                 
                 // Make sure we have an index to run against.
-                if (mIndexPath == null) {
+                if (indexPath == null) {
                         throw new ConfigurationException("Must specify an index!");
                 }
         }       
@@ -465,10 +472,10 @@ public class BatchQueryRunner_cascade extends BatchQueryRunner{
 			for (int j = 0; j < children.getLength(); j++) {
 				Node child = children.item(j);
 				if ("expander".equals(child.getNodeName())) {
-					if (mExpanders.containsKey(modelID)) {
+					if (expanders.containsKey(modelID)) {
 						throw new ConfigurationException("Only one expander allowed per model!");
 					}
-					mExpanders.put(modelID, child);
+					expanders.put(modelID, child);
 				}
 			}
 
@@ -496,22 +503,22 @@ public class BatchQueryRunner_cascade extends BatchQueryRunner{
 			mIndexPath = index.item(0).getTextContent();
 			*/
 
-			if (mIndexPath!=null){
+			if (indexPath!=null){
 				//System.out.println("The name of the index is "+mIndexPath);
-				if (mIndexPath.toLowerCase().indexOf("wt10g")!=-1){
+				if (indexPath.toLowerCase().indexOf("wt10g")!=-1){
 					dataCollection = "wt10g";
 					RetrievalEnvironment.dataCollection = "wt10g";
 				}
-				else if (mIndexPath.toLowerCase().indexOf("gov2")!=-1){
+				else if (indexPath.toLowerCase().indexOf("gov2")!=-1){
 					dataCollection = "gov2";
 					RetrievalEnvironment.dataCollection = "gov2";
 				}
-				else if (mIndexPath.toLowerCase().indexOf("clue")!=-1){
+				else if (indexPath.toLowerCase().indexOf("clue")!=-1){
 					dataCollection = "clue";
 					RetrievalEnvironment.dataCollection = "clue";
 				}
 				else{
-					System.out.println("Invalid data collection "+mIndexPath);
+					System.out.println("Invalid data collection "+indexPath);
 					System.exit(-1);
 				}
 			}

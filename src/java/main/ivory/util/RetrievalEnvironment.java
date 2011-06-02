@@ -70,8 +70,8 @@ public class RetrievalEnvironment {
 	protected int numDocsLocal = -1;
 	protected long collectionSize;           // Number of terms in the collection.
 
-	protected int defaultDf;                 // Default df value.
-	protected long defaultCf;                // Default cf value.
+	public static int defaultDf;                 // Default df value.
+	public static long defaultCf;                // Default cf value.
 
 	protected String postingsType;           // Type of postings in the index.
 	protected DocLengthTable doclengths;     // Document length lookup.
@@ -89,6 +89,12 @@ public class RetrievalEnvironment {
 
 	// Globally-defined concept importance models.
 	private final Map<String, ConceptImportanceModel> importanceModels = new HashMap<String, ConceptImportanceModel>();
+
+	// These are for the cascade.
+	public static int topK;
+	public static boolean mIsNewModel;
+	public static String dataCollection;
+	public static int documentCount;
 
 	public RetrievalEnvironment(String indexPath, FileSystem fs) throws IOException {
 		if (!fs.exists(new Path(indexPath))) {
@@ -190,6 +196,10 @@ public class RetrievalEnvironment {
 			throw new RuntimeException("Error: docscore type \"" + type + "\" not found!");
 		}
 		return docScores.get(type).getScore(docno);
+	}
+
+	public static void setIsNew(boolean isNewModel){
+	  mIsNewModel = isNewModel;
 	}
 
 	public void addImportanceModel(String key, ConceptImportanceModel m) {

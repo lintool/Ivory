@@ -20,6 +20,7 @@ import ivory.exception.ConfigurationException;
 import ivory.util.RetrievalEnvironment;
 import ivory.util.XMLTools;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -82,6 +83,13 @@ public class MarkovRandomField {
 	public void addClique(Clique c) {
 		cliques.add(c);
 	}
+
+	 /**             
+   * Removes all cliques from this MRF.
+   */
+public void removeAllCliques(){
+          cliques.clear();
+  }
 
 	/**
 	 * Returns the cliques associated with this MRF.

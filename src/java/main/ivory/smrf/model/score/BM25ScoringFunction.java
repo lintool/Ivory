@@ -29,11 +29,11 @@ import org.w3c.dom.Node;
  *
  */
 public class BM25ScoringFunction extends ScoringFunction {
-	private float k1 = 1.2f;
-	private float b = 0.75f;
-	private float avgDocLen;
+	protected float k1 = 1.2f;
+	protected float b = 0.75f;
+	protected float avgDocLen;
 	private String idfType = "okapi";
-	private float idf;
+	protected float idf;
 	private float maxScore;
 
 	@Override

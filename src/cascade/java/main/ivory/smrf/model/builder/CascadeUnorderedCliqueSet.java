@@ -29,7 +29,7 @@ import com.google.common.base.Preconditions;
  * @author Don Metzler
  * @author Lidan Wang
  */
-public class UnorderedCliqueSet_cascade extends CliqueSet_cascade {
+public class CascadeUnorderedCliqueSet extends CascadeCliqueSet {
 
 	public static final String TYPE = "Unordered";
 	
@@ -49,7 +49,7 @@ public class UnorderedCliqueSet_cascade extends CliqueSet_cascade {
 		if (dependenceType.equals("sequential")) {
 			throw new ConfigurationException("Unsupported operation: there are no unordered cliques within a sequentially dependent graph.");
 		} else if (dependenceType.equals("full")) {
-			addCliques(CliqueFactory_cascade.getFullDependenceCliques(env, queryTerms, domNode, false, docDependent, cascadeStage, pruner_and_params));
+			addCliques(CascadeCliqueFactory.getFullDependenceCliques(env, queryTerms, domNode, false, docDependent, cascadeStage, pruner_and_params));
 		} else {
 			throw new ConfigurationException("Unrecognized UnorderedCliqueSet type: " + dependenceType);
 		}

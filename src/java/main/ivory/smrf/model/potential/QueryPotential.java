@@ -46,20 +46,21 @@ import com.google.common.collect.Lists;
  */
 public class QueryPotential extends PotentialFunction {
 	// Default score for potentials with no postings.
-	private static final float DEFAULT_SCORE = 0.0f;
+	protected static final float DEFAULT_SCORE = 0.0f;
 
-	private final List<TermNode> termNodes = Lists.newArrayList();
-	private final GlobalTermEvidence termEvidence = new GlobalTermEvidence();
-	private final Posting curPosting = new Posting();
-
-	private RetrievalEnvironment env;
 	private ExpressionGenerator expressionGenerator;
-	private ScoringFunction scoringFunction;
-	private DocumentNode docNode = null;
-	private PostingsReader postingsReader = null;
 
-	private boolean endOfList = true;  	// Whether or not we're at the end of the postings list.
-	private int lastScoredDocno = 0;
+	protected final List<TermNode> termNodes = Lists.newArrayList();
+	protected final GlobalTermEvidence termEvidence = new GlobalTermEvidence();
+	protected final Posting curPosting = new Posting();
+
+	protected RetrievalEnvironment env;
+	protected ScoringFunction scoringFunction;
+	protected DocumentNode docNode = null;
+	protected PostingsReader postingsReader = null;
+
+	protected boolean endOfList = true;  	// Whether or not we're at the end of the postings list.
+	protected int lastScoredDocno = 0;
 
 	public QueryPotential() {}  // Note, must have zero-arg constructor for creation by factory method in PotentialFunction
 

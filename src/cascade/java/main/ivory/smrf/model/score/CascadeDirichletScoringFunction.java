@@ -27,38 +27,38 @@ import org.w3c.dom.Node;
  * @author Lidan Wang
  * 
  */
-public class BM25ScoringFunction_cascade extends BM25ScoringFunction {
+public class CascadeDirichletScoringFunction extends DirichletScoringFunction {
 
-        public static float K1;
-        public static float B;
-        public static float avg_docLen;
+        public static float MU;
 
+	public static float collectionLength;
+
+	
 	@Override
 	public void configure(Node domNode) {
 		super.configure(domNode);
-		K1 = k1;
-                B = b; 
+		MU = mu;
 	}
 
-	@Override
-	public void initialize(GlobalTermEvidence termEvidence, GlobalEvidence globalEvidence) {
-
-		super.initialize(termEvidence, globalEvidence); 
-		avg_docLen = avgDocLen;
-	}
 
         @Override
         public float getScore(int tf, int docLen) {
-                float bm25TF = 0;
- 
+                if (isOOV) {
+                        return 0.0f;
+                }
+
+                //Since cascade is trained this way (term and term proximity features have same mu)
                 if (RetrievalEnvironment.mIsNewModel){
-                        bm25TF = ((K1 + 1.0f) * tf) / (K1 * ((1.0f - B) + B * docLen / avg_docLen) + tf);
+                        return (float) Math.log(((float) tf + MU * backgroundProb) / (docLen + MU));
                 }
                 else{
-                        bm25TF = ((k1 + 1.0f) * tf) / (k1 * ((1.0f - b) + b * docLen / avgDocLen) + tf);
+                        return (float) Math.log(((float) tf + mu * backgroundProb) / (docLen + mu));
                 }
- 
-                return bm25TF * idf;
         }
 
+	@Override
+	public void initialize(GlobalTermEvidence termEvidence, GlobalEvidence globalEvidence) {
+		super.initialize(termEvidence, globalEvidence);
+		collectionLength = (float) globalEvidence.collectionLength;
+	}
 }

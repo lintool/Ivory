@@ -18,7 +18,7 @@ package ivory.smrf.model;
 
 import ivory.exception.ConfigurationException;
 import ivory.smrf.model.potential.PotentialFunction;
-import ivory.smrf.model.potential.QueryPotential_cascade;
+import ivory.smrf.model.potential.CascadeQueryPotential;
 
 import java.util.Comparator;
 import java.util.List;
@@ -29,7 +29,7 @@ import com.google.common.base.Preconditions;
 /**
  * @author Lidan Wang
  */
-public class Clique_cascade extends Clique {
+public class CascadeClique extends Clique {
 
 	// Cascade stage
 	private int mCascadeStage;
@@ -50,11 +50,11 @@ public class Clique_cascade extends Clique {
 	 * @param nodes
 	 * @param f
 	 */
-	public Clique_cascade(List<GraphNode> nodes, PotentialFunction f, Parameter weight, int cascadeStage, String pruner_and_params) {
+	public CascadeClique(List<GraphNode> nodes, PotentialFunction f, Parameter weight, int cascadeStage, String pruner_and_params) {
 		this(nodes, f, weight, 1.0f, null, true, cascadeStage, pruner_and_params);
 	}
 
-	public Clique_cascade(List<GraphNode> nodes, PotentialFunction f, Parameter param, float importance, Type type, boolean docDependent, int cascadeStage, String pruner_and_params) {
+	public CascadeClique(List<GraphNode> nodes, PotentialFunction f, Parameter param, float importance, Type type, boolean docDependent, int cascadeStage, String pruner_and_params) {
 
 
 		super (nodes, f, param, importance, type, docDependent);
@@ -79,18 +79,18 @@ public class Clique_cascade extends Clique {
 	//not supported if it's term proximity feature!
 	public int[] getPositions(){
 		PotentialFunction potential = getPotentialFunction();
-		return ((QueryPotential_cascade)potential).getPositions();
+		return ((CascadeQueryPotential)potential).getPositions();
 	}
 
 	public int getDocLen(){
 		PotentialFunction potential = getPotentialFunction();
-		return ((QueryPotential_cascade)potential).getDocLen();
+		return ((CascadeQueryPotential)potential).getDocLen();
 	}
 	
 	//reset postings readers
 	public void resetPostingsListReader(){
 		PotentialFunction potential = getPotentialFunction();
-		((QueryPotential_cascade)potential).resetPostingsListReader();
+		((CascadeQueryPotential)potential).resetPostingsListReader();
 	}
 	
 
@@ -121,12 +121,12 @@ public class Clique_cascade extends Clique {
 	//Collection CF of this term/bigram
 	public float termCollectionCF(){
 		PotentialFunction potential = getPotentialFunction();
-                return ((QueryPotential_cascade) potential).termCollectionCF();
+                return ((CascadeQueryPotential) potential).termCollectionCF();
         }
 
 	public float termCollectionDF(){
 		PotentialFunction potential = getPotentialFunction();
-		return ((QueryPotential_cascade) potential).termCollectionDF();
+		return ((CascadeQueryPotential) potential).termCollectionDF();
 	}
 
 	public void setType(Type type) {
@@ -153,22 +153,22 @@ public class Clique_cascade extends Clique {
 
 	public int getDocno(){
 		PotentialFunction potential = getPotentialFunction();
-		return ((QueryPotential_cascade)potential).getDocno();
+		return ((CascadeQueryPotential)potential).getDocno();
 	}
 
 	public int getNumberOfPostings(){
 		PotentialFunction potential = getPotentialFunction();
-		return ((QueryPotential_cascade)potential).getNumberOfPostings();
+		return ((CascadeQueryPotential)potential).getNumberOfPostings();
 	}
 
 	public int getWindowSize(){
 		PotentialFunction potential = getPotentialFunction();
-		return ((QueryPotential_cascade)potential).getWindowSize();
+		return ((CascadeQueryPotential)potential).getWindowSize();
 	}
 
 	public String getScoringFunctionName(){ //dirichlet, bm25
 		PotentialFunction potential = getPotentialFunction();
-		return ((QueryPotential_cascade)potential).getScoringFunctionName();
+		return ((CascadeQueryPotential)potential).getScoringFunctionName();
 	}
 
 	public String [] getSingleTerms(){
@@ -182,7 +182,7 @@ public class Clique_cascade extends Clique {
 	        
 	public String toString() {
                 StringBuilder s = new StringBuilder();
-                s.append("<clique type=\"").append(type).append("\">");
+                s.append("<clique type=\"").append(getType()).append("\">");
                         
 		s.append("<terms>").append(getConcept()).append("</terms>");
                         

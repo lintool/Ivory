@@ -18,8 +18,8 @@ package ivory.smrf.model.builder;
 
 import ivory.exception.ConfigurationException;
 import ivory.exception.RetrievalException;
-import ivory.smrf.model.Clique_cascade;
-import ivory.smrf.model.builder.CliqueSet_cascade;
+import ivory.smrf.model.CascadeClique;
+import ivory.smrf.model.builder.CascadeCliqueSet;
 import ivory.smrf.model.Clique;
 import ivory.smrf.model.MarkovRandomField;
 import ivory.smrf.model.importance.ConceptImportanceModel;
@@ -53,7 +53,7 @@ public class FeatureBasedMRFBuilder_new extends FeatureBasedMRFBuilder {
 	public FeatureBasedMRFBuilder_new(RetrievalEnvironment env, Node model) {
 		super (env, model);
 		weightScale = XMLTools.getAttributeValue(model, "weightScale", -1.0f);
-		pruningThresholdBigram= XMLTools.getAttributeValue(mModel, "pruningThresholdBigram", 0.0f);
+		pruningThresholdBigram= XMLTools.getAttributeValue(model, "pruningThresholdBigram", 0.0f);
 	}
 
 	@Override
@@ -69,7 +69,7 @@ public class FeatureBasedMRFBuilder_new extends FeatureBasedMRFBuilder {
 		float totalImportance = 0.0f;
 
 		// Cliques that have query-dependent importance weights.
-		Set<Clique_cascade> cliquesWithImportance = new HashSet<Clique_cascade>();
+		Set<CascadeClique> cliquesWithImportance = new HashSet<CascadeClique>();
 
 		//For cascade model, # docs from last stage
 		//int numResultsMin = 99999999;
@@ -151,7 +151,7 @@ public class FeatureBasedMRFBuilder_new extends FeatureBasedMRFBuilder {
 				}
 
 				// Construct the clique set.
-				CliqueSet_cascade cliqueSet = (CliqueSet_cascade) (CliqueSet_cascade.create(cliqueSetType, env, queryTerms, child, cascade_stage_proper, pruner_and_params));//, approxProximity);
+				CascadeCliqueSet cliqueSet = (CascadeCliqueSet) (CascadeCliqueSet.create(cliqueSetType, env, queryTerms, child, cascade_stage_proper, pruner_and_params));//, approxProximity);
 
 				// Get cliques from clique set.
 				List<Clique> cliques = cliqueSet.getCliques();
@@ -191,7 +191,7 @@ public class FeatureBasedMRFBuilder_new extends FeatureBasedMRFBuilder {
 
 						if (keptCliques.length!=0){
                 	                                for (Clique c : cliques) {
-                        	                                ((Clique_cascade)c).setCascadeStage(cascade_stage);
+                        	                                ((CascadeClique)c).setCascadeStage(cascade_stage);
                                 	                }
                                         	        cascade_stage++;
                                         	}
@@ -218,7 +218,7 @@ public class FeatureBasedMRFBuilder_new extends FeatureBasedMRFBuilder {
 						c.setImportance(importance);
 
 						totalImportance += importance;
-						cliquesWithImportance.add((Clique_cascade)c);						
+						cliquesWithImportance.add((CascadeClique)c);						
 
 						w = importance;
 					}
@@ -237,7 +237,7 @@ public class FeatureBasedMRFBuilder_new extends FeatureBasedMRFBuilder {
 
 
 		// Normalize query-dependent feature importance values.
-		if (mNormalizeImportance) {
+		if (normalizeImportance) {
 			for (Clique c : cliquesWithImportance) {
 				c.setImportance(c.getImportance() / totalImportance);
 			}

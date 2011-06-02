@@ -18,13 +18,13 @@ package ivory.smrf.retrieval;
 
 import ivory.exception.ConfigurationException;
 import ivory.smrf.model.Clique;
-import ivory.smrf.model.Clique_cascade;
+import ivory.smrf.model.CascadeClique;
 import ivory.smrf.model.DocumentNode;
 import ivory.smrf.model.GraphNode;
 import ivory.smrf.model.MarkovRandomField;
 import ivory.util.RetrievalEnvironment;
-import ivory.smrf.model.score.DirichletScoringFunction_cascade;
-import ivory.smrf.model.score.BM25ScoringFunction_cascade;
+import ivory.smrf.model.score.CascadeDirichletScoringFunction;
+import ivory.smrf.model.score.CascadeBM25ScoringFunction;
 
 import java.util.Arrays;
 import java.util.ArrayList;
@@ -53,12 +53,12 @@ public class CascadeEval{
 	/**
 	 * Pool of accumulators.
 	 */
-	private Accumulator_cascade[] mAccumulators = null;
+	private CascadeAccumulator[] mAccumulators = null;
 
 	/**
 	 * Sorted list of accumulators.
 	 */
-	private final PriorityQueue<Accumulator_cascade> mSortedAccumulators = new PriorityQueue<Accumulator_cascade>();
+	private final PriorityQueue<CascadeAccumulator> mSortedAccumulators = new PriorityQueue<CascadeAccumulator>();
 
 	/**
 	 * Comparator used to sort cliques by their max score.
@@ -101,8 +101,8 @@ public class CascadeEval{
 	//Lidan: query ID 
 	private String mQid;
 
-	Accumulator_cascade[] results = null;
-	Accumulator_cascade[] results_tmp = null;
+	CascadeAccumulator[] results = null;
+	CascadeAccumulator[] results_tmp = null;
 
 	List<Clique> cliques_all;
 	int cnt;
@@ -369,15 +369,15 @@ public class CascadeEval{
 				mMRF.removeAllCliques();
 			
 				for (Clique c: cliques_all){
-					int cs = ((Clique_cascade)c).getCascadeStage();
+					int cs = ((CascadeClique)c).getCascadeStage();
 					if (cascadeStage == cs){
 
 						//c.resetPostingsListReader();
 						mMRF.addClique(c);
 						cnt++;
 						//mNumResults = c.getNumResults();
-						pruner = ((Clique_cascade)c).getPruner();
-						pruner_param = ((Clique_cascade)c).getPruner_param();
+						pruner = ((CascadeClique)c).getPruner();
+						pruner_param = ((CascadeClique)c).getPruner_param();
 
 						if (cascadeStage == 0){
 
@@ -386,19 +386,19 @@ public class CascadeEval{
 							if (mDocSet == null){
 								try{ //c.getNumberOfPostings() is not supported for bigram postings readers
 
-									numDocs = ((Clique_cascade)c).getNumberOfPostings();
+									numDocs = ((CascadeClique)c).getNumberOfPostings();
 								}
 								catch(Exception e){}
 
 								//(not) ignore cost of first stage from the cost model
-								subTotal_cascadeCost += ((Clique_cascade)c).mUnitCost * numDocs;
+								subTotal_cascadeCost += ((CascadeClique)c).mUnitCost * numDocs;
 							}
 							else{
-								subTotal_cascadeCost += ((Clique_cascade)c).mUnitCost;
+								subTotal_cascadeCost += ((CascadeClique)c).mUnitCost;
 							}
 						}
 						else{
-							subTotal_cascadeCost += ((Clique_cascade)c).mUnitCost;
+							subTotal_cascadeCost += ((CascadeClique)c).mUnitCost;
 						}
 					}
 				}
@@ -430,9 +430,9 @@ public class CascadeEval{
 				}
 
 				// Create single pool of reusable accumulators.
-                        	mAccumulators = new Accumulator_cascade[mNumResults + 1];
+                        	mAccumulators = new CascadeAccumulator[mNumResults + 1];
                         	for (int i = 0; i < mNumResults + 1; i++) {
-                             		mAccumulators[i] = new Accumulator_cascade(0, 0.0f);
+                             		mAccumulators[i] = new CascadeAccumulator(0, 0.0f);
                         	}
 
 				results = rank_cascade();
@@ -449,25 +449,25 @@ public class CascadeEval{
 				int cntConcepts = 0;
 
 				for (Clique c: cliques_all){
-					int cs = ((Clique_cascade)c).getCascadeStage();
+					int cs = ((CascadeClique)c).getCascadeStage();
 					if (cascadeStage == cs){
 						cnt++;
-						pruner = ((Clique_cascade)c).getPruner();
-						pruner_param = ((Clique_cascade)c).getPruner_param();
+						pruner = ((CascadeClique)c).getPruner();
+						pruner_param = ((CascadeClique)c).getPruner_param();
 
-						featureID = ((Clique_cascade)c).getParamID().trim(); //termWt, orderedWt, unorderedWt							
-						scoringFunction = ((Clique_cascade)c).getScoringFunctionName();	 //dirichlet, bm25
+						featureID = ((CascadeClique)c).getParamID().trim(); //termWt, orderedWt, unorderedWt							
+						scoringFunction = ((CascadeClique)c).getScoringFunctionName();	 //dirichlet, bm25
 
-						mSize = ((Clique_cascade)c).getWindowSize(); //window width
+						mSize = ((CascadeClique)c).getWindowSize(); //window width
 						if (mSize == -1 && !(featureID.equals("termWt"))){
 							System.out.println("Only term features don't support getWindowSize()! "+featureID);
 							System.exit(-1);
 						}				
-						concepts_this_stage[cntConcepts] = ((Clique_cascade)c).getSingleTerms();
+						concepts_this_stage[cntConcepts] = ((CascadeClique)c).getSingleTerms();
 						clique_wgts[cntConcepts] = c.getWeight();
 
 						cntConcepts++;
-						subTotal_cascadeCost += ((Clique_cascade)c).mUnitCost;
+						subTotal_cascadeCost += ((CascadeClique)c).mUnitCost;
 					}
 				}
 
@@ -742,7 +742,7 @@ public class CascadeEval{
 									}
 								} //end if this is a match, i.e., both query terms are in the doc
 
-								float s = getScore(matches, docLen, RetrievalEnvironment.mDefaultCf, (float)RetrievalEnvironment.mDefaultDf, scoringFunction);
+								float s = getScore(matches, docLen, RetrievalEnvironment.defaultCf, (float)RetrievalEnvironment.defaultDf, scoringFunction);
 								docScore_cascade += clique_wgts[j] * s;
                                                            					
 							}  //end else it's proximity feature
@@ -768,7 +768,7 @@ public class CascadeEval{
 					System.exit(-1);
 				}
 
-				results_tmp = new Accumulator_cascade[size];
+				results_tmp = new CascadeAccumulator[size];
 
 				//meanScore = 0;
 
@@ -807,14 +807,14 @@ public class CascadeEval{
 
 		long endTime = System.currentTimeMillis();
 
-		Accumulator_cascade[] results_return = results;
+		CascadeAccumulator[] results_return = results;
 
 		if (results.length > mK){ //RetrievalEnvironment.mCascade_K){
  
-			results_return = new Accumulator_cascade[mK]; //RetrievalEnvironment.mCascade_K];
+			results_return = new CascadeAccumulator[mK]; //RetrievalEnvironment.mCascade_K];
 
 			for (int i=0; i<mK; i++){ //RetrievalEnvironment.mCascade_K; i++){
-				results_return[i] = new Accumulator_cascade(results[i].docno, results[i].score);
+				results_return[i] = new CascadeAccumulator(results[i].docno, results[i].score);
 				//results_return[i].docno = results[i].docno;
 				//results_return[i].score = results[i].score;
 			}
@@ -830,15 +830,15 @@ public class CascadeEval{
 
 		if (scoringFunction.equals("dirichlet")){
 			
-			float backgroundProb = termCollectionFreq/DirichletScoringFunction_cascade.collectionLength;
+			float backgroundProb = termCollectionFreq/CascadeDirichletScoringFunction.collectionLength;
 
-			score = (float) Math.log(((float) tf + DirichletScoringFunction_cascade.MU * backgroundProb) / (docLen + DirichletScoringFunction_cascade.MU));
+			score = (float) Math.log(((float) tf + CascadeDirichletScoringFunction.MU * backgroundProb) / (docLen + CascadeDirichletScoringFunction.MU));
 
 
 		}
 		else if (scoringFunction.equals("bm25")){
 			
-			score = ((BM25ScoringFunction_cascade.K1 + 1.0f) * tf) / (BM25ScoringFunction_cascade.K1 * ((1.0f - BM25ScoringFunction_cascade.B) + BM25ScoringFunction_cascade.B * docLen / BM25ScoringFunction_cascade.avg_docLen) + tf);
+			score = ((CascadeBM25ScoringFunction.K1 + 1.0f) * tf) / (CascadeBM25ScoringFunction.K1 * ((1.0f - CascadeBM25ScoringFunction.B) + CascadeBM25ScoringFunction.B * docLen / CascadeBM25ScoringFunction.avg_docLen) + tf);
 			float mIdf = (float) Math.log(((float) RetrievalEnvironment.documentCount - termDF + 0.5f) / (termDF + 0.5f));
 			score = score * mIdf;
 		}
@@ -851,7 +851,7 @@ public class CascadeEval{
 
 	}
 
-	public Accumulator_cascade[] rank_cascade() {
+	public CascadeAccumulator[] rank_cascade() {
 
 		//point to next position in keptDocs array that hasn't been filled
 		int indexCntKeptDocs = 0;
@@ -868,7 +868,7 @@ public class CascadeEval{
 		}
 
 		// Current accumulator.
-		Accumulator_cascade a = mAccumulators[0];
+		CascadeAccumulator a = mAccumulators[0];
 
 		/*
 		// Initialize the MRF.
@@ -883,8 +883,8 @@ public class CascadeEval{
 		// Maximum possible score that this MRF can achieve.
 		float mrfMaxScore = 0.0f;
 		for (Clique c : cliques) {
-			if (!((((Clique_cascade)c).getParamID()).equals("termWt"))){
-				System.out.println("In this faster cascade implementation, first stage must be term in order to get positions[] values! "+((Clique_cascade)c).getParamID());
+			if (!((((CascadeClique)c).getParamID()).equals("termWt"))){
+				System.out.println("In this faster cascade implementation, first stage must be term in order to get positions[] values! "+((CascadeClique)c).getParamID());
 				System.exit(-1);
 			}
 			mrfMaxScore += c.getMaxScore();
@@ -945,8 +945,8 @@ public class CascadeEval{
 
 				if (firstTime){
                                         term_to_cliqueNumber.put(c.getConcept().trim().toLowerCase(), i+"");
-                                        term_to_termCollectionFrequency.put(c.getConcept().trim().toLowerCase(), ((Clique_cascade)c).termCollectionCF()+"");
-					term_to_termDF.put(c.getConcept().trim().toLowerCase(), ((Clique_cascade)c).termCollectionDF()+"");
+                                        term_to_termCollectionFrequency.put(c.getConcept().trim().toLowerCase(), ((CascadeClique)c).termCollectionCF()+"");
+					term_to_termDF.put(c.getConcept().trim().toLowerCase(), ((CascadeClique)c).termCollectionDF()+"");
                                 }
 
 				if (score + docMaxScore <= scoreThreshold) {
@@ -974,14 +974,14 @@ public class CascadeEval{
 
 
 				//stuff needed for document evaluation in the next stage
-				int [] p = ((Clique_cascade)c).getPositions();
+				int [] p = ((CascadeClique)c).getPositions();
 
 
 				if (p!=null){
 
 					termPositions[i]= Arrays.copyOf(p, p.length);
 
-					document_length = ((Clique_cascade)c).getDocLen();
+					document_length = ((CascadeClique)c).getDocLen();
 				}
 			}
 
@@ -1036,7 +1036,7 @@ public class CascadeEval{
 		}
 
 		// Grab the accumulators off the stack, in (reverse) order.
-		Accumulator_cascade[] results_tmp = new Accumulator_cascade[Math.min(mNumResults, mSortedAccumulators.size())];
+		CascadeAccumulator[] results_tmp = new CascadeAccumulator[Math.min(mNumResults, mSortedAccumulators.size())];
 
 		for (int i = 0; i < results_tmp.length; i++) {
 			results_tmp[results_tmp.length - 1 - i] = mSortedAccumulators.poll();
@@ -1045,7 +1045,7 @@ public class CascadeEval{
 
 		meanScore /= results_tmp.length;
 
-		Accumulator_cascade[] results = results_tmp;
+		CascadeAccumulator[] results = results_tmp;
 
 		/* Do the sorting in rank()
 		//if there are more stages, should sort by docno

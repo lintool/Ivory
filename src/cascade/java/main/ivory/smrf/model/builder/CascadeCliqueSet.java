@@ -31,7 +31,7 @@ import com.google.common.base.Preconditions;
  * @author Don Metzler
  * @author Lidan Wang
  */
-public abstract class CliqueSet_cascade {
+public abstract class CascadeCliqueSet {
 
 	/**
 	 * cliques that make up this clique set
@@ -60,7 +60,7 @@ public abstract class CliqueSet_cascade {
 	public abstract Clique.Type getType();
 
 	@SuppressWarnings("unchecked")
-	public static CliqueSet_cascade create(String type, RetrievalEnvironment env, String[] queryTerms, Node domNode, int cascadeStage, String pruner_and_params)
+	public static CascadeCliqueSet create(String type, RetrievalEnvironment env, String[] queryTerms, Node domNode, int cascadeStage, String pruner_and_params)
 			throws ConfigurationException {
 		Preconditions.checkNotNull(type);
 		Preconditions.checkNotNull(env);
@@ -68,8 +68,8 @@ public abstract class CliqueSet_cascade {
 		Preconditions.checkNotNull(domNode);
 
 		try {
-			Class<? extends CliqueSet_cascade> clz = (Class<? extends CliqueSet_cascade>) Class.forName(type);
-			CliqueSet_cascade f = clz.newInstance();
+			Class<? extends CascadeCliqueSet> clz = (Class<? extends CascadeCliqueSet>) Class.forName(type);
+			CascadeCliqueSet f = clz.newInstance();
 
 			f.configure(env, queryTerms, domNode, cascadeStage, pruner_and_params);
 

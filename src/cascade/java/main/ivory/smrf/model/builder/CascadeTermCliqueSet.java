@@ -18,7 +18,7 @@ package ivory.smrf.model.builder;
 
 import ivory.exception.ConfigurationException;
 import ivory.smrf.model.Clique;
-import ivory.smrf.model.Clique_cascade;
+import ivory.smrf.model.CascadeClique;
 import ivory.smrf.model.DocumentNode;
 import ivory.smrf.model.GraphNode;
 import ivory.smrf.model.Parameter;
@@ -37,7 +37,7 @@ import com.google.common.base.Preconditions;
  * @author Don Metzler
  * @author Lidan Wang
  */
-public class TermCliqueSet_cascade extends CliqueSet_cascade {
+public class CascadeTermCliqueSet extends CascadeCliqueSet {
 
 	public static final String TYPE = "Term";
 	
@@ -79,7 +79,7 @@ public class TermCliqueSet_cascade extends CliqueSet_cascade {
 			// Get the potential function.
 			PotentialFunction potential = PotentialFunction.create(env, potentialType, domNode);
 
-			Clique c = new Clique_cascade(cliqueNodes, potential, termParameter, cascadeStage, pruner_and_params);
+			Clique c = new CascadeClique(cliqueNodes, potential, termParameter, cascadeStage, pruner_and_params);
 			addClique(c);
 		}
 	}

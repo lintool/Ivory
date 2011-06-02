@@ -1,5 +1,5 @@
 <parameters>
-     <index>/scratch0/gov2</index>
+     <index>/Users/jimmy/data/indexes/gov2</index>
 
      <!-- Concept importance model for binning -->
      <importancemodel id="wsd" type="ivory.smrf.model.importance.LinearImportanceModel">
@@ -127,37 +127,37 @@
                <feature id="termWt" weight="0.6"
                         cascadeStage="0"
                         prune = "rank 0.9000000953674316"
-                        cliqueSet="ivory.smrf.model.builder.TermCliqueSet_cascade"
-                        potential="ivory.smrf.model.potential.QueryPotential_cascade"
+                        cliqueSet="ivory.smrf.model.builder.CascadeTermCliqueSet"
+                        potential="ivory.smrf.model.potential.CascadeQueryPotential"
                         generator="ivory.smrf.model.builder.TermExpressionGenerator"
-                        scoreFunction="ivory.smrf.model.score.DirichletScoringFunction_cascade" mu="1000.0" />
+                        scoreFunction="ivory.smrf.model.score.CascadeDirichletScoringFunction" mu="1000.0" />
                 <feature id="orderedWt" weight="0.15"
                         cascadeStage="1"
                         prune = "mean-max 0.30000001192092896"
                         conceptBinType = "default"
                         conceptBinParams = "3 1"
-                        cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet_cascade" dependence="sequential"
-                        potential="ivory.smrf.model.potential.QueryPotential_cascade"
+                        cliqueSet="ivory.smrf.model.builder.CascadeOrderedCliqueSet" dependence="sequential"
+                        potential="ivory.smrf.model.potential.CascadeQueryPotential"
                         generator="ivory.smrf.model.builder.OrderedWindowExpressionGenerator" width="4"
-                        scoreFunction="ivory.smrf.model.score.DirichletScoringFunction_cascade" mu="750.0" />
+                        scoreFunction="ivory.smrf.model.score.CascadeDirichletScoringFunction" mu="750.0" />
                 <feature id="unorderedWt" weight="0.12"
                         cascadeStage="2"
                         prune = "rank 0.5"
                         conceptBinType = "default"
                         conceptBinParams = "3 1"
-                        cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet_cascade" dependence="sequential"
-                        potential="ivory.smrf.model.potential.QueryPotential_cascade"
+                        cliqueSet="ivory.smrf.model.builder.CascadeOrderedCliqueSet" dependence="sequential"
+                        potential="ivory.smrf.model.potential.CascadeQueryPotential"
                         generator="ivory.smrf.model.builder.UnorderedWindowExpressionGenerator" width="2"
-                        scoreFunction="ivory.smrf.model.score.DirichletScoringFunction_cascade" mu="750.0" />
+                        scoreFunction="ivory.smrf.model.score.CascadeDirichletScoringFunction" mu="750.0" />
                 <feature id="unorderedWt" weight="0.1"
                         cascadeStage="3"
                         prune = "rank 0.0"
                         conceptBinType = "default"
                         conceptBinParams = "3 2"
-                        cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet_cascade" dependence="sequential"
-                        potential="ivory.smrf.model.potential.QueryPotential_cascade"
+                        cliqueSet="ivory.smrf.model.builder.CascadeOrderedCliqueSet" dependence="sequential"
+                        potential="ivory.smrf.model.potential.CascadeQueryPotential"
                         generator="ivory.smrf.model.builder.UnorderedWindowExpressionGenerator" width="2"
-                        scoreFunction="ivory.smrf.model.score.DirichletScoringFunction_cascade" mu="750.0" />
+                        scoreFunction="ivory.smrf.model.score.CascadeDirichletScoringFunction" mu="750.0" />
 
         </model>
 </parameters>

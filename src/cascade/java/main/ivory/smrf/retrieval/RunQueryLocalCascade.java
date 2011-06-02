@@ -30,19 +30,19 @@ import org.xml.sax.SAXException;
  * @author Lidan Wang
  *
  */
-public class RunQueryLocal_cascade {
+public class RunQueryLocalCascade {
 
-	private static final Logger sLogger = Logger.getLogger(RunQueryLocal_cascade.class);
+	private static final Logger sLogger = Logger.getLogger(RunQueryLocalCascade.class);
 
-	private BatchQueryRunner_cascade runner = null;
+	private CascadeBatchQueryRunner runner = null;
 
-	public RunQueryLocal_cascade(String[] args) throws SAXException, IOException,
+	public RunQueryLocalCascade(String[] args) throws SAXException, IOException,
 			ParserConfigurationException, Exception, NotBoundException {
 		Configuration conf = new Configuration();
 		FileSystem fs = FileSystem.getLocal(conf);
 		try {
 			sLogger.info("initilaize runquery ...");
-			runner = new BatchQueryRunner_cascade(args, fs);
+			runner = new CascadeBatchQueryRunner(args, fs);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -62,9 +62,9 @@ public class RunQueryLocal_cascade {
 	}
 
 	public static void main(String[] args) throws Exception {
-		RunQueryLocal_cascade s;
+		RunQueryLocalCascade s;
 		try {
-			s = new RunQueryLocal_cascade(args);
+			s = new RunQueryLocalCascade(args);
 			s.runQueries();
 		} catch (Exception e) {
 			e.printStackTrace();

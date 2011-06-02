@@ -27,38 +27,38 @@ import org.w3c.dom.Node;
  * @author Lidan Wang
  * 
  */
-public class DirichletScoringFunction_cascade extends DirichletScoringFunction {
+public class CascadeBM25ScoringFunction extends BM25ScoringFunction {
 
-        public static float MU;
+        public static float K1;
+        public static float B;
+        public static float avg_docLen;
 
-	public static float collectionLength;
-
-	
 	@Override
 	public void configure(Node domNode) {
 		super.configure(domNode);
-		MU = mu;
+		K1 = k1;
+                B = b; 
 	}
-
-
-        @Override
-        public float getScore(int tf, int docLen) {
-                if (isOOV) {
-                        return 0.0f;
-                }
-
-                //Since cascade is trained this way (term and term proximity features have same mu)
-                if (RetrievalEnvironment.mIsNewModel){
-                        return (float) Math.log(((float) tf + MU * backgroundProb) / (docLen + MU));
-                }
-                else{
-                        return (float) Math.log(((float) tf + mu * backgroundProb) / (docLen + mu));
-                }
-        }
 
 	@Override
 	public void initialize(GlobalTermEvidence termEvidence, GlobalEvidence globalEvidence) {
-		super.initialize(termEvidence, globalEvidence);
-		collectionLength = (float) globalEvidence.collectionLength;
+
+		super.initialize(termEvidence, globalEvidence); 
+		avg_docLen = avgDocLen;
 	}
+
+        @Override
+        public float getScore(int tf, int docLen) {
+                float bm25TF = 0;
+ 
+                if (RetrievalEnvironment.mIsNewModel){
+                        bm25TF = ((K1 + 1.0f) * tf) / (K1 * ((1.0f - B) + B * docLen / avg_docLen) + tf);
+                }
+                else{
+                        bm25TF = ((k1 + 1.0f) * tf) / (k1 * ((1.0f - b) + b * docLen / avgDocLen) + tf);
+                }
+ 
+                return bm25TF * idf;
+        }
+
 }

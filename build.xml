@@ -79,6 +79,10 @@
 		</javac>
 		<javac classpathref="lib.path.id" srcdir="${src.dir}/java/regression" destdir="${build.dir}" optimize="on" debug="on">
 		</javac>
+		<javac classpathref="lib.path.id" srcdir="${src.dir}/cascade/java/main" destdir="${build.dir}" optimize="on" debug="on">
+			<!-- compilerarg value="-Xlint:unchecked"/ uncomment this to check for generics -->
+		</javac>
+
 		<!-- javac classpathref="classpath" srcdir="${src.dir}/sandbox" destdir="${build.dir}" optimize="on" debug="on" -->
 			<!-- compilerarg value="-Xlint:unchecked"/ uncomment this to check for generics -->
 		<!-- /javac -->

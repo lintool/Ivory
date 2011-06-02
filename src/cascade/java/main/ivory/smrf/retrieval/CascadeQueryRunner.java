@@ -22,7 +22,7 @@ import java.util.Map;
  * @author Lidan Wang
  *
  */
-public interface QueryRunner_cascade extends QueryRunner{
+public interface CascadeQueryRunner extends QueryRunner{
 	public Accumulator[] runQuery(String[] query);
 	public void runQuery(String qid, String[] query);
 	public Accumulator[] getResults(String qid);

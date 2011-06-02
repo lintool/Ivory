@@ -57,6 +57,8 @@ public abstract class MRFBuilder {
         builder = new FeatureBasedMRFBuilder(env, model);
       } else if ("GreedyConstrained".equals(modelType)) {
         builder = new GreedyConstrainedMRFBuilder(env, model);
+      } else if (modelType.equals("New")){
+        builder = new FeatureBasedMRFBuilder_new(env, model);
       } else {
         throw new ConfigurationException("Unrecognized model type: " + modelType);
       }

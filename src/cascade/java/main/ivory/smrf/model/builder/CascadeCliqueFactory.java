@@ -18,7 +18,7 @@ package ivory.smrf.model.builder;
 
 import ivory.exception.ConfigurationException;
 import ivory.smrf.model.Clique;
-import ivory.smrf.model.Clique_cascade;
+import ivory.smrf.model.CascadeClique;
 import ivory.smrf.model.DocumentNode;
 import ivory.smrf.model.GraphNode;
 import ivory.smrf.model.Parameter;
@@ -38,7 +38,7 @@ import com.google.common.collect.Lists;
  * @author Don Metzler
  * @author Lidan Wang
  */
-public class CliqueFactory_cascade {
+public class CascadeCliqueFactory {
 
 	public static List<Clique> getSequentialDependenceCliques(RetrievalEnvironment env,
 			String[] queryTerms, Node domNode, boolean docDependent, int cascadeStage, String pruner_and_params) throws ConfigurationException {
@@ -83,7 +83,7 @@ public class CliqueFactory_cascade {
 				// Get the potential function.
 				PotentialFunction potential = PotentialFunction.create(env, potentialType, domNode);
 
-				c = new Clique_cascade(cliqueNodes, potential, parameter, cascadeStage, pruner_and_params);
+				c = new CascadeClique(cliqueNodes, potential, parameter, cascadeStage, pruner_and_params);
 
 				cliques.add(c);
 			}
@@ -157,7 +157,7 @@ public class CliqueFactory_cascade {
 				// Get the potential function.
 				PotentialFunction potential = PotentialFunction.create(env, potentialType, domNode);
 
-				c = new Clique_cascade(cliqueNodes, potential, parameter, cascadeStage, pruner_and_params);
+				c = new CascadeClique(cliqueNodes, potential, parameter, cascadeStage, pruner_and_params);
 				cliques.add(c);
 			} else if (!ordered && !singleTerm && !contiguous) {
 				cliqueNodes = Lists.newArrayList();
@@ -174,7 +174,7 @@ public class CliqueFactory_cascade {
 				// Get the potential function.
 				PotentialFunction potential = PotentialFunction.create(env, potentialType, domNode);
 
-				c = new Clique_cascade(cliqueNodes, potential, parameter, cascadeStage, pruner_and_params);
+				c = new CascadeClique(cliqueNodes, potential, parameter, cascadeStage, pruner_and_params);
 				cliques.add(c);
 			}
 		}
