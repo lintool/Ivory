@@ -1,11 +1,9 @@
 package ivory.regression;
 
-import ivory.eval.Qrels;
-import ivory.eval.Qrels_new;
+import ivory.eval.GradedQrels;
 import ivory.regression.GroundTruth.Metric;
 import ivory.smrf.retrieval.Accumulator;
-import ivory.smrf.retrieval.BatchQueryRunner;
-import ivory.smrf.retrieval.BatchQueryRunner_cascade;
+import ivory.smrf.retrieval.cascade.CascadeBatchQueryRunner;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -98,7 +96,7 @@ public class Wt10g_SIGIR2011_varying_tradeoff_featureprune {
 
 		g.put("wt10g-featureprune-0.9", new GroundTruth("wt10g-featureprune-0.9", Metric.NDCG20, 50, p9, 0.3404f));
 
-		Qrels_new qrels = new Qrels_new("data/wt10g/qrels.wt10g.all");
+		GradedQrels qrels = new GradedQrels("data/wt10g/qrels.wt10g.all");
 
     String[] params = new String[] {
             "data/wt10g/run.wt10g.SIGIR2011.varying.tradeoff.featureprune.xml",
@@ -106,7 +104,7 @@ public class Wt10g_SIGIR2011_varying_tradeoff_featureprune {
 
 		FileSystem fs = FileSystem.getLocal(new Configuration());
 
-		BatchQueryRunner_cascade qr = new BatchQueryRunner_cascade(params, fs);
+		CascadeBatchQueryRunner qr = new CascadeBatchQueryRunner(params, fs);
 
 		long start = System.currentTimeMillis();
 		qr.runQueries();

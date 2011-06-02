@@ -1,11 +1,9 @@
 package ivory.regression;
 
-import ivory.eval.Qrels;
-import ivory.eval.Qrels_new;
+import ivory.eval.GradedQrels;
 import ivory.regression.GroundTruth.Metric;
 import ivory.smrf.retrieval.Accumulator;
-import ivory.smrf.retrieval.BatchQueryRunner;
-import ivory.smrf.retrieval.BatchQueryRunner_cascade;
+import ivory.smrf.retrieval.cascade.CascadeBatchQueryRunner;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -74,7 +72,7 @@ public class Clue_SIGIR2011_varying_tradeoff_cascade {
 
 		g.put("clue-cascade-0.9", new GroundTruth("clue-cascade-0.9", Metric.NDCG20, 25, p9, 0.2760f));
 
-		Qrels_new qrels = new Qrels_new("data/clue/qrels.web09catB.txt");
+		GradedQrels qrels = new GradedQrels("data/clue/qrels.web09catB.txt");
 
     String[] params = new String[] {
             "data/clue/run.clue.SIGIR2011.varying.tradeoff.cascade.xml",
@@ -82,7 +80,7 @@ public class Clue_SIGIR2011_varying_tradeoff_cascade {
 
 		FileSystem fs = FileSystem.getLocal(new Configuration());
 
-		BatchQueryRunner_cascade qr = new BatchQueryRunner_cascade(params, fs);
+		CascadeBatchQueryRunner qr = new CascadeBatchQueryRunner(params, fs);
 
 		long start = System.currentTimeMillis();
 		qr.runQueries();

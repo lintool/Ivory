@@ -1,11 +1,9 @@
 package ivory.regression;
 
-import ivory.eval.Qrels;
-import ivory.eval.Qrels_new;
+import ivory.eval.GradedQrels;
 import ivory.regression.GroundTruth.Metric;
 import ivory.smrf.retrieval.Accumulator;
-import ivory.smrf.retrieval.BatchQueryRunner;
-import ivory.smrf.retrieval.BatchQueryRunner_cascade;
+import ivory.smrf.retrieval.cascade.CascadeBatchQueryRunner;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -125,7 +123,7 @@ public class Gov2_SIGIR2011_varying_tradeoff_cascade {
 
 		g.put("gov2-cascade-0.1", new GroundTruth("gov2-cascade-0.1", Metric.NDCG20, 75, p1, 0.4745f));
 
-		Qrels_new qrels = new Qrels_new("data/gov2/qrels.gov2.all");
+		GradedQrels qrels = new GradedQrels("data/gov2/qrels.gov2.all");
 
     String[] params = new String[] {
             "data/gov2/run.gov2.SIGIR2011.varying.tradeoff.cascade.xml",
@@ -133,7 +131,7 @@ public class Gov2_SIGIR2011_varying_tradeoff_cascade {
 
 		FileSystem fs = FileSystem.getLocal(new Configuration());
 
-		BatchQueryRunner_cascade qr = new BatchQueryRunner_cascade(params, fs);
+		CascadeBatchQueryRunner qr = new CascadeBatchQueryRunner(params, fs);
 
 		long start = System.currentTimeMillis();
 		qr.runQueries();
