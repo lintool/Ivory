@@ -1,11 +1,11 @@
 package ivory.regression;
 
 import ivory.eval.Qrels;
-import ivory.eval.Qrels_new;
+import ivory.eval.GradedQrels;
 import ivory.regression.GroundTruth.Metric;
 import ivory.smrf.retrieval.Accumulator;
 import ivory.smrf.retrieval.BatchQueryRunner;
-import ivory.smrf.retrieval.CascadeBatchQueryRunner;
+import ivory.smrf.retrieval.cascade.CascadeBatchQueryRunner;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -64,7 +64,7 @@ public class Clue_SIGIR2011 {
 
 		g.put("clue-featureprune", new GroundTruth("clue-featureprune", Metric.NDCG20, 25, featurePrune, 0.2966f));
 
-		Qrels_new qrels = new Qrels_new("data/clue/qrels.web09catB.txt");
+		GradedQrels qrels = new GradedQrels("data/clue/qrels.web09catB.txt");
 
     String[] params = new String[] {
             "data/clue/run.clue.SIGIR2011.xml",

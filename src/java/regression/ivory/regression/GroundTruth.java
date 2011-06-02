@@ -2,9 +2,8 @@ package ivory.regression;
 
 import static org.junit.Assert.assertEquals;
 import ivory.eval.Qrels;
-import ivory.eval.Qrels_new;
+import ivory.eval.GradedQrels;
 import ivory.eval.RankedListEvaluator;
-import ivory.eval.RankedListEvaluator_new;
 import ivory.smrf.retrieval.Accumulator;
 
 import java.util.HashMap;
@@ -63,18 +62,18 @@ public class GroundTruth {
 		} else if (mMetric.equals(Metric.P10)) {
 			verifyP10(results, mapping, qrels);
 		} else if (mMetric.equals(Metric.NDCG20)){
-			verifyNDCG20(results, mapping, (Qrels_new)qrels);
+			verifyNDCG20(results, mapping, (GradedQrels)qrels);
 		} 
 		else {
 			throw new RuntimeException("Unknown metric: Don't know how to verify!");
 		}
 	}
 
-	private void verifyNDCG20(Map<String, Accumulator[]> results, DocnoMapping mapping, Qrels_new qrels) {
+	private void verifyNDCG20(Map<String, Accumulator[]> results, DocnoMapping mapping, GradedQrels qrels) {
 		float ndcgSum = 0;
 
 		for (String qid : results.keySet()) {
-			float ndcg = (float) RankedListEvaluator_new.computeNDCG(20, results.get(qid), mapping, qrels.getReldocsForQid(qid, true));
+			float ndcg = (float) RankedListEvaluator.computeNDCG(20, results.get(qid), mapping, qrels.getReldocsForQid(qid, true));
 
 			ndcgSum += ndcg;
 

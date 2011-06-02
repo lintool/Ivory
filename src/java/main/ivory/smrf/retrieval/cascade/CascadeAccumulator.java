@@ -1,5 +1,5 @@
 /*
- * Ivory: A Hadoop toolkit for Web-scale information retrieval
+ * Ivory: A Hadoop toolkit for web-scale information retrieval
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You may
@@ -14,20 +14,24 @@
  * permissions and limitations under the License.
  */
 
-package ivory.smrf.retrieval;
+package ivory.smrf.retrieval.cascade;
 
-import java.util.Map;
+import ivory.smrf.retrieval.Accumulator;
+
+import java.io.Serializable;
+import java.util.Comparator;
+
+import com.google.common.base.Preconditions;
 
 /**
  * @author Lidan Wang
- *
  */
-public interface CascadeQueryRunner extends QueryRunner{
-	public Accumulator[] runQuery(String[] query);
-	public void runQuery(String qid, String[] query);
-	public Accumulator[] getResults(String qid);
-	public Map<String, Accumulator[]> getResults();
-	public void clearResults();
-	public float[] getCascadeCostAllQueries();
-	public float [] getCascadeCostAllQueries_lastStage();
+public class CascadeAccumulator extends Accumulator{ 
+
+	//index into the kept docs array that will be passed through the cascade
+	public int index_into_keptDocs = -1;
+
+	public CascadeAccumulator(int docno, float score) {
+		super(docno, score);
+	}
 }

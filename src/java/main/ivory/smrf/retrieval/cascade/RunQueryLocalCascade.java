@@ -14,7 +14,7 @@
  * permissions and limitations under the License.
  */
 
-package ivory.smrf.retrieval;
+package ivory.smrf.retrieval.cascade;
 
 import java.io.IOException;
 import java.rmi.NotBoundException;

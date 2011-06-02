@@ -1,11 +1,11 @@
 package ivory.regression;
 
 import ivory.eval.Qrels;
-import ivory.eval.Qrels_new;
+import ivory.eval.GradedQrels;
 import ivory.regression.GroundTruth.Metric;
 import ivory.smrf.retrieval.Accumulator;
 import ivory.smrf.retrieval.BatchQueryRunner;
-import ivory.smrf.retrieval.CascadeBatchQueryRunner;
+import ivory.smrf.retrieval.cascade.CascadeBatchQueryRunner;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -87,7 +87,7 @@ public class Wt10g_SIGIR2011 {
 
 		g.put("wt10g-featureprune", new GroundTruth("wt10g-featureprune", Metric.NDCG20, 50, featurePrune, 0.3486f));
 
-		Qrels_new qrels = new Qrels_new("data/wt10g/qrels.wt10g.all");
+		GradedQrels qrels = new GradedQrels("data/wt10g/qrels.wt10g.all");
 
     String[] params = new String[] {
             "data/wt10g/run.wt10g.SIGIR2011.xml",

@@ -36,7 +36,7 @@ import java.util.Map.Entry;
  * @author Jimmy Lin
  * @author Lidan Wang
  */
-public class Qrels_new extends Qrels{
+public class GradedQrels extends Qrels{
 
 	private Map<String, Map<String, String>> mQrels;
 
@@ -48,7 +48,7 @@ public class Qrels_new extends Qrels{
 	 * @param file
 	 *            file that contains the relevance judgments
 	 */
-	public Qrels_new(String file) {
+	public GradedQrels(String file) {
 
 		super (file);
 

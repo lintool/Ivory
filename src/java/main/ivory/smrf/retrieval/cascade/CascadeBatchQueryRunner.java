@@ -14,44 +14,39 @@
  * permissions and limitations under the License.
  */
 
-package ivory.smrf.retrieval;
+package ivory.smrf.retrieval.cascade;
 
+import ivory.eval.GradedQrels;
+import ivory.eval.RankedListEvaluator;
 import ivory.exception.ConfigurationException;
 import ivory.smrf.model.builder.MRFBuilder;
 import ivory.smrf.model.expander.MRFExpander;
-import ivory.smrf.model.importance.ConceptImportanceModel;
+import ivory.smrf.retrieval.Accumulator;
+import ivory.smrf.retrieval.BatchQueryRunner;
+import ivory.smrf.retrieval.QueryRunner;
 import ivory.util.ResultWriter;
 import ivory.util.RetrievalEnvironment;
 import ivory.util.XMLTools;
-import ivory.eval.Qrels_new;
-import ivory.eval.RankedListEvaluator_new;
 
 import java.io.BufferedReader;
-import java.io.InputStreamReader;
-
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Map;
+import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.conf.Configuration;
-
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-
-import com.google.common.base.Preconditions;
 
 import edu.umd.cloud9.collection.DocnoMapping;
 
@@ -339,7 +334,7 @@ public class CascadeBatchQueryRunner extends BatchQueryRunner{
 			System.exit(-1);
 		}
 
-		Qrels_new qrels = new Qrels_new(qrelsPath);
+		GradedQrels qrels = new GradedQrels(qrelsPath);
                 DocnoMapping mapping = getDocnoMapping();
 
 		if (K_val==0){
@@ -354,7 +349,7 @@ public class CascadeBatchQueryRunner extends BatchQueryRunner{
 				continue;
 			}
 
-			float ndcg = (float) RankedListEvaluator_new.computeNDCG(kVal, list, mapping, qrels.getReldocsForQid(queryID, true)); 
+			float ndcg = (float) RankedListEvaluator.computeNDCG(kVal, list, mapping, qrels.getReldocsForQid(queryID, true)); 
 			ndcgSum += ndcg;
 
 			if (!internalDocno){
