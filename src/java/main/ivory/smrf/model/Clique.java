@@ -31,7 +31,7 @@ import com.google.common.base.Preconditions;
  * @author Lidan Wang
  */
 public class Clique {
-	public static enum Type { Document, Term, Ordered, Unorderd }
+	public static enum Type { Document, Term, Ordered, Unordered }
 
 	private final List<GraphNode> nodes;        // Nodes associated with this clique.
 	private final PotentialFunction potential;  // Potential function associated with this clique.

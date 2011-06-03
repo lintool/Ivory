@@ -31,7 +31,7 @@ import com.google.common.collect.Lists;
  * @author Don Metzler
  */
 public abstract class CliqueSet {
-	private final List<Clique> cliques = Lists.newArrayList();
+	protected final List<Clique> cliques = Lists.newArrayList();
 
   public abstract void configure(RetrievalEnvironment env, String[] queryTerms, Node domNode)
       throws ConfigurationException;

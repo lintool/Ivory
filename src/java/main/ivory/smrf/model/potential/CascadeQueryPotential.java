@@ -129,7 +129,7 @@ public class CascadeQueryPotential extends QueryPotential {
     return postingsReader.getWindowSize();
   }
 
-        public String getScoringFunctionName(){
+  public String getScoringFunctionName(){
     if (scoringFunction.toString().indexOf("Dirichlet")!=-1){
       return "dirichlet";
     }
@@ -141,6 +141,9 @@ public class CascadeQueryPotential extends QueryPotential {
     }
   }
 
+  public ScoringFunction getScoringFunction() {
+    return scoringFunction;
+  }
         public int [] getPositions(){
     return positions;
   }

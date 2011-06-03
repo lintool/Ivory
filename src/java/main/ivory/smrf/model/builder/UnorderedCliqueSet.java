@@ -52,6 +52,6 @@ public class UnorderedCliqueSet extends CliqueSet {
 
 	@Override
 	public Clique.Type getType() {
-		return Clique.Type.Unorderd;
+		return Clique.Type.Unordered;
 	}
 }

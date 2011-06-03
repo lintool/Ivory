@@ -1,11 +1,11 @@
 /*
  * Ivory: A Hadoop toolkit for web-scale information retrieval
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You may
  * obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0 
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -39,59 +39,52 @@ import com.google.common.base.Preconditions;
  */
 public class CascadeTermCliqueSet extends CascadeCliqueSet {
 
-	public static final String TYPE = "Term";
-	
-	@Override
-	public void configure(RetrievalEnvironment env, String[] queryTerms, Node domNode, int cascadeStage, String pruner_and_params) throws ConfigurationException {
-		Preconditions.checkNotNull(env);
-		Preconditions.checkNotNull(queryTerms);
-		Preconditions.checkNotNull(domNode);
+  @Override
+  public void configure(RetrievalEnvironment env, String[] queryTerms, Node domNode,
+      int cascadeStage, String pruner_and_params) throws ConfigurationException {
+    Preconditions.checkNotNull(env);
+    Preconditions.checkNotNull(queryTerms);
+    Preconditions.checkNotNull(domNode);
 
-		boolean docDependent = XMLTools.getAttributeValue(domNode, "docDependent", true);
+    boolean docDependent = XMLTools.getAttributeValue(domNode, "docDependent", true);
 
-		// Initialize clique set.
-		clearCliques();
+    // Initialize clique set.
+    clearCliques();
 
-		// The document node.
-		DocumentNode docNode = new DocumentNode();
+    // The document node.
+    DocumentNode docNode = new DocumentNode();
 
-		// Default parameter associated with clique set.
-		Parameter termParameter = new Parameter(Parameter.DEFAULT, 1.0f);
+    // Default parameter associated with clique set.
+    Parameter termParameter = new Parameter(Parameter.DEFAULT, 1.0f);
 
-		// Get potential type.
-		String potentialType = XMLTools.getAttributeValue(domNode, "potential", null);
-		if (potentialType == null) {
-			throw new ConfigurationException("A potential attribute must be specified in order to generate a CliqueSet!");
-		}
+    // Get potential type.
+    String potentialType = XMLTools.getAttributeValue(domNode, "potential", null);
+    if (potentialType == null) {
+      throw new ConfigurationException("A potential attribute must be specified in order to generate a CliqueSet!");
+    }
 
-		// Add clique for each query term.
-		for (String element : queryTerms) {
-			// Add term node.
-			TermNode termNode = new TermNode(element);
+    // Add clique for each query term.
+    for (String element : queryTerms) {
+      // Add term node.
+      TermNode termNode = new TermNode(element);
 
-			// Add document/term clique.
-			ArrayList<GraphNode> cliqueNodes = new ArrayList<GraphNode>();
-			if (docDependent) {
-				cliqueNodes.add(docNode);
-			}
-			cliqueNodes.add(termNode);
+      // Add document/term clique.
+      ArrayList<GraphNode> cliqueNodes = new ArrayList<GraphNode>();
+      if (docDependent) {
+        cliqueNodes.add(docNode);
+      }
+      cliqueNodes.add(termNode);
 
-			// Get the potential function.
-			PotentialFunction potential = PotentialFunction.create(env, potentialType, domNode);
+      // Get the potential function.
+      PotentialFunction potential = PotentialFunction.create(env, potentialType, domNode);
 
-			Clique c = new CascadeClique(cliqueNodes, potential, termParameter, cascadeStage, pruner_and_params);
-			addClique(c);
-		}
-	}
+      Clique c = new CascadeClique(cliqueNodes, potential, termParameter, cascadeStage, pruner_and_params);
+      addClique(c);
+    }
+  }
 
-	@Override
-        public Clique.Type getType() {
-                return Clique.Type.Term;
-        }
-
-	/*
-	@Override
-	public String getType() {
-		return TYPE;
-	}*/
+  @Override
+  public Clique.Type getType() {
+    return Clique.Type.Term;
+  }
 }
