@@ -55,6 +55,7 @@ public class BM25ScoringFunction extends ScoringFunction {
 
 	@Override
 	public void initialize(GlobalTermEvidence termEvidence, GlobalEvidence globalEvidence) {
+	  super.initialize(termEvidence, globalEvidence);
 		avgDocLen = (float) globalEvidence.collectionLength / (float) globalEvidence.numDocs;
 
 		if ("none".equals(idfType)) {
