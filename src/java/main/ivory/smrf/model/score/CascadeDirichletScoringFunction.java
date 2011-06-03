@@ -29,13 +29,11 @@ import org.w3c.dom.Node;
  */
 public class CascadeDirichletScoringFunction extends DirichletScoringFunction {
 
-        public static float MU;
-
-	public static float collectionLength;
+        private static float MU;
 
 	
 	@Override
-	public void configure(Node domNode) {
+	public synchronized void configure(Node domNode) {
 		super.configure(domNode);
 		MU = mu;
 	}
@@ -43,6 +41,9 @@ public class CascadeDirichletScoringFunction extends DirichletScoringFunction {
 
         @Override
         public float getScore(int tf, int docLen) {
+//          if ( MU != mu ) {
+//            throw new RuntimeException("MU=" + MU + ", mu=" + mu + ", " + RetrievalEnvironment.mIsNewModel);
+//          }
                 if (isOOV) {
                         return 0.0f;
                 }
@@ -56,9 +57,9 @@ public class CascadeDirichletScoringFunction extends DirichletScoringFunction {
                 }
         }
 
-	@Override
-	public void initialize(GlobalTermEvidence termEvidence, GlobalEvidence globalEvidence) {
-		super.initialize(termEvidence, globalEvidence);
-		collectionLength = (float) globalEvidence.collectionLength;
-	}
+//	@Override
+//	public void initialize(GlobalTermEvidence termEvidence, GlobalEvidence globalEvidence) {
+//		super.initialize(termEvidence, globalEvidence);
+//		collectionLength = (float) globalEvidence.collectionLength;
+//	}
 }

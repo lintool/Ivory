@@ -50,6 +50,7 @@ public class DirichletScoringFunction extends ScoringFunction {
 
 	@Override
 	public void initialize(GlobalTermEvidence termEvidence, GlobalEvidence globalEvidence) {
+	  super.initialize(termEvidence, globalEvidence);
 		isOOV = termEvidence.getCf() == 0 ? true : false;
 		backgroundProb = (float) termEvidence.getCf() / (float) globalEvidence.collectionLength;
 	}

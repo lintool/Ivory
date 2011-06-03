@@ -21,10 +21,12 @@ import ivory.exception.RetrievalException;
 import ivory.smrf.model.CascadeClique;
 import ivory.smrf.model.Clique;
 import ivory.smrf.model.DocumentNode;
+import ivory.smrf.model.GlobalTermEvidence;
 import ivory.smrf.model.GraphNode;
 import ivory.smrf.model.MarkovRandomField;
 import ivory.smrf.model.score.CascadeBM25ScoringFunction;
 import ivory.smrf.model.score.CascadeDirichletScoringFunction;
+import ivory.smrf.model.score.ScoringFunction;
 import ivory.smrf.retrieval.Accumulator;
 import ivory.util.RetrievalEnvironment;
 
@@ -389,7 +391,9 @@ public class CascadeEval {
         cascadeStage++;
       } else {
         String featureID = null;
-        String scoringFunction = null;
+        String scoringFunctionName = null;
+        ScoringFunction scoringFunction = null;
+
         int mSize = -1;
         String[][] concepts_this_stage = new String[cliques_all.size()][];
         float[] clique_wgts = new float[concepts_this_stage.length];
@@ -404,7 +408,8 @@ public class CascadeEval {
             pruner_param = ((CascadeClique) c).getPruningParameter();
 
             featureID = ((CascadeClique) c).getParamID().trim(); // termWt, orderedWt, unorderedWt
-            scoringFunction = ((CascadeClique) c).getScoringFunctionName(); // dirichlet, bm25
+            scoringFunctionName = ((CascadeClique) c).getScoringFunctionName(); // dirichlet, bm25
+            scoringFunction = ((CascadeClique) c).getScoringFunction();
 
             mSize = ((CascadeClique) c).getWindowSize(); // window width
             if (mSize == -1 && !(featureID.equals("termWt"))) {
@@ -533,8 +538,8 @@ public class CascadeEval {
                 float termCollectionFreq = termCollectionFreqs[j];
                 float termDF = termDFs[j];
 
-                docScore_cascade += clique_wgts[j]
-                    * getScore(tf, docLen, termCollectionFreq, termDF, scoringFunction);
+                docScore_cascade += clique_wgts[j] * scoringFunction.getScore(tf, docLen);
+                    //* getScore(tf, docLen, termCollectionFreq, termDF, scoringFunctionName);
 
               } else { // term proximity
 
@@ -654,9 +659,16 @@ public class CascadeEval {
                   }
                 } // end if this is a match, i.e., both query terms are in the doc
 
-                float s = getScore(matches, docLen, RetrievalEnvironment.defaultCf,
-                    (float) RetrievalEnvironment.defaultDf, scoringFunction);
-                docScore_cascade += clique_wgts[j] * s;
+//                float s = getScore(matches, docLen, RetrievalEnvironment.defaultCf,
+//                    (float) RetrievalEnvironment.defaultDf, scoringFunctionName);
+//                docScore_cascade += clique_wgts[j] * s;
+                
+                GlobalTermEvidence termEvidence = scoringFunction.getGlobalTermEvidence();
+                termEvidence.cf = RetrievalEnvironment.defaultCf;
+                termEvidence.df = RetrievalEnvironment.defaultDf;
+
+                scoringFunction.initialize(termEvidence, scoringFunction.getGlobalEvidence());
+                docScore_cascade += clique_wgts[j] * scoringFunction.getScore(matches, docLen);
 
               } // end else it's proximity feature
             } // end for (each concept)
@@ -719,38 +731,38 @@ public class CascadeEval {
     return results_return;
   }
 
-  public float getScore(int tf, int docLen, float termCollectionFreq, float termDF,
-      String scoringFunction) {
-    float score = 0;
-
-    // Lidan: note: here assume we only use one kind of hyperparameter for dirichlet and bm25 in
-    // feature set. Since these hyperparameters are declared as static variables in the dirichlet
-    // and bm25 scoring functions!
-
-    if (scoringFunction.equals("dirichlet")) {
-
-      float backgroundProb = termCollectionFreq / CascadeDirichletScoringFunction.collectionLength;
-
-      score = (float) Math.log(((float) tf + CascadeDirichletScoringFunction.MU * backgroundProb)
-          / (docLen + CascadeDirichletScoringFunction.MU));
-
-    } else if (scoringFunction.equals("bm25")) {
-
-      score = ((CascadeBM25ScoringFunction.K1 + 1.0f) * tf)
-          / (CascadeBM25ScoringFunction.K1
-              * ((1.0f - CascadeBM25ScoringFunction.B) + CascadeBM25ScoringFunction.B * docLen
-                  / CascadeBM25ScoringFunction.avg_docLen) + tf);
-      float mIdf = (float) Math.log(((float) RetrievalEnvironment.documentCount - termDF + 0.5f)
-          / (termDF + 0.5f));
-      score = score * mIdf;
-    } else {
-      System.out.println("Not supported scoringFunction " + scoringFunction);
-      System.exit(-1);
-    }
-
-    return score;
-
-  }
+//  public float getScore(int tf, int docLen, float termCollectionFreq, float termDF,
+//      String scoringFunction) {
+//    float score = 0;
+//
+//    // Lidan: note: here assume we only use one kind of hyperparameter for dirichlet and bm25 in
+//    // feature set. Since these hyperparameters are declared as static variables in the dirichlet
+//    // and bm25 scoring functions!
+//
+//    if (scoringFunction.equals("dirichlet")) {
+//
+//      float backgroundProb = termCollectionFreq / CascadeDirichletScoringFunction.collectionLength;
+//
+//      score = (float) Math.log(((float) tf + CascadeDirichletScoringFunction.MU * backgroundProb)
+//          / (docLen + CascadeDirichletScoringFunction.MU));
+//
+//    } else if (scoringFunction.equals("bm25")) {
+//
+//      score = ((CascadeBM25ScoringFunction.K1 + 1.0f) * tf)
+//          / (CascadeBM25ScoringFunction.K1
+//              * ((1.0f - CascadeBM25ScoringFunction.B) + CascadeBM25ScoringFunction.B * docLen
+//                  / CascadeBM25ScoringFunction.avg_docLen) + tf);
+//      float mIdf = (float) Math.log(((float) RetrievalEnvironment.documentCount - termDF + 0.5f)
+//          / (termDF + 0.5f));
+//      score = score * mIdf;
+//    } else {
+//      System.out.println("Not supported scoringFunction " + scoringFunction);
+//      System.exit(-1);
+//    }
+//
+//    return score;
+//
+//  }
 
   public CascadeAccumulator[] rank_cascade() {
 

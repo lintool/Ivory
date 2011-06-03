@@ -31,6 +31,9 @@ import com.google.common.base.Preconditions;
  *
  */
 public abstract class ScoringFunction {
+  protected GlobalTermEvidence termEvidence;
+  protected GlobalEvidence globalEvidence;
+  
 	/**
 	 * Configures this scoring function.
 	 */
@@ -39,7 +42,18 @@ public abstract class ScoringFunction {
 	/**
 	 * Initializes this scoring function with global evidence.
 	 */
-	public void initialize(GlobalTermEvidence termEvidence, GlobalEvidence globalEvidence) {}
+	public void initialize(GlobalTermEvidence termEvidence, GlobalEvidence globalEvidence) {
+	  this.termEvidence = termEvidence;
+	  this.globalEvidence = globalEvidence;
+	}
+
+	public GlobalEvidence getGlobalEvidence() {
+	  return globalEvidence;
+	}
+
+	public GlobalTermEvidence getGlobalTermEvidence() {
+	  return termEvidence;
+	}
 
 	/**
 	 * Computes score.

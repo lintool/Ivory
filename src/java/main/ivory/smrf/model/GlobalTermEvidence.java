@@ -23,8 +23,8 @@ package ivory.smrf.model;
  *
  */
 public class GlobalTermEvidence {
-	private int df;
-	private long cf;
+	public int df;
+	public long cf;
 
 	public GlobalTermEvidence() {
 		df = 0;
