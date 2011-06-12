@@ -14,7 +14,7 @@
  * permissions and limitations under the License.
  */
 
-package ivory.smrf.model.builder;
+package ivory.cascade.model.builder;
 
 import ivory.exception.ConfigurationException;
 import ivory.smrf.model.Clique;

@@ -14,12 +14,13 @@
  * permissions and limitations under the License.
  */
 
-package ivory.smrf.model.builder;
+package ivory.cascade.model.builder;
 
+import ivory.cascade.model.CascadeClique;
+import ivory.cascade.model.builder.CascadeCliqueSet;
 import ivory.exception.ConfigurationException;
 import ivory.exception.RetrievalException;
-import ivory.smrf.model.CascadeClique;
-import ivory.smrf.model.builder.CascadeCliqueSet;
+import ivory.smrf.model.builder.FeatureBasedMRFBuilder;
 import ivory.smrf.model.Clique;
 import ivory.smrf.model.MarkovRandomField;
 import ivory.smrf.model.importance.ConceptImportanceModel;

@@ -14,8 +14,9 @@
  * permissions and limitations under the License.
  */
 
-package ivory.smrf.model.score;
+package ivory.cascade.model.score;
 
+import ivory.smrf.model.score.DirichletScoringFunction;
 import ivory.util.RetrievalEnvironment;
 
 import org.w3c.dom.Node;

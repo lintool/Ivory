@@ -14,9 +14,10 @@
  * permissions and limitations under the License.
  */
 
-package ivory.smrf.model.potential;
+package ivory.cascade.model.potential;
 
 import ivory.smrf.model.builder.ExpressionGenerator;
+import ivory.smrf.model.potential.QueryPotential;
 import ivory.smrf.model.score.ScoringFunction;
 import ivory.util.RetrievalEnvironment;
 

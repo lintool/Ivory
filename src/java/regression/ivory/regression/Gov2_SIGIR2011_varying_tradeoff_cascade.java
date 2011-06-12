@@ -1,9 +1,9 @@
 package ivory.regression;
 
+import ivory.cascade.retrieval.CascadeBatchQueryRunner;
 import ivory.eval.GradedQrels;
 import ivory.regression.GroundTruth.Metric;
 import ivory.smrf.retrieval.Accumulator;
-import ivory.smrf.retrieval.cascade.CascadeBatchQueryRunner;
 
 import java.util.HashMap;
 import java.util.Map;

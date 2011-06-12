@@ -14,7 +14,7 @@
  * permissions and limitations under the License.
  */
 
-package ivory.smrf.retrieval.cascade;
+package ivory.cascade.retrieval;
 
 import ivory.eval.GradedQrels;
 import ivory.eval.RankedListEvaluator;

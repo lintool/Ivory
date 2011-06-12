@@ -14,18 +14,18 @@
  * permissions and limitations under the License.
  */
 
-package ivory.smrf.retrieval.cascade;
+package ivory.cascade.retrieval;
 
+import ivory.cascade.model.CascadeClique;
+import ivory.cascade.model.score.CascadeBM25ScoringFunction;
+import ivory.cascade.model.score.CascadeDirichletScoringFunction;
 import ivory.exception.ConfigurationException;
 import ivory.exception.RetrievalException;
-import ivory.smrf.model.CascadeClique;
 import ivory.smrf.model.Clique;
 import ivory.smrf.model.DocumentNode;
 import ivory.smrf.model.GlobalTermEvidence;
 import ivory.smrf.model.GraphNode;
 import ivory.smrf.model.MarkovRandomField;
-import ivory.smrf.model.score.CascadeBM25ScoringFunction;
-import ivory.smrf.model.score.CascadeDirichletScoringFunction;
 import ivory.smrf.model.score.ScoringFunction;
 import ivory.smrf.retrieval.Accumulator;
 import ivory.util.RetrievalEnvironment;

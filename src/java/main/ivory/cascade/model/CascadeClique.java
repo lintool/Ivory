@@ -14,9 +14,13 @@
  * permissions and limitations under the License.
  */
 
-package ivory.smrf.model;
+package ivory.cascade.model;
 
-import ivory.smrf.model.potential.CascadeQueryPotential;
+import ivory.cascade.model.potential.CascadeQueryPotential;
+import ivory.smrf.model.Clique;
+import ivory.smrf.model.GraphNode;
+import ivory.smrf.model.Parameter;
+import ivory.smrf.model.Clique.Type;
 import ivory.smrf.model.potential.PotentialFunction;
 import ivory.smrf.model.score.ScoringFunction;
 

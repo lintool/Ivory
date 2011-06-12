@@ -18,6 +18,7 @@ package ivory.smrf.model.builder;
 
 import java.io.IOException;
 
+import ivory.cascade.model.builder.CascadeFeatureBasedMRFBuilder;
 import ivory.exception.ConfigurationException;
 import ivory.exception.RetrievalException;
 import ivory.smrf.model.MarkovRandomField;

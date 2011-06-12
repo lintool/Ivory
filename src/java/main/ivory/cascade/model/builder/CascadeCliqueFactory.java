@@ -14,11 +14,11 @@
  * permissions and limitations under the License.
  */
 
-package ivory.smrf.model.builder;
+package ivory.cascade.model.builder;
 
+import ivory.cascade.model.CascadeClique;
 import ivory.exception.ConfigurationException;
 import ivory.smrf.model.Clique;
-import ivory.smrf.model.CascadeClique;
 import ivory.smrf.model.DocumentNode;
 import ivory.smrf.model.GraphNode;
 import ivory.smrf.model.Parameter;

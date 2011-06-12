@@ -14,7 +14,7 @@
  * permissions and limitations under the License.
  */
 
-package ivory.smrf.retrieval.cascade;
+package ivory.cascade.retrieval;
 
 import ivory.smrf.retrieval.Accumulator;
 import ivory.smrf.retrieval.QueryRunner;
