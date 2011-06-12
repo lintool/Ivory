@@ -19,6 +19,7 @@ import org.apache.log4j.Logger;
 import org.tartarus.snowball.SnowballStemmer;
 
 import edu.umd.hooka.VocabularyWritable;
+import edu.umd.hooka.alignment.HadoopAlign;
 
 public class OpenNLPTokenizer implements ivory.tokenize.Tokenizer {
 	private static final Logger sLogger = Logger.getLogger(DocumentProcessingUtils.class);
@@ -48,7 +49,7 @@ public class OpenNLPTokenizer implements ivory.tokenize.Tokenizer {
 		setLanguageAndStemmer(mJobConf.get("Ivory.Lang"));
 		VocabularyWritable vocab;
 		try {
-			vocab = (VocabularyWritable) CLIRUtils.loadVocab(new Path(mJobConf.get("Ivory.CollectionVocab")), fs);
+			vocab = (VocabularyWritable) HadoopAlign.loadVocab(new Path(mJobConf.get("Ivory.CollectionVocab")), fs);
 			setVocab(vocab);
 		} catch (IOException e) {
 			sLogger.warn("VOCAB IS NULL!");
@@ -81,10 +82,11 @@ public class OpenNLPTokenizer implements ivory.tokenize.Tokenizer {
 		Class stemClass;
 		try {
 			stemClass = Class.forName("org.tartarus.snowball.ext." +
-					l + "Stemmer");
+					lang + "Stemmer");
 			stemmer = (SnowballStemmer) stemClass.newInstance();
 		} catch (ClassNotFoundException e) {
-			sLogger.warn("Stemmer class not recognized!");
+			sLogger.warn("Stemmer class not recognized!\n"+"org.tartarus.snowball.ext." +
+					lang + "Stemmer");
 			stemmer = null;
 			return;
 		} catch (Exception e) {
@@ -101,6 +103,8 @@ public class OpenNLPTokenizer implements ivory.tokenize.Tokenizer {
 		String[] tokens = tokenizer.tokenize(text);
 		List<String> stemmedTokens = new ArrayList<String>();
 		for(String token : tokens){
+			token = removeNonUnicodeChars(token);
+
 			if(token.length() < MIN_LENGTH || token.length() > MAX_LENGTH || delims.contains(token))	continue;
 			String stemmed = token;
 			if(stemmer!=null){
@@ -108,7 +112,6 @@ public class OpenNLPTokenizer implements ivory.tokenize.Tokenizer {
 				stemmer.stem();
 				stemmed = stemmer.getCurrent().toLowerCase();
 			}
-			
 			//skip if out of vocab
 			if(vocab!=null && vocab.get(stemmed)<=0){
 				continue;
@@ -123,6 +126,35 @@ public class OpenNLPTokenizer implements ivory.tokenize.Tokenizer {
 		}
 		return tokensArray;
 
+	}
+	
+	public String processContent2(String text) {
+		String[] tokens = tokenizer.tokenize(text);
+		String line = "";
+		for(String token : tokens){
+			token = removeNonUnicodeChars(token);
+			String stemmed = token;
+			if(stemmer!=null){
+				stemmer.setCurrent(token);
+				stemmer.stem();
+				stemmed = stemmer.getCurrent().toLowerCase();
+			}
+			if(!stemmed.isEmpty()){
+				line += stemmed+" ";
+			}
+		}
+		return line;
+	}
+	
+	private String removeNonUnicodeChars(String token) {
+		StringBuffer fixedToken = new StringBuffer();
+		for(int i=0; i<token.length(); i++){
+			char c = token.charAt(i);
+			if(Character.getNumericValue(c)>=0){
+				fixedToken.append(c);
+			}
+		}
+		return fixedToken.toString();
 	}
 
 	public static void main(String[] args) throws IOException, ClassNotFoundException, InstantiationException, IllegalAccessException{
@@ -156,7 +188,7 @@ public class OpenNLPTokenizer implements ivory.tokenize.Tokenizer {
 		}
 		String indexPath = "/Users/ferhanture/edu/research/data/de-en/eu-nc-wmt08";
 		String srcVocabFile = indexPath+"/berkeleyaligner.vocab.ger";
-		VocabularyWritable engVocabH = (VocabularyWritable) CLIRUtils.loadVocab(new Path(srcVocabFile), localFs);
+		VocabularyWritable engVocabH = (VocabularyWritable) HadoopAlign.loadVocab(new Path(srcVocabFile), localFs);
 
 
 		eTokenizer.setVocab(engVocabH);
