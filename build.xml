@@ -140,11 +140,14 @@
 			<formatter type="xml" />
 			<batchtest todir="${regression.quick.dir}">
 				<fileset dir="${build.dir}">
-					<include name="ivory/regression/Robust04_Basic.class" />
-					<include name="ivory/regression/Robust04_WSD.class" />
-					<include name="ivory/regression/Wt10g_Basic.class" />
-					<include name="ivory/regression/Gov2_Basic.class" />
-					<include name="ivory/regression/Web09catB_All.class" />
+					<include name="ivory/regression/basic/Robust04_Basic.class" />
+					<include name="ivory/regression/basic/Robust04_WSD.class" />
+					<include name="ivory/regression/basic/Wt10g_Basic.class" />
+					<include name="ivory/regression/basic/Gov2_Basic.class" />
+					<include name="ivory/regression/basic/Web09catB_All.class" />
+					<include name="ivory/regression/sigir2011/Clue_Cascade.class" />
+					<include name="ivory/regression/sigir2011/Gov2_Cascade.class" />
+					<include name="ivory/regression/sigir2011/Wt10g_Cascade.class" />
 				</fileset>
 			</batchtest>
 		</junit>
@@ -170,7 +173,7 @@
 			<formatter type="xml" />
 			<batchtest todir="${regression.complete.dir}">
 				<fileset dir="${build.dir}">
-                                        <include name="ivory/regression/*.class" />
+                                        <include name="ivory/regression/**/*.class" />
                                         <exclude name="ivory/regression/GroundTruth*.class" />
                                         <exclude name="ivory/regression/RegressionUtils.class" />
 				</fileset>
