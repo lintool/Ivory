@@ -39,14 +39,21 @@ import org.apache.hadoop.mapred.Reducer;
 import org.apache.hadoop.mapred.Reporter;
 import org.apache.hadoop.mapred.SequenceFileInputFormat;
 import org.apache.hadoop.mapred.lib.NullOutputFormat;
+
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import edu.umd.cloud9.util.PowerTool;
+
+
 
 @SuppressWarnings("deprecation")
 public class BuildTermDocVectorsForwardIndex extends PowerTool {
 
 	private static final Logger sLogger = Logger.getLogger(BuildTermDocVectorsForwardIndex.class);
+	{
+		sLogger.setLevel (Level.DEBUG);
+	}
 
 	protected static enum Dictionary {
 		Size
@@ -77,7 +84,7 @@ public class BuildTermDocVectorsForwardIndex extends PowerTool {
 
 				pos = input.getPos();
 			}
-			sLogger.info("last termid: " + key + "(" + fileNo + ", " + pos + ")");
+			sLogger.trace("last termid: " + key + "(" + fileNo + ", " + pos + ")");
 		}
 	}
 
@@ -124,7 +131,7 @@ public class BuildTermDocVectorsForwardIndex extends PowerTool {
 				OutputCollector<Text, Text> output, Reporter reporter) throws IOException {
 			String[] s = values.next().toString().split("\\s+");
 
-			sLogger.info(key + ": " + s[0] + " " + s[1]);
+			sLogger.trace(key + ": " + s[0] + " " + s[1]);
 			if (values.hasNext())
 				throw new RuntimeException("There shouldn't be more than one value, key=" + key);
 

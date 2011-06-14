@@ -170,8 +170,14 @@ public class BuildIntDocVectorsForwardIndex2 extends PowerTool {
 				throw new RuntimeException("Unable to create RetrievalEnvironment!");
 			}
 
-			String forwardIndexPath = env.getIntDocVectorsForwardIndex ();
 			collectionDocumentCount = env.readCollectionDocumentCount ();
+			boolean buildWeighted = conf.getBoolean ("Ivory.BuildWeighted", false);
+			String forwardIndexPath;
+			if (buildWeighted) {
+				forwardIndexPath = env.getWeightedIntDocVectorsForwardIndex ();
+			} else {
+				forwardIndexPath = env.getIntDocVectorsForwardIndex ();
+			}
 
 			try {
 				out = fs.create (new Path (forwardIndexPath), true);
@@ -227,8 +233,20 @@ public class BuildIntDocVectorsForwardIndex2 extends PowerTool {
 		LOG.info(String.format(" - %s: %s", Constants.CollectionName, collectionName));
 		LOG.info(String.format(" - %s: %s", Constants.IndexPath, indexPath));
 
-		String intDocVectorsPath = env.getIntDocVectorsDirectory();
-		String forwardIndexPath = env.getIntDocVectorsForwardIndex();
+		//String intDocVectorsPath = env.getIntDocVectorsDirectory();
+		//String forwardIndexPath = env.getIntDocVectorsForwardIndex();
+
+		boolean buildWeighted = conf.getBoolean ("Ivory.BuildWeighted", false);
+		String intDocVectorsPath;
+		String forwardIndexPath;
+		if (buildWeighted) {
+			intDocVectorsPath = env.getWeightedIntDocVectorsDirectory ();
+			forwardIndexPath = env.getWeightedIntDocVectorsForwardIndex ();
+		} else {
+			intDocVectorsPath = env.getIntDocVectorsDirectory ();
+			forwardIndexPath = env.getIntDocVectorsForwardIndex ();
+		}
+
 
 		if (!fs.exists(new Path(intDocVectorsPath))) {
 			LOG.info("Error: IntDocVectors don't exist!");

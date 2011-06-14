@@ -99,6 +99,11 @@ public class IntDocVectorsForwardIndex {
 		}
 	}
 
+	public int getDocCount () {
+		return mCollectionDocumentCount;
+	}
+
+
 	/**
 	 * Returns the document vector given a docno.
 	 */
