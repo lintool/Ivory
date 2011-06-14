@@ -41,6 +41,9 @@ import org.apache.hadoop.mapred.SequenceFileInputFormat;
 import org.apache.hadoop.mapred.lib.NullOutputFormat;
 import org.apache.log4j.Logger;
 
+import org.apache.commons.lang.StringUtils;
+
+
 import edu.umd.cloud9.util.PowerTool;
 
 @SuppressWarnings("deprecation")
@@ -129,8 +132,10 @@ public class BuildIntDocVectorsForwardIndex extends PowerTool {
 			String[] s = values.next().toString().split("\\s+");
 
 			//sLogger.info (key + ": " + s[0] + " " + s[1]);
-			if (values.hasNext())
-				throw new RuntimeException("There shouldn't be more than one value, key=" + key);
+			if (values.hasNext()) {
+				String[] s2 = values.next().toString().split("\\s+");
+				throw new RuntimeException("There shouldn't be more than one value, key: " + key + ", first value: " + StringUtils.join (s, " ") + ", second value: " + StringUtils.join (s2, " "));
+			}
 
 			int fileNo = Integer.parseInt(s[0]);
 			long filePos = Long.parseLong(s[1]);
