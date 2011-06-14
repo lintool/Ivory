@@ -43,11 +43,11 @@ public class CascadeQueryPotential extends QueryPotential {
   }
 
 
-  public float termCollectionCF(){
+  public long termCollectionCF(){
     return termEvidence.getCf();
   }
 
-  public float termCollectionDF(){
+  public int termCollectionDF(){
     return termEvidence.getDf();
   }
 

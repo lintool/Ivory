@@ -24,8 +24,6 @@ import ivory.smrf.retrieval.Accumulator;
 import ivory.smrf.retrieval.MRFDocumentRanker;
 import ivory.util.RetrievalEnvironment;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -36,6 +34,7 @@ import java.util.concurrent.Future;
 import org.apache.log4j.Logger;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Maps;
 
 /**
  * @author Lidan Wang
@@ -48,14 +47,15 @@ public class CascadeThreadedQueryRunner implements CascadeQueryRunner {
 	private ExecutorService mThreadPool;
 	private Map<String, Future<Accumulator[]>> mQueryResults;
 	private int mNumHits;
-	private HashMap savedResults_prevStage = new HashMap(); //for all queries
+	private Map<Integer, Float[][]> savedResults_prevStage = Maps.newHashMap(); //for all queries
 	private int mK; //K value used in cascade model
 
 	//assume no more than 1000 queries
 	private float [] cascadeCostAllQueries = new float[1000];
 	private float [] cascadeCostAllQueries_lastStage = new float[1000];
 
-	public CascadeThreadedQueryRunner(MRFBuilder builder, MRFExpander expander, int numThreads, int numHits, HashMap savedResults, int K) {
+	public CascadeThreadedQueryRunner(MRFBuilder builder, MRFExpander expander, int numThreads,
+	    int numHits, Map<Integer, Float[][]> savedResults, int K) {
 		Preconditions.checkNotNull(builder);
 
 		assert (numThreads > 0);
@@ -64,7 +64,7 @@ public class CascadeThreadedQueryRunner implements CascadeQueryRunner {
 		mBuilder = builder;
 		mExpander = expander;
 		mThreadPool = Executors.newFixedThreadPool(numThreads);
-		mQueryResults = new LinkedHashMap<String, Future<Accumulator[]>>();
+		mQueryResults = Maps.newLinkedHashMap();
 		mNumHits = numHits;
 		savedResults_prevStage = savedResults;
 		mK = K;
@@ -130,7 +130,7 @@ public class CascadeThreadedQueryRunner implements CascadeQueryRunner {
 	 * Returns results of all queries executed.
 	 */
 	public Map<String, Accumulator[]> getResults() {
-		Map<String, Accumulator[]> results = new LinkedHashMap<String, Accumulator[]>();
+		Map<String, Accumulator[]> results = Maps.newLinkedHashMap();
 		for (Map.Entry<String, Future<Accumulator[]>> e : mQueryResults.entrySet()) {
 			try {
 				Accumulator[] a = e.getValue().get();

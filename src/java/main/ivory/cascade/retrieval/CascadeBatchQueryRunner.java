@@ -1,11 +1,11 @@
 /*
  * Ivory: A Hadoop toolkit for web-scale information retrieval
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You may
  * obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0 
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -48,6 +48,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import com.google.common.collect.Maps;
+
 import edu.umd.cloud9.collection.DocnoMapping;
 
 /**
@@ -58,7 +60,7 @@ public class CascadeBatchQueryRunner extends BatchQueryRunner{
   private static final Logger LOG = Logger.getLogger(CascadeBatchQueryRunner.class);
 
 	//For each model (as key), store the cascade costs for all queries (as value)
-	private HashMap cascadeCosts = new HashMap();
+	private HashMap<String, float[]> cascadeCosts = Maps.newHashMap();
 	private HashMap cascadeCosts_lastStage = new HashMap();
 
 	private String [] internalOutputFiles;
@@ -77,7 +79,7 @@ public class CascadeBatchQueryRunner extends BatchQueryRunner{
 	}
 
 	public HashMap readInternalInputFile(String internalInputFile){
-		HashMap savedResults= new HashMap();
+		HashMap<String, LinkedList<float[]>> savedResults= new HashMap<String, LinkedList<float[]>>();
 		
 		if (internalInputFile!=null){
 			BufferedReader in;
@@ -85,7 +87,7 @@ public class CascadeBatchQueryRunner extends BatchQueryRunner{
 				in = new BufferedReader(new InputStreamReader(fs.open(new Path(internalInputFile))));
 				String line;
 				 //Docnos and scores for a given query
-				LinkedList results = new LinkedList();
+				LinkedList<float[]> results = new LinkedList<float[]>();
 				String qid = "";
 				float [] docno_score = new float[2];
 
@@ -98,7 +100,7 @@ public class CascadeBatchQueryRunner extends BatchQueryRunner{
 							savedResults.put(qid, results);
 						}
 						qid = tokens[0];
-						results = new LinkedList();
+						results = new LinkedList<float[]>();
 					}
 					docno_score = new float[2];
 					//docno_score[0] = Integer.parseInt(qid);
