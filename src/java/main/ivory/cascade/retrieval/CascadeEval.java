@@ -17,8 +17,6 @@
 package ivory.cascade.retrieval;
 
 import ivory.cascade.model.CascadeClique;
-import ivory.cascade.model.score.CascadeBM25ScoringFunction;
-import ivory.cascade.model.score.CascadeDirichletScoringFunction;
 import ivory.exception.ConfigurationException;
 import ivory.exception.RetrievalException;
 import ivory.smrf.model.Clique;
@@ -38,24 +36,20 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
+import java.util.Set;
 
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 /**
  * @author Lidan Wang
- * 
  */
 public class CascadeEval {
+  private static final Logger LOG = Logger.getLogger(CascadeEval.class);
 
-  private static final Logger sLogger = Logger.getLogger(CascadeEval.class);
-
-  static {
-    sLogger.setLevel(Level.WARN);
-  }
+  static int INITIAL_STAGE_NUM_RESULTS = 20000;
 
   /**
    * Pool of accumulators.
@@ -70,7 +64,7 @@ public class CascadeEval {
   /**
    * Comparator used to sort cliques by their max score.
    */
-  private final Comparator<Clique> mMaxScoreComparator = new Clique.MaxScoreComparator();
+  private final Comparator<Clique> maxScoreComparator = new Clique.MaxScoreComparator();
 
   /**
    * Markov Random Field that we are using to generate the ranking.
@@ -104,19 +98,9 @@ public class CascadeEval {
   // K value used in cascade model
   private int mK;
 
-  CascadeAccumulator[] results = null;
-  CascadeAccumulator[] results_tmp = null;
-
-  List<Clique> cliques_all;
-  int cnt;
-
-  int cascadeStage;
-
   // Cost of this cascade model = # documents * sum of unit per document cost over the cliques
   float cascadeCost = 0;
 
-  // Lidan: # output documents from the initial stage
-  static int numOutputs_firstStage = 20000;
 
   // docs that will be passed around
   int[][][] keptDocs;
@@ -124,9 +108,9 @@ public class CascadeEval {
 
   // single terms in cliques used in first stage, which clique number they correspond to, keyed by
   // the concept, value is the cliqueNumber or termCollectionFrequency
-  Map<String, String> term_to_cliqueNumber = Maps.newHashMap();
-  Map<String, String> term_to_termCollectionFrequency = Maps.newHashMap();
-  Map<String, String> term_to_termDF = Maps.newHashMap();
+  Map<String, Integer> termToCliqueNumber = Maps.newHashMap();
+  Map<String, Long> cf = Maps.newHashMap();
+  Map<String, Integer> df = Maps.newHashMap();
 
   // for pruning use
   float meanScore = 0;
@@ -153,9 +137,9 @@ public class CascadeEval {
     // Lidan: get # query terms
     numQueryTerms = mMRF.getQueryTerms().length;
 
-    keptDocs = new int[numOutputs_firstStage + 1][numQueryTerms][];
+    keptDocs = new int[INITIAL_STAGE_NUM_RESULTS + 1][numQueryTerms][];
 
-    keptDocLengths = new int[numOutputs_firstStage + 1];
+    keptDocLengths = new int[INITIAL_STAGE_NUM_RESULTS + 1];
   }
 
   // Lidan: assuming mDocSet[] & accumulated_scores[] sorted by descending order of scores!
@@ -223,7 +207,7 @@ public class CascadeEval {
         z_scores[i] = (accumulated_scores[i] - avgScores) / stddev;
       }
     } else {
-      throw new RetrievalException("Pruner " + pruner + " is not supported!");
+      throw new RetrievalException("PruningFunction " + pruner + " is not supported!");
     }
 
     if (retainSize < mK) {
@@ -300,68 +284,59 @@ public class CascadeEval {
     try {
       mMRF.initialize();
     } catch (ConfigurationException e) {
-      sLogger.error("Error initializing MRF. Aborting ranking!");
+      LOG.error("Error initializing MRF. Aborting ranking!");
       return null;
     }
 
-    // Cliques associated with the MRF.
-    cliques_all = Lists.newArrayList();
-    List<Clique> cliques = mMRF.getCliques();
-    for (int i = 0; i < cliques.size(); i++) {
-      cliques_all.add(cliques.get(i));
+    int totalCnt = mMRF.getCliques().size();
+    Map<Integer, Set<CascadeClique>> cascadeStages = Maps.newHashMap();
+    for (Clique c : mMRF.getCliques()) {
+      CascadeClique cc = (CascadeClique) c;
+      int stage = cc.getCascadeStage();
+      if ( cascadeStages.containsKey(stage)) {
+        cascadeStages.get(stage).add(cc);
+      } else {
+        cascadeStages.put(stage, Sets.newHashSet(cc));
+      }
     }
 
+    CascadeAccumulator[] results = null;
     // Cascade stage starts at 0
-    cascadeStage = 0;
-    cnt = 0;
+    int cascadeStage = 0;
+    int cnt = 0;
 
-    String pruner = null;
-    float pruner_param = -1;
+    String pruningFunction = null;
+    float pruningParameter = -1;
     int termMatches = 0;
 
-    while (cnt != cliques_all.size()) { // if not have gone thru all cascade stages
+    while (cnt != totalCnt) { // if not have gone thru all cascade stages
       float subTotal_cascadeCost = 0;
 
       if (cascadeStage < 1) { // only call once, then use keptDocs[][][]
         mMRF.removeAllCliques();
 
-        for (Clique c : cliques_all) {
-          int cs = ((CascadeClique) c).getCascadeStage();
-          if (cascadeStage == cs) {
+        for (CascadeClique c : cascadeStages.get(cascadeStage)) {
+          mMRF.addClique(c);
+          cnt++;
 
-            // c.resetPostingsListReader();
-            mMRF.addClique(c);
-            cnt++;
-            // mNumResults = c.getNumResults();
-            pruner = ((CascadeClique) c).getPruningFunction();
-            pruner_param = ((CascadeClique) c).getPruningParameter();
+          pruningFunction = c.getPruningFunction();
+          pruningParameter = c.getPruningParameter();
 
-            if (cascadeStage == 0) {
+          int numDocs = Integer.MAX_VALUE;
 
-              int numDocs = Integer.MAX_VALUE;
-
-              if (mDocSet == null) {
-                try { // c.getNumberOfPostings() is not supported for bigram postings readers
-
-                  numDocs = ((CascadeClique) c).getNumberOfPostings();
-                } catch (Exception e) {
-                }
-
-                // (not) ignore cost of first stage from the cost model
-                subTotal_cascadeCost += ((CascadeClique) c).cost * numDocs;
-              } else {
-                subTotal_cascadeCost += ((CascadeClique) c).cost;
-              }
-            } else {
-              subTotal_cascadeCost += ((CascadeClique) c).cost;
-            }
+          if (mDocSet == null) {
+            numDocs = c.getNumberOfPostings();
+            // (not) ignore cost of first stage from the cost model
+            subTotal_cascadeCost += c.cost * numDocs;
+          } else {
+            subTotal_cascadeCost += c.cost;
           }
         }
 
         if (mDocSet != null) {
           // Lidan: mDocSet[] & accumulated_scores[] should be sorted by doc scores!
           // Lidan: this method opereates on mDocSet[] & accumulated_scores[]!
-          pruneDocuments(pruner, pruner_param);
+          pruneDocuments(pruningFunction, pruningParameter);
 
           // Lidan: will score all documents in the retained documenet set
           mNumResults = mDocSet.length;
@@ -372,7 +347,7 @@ public class CascadeEval {
           subTotal_cascadeCost = subTotal_cascadeCost * mNumResults;
         } else {
           // Lidan: first cascade stage, just output 20000 documents
-          mNumResults = numOutputs_firstStage;
+          mNumResults = INITIAL_STAGE_NUM_RESULTS;
 
           if (cascadeStage != 0) {
             System.out.println("Should be the first stage here!");
@@ -386,42 +361,36 @@ public class CascadeEval {
           mAccumulators[i] = new CascadeAccumulator(0, 0.0f);
         }
 
-        results = rank_cascade();
+        results = executeInitialStage();
 
         cascadeStage++;
       } else {
         String featureID = null;
-        String scoringFunctionName = null;
         ScoringFunction scoringFunction = null;
 
         int mSize = -1;
-        String[][] concepts_this_stage = new String[cliques_all.size()][];
+        String[][] concepts_this_stage = new String[totalCnt][];
         float[] clique_wgts = new float[concepts_this_stage.length];
 
         int cntConcepts = 0;
 
-        for (Clique c : cliques_all) {
-          int cs = ((CascadeClique) c).getCascadeStage();
-          if (cascadeStage == cs) {
-            cnt++;
-            pruner = ((CascadeClique) c).getPruningFunction();
-            pruner_param = ((CascadeClique) c).getPruningParameter();
+        for (CascadeClique c : cascadeStages.get(cascadeStage)) {
+          cnt++;
+          pruningFunction = c.getPruningFunction();
+          pruningParameter = c.getPruningParameter();
 
-            featureID = ((CascadeClique) c).getParamID().trim(); // termWt, orderedWt, unorderedWt
-            scoringFunctionName = ((CascadeClique) c).getScoringFunctionName(); // dirichlet, bm25
-            scoringFunction = ((CascadeClique) c).getScoringFunction();
+          featureID = c.getParamID().trim(); // termWt, orderedWt, unorderedWt
+          scoringFunction = c.getScoringFunction();
 
-            mSize = ((CascadeClique) c).getWindowSize(); // window width
-            if (mSize == -1 && !(featureID.equals("termWt"))) {
-              System.out.println("Only term features don't support getWindowSize()! " + featureID);
-              System.exit(-1);
-            }
-            concepts_this_stage[cntConcepts] = ((CascadeClique) c).getSingleTerms();
-            clique_wgts[cntConcepts] = c.getWeight();
-
-            cntConcepts++;
-            subTotal_cascadeCost += ((CascadeClique) c).cost;
+          mSize = c.getWindowSize(); // window width
+          if (mSize == -1 && !(featureID.equals("termWt"))) {
+            throw new RetrievalException("Only term features don't support getWindowSize()! " + featureID);
           }
+          concepts_this_stage[cntConcepts] = c.getSingleTerms();
+          clique_wgts[cntConcepts] = c.getWeight();
+
+          cntConcepts++;
+          subTotal_cascadeCost += c.cost;
         }
 
         // for use in pruning
@@ -429,11 +398,11 @@ public class CascadeEval {
         // score-based
         float max_score = results[0].score;
         float min_score = results[results.length - 1].score;
-        float score_threshold = (max_score - min_score) * pruner_param + min_score;
-        float mean_max_score_threshold = pruner_param * max_score + (1.0f - pruner_param) * meanScore;
+        float score_threshold = (max_score - min_score) * pruningParameter + min_score;
+        float mean_max_score_threshold = pruningParameter * max_score + (1.0f - pruningParameter) * meanScore;
 
         // rank-based
-        int retainSize = (int) ((1.0 - pruner_param) * ((double) (results.length)));
+        int retainSize = (int) ((1.0 - pruningParameter) * ((double) (results.length)));
         int size = 0;
 
         // Clear priority queue.
@@ -448,14 +417,13 @@ public class CascadeEval {
         for (int j = 0; j < cntConcepts; j++) {
           String[] singleTerms = concepts_this_stage[j];
 
-          int termIndex1 = Integer.parseInt((String) (term_to_cliqueNumber.get(singleTerms[0])));
+          int termIndex1 = termToCliqueNumber.get(singleTerms[0]);
 
           if (featureID.indexOf("termWt") != -1) {
-            float termCollectionFreq = Float.parseFloat((String) (term_to_termCollectionFrequency
-                .get(singleTerms[0])));
+            float termCollectionFreq = cf.get(singleTerms[0]);
             termCollectionFreqs[j] = termCollectionFreq;
 
-            float termDF = Float.parseFloat((String) (term_to_termDF.get(singleTerms[0])));
+            float termDF = df.get(singleTerms[0]);
             termDFs[j] = termDF;
 
             termIndexes[j] = new int[1];
@@ -466,7 +434,7 @@ public class CascadeEval {
               System.exit(-1);
             }
           } else {
-            int termIndex2 = Integer.parseInt((String) (term_to_cliqueNumber.get(singleTerms[1])));
+            int termIndex2 = termToCliqueNumber.get(singleTerms[1]);
 
             termIndexes[j] = new int[2];
             termIndexes[j][0] = termIndex1;
@@ -484,7 +452,7 @@ public class CascadeEval {
           // pruning, if okay, scoring, update pruning stats for next cascade stage
 
           boolean passedPruning = false;
-          if (pruner.equals("rank")) {
+          if (pruningFunction.equals("rank")) {
             if (i < retainSize) {
               passedPruning = true;
             } else {
@@ -494,7 +462,7 @@ public class CascadeEval {
                 break;
               }
             }
-          } else if (pruner.equals("score")) {
+          } else if (pruningFunction.equals("score")) {
             if (results[i].score > score_threshold) {
               passedPruning = true;
             } else {
@@ -504,7 +472,7 @@ public class CascadeEval {
                 break;
               }
             }
-          } else if (pruner.equals("mean-max")) {
+          } else if (pruningFunction.equals("mean-max")) {
             if (results[i].score > mean_max_score_threshold) {
               passedPruning = true;
             } else {
@@ -515,7 +483,7 @@ public class CascadeEval {
               }
             }
           } else {
-            throw new RetrievalException("Not supported pruner! "+pruner);
+            throw new RetrievalException("Not supported pruner! "+pruningFunction);
           }
 
           if (passedPruning) {
@@ -535,11 +503,7 @@ public class CascadeEval {
                   tf = positions1.length;
                 }
 
-                float termCollectionFreq = termCollectionFreqs[j];
-                float termDF = termDFs[j];
-
                 docScore_cascade += clique_wgts[j] * scoringFunction.getScore(tf, docLen);
-                    //* getScore(tf, docLen, termCollectionFreq, termDF, scoringFunctionName);
 
               } else { // term proximity
 
@@ -689,7 +653,7 @@ public class CascadeEval {
               + mSortedAccumulators.size());
         }
 
-        results_tmp = new CascadeAccumulator[size];
+        CascadeAccumulator[] results_tmp = new CascadeAccumulator[size];
 
         meanScore = sumScore / (float) size; // update stats for use in pruning in next cascade stage
         stddev = 0;
@@ -731,40 +695,7 @@ public class CascadeEval {
     return results_return;
   }
 
-//  public float getScore(int tf, int docLen, float termCollectionFreq, float termDF,
-//      String scoringFunction) {
-//    float score = 0;
-//
-//    // Lidan: note: here assume we only use one kind of hyperparameter for dirichlet and bm25 in
-//    // feature set. Since these hyperparameters are declared as static variables in the dirichlet
-//    // and bm25 scoring functions!
-//
-//    if (scoringFunction.equals("dirichlet")) {
-//
-//      float backgroundProb = termCollectionFreq / CascadeDirichletScoringFunction.collectionLength;
-//
-//      score = (float) Math.log(((float) tf + CascadeDirichletScoringFunction.MU * backgroundProb)
-//          / (docLen + CascadeDirichletScoringFunction.MU));
-//
-//    } else if (scoringFunction.equals("bm25")) {
-//
-//      score = ((CascadeBM25ScoringFunction.K1 + 1.0f) * tf)
-//          / (CascadeBM25ScoringFunction.K1
-//              * ((1.0f - CascadeBM25ScoringFunction.B) + CascadeBM25ScoringFunction.B * docLen
-//                  / CascadeBM25ScoringFunction.avg_docLen) + tf);
-//      float mIdf = (float) Math.log(((float) RetrievalEnvironment.documentCount - termDF + 0.5f)
-//          / (termDF + 0.5f));
-//      score = score * mIdf;
-//    } else {
-//      System.out.println("Not supported scoringFunction " + scoringFunction);
-//      System.exit(-1);
-//    }
-//
-//    return score;
-//
-//  }
-
-  public CascadeAccumulator[] rank_cascade() {
+  public CascadeAccumulator[] executeInitialStage() {
 
     // point to next position in keptDocs array that hasn't been filled
     int indexCntKeptDocs = 0;
@@ -776,8 +707,7 @@ public class CascadeEval {
     List<Clique> cliques = mMRF.getCliques();
 
     if (cliques.size() == 0) {
-      System.out.println("Shouldn't have size 0");
-      System.exit(-1);
+      throw new RetrievalException("Shouldn't have size 0!");
     }
 
     // Current accumulator.
@@ -796,7 +726,7 @@ public class CascadeEval {
     }
 
     // Sort cliques according to their max scores.
-    Collections.sort(cliques, mMaxScoreComparator);
+    Collections.sort(cliques, maxScoreComparator);
 
     // Score that must be achieved to enter result set.
     double scoreThreshold = Double.NEGATIVE_INFINITY;
@@ -808,11 +738,6 @@ public class CascadeEval {
     if (mDocSet != null) {
       docno = docsetOffset < mDocSet.length ? mDocSet[docsetOffset++] : Integer.MAX_VALUE;
     } else {
-      if (cascadeStage != 0) {
-        System.out.println("Shouldn't happen. Cascade stage " + cascadeStage);
-        System.exit(-1);
-      }
-
       docno = mMRF.getNextCandidate();
     }
 
@@ -830,28 +755,22 @@ public class CascadeEval {
       float score = 0.0f;
 
       // Lidan: accumulate document scores across the cascade stages
-      if (mDocSet != null && cascadeStage != 0) {
-        score = accumulated_scores[docsetOffset - 1];
-      }
+//      if (mDocSet != null && cascadeStage != 0) {
+//        score = accumulated_scores[docsetOffset - 1];
+//      }
 
       // for each query term, its position in a document
       int[][] termPositions = new int[cliques.size()][];
-      int document_length = -1;
+      int doclen = -1;
 
       for (int i = 0; i < cliques.size(); i++) {
-
         // Current clique that we're scoring.
-        Clique c = cliques.get(i);
-
-        // If there's no way that this document can enter the result set
-        // then exit.
+        CascadeClique c = (CascadeClique) cliques.get(i);
 
         if (firstTime) {
-          term_to_cliqueNumber.put(c.getConcept().trim().toLowerCase(), i + "");
-          term_to_termCollectionFrequency.put(c.getConcept().trim().toLowerCase(),
-              ((CascadeClique) c).termCollectionCF() + "");
-          term_to_termDF.put(c.getConcept().trim().toLowerCase(),
-              ((CascadeClique) c).termCollectionDF() + "");
+          termToCliqueNumber.put(c.getConcept().trim().toLowerCase(), i);
+          cf.put(c.getConcept().trim().toLowerCase(), c.termCollectionCF());
+          df.put(c.getConcept().trim().toLowerCase(), c.termCollectionDF());
         }
 
         if (score + docMaxScore <= scoreThreshold) {
@@ -877,11 +796,11 @@ public class CascadeEval {
         docMaxScore -= c.getMaxScore();
 
         // stuff needed for document evaluation in the next stage
-        int[] p = ((CascadeClique) c).getPositions();
+        int[] p = c.getPositions();
 
         if (p != null) {
           termPositions[i] = Arrays.copyOf(p, p.length);
-          document_length = ((CascadeClique) c).getDocLen();
+          doclen = c.getDocLen();
         }
       }
 
@@ -892,7 +811,7 @@ public class CascadeEval {
         a.docno = docno;
         a.score = score;
         a.index_into_keptDocs = indexCntKeptDocs;
-        keptDocLengths[indexCntKeptDocs] = document_length;
+        keptDocLengths[indexCntKeptDocs] = doclen;
 
         mSortedAccumulators.add(a);
 
@@ -927,11 +846,6 @@ public class CascadeEval {
       if (mDocSet != null) {
         docno = docsetOffset < mDocSet.length ? mDocSet[docsetOffset++] : Integer.MAX_VALUE;
       } else {
-        if (cascadeStage != 0) {
-          System.out.println("Shouldn't happen. Cascade stage " + cascadeStage);
-          System.exit(-1);
-        }
-
         docno = mMRF.getNextCandidate();
       }
     }

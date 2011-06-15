@@ -1,12 +1,9 @@
 /*
  * Ivory: A Hadoop toolkit for web-scale information retrieval
- * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You may
  * obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0 
- *
+ * http://www.apache.org/licenses/LICENSE-2.0
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
@@ -28,47 +25,35 @@ import org.xml.sax.SAXException;
 
 /**
  * @author Lidan Wang
- *
  */
 public class RunQueryLocalCascade {
+  private static final Logger LOG = Logger.getLogger(RunQueryLocalCascade.class);
 
-	private static final Logger sLogger = Logger.getLogger(RunQueryLocalCascade.class);
+  private CascadeBatchQueryRunner runner = null;
 
-	private CascadeBatchQueryRunner runner = null;
+  public RunQueryLocalCascade(String[] args) throws SAXException, IOException,
+      ParserConfigurationException, Exception, NotBoundException {
+    LOG.info("Initializing QueryRunner...");
 
-	public RunQueryLocalCascade(String[] args) throws SAXException, IOException,
-			ParserConfigurationException, Exception, NotBoundException {
-		Configuration conf = new Configuration();
-		FileSystem fs = FileSystem.getLocal(conf);
-		try {
-			sLogger.info("initilaize runquery ...");
-			runner = new CascadeBatchQueryRunner(args, fs);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+    Configuration conf = new Configuration();
+    FileSystem fs = FileSystem.getLocal(conf);
+    runner = new CascadeBatchQueryRunner(args, fs);
+  }
 
-	/**
-	 * runs the queries
-	 */
-	public void runQueries() throws Exception {
-		// run the queries
-		sLogger.info("run the queries ...");
-		long start = System.currentTimeMillis();
-		runner.runQueries();
-		long end = System.currentTimeMillis();
+  /**
+   * runs the queries
+   */
+  public void runQueries() throws Exception {
+    LOG.info("Running queries ...");
+    long start = System.currentTimeMillis();
+    runner.runQueries();
+    long end = System.currentTimeMillis();
 
-		sLogger.info("Total query time: " + (end - start) + "ms");
-	}
+    LOG.info("Total query time: " + (end - start) + "ms");
+  }
 
-	public static void main(String[] args) throws Exception {
-		RunQueryLocalCascade s;
-		try {
-			s = new RunQueryLocalCascade(args);
-			s.runQueries();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		System.exit(0);
-	}
+  public static void main(String[] args) throws Exception {
+    new RunQueryLocalCascade(args).runQueries();
+    System.exit(0);
+  }
 }

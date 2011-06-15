@@ -1,6 +1,6 @@
 /*
  * Ivory: A Hadoop toolkit for web-scale information retrieval
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You may
  * obtain a copy of the License at
@@ -20,7 +20,6 @@ import ivory.cascade.model.potential.CascadeQueryPotential;
 import ivory.smrf.model.Clique;
 import ivory.smrf.model.GraphNode;
 import ivory.smrf.model.Parameter;
-import ivory.smrf.model.Clique.Type;
 import ivory.smrf.model.potential.PotentialFunction;
 import ivory.smrf.model.score.ScoringFunction;
 
@@ -113,12 +112,12 @@ public class CascadeClique extends Clique {
   }
 
   // Collection CF of this term/bigram
-  public float termCollectionCF() {
+  public long termCollectionCF() {
     PotentialFunction potential = getPotentialFunction();
     return ((CascadeQueryPotential) potential).termCollectionCF();
   }
 
-  public float termCollectionDF() {
+  public int termCollectionDF() {
     PotentialFunction potential = getPotentialFunction();
     return ((CascadeQueryPotential) potential).termCollectionDF();
   }
