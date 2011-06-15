@@ -63,9 +63,15 @@ public class RunPCP extends Configured implements Tool {
 		if (args.length == 7)
 			topN = Integer.parseInt(args[6]);
 
+		String pwsimOutputPath = indexPath + "/pcp-dfCut=" + dfCut + "-blk=" + blockSize
+			+ "-" + fn + (topN > 0 ? "-topN=" + topN : "");
+		String pwsimResultsOutputPath = pwsimOutputPath + "-results";
+
+		//config.set("mapred.child.java.opts", "-Xmx1024m");
+		config.set("mapred.child.java.opts", "-Xmx2048m");
 		config.set("Ivory.IndexPath", indexPath);
-		config.set("Ivory.OutputPath", indexPath + "/pcp-dfCut=" + dfCut + "-blk=" + blockSize
-				+ "-" + fn + (topN > 0 ? "-topN=" + topN : ""));
+		config.set("Ivory.OutputPath", pwsimOutputPath);
+		config.set("Ivory.ResultsOutputPath", pwsimResultsOutputPath);
 
 		config.set("Ivory.ScoringModel", scoringModel);
 
@@ -76,6 +82,9 @@ public class RunPCP extends Configured implements Tool {
 
 		PCP pwsimTask = new PCP(config);
 		pwsimTask.run();
+
+		PrintPCP printPCPTask = new PrintPCP(config);
+		printPCPTask.run();
 
 		return 0;
 	}
