@@ -144,7 +144,7 @@ public class LazyTermDocVector implements TermDocVector {
 		StringBuffer s = new StringBuffer(this.getClass().getName() + "," + nTerms + ","
 				+ mRawBytes + "," + mTerms + "\n" + "[");
 		try {
-			TermDocVectorReader r = this.getDocVectorReader();
+			Reader r = this.getReader();
 			while (r.hasMoreTerms()) {
 				String id = r.nextTerm();
 				TermPositions pos = new TermPositions();
@@ -158,11 +158,11 @@ public class LazyTermDocVector implements TermDocVector {
 		return s.toString();
 	}
 
-	public TermDocVectorReader getDocVectorReader() throws IOException {
+	public Reader getReader() throws IOException {
 		return new Reader(nTerms, mRawBytes, mTerms);
 	}
 
-	public static class Reader implements TermDocVectorReader {
+	public static class Reader implements TermDocVector.Reader {
 		private ByteArrayInputStream mBytesIn;
 		private BitInputStream mBitsIn;
 		private int p = -1;
