@@ -72,12 +72,12 @@
 
 	<target name="compile" depends="init,resolve" description="compile the source">
 		<!-- echo message="${toString:classpath}"/ -->
-		<javac classpathref="lib.path.id" srcdir="${src.dir}/java/main" destdir="${build.dir}" optimize="on" debug="on">
+		<javac classpathref="lib.path.id" srcdir="${src.dir}/java/main" destdir="${build.dir}" optimize="on" debug="on" includeantruntime="false">
 			<!-- compilerarg value="-Xlint:unchecked"/ uncomment this to check for generics -->
 		</javac>
-		<javac classpathref="lib.path.id" srcdir="${src.dir}/java/test" destdir="${build.dir}" optimize="on" debug="on">
+		<javac classpathref="lib.path.id" srcdir="${src.dir}/java/test" destdir="${build.dir}" optimize="on" debug="on" includeantruntime="false">
 		</javac>
-		<javac classpathref="lib.path.id" srcdir="${src.dir}/java/regression" destdir="${build.dir}" optimize="on" debug="on">
+		<javac classpathref="lib.path.id" srcdir="${src.dir}/java/regression" destdir="${build.dir}" optimize="on" debug="on" includeantruntime="false">
 		</javac>
 		<!-- javac classpathref="classpath" srcdir="${src.dir}/sandbox" destdir="${build.dir}" optimize="on" debug="on" -->
 			<!-- compilerarg value="-Xlint:unchecked"/ uncomment this to check for generics -->
