@@ -24,11 +24,8 @@ import ivory.preprocess.BuildTranslatedTermDocVectors;
 import ivory.preprocess.BuildWeightedIntDocVectors;
 import ivory.preprocess.BuildWeightedTermDocVectors;
 import ivory.preprocess.GetTermCount;
-import ivory.util.CLIRUtils;
 import ivory.util.RetrievalEnvironment;
-
 import java.io.IOException;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
@@ -36,10 +33,10 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Logger;
-
-import edu.umd.hooka.Vocab;
 import edu.umd.cloud9.collection.wikipedia.BuildWikipediaDocnoMapping;
 import edu.umd.cloud9.collection.wikipedia.RepackWikipedia;
+import edu.umd.hooka.Vocab;
+import edu.umd.hooka.alignment.HadoopAlign;
 
 /**
  * Driver class that preprocesses a Wikipedia collection in any language. 
@@ -63,7 +60,7 @@ public class PreprocessWikipedia extends Configured implements Tool {
 				"\n\nInput: English side of cross-lingual Wikipedia collection\nOutput: English weighted document vectors (comparable with the document vectors generated from non-English side)" +
 				"\nusage: [index-path] [raw-path] [compressed-path] [tokenizer-class] [collection-lang] [tokenizer-model] [collection-vocab]" +
 				"\n\nInput: Non-English side of cross-lingual Wikipedia collection\nOutput: English weighted document vectors (comparable with the document vectors generated from English side)" +
-		"\nusage: [index-path] [raw-path] [compressed-path] [tokenizer-class] [collection-lang] [tokenizer-model] [src-vocab_f] [src-vocab_e] [prob-table_f-->e] [src-vocab_e] [trg-vocab_f] [prob-table_e-->f])");
+		"\nusage: [index-path] [raw-path] [compressed-path] [tokenizer-class] [collection-lang] [tokenizer-model] [src-vocab_f] [trg-vocab_e] [prob-table_f-->e] [src-vocab_e] [trg-vocab_f] [prob-table_e-->f])");
 		return -1;
 	}
 
@@ -249,7 +246,7 @@ public class PreprocessWikipedia extends Configured implements Tool {
 			// set Property.CollectionTermCount to the size of the target vocab. since all docs are translated into that vocab. This property is read by WriteRandomVectors via RunComputeSignatures.
 			Vocab engVocabH = null;
 			try {
-				engVocabH = CLIRUtils.loadVocab(new Path(conf.get("Ivory.FinalVocab")), conf);
+				engVocabH = HadoopAlign.loadVocab(new Path(conf.get("Ivory.FinalVocab")), conf);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}	
