@@ -1,0 +1,196 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="1038.35">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 15.0px Helvetica}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
+    p.p3 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
+    p.p4 {margin: 0.0px 0.0px 0.0px 0.0px; font: 11.0px Monaco}
+    p.p5 {margin: 0.0px 0.0px 0.0px 0.0px; font: 11.0px Monaco; min-height: 15.0px}
+    p.p6 {margin: 0.0px 0.0px 0.0px 0.0px; font: 11.0px Monaco; color: #3b3df5; min-height: 15.0px}
+    span.s1 {text-decoration: underline ; color: #0000ee}
+    span.s2 {text-decoration: underline}
+    span.s3 {color: #013366}
+    span.s4 {font: 10.0px Helvetica}
+    span.s5 {font: 11.0px Monaco}
+  </style>
+</head>
+<body>
+<p class="p1"><b>Large-scale Pairwise Similarity using Hadoop</b></p>
+<p class="p2"><br></p>
+<p class="p3">In this article, we explain our toolkit for finding similar document pairs in very large collections. Our system exploits Hadoop, the open-source implementation of the MapReduce architecture, and is coupled with the information retrieval toolkit <a href="http://www.ivory.cc/"><span class="s1">Ivory</span></a>.</p>
+<p class="p2"><br></p>
+<p class="p3"><b>1. Preprocessing</b></p>
+<p class="p2"><br></p>
+<p class="p3">We first explain how to prepare your raw input for the actual algorithm. The Ivory package has an automatic preprocessing pipeline that consists of steps like numbering documents, creating the collection vocabulary, converting documents into document vectors following the tf-idf model with various scoring schemes and applying compression techniques. For more details on how to run the preprocessing on a given collection, go to Ivory's website <a href="http://www.umiacs.umd.edu/~jimmylin/ivory/docs/pipeline.html"><span class="s1">here</span></a>. <span class="Apple-converted-space"> </span></p>
+<p class="p2"><br></p>
+<p class="p3">At the end of the preprocessing, the raw collection is converted into a list of document vectors. In integer document vectors, the document terms are represented with integer ids. In term document vectors, terms are represented with the original string. When the actual strings are not needed, it's better to use integer document vectors due to efficiency. To remain flexible, we store both in their corresponding HDFS directories and choose the best depending on the application.</p>
+<p class="p2"><br></p>
+<p class="p3">Our sytem also supports cross-lingual pairwise similarity (CLPwsim), which involves finding similar document pairs in two different languages. For instance, one may want to find similar documents to a website about information retrieval. Instead of just looking for such documents in English, it is logical to look for sources in other languages containing relevant information. We explain how CLPwsim works in our paper [ENTER-LINK]</p>
+<p class="p2"><br></p>
+<p class="p3">When preprocessing for CLPwsim, the term document vectors are translated into the target language. For this procedure, vocabulary and translation table (ttable) files are required. For preparing these files in the proper format, please refer to Cloud9/docs/hooka.html. For more information on preprocessing Wikipedia collections, see Ivory/docs/wiki-preprocess-doc.rtf.</p>
+<p class="p2"><br></p>
+<p class="p3"><b>2. Projecting documents to signatures</b></p>
+<p class="p2"><br></p>
+<p class="p3">Documents, represented by document vectors, can be projected to relative <i>signatures</i> in several ways. Currently, our system fully supports three state-of-the-art projection techniques (Random projection, simhash, and Minhash).<span class="Apple-converted-space"> </span></p>
+<p class="p2"><br></p>
+<p class="p3">First, let's give some background on signature generation (also called footprinting). Document vectors can represent a document's content very thoroughly; however, this comes with a cost. These vectors take up a lot of space, because every term is paired with its weight, a floating number. Storing a floating number for every unique term in a document is necessary for complete information, although for some applications it is not required to be 100% accurate.<span class="Apple-converted-space"> </span></p>
+<p class="p2"><br></p>
+<p class="p3">Signatures were introduced to store the document concent very accurately, but not perfectly, yet using much less and a fixed amount of space. A signature of a document can also be viewed as a compressed version of the content, and the compression results in a loss of information. Minimal loss of information and small memory requirements are the key aspects of a good signature generation technique. The time to project an entire collection is also an important factor when developing such techniques.</p>
+<p class="p2"><br></p>
+<p class="p3">Next, we explain each of the three methods in detail. All of these methods use hash functions to map a document content to a fixed-size signature.</p>
+<p class="p2"><br></p>
+<p class="p3"><span class="s2">2.1 Random projection (RP)</span></p>
+<p class="p2"><br></p>
+<p class="p3">For a given document, the signature is a sequence of <i>D</i> bits, where each bit is determined by the result of a dot product between a random vector and the int doc vector. Therefore, the method starts by creating <i>D</i> random vectors, each containing <i>N </i>(collection size) floating numbers drawn from a uniform distribution with mean 0. Each document is projected to a signature by performing D dot-products between its int doc vector and the respective random vector. This procedure can be run in parallel using Hadoop.</p>
+<p class="p2"><span class="Apple-converted-space"> </span></p>
+<p class="p3">RP has been used by Ravichandran et al for noun clustering, described in <a href="http://acl.ldc.upenn.edu/P/p05/P05-1077.pdf"><span class="s3">this paper</span></a>.</p>
+<p class="p2"><br></p>
+<p class="p3"><span class="s2">2.2 Simhash</span></p>
+<p class="p2"><br></p>
+<p class="p3">The signature is a sequence of <i>D</i> bits, and the algorithm starts by hashing each term using <i>D</i> bits. To determine the i<span class="s4"><sup>th</sup></span> bit of the final signature, we go through each term <i>t</i> and keep a sum as we do. For each term,<span class="Apple-converted-space">  </span>we add its weight (in the doc vector) to the sum if the i<span class="s4"><sup>th</sup></span> bit of <i>t</i> is 1, otherwise we subtract its weight from the sum. In the end, if the sum is greater than 0, the i<span class="s4"><sup>th</sup></span> bit of the final signature is 1, otherwise its 0. One drawback is the fact that <i>D</i> needs to be a number into which a string can be hashed. Since many hash functions map strings to 64 or 128 bits, those are the most commonly used values for <i>D</i>.</p>
+<p class="p2"><br></p>
+<p class="p3">Simhash algorithm has been used to solve near-duplicate problem by Google. Click <a href="http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.78.7794&amp;rep=rep1&amp;type=pdf"><span class="s3">here</span></a> for the paper.<span class="Apple-converted-space"> </span></p>
+<p class="p2"><br></p>
+<p class="p3"><span class="s2">2.3 Minhash</span></p>
+<p class="p2"><br></p>
+<p class="p3">For each document, you need <i>K</i> hash functions. You can also view each hash function as an ordering of the vocabulary items. Based on the hash value, you can order terms. For each of the <i>K</i> orderings, we pick the term that has lowest order. The probability that two documents have the same min-hash for a given ordering is the same as their Jaccard similarity (=intersection/union). Doing this <i>K</i> times reduces the risk of a false positive (incorrectly assigning two documents similar). The list of these min-hash terms is the signature of the document. Two documents are said to be similar if they have <i>h</i> or more matching min-hash terms.</p>
+<p class="p2"><br></p>
+<p class="p3">Min-hash has been described nicely in <a href="http://cmp.felk.cvut.cz/~chum/papers/chum_bmvc08.pdf"><span class="s3">this paper</span></a>.</p>
+<p class="p2"><br></p>
+<p class="p3">In order to generate signatures after the preprocessing step, here is a command line example (parameters in parantheses are optional):</p>
+<p class="p2"><br></p>
+<p class="p3">======================</p>
+<p class="p4">usage: [index-path] [num-of-bits] [type-of-signature] ([batch-size]) ([dot-prod-thresholds])</p>
+<p class="p4">If you want non-batch mode but want to include 'dot product averages' file, enter X for [batch-size]</p>
+<p class="p2"><br></p>
+<p class="p4">e.g.,</p>
+<p class="p4"><span class="Apple-converted-space">    </span>hadoop jar pwsim.jar ivory.lsh.driver.RunComputeSignatures /user/fture/de-wiki 64 simhash 100000</p>
+<p class="p4"><span class="Apple-converted-space">    </span>hadoop jar pwsim.jar ivory.lsh.driver.RunComputeSignatures /user/fture/de-wiki 1000 random X /user/fture/de-wiki/dot-prod-thresholds_D=1000</p>
+<p class="p3">======================</p>
+<p class="p2"><br></p>
+<p class="p3">All algorithms use only mappers, and execute all map calls in a fully parallel manner. The output is a set of (<span class="s5">IntWritable</span> docno, <span class="s5">Signature</span> signature) key-value pairs.<span class="Apple-converted-space"> </span></p>
+<p class="p2"><br></p>
+<p class="p3"><b>3. Finding similar document pairs</b></p>
+<p class="p2"><br></p>
+<p class="p3">We have implemented three different methods to find similar document pairs, given the signature of each document. Each technique has its own advantages and disadvantages, and the user needs to choose the best alternative depending on the application. Now, we'll explain each method and how to run it on our system.</p>
+<p class="p2"><span class="Apple-converted-space"> </span></p>
+<p class="p3"><span class="s2">3.1 Sliding window pwsim</span></p>
+<p class="p2"><br></p>
+<p class="p3">Sliding window pwsim is based on the algorithm in <a href="http://acl.ldc.upenn.edu/P/p05/P05-1077.pdf"><span class="s3">this paper</span></a>. We implemented it in Hadoop with some modifications to make it run efficiently in a parallel computation framework. The algorithm runs in two phases: (1) Generating permuted tables and (2) finding similar pairs using sliding windows.</p>
+<p class="p2"><br></p>
+<p class="p3">3.1.1 Generating permuted tables</p>
+<p class="p3">This phase requires the number of tables as input, say <i>Q</i>. First, <i>Q</i> random permutations of the <i>D</i> bits are generated. Each permutation changes the order of the bits randomly, and all permutations are passed to the mapper. Each map call processes a signature, by permuting it <i>Q</i> times with respect to each of the permutation functions, and emitting the key-value pair (permutation-number, permuted-signature) for each <i>Q</i>.</p>
+<p class="p2"><br></p>
+<p class="p3">There are <i>Q</i> reducers, and reducer <i>i</i> collects all signatures which have been permuted w.r.t. permutation #<i>i</i>, arriving in sorted order. As signatures arrive to the reducer, it emits them in chunks so that each chunk is not larger than a specified value C. In the end, <i>Q</i>*<i>N/C</i> files are written to HDFS, where <i>N</i> is the total number of signatures and <i>C</i> is the size of each chunk. Each chunk contains a sorted list of permuted signatures.</p>
+<p class="p2"><br></p>
+<p class="p3">3.1.2 Finding similar pairs</p>
+<p class="p3">This phase requires the window size <i>B</i> and distance threshold <i>T</i> as parameters, and maps over the chunks. Each chunk is processed by a separate mapper, where every signature in the chunk is compared to its <i>B</i> neighbors on each side, and all pairs that have distance below <i>T</i> are emitted. The output of the algorithm is in the form ((docno1, docno2), similarity) where similarity is measured by the number of shared terms.</p>
+<p class="p2"><br></p>
+<p class="p3">Here is how to run the sliding window pwsim, once you've created the signatures (parameters in parantheses are optional):</p>
+<p class="p2"><br></p>
+<p class="p3">======================</p>
+<p class="p4">usage: [targetlang-dir] [srclang-dir] [num-bits] [type-of-signature] [num-perms] [overlap-size] [window-size] [max-dist] [sample-size] [mode]</p>
+<p class="p4">(1) overlap-size is the number of signatures that overlap between two consecutive chunks. It is needed so that we don't miss any pairs when doing comparisons. The best configuration is to set overlap-size equal to window-size</p>
+<p class="p4">(2) If you want to run full pwsim on all document pairs, [mode=all], otherwise [mode=sample]. See Section 4 for more details on this.</p>
+<p class="p4">(3) file that contains sample docnos will be searched based on the [sample-size] parameter. See Section 4 for more details on this.</p>
+<p class="p5"><br></p>
+<p class="p4">hadoop jar ivory.jar ivory.lsh.driver.RunEvalCrossLingPwsim /user/fture/en-wiki /user/fture/de-wiki 1000 random 300 10000 5000 400 1000 all</p>
+<p class="p3">======================</p>
+<p class="p2"><br></p>
+<p class="p3"><span class="s2">3.2 Batch pwsim</span> <span class="s2">(</span>experimental<span class="s2">)</span></p>
+<p class="p2"><br></p>
+<p class="p3">Batch pwsim is based on the algorithm introduced in <a href="http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.78.7794&amp;rep=rep1&amp;type=pdf"><span class="s3">this paper</span></a><span class="s3">. </span>This method is tuned for situations in which a small number of documents (called the batch) need to be compared to a very large collection to find similar pairs. The idea is to store an index of the batch in memory for easy access, then map over the collection signatures and probe the index for a match.<span class="Apple-converted-space"> </span></p>
+<p class="p2"><br></p>
+<p class="p3">In our implementation, the index is a hash table, keyed by the first <i>L</i> bits of the signature. Therefore, a "match" occurs if a signature from the batch and a signature from the collection share the first <i>L</i> bits. To decrease the chance of a false mismatch, each signature is permuted Q times, similarly to the sliding window approach. As a result, there are <i>Q</i> hash tables, and each signature in the collection is queried against each hash table. For all pairs that match, the pair is emitted if the distance is less than <i>T</i>.</p>
+<p class="p2"><br></p>
+<p class="p3">A drawback of this method is the difficulty to choose a good value for <i>L</i>. If it's too high, than many similar pairs will be missed, and otherwise, each key in the hash table will map to too many signatures.<span class="Apple-converted-space"> </span></p>
+<p class="p2"><br></p>
+<p class="p3">Here is the command line instructions to run batch pwsim:</p>
+<p class="p2"><br></p>
+<p class="p3">======================</p>
+<p class="p4">usage: [index-path] [num-bits] [num-perms] [type-of-signature] [permutation-type] [max-dist] [batch-path] [key-len]</p>
+<p class="p5"><br></p>
+<p class="p4">e.g.,</p>
+<p class="p4"><span class="Apple-converted-space">    </span>hadoop jar pwsim.jar ivory.lsh.driver.RunBatchPWSim /umd-lin/fture/pwsim/en-wikipedia 64 10 simhash bit 3 /umd-lin/fture/pwsim/en-wikipedia/signatures-simhash_D=64 15</p>
+<p class="p4"><span class="Apple-converted-space">    </span>hadoop jar pwsim.jar ivory.lsh.driver.RunBatchPWSim /umd-lin/fture/pwsim/en-wikipedia 1000 10 random bit 200 /umd-lin/fture/pwsim/de-wikipedia/signatures-random_D=1000 10</p>
+<p class="p3">======================</p>
+<p class="p2"><br></p>
+<p class="p3"><span class="s2">3.3 Hybrid method</span></p>
+<p class="p2"><br></p>
+<p class="p3">The hybrid method was developed as a combination of the previous two approaches. In this method, <i>Q</i> permuted tables of the signatures are created just like in the sliding window approach. Instead of chunking the tables into consecutive, over-lapping pieces and perform the sliding window phase on each chunk, signatures in each table are grouped by their first <i>L</i> bits. All signatures in the same table that share the first <i>L</i> bits are called a chunk. Then, depending on the size of each chunk (which can be approximated as <i>N/2^L</i>), the sliding window algorithm or the trivial nested loop can be applied to each chunk.</p>
+<p class="p2"><br></p>
+<p class="p3">In the sliding window algorithm, dividing tables into chunks increased the level of parallelization. However, as the chunks get smaller, storing the extra <i>B</i> signatures becomes very wasteful. The hybrid approach eliminates this waste of space and computation.<span class="Apple-converted-space"> </span></p>
+<p class="p2"><br></p>
+<p class="p3">Although we've implemented this as well, we haven't thoroughly tested the hybrid algorithm. It's still in progress, but anyone's more than welcome to look at the code and use it for their own purposes.</p>
+<p class="p2"><br></p>
+<p class="p3"><span class="s2">3.4 PCP method for cross-lingual collections</span></p>
+<p class="p2"><br></p>
+<p class="p3">A totally different approach has been introduced in <a href="http://www.umiacs.umd.edu/~jimmylin/publications/Lin_SIGIR2009.pdf"><span class="s1">this paper</span></a> by Jimmy Lin. The postings Cartesian product (PCP) method runs on postings of a collection, and counts the number of shared terms for each document pair by computing a cartesian product of the postings with itself. There, a posting for a term is basically a list of documents that contain that term. To adapt this method, we slice each signature into pieces of several bits, and call each slice a term. For example, a 64-bit signature can be sliced into 8 terms, each 8 bits. Once signatures become documents, and terms in a signature are defined, the PCP method can be applied.</p>
+<p class="p2"><br></p>
+<p class="p3">The first job converts Signature objects into Indexable objects, merely a technical detail. The collection in both languages are added as input to the first task. The second task is to slice the signatures into terms, and represent each as a document vector. Next, the regular IR indexing step creates a postings list for every term (if each term is <i>l</i> bits, there are <i>2^l</i> unique terms in total) in the signatures collection. Then, the PCP algorithm is run on these postings to find the most similar pairs of signatures. The output of the algorithm is in the form (docno, {docno1-&gt;similarity, …}) where similarity is measured by the number of shared terms.</p>
+<p class="p2"><br></p>
+<p class="p3">Here is the sequence of commands needed to run PCP on a set of signatures in a cross-lingual setting. Details on how to run PCP on a mono-lingual collections will be added soon.</p>
+<p class="p2"><br></p>
+<p class="p3">======================</p>
+<p class="p3">1) Convert signatures into Indexable objects. (Only once for a given collection)</p>
+<p class="p2"><br></p>
+<p class="p4">usage: [index-dir-srclang] [index-dir-targetlang] [output-dir] [num-of-bits]</p>
+<p class="p4">hadoop jar pcp.jar ivory.lsh.driver.PrepareSignaturesForIndexing /umd-lin/fture/pwsim/en-wikipedia /umd-lin/fture/pwsim/de-wikipedia /umd-lin/fture/pwsim/en-de-wiki-indexable 1000</p>
+<p class="p2"><br></p>
+<p class="p3">2) Preprocess the collection of signatures, where each consecutive k bits is assumed a term. (Done once for each given collection and term length)</p>
+<p class="p2"><br></p>
+<p class="p4">usage: [coll-path] [index-path] [term-length] [num-of-bits]</p>
+<p class="p4">hadoop jar pcp.jar ivory.driver.PreprocessIndexableSignatures /umd-lin/fture/pwsim/en-de-wiki-indexable/signatures-random-indx_D=1000 /umd-lin/fture/pwsim/en-de-wiki-indexable_termlen=8 8 1000</p>
+<p class="p2"><br></p>
+<p class="p3">3) Build inverted index from doc vectors. (Done once for each given collection and term length)</p>
+<p class="p2"><br></p>
+<p class="p4">hadoop jar pcp.jar ivory.driver.BuildLPIndex /umd-lin/fture/pwsim/en-de-wiki-indexable 100 100 0.9 0.9</p>
+<p class="p2"><br></p>
+<p class="p3">4) Run PCP on index. (Done once for each given collection and term length)</p>
+<p class="p2"><br></p>
+<p class="p4">usage: [index-path] [term-length] [num-of-bits]</p>
+<p class="p4">hadoop jar pcp.jar ivory.lsh.driver.RunPCPSignatures /umd-lin/fture/pwsim/en-de-wiki-indexable 8 1000</p>
+<p class="p3">======================</p>
+<p class="p2"><br></p>
+<p class="p3">For more information on the PCP method, see this website: <a href="http://www.umiacs.umd.edu/~jimmylin/ivory/docs/pwsim.html"><span class="s1">http://www.umiacs.umd.edu/~jimmylin/ivory/docs/pwsim.html</span></a>.</p>
+<p class="p2"><br></p>
+<p class="p3"><b>4. Evaluation</b></p>
+<p class="p2"><br></p>
+<p class="p3">In order to evaluate a pairwise similarity algorithm, we sample a small number of non-English documents. For each sampled document, we find all English documents with cosine similarity above a specified threshold. <span class="s5">ivory.lsh.eval.BruteForcePwsim </span>implements the following brute force pwsim approach: all doc vector pairs in the two collections are compared, and the ones that have cosine similarity above the specified threshold are emitted. This is the ground truth of our evaluation; we compare the output of the sliding window algorithm against the output of the brute force algorithm. Sampling documents and generating the ground truth is handled automatically by the pwsim driver job:<span class="Apple-converted-space">  </span><span class="s5">ivory.lsh.driver.RunEvalCrossLingPwsim</span>. The [sample-size] parameter determines how many non-English documents to sample. The [mode] parameter is useful for evaluation purposes; if it is set to 'sample', the algorithm will find English documents similar to the sample non-English documents only, therefore taking a fraction of the total running time. If it is set to 'all', it will return all similar cross-lingual document pairs.<span class="Apple-converted-space"> </span></p>
+<p class="p2"><br></p>
+<p class="p3">Once the driver job <span class="s5">ivory.lsh.driver.RunEvalCrossLingPwsim</span> has completed, the ground truth pairs and the sliding window algorithm output should both be in the working directory. The two can be easily compared with a Perl script in order to compute precision and recall. This gives an assessment of how good the sliding window algorithm is at retrieving pairs that have cosine similarity above some threshold.<span class="Apple-converted-space"> </span></p>
+<p class="p2"><br></p>
+<p class="p3"><span class="s2">Example command-line invocations</span></p>
+<p class="p2"><br></p>
+<p class="p3">Command-line instructions to sample doc vectors and signatures separate from the cross-lingual pwsim evaluation.</p>
+<p class="p2"><br></p>
+<p class="p4">usage: [input] [output-dir] [number-of-mappers] [sample-frequency] ([sample-docnos-path])</p>
+<p class="p4">e.g.,</p>
+<p class="p4">hadoop jar pwsim.jar ivory.lsh.eval.SampleDocVectors /user/fture/de-wiki/wt-int-doc-vectors /user/fture/de-wiki/wt-int-doc-vectors-sample 100 1300</p>
+<p class="p6"><br></p>
+<p class="p4">usage: [signatures-path] [sample-signatures-path] [signature-type] [sample-frequency] ([sample-docnos-path])</p>
+<p class="p4">Signature type is either random, simhash or minhash.</p>
+<p class="p4">e.g.,</p>
+<p class="p4">hadoop jar pwsim.jar ivory.lsh.eval.SampleSignatures /user/fture/de-wiki/signatures-random_D=1000 /user/fture/de-wiki/sample-signatures-random_D=1000 random /user/fture/de-wiki/sample-docnos.txt</p>
+<p class="p2"><br></p>
+<p class="p3">Command-line instructions to run the brute force pwsim algorithm:</p>
+<p class="p2"><br></p>
+<p class="p4">usage: [type] [input-path] [output-path] [sample-path] [threshold] [num-results]</p>
+<p class="p4">[type] is either signature or docvector.</p>
+<p class="p4">For all results, enter -1 for [num-results]</p>
+<p class="p2"><br></p>
+<p class="p3">We also provide a Hadoop job to extract language links from two Wikipedia collections:</p>
+<p class="p2"><br></p>
+<p class="p3">Extracting language links:</p>
+<p class="p4">hadoop jar pwsim.jar ivory.lsh.eval.ExtractWikipedia /shared/Wikipedia/raw/enwiki-20100130-pages-articles.xml /umd-lin/fture/pwsim/en-wikipedia /umd-lin/fture/pwsim/en-wikipedia/tmp /shared/Wikipedia/raw/dewiki-20100117-pages-articles.xml /umd-lin/fture/pwsim/de-wikipedia /umd-lin/fture/pwsim/eval/en-de_wikilinks</p>
+<p class="p4">hadoop jar pwsim.jar ivory.lsh.eval.ExtractWikipedia /shared/Wikipedia/raw/dewiki-20100117-pages-articles.xml /umd-lin/fture/pwsim/de-wikipedia /umd-lin/fture/pwsim/en-wikipedia/tmp /shared/Wikipedia/raw/enwiki-20100130-pages-articles.xml /umd-lin/fture/pwsim/en-wikipedia /umd-lin/fture/pwsim/eval/de-en_wikilinks</p>
+<p class="p2"><br></p>
+<p class="p3">In this example, each run extracts links in different directions: English-&gt;German, German-&gt;English.</p>
+</body>
+</html>
