@@ -41,6 +41,7 @@ import org.apache.hadoop.mapred.SequenceFileOutputFormat;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import edu.umd.hooka.Vocab;
+import edu.umd.hooka.alignment.HadoopAlign;
 import edu.umd.cloud9.io.map.HMapIFW;
 import edu.umd.cloud9.io.map.HMapSFW;
 import edu.umd.cloud9.util.PowerTool;
@@ -88,7 +89,7 @@ public class BuildTargetLangWeightedIntDocVectors extends PowerTool {
 			}
 			
 			try{
-				engVocabH = CLIRUtils.loadVocab(localFiles[0], FileSystem.getLocal(conf));
+				engVocabH = HadoopAlign.loadVocab(localFiles[0], FileSystem.getLocal(conf));
 			} catch (Exception e) {
 				e.printStackTrace();
 				throw new RuntimeException("Error initializing Term to Id map!");
