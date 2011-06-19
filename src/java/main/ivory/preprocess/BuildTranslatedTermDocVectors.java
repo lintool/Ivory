@@ -29,6 +29,7 @@ import org.apache.hadoop.mapred.SequenceFileOutputFormat;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import edu.umd.hooka.Vocab;
+import edu.umd.hooka.alignment.HadoopAlign;
 import edu.umd.hooka.ttables.TTable_monolithic_IFAs;
 import edu.umd.cloud9.io.map.HMapIFW;
 import edu.umd.cloud9.io.map.HMapSFW;
@@ -73,7 +74,7 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
 		static int numDocs;
 		static boolean isNormalize;
 		private String language;
-		int MIN_SIZE = 0;	// minimum document size, to avoid noise in Wikipedia due to stubs/very short articles etc.
+		int MIN_SIZE = 0;	// minimum document size, to avoid noise in Wikipedia due to stubs/very short articles etc. this is set via Conf object
 		
 		public void configure(JobConf job) {
 			//			LOG.setLevel(Level.DEBUG);
@@ -107,12 +108,12 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
 
 			//load vocabularies and prob table
 			try {
-				eVocabTrg = CLIRUtils.loadVocab(localFiles[1], localFs);
-				fVocabSrc = CLIRUtils.loadVocab(localFiles[2], localFs);
+				eVocabTrg = HadoopAlign.loadVocab(localFiles[1], localFs);
+				fVocabSrc = HadoopAlign.loadVocab(localFiles[2], localFs);
 				f2e_Probs = new TTable_monolithic_IFAs(localFs, localFiles[3], true);
 
-				eVocabSrc = CLIRUtils.loadVocab(localFiles[4], localFs);
-				fVocabTrg = CLIRUtils.loadVocab(localFiles[5], localFs);
+				eVocabSrc = HadoopAlign.loadVocab(localFiles[4], localFs);
+				fVocabTrg = HadoopAlign.loadVocab(localFiles[5], localFs);
 				e2f_Probs = new TTable_monolithic_IFAs(localFs, localFiles[6], true);
 			} catch (IOException e) {
 				throw new RuntimeException("Error initializing vocabularies/prob table!");
@@ -318,8 +319,8 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
 			Vocab eVocab_e2f = null, fVocab_e2f = null;
 			TTable_monolithic_IFAs en2DeProbs = null;
 			try {
-				eVocab_e2f = CLIRUtils.loadVocab(new Path(eFile), conf);
-				fVocab_e2f = CLIRUtils.loadVocab(new Path(fFile), conf);
+				eVocab_e2f = HadoopAlign.loadVocab(new Path(eFile), conf);
+				fVocab_e2f = HadoopAlign.loadVocab(new Path(fFile), conf);
 
 				en2DeProbs = new TTable_monolithic_IFAs(fs2, new Path(e2fttableFile), true);
 			} catch (IOException e) {
