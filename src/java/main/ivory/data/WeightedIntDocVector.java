@@ -26,9 +26,9 @@ import ivory.util.RetrievalEnvironment;
  */
 public class WeightedIntDocVector implements IntDocVector {
 
-	private static final Logger sLogger = Logger.getLogger (WeightedIntDocVector.class);
+	private static final Logger LOG = Logger.getLogger (WeightedIntDocVector.class);
 	{
-		sLogger.setLevel (Level.DEBUG);
+		LOG.setLevel (Level.DEBUG);
 	}
 
 	private int docLength;
@@ -81,16 +81,16 @@ public class WeightedIntDocVector implements IntDocVector {
 	}
 
 	public float dot (WeightedIntDocVector otherVector) {
-		//sLogger.debug ("dot (otherVector: " + otherVector + ")");
+		//LOG.debug ("dot (otherVector: " + otherVector + ")");
 		float result = weightedTerms.dot (otherVector.weightedTerms);
-		//sLogger.debug ("in KMeansClusterDocs mapper dotProduct () returning: " + result);
+		//LOG.debug ("in KMeansClusterDocs mapper dotProduct () returning: " + result);
 		return result;
 	}
 
 	public void plus (WeightedIntDocVector otherVector) {
-		//sLogger.debug ("plus (otherVector: " + otherVector + ")");
-		//sLogger.debug ("weightedTerms == null: " + (weightedTerms == null));
-		//sLogger.debug ("otherVector.mWeightedTerms == null: " + (otherVector.mWeightedTerms == null));
+		//LOG.debug ("plus (otherVector: " + otherVector + ")");
+		//LOG.debug ("weightedTerms == null: " + (weightedTerms == null));
+		//LOG.debug ("otherVector.mWeightedTerms == null: " + (otherVector.mWeightedTerms == null));
 		weightedTerms.plus (otherVector.weightedTerms);
 		docLength += otherVector.docLength;
 	}

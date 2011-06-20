@@ -40,6 +40,8 @@ import edu.umd.hooka.alignment.HadoopAlign;
 import edu.umd.hooka.alignment.IndexedFloatArray;
 import edu.umd.hooka.ttables.TTable_monolithic_IFAs;
 
+import org.apache.hadoop.conf.Configuration;
+
 /**
  * Algorithms used in our CLIR approach to convert doc vectors from one language into another. See SIGIR'11 paper for details.<p>
  * <p>
@@ -509,7 +511,9 @@ public abstract class CLIRUtils extends Configured {
 	//	 * 		Vocab object
 	//	 * @throws IOException
 	//	 */
-	//	public static Vocab loadVocab(Path path, FileSystem fileSys) throws IOException {
+		public static Vocab loadVocab(Path path, FileSystem fileSys) throws IOException {
+			return null;
+		}
 	//		DataInput in = new DataInputStream(new BufferedInputStream(fileSys.open(path)));
 	//		VocabularyWritable at = new VocabularyWritable();
 	//		at.readFields(in);
@@ -529,7 +533,9 @@ public abstract class CLIRUtils extends Configured {
 	//	 * 		Vocab object
 	//	 * @throws IOException
 	//	 */
-	//	static public Vocab loadVocab(Path path, Configuration job) throws IOException {
+		static public Vocab loadVocab(Path path, Configuration job) throws IOException {
+			return null;
+		}
 	//		org.apache.hadoop.conf.Configuration conf = new org.apache.hadoop.conf.Configuration(job);
 	//		FileSystem fileSys = FileSystem.get(conf);
 	//

@@ -52,7 +52,8 @@ public class BuildTermDocVectorsForwardIndex extends PowerTool {
 
 	private static final Logger sLogger = Logger.getLogger(BuildTermDocVectorsForwardIndex.class);
 	{
-		sLogger.setLevel (Level.DEBUG);
+		//sLogger.setLevel (Level.DEBUG);
+		sLogger.setLevel (Level.ERROR);
 	}
 
 	protected static enum Dictionary {

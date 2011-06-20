@@ -147,7 +147,8 @@ public class BuildIPInvertedIndexDocSorted extends PowerTool {
 				} else if (curTerm != prevTerm) {
 					// Encountered next term, so emit postings corresponding to previous term.
 					if (numPostings != postings.size()) {
-						throw new RuntimeException("Error: actual number of postings processed is different from expected!");
+						throw new RuntimeException("Error: actual number of postings processed: " + numPostings + " is different from expected: " + postings.size());
+
 					}
 
 					term.set(prevTerm);
@@ -186,7 +187,8 @@ public class BuildIPInvertedIndexDocSorted extends PowerTool {
 
 			// We need to flush out the final postings list.
 			if (numPostings != postings.size()) {
-				throw new RuntimeException("Error: actual number of postings processed is different from expected!");
+						// throw new RuntimeException("Error: actual number of postings processed is different from expected!");
+						throw new RuntimeException("Error: actual number of postings processed: " + numPostings + " is different from expected: " + postings.size());
 			}
 
 			term.set(prevTerm);
