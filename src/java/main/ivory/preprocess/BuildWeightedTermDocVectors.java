@@ -19,9 +19,9 @@ import ivory.data.DocLengthTable;
 import ivory.data.DocLengthTable2B;
 import ivory.data.DocLengthTable4B;
 import ivory.data.LazyTermDocVector;
+import ivory.data.TermDocVector;
 import ivory.data.PrefixEncodedGlobalStats;
 import ivory.data.PrefixEncodedGlobalStatsWithIndex;
-import ivory.data.TermDocVectorReader;
 import ivory.pwsim.score.ScoringModel;
 import ivory.util.CLIRUtils;
 import ivory.util.RetrievalEnvironment;
@@ -157,7 +157,7 @@ public class BuildWeightedTermDocVectors extends PowerTool {
 			int docLen = mDLTable.getDocLength(mDocno.get());
 
 			weightedVector.clear();
-			TermDocVectorReader r = doc.getDocVectorReader();
+			TermDocVector.Reader r = doc.getReader();
 
 			sLogger.debug("===================================BEGIN READ DOC");
 			sum2 = 0;

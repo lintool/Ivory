@@ -70,7 +70,7 @@ public class WeightedIntDocVector implements IntDocVector {
 		weightedTerms.readFields (in);
 	}
 
-	public IntDocVectorReader getDocVectorReader () throws IOException {
+	public Reader getReader () throws IOException {
 		return null;
 	}
 

@@ -2,7 +2,6 @@ package ivory.util;
 
 import ivory.data.PrefixEncodedGlobalStats;
 import ivory.data.TermDocVector;
-import ivory.data.TermDocVectorReader;
 import ivory.pwsim.score.Bm25;
 import ivory.pwsim.score.ScoringModel;
 import java.io.BufferedOutputStream;
@@ -332,7 +331,7 @@ public abstract class CLIRUtils extends Configured {
 			sLogger = logger;
 		}
 		//translate doc vector		
-		TermDocVectorReader reader = doc.getDocVectorReader();
+		TermDocVector.Reader reader = doc.getReader();
 		int docLen = 0;
 		while (reader.hasMoreTerms()) {
 			String fTerm = reader.nextTerm();
