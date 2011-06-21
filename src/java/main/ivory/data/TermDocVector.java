@@ -16,6 +16,8 @@
 
 package ivory.data;
 
+import ivory.index.TermPositions;
+
 import java.io.IOException;
 
 import org.apache.hadoop.io.Writable;
@@ -31,6 +33,51 @@ public interface TermDocVector extends Writable {
 	/**
 	 * Returns the reader for this <code>TermDocVector</code>.
 	 */
-	public abstract TermDocVectorReader getDocVectorReader() throws IOException;
+	public abstract Reader getReader() throws IOException;
 
+	/**
+	 * Interface representing a reader for a {@link TermDocVector}, providing
+	 * access to terms, their frequencies, and positions.
+	 * 
+	 * @author Tamer Elsayed
+	 * 
+	 */
+	public interface Reader {
+
+	  /**
+	   * Returns the next term.
+	   */
+	  public String nextTerm();
+
+	  /**
+	   * Returns <code>true</code> if there are more terms to read.
+	   */
+	  public boolean hasMoreTerms();
+
+	  /**
+	   * Returns the total number of terms.
+	   */
+	  public int getNumberOfTerms();
+
+	  /**
+	   * Resets the reader.
+	   */
+	  public void reset();
+
+	  /**
+	   * Returns the position offsets of the current term as an array.
+	   */
+	  public int[] getPositions();
+
+	  /**
+	   * Returns the position offsets of the current term as a
+	   * {@link TermPositions} object.
+	   */
+	  public boolean getPositions(TermPositions tp);
+
+	  /**
+	   * Returns the term frequency of the current term.
+	   */
+	  public short getTf();
+	}
 }

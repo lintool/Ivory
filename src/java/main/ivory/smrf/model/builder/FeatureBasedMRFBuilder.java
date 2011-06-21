@@ -41,7 +41,8 @@ public class FeatureBasedMRFBuilder extends MRFBuilder {
 	private Node model = null;
 
 	// Whether or not to normalize the feature importance weights.
-	private boolean normalizeImportance = false;
+	protected boolean normalizeImportance = false;
+  float pruningThresholdBigram = 0.0f;
 
 	public FeatureBasedMRFBuilder(RetrievalEnvironment env, Node model) {
 		super(env);
@@ -49,7 +50,12 @@ public class FeatureBasedMRFBuilder extends MRFBuilder {
 
 		// Whether or not we should normalize the feature importance weights.
 		normalizeImportance = XMLTools.getAttributeValue(model, "normalizeImportance", false);
+    pruningThresholdBigram= XMLTools.getAttributeValue(model, "pruningThresholdBigram", 0.0f);
 	}
+
+  public Node getModel() {
+    return model;
+  }
 
 	@Override
 	public MarkovRandomField buildMRF(String[] queryTerms) throws ConfigurationException {
@@ -97,23 +103,50 @@ public class FeatureBasedMRFBuilder extends MRFBuilder {
 				// Get cliques from clique set.
 				List<Clique> cliques = cliqueSet.getCliques();
 
-				for (Clique c : cliques) {
-					c.setParameterName(featureID); 	 // Parameter id.
-					c.setParameterWeight(weight);    // Weight.
-					c.setType(cliqueSet.getType());  // Clique type.
+//				for (Clique c : cliques) {
+//					c.setParameterName(featureID); 	 // Parameter id.
+//					c.setParameterWeight(weight);    // Weight.
+//					c.setType(cliqueSet.getType());  // Clique type.
+//
+//					// Get clique weight.
+//					if (importanceModel != null) {
+//						float importance = importanceModel.getCliqueWeight(c);						
+//						c.setImportance(importance);
+//
+//						totalImportance += importance;
+//						cliquesWithImportance.add(c);						
+//					}
+//
+//					// Add clique to MRF.
+//					mrf.addClique(c);
+//				}
+        for (Clique c : cliques) {
+          double w = weight;
 
-					// Get clique weight.
-					if (importanceModel != null) {
-						float importance = importanceModel.getCliqueWeight(c);						
-						c.setImportance(importance);
+          c.setParameterName(featureID);   // Parameter id.
+          c.setParameterWeight(weight);    // Weight.
+          c.setType(cliqueSet.getType());  // Clique type.
 
-						totalImportance += importance;
-						cliquesWithImportance.add(c);						
-					}
+          // Get clique weight.
+          if (importanceModel != null) {
+            float importance = importanceModel.getCliqueWeight(c);            
+            c.setImportance(importance);
 
-					// Add clique to MRF.
-					mrf.addClique(c);
-				}
+            totalImportance += importance;
+            cliquesWithImportance.add(c);         
+
+            w = importance; 
+          }
+
+          if (w < pruningThresholdBigram && c.getType()!=Clique.Type.Term){
+            //System.out.println("Not add "+c);
+          }
+                                        else{
+                                                // Add clique to MRF.
+                                                mrf.addClique(c);
+            //System.out.println("Add "+c);
+                                        }
+        }
 			}
 		}
 

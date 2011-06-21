@@ -18,6 +18,7 @@ package ivory.smrf.model.builder;
 
 import java.io.IOException;
 
+import ivory.cascade.model.builder.CascadeFeatureBasedMRFBuilder;
 import ivory.exception.ConfigurationException;
 import ivory.exception.RetrievalException;
 import ivory.smrf.model.MarkovRandomField;
@@ -57,6 +58,8 @@ public abstract class MRFBuilder {
         builder = new FeatureBasedMRFBuilder(env, model);
       } else if ("GreedyConstrained".equals(modelType)) {
         builder = new GreedyConstrainedMRFBuilder(env, model);
+      } else if (modelType.equals("New")){
+        builder = new CascadeFeatureBasedMRFBuilder(env, model);
       } else {
         throw new ConfigurationException("Unrecognized model type: " + modelType);
       }

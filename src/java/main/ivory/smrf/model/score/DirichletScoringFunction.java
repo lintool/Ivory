@@ -29,9 +29,9 @@ import org.w3c.dom.Node;
  *
  */
 public class DirichletScoringFunction extends ScoringFunction {
-	private float mu = 2500.0f;     // Smoothing parameter.
-	private float backgroundProb; 	// Background probability.
-	private boolean isOOV = false;  // Is this term OOV?
+	protected float mu = 2500.0f;     // Smoothing parameter.
+	protected float backgroundProb; 	// Background probability.
+	protected boolean isOOV = false;  // Is this term OOV?
 
 	@Override
 	public void configure(Node domNode) {
@@ -50,6 +50,7 @@ public class DirichletScoringFunction extends ScoringFunction {
 
 	@Override
 	public void initialize(GlobalTermEvidence termEvidence, GlobalEvidence globalEvidence) {
+	  super.initialize(termEvidence, globalEvidence);
 		isOOV = termEvidence.getCf() == 0 ? true : false;
 		backgroundProb = (float) termEvidence.getCf() / (float) globalEvidence.collectionLength;
 	}

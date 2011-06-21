@@ -2,6 +2,7 @@ package ivory.regression;
 
 import static org.junit.Assert.assertEquals;
 import ivory.eval.Qrels;
+import ivory.eval.GradedQrels;
 import ivory.eval.RankedListEvaluator;
 import ivory.smrf.retrieval.Accumulator;
 
@@ -16,7 +17,7 @@ public class GroundTruth {
 	private static final Logger sLogger = Logger.getLogger(GroundTruth.class);
 
 	public static enum Metric {
-		AP, P10
+		AP, P10, NDCG20
 	}
 
 	private String mModel;
@@ -60,11 +61,34 @@ public class GroundTruth {
 			verifyAP(results, mapping, qrels);
 		} else if (mMetric.equals(Metric.P10)) {
 			verifyP10(results, mapping, qrels);
-		} else {
+		} else if (mMetric.equals(Metric.NDCG20)){
+			verifyNDCG20(results, mapping, (GradedQrels)qrels);
+		} 
+		else {
 			throw new RuntimeException("Unknown metric: Don't know how to verify!");
 		}
 	}
 
+	private void verifyNDCG20(Map<String, Accumulator[]> results, DocnoMapping mapping, GradedQrels qrels) {
+		float ndcgSum = 0;
+
+		for (String qid : results.keySet()) {
+			float ndcg = (float) RankedListEvaluator.computeNDCG(20, results.get(qid), mapping, qrels.getReldocsForQid(qid, true));
+
+			ndcgSum += ndcg;
+
+			String s = mModel == null ? "" : "model " + mModel + ": ";
+			sLogger.info(s + "verifying ndcg for qid " + qid);
+
+			assertEquals(scores.get(qid), ndcg, 10e-4);
+		}		
+
+		float NDCG =  (float) RankedListEvaluator.roundTo4SigFigs(ndcgSum / (float) mNumTopics);
+
+		assertEquals(overallScore, NDCG, 10e-4);
+
+	}
+	
 	private void verifyAP(Map<String, Accumulator[]> results, DocnoMapping mapping, Qrels qrels) {
 		float apSum = 0;
 		for (String qid : results.keySet()) {

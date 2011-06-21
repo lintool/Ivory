@@ -1,0 +1,227 @@
+<parameters>
+  <index>/scratch0/gov2</index>
+
+  <!-- Concept importance model for feature prune -->
+  <importancemodel id="wsd_featureprune" type="ivory.smrf.model.importance.LinearImportanceModel">
+    <feature id="collection_freq" weight="0.1862" file="data/gov2/stats.gov2.cf.collection.txt.norm" default="0.0"/>
+    <feature id="document_freq" weight="0.7137" file="data/gov2/stats.gov2.df.collection.txt.norm" default="0.01354153" />
+    <feature id="clue_cf" weight="0" file="data/gov2/stats.gov2.cf.clue.txt.norm" default="0.0"/>
+    <feature id="enwiki_cf" weight="0.1" file="data/gov2/stats.gov2.cf.enwiki.txt.norm" default="0.0"/>
+  </importancemodel>
+
+  <model id="Gov2-FeaturePrune-0.1" type="Feature" output="ranking.SIGIR2011-Gov2-FeaturePrune-0.1.txt" K="20" topK="20" pruningThresholdBigram="0.0058">
+    <feature id="termWt" importance="wsd_featureprune"
+             cliqueSet="ivory.smrf.model.builder.TermCliqueSet"
+             potential="ivory.smrf.model.potential.QueryPotential"
+             generator="ivory.smrf.model.builder.TermExpressionGenerator"
+             scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1000.0" />
+    <feature id="unorderedWt" importance="wsd_featureprune"
+             conceptBinType="default"
+             conceptBinParams="3 1"
+             cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+             potential="ivory.smrf.model.potential.QueryPotential"
+             generator="ivory.smrf.model.builder.UnorderedWindowExpressionGenerator" width="2"
+             scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="750.0" />
+    <feature id="orderedWt" importance="wsd_featureprune"
+             conceptBinType="default"
+             conceptBinParams="3 1"
+             cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+             potential="ivory.smrf.model.potential.QueryPotential"
+             generator="ivory.smrf.model.builder.OrderedWindowExpressionGenerator" width="4"
+             scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="750.0" />
+    <feature id="unorderedWt" importance="wsd_featureprune"
+             conceptBinType="default"
+             conceptBinParams="3 2"
+             cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+             potential="ivory.smrf.model.potential.QueryPotential"
+             generator="ivory.smrf.model.builder.UnorderedWindowExpressionGenerator" width="2"
+             scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="750.0" />
+    <feature id="orderedWt" importance="wsd_featureprune"
+             conceptBinType="default"
+             conceptBinParams="3 2"
+             cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+             potential="ivory.smrf.model.potential.QueryPotential"
+             generator="ivory.smrf.model.builder.UnorderedWindowExpressionGenerator" width="2"
+             scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="750.0" />
+    <feature id="unorderedWt" importance="wsd_featureprune"
+             conceptBinType="default"
+             conceptBinParams="3 3"
+             cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+             potential="ivory.smrf.model.potential.QueryPotential"
+             generator="ivory.smrf.model.builder.UnorderedWindowExpressionGenerator" width="4"
+             scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="750.0" />
+  </model>
+
+  <model id="Gov2-FeaturePrune-0.3" type="Feature" output="ranking.SIGIR2011-Gov2-FeaturePrune-0.3.txt" K="20" topK="20" pruningThresholdBigram="0.0063">
+    <feature id="termWt" importance="wsd_featureprune"
+             cliqueSet="ivory.smrf.model.builder.TermCliqueSet"
+             potential="ivory.smrf.model.potential.QueryPotential"
+             generator="ivory.smrf.model.builder.TermExpressionGenerator"
+             scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1000.0" />
+    <feature id="unorderedWt" importance="wsd_featureprune"
+             conceptBinType="default"
+             conceptBinParams="3 1"
+             cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+             potential="ivory.smrf.model.potential.QueryPotential"
+             generator="ivory.smrf.model.builder.UnorderedWindowExpressionGenerator" width="2"
+             scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="750.0" />
+    <feature id="orderedWt" importance="wsd_featureprune"
+             conceptBinType="default"
+             conceptBinParams="3 1"
+             cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+             potential="ivory.smrf.model.potential.QueryPotential"
+             generator="ivory.smrf.model.builder.OrderedWindowExpressionGenerator" width="4"
+             scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="750.0" />
+    <feature id="unorderedWt" importance="wsd_featureprune"
+             conceptBinType="default"
+             conceptBinParams="3 2"
+             cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+             potential="ivory.smrf.model.potential.QueryPotential"
+             generator="ivory.smrf.model.builder.UnorderedWindowExpressionGenerator" width="2"
+             scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="750.0" />
+    <feature id="orderedWt" importance="wsd_featureprune"
+             conceptBinType="default"
+             conceptBinParams="3 2"
+             cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+             potential="ivory.smrf.model.potential.QueryPotential"
+             generator="ivory.smrf.model.builder.UnorderedWindowExpressionGenerator" width="2"
+             scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="750.0" />
+    <feature id="unorderedWt" importance="wsd_featureprune"
+             conceptBinType="default"
+             conceptBinParams="3 3"
+             cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+             potential="ivory.smrf.model.potential.QueryPotential"
+             generator="ivory.smrf.model.builder.UnorderedWindowExpressionGenerator" width="4"
+             scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="750.0" />
+  </model>
+
+  <model id="Gov2-FeaturePrune-0.5" type="Feature" output="ranking.SIGIR2011-Gov2-FeaturePrune-0.5.txt" K="20" topK="20" pruningThresholdBigram="0.0064">
+    <feature id="termWt" importance="wsd_featureprune"
+             cliqueSet="ivory.smrf.model.builder.TermCliqueSet"
+             potential="ivory.smrf.model.potential.QueryPotential"
+             generator="ivory.smrf.model.builder.TermExpressionGenerator"
+             scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1000.0" />
+    <feature id="unorderedWt" importance="wsd_featureprune"
+             conceptBinType="default"
+             conceptBinParams="3 1"
+             cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+             potential="ivory.smrf.model.potential.QueryPotential"
+             generator="ivory.smrf.model.builder.UnorderedWindowExpressionGenerator" width="2"
+             scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="750.0" />
+    <feature id="orderedWt" importance="wsd_featureprune"
+             conceptBinType="default"
+             conceptBinParams="3 1"
+             cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+             potential="ivory.smrf.model.potential.QueryPotential"
+             generator="ivory.smrf.model.builder.OrderedWindowExpressionGenerator" width="4"
+             scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="750.0" />
+    <feature id="unorderedWt" importance="wsd_featureprune"
+             conceptBinType="default"
+             conceptBinParams="3 2"
+             cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+             potential="ivory.smrf.model.potential.QueryPotential"
+             generator="ivory.smrf.model.builder.UnorderedWindowExpressionGenerator" width="2"
+             scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="750.0" />
+    <feature id="orderedWt" importance="wsd_featureprune"
+             conceptBinType="default"
+             conceptBinParams="3 2"
+             cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+             potential="ivory.smrf.model.potential.QueryPotential"
+             generator="ivory.smrf.model.builder.UnorderedWindowExpressionGenerator" width="2"
+             scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="750.0" />
+    <feature id="unorderedWt" importance="wsd_featureprune"
+             conceptBinType="default"
+             conceptBinParams="3 3"
+             cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+             potential="ivory.smrf.model.potential.QueryPotential"
+             generator="ivory.smrf.model.builder.UnorderedWindowExpressionGenerator" width="4"
+             scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="750.0" />
+  </model>
+
+  <model id="Gov2-FeaturePrune-0.7" type="Feature" output="ranking.SIGIR2011-Gov2-FeaturePrune-0.7.txt" K="20" topK="20" pruningThresholdBigram="0.008">
+    <feature id="termWt" importance="wsd_featureprune"
+             cliqueSet="ivory.smrf.model.builder.TermCliqueSet"
+             potential="ivory.smrf.model.potential.QueryPotential"
+             generator="ivory.smrf.model.builder.TermExpressionGenerator"
+             scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1000.0" />
+    <feature id="unorderedWt" importance="wsd_featureprune"
+             conceptBinType="default"
+             conceptBinParams="3 1"
+             cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+             potential="ivory.smrf.model.potential.QueryPotential"
+             generator="ivory.smrf.model.builder.UnorderedWindowExpressionGenerator" width="2"
+             scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="750.0" />
+    <feature id="orderedWt" importance="wsd_featureprune"
+             conceptBinType="default"
+             conceptBinParams="3 1"
+             cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+             potential="ivory.smrf.model.potential.QueryPotential"
+             generator="ivory.smrf.model.builder.OrderedWindowExpressionGenerator" width="4"
+             scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="750.0" />
+    <feature id="unorderedWt" importance="wsd_featureprune"
+             conceptBinType="default"
+             conceptBinParams="3 2"
+             cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+             potential="ivory.smrf.model.potential.QueryPotential"
+             generator="ivory.smrf.model.builder.UnorderedWindowExpressionGenerator" width="2"
+             scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="750.0" />
+    <feature id="orderedWt" importance="wsd_featureprune"
+             conceptBinType="default"
+             conceptBinParams="3 2"
+             cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+             potential="ivory.smrf.model.potential.QueryPotential"
+             generator="ivory.smrf.model.builder.UnorderedWindowExpressionGenerator" width="2"
+             scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="750.0" />
+    <feature id="unorderedWt" importance="wsd_featureprune"
+             conceptBinType="default"
+             conceptBinParams="3 3"
+             cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+             potential="ivory.smrf.model.potential.QueryPotential"
+             generator="ivory.smrf.model.builder.UnorderedWindowExpressionGenerator" width="4"
+             scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="750.0" />
+  </model>
+
+  <model id="Gov2-FeaturePrune-0.9" type="Feature" output="ranking.SIGIR2011-Gov2-FeaturePrune-0.9.txt" K="20" topK="20" pruningThresholdBigram="0.009">
+    <feature id="termWt" weight="0.82"
+             cliqueSet="ivory.smrf.model.builder.TermCliqueSet"
+             potential="ivory.smrf.model.potential.QueryPotential"
+             generator="ivory.smrf.model.builder.TermExpressionGenerator"
+             scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1000.0" />
+    <feature id="unorderedWt" importance="wsd_featureprune"
+             conceptBinType="default"
+             conceptBinParams="3 1"
+             cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+             potential="ivory.smrf.model.potential.QueryPotential"
+             generator="ivory.smrf.model.builder.UnorderedWindowExpressionGenerator" width="2"
+             scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="750.0" />
+    <feature id="orderedWt" importance="wsd_featureprune"
+             conceptBinType="default"
+             conceptBinParams="3 1"
+             cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+             potential="ivory.smrf.model.potential.QueryPotential"
+             generator="ivory.smrf.model.builder.OrderedWindowExpressionGenerator" width="4"
+             scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="750.0" />
+    <feature id="unorderedWt" importance="wsd_featureprune"
+             conceptBinType="default"
+             conceptBinParams="3 2"
+             cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+             potential="ivory.smrf.model.potential.QueryPotential"
+             generator="ivory.smrf.model.builder.UnorderedWindowExpressionGenerator" width="2"
+             scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="750.0" />
+    <feature id="orderedWt" importance="wsd_featureprune"
+             conceptBinType="default"
+             conceptBinParams="3 2"
+             cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+             potential="ivory.smrf.model.potential.QueryPotential"
+             generator="ivory.smrf.model.builder.UnorderedWindowExpressionGenerator" width="2"
+             scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="750.0" />
+    <feature id="unorderedWt" importance="wsd_featureprune"
+             conceptBinType="default"
+             conceptBinParams="3 3"
+             cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+             potential="ivory.smrf.model.potential.QueryPotential"
+             generator="ivory.smrf.model.builder.UnorderedWindowExpressionGenerator" width="4"
+             scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="750.0" />
+  </model>
+</parameters>
+

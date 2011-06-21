@@ -83,6 +83,13 @@ public class MarkovRandomField {
 		cliques.add(c);
 	}
 
+	 /**             
+   * Removes all cliques from this MRF.
+   */
+  public void removeAllCliques() {
+    cliques.clear();
+  }
+
 	/**
 	 * Returns the cliques associated with this MRF.
 	 */

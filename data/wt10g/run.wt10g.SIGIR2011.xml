@@ -1,0 +1,149 @@
+<parameters>
+  <index>/scratch0/wt10g</index>
+
+  <!-- Concept importance model for binning -->
+  <importancemodel id="wsd" type="ivory.smrf.model.importance.LinearImportanceModel">
+    <feature id="collection_freq" weight="0.0756" file="data/wt10g/stats.wt10g.cf.collection.txt.norm" default="0.0"/>
+    <feature id="document_freq" weight = "0.6256" file="data/wt10g/stats.wt10g.df.collection.txt.norm" default="0.01140762" />
+    <feature id="clue_cf" weight = "0.000695" file="data/wt10g/stats.wt10g.cf.clue.txt.norm" default="0.0" />
+    <feature id="enwiki_cf" weight = "0.2980" file="data/wt10g/stats.wt10g.cf.enwiki.txt.norm" default="0.0" />
+  </importancemodel>
+
+
+  <!-- Concept importance model for feature prune -->
+  <importancemodel id="wsd_featureprune" type="ivory.smrf.model.importance.LinearImportanceModel">    
+    <feature id="collection_freq" weight="0.00099900099900099" file="data/wt10g/stats.wt10g.cf.collection.txt.norm" default="0" />
+    <feature id="document_freq" weight="0.400758927" file="data/wt10g/stats.wt10g.df.collection.txt.norm" default="0.01140762"/>
+    <feature id="clue_cf" weight="0.596844458016" file="data/wt10g/stats.wt10g.cf.clue.txt.norm" default="0"/>
+    <feature id="enwiki_cf" weight="0.001397613756744" file="data/wt10g/stats.wt10g.cf.enwiki.txt.norm" default="0"/>
+  </importancemodel>
+
+  <!-- Dirichlet, full independence -->
+  <model id="Wt10g-QL" type="Feature" output="ranking.SIGIR2011-Wt10g-QL.txt"  K="20" topK="20" >
+    <feature id="termWt" weight="1.0"
+             cliqueSet="ivory.smrf.model.builder.TermCliqueSet"
+             potential="ivory.smrf.model.potential.QueryPotential"
+             generator="ivory.smrf.model.builder.TermExpressionGenerator"
+             scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1000.0" />
+  </model>
+
+  <!-- FeaturePrune -->                        
+  <model id="Wt10g-FeaturePrune" type="Feature" output="ranking.SIGIR2011-Wt10g-FeaturePrune.txt" K="20" topK="20" pruningThresholdBigram="0.003">
+    <feature id="termWt" importance="wsd_featureprune"
+             cliqueSet="ivory.smrf.model.builder.TermCliqueSet"
+             potential="ivory.smrf.model.potential.QueryPotential"
+             generator="ivory.smrf.model.builder.TermExpressionGenerator"
+             scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1000.0" />
+    <feature id="orderedWt" importance="wsd_featureprune"
+             cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+             potential="ivory.smrf.model.potential.QueryPotential"
+             generator="ivory.smrf.model.builder.OrderedWindowExpressionGenerator" width="2"
+             scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="750.0" />
+    <feature id="unorderedWt" importance="wsd_featureprune"
+             cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+             potential="ivory.smrf.model.potential.QueryPotential"
+             generator="ivory.smrf.model.builder.UnorderedWindowExpressionGenerator" width="2"
+             scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="750.0" />
+    <feature id="orderedWt" importance="wsd_featureprune"
+             cliqueSet="ivory.smrf.model.builder.OrderedCliqueSet" dependence="sequential"
+             potential="ivory.smrf.model.potential.QueryPotential"
+             generator="ivory.smrf.model.builder.OrderedWindowExpressionGenerator" width="4"  
+             scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="750.0" />
+  </model>
+
+                        
+  <!-- Cascade -->
+  <model id="Wt10g-Cascade" type="New" output="ranking.SIGIR2011-Wt10g-Cascade.txt" internalOutputFile="" internalInputFile="" K="20" topK="20" >
+    <feature id="termWt" weight="0.86" 
+             cascadeStage="0"
+             prune="rank 0.9000000953674316"
+             cliqueSet="ivory.cascade.model.builder.CascadeTermCliqueSet"
+             potential="ivory.cascade.model.potential.CascadeQueryPotential"
+             generator="ivory.smrf.model.builder.TermExpressionGenerator"
+             scoreFunction="ivory.cascade.model.score.CascadeDirichletScoringFunction" mu="1000.0" />
+    <feature id="unorderedWt" weight="0.19" 
+             cascadeStage="1"
+             prune="score 0.4000000059604645"
+             conceptBinType="default"
+             conceptBinParams="3 1"
+             cliqueSet="ivory.cascade.model.builder.CascadeOrderedCliqueSet" dependence="sequential"
+             potential="ivory.cascade.model.potential.CascadeQueryPotential"
+             generator="ivory.smrf.model.builder.UnorderedWindowExpressionGenerator" width="2"
+             scoreFunction="ivory.cascade.model.score.CascadeDirichletScoringFunction" mu="750.0" />
+    <feature id="orderedWt" weight="0.16" 
+             cascadeStage="2"
+             prune="rank 0.0"
+             conceptBinType="default"
+             conceptBinParams="3 1"
+             cliqueSet="ivory.cascade.model.builder.CascadeOrderedCliqueSet" dependence="sequential"
+             potential="ivory.cascade.model.potential.CascadeQueryPotential"
+             generator="ivory.smrf.model.builder.OrderedWindowExpressionGenerator" width="2"
+             scoreFunction="ivory.cascade.model.score.CascadeDirichletScoringFunction" mu="750.0" />
+    <feature id="orderedWt" weight="0.12" 
+             cascadeStage="3"
+             prune="rank 0.20000000298023224"
+             conceptBinType="default"
+             conceptBinParams="3 2"
+             cliqueSet="ivory.cascade.model.builder.CascadeOrderedCliqueSet" dependence="sequential"
+             potential="ivory.cascade.model.potential.CascadeQueryPotential"
+             generator="ivory.smrf.model.builder.OrderedWindowExpressionGenerator" width="2"
+             scoreFunction="ivory.cascade.model.score.CascadeDirichletScoringFunction" mu="750.0" />
+  </model>
+
+  <!-- AdaRank -->
+  <model id="Wt10g-AdaRank" type="New" output="ranking.SIGIR2011-Wt10g-AdaRank.txt" K="20" topK="20" >
+    <feature id="termWt" weight="0.86"
+             cascadeStage="0"
+             prune="rank 0.9000000953674316"
+             cliqueSet="ivory.cascade.model.builder.CascadeTermCliqueSet"
+             potential="ivory.cascade.model.potential.CascadeQueryPotential"
+             generator="ivory.smrf.model.builder.TermExpressionGenerator"
+             scoreFunction="ivory.cascade.model.score.CascadeDirichletScoringFunction" mu="1000.0" />
+    <feature id="unorderedWt" weight="0.19"
+             cascadeStage="1"
+             prune="score 0.4000000059604645"
+             conceptBinType="default"
+             conceptBinParams="3 1"
+             cliqueSet="ivory.cascade.model.builder.CascadeOrderedCliqueSet" dependence="sequential"
+             potential="ivory.cascade.model.potential.CascadeQueryPotential"
+             generator="ivory.smrf.model.builder.UnorderedWindowExpressionGenerator" width="2"
+             scoreFunction="ivory.cascade.model.score.CascadeDirichletScoringFunction" mu="750.0" />
+    <feature id="orderedWt" weight="0.16"
+             cascadeStage="2"
+             prune="rank 0.0"
+             conceptBinType="default"
+             conceptBinParams="3 1"
+             cliqueSet="ivory.cascade.model.builder.CascadeOrderedCliqueSet" dependence="sequential"
+             potential="ivory.cascade.model.potential.CascadeQueryPotential"
+             generator="ivory.smrf.model.builder.OrderedWindowExpressionGenerator" width="2"
+             scoreFunction="ivory.cascade.model.score.CascadeDirichletScoringFunction" mu="750.0" />
+    <feature id="orderedWt" weight="0.12"
+             cascadeStage="3"
+             prune="rank 0.20000000298023224"
+             conceptBinType="default"
+             conceptBinParams="3 2"
+             cliqueSet="ivory.cascade.model.builder.CascadeOrderedCliqueSet" dependence="sequential"
+             potential="ivory.cascade.model.potential.CascadeQueryPotential"
+             generator="ivory.smrf.model.builder.OrderedWindowExpressionGenerator" width="2"
+             scoreFunction="ivory.cascade.model.score.CascadeDirichletScoringFunction" mu="750.0" />
+    <feature id="unorderedWt" weight="0.03"
+             cascadeStage="2"
+             prune="rank 0.0"
+             conceptBinType="default"
+             conceptBinParams="3 1"
+             cliqueSet="ivory.cascade.model.builder.CascadeOrderedCliqueSet" dependence="sequential"
+             potential="ivory.cascade.model.potential.CascadeQueryPotential"
+             generator="ivory.smrf.model.builder.UnorderedWindowExpressionGenerator" width="4"
+             scoreFunction="ivory.cascade.model.score.CascadeDirichletScoringFunction" mu="750.0" />
+    <feature id="unorderedWt" weight="0.01"
+             cascadeStage="3"  
+             prune="rank 0.20000000298023224"
+             conceptBinType="default"
+             conceptBinParams="3 2"
+             cliqueSet="ivory.cascade.model.builder.CascadeOrderedCliqueSet" dependence="sequential"
+             potential="ivory.cascade.model.potential.CascadeQueryPotential"
+             generator="ivory.smrf.model.builder.UnorderedWindowExpressionGenerator" width="4"
+             scoreFunction="ivory.cascade.model.score.CascadeDirichletScoringFunction" mu="750.0" />
+  </model>
+
+</parameters>
