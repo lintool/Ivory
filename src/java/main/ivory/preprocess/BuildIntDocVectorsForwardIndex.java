@@ -39,6 +39,7 @@ import org.apache.hadoop.mapred.Reducer;
 import org.apache.hadoop.mapred.Reporter;
 import org.apache.hadoop.mapred.SequenceFileInputFormat;
 import org.apache.hadoop.mapred.lib.NullOutputFormat;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import org.apache.commons.lang.StringUtils;
@@ -50,6 +51,10 @@ import edu.umd.cloud9.util.PowerTool;
 public class BuildIntDocVectorsForwardIndex extends PowerTool {
 
 	private static final Logger sLogger = Logger.getLogger(BuildIntDocVectorsForwardIndex.class);
+	{
+		sLogger.setLevel (Level.INFO);
+	}
+
 
 	protected static enum Dictionary {
 		Size
@@ -75,6 +80,7 @@ public class BuildIntDocVectorsForwardIndex extends PowerTool {
 			while (input.next(key, value)) {
 				outputValue.set(fileNo + "\t" + pos);
 
+				sLogger.debug ("in run, writing key: " + key + ", value with fileNo: " + fileNo + " and pos: " + pos);
 				output.collect(key, outputValue);
 				reporter.incrCounter(Dictionary.Size, 1);
 
@@ -134,7 +140,7 @@ public class BuildIntDocVectorsForwardIndex extends PowerTool {
 			//sLogger.info (key + ": " + s[0] + " " + s[1]);
 			if (values.hasNext()) {
 				String[] s2 = values.next().toString().split("\\s+");
-				throw new RuntimeException("There shouldn't be more than one value, key: " + key + ", first value: " + StringUtils.join (s, " ") + ", second value: " + StringUtils.join (s2, " "));
+				throw new RuntimeException("There shouldn't be more than one value for key: " + key + "\n\tfirst value: " + StringUtils.join (s, " ") + "\n\tsecond value: " + StringUtils.join (s2, " "));
 			}
 
 			int fileNo = Integer.parseInt(s[0]);

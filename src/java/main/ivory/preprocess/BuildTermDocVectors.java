@@ -65,6 +65,7 @@ import edu.umd.cloud9.util.map.MapII;
 public class BuildTermDocVectors extends PowerTool {
 	private static final Logger sLogger = Logger.getLogger(BuildTermDocVectors.class);
 	static {
+		//sLogger.setLevel(Level.INFO);
 		sLogger.setLevel(Level.WARN);
 	}
 
@@ -175,9 +176,9 @@ public class BuildTermDocVectors extends PowerTool {
 			if (termPositionsMap.size() == 0) {
 				reporter.incrCounter(Docs.Empty, 1);
 			}
-			sLogger.info ("in BuildTermDocVectors map, created term positions map: " + termPositionsMap);
+			sLogger.trace ("in BuildTermDocVectors map, created term positions map: " + termPositionsMap);
 			TermDocVector docVector = new LazyTermDocVector(termPositionsMap);
-			sLogger.info ("in BuildTermDocVectors map, created term doc vector:" + docVector);
+			sLogger.trace ("in BuildTermDocVectors map, created term doc vector:" + docVector);
 			startTime = System.currentTimeMillis();
 			keyOut.set(mDocno);
 			reporter.incrCounter(Docs.Created, 1);
@@ -187,6 +188,7 @@ public class BuildTermDocVectors extends PowerTool {
 			int dl = DocumentProcessingUtils.getDocLengthFromPositionsMap(termPositionsMap);
 			// record the document length
 			sLogger.info ("in BuildTermDocVectors map, outputting mDocno: " + mDocno + ", dl: " + dl);
+			//sLogger.warn ("in BuildTermDocVectors map, outputting mDocno: " + mDocno + ", dl: " + dl);
 			mDocLengths.put(mDocno, dl);
 		}
 

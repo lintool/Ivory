@@ -60,6 +60,11 @@ import edu.umd.cloud9.util.map.MapII;
 @SuppressWarnings("deprecation")
 public class BuildIPInvertedIndexDocSorted extends PowerTool {
 	private static final Logger LOG = Logger.getLogger(BuildIPInvertedIndexDocSorted.class);
+	static {
+		//LOG.setLevel (Level.DEBUG);
+		LOG.setLevel (Level.WARN);
+	}
+	
 
 	protected static enum Docs { Total }
 	protected static enum IndexedTerms { Unique, Total }
@@ -67,6 +72,13 @@ public class BuildIPInvertedIndexDocSorted extends PowerTool {
 	protected static enum ReduceTime { Total }
 
 	private static class MyMapper extends MapReduceBase implements Mapper<IntWritable, IntDocVector, PairOfInts, TermPositions> {
+		private static final Logger LOG = Logger.getLogger(BuildIPInvertedIndexDocSorted.MyMapper.class);
+		static {
+			//LOG.setLevel (Level.DEBUG);
+			//LOG.setLevel (Level.INFO);
+			LOG.setLevel (Level.WARN);
+		}
+
 		private static final TermPositions termPositions = new TermPositions();
 		private static final PairOfInts pair = new PairOfInts();
 		private static final HMapII dfs = new HMapII();  // Holds dfs of terms processed by this mapper.
@@ -79,7 +91,7 @@ public class BuildIPInvertedIndexDocSorted extends PowerTool {
 		public void map(IntWritable key, IntDocVector doc, OutputCollector<PairOfInts, TermPositions> output, Reporter reporter) throws IOException {
 			this.output = output;
 			docno = key.get();
-
+			LOG.info ("map (key: " + key + ", doc, output, reporter)");
 			long startTime = System.currentTimeMillis();
 			IntDocVectorReader r = doc.getDocVectorReader();
 
@@ -90,6 +102,7 @@ public class BuildIPInvertedIndexDocSorted extends PowerTool {
 
 				// Set up the key and value, and emit.
 				pair.set(term, docno);
+				LOG.debug ("in map, outputting pair: " + pair + ", termPositions: " + termPositions);
 				output.collect(pair, termPositions);
 
 				// Document length of the current doc.
@@ -105,6 +118,7 @@ public class BuildIPInvertedIndexDocSorted extends PowerTool {
 		}
 
 		public void close() throws IOException {
+			LOG.info ("close ()");
 			int[] arr = new int[1];
 
 			// Emit dfs for terms encountered in this partition of the collection.
@@ -114,6 +128,7 @@ public class BuildIPInvertedIndexDocSorted extends PowerTool {
 				// Special docno of "-1" to make sure this key-value pair
 				// comes before all other postings in reducer.
 				pair.set(e.getKey(), -1);
+				LOG.debug ("in close, outputting dummy pair: " + pair + ", termPositions: " + termPositions);
 				output.collect(pair, termPositions);
 			}
 		}
@@ -131,22 +146,28 @@ public class BuildIPInvertedIndexDocSorted extends PowerTool {
 
 		@Override
 		public void configure(JobConf job) {
+			//LOG.setLevel(Level.DEBUG);
+			//LOG.setLevel(Level.INFO);
 			LOG.setLevel(Level.WARN);
 			postings.setCollectionDocumentCount(job.getInt("Ivory.CollectionDocumentCount", 0));
 		}
 
 		public void reduce(PairOfInts pair, Iterator<TermPositions> values, OutputCollector<IntWritable, PostingsList> output, Reporter reporter) throws IOException {
+			LOG.info ("reduce (pair: " + pair + ", values, output, reporter)");
 			long start = System.currentTimeMillis();
 			int curTerm = pair.getLeftElement();
 
+			LOG.debug ("pair: " + pair + ", prevTerm: " + prevTerm + ", curTerm: " + curTerm + ", numPostings: " + numPostings);
 			if (pair.getRightElement() == -1) {
 				if (prevTerm == -1) {
 					// First term, so save references.
 					this.output = output;
 					this.reporter = reporter;
 				} else if (curTerm != prevTerm) {
+					//LOG.debug ("current numPostings: " + numPostings);
 					// Encountered next term, so emit postings corresponding to previous term.
 					if (numPostings != postings.size()) {
+						//LOG.debug ("prevTerm: " + prevTerm);
 						throw new RuntimeException("Error: actual number of postings processed: " + numPostings + " is different from expected: " + postings.size());
 
 					}
@@ -155,14 +176,22 @@ public class BuildIPInvertedIndexDocSorted extends PowerTool {
 					output.collect(term, postings);
 					reporter.incrCounter(IndexedTerms.Unique, 1);
 
-					LOG.info(String.format("Finished processing postings for term \"%s\" (num postings=%d)", prevTerm, postings.size()));
+					LOG.debug(String.format("Finished processing postings for term \"%s\" (num postings=%d)", prevTerm, postings.size()));
 					postings.clear();
 				}
 
 				numPostings = 0;
+				LOG.debug ("before numPostings: " + numPostings);
 				while (values.hasNext()) {
 					TermPositions positions = values.next();
 					numPostings += positions.getPositions()[0];
+					LOG.debug ("positions: " + positions);
+					LOG.debug ("positions.getPositions(): " + positions.getPositions());
+					for (int i = 0; i < positions.getPositions().length; i++) {
+						LOG.debug ("positions.getPositions()[" + i + "]: " + positions.getPositions()[i]);
+					}
+					//LOG.debug ("positions.getPositions()[0]: " + positions.getPositions()[0]);
+					LOG.debug ("after numPostings: " + numPostings);
 				}
 
 				postings.setNumberOfPostings(numPostings);
@@ -170,6 +199,7 @@ public class BuildIPInvertedIndexDocSorted extends PowerTool {
 			}
 
 			TermPositions positions = values.next();
+			//LOG.debug ("curTerm: " + curTerm + ", pair.getRightElement(): " + pair.getRightElement() + ", positions: " + positions);
 			postings.add(pair.getRightElement(), positions.getTf(), positions);
 
 			if (values.hasNext()) {
@@ -183,6 +213,7 @@ public class BuildIPInvertedIndexDocSorted extends PowerTool {
 		}
 
 		public void close() throws IOException {
+			LOG.info ("close ()");
 			long start = System.currentTimeMillis();
 
 			// We need to flush out the final postings list.
@@ -195,7 +226,7 @@ public class BuildIPInvertedIndexDocSorted extends PowerTool {
 			output.collect(term, postings);
 			reporter.incrCounter(IndexedTerms.Unique, 1);
 
-			LOG.info(String.format("Finished processing postings for term \"%s\" (num postings=%d)", prevTerm, postings.size()));
+			LOG.debug(String.format("Finished processing postings for term \"%s\" (num postings=%d)", prevTerm, postings.size()));
 			reporter.incrCounter(ReduceTime.Total, System.currentTimeMillis() - start);
 		}
 	}
