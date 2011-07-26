@@ -70,8 +70,8 @@ public class RunPCP extends Configured implements Tool {
 		//config.set("mapred.child.java.opts", "-Xmx1024m");
 		config.set("mapred.child.java.opts", "-Xmx2048m");
 		config.set("Ivory.IndexPath", indexPath);
-		config.set("Ivory.OutputPath", pwsimOutputPath);
-		config.set("Ivory.ResultsOutputPath", pwsimResultsOutputPath);
+		config.set("Ivory.PwsimOutputPath", pwsimOutputPath);
+		config.set("Ivory.PwsimResultsOutputPath", pwsimResultsOutputPath);
 
 		config.set("Ivory.ScoringModel", scoringModel);
 

@@ -108,8 +108,8 @@ public class PrintPCP extends PowerTool {
 
 	public static final String[] RequiredParameters = {
 			"Ivory.IndexPath",
-			"Ivory.OutputPath",
-			"Ivory.ResultsOutputPath",
+			"Ivory.PwsimOutputPath",
+			"Ivory.PwsimResultsOutputPath",
 	};
 
 	public String[] getRequiredParameters() {
@@ -125,8 +125,8 @@ public class PrintPCP extends PowerTool {
 		int mapTasks = conf.getInt ("Ivory.NumMapTasks", 1);
 		int reduceTasks = conf.getInt ("Ivory.NumReduceTasks", 1);
 
-		String outputPath = getConf().get("Ivory.OutputPath");
-		String resultsOutputPath = getConf().get("Ivory.ResultsOutputPath");
+		String outputPath = getConf().get("Ivory.PwsimOutputPath");
+		String resultsOutputPath = getConf().get("Ivory.PwsimResultsOutputPath");
 
 		FileInputFormat.setInputPaths (conf, new Path (outputPath + "/block0/part-00000"));
 		FileOutputFormat.setOutputPath (conf, new Path (resultsOutputPath));

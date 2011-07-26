@@ -234,7 +234,7 @@ public class PCP extends PowerTool {
 
 	public static final String[] RequiredParameters = {
 			"Ivory.IndexPath",
-			"Ivory.OutputPath",
+			"Ivory.PwsimOutputPath",
 			"Ivory.NumMapTasks",
 			"Ivory.NumReduceTasks",
 			"Ivory.ScoringModel",
@@ -249,7 +249,7 @@ public class PCP extends PowerTool {
 
 	public int runTool() throws Exception {
 		String indexPath = getConf().get("Ivory.IndexPath");
-		String outputPath = getConf().get("Ivory.OutputPath");
+		String pwsimOutputPath = getConf().get("Ivory.PwsimOutputPath");
 
 		int mapTasks = getConf().getInt("Ivory.NumMapTasks", 0);
 		int reduceTasks = getConf().getInt("Ivory.NumReduceTasks", 0);
@@ -276,11 +276,11 @@ public class PCP extends PowerTool {
 		sLogger.info(" - BlockSize: " + blockSize);
 		sLogger.info(" - ScoringModel: " + scoringModel);
 		sLogger.info(" - topN: " + topN);
-		sLogger.info(" - OutputPath: " + outputPath);
+		sLogger.info(" - PwsimOutputPath: " + pwsimOutputPath);
 
 		getConf().setInt("Ivory.CollectionDocumentCount", numDocs);
 
-		if (fs.exists(new Path(outputPath))) {
+		if (fs.exists(new Path(pwsimOutputPath))) {
 			System.out.println("PCP output path already exists!");
 			return 0;
 		}
@@ -305,7 +305,7 @@ public class PCP extends PowerTool {
 			conf.setNumMapTasks(mapTasks);
 			conf.setNumReduceTasks(reduceTasks);
 
-			String currentOutputPath = outputPath + "/block" + i;
+			String currentOutputPath = pwsimOutputPath + "/block" + i;
 
 			FileInputFormat.setInputPaths(conf, new Path(re.getPostingsDirectory()));
 			FileOutputFormat.setOutputPath(conf, new Path(currentOutputPath));
