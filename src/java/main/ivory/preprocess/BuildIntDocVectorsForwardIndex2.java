@@ -41,12 +41,18 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.NullOutputFormat;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import edu.umd.cloud9.util.PowerTool;
 
 public class BuildIntDocVectorsForwardIndex2 extends PowerTool {
 	private static final Logger LOG = Logger.getLogger(BuildIntDocVectorsForwardIndex2.class);
+		{
+			//LOG.setLevel (Level.DEBUG);
+			LOG.setLevel (Level.ERROR);
+		}
+
 
 	protected static enum DocVectors { Count };
 
@@ -139,6 +145,7 @@ public class BuildIntDocVectorsForwardIndex2 extends PowerTool {
 			while (reader.nextKeyValue()) {
 				output.set(BigNumber * fileNo + filePos);
 
+				LOG.debug ("in run, fileNo: " + fileNo + ", writing key: " + reader.getCurrentKey () + ", output: " + output);
 				context.write(reader.getCurrentKey(), output);
 				context.getCounter(DocVectors.Count).increment(1);
 
@@ -192,9 +199,11 @@ public class BuildIntDocVectorsForwardIndex2 extends PowerTool {
 		public void reduce(IntWritable key, Iterable<LongWritable> values, Context context) throws IOException, InterruptedException {
 			Iterator<LongWritable> iter = values.iterator();
 			long pos = iter.next().get();
-
+			LOG.debug ("in reduce, key: " + key + ", pos: " + pos);
 			if (iter.hasNext()) {
-				throw new RuntimeException("There shouldn't be more than one value, key=" + key);
+				throw new RuntimeException("There shouldn't be more than one value, key: " + key + "\n" +
+										   "first pos: " + pos + "\n" +
+										   "second pos: " + iter.next ().get ());
 			}
 
 			curDoc++;

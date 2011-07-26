@@ -44,6 +44,7 @@ import org.apache.hadoop.mapred.Reporter;
 import org.apache.hadoop.mapred.RunningJob;
 import org.apache.hadoop.mapred.SequenceFileInputFormat;
 import org.apache.hadoop.mapred.SequenceFileOutputFormat;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import edu.umd.cloud9.util.PowerTool;
@@ -51,6 +52,9 @@ import edu.umd.cloud9.util.PowerTool;
 @SuppressWarnings("deprecation")
 public class BuildIntDocVectors extends PowerTool {
 	private static final Logger sLogger = Logger.getLogger(BuildIntDocVectors.class);
+	{
+		sLogger.setLevel (Level.WARN);
+	}
 
 	protected static enum Docs {
 		Skipped, Total
@@ -119,6 +123,7 @@ public class BuildIntDocVectors extends PowerTool {
 
 			startTime = System.currentTimeMillis();
 			IntDocVector docVector = new LazyIntDocVector(termPositionsMap);
+			sLogger.debug ("in map, writing key: " + key + ", value of doc vector");
 			output.collect(key, docVector);
 			reporter.incrCounter(MapTime.EncodingAndSpilling, System.currentTimeMillis()
 					- startTime);
