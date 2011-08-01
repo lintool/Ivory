@@ -128,8 +128,9 @@ public class OpenNLPTokenizer implements ivory.tokenize.Tokenizer {
 
 	}
 	
+	//output a cleaned, stemmed version of the sentence
 	public String processContent2(String text) {
-		String[] tokens = tokenizer.tokenize(text);
+		String[] tokens = tokenizer.tokenize(text.toString());
 		String line = "";
 		for(String token : tokens){
 			token = removeNonUnicodeChars(token);
@@ -144,6 +145,10 @@ public class OpenNLPTokenizer implements ivory.tokenize.Tokenizer {
 			}
 		}
 		return line;
+	}
+	
+	public int getNumberTokens(String string){
+		return tokenizer.tokenize(string).length;
 	}
 	
 	private String removeNonUnicodeChars(String token) {
