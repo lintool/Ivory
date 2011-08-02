@@ -61,8 +61,8 @@ import edu.umd.cloud9.util.map.MapII;
 public class BuildIPInvertedIndexDocSorted extends PowerTool {
 	private static final Logger LOG = Logger.getLogger(BuildIPInvertedIndexDocSorted.class);
 	static {
-		//LOG.setLevel (Level.DEBUG);
-		LOG.setLevel (Level.WARN);
+		LOG.setLevel (Level.DEBUG);
+		//LOG.setLevel (Level.WARN);
 	}
 	
 
@@ -74,9 +74,8 @@ public class BuildIPInvertedIndexDocSorted extends PowerTool {
 	private static class MyMapper extends MapReduceBase implements Mapper<IntWritable, IntDocVector, PairOfInts, TermPositions> {
 		private static final Logger LOG = Logger.getLogger(BuildIPInvertedIndexDocSorted.MyMapper.class);
 		static {
-			//LOG.setLevel (Level.DEBUG);
+			LOG.setLevel (Level.DEBUG);
 			//LOG.setLevel (Level.INFO);
-			LOG.setLevel (Level.WARN);
 		}
 
 		private static final TermPositions termPositions = new TermPositions();
@@ -91,7 +90,7 @@ public class BuildIPInvertedIndexDocSorted extends PowerTool {
 		public void map(IntWritable key, IntDocVector doc, OutputCollector<PairOfInts, TermPositions> output, Reporter reporter) throws IOException {
 			this.output = output;
 			docno = key.get();
-			LOG.info ("map (key: " + key + ", doc, output, reporter)");
+			//LOG.info ("map (key: " + key + ", doc, output, reporter)");
 			long startTime = System.currentTimeMillis();
 			IntDocVectorReader r = doc.getDocVectorReader();
 
@@ -102,7 +101,7 @@ public class BuildIPInvertedIndexDocSorted extends PowerTool {
 
 				// Set up the key and value, and emit.
 				pair.set(term, docno);
-				LOG.debug ("in map, outputting pair: " + pair + ", termPositions: " + termPositions);
+				//LOG.debug ("in map, outputting pair: " + pair + ", termPositions: " + termPositions);
 				output.collect(pair, termPositions);
 
 				// Document length of the current doc.
@@ -119,18 +118,22 @@ public class BuildIPInvertedIndexDocSorted extends PowerTool {
 
 		public void close() throws IOException {
 			LOG.info ("close ()");
+			int firstEntry = -1;
 			int[] arr = new int[1];
 
 			// Emit dfs for terms encountered in this partition of the collection.
 			for (MapII.Entry e : dfs.entrySet()) {
 				arr[0] = e.getValue();
+				if (firstEntry == -1) firstEntry = arr[0];
 				termPositions.set(arr, (short) 1);          // Dummy value.
 				// Special docno of "-1" to make sure this key-value pair
 				// comes before all other postings in reducer.
 				pair.set(e.getKey(), -1);
-				LOG.debug ("in close, outputting dummy pair: " + pair + ", termPositions: " + termPositions);
+				//LOG.debug ("in close, outputting dummy pair: " + pair + ", termPositions: " + termPositions);
 				output.collect(pair, termPositions);
 			}
+			LOG.info ("firstEntry: " + firstEntry);
+			LOG.info ("close returning");
 		}
 	}
 
