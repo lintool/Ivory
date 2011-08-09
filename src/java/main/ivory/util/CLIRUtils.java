@@ -1,7 +1,9 @@
 package ivory.util;
 
+import ivory.data.DfTable;
 import ivory.data.PrefixEncodedGlobalStats;
 import ivory.data.TermDocVector;
+import ivory.data.TermDocVector.Reader;
 import ivory.pwsim.score.Bm25;
 import ivory.pwsim.score.ScoringModel;
 import java.io.BufferedOutputStream;
@@ -161,6 +163,22 @@ public abstract class CLIRUtils extends Configured {
 		for(edu.umd.cloud9.util.map.MapKF.Entry<String> e : vectorA.entrySet()){
 			float value = e.getValue();
 			if(vectorB.containsKey(e.getKey())){
+				sum+= value*vectorB.get(e.getKey());
+			}
+		}
+		return sum;
+	}
+	
+	/**
+************
+	 */
+	public static float cosineNormalized2(HMapSFW vectorA, HMapSFW vectorB) {
+		logger.setLevel(Level.DEBUG);
+		float sum = 0;
+		for(edu.umd.cloud9.util.map.MapKF.Entry<String> e : vectorA.entrySet()){
+			float value = e.getValue();
+			if(vectorB.containsKey(e.getKey())){
+				logger.debug("Matched "+ e.getKey()+"="+value+" x "+vectorB.get(e.getKey()));
 				sum+= value*vectorB.get(e.getKey());
 			}
 		}
@@ -331,7 +349,7 @@ public abstract class CLIRUtils extends Configured {
 			sLogger = logger;
 		}
 		//translate doc vector		
-		TermDocVector.Reader reader = doc.getReader();
+		Reader reader = doc.getReader();
 		int docLen = 0;
 		while (reader.hasMoreTerms()) {
 			String fTerm = reader.nextTerm();
@@ -477,13 +495,13 @@ public abstract class CLIRUtils extends Configured {
 
 			// compute score via scoring model
 			float score = ((Bm25) scoringModel).computeDocumentWeight(tf, df, docLen);
+			sLogger.debug(eTerm+" "+tf+" "+df+" "+score);
 			if(score>0){
 				v.put(eTerm, score);
 				if(isNormalize){
 					normalization+=Math.pow(score, 2);
 				}		
 			}
-			sLogger.debug(eTerm+" "+tf+" "+df+" "+score);
 		}
 
 		// length-normalize doc vector
@@ -496,6 +514,58 @@ public abstract class CLIRUtils extends Configured {
 		return v;
 	}
 
+	/**
+	 * Given the TF, DF values, doc length, scoring model, this method creates the term doc vector for a document.
+	 * 
+	 * @param docLen
+	 * 		doc length
+	 * @param tfTable
+	 * 		mapping from term id to tf values
+	 * @param eVocabSrc
+	 * 		vocabulary object for final doc vector language
+	 * @param scoring model
+	 * @param dfTable
+	 * 		mapping from term id to df values
+	 * @param isNormalize
+	 * 		indicating whether to normalize the doc vector weights or not
+	 * @param sLogger
+	 * 		Logger object for log output
+	 * @return
+	 * 		Term doc vector representing the document
+	 */
+	public static HMapSFW createTermDocVector(int docLen, HMapSIW tfTable, Vocab eVocabSrc, ScoringModel scoringModel, PrefixEncodedGlobalStats dfTable, boolean isNormalize, Logger sLogger) {
+		if(sLogger == null){
+			sLogger = logger;
+		}
+		
+		HMapSFW v = new HMapSFW();
+		float normalization=0;
+		for(edu.umd.cloud9.util.map.MapKI.Entry<String> entry : tfTable.entrySet()){
+			// retrieve term string, tf and df
+			String eTerm = entry.getKey();
+			int tf = entry.getValue();
+			int df = dfTable.getDF(eTerm);
+		
+			// compute score via scoring model
+			float score = ((Bm25) scoringModel).computeDocumentWeight(tf, df, docLen);
+			sLogger.debug(eTerm+" "+tf+" "+df+" "+score);
+			if(score>0){
+				v.put(eTerm, score);
+				if(isNormalize){
+					normalization+=Math.pow(score, 2);
+				}		
+			}
+		}
+
+		// length-normalize doc vector
+		if(isNormalize){
+			normalization = (float) Math.sqrt(normalization);
+			for(Entry<String> e : v.entrySet()){
+				v.put(e.getKey(), e.getValue()/normalization);
+			}
+		}
+		return v;
+	}
 
 	//	/**
 	//	 * Read a Vocab object from file.
