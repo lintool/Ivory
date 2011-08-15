@@ -4,7 +4,6 @@ import ivory.lsh.projection.ComputeSignaturesMinhash;
 import ivory.lsh.projection.ComputeSignaturesRandom;
 import ivory.lsh.projection.ComputeSignaturesSimhash;
 import ivory.lsh.projection.WriteRandomVectors;
-import ivory.spots.partition.PartitionSignatures;
 import ivory.util.RetrievalEnvironment;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
@@ -86,32 +85,6 @@ public class RunComputeSignatures extends PwsimEnvironment implements Tool {
 		}else{	//minhash
 			ComputeSignaturesMinhash computeSignaturesTask = new ComputeSignaturesMinhash(config);
 			computeSignaturesTask.run();
-		}
-		
-		if(batchSizeGiven && batchSize<=0){
-			
-			if(dir.toLowerCase().contains("spot") || dir.toLowerCase().contains("spots")){
-				config.setBoolean("Ivory.ShortDocLengths", true);
-			}
-			if(collName.equals("Golden")){
-				config.setInt("Ivory.SpotSigsRange", 100);
-				config.set("Ivory.SpotSigsSimilarityThreshold", 0.44+"");
-				config.setInt("Ivory.MinAllowedSpotSigs", 4);	
-			}else{
-				config.setInt("Ivory.SpotSigsRange", 500);
-				config.set("Ivory.SpotSigsSimilarityThreshold", 0.9+"");
-				config.setInt("Ivory.MinAllowedSpotSigs", 4);
-			}
-			int boundaries = -batchSize;
-			if(boundaries == 0){
-				withBoundaries = false;
-			}else{
-				withBoundaries = true;
-			}
-			config.setBoolean("Ivory.WithBoundaries", withBoundaries);
-			PartitionSignatures partitionSignaturesTool;
-			partitionSignaturesTool = new PartitionSignatures(config);
-			partitionSignaturesTool.run();
 		}
 		
 		return 0;
