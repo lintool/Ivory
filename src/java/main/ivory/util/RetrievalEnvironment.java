@@ -294,7 +294,7 @@ public class RetrievalEnvironment {
 
 	public PostingsList getPostingsList(String term) {
 		//LOG.info("**getPostingsList("+term+")");
-		int termid = termidMap.getID(term);
+		int termid = termidMap.getId(term);
 
 		if (termid == -1) {
 			LOG.error("couldn't find term id (-1) for term \"" + term + "\"");

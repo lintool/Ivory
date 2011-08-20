@@ -80,7 +80,7 @@ public class DocumentProcessingUtils {
 		while(it.hasNext()){
 			e = it.next();
 			positionsList = e.getValue(); // positions.get(e.getKey());
-			id = termIDMap.getID(e.getKey());
+			id = termIDMap.getId(e.getKey());
 			if(id <= 0)	continue;
 			positions.put(id, positionsList);
 		}

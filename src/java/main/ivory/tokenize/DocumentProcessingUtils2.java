@@ -64,7 +64,7 @@ public class DocumentProcessingUtils2 {
 
 		analyzed.clear();
 		while(r.hasMoreTerms()){
-			analyzed.put(termidMap.getID(r.nextTerm()), r.getPositions());
+			analyzed.put(termidMap.getId(r.nextTerm()), r.getPositions());
 		}
 	}
 
@@ -240,7 +240,7 @@ public class DocumentProcessingUtils2 {
 		}
 
 		while(r.hasMoreTerms()){
-			positions.put(termidMap.getID(r.nextTerm()), r.getPositions());
+			positions.put(termidMap.getId(r.nextTerm()), r.getPositions());
 		}
 
 		return positions;

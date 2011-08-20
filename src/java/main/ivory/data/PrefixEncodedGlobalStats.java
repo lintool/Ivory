@@ -70,8 +70,8 @@ public class PrefixEncodedGlobalStats {
 		dfStatsInput = fs.open(dfStatsPath);
 
 		int l = dfStatsInput.readInt();
-		if (l != prefixSet.length()) {
-			throw new RuntimeException("df length mismatch: " + l + "\t" + prefixSet.length());
+		if (l != prefixSet.size()) {
+			throw new RuntimeException("df length mismatch: " + l + "\t" + prefixSet.size());
 		}
 		df = new int[l];
 		for (int i = 0; i < l; i++)
@@ -89,8 +89,8 @@ public class PrefixEncodedGlobalStats {
 		cfStatsInput = fs.open(cfStatsPath);
 
 		int l = cfStatsInput.readInt();
-		if (l != prefixSet.length()) {
-			throw new RuntimeException("cf length mismatch: " + l + "\t" + prefixSet.length());
+		if (l != prefixSet.size()) {
+			throw new RuntimeException("cf length mismatch: " + l + "\t" + prefixSet.size());
 		}
 		cf = new long[l];
 		for (int i = 0; i < l; i++)
@@ -102,7 +102,7 @@ public class PrefixEncodedGlobalStats {
 	public int getDF(String term) {
 		if(df == null) 
 			throw new RuntimeException("DF-Stats must be loaded first!");
-		int index = prefixSet.getIndex(term);
+		int index = prefixSet.getId(term);
 		LOGGER.info("index of " + term + ": " + index);
 		if (index < 0)
 			return -1;
@@ -112,7 +112,7 @@ public class PrefixEncodedGlobalStats {
 	public long getCF(String term) {
 		if(cf == null) 
 			throw new RuntimeException("CF-Stats must be loaded first!");
-		int index = prefixSet.getIndex(term);
+		int index = prefixSet.getId(term);
 		LOGGER.info("index of " + term + ": " + index);
 		if (index < 0)
 			return -1;
@@ -120,7 +120,7 @@ public class PrefixEncodedGlobalStats {
 	}
 
 	public PairOfIntLong getStats(String term) {
-		int index = prefixSet.getIndex(term);
+		int index = prefixSet.getId(term);
 		LOGGER.info("index of " + term + ": " + index);
 		if (index < 0)
 			return null;
@@ -138,7 +138,7 @@ public class PrefixEncodedGlobalStats {
 	}
 
 	public int length() {
-		return prefixSet.length();
+		return prefixSet.size();
 	}
 
 	public void printKeys() {
@@ -146,7 +146,7 @@ public class PrefixEncodedGlobalStats {
 		System.out.println("Length: " + this.length());
 		// int window = prefixSet.getWindow();
 		for (int i = 0; i < length() && i < 100; i++) {
-			System.out.print(i + "\t" + prefixSet.getKey(i));
+			System.out.print(i + "\t" + prefixSet.getTerm(i));
 			if (df != null)
 				System.out.print("\t" + df[i]);
 			if (cf != null)

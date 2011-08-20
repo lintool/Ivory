@@ -45,13 +45,13 @@ public class DefaultCachedFrequencySortedDictionary extends DefaultFrequencySort
 		if (cachedFrequentPercent < 0 || cachedFrequentPercent > 1.0)
 			return;
 
-		int cachedFrequent = (int) (cachedFrequentPercent * getVocabularySize());
+		int cachedFrequent = (int) (cachedFrequentPercent * size());
 		loadFrequentMap(cachedFrequent);
 	}
 
 	private void loadFrequentMap(int n) {
-		if (getVocabularySize() < n) {
-			n = getVocabularySize();
+		if (size() < n) {
+			n = size();
 		}
 
 		cache = new HMapKI<String>(n);
@@ -61,12 +61,13 @@ public class DefaultCachedFrequencySortedDictionary extends DefaultFrequencySort
 		}
 	}
 
-	public int getID(String term) {
+	@Override
+	public int getId(String term) {
 		if (cache != null && cache.containsKey(term)) {
 				return cache.get(term);
 		}
 
-		return super.getID(term);
+		return super.getId(term);
 	}	
 	
 	public static void main(String[] args) throws Exception {
@@ -89,7 +90,7 @@ public class DefaultCachedFrequencySortedDictionary extends DefaultFrequencySort
 		DefaultCachedFrequencySortedDictionary termIDMap = new DefaultCachedFrequencySortedDictionary(termsFilePath, termIDsFilePath,
 				idToTermFilePath, 100, fileSys);
 
-		int nTerms = termIDMap.getVocabularySize();
+		int nTerms = termIDMap.size();
 		System.out.println("nTerms: " + nTerms);
 
 		System.out.println(" \"term word\" to lookup termid; \"termid 234\" to lookup term");
@@ -122,7 +123,7 @@ public class DefaultCachedFrequencySortedDictionary extends DefaultFrequencySort
 			} else if (tokens[0].equals("term")) {
 				String term = tokens[1];
 
-				System.out.println("term=" + term + ", termid=" + termIDMap.getID(term));
+				System.out.println("term=" + term + ", termid=" + termIDMap.getId(term));
 			} else {
 				System.out.println("Error: unrecognized command!");
 				System.out.print("lookup > ");

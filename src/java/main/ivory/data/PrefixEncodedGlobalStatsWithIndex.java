@@ -96,8 +96,8 @@ public class PrefixEncodedGlobalStatsWithIndex {
 		if(dfs != null) return;
 		FSDataInputStream dfStatsInput = fileSys.open(dfStatsPath);
 		int l = dfStatsInput.readInt();
-		if (l != prefixSet.length()) {
-			throw new RuntimeException("df length mismatch: " + l + "\t" + prefixSet.length());
+		if (l != prefixSet.size()) {
+			throw new RuntimeException("df length mismatch: " + l + "\t" + prefixSet.size());
 		}
 		dfs = new int[l];
 		for (int i = 0; i < l; i++)
@@ -121,7 +121,7 @@ public class PrefixEncodedGlobalStatsWithIndex {
 		frequentTermsDfs = new HMapKI<String>();
 		if(dfs.length<n) n = dfs.length;  
 		for(int id = 1; id<=n; id++){
-			frequentTermsDfs.put(prefixSet.getKey(idToTerm[id-1]), dfs[idToTerm[id-1]]);
+			frequentTermsDfs.put(prefixSet.getTerm(idToTerm[id-1]), dfs[idToTerm[id-1]]);
 		}
 		//return frequentTermsMap;
 	}
@@ -137,7 +137,7 @@ public class PrefixEncodedGlobalStatsWithIndex {
 			}catch (NoSuchElementException e){
 			}
 		}
-		int index = prefixSet.getIndex(term);
+		int index = prefixSet.getId(term);
 		LOGGER.info("index of " + term + ": " + index);
 		if (index < 0)
 			return -1;
@@ -167,8 +167,8 @@ public class PrefixEncodedGlobalStatsWithIndex {
 		FSDataInputStream cfStatsInput = fileSys.open(cfStatsPath);
 
 		int l = cfStatsInput.readInt();
-		if (l != prefixSet.length()) {
-			throw new RuntimeException("cf length mismatch: " + l + "\t" + prefixSet.length());
+		if (l != prefixSet.size()) {
+			throw new RuntimeException("cf length mismatch: " + l + "\t" + prefixSet.size());
 		}
 		cfs = new long[l];
 		for (int i = 0; i < l; i++)
@@ -181,7 +181,7 @@ public class PrefixEncodedGlobalStatsWithIndex {
 		frequentTermsCfs = new HMapKL<String>();
 		if(cfs.length<n) n = cfs.length;  
 		for(int id = 1; id<=n; id++){
-			frequentTermsCfs.put(prefixSet.getKey(idToTerm[id-1]), cfs[idToTerm[id-1]]);
+			frequentTermsCfs.put(prefixSet.getTerm(idToTerm[id-1]), cfs[idToTerm[id-1]]);
 		}
 	}
 	
@@ -197,7 +197,7 @@ public class PrefixEncodedGlobalStatsWithIndex {
 			}catch (NoSuchElementException e){
 			}
 		}
-		int index = prefixSet.getIndex(term);
+		int index = prefixSet.getId(term);
 		LOGGER.info("index of " + term + ": " + index);
 		if (index < 0)
 			return -1;
@@ -224,7 +224,7 @@ public class PrefixEncodedGlobalStatsWithIndex {
 			}catch (NoSuchElementException e){
 			}
 		}
-		int index = prefixSet.getIndex(term);
+		int index = prefixSet.getId(term);
 		LOGGER.info("index of " + term + ": " + index);
 		if (index < 0)
 			return null;
@@ -251,7 +251,7 @@ public class PrefixEncodedGlobalStatsWithIndex {
 	}
 
 	public int length() {
-		return prefixSet.length();
+		return prefixSet.size();
 	}
 
 	public void printKeys() {
@@ -259,7 +259,7 @@ public class PrefixEncodedGlobalStatsWithIndex {
 		System.out.println("Length: " + this.length());
 		// int window = prefixSet.getWindow();
 		for (int i = 0; i < length() && i < 100; i++) {
-			System.out.print(i + "\t" + prefixSet.getKey(i));
+			System.out.print(i + "\t" + prefixSet.getTerm(i));
 			if (dfs != null)
 				System.out.print("\t" + dfs[i]);
 			if (cfs != null)
