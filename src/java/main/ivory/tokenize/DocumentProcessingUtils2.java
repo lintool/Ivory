@@ -16,8 +16,8 @@
 
 package ivory.tokenize;
 
+import ivory.core.data.dictionary.DefaultCachedFrequencySortedDictionary;
 import ivory.data.TermDocVector;
-import ivory.data.TermIdMapWithCache;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -54,7 +54,7 @@ public class DocumentProcessingUtils2 {
 		}
 	}
 
-	public static void getTermIDsPositionsMap(TermDocVector doc, TermIdMapWithCache termidMap, AnalyzedIntDocument analyzed){
+	public static void getTermIDsPositionsMap(TermDocVector doc, DefaultCachedFrequencySortedDictionary termidMap, AnalyzedIntDocument analyzed){
 		TermDocVector.Reader r;
 		try {
 			r = doc.getReader();
@@ -229,7 +229,7 @@ public class DocumentProcessingUtils2 {
 		return dl;
 	}
 
-	public static TreeMap<Integer, int[]> getTermIDsPositionsMap(TermDocVector doc, TermIdMapWithCache termidMap){
+	public static TreeMap<Integer, int[]> getTermIDsPositionsMap(TermDocVector doc, DefaultCachedFrequencySortedDictionary termidMap){
 		TreeMap<Integer, int[]> positions = new TreeMap<Integer, int[]>();
 
 		TermDocVector.Reader r;

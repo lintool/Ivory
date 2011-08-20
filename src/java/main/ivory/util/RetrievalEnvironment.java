@@ -16,6 +16,7 @@
 
 package ivory.util;
 
+import ivory.core.data.dictionary.DefaultCachedFrequencySortedDictionary;
 import ivory.data.DocLengthTable;
 import ivory.data.DocLengthTable2B;
 import ivory.data.DocScoreTable;
@@ -29,7 +30,6 @@ import ivory.data.ProximityPostingsReaderOrderedWindow;
 import ivory.data.ProximityPostingsReaderUnorderedWindow;
 import ivory.data.TermDocVector;
 import ivory.data.TermDocVectorsForwardIndex;
-import ivory.data.TermIdMapWithCache;
 import ivory.exception.ConfigurationException;
 import ivory.smrf.model.builder.Expression;
 import ivory.smrf.model.importance.ConceptImportanceModel;
@@ -76,7 +76,7 @@ public class RetrievalEnvironment {
 	protected String postingsType;           // Type of postings in the index.
 	protected DocLengthTable doclengths;     // Document length lookup.
 	protected Tokenizer tokenizer;           // Tokenizer for parsing queries.
-	protected TermIdMapWithCache termidMap;  // Mapping from terms to term ids.
+	protected DefaultCachedFrequencySortedDictionary termidMap;  // Mapping from terms to term ids.
 
 	protected IntPostingsForwardIndex postingsIndex;     // Forward index into postings.
 	protected IntDocVectorsForwardIndex docvectorsIndex; // Forward index into int doc vectors.
@@ -154,7 +154,7 @@ public class RetrievalEnvironment {
 		LOG.info("Done!");
 
 		try {
-			termidMap = new TermIdMapWithCache(new Path(getIndexTermsData()), new Path(getIndexTermIdsData()),
+			termidMap = new DefaultCachedFrequencySortedDictionary(new Path(getIndexTermsData()), new Path(getIndexTermIdsData()),
 					new Path(getIndexTermIdMappingData()), 0.2f,	fs);
 		} catch (Exception e) {
 			throw new ConfigurationException("Error initializing term to term id mapping!", e);

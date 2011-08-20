@@ -14,7 +14,7 @@
  * permissions and limitations under the License.
  */
 
-package ivory.data;
+package ivory.core.data.dictionary;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -33,9 +33,9 @@ import org.apache.log4j.Logger;
 
 import edu.umd.cloud9.io.FSLineReader;
 
-public class PrefixEncodedTermSet implements Writable {
+public class PrefixEncodedLexicographicallySortedDictionary implements Writable {
 
-	private static final Logger LOGGER = Logger.getLogger(PrefixEncodedTermSet.class);
+	private static final Logger LOGGER = Logger.getLogger(PrefixEncodedLexicographicallySortedDictionary.class);
 	static {
 		LOGGER.setLevel(Level.WARN);
 	}
@@ -60,21 +60,21 @@ public class PrefixEncodedTermSet implements Writable {
 		return curKeyIndex;
 	}
 
-	public PrefixEncodedTermSet() {
+	public PrefixEncodedLexicographicallySortedDictionary() {
 		keys = new byte[DEFAULT_INITIAL_SIZE][];
 	}
 
-	public PrefixEncodedTermSet(int indexWindow) {
+	public PrefixEncodedLexicographicallySortedDictionary(int indexWindow) {
 		keys = new byte[DEFAULT_INITIAL_SIZE][];
 		window = indexWindow;
 	}
 
-	public PrefixEncodedTermSet(int initialSize, int indexWindow) {
+	public PrefixEncodedLexicographicallySortedDictionary(int initialSize, int indexWindow) {
 		keys = new byte[initialSize][];
 		window = indexWindow;
 	}
 
-	public PrefixEncodedTermSet(int initialSize, float resizeF, int indexWindow) {
+	public PrefixEncodedLexicographicallySortedDictionary(int initialSize, float resizeF, int indexWindow) {
 		keys = new byte[initialSize][];
 		window = indexWindow;
 		resizeFactor = resizeF;
@@ -269,20 +269,20 @@ public class PrefixEncodedTermSet implements Writable {
 		return i;
 	}
 
-	public static PrefixEncodedTermSet load(String file, FileSystem fs) throws IOException {
+	public static PrefixEncodedLexicographicallySortedDictionary load(String file, FileSystem fs) throws IOException {
 		FSDataInputStream in;
 
 		in = fs.open(new Path(file));
-		PrefixEncodedTermSet terms = new PrefixEncodedTermSet();
+		PrefixEncodedLexicographicallySortedDictionary terms = new PrefixEncodedLexicographicallySortedDictionary();
 		terms.readFields(in);
 
 		return terms;
 	}
 
-	public static PrefixEncodedTermSet loadFromPlainTextFile(String file, FileSystem fs, int window)
+	public static PrefixEncodedLexicographicallySortedDictionary loadFromPlainTextFile(String file, FileSystem fs, int window)
 			throws IOException {
 		FSLineReader reader = new FSLineReader(new Path(file), fs);
-		PrefixEncodedTermSet terms = new PrefixEncodedTermSet(window);
+		PrefixEncodedLexicographicallySortedDictionary terms = new PrefixEncodedLexicographicallySortedDictionary(window);
 
 		int cnt = 0;
 		Text t = new Text();

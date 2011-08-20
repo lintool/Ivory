@@ -16,10 +16,10 @@
 
 package ivory.preprocess;
 
+import ivory.core.data.dictionary.DefaultCachedFrequencySortedDictionary;
 import ivory.data.IntDocVector;
 import ivory.data.LazyIntDocVector;
 import ivory.data.TermDocVector;
-import ivory.data.TermIdMapWithCache;
 import ivory.tokenize.DocumentProcessingUtils;
 import ivory.util.RetrievalEnvironment;
 
@@ -63,7 +63,7 @@ public class BuildIntDocVectors extends PowerTool {
 	private static class MyMapper extends MapReduceBase implements
 			Mapper<IntWritable, TermDocVector, IntWritable, IntDocVector> {
 
-		private TermIdMapWithCache termIDMap = null;
+		private DefaultCachedFrequencySortedDictionary termIDMap = null;
 
 		public void configure(JobConf job) {
 
@@ -85,7 +85,7 @@ public class BuildIntDocVectors extends PowerTool {
 					termIDsFile = env.getIndexTermIdsData();
 					idToTermFile = env.getIndexTermIdMappingData();
 					try {
-						termIDMap = new TermIdMapWithCache(new Path(termsFile),
+						termIDMap = new DefaultCachedFrequencySortedDictionary(new Path(termsFile),
 								new Path(termIDsFile), new Path(idToTermFile), 0.2f, fs);
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -94,7 +94,7 @@ public class BuildIntDocVectors extends PowerTool {
 				} else {
 					Path[] localFiles = DistributedCache.getLocalCacheFiles(job);
 					try {
-						termIDMap = new TermIdMapWithCache(localFiles[0],
+						termIDMap = new DefaultCachedFrequencySortedDictionary(localFiles[0],
 								localFiles[1], localFiles[2], 0.3f, FileSystem.getLocal(job));
 					} catch (Exception e) {
 						e.printStackTrace();

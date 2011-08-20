@@ -1,7 +1,7 @@
 package ivory.util;
 
+import ivory.core.data.dictionary.DefaultFrequencySortedDictionary;
 import ivory.data.DfTableArray;
-import ivory.data.TermIdMap;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
@@ -27,7 +27,7 @@ public class PrintMostFrequentTerms {
 		Path termIDsFilePath = new Path(env.getIndexTermIdsData());
 		Path idToTermFilePath = new Path(env.getIndexTermIdMappingData());
 
-		TermIdMap termIDMap = new TermIdMap(termsFilePath, termIDsFilePath, idToTermFilePath, fs);
+		DefaultFrequencySortedDictionary termIDMap = new DefaultFrequencySortedDictionary(termsFilePath, termIDsFilePath, idToTermFilePath, fs);
 
 		for (int i=1; i<=200; i++) {
 			System.out.println(String.format("%d\t%s\t%d", i, termIDMap.getTerm(i), dfs.getDf(i)));

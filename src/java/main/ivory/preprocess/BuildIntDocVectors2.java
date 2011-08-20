@@ -16,10 +16,10 @@
 
 package ivory.preprocess;
 
+import ivory.core.data.dictionary.DefaultCachedFrequencySortedDictionary;
 import ivory.data.IntDocVector;
 import ivory.data.LazyIntDocVector;
 import ivory.data.TermDocVector;
-import ivory.data.TermIdMapWithCache;
 import ivory.tokenize.DocumentProcessingUtils2;
 import ivory.util.Constants;
 import ivory.util.RetrievalEnvironment;
@@ -53,7 +53,7 @@ public class BuildIntDocVectors2 extends PowerTool {
 	protected static enum MapTime { DecodingAndIdMapping, EncodingAndSpilling }
 
 	private static class MyMapper extends Mapper<IntWritable, TermDocVector, IntWritable, IntDocVector> {
-		private TermIdMapWithCache termidMap = null;
+		private DefaultCachedFrequencySortedDictionary termidMap = null;
 		private static final LazyIntDocVector docVector = new LazyIntDocVector();
 
 		@Override
@@ -96,7 +96,7 @@ public class BuildIntDocVectors2 extends PowerTool {
 				LOG.info(" - id: " + pathMapping.get(termidsFile));
 				LOG.info(" - idToTerms: " + pathMapping.get(idToTermFile));
 
-				termidMap = new TermIdMapWithCache(pathMapping.get(termsFile), pathMapping.get(termidsFile), pathMapping.get(idToTermFile),
+				termidMap = new DefaultCachedFrequencySortedDictionary(pathMapping.get(termsFile), pathMapping.get(termidsFile), pathMapping.get(idToTermFile),
 						0.3f, FileSystem.getLocal(context.getConfiguration()));
 			} catch (Exception e) {
 				e.printStackTrace();

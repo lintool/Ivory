@@ -18,6 +18,8 @@ package ivory.data;
 
 import static org.junit.Assert.assertEquals;
 
+import ivory.core.data.dictionary.PrefixEncodedLexicographicallySortedDictionary;
+
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Set;
@@ -33,7 +35,7 @@ public class PrefixEncodedTermSetTest {
 
 	@Test
 	public void test1() throws IOException {
-		PrefixEncodedTermSet m = new PrefixEncodedTermSet(8);
+		PrefixEncodedLexicographicallySortedDictionary m = new PrefixEncodedLexicographicallySortedDictionary(8);
 		m.add("a");
 		m.add("aa");
 		m.add("aaa");
@@ -78,7 +80,7 @@ public class PrefixEncodedTermSetTest {
 		FileSystem fs = FileSystem.getLocal(new Configuration());
 		m.store("tmp.dat", fs);
 		
-		PrefixEncodedTermSet n = PrefixEncodedTermSet.load("tmp.dat", fs);
+		PrefixEncodedLexicographicallySortedDictionary n = PrefixEncodedLexicographicallySortedDictionary.load("tmp.dat", fs);
 		assertEquals(0, n.getIndex("a"));
 		assertEquals(1, n.getIndex("aa"));
 		assertEquals(2, n.getIndex("aaa"));
@@ -112,7 +114,7 @@ public class PrefixEncodedTermSetTest {
 	@Test
 	public void test2() throws IOException {
 		FileSystem fs = FileSystem.getLocal(new Configuration());
-		PrefixEncodedTermSet m = PrefixEncodedTermSet.loadFromPlainTextFile("etc/dictionary-test.txt", fs, 8);
+		PrefixEncodedLexicographicallySortedDictionary m = PrefixEncodedLexicographicallySortedDictionary.loadFromPlainTextFile("etc/dictionary-test.txt", fs, 8);
 
 		assertEquals(0, m.getIndex("a"));
 		assertEquals(1, m.getIndex("a1"));
@@ -127,7 +129,7 @@ public class PrefixEncodedTermSetTest {
 
 		m.store("tmp.dat", fs);
 
-		PrefixEncodedTermSet n = PrefixEncodedTermSet.load("tmp.dat", fs);
+		PrefixEncodedLexicographicallySortedDictionary n = PrefixEncodedLexicographicallySortedDictionary.load("tmp.dat", fs);
 
 		assertEquals(0, n.getIndex("a"));
 		assertEquals(1, n.getIndex("a1"));

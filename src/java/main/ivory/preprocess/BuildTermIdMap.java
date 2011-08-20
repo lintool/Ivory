@@ -16,7 +16,7 @@
 
 package ivory.preprocess;
 
-import ivory.data.PrefixEncodedTermSet;
+import ivory.core.data.dictionary.PrefixEncodedLexicographicallySortedDictionary;
 import ivory.util.QuickSort;
 import ivory.util.RetrievalEnvironment;
 
@@ -155,7 +155,7 @@ public class BuildTermIdMap extends PowerTool {
 				for (int j = 0; j < byteArray.length; j++)
 					mTermsOut.writeByte(byteArray[j]);
 			} else {
-				prefixLength = PrefixEncodedTermSet.getPrefix(lastKey, term);
+				prefixLength = PrefixEncodedLexicographicallySortedDictionary.getPrefix(lastKey, term);
 				byte[] suffix = term.substring(prefixLength).getBytes();
 
 				if (prefixLength > Byte.MAX_VALUE || suffix.length > Byte.MAX_VALUE)

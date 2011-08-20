@@ -1,9 +1,9 @@
 package ivory.index;
 
+import ivory.core.data.dictionary.DefaultCachedFrequencySortedDictionary;
 import ivory.data.PostingsList;
 import ivory.data.PostingsListDocSortedPositional;
 import ivory.data.PrefixEncodedGlobalStats;
-import ivory.data.TermIdMapWithCache;
 import ivory.util.RetrievalEnvironment;
 
 import java.io.IOException;
@@ -38,7 +38,7 @@ public class DistributeGlobalStatsToPostings extends PowerTool {
 
 		private PrefixEncodedGlobalStats gs;
 
-		private TermIdMapWithCache mTermIdMap;
+		private DefaultCachedFrequencySortedDictionary mTermIdMap;
 
 		public void configure(JobConf job) {
 			try {
@@ -59,7 +59,7 @@ public class DistributeGlobalStatsToPostings extends PowerTool {
 
 				String indexPath = job.get("Ivory.IndexPath");
 				sLogger.info("loading TermIdMap from " + indexPath);
-				mTermIdMap = new TermIdMapWithCache(localFiles[3], localFiles[4],
+				mTermIdMap = new DefaultCachedFrequencySortedDictionary(localFiles[3], localFiles[4],
 						localFiles[5], 0.2f, fs);
 			} catch (IOException e) {
 				e.printStackTrace();

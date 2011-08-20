@@ -16,6 +16,7 @@
 
 package ivory.data;
 
+import ivory.core.data.dictionary.PrefixEncodedLexicographicallySortedDictionary;
 import ivory.util.RetrievalEnvironment;
 
 import java.io.IOException;
@@ -47,7 +48,7 @@ public class PrefixEncodedGlobalStatsWithIndex {
 	Configuration conf = new Configuration();
 	FileSystem fileSys = FileSystem.get(conf);
 	
-	PrefixEncodedTermSet prefixSet = new PrefixEncodedTermSet();
+	PrefixEncodedLexicographicallySortedDictionary prefixSet = new PrefixEncodedLexicographicallySortedDictionary();
 	
 	int[] dfs = null;
 	HMapKI<String> frequentTermsDfs = null;
