@@ -29,21 +29,21 @@ import org.apache.hadoop.fs.Path;
 import edu.umd.cloud9.util.map.HMapKI;
 
 public class DefaultCachedFrequencySortedDictionary extends DefaultFrequencySortedDictionary {
+  private final HMapKI<String> cache = new HMapKI<String>();
 
-	HMapKI<String> cache = null;
-
-	public DefaultCachedFrequencySortedDictionary(Path prefixSetPath, Path idsPath, Path idToTermPath,
-			int cachedFrequent, FileSystem fileSys) throws IOException {
-		super(prefixSetPath, idsPath, idToTermPath, fileSys);
+	public DefaultCachedFrequencySortedDictionary(Path prefixSetPath, Path idsPath,
+	    Path idToTermPath, int cachedFrequent, FileSystem fs) throws IOException {
+		super(prefixSetPath, idsPath, idToTermPath, fs);
 		loadFrequentMap(cachedFrequent);
 	}
 
-	public DefaultCachedFrequencySortedDictionary(Path prefixSetPath, Path idsPath, Path idToTermPath,
-			float cachedFrequentPercent, FileSystem fileSys) throws IOException {
-		super(prefixSetPath, idsPath, idToTermPath, fileSys);
+	public DefaultCachedFrequencySortedDictionary(Path prefixSetPath, Path idsPath,
+	    Path idToTermPath, float cachedFrequentPercent, FileSystem fs) throws IOException {
+		super(prefixSetPath, idsPath, idToTermPath, fs);
 
-		if (cachedFrequentPercent < 0 || cachedFrequentPercent > 1.0)
+		if (cachedFrequentPercent < 0 || cachedFrequentPercent > 1.0) {
 			return;
+		}
 
 		int cachedFrequent = (int) (cachedFrequentPercent * size());
 		loadFrequentMap(cachedFrequent);
@@ -53,8 +53,6 @@ public class DefaultCachedFrequencySortedDictionary extends DefaultFrequencySort
 		if (size() < n) {
 			n = size();
 		}
-
-		cache = new HMapKI<String>(n);
 
 		for (int id = 1; id <= n; id++) {
 			cache.put(getTerm(id), id);
@@ -79,18 +77,19 @@ public class DefaultCachedFrequencySortedDictionary extends DefaultFrequencySort
 		String indexPath = args[0];
 
 		Configuration conf = new Configuration();
-		FileSystem fileSys = FileSystem.get(conf);
+		FileSystem fs = FileSystem.get(conf);
 
-		RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fileSys);
+		RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fs);
 
 		Path termsFilePath = new Path(env.getIndexTermsData());
 		Path termIDsFilePath = new Path(env.getIndexTermIdsData());
 		Path idToTermFilePath = new Path(env.getIndexTermIdMappingData());
 
-		DefaultCachedFrequencySortedDictionary termIDMap = new DefaultCachedFrequencySortedDictionary(termsFilePath, termIDsFilePath,
-				idToTermFilePath, 100, fileSys);
+		DefaultCachedFrequencySortedDictionary dictionary =
+		    new DefaultCachedFrequencySortedDictionary(termsFilePath, termIDsFilePath,
+				    idToTermFilePath, 100, fs);
 
-		int nTerms = termIDMap.size();
+		int nTerms = dictionary.size();
 		System.out.println("nTerms: " + nTerms);
 
 		System.out.println(" \"term word\" to lookup termid; \"termid 234\" to lookup term");
@@ -119,11 +118,11 @@ public class DefaultCachedFrequencySortedDictionary extends DefaultFrequencySort
 					continue;
 				}
 
-				System.out.println("termid=" + termid + ", term=" + termIDMap.getTerm(termid));
+				System.out.println("termid=" + termid + ", term=" + dictionary.getTerm(termid));
 			} else if (tokens[0].equals("term")) {
 				String term = tokens[1];
 
-				System.out.println("term=" + term + ", termid=" + termIDMap.getId(term));
+				System.out.println("term=" + term + ", termid=" + dictionary.getId(term));
 			} else {
 				System.out.println("Error: unrecognized command!");
 				System.out.print("lookup > ");

@@ -36,27 +36,29 @@ public class DefaultFrequencySortedDictionary implements FrequencySortedDictiona
 
 	public DefaultFrequencySortedDictionary(Path prefixSetPath, Path idsPath, Path idToTermPath,
 	    FileSystem fs) throws IOException {
-		FSDataInputStream termsInput, idsInput, idToTermInput;
+		FSDataInputStream in;
 
-		termsInput = fs.open(prefixSetPath);
-		dictionary.readFields(termsInput);
-		termsInput.close();
+		in = fs.open(prefixSetPath);
+		dictionary.readFields(in);
+		in.close();
 
 		int l = 0;
 
-		idsInput = fs.open(idsPath);
-		l = idsInput.readInt();
+		in = fs.open(idsPath);
+		l = in.readInt();
 		ids = new int[l];
-		for (int i = 0; i < l; i++)
-			ids[i] = idsInput.readInt();
-		idsInput.close();
+		for (int i = 0; i < l; i++) {
+			ids[i] = in.readInt();
+		}
+		in.close();
 
-		idToTermInput = fs.open(idToTermPath);
-		l = idToTermInput.readInt();
+		in = fs.open(idToTermPath);
+		l = in.readInt();
 		idsToTerm = new int[l];
-		for (int i = 0; i < l; i++)
-			idsToTerm[i] = idToTermInput.readInt();
-		idToTermInput.close();
+		for (int i = 0; i < l; i++) {
+			idsToTerm[i] = in.readInt();
+		}
+		in.close();
 	}
 
 	@Override
@@ -68,8 +70,9 @@ public class DefaultFrequencySortedDictionary implements FrequencySortedDictiona
 	public int getId(String term) {
 		int index = dictionary.getId(term);
 
-		if (index < 0)
+		if (index < 0) {
 			return -1;
+		}
 
 		return ids[index];
 	}
@@ -86,8 +89,25 @@ public class DefaultFrequencySortedDictionary implements FrequencySortedDictiona
 
   @Override
   public Iterator<String> iterator() {
-    // TODO: Implement this later.
-    throw new UnsupportedOperationException();
+    return new Iterator<String>() {
+      private int cur = 1;
+      final private int end = dictionary.size();
+
+      @Override
+      public boolean hasNext() {
+        return cur < end+1;
+      }
+
+      @Override
+      public String next() {
+        return getTerm(cur++);
+      }
+
+      @Override
+      public void remove() {
+        throw new UnsupportedOperationException();
+      }
+    };
   }
 
 	public static void main(String[] args) throws Exception {
