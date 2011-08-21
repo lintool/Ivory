@@ -1,11 +1,11 @@
 /*
- * Ivory: A Hadoop toolkit for Web-scale information retrieval
- * 
+ * Ivory: A Hadoop toolkit for web-scale information retrieval
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You may
  * obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0 
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,7 +15,6 @@
  */
 
 package ivory.core.preprocess;
-
 
 import ivory.core.Constants;
 import ivory.core.RetrievalEnvironment;
@@ -52,7 +51,8 @@ public class GetTermCount2 extends PowerTool {
 		private static final PairOfIntLong pair = new PairOfIntLong();
 
 		@Override
-		public void map(IntWritable key, TermDocVector doc, Context context) throws IOException, InterruptedException {
+		public void map(IntWritable key, TermDocVector doc, Context context)
+		    throws IOException, InterruptedException {
 			TermDocVector.Reader r = doc.getReader();
 			int dl=0, tf=0;
 			while (r.hasMoreTerms()) {
@@ -71,7 +71,8 @@ public class GetTermCount2 extends PowerTool {
 	private static class MyCombiner extends Reducer<Text, PairOfIntLong, Text, PairOfIntLong> {
 		private static final PairOfIntLong output = new PairOfIntLong(); 
 		@Override
-		public void reduce(Text key, Iterable<PairOfIntLong> values, Context context) throws IOException, InterruptedException {
+		public void reduce(Text key, Iterable<PairOfIntLong> values, Context context)
+		    throws IOException, InterruptedException {
 			int df = 0;
 			long cf = 0;
 			for ( PairOfIntLong pair : values) {
@@ -95,7 +96,8 @@ public class GetTermCount2 extends PowerTool {
 		}
 
 		@Override
-		public void reduce(Text key, Iterable<PairOfIntLong> values, Context context) throws IOException, InterruptedException {
+		public void reduce(Text key, Iterable<PairOfIntLong> values, Context context)
+		    throws IOException, InterruptedException {
 			int df = 0;
 			long cf = 0;
 			for ( PairOfIntLong pair : values ) {

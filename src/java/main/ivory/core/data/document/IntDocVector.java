@@ -1,5 +1,5 @@
 /*
- * Ivory: A Hadoop toolkit for Web-scale information retrieval
+ * Ivory: A Hadoop toolkit for web-scale information retrieval
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You may
@@ -16,72 +16,65 @@
 
 package ivory.core.data.document;
 
-
 import ivory.core.index.TermPositions;
 
 import java.io.IOException;
 
 import org.apache.hadoop.io.Writable;
 
-
 /**
  * Interface representing a document vector where the terms are represented by
  * integer term ids.
- * 
+ *
  * @author Tamer Elsayed
- * 
  */
 public interface IntDocVector extends Writable {
 
-	/**
-	 * Returns the reader for this <code>IntDocVector</code>.
-	 */
-	public abstract IntDocVector.Reader getReader() throws IOException;
+  /**
+   * Returns the reader for this {@code IntDocVector}.
+   */
+  IntDocVector.Reader getReader() throws IOException;
 
-	/**
-	 * Interface representing a reader for a {@link IntDocVector}, providing access
-	 * to terms, their frequencies, and positions.
-	 * 
-	 * @author Tamer Elsayed
-	 * 
-	 */
-	public interface Reader {
+  /**
+   * Interface representing a reader for a {@link IntDocVector}, providing access
+   * to terms, their frequencies, and positions.
+   *
+   * @author Tamer Elsayed
+   */
+  public interface Reader {
+    /**
+     * Returns the next term.
+     */
+    int nextTerm();
 
-	  /**
-	   * Returns the next term.
-	   */
-	  public int nextTerm();
+    /**
+     * Returns {@code true} if there are more terms to read.
+     */
+    boolean hasMoreTerms();
 
-	  /**
-	   * Returns <code>true</code> if there are more terms to read.
-	   */
-	  public boolean hasMoreTerms();
+    /**
+     * Returns the total number of terms.
+     */
+    int getNumberOfTerms();
 
-	  /**
-	   * Returns the total number of terms.
-	   */
-	  public int getNumberOfTerms();
+    /**
+     * Resets the reader.
+     */
+    void reset();
 
-	  /**
-	   * Resets the reader.
-	   */
-	  public void reset();
+    /**
+     * Returns the position offsets of the current term as an array.
+     */
+    int[] getPositions();
 
-	  /**
-	   * Returns the position offsets of the current term as an array.
-	   */
-	  public int[] getPositions();
+    /**
+     * Returns the position offsets of the current term as a {@link TermPositions} object.
+     */
+    boolean getPositions(TermPositions tp);
 
-	  /**
-	   * Returns the position offsets of the current term as a
-	   * {@link TermPositions} object.
-	   */
-	  public boolean getPositions(TermPositions tp);
-
-	  /**
-	   * Returns the term frequency of the current term.
-	   */
-	  public short getTf();
-	}
-
+    /**
+     * Returns the term frequency of the current term.
+     */
+    short getTf();
+  }
 }

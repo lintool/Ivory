@@ -16,7 +16,6 @@
 
 package ivory.core.preprocess;
 
-
 import ivory.core.Constants;
 import ivory.core.RetrievalEnvironment;
 import ivory.core.data.document.IntDocVector;
@@ -62,7 +61,8 @@ public class BuildIntDocVectorsForwardIndex2 extends PowerTool {
 		protected Configuration conf;
 
 		@Override
-		public void initialize(InputSplit split, TaskAttemptContext context) throws IOException, InterruptedException {
+		public void initialize(InputSplit split, TaskAttemptContext context)
+		    throws IOException, InterruptedException {
 			FileSplit fileSplit = (FileSplit) split;
 			conf = context.getConfiguration();
 			Path path = fileSplit.getPath();
@@ -125,7 +125,8 @@ public class BuildIntDocVectorsForwardIndex2 extends PowerTool {
 
 	public static final long BigNumber = 1000000000;
 
-	private static class MyMapper extends Mapper<IntWritable, IntDocVector, IntWritable, LongWritable> {
+	private static class MyMapper
+	    extends Mapper<IntWritable, IntDocVector, IntWritable, LongWritable> {
 		private static final LongWritable output = new LongWritable();
 
 		@Override
@@ -133,7 +134,8 @@ public class BuildIntDocVectorsForwardIndex2 extends PowerTool {
 			String file = ((FileSplit) context.getInputSplit()).getPath().getName();
 			LOG.info("Input file: " + file);
 
-			MySequenceFileRecordReader<IntWritable, IntDocVector> reader = new MySequenceFileRecordReader<IntWritable, IntDocVector>();
+			MySequenceFileRecordReader<IntWritable, IntDocVector> reader =
+			    new MySequenceFileRecordReader<IntWritable, IntDocVector>();
 			reader.initialize(context.getInputSplit(), context);
 
 			int fileNo = Integer.parseInt(file.substring(file.lastIndexOf("-") + 1));
@@ -150,13 +152,15 @@ public class BuildIntDocVectorsForwardIndex2 extends PowerTool {
 		}
 	}
 
-	private static class MyReducer extends Reducer<IntWritable, LongWritable, NullWritable, NullWritable> {
+	private static class MyReducer
+	    extends Reducer<IntWritable, LongWritable, NullWritable, NullWritable> {
 		private FSDataOutputStream out;
 		private int collectionDocumentCount;
 		private int curDoc = 0;
 
 		@Override
-		public void setup(Reducer<IntWritable, LongWritable, NullWritable, NullWritable>.Context context) {
+		public void setup(
+		    Reducer<IntWritable, LongWritable, NullWritable, NullWritable>.Context context) {
 			Configuration conf = context.getConfiguration();
 			FileSystem fs;
 			try {
@@ -172,8 +176,8 @@ public class BuildIntDocVectorsForwardIndex2 extends PowerTool {
 				throw new RuntimeException("Unable to create RetrievalEnvironment!");
 			}
 
-			String forwardIndexPath = env.getIntDocVectorsForwardIndex ();
-			collectionDocumentCount = env.readCollectionDocumentCount ();
+			String forwardIndexPath = env.getIntDocVectorsForwardIndex();
+			collectionDocumentCount = env.readCollectionDocumentCount();
 
 			try {
 				out = fs.create (new Path (forwardIndexPath), true);
@@ -185,7 +189,8 @@ public class BuildIntDocVectorsForwardIndex2 extends PowerTool {
 		}
 
 		@Override
-		public void reduce(IntWritable key, Iterable<LongWritable> values, Context context) throws IOException, InterruptedException {
+		public void reduce(IntWritable key, Iterable<LongWritable> values, Context context)
+		    throws IOException, InterruptedException {
 			Iterator<LongWritable> iter = values.iterator();
 			long pos = iter.next().get();
 
@@ -198,11 +203,14 @@ public class BuildIntDocVectorsForwardIndex2 extends PowerTool {
 		}
 
 		@Override
-		public void cleanup(Reducer<IntWritable, LongWritable, NullWritable, NullWritable>.Context context) throws IOException {
+		public void cleanup(
+		    Reducer<IntWritable, LongWritable, NullWritable, NullWritable>.Context context)
+		    throws IOException {
 			out.close();
 
 			if (curDoc != collectionDocumentCount) {
-				throw new IOException("Expected " + collectionDocumentCount + " docs, actually got " + curDoc + " terms!");
+				throw new IOException("Expected " + collectionDocumentCount + " docs, actually got "
+				    + curDoc + " terms!");
 			}
 		}
 	}

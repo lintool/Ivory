@@ -1,5 +1,5 @@
 /*
- * Ivory: A Hadoop toolkit for Web-scale information retrieval
+ * Ivory: A Hadoop toolkit for web-scale information retrieval
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You may
@@ -16,13 +16,11 @@
 
 package ivory.core.preprocess;
 
-
 import ivory.core.Constants;
 import ivory.core.RetrievalEnvironment;
 import ivory.core.data.document.LazyTermDocVector;
 import ivory.core.data.document.TermDocVector;
 import ivory.core.tokenize.DocumentProcessingUtils;
-import ivory.core.tokenize.DocumentProcessingUtils2;
 import ivory.core.tokenize.Tokenizer;
 
 import java.io.IOException;
@@ -75,7 +73,8 @@ public class BuildTermDocVectors2 extends PowerTool {
 		private int docno;
 
 		@Override
-		public void setup(Mapper<Writable, Indexable, IntWritable, TermDocVector>.Context context) throws IOException {
+		public void setup(Mapper<Writable, Indexable, IntWritable, TermDocVector>.Context context)
+		    throws IOException {
 			Configuration conf = context.getConfiguration();
 
 			Path[] localFiles;
@@ -96,7 +95,8 @@ public class BuildTermDocVectors2 extends PowerTool {
 
 			// Load the docid to docno mappings.
 			try {
-				docMapping = (DocnoMapping) Class.forName(conf.get(Constants.DocnoMappingClass)).newInstance();
+				docMapping =
+				    (DocnoMapping) Class.forName(conf.get(Constants.DocnoMappingClass)).newInstance();
 				docMapping.loadMapping(localFiles[0], FileSystem.getLocal(conf));
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -105,7 +105,8 @@ public class BuildTermDocVectors2 extends PowerTool {
 		}
 
 		@Override
-		public void map(Writable in, Indexable doc, Context context) throws IOException, InterruptedException {
+		public void map(Writable in, Indexable doc, Context context)
+		    throws IOException, InterruptedException {
 			docno = docMapping.getDocno(doc.getDocid());
 
 			// Skip invalid docnos.
@@ -117,7 +118,8 @@ public class BuildTermDocVectors2 extends PowerTool {
 			long startTime;
 
 			startTime = System.currentTimeMillis();
-			Map<String, ArrayListOfInts> termPositionsMap = DocumentProcessingUtils.getTermPositionsMap(doc, tokenizer);
+			Map<String, ArrayListOfInts> termPositionsMap =
+			    DocumentProcessingUtils.getTermPositionsMap(doc, tokenizer);
 			context.getCounter(MapTime.Parsing).increment(System.currentTimeMillis() - startTime);
 
 			if (termPositionsMap.size() == 0) {
@@ -131,67 +133,71 @@ public class BuildTermDocVectors2 extends PowerTool {
 			context.getCounter(MapTime.Spilling).increment(System.currentTimeMillis() - startTime);
 			context.getCounter(Docs.Total).increment(1);
 
-			doclengths.put(docno, DocumentProcessingUtils2.getDocLengthFromPositionsMap(termPositionsMap));
+			doclengths.put(docno,
+			    DocumentProcessingUtils.getDocLengthFromPositionsMap(termPositionsMap));
 		}
 
-	    @Override
-	    public void cleanup(Mapper<Writable, Indexable, IntWritable, TermDocVector>.Context context) throws IOException, InterruptedException {
-			// Now we want to write out the doclengths as "side data" onto HDFS.
-			// Since speculative execution is on, we'll append the task id to
-			// the filename to guarantee uniqueness. However, this means that
-			// the may be multiple files with the same doclength information,
-			// which we have the handle when we go to write out the binary
-			// encoding of the data.
+    @Override
+    public void cleanup(Mapper<Writable, Indexable, IntWritable, TermDocVector>.Context context)
+          throws IOException, InterruptedException {
+      // Now we want to write out the doclengths as "side data" onto HDFS.
+      // Since speculative execution is on, we'll append the task id to
+      // the filename to guarantee uniqueness. However, this means that
+      // the may be multiple files with the same doclength information,
+      // which we have the handle when we go to write out the binary
+      // encoding of the data.
 
-			if (doclengths.size() == 0) {
-				throw new RuntimeException("Error: Doclength table empty!");
-			}
+      if (doclengths.size() == 0) {
+        throw new RuntimeException("Error: Doclength table empty!");
+      }
 
-			long bytesCnt = 0;
-			Configuration conf = context.getConfiguration();
-			String taskId = conf.get("mapred.task.id");
-			String indexPath = conf.get("Ivory.IndexPath");
+      long bytesCnt = 0;
+      Configuration conf = context.getConfiguration();
+      String taskId = conf.get("mapred.task.id");
+      String indexPath = conf.get("Ivory.IndexPath");
 
-			FileSystem fs = FileSystem.get(conf);
-			// Use the last processed docno as the file name + task id.
-			Path path = new Path(indexPath + "/doclengths/" + docno + "." + taskId);
-			FSDataOutputStream out = fs.create(path, false);
+      FileSystem fs = FileSystem.get(conf);
+      // Use the last processed docno as the file name + task id.
+      Path path = new Path(indexPath + "/doclengths/" + docno + "." + taskId);
+      FSDataOutputStream out = fs.create(path, false);
 
-			// Iterate through the docs and write out doclengths.
-			long dlSum = 0;
-			int cnt = 0;
-			for (MapII.Entry e : doclengths.entrySet()) {
-				String s = e.getKey() + "\t" + e.getValue() + "\n";
-				out.write(s.getBytes());
-				bytesCnt += s.getBytes().length;
-				cnt++;
-				dlSum += e.getValue();
-			}
-			out.close();
+      // Iterate through the docs and write out doclengths.
+      long dlSum = 0;
+      int cnt = 0;
+      for (MapII.Entry e : doclengths.entrySet()) {
+        String s = e.getKey() + "\t" + e.getValue() + "\n";
+        out.write(s.getBytes());
+        bytesCnt += s.getBytes().length;
+        cnt++;
+        dlSum += e.getValue();
+      }
+      out.close();
 
-			// We want to check if the file has actually been written successfully...
-			LOG.info("Expected length of doclengths file: " + bytesCnt);
+      // We want to check if the file has actually been written successfully...
+      LOG.info("Expected length of doclengths file: " + bytesCnt);
 
-			long bytesActual = fs.listStatus(path)[0].getLen();
-			LOG.info("Actual length of doclengths file: " + bytesActual);
+      long bytesActual = fs.listStatus(path)[0].getLen();
+      LOG.info("Actual length of doclengths file: " + bytesActual);
 
-			if (bytesCnt == 0) {
-				throw new RuntimeException("Error: zero bytesCnt at " + path);
-			} else if (bytesActual == 0) {
-				throw new RuntimeException("Error: zero bytesActual at " + path);
-			} else if (bytesCnt != bytesActual) {
-				throw new RuntimeException("Error writing Doclengths file: " + bytesCnt + " " + bytesActual + " " + path);
-			}
+      if (bytesCnt == 0) {
+        throw new RuntimeException("Error: zero bytesCnt at " + path);
+      } else if (bytesActual == 0) {
+        throw new RuntimeException("Error: zero bytesActual at " + path);
+      } else if (bytesCnt != bytesActual) {
+        throw new RuntimeException(String.format("Error writing Doclengths file: %d %d %s",
+            bytesCnt, bytesActual, path.toString()));
+      }
 
-			context.getCounter(DocLengths.Count).increment(cnt);
-			// Sum of the document lengths, should match sum of tfs.
-			context.getCounter(DocLengths.SumOfDocLengths).increment(dlSum);
-		}
+      context.getCounter(DocLengths.Count).increment(cnt);
+      // Sum of the document lengths, should match sum of tfs.
+      context.getCounter(DocLengths.SumOfDocLengths).increment(dlSum);
+    }
 	}
 
 	private static class DocLengthDataWriterMapper extends NullMapper {
 		@Override
-		public void run(Mapper<NullWritable, NullWritable, NullWritable, NullWritable>.Context context) throws IOException, InterruptedException {
+		public void run(Mapper<NullWritable, NullWritable, NullWritable, NullWritable>.Context context)
+		    throws IOException, InterruptedException {
 			Configuration conf = context.getConfiguration();
 			int collectionDocCount = conf.getInt(Constants.CollectionDocumentCount, -1);
 			String inputPath = conf.get(InputPath);
@@ -208,9 +214,9 @@ public class BuildTermDocVectors2 extends PowerTool {
 			FileSystem fs = FileSystem.get(conf);
 			FileStatus[] fileStats = fs.listStatus(p);
 
-			int[] doclengths = new int[collectionDocCount + 1];  // Initial array to hold the doc lengths.
-			int maxDocno = 0;                                    // Largest docno.
-			int minDocno = Integer.MAX_VALUE;                    // Smallest docno.
+			int[] doclengths = new int[collectionDocCount + 1]; // Initial array to hold the doclengths.
+			int maxDocno = 0;                                   // Largest docno.
+			int minDocno = Integer.MAX_VALUE;                   // Smallest docno.
 
 			int nFiles = fileStats.length;
 			for (int i = 0; i < nFiles; i++) {
@@ -232,7 +238,8 @@ public class BuildTermDocVectors2 extends PowerTool {
 					// just count number of doclengths read. Instead, keep track
 					// of largest docno encountered.
 					if (docno < docnoOffset) {
-						throw new RuntimeException("Error: docno " + docno + " < docnoOffset " + docnoOffset + "!");
+						throw new RuntimeException(
+						    "Error: docno " + docno + " < docnoOffset " + docnoOffset + "!");
 					}
 
 					doclengths[docno - docnoOffset] = len;
@@ -272,8 +279,13 @@ public class BuildTermDocVectors2 extends PowerTool {
 	private static final String DocLengthDataFile = "Ivory.DocLengthDataFile";
 
 	public static final String[] RequiredParameters = {
-		Constants.CollectionName, Constants.CollectionPath, Constants.IndexPath, Constants.InputFormat,
-		Constants.Tokenizer, Constants.DocnoMappingClass, Constants.DocnoOffset };
+		Constants.CollectionName,
+		Constants.CollectionPath,
+		Constants.IndexPath,
+		Constants.InputFormat,
+		Constants.Tokenizer,
+		Constants.DocnoMappingClass,
+		Constants.DocnoOffset };
 
 	@Override
 	public String[] getRequiredParameters() {
@@ -352,7 +364,7 @@ public class BuildTermDocVectors2 extends PowerTool {
 		job1.waitForCompletion(true);
 		LOG.info("Job Finished in " + (System.currentTimeMillis() - startTime) / 1000.0	+ " seconds");
 
-		// write out number of postings
+		// Write out number of postings.
 		int collectionDocCount = (int) job1.getCounters().findCounter(Docs.Total).getValue();
 		env.writeCollectionDocumentCount(collectionDocCount);
 
@@ -384,8 +396,10 @@ public class BuildTermDocVectors2 extends PowerTool {
 		job2.waitForCompletion(true);
 		LOG.info("Job Finished in " + (System.currentTimeMillis() - startTime) / 1000.0	+ " seconds");
 
-		long collectionSumOfDocLengths = job2.getCounters().findCounter(DocLengths.SumOfDocLengths).getValue();
-		env.writeCollectionAverageDocumentLength((float) collectionSumOfDocLengths / collectionDocCount);
+		long collectionSumOfDocLengths =
+		    job2.getCounters().findCounter(DocLengths.SumOfDocLengths).getValue();
+		env.writeCollectionAverageDocumentLength(
+		    (float) collectionSumOfDocLengths / collectionDocCount);
 
 		return 0;
 	}

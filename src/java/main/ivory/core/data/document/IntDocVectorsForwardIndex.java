@@ -1,11 +1,11 @@
 /*
- * Ivory: A Hadoop toolkit for Web-scale information retrieval
- * 
+ * Ivory: A Hadoop toolkit for web-scale information retrieval
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You may
  * obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0 
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,7 +15,6 @@
  */
 
 package ivory.core.data.document;
-
 
 import ivory.core.RetrievalEnvironment;
 import ivory.core.preprocess.BuildIntDocVectorsForwardIndex;
@@ -32,138 +31,127 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.SequenceFile;
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
+import com.google.common.base.Preconditions;
 
 import edu.umd.cloud9.debug.MemoryUsageUtils;
 
 /**
- * Object providing an index into one or more <code>SequenceFile</code>s
+ * Object providing an index into one or more {@code SequenceFile}s
  * containing {@link IntDocVector}s, providing random access to the document
  * vectors.
- * 
+ *
  * @see BuildIntDocVectorsForwardIndex
- * 
+ *
  * @author Jimmy Lin
  */
 public class IntDocVectorsForwardIndex {
+  private static final Logger LOG = Logger.getLogger(IntDocVectorsForwardIndex.class);
+  private static final NumberFormat FORMAT = new DecimalFormat("00000");
 
-	private static final Logger sLogger = Logger.getLogger(IntDocVectorsForwardIndex.class);
-	{
-		sLogger.setLevel (Level.WARN);
-	}
+  private final FileSystem fs;
+  private final Configuration conf;
+  private final long[] positions;
+  private final String path;
+  private final int docnoOffset;
+  private final int collectionDocumentCount;
 
-	private static final NumberFormat sFormatW5 = new DecimalFormat("00000");
+  /**
+   * Creates an {@code IntDocVectorsIndex} object.
+   *
+   * @param indexPath location of the index file
+   * @param fs handle to the FileSystem
+   * @throws IOException
+   */
+  public IntDocVectorsForwardIndex(String indexPath, FileSystem fs) throws IOException {
+    this(indexPath, fs, false);
+  }
 
-	private FileSystem mFs;
-	private Configuration mConf;
+  public IntDocVectorsForwardIndex(String indexPath, FileSystem fs, boolean weighted)
+      throws IOException {
+    this.fs = Preconditions.checkNotNull(fs);
+    this.conf = fs.getConf();
 
-	private long[] mPositions;
+    RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fs);
+    path = (weighted ? env.getWeightedIntDocVectorsDirectory() : env.getIntDocVectorsDirectory());
 
-	private String mPath;
+    String forwardIndexPath = (weighted ? env.getWeightedIntDocVectorsForwardIndex()
+        : env.getIntDocVectorsForwardIndex());
+    FSDataInputStream posInput = fs.open(new Path(forwardIndexPath));
 
-	private int mDocnoOffset;
-	private int mCollectionDocumentCount;
+    docnoOffset = posInput.readInt();
+    collectionDocumentCount = posInput.readInt();
 
-	/**
-	 * Creates an <code>IntDocVectorsIndex</code> object.
-	 * 
-	 * @param indexPath
-	 *            location of the index file
-	 * @param fs
-	 *            handle to the FileSystem
-	 * @throws IOException
-	 */
-	public IntDocVectorsForwardIndex(String indexPath, FileSystem fs) throws IOException {
-		this(indexPath, fs, false);
-	}
+    positions = new long[collectionDocumentCount];
+    for (int i = 0; i < collectionDocumentCount; i++) {
+      positions[i] = posInput.readLong();
+    }
+  }
 
+  /**
+   * Returns the document vector given a docno.
+   */
+  public IntDocVector getDocVector(int docno) throws IOException {
+    if (docno > collectionDocumentCount || docno < 1)
+      return null;
 
-	public IntDocVectorsForwardIndex(String indexPath, FileSystem fs, boolean weighted) throws IOException {
-		mFs = fs;
-		mConf = fs.getConf();
+    long pos = positions[docno - docnoOffset - 1];
 
-		RetrievalEnvironment env = new RetrievalEnvironment (indexPath, fs);
-		mPath = (weighted ? env.getWeightedIntDocVectorsDirectory () : env.getIntDocVectorsDirectory ());
-		sLogger.debug ("mPath: " + mPath);
+    int fileNo = (int) (pos / BuildIntDocVectorsForwardIndex.BigNumber);
+    pos = pos % BuildIntDocVectorsForwardIndex.BigNumber;
 
-		String forwardIndexPath = (weighted ? env.getWeightedIntDocVectorsForwardIndex () : env.getIntDocVectorsForwardIndex ());
-		sLogger.debug ("forwardIndexPath: " + forwardIndexPath);
-		FSDataInputStream posInput = fs.open (new Path (forwardIndexPath));
+    SequenceFile.Reader reader = new SequenceFile.Reader(fs,
+        new Path(path + "/part-" + FORMAT.format(fileNo)), conf);
 
-		mDocnoOffset = posInput.readInt();
-		mCollectionDocumentCount = posInput.readInt();
+    IntWritable key = new IntWritable();
+    IntDocVector value;
 
-		mPositions = new long[mCollectionDocumentCount];
-		for (int i = 0; i < mCollectionDocumentCount; i++) {
-			mPositions[i] = posInput.readLong();
-		}
-	}
+    try {
+      value = (IntDocVector) reader.getValueClass().newInstance();
+    } catch (Exception e) {
+      throw new RuntimeException("Unable to instantiate key/value pair!");
+    }
 
-	/**
-	 * Returns the document vector given a docno.
-	 */
-	public IntDocVector getDocVector(int docno) throws IOException {
-		if (docno > mCollectionDocumentCount || docno < 1)
-			return null;
+    reader.seek(pos);
+    reader.next(key, value);
 
-		long pos = mPositions[docno - mDocnoOffset - 1];
+    if (key.get() != docno) {
+      LOG.error("unable to doc vector for docno " + docno + ": found docno " + key
+          + " instead");
+      return null;
+    }
 
-		int fileNo = (int) (pos / BuildIntDocVectorsForwardIndex.BigNumber);
-		pos = pos % BuildIntDocVectorsForwardIndex.BigNumber;
+    reader.close();
+    return value;
+  }
 
-		SequenceFile.Reader reader = new SequenceFile.Reader(mFs, new Path(mPath + "/part-"
-				+ sFormatW5.format(fileNo)), mConf);
+  /**
+   * Simple test program.
+   */
+  public static void main(String[] args) throws Exception {
+    if (args.length != 1) {
+      System.out.println("usage: [indexPath]");
+      System.exit(-1);
+    }
 
-		IntWritable key = new IntWritable();
-		IntDocVector value;
+    long startingMemoryUse = MemoryUsageUtils.getUsedMemory();
 
-		try {
-			value = (IntDocVector) reader.getValueClass().newInstance();
-		} catch (Exception e) {
-			throw new RuntimeException("Unable to instantiate key/value pair!");
-		}
+    Configuration conf = new Configuration();
 
-		reader.seek(pos);
-		reader.next(key, value);
+    IntDocVectorsForwardIndex index = new IntDocVectorsForwardIndex(args[0], FileSystem.get(conf));
 
-		if (key.get() != docno) {
-			sLogger.error("unable to doc vector for docno " + docno + ": found docno " + key
-					+ " instead");
-			return null;
-		}
+    long endingMemoryUse = MemoryUsageUtils.getUsedMemory();
 
-		reader.close();
-		return value;
-	}
+    System.out.println("Memory usage: " + (endingMemoryUse - startingMemoryUse) + " bytes\n");
 
-	/**
-	 * Simple test program.
-	 */
-	public static void main(String[] args) throws Exception {
-		if (args.length != 1) {
-			System.out.println("usage: [indexPath]");
-			System.exit(-1);
-		}
-
-		long startingMemoryUse = MemoryUsageUtils.getUsedMemory();
-
-		Configuration conf = new Configuration();
-
-		IntDocVectorsForwardIndex index = new IntDocVectorsForwardIndex(args[0], FileSystem.get(conf));
-
-		long endingMemoryUse = MemoryUsageUtils.getUsedMemory();
-
-		System.out.println("Memory usage: " + (endingMemoryUse - startingMemoryUse) + " bytes\n");
-
-		String term = null;
-		BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
-		System.out.print("Look up postings of docno > ");
-		while ((term = stdin.readLine()) != null) {
-			int docno = Integer.parseInt(term);
-			System.out.println(docno + ": " + index.getDocVector(docno));
-			System.out.print("Look up postings of docno > ");
-		}
-	}
+    String term = null;
+    BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
+    System.out.print("Look up postings of docno > ");
+    while ((term = stdin.readLine()) != null) {
+      int docno = Integer.parseInt(term);
+      System.out.println(docno + ": " + index.getDocVector(docno));
+      System.out.print("Look up postings of docno > ");
+    }
+  }
 }

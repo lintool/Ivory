@@ -1,5 +1,5 @@
 /*
- * Ivory: A Hadoop toolkit for Web-scale information retrieval
+ * Ivory: A Hadoop toolkit for web-scale information retrieval
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You may
@@ -15,7 +15,6 @@
  */
 
 package ivory.core.preprocess;
-
 
 import ivory.core.Constants;
 import ivory.core.RetrievalEnvironment;
@@ -53,12 +52,14 @@ public class BuildIntDocVectors2 extends PowerTool {
 	protected static enum Docs { Skipped, Total }
 	protected static enum MapTime { DecodingAndIdMapping, EncodingAndSpilling }
 
-	private static class MyMapper extends Mapper<IntWritable, TermDocVector, IntWritable, IntDocVector> {
-		private DefaultCachedFrequencySortedDictionary termidMap = null;
+	private static class MyMapper
+	    extends Mapper<IntWritable, TermDocVector, IntWritable, IntDocVector> {
+		private DefaultCachedFrequencySortedDictionary dictionary = null;
 		private static final LazyIntDocVector docVector = new LazyIntDocVector();
 
 		@Override
-		public void setup(Mapper<IntWritable, TermDocVector, IntWritable, IntDocVector>.Context context) {
+		public void setup(
+		    Mapper<IntWritable, TermDocVector, IntWritable, IntDocVector>.Context context) {
 			try {
 				Configuration conf = context.getConfiguration();
 				FileSystem fs;
@@ -97,7 +98,8 @@ public class BuildIntDocVectors2 extends PowerTool {
 				LOG.info(" - id: " + pathMapping.get(termidsFile));
 				LOG.info(" - idToTerms: " + pathMapping.get(idToTermFile));
 
-				termidMap = new DefaultCachedFrequencySortedDictionary(pathMapping.get(termsFile), pathMapping.get(termidsFile), pathMapping.get(idToTermFile),
+				dictionary = new DefaultCachedFrequencySortedDictionary(pathMapping.get(termsFile),
+				    pathMapping.get(termidsFile), pathMapping.get(idToTermFile),
 						0.3f, FileSystem.getLocal(context.getConfiguration()));
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -106,15 +108,19 @@ public class BuildIntDocVectors2 extends PowerTool {
 		}
 
 		@Override
-		public void map(IntWritable key, TermDocVector doc, Context context) throws IOException, InterruptedException {
+		public void map(IntWritable key, TermDocVector doc, Context context)
+		    throws IOException, InterruptedException {
 			long startTime = System.currentTimeMillis();
-			TreeMap<Integer, int[]> positions = DocumentProcessingUtils.getTermIDsPositionsMap(doc, termidMap);
-			context.getCounter(MapTime.DecodingAndIdMapping).increment(System.currentTimeMillis() - startTime);
+			TreeMap<Integer, int[]> positions =
+			    DocumentProcessingUtils.getTermIDsPositionsMap(doc, dictionary);
+			context.getCounter(MapTime.DecodingAndIdMapping)
+			    .increment(System.currentTimeMillis() - startTime);
 
 			startTime = System.currentTimeMillis();
 			docVector.setTermPositionsMap(positions);
 			context.write(key, docVector);
-			context.getCounter(MapTime.EncodingAndSpilling).increment(System.currentTimeMillis() - startTime);
+			context.getCounter(MapTime.EncodingAndSpilling)
+			    .increment(System.currentTimeMillis() - startTime);
 			context.getCounter(Docs.Total).increment(1);
 		}
 	}
@@ -164,7 +170,6 @@ public class BuildIntDocVectors2 extends PowerTool {
 		DistributedCache.addCacheFile(new URI(idToTermFile), conf);
 
 		conf.set("mapred.child.java.opts", "-Xmx2048m");
-		//conf.set("mapreduce.map.java.opts", "-Xmx2048m");
 
 		Job job = new Job(conf, "BuildIntDocVectors2:" + collectionName);
 		job.setJarByClass(BuildIntDocVectors2.class);

@@ -1,5 +1,5 @@
 /*
- * Ivory: A Hadoop toolkit for Web-scale information retrieval
+ * Ivory: A Hadoop toolkit for web-scale information retrieval
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You may
@@ -15,7 +15,6 @@
  */
 
 package ivory.core.preprocess;
-
 
 import ivory.core.Constants;
 import ivory.core.RetrievalEnvironment;
@@ -50,8 +49,10 @@ public class BuildTermIdMap2 extends PowerTool {
 
 	protected static enum Terms { Total }
 
-	private static class MyReducer extends Reducer<Text, PairOfIntLong, NullWritable, NullWritable> {
-		private FSDataOutputStream termsOut, idsOut, idsToTermOut, dfByTermOut, cfByTermOut, dfByIntOut, cfByIntOut;
+	private static class MyReducer
+	    extends Reducer<Text, PairOfIntLong, NullWritable, NullWritable> {
+		private FSDataOutputStream termsOut, idsOut, idsToTermOut,
+		    dfByTermOut, cfByTermOut, dfByIntOut, cfByIntOut;
 		private int nTerms, window;
 		private int[] seqNums = null;
 		private int[] dfs = null;
@@ -123,7 +124,8 @@ public class BuildTermIdMap2 extends PowerTool {
 		}
 
 		@Override
-		public void reduce(Text key, Iterable<PairOfIntLong> values, Context context) throws IOException, InterruptedException {
+		public void reduce(Text key, Iterable<PairOfIntLong> values, Context context)
+		    throws IOException, InterruptedException {
 			String term = key.toString();
 			Iterator<PairOfIntLong> iter = values.iterator();
 			PairOfIntLong p = iter.next();
@@ -166,10 +168,13 @@ public class BuildTermIdMap2 extends PowerTool {
 		}
 
 		@Override
-		public void cleanup(Reducer<Text, PairOfIntLong, NullWritable, NullWritable>.Context context) throws IOException {
+		public void cleanup(
+		    Reducer<Text, PairOfIntLong, NullWritable, NullWritable>.Context context)
+		    throws IOException {
 			LOG.info("Finished reduce.");
 			if (curKeyIndex != nTerms) {
-				throw new RuntimeException("Total expected Terms: " + nTerms + ", Total observed terms: " + curKeyIndex + "!");
+				throw new RuntimeException("Total expected Terms: " + nTerms +
+				    ", Total observed terms: " + curKeyIndex + "!");
 			}
 			// Sort based on df and change seqNums accordingly.
 			QuickSort.quicksortWithSecondary(seqNums, dfs, cfs, 0, nTerms - 1);
