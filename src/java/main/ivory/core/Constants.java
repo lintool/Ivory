@@ -1,4 +1,4 @@
-package ivory.core.util;
+package ivory.core;
 
 public class Constants {
 	public static final String NumMapTasks = "Ivory.NumMapTasks";

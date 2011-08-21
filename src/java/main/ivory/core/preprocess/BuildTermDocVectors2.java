@@ -17,12 +17,12 @@
 package ivory.core.preprocess;
 
 
+import ivory.core.Constants;
 import ivory.core.RetrievalEnvironment;
 import ivory.core.data.document.LazyTermDocVector;
 import ivory.core.data.document.TermDocVector;
 import ivory.core.tokenize.DocumentProcessingUtils2;
 import ivory.core.tokenize.Tokenizer;
-import ivory.core.util.Constants;
 
 import java.io.IOException;
 import java.util.Map;

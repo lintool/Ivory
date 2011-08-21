@@ -91,7 +91,7 @@ public class PreprocessClueWebEnglish extends Configured implements Tool {
 		conf.set("Ivory.CollectionPath", collection);
 		conf.set("Ivory.IndexPath", indexPath);
 		conf.set("Ivory.InputFormat", "org.apache.hadoop.mapred.SequenceFileInputFormat");
-		conf.set("Ivory.Tokenizer", "ivory.tokenize.GalagoTokenizer");
+		conf.set("Ivory.Tokenizer", ivory.core.tokenize.GalagoTokenizer.class.getCanonicalName());
 		conf.set("Ivory.DocnoMappingClass", "edu.umd.cloud9.collection.clue.ClueWarcDocnoMapping");
 		conf.set("Ivory.DocnoMappingFile", env.getDocnoMappingData().toString());
 

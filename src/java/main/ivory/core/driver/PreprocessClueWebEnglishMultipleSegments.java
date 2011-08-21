@@ -17,6 +17,7 @@
 package ivory.core.driver;
 
 
+import ivory.core.Constants;
 import ivory.core.RetrievalEnvironment;
 import ivory.core.preprocess.BuildIntDocVectors;
 import ivory.core.preprocess.BuildIntDocVectorsForwardIndex;
@@ -24,7 +25,6 @@ import ivory.core.preprocess.BuildTermDocVectors;
 import ivory.core.preprocess.BuildTermDocVectorsForwardIndex;
 import ivory.core.preprocess.BuildTermIdMap;
 import ivory.core.preprocess.GetTermCount;
-import ivory.core.util.Constants;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;

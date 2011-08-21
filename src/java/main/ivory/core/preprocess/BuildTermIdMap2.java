@@ -17,9 +17,9 @@
 package ivory.core.preprocess;
 
 
+import ivory.core.Constants;
 import ivory.core.RetrievalEnvironment;
 import ivory.core.data.dictionary.PrefixEncodedLexicographicallySortedDictionary;
-import ivory.core.util.Constants;
 import ivory.core.util.QuickSort;
 
 import java.io.IOException;

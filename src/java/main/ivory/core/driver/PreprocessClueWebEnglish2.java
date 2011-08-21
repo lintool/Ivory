@@ -17,12 +17,12 @@
 package ivory.core.driver;
 
 
+import ivory.core.Constants;
 import ivory.core.RetrievalEnvironment;
 import ivory.core.preprocess.BuildIntDocVectors2;
 import ivory.core.preprocess.BuildTermDocVectors2;
 import ivory.core.preprocess.BuildTermIdMap2;
 import ivory.core.preprocess.GetTermCount2;
-import ivory.core.util.Constants;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;

@@ -17,9 +17,9 @@
 package ivory.core.preprocess;
 
 
+import ivory.core.Constants;
 import ivory.core.RetrievalEnvironment;
 import ivory.core.data.document.IntDocVector;
-import ivory.core.util.Constants;
 
 import java.io.IOException;
 import java.util.Iterator;
