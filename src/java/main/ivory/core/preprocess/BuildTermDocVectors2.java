@@ -21,6 +21,7 @@ import ivory.core.Constants;
 import ivory.core.RetrievalEnvironment;
 import ivory.core.data.document.LazyTermDocVector;
 import ivory.core.data.document.TermDocVector;
+import ivory.core.tokenize.DocumentProcessingUtils;
 import ivory.core.tokenize.DocumentProcessingUtils2;
 import ivory.core.tokenize.Tokenizer;
 
@@ -46,7 +47,6 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.NullOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 import org.apache.log4j.Logger;
-
 
 import edu.umd.cloud9.collection.DocnoMapping;
 import edu.umd.cloud9.collection.Indexable;
@@ -117,7 +117,7 @@ public class BuildTermDocVectors2 extends PowerTool {
 			long startTime;
 
 			startTime = System.currentTimeMillis();
-			Map<String, ArrayListOfInts> termPositionsMap = DocumentProcessingUtils2.getTermPositionsMap(doc, tokenizer);
+			Map<String, ArrayListOfInts> termPositionsMap = DocumentProcessingUtils.getTermPositionsMap(doc, tokenizer);
 			context.getCounter(MapTime.Parsing).increment(System.currentTimeMillis() - startTime);
 
 			if (termPositionsMap.size() == 0) {

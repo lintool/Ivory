@@ -121,7 +121,7 @@ trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-bm25-sd.txt
 trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-bm25-fd.txt
 
 # junit
-etc/junit.sh ivory.regression.Robust04_Basic
+etc/junit.sh ivory.regression.basic.Robust04_Basic
 </pre>
 
 <table>
@@ -175,7 +175,7 @@ trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-wsd-sd.txt
 trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-wsd-fd.txt
 
 # junit
-etc/junit.sh ivory.regression.Robust04_WSD
+etc/junit.sh ivory.regression.basic.Robust04_WSD
 </pre>
 
 <table>
@@ -215,7 +215,7 @@ trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-sd-lce-s.txt
 trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-sd-lce-bigram.txt
 
 # junit
-etc/junit.sh ivory.regression.Robust04_Basic_LCE
+etc/junit.sh ivory.regression.basic.Robust04_Basic_LCE
 </pre>
 
 <table>
@@ -263,7 +263,7 @@ etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/trec/run.robust04.wsd.lce.xml
 trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-wsd-lce.txt
 
 # junit
-etc/junit.sh ivory.regression.Robust04_WSD_LCE
+etc/junit.sh ivory.regression.basic.Robust04_WSD_LCE
 </pre>
 
 <table>
@@ -303,7 +303,7 @@ trec_eval data/wt10g/qrels.wt10g ranking.wt10g-bm25-sd.txt
 trec_eval data/wt10g/qrels.wt10g ranking.wt10g-bm25-fd.txt
 
 # junit
-etc/junit.sh ivory.regression.Wt10g_Basic
+etc/junit.sh ivory.regression.basic.Wt10g_Basic
 </pre>
 
 <table>
@@ -366,7 +366,7 @@ trec_eval data/gov2/qrels.gov2.all ranking.gov2-bm25-sd.txt
 trec_eval data/gov2/qrels.gov2.all ranking.gov2-bm25-fd.txt
 
 # junit
-etc/junit.sh ivory.regression.Gov2_Basic
+etc/junit.sh ivory.regression.basic.Gov2_Basic
 </pre>
 
 <table>
@@ -428,7 +428,7 @@ trec_eval data/clue/qrels.web09catB.txt ranking.web09catB-bm25.txt
 trec_eval data/clue/qrels.web09catB.txt ranking.web09catB-ql.txt
 
 # junit
-etc/junit.sh ivory.regression.Web09catB_Baseline
+etc/junit.sh ivory.regression.basic.Web09catB_Baseline
 </pre>
 
 <table>
@@ -475,7 +475,7 @@ trec_eval data/clue/qrels.web09catB.txt ranking.web09catB.all.bm25.sd.txt
 trec_eval data/clue/qrels.web09catB.txt ranking.web09catB.all.bm25.wsd.txt
 
 # junit
-etc/junit.sh ivory.regression.Web09catB_All
+etc/junit.sh ivory.regression.basic.Web09catB_All
 </pre>
 
 <table>
@@ -539,7 +539,7 @@ trec_eval data/clue/qrels.web09catB.txt ranking.web09catB.spam.bm25.sd.txt
 trec_eval data/clue/qrels.web09catB.txt ranking.web09catB.spam.bm25.wsd.txt
 
 # junit
-etc/junit.sh ivory.regression.Web09catB_All_Spam
+etc/junit.sh ivory.regression.basic.Web09catB_All_Spam
 </pre>
 
 <table>
@@ -608,7 +608,7 @@ trec_eval data/wt10g/qrels.wt10g ranking.sigir2010-wt10g-sd.txt
 trec_eval data/wt10g/qrels.wt10g ranking.sigir2010-wt10g-wsd-sd.txt
 
 # junit
-etc/junit.sh ivory.regression.Wt10g_SIGIR2010
+etc/junit.sh ivory.regression.sigir2010.Wt10g_ESD
 </pre>
 
 <table>
@@ -647,7 +647,7 @@ trec_eval data/gov2/qrels.gov2.all ranking.sigir2010-gov2-sd.txt
 trec_eval data/gov2/qrels.gov2.all ranking.sigir2010-gov2-wsd-sd.txt
     
 # junit
-etc/junit.sh ivory.regression.Gov2_SIGIR2010
+etc/junit.sh ivory.regression.sigir2010.Gov2_ESD
 </pre>
         
 <table>
@@ -691,7 +691,7 @@ perl etc/statAP_MQ_eval_v3.pl data/clue/prels.web09catB.txt ranking.sigir2010-we
 perl etc/statAP_MQ_eval_v3.pl data/clue/prels.web09catB.txt ranking.sigir2010-web09catB-wsd-sd.txt
 
 # junit
-etc/junit.sh ivory.regression.Web09catB_SIGIR2010
+etc/junit.sh ivory.regression.sigir2010.Clue_ESD
 </pre>
 
 <table>
@@ -788,10 +788,10 @@ trec_eval data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-desc-joint-x4.5.txt
 trec_eval data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-desc-joint-x5.0.txt
 
 # junit
-etc/junit.sh ivory.regression.Wt10g_CIKM2010_Title_Indep
-etc/junit.sh ivory.regression.Wt10g_CIKM2010_Title_Joint
-etc/junit.sh ivory.regression.Wt10g_CIKM2010_Desc_Indep
-etc/junit.sh ivory.regression.Wt10g_CIKM2010_Desc_Joint
+etc/junit.sh ivory.regression.cikm2010.Wt10g_Title_Indep
+etc/junit.sh ivory.regression.cikm2010.Wt10g_Title_Joint
+etc/junit.sh ivory.regression.cikm2010.Wt10g_Desc_Indep
+etc/junit.sh ivory.regression.cikm2010.Wt10g_Desc_Joint
 </pre>
 
 <table>
@@ -902,10 +902,10 @@ trec_eval data/gov2/qrels.gov2.all ranking.cikm2010-gov2-desc-joint-x4.5.txt
 trec_eval data/gov2/qrels.gov2.all ranking.cikm2010-gov2-desc-joint-x5.0.txt
 
 # junit
-etc/junit.sh ivory.regression.Gov2_CIKM2010_Title_Indep
-etc/junit.sh ivory.regression.Gov2_CIKM2010_Title_Joint
-etc/junit.sh ivory.regression.Gov2_CIKM2010_Desc_Indep
-etc/junit.sh ivory.regression.Gov2_CIKM2010_Desc_Joint
+etc/junit.sh ivory.regression.cikm2010.Gov2_Title_Indep
+etc/junit.sh ivory.regression.cikm2010.Gov2_Title_Joint
+etc/junit.sh ivory.regression.cikm2010.Gov2_Desc_Indep
+etc/junit.sh ivory.regression.cikm2010.Gov2_Desc_Joint
 </pre>
 
 <table>
@@ -1017,10 +1017,10 @@ trec_eval data/clue/qrels.web09catB.txt ranking.cikm2010-clue-desc-joint-x4.5.tx
 trec_eval data/clue/qrels.web09catB.txt ranking.cikm2010-clue-desc-joint-x5.0.txt
 
 # junit
-etc/junit.sh ivory.regression.Web09catB_CIKM2010_Title_Indep 
-etc/junit.sh ivory.regression.Web09catB_CIKM2010_Title_Joint
-etc/junit.sh ivory.regression.Web09catB_CIKM2010_Desc_Indep
-etc/junit.sh ivory.regression.Web09catB_CIKM2010_Desc_Joint
+etc/junit.sh ivory.regression.cikm2010.Web09catB_Title_Indep
+etc/junit.sh ivory.regression.cikm2010.Web09catB_Title_Joint
+etc/junit.sh ivory.regression.cikm2010.Web09catB_Desc_Indep
+etc/junit.sh ivory.regression.cikm2010.Web09catB_Desc_Joint
 </pre>  
     
 

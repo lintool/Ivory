@@ -23,7 +23,7 @@ import ivory.core.data.dictionary.DefaultCachedFrequencySortedDictionary;
 import ivory.core.data.document.IntDocVector;
 import ivory.core.data.document.LazyIntDocVector;
 import ivory.core.data.document.TermDocVector;
-import ivory.core.tokenize.DocumentProcessingUtils2;
+import ivory.core.tokenize.DocumentProcessingUtils;
 
 import java.io.IOException;
 import java.net.URI;
@@ -44,7 +44,6 @@ import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 import org.apache.log4j.Logger;
-
 
 import edu.umd.cloud9.util.PowerTool;
 
@@ -109,7 +108,7 @@ public class BuildIntDocVectors2 extends PowerTool {
 		@Override
 		public void map(IntWritable key, TermDocVector doc, Context context) throws IOException, InterruptedException {
 			long startTime = System.currentTimeMillis();
-			TreeMap<Integer, int[]> positions = DocumentProcessingUtils2.getTermIDsPositionsMap(doc, termidMap);
+			TreeMap<Integer, int[]> positions = DocumentProcessingUtils.getTermIDsPositionsMap(doc, termidMap);
 			context.getCounter(MapTime.DecodingAndIdMapping).increment(System.currentTimeMillis() - startTime);
 
 			startTime = System.currentTimeMillis();
