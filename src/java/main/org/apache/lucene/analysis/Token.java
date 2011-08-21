@@ -2,7 +2,7 @@
 
 package org.apache.lucene.analysis;
 
-import ivory.index.TermPositions;
+import ivory.core.index.TermPositions;
 
 /**
  * Licensed to the Apache Software Foundation (ASF) under one or more

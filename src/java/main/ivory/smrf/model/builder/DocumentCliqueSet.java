@@ -16,18 +16,19 @@
 
 package ivory.smrf.model.builder;
 
-import ivory.exception.ConfigurationException;
+import ivory.core.RetrievalEnvironment;
+import ivory.core.exception.ConfigurationException;
+import ivory.core.util.XMLTools;
 import ivory.smrf.model.Clique;
 import ivory.smrf.model.DocumentNode;
 import ivory.smrf.model.GraphNode;
 import ivory.smrf.model.Parameter;
 import ivory.smrf.model.potential.PotentialFunction;
-import ivory.util.RetrievalEnvironment;
-import ivory.util.XMLTools;
 
 import java.util.ArrayList;
 
 import org.w3c.dom.Node;
+
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;

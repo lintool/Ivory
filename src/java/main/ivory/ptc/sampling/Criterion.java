@@ -16,10 +16,12 @@
 
 package ivory.ptc.sampling;
 
-import org.apache.hadoop.fs.FileSystem;
-
 import ivory.ptc.data.PseudoJudgments;
 import ivory.ptc.data.PseudoQuery;
+
+import org.apache.hadoop.fs.FileSystem;
+
+
 
 /**
  * Criterion for sampling pseudo judgments.

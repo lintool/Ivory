@@ -16,7 +16,8 @@
 
 package ivory.ltr;
 
-import ivory.exception.ConfigurationException;
+import ivory.core.RetrievalEnvironment;
+import ivory.core.exception.ConfigurationException;
 import ivory.smrf.model.Clique;
 import ivory.smrf.model.DocumentNode;
 import ivory.smrf.model.GraphNode;
@@ -26,7 +27,6 @@ import ivory.smrf.model.importance.ConceptImportanceModel;
 import ivory.smrf.model.importance.LinearImportanceModel;
 import ivory.smrf.model.importance.MetaFeature;
 import ivory.smrf.retrieval.BatchQueryRunner;
-import ivory.util.RetrievalEnvironment;
 
 import java.io.IOException;
 import java.rmi.NotBoundException;
@@ -48,6 +48,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
+
 
 import edu.umd.cloud9.collection.DocnoMapping;
 

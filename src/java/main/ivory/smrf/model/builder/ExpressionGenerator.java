@@ -16,9 +16,11 @@
 
 package ivory.smrf.model.builder;
 
-import ivory.exception.ConfigurationException;
+
+import ivory.core.exception.ConfigurationException;
 
 import org.w3c.dom.Node;
+
 
 import com.google.common.base.Preconditions;
 

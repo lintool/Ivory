@@ -16,7 +16,7 @@
 
 package ivory.smrf.retrieval;
 
-import ivory.exception.ConfigurationException;
+import ivory.core.exception.ConfigurationException;
 import ivory.smrf.model.Clique;
 import ivory.smrf.model.DocumentNode;
 import ivory.smrf.model.GraphNode;
@@ -30,6 +30,7 @@ import java.util.PriorityQueue;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+
 
 /**
  * @author Don Metzler

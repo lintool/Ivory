@@ -16,10 +16,11 @@
 
 package ivory.smrf.model.builder;
 
+import ivory.core.util.XMLTools;
 import ivory.smrf.model.builder.Expression.Type;
-import ivory.util.XMLTools;
 
 import org.w3c.dom.Node;
+
 
 import com.google.common.base.Preconditions;
 

@@ -16,11 +16,13 @@
 
 package ivory.smrf.model.expander;
 
-import ivory.data.IntDocVector;
-import ivory.data.PostingsList;
-import ivory.data.PostingsReader;
-import ivory.exception.ConfigurationException;
-import ivory.exception.RetrievalException;
+import ivory.core.RetrievalEnvironment;
+import ivory.core.data.document.IntDocVector;
+import ivory.core.data.index.PostingsList;
+import ivory.core.data.index.PostingsReader;
+import ivory.core.exception.ConfigurationException;
+import ivory.core.exception.RetrievalException;
+import ivory.core.util.XMLTools;
 import ivory.smrf.model.Clique;
 import ivory.smrf.model.DocumentNode;
 import ivory.smrf.model.GlobalEvidence;
@@ -38,8 +40,6 @@ import ivory.smrf.model.potential.PotentialFunction;
 import ivory.smrf.model.potential.QueryPotential;
 import ivory.smrf.model.score.ScoringFunction;
 import ivory.smrf.retrieval.Accumulator;
-import ivory.util.RetrievalEnvironment;
-import ivory.util.XMLTools;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -48,6 +48,7 @@ import java.util.Map;
 import java.util.PriorityQueue;
 
 import org.w3c.dom.Node;
+
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;

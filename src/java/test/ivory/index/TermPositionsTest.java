@@ -18,11 +18,15 @@ package ivory.index;
 
 import static org.junit.Assert.assertEquals;
 
+
+import ivory.core.index.TermPositions;
+
 import java.io.IOException;
 
 import junit.framework.JUnit4TestAdapter;
 
 import org.junit.Test;
+
 
 public class TermPositionsTest {
 

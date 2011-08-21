@@ -1,7 +1,7 @@
 package ivory.regression.sigir2011;
 
 import ivory.cascade.retrieval.CascadeBatchQueryRunner;
-import ivory.eval.GradedQrels;
+import ivory.core.eval.GradedQrels;
 import ivory.regression.GroundTruth;
 import ivory.regression.GroundTruth.Metric;
 import ivory.smrf.retrieval.Accumulator;
@@ -15,6 +15,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.log4j.Logger;
 import org.junit.Test;
+
 
 import edu.umd.cloud9.collection.DocnoMapping;
 

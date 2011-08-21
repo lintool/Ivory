@@ -16,11 +16,12 @@
 
 package ivory.smrf.model.score;
 
-import ivory.exception.ConfigurationException;
+import ivory.core.exception.ConfigurationException;
 import ivory.smrf.model.GlobalEvidence;
 import ivory.smrf.model.GlobalTermEvidence;
 
 import org.w3c.dom.Node;
+
 
 import com.google.common.base.Preconditions;
 

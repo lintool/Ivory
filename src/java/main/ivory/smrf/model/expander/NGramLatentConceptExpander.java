@@ -16,21 +16,22 @@
 
 package ivory.smrf.model.expander;
 
-import ivory.data.IntDocVector;
-import ivory.exception.ConfigurationException;
-import ivory.exception.RetrievalException;
+import ivory.core.RetrievalEnvironment;
+import ivory.core.data.document.IntDocVector;
+import ivory.core.exception.ConfigurationException;
+import ivory.core.exception.RetrievalException;
 import ivory.smrf.model.Clique;
 import ivory.smrf.model.MarkovRandomField;
 import ivory.smrf.model.VocabFrequencyPair;
 import ivory.smrf.model.builder.MRFBuilder;
 import ivory.smrf.retrieval.Accumulator;
 import ivory.smrf.retrieval.MRFDocumentRanker;
-import ivory.util.RetrievalEnvironment;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.PriorityQueue;
+
 
 import com.google.common.base.Preconditions;
 

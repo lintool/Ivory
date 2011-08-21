@@ -16,18 +16,18 @@
 
 package ivory.smrf.model.expander;
 
-import ivory.data.IntDocVector;
-import ivory.data.IntDocVector.Reader;
-import ivory.exception.ConfigurationException;
-import ivory.exception.RetrievalException;
+import ivory.core.RetrievalEnvironment;
+import ivory.core.data.document.IntDocVector;
+import ivory.core.data.document.IntDocVector.Reader;
+import ivory.core.exception.ConfigurationException;
+import ivory.core.exception.RetrievalException;
+import ivory.core.util.XMLTools;
 import ivory.smrf.model.MarkovRandomField;
 import ivory.smrf.model.Parameter;
 import ivory.smrf.model.VocabFrequencyPair;
 import ivory.smrf.model.builder.MRFBuilder;
 import ivory.smrf.model.importance.ConceptImportanceModel;
 import ivory.smrf.retrieval.Accumulator;
-import ivory.util.RetrievalEnvironment;
-import ivory.util.XMLTools;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -40,6 +40,7 @@ import java.util.Map.Entry;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;

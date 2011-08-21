@@ -16,10 +16,11 @@
 
 package ivory.cascade.model.score;
 
+import ivory.core.RetrievalEnvironment;
 import ivory.smrf.model.score.DirichletScoringFunction;
-import ivory.util.RetrievalEnvironment;
 
 import org.w3c.dom.Node;
+
 
 /**
  * @author Lidan Wang

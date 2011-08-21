@@ -16,10 +16,10 @@
 
 package ivory.ptc.judgments.extractor;
 
-import edu.umd.cloud9.io.array.ArrayListWritable;
-
 import ivory.ptc.data.AnchorTextTarget;
 import ivory.ptc.data.PseudoJudgments;
+import edu.umd.cloud9.io.array.ArrayListWritable;
+
 
 /**
  * Returns all the input documents as pseudo judgments. No parameter is necessary.

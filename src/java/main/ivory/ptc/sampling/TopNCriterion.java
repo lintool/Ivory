@@ -16,10 +16,12 @@
 
 package ivory.ptc.sampling;
 
-import org.apache.hadoop.fs.FileSystem;
-
 import ivory.ptc.data.PseudoJudgments;
 import ivory.ptc.data.PseudoQuery;
+
+import org.apache.hadoop.fs.FileSystem;
+
+
 
 /**
  * Returns top N pseudo queries and judgments passed to this

@@ -16,8 +16,9 @@
 
 package ivory.smrf.retrieval;
 
-import ivory.util.ResultWriter;
-import ivory.util.XMLTools;
+
+import ivory.core.util.ResultWriter;
+import ivory.core.util.XMLTools;
 
 import java.io.IOException;
 import java.rmi.NotBoundException;
@@ -36,6 +37,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+
 
 /**
  * @author Tamer Elsayed

@@ -16,13 +16,13 @@
 
 package ivory.cascade.retrieval;
 
-import ivory.exception.ConfigurationException;
+import ivory.core.RetrievalEnvironment;
+import ivory.core.exception.ConfigurationException;
 import ivory.smrf.model.MarkovRandomField;
 import ivory.smrf.model.builder.MRFBuilder;
 import ivory.smrf.model.expander.MRFExpander;
 import ivory.smrf.retrieval.Accumulator;
 import ivory.smrf.retrieval.MRFDocumentRanker;
-import ivory.util.RetrievalEnvironment;
 
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -32,6 +32,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import org.apache.log4j.Logger;
+
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;

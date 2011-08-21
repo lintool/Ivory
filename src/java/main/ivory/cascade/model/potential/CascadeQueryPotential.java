@@ -16,12 +16,13 @@
 
 package ivory.cascade.model.potential;
 
+import ivory.core.RetrievalEnvironment;
 import ivory.smrf.model.builder.ExpressionGenerator;
 import ivory.smrf.model.potential.QueryPotential;
 import ivory.smrf.model.score.ScoringFunction;
-import ivory.util.RetrievalEnvironment;
 
 import java.util.Arrays;
+
 
 /**
  * @author Lidan Wang

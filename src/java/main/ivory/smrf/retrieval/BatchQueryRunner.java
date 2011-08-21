@@ -16,13 +16,13 @@
 
 package ivory.smrf.retrieval;
 
-import ivory.exception.ConfigurationException;
+import ivory.core.RetrievalEnvironment;
+import ivory.core.exception.ConfigurationException;
+import ivory.core.util.ResultWriter;
+import ivory.core.util.XMLTools;
 import ivory.smrf.model.builder.MRFBuilder;
 import ivory.smrf.model.expander.MRFExpander;
 import ivory.smrf.model.importance.ConceptImportanceModel;
-import ivory.util.ResultWriter;
-import ivory.util.RetrievalEnvironment;
-import ivory.util.XMLTools;
 
 import java.io.IOException;
 import java.util.Map;
@@ -38,6 +38,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;

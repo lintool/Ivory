@@ -1,5 +1,6 @@
 package ivory.lsh.eval;
-import ivory.util.RetrievalEnvironment;
+
+import ivory.core.RetrievalEnvironment;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -31,6 +32,7 @@ import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+
 
 import edu.umd.cloud9.collection.DocnoMapping;
 import edu.umd.cloud9.collection.wikipedia.WikipediaDocnoMapping;

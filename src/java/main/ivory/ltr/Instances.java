@@ -17,13 +17,15 @@
 package ivory.ltr;
 
 
-import ivory.exception.ConfigurationException;
+
+import ivory.core.exception.ConfigurationException;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+
 
 /**
  * @author metzler

@@ -16,10 +16,12 @@
 
 package ivory.smrf.model.potential;
 
-import ivory.data.Posting;
-import ivory.data.PostingsReader;
-import ivory.data.ProximityPostingsReader;
-import ivory.exception.ConfigurationException;
+import ivory.core.RetrievalEnvironment;
+import ivory.core.data.index.Posting;
+import ivory.core.data.index.PostingsReader;
+import ivory.core.data.index.ProximityPostingsReader;
+import ivory.core.exception.ConfigurationException;
+import ivory.core.util.XMLTools;
 import ivory.smrf.model.DocumentNode;
 import ivory.smrf.model.GlobalEvidence;
 import ivory.smrf.model.GlobalTermEvidence;
@@ -28,12 +30,11 @@ import ivory.smrf.model.TermNode;
 import ivory.smrf.model.builder.Expression;
 import ivory.smrf.model.builder.ExpressionGenerator;
 import ivory.smrf.model.score.ScoringFunction;
-import ivory.util.RetrievalEnvironment;
-import ivory.util.XMLTools;
 
 import java.util.List;
 
 import org.w3c.dom.Node;
+
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;

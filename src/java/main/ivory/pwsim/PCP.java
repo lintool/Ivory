@@ -1,12 +1,12 @@
 package ivory.pwsim;
 
-import ivory.data.DocLengthTable;
-import ivory.data.DocLengthTable2B;
-import ivory.data.Posting;
-import ivory.data.PostingsList;
-import ivory.data.PostingsReader;
+import ivory.core.RetrievalEnvironment;
+import ivory.core.data.index.Posting;
+import ivory.core.data.index.PostingsList;
+import ivory.core.data.index.PostingsReader;
+import ivory.core.data.stat.DocLengthTable;
+import ivory.core.data.stat.DocLengthTable2B;
 import ivory.pwsim.score.ScoringModel;
-import ivory.util.RetrievalEnvironment;
 
 import java.io.IOException;
 import java.util.Iterator;
@@ -30,6 +30,7 @@ import org.apache.hadoop.mapred.SequenceFileOutputFormat;
 import org.apache.hadoop.mapred.lib.IdentityReducer;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+
 
 import edu.umd.cloud9.io.map.HMapIFW;
 import edu.umd.cloud9.util.PowerTool;

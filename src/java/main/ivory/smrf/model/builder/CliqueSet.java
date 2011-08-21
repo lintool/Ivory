@@ -16,13 +16,14 @@
 
 package ivory.smrf.model.builder;
 
-import ivory.exception.ConfigurationException;
+import ivory.core.RetrievalEnvironment;
+import ivory.core.exception.ConfigurationException;
 import ivory.smrf.model.Clique;
-import ivory.util.RetrievalEnvironment;
 
 import java.util.List;
 
 import org.w3c.dom.Node;
+
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
