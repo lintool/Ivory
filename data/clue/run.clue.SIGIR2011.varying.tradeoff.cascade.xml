@@ -1,5 +1,5 @@
 <parameters>
-  <index>/scratch0/clue.en.01</index>
+  <index>/scratch0/indexes/clue.en.01</index>
 	
   <!-- Concept importance model for binning -->
   <importancemodel id="wsd" type="ivory.smrf.model.importance.LinearImportanceModel">

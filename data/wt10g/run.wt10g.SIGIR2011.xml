@@ -1,5 +1,5 @@
 <parameters>
-  <index>/scratch0/wt10g</index>
+  <index>/scratch0/indexes/wt10g</index>
 
   <!-- Concept importance model for binning -->
   <importancemodel id="wsd" type="ivory.smrf.model.importance.LinearImportanceModel">

@@ -292,15 +292,15 @@ etc/junit.sh ivory.regression.basic.Robust04_WSD_LCE
 <pre>
 # command-line
 etc/run.sh ivory.smrf.retrieval.RunQueryLocal \
-  data/wt10g/run.wt10g.basic.xml data/wt10g/wt10g_queries_451-500.xml data/wt10g/wt10g_queries_501-550.xml
+  data/wt10g/run.wt10g.basic.xml data/wt10g/queries.wt10g.451-500.xml data/wt10g/queries.wt10g.501-550.xml
 
 # evaluating effectiveness
-trec_eval data/wt10g/qrels.wt10g ranking.wt10g-dir-base.txt
-trec_eval data/wt10g/qrels.wt10g ranking.wt10g-dir-sd.txt
-trec_eval data/wt10g/qrels.wt10g ranking.wt10g-dir-fd.txt
-trec_eval data/wt10g/qrels.wt10g ranking.wt10g-bm25-base.txt
-trec_eval data/wt10g/qrels.wt10g ranking.wt10g-bm25-sd.txt
-trec_eval data/wt10g/qrels.wt10g ranking.wt10g-bm25-fd.txt
+trec_eval data/wt10g/qrels.wt10g.all ranking.wt10g-dir-base.txt
+trec_eval data/wt10g/qrels.wt10g.all ranking.wt10g-dir-sd.txt
+trec_eval data/wt10g/qrels.wt10g.all ranking.wt10g-dir-fd.txt
+trec_eval data/wt10g/qrels.wt10g.all ranking.wt10g-bm25-base.txt
+trec_eval data/wt10g/qrels.wt10g.all ranking.wt10g-bm25-sd.txt
+trec_eval data/wt10g/qrels.wt10g.all ranking.wt10g-bm25-fd.txt
 
 # junit
 etc/junit.sh ivory.regression.basic.Wt10g_Basic
@@ -600,12 +600,12 @@ represent results in Tables 5 and 6 of the paper.</p>
 <pre>
 # command-line
 etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/wt10g/run.wt10g.SIGIR2010.xml \
-  data/wt10g/wt10g_queries_501-550.xml
+  data/wt10g/queries.wt10g.501-550.xml
 
 # evaluating effectiveness
-trec_eval data/wt10g/qrels.wt10g ranking.sigir2010-wt10g-ql.txt
-trec_eval data/wt10g/qrels.wt10g ranking.sigir2010-wt10g-sd.txt
-trec_eval data/wt10g/qrels.wt10g ranking.sigir2010-wt10g-wsd-sd.txt
+trec_eval data/wt10g/qrels.wt10g.all ranking.sigir2010-wt10g-ql.txt
+trec_eval data/wt10g/qrels.wt10g.all ranking.sigir2010-wt10g-sd.txt
+trec_eval data/wt10g/qrels.wt10g.all ranking.sigir2010-wt10g-wsd-sd.txt
 
 # junit
 etc/junit.sh ivory.regression.sigir2010.Wt10g_ESD

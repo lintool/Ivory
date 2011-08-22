@@ -2,7 +2,7 @@
 
      <!-- Note: query-independent features are ordered by their contributions to effectiveness for Indep model -->
 
-     <index>/fs/clip-hadoop/indexes/wt10g</index>
+     <index>/scratch0/indexes/wt10g</index>
 
      <!-- Concept importance model definition -->
      <importancemodel id="wsd" type="ivory.smrf.model.importance.LinearImportanceModel">

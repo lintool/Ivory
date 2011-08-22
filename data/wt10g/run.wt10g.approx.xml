@@ -1,6 +1,6 @@
 <parameters>
 
-     <index>/fs/clip-hadoop/indexes/wt10g_new</index>
+     <index>/scratch0/indexes/wt10g_new</index>
 
 	 <!-- Dirichlet, sequential dependence -->
      <model id="wt10g-dir-sd" type="Feature" output="ranking.wt10g-dir-sd.txt" hits="1000">

@@ -72,23 +72,6 @@ public class IntPostingsForwardIndex {
     // sLogger.info("getPostingsList("+termid+")");
     long pos = positions[termid - 1];
 
-    IntWritable key = new IntWritable();
-
-    PostingsList value = null;
-    try {
-      value = (PostingsList) Class.forName(postingsType).newInstance();
-    } catch (InstantiationException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (IllegalAccessException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (ClassNotFoundException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
-    // sLogger.info("type: "+postingsType);
-    // sLogger.info("stored pos: " + pos);
     int fileNo = (int) (pos / BIG_LONG_NUMBER);
 
     pos = pos % BIG_LONG_NUMBER;
@@ -99,13 +82,24 @@ public class IntPostingsForwardIndex {
       padd += "0";
     fileNoStr = padd + fileNoStr;
 
-    // open up the SequenceFile
-
-    // sLogger.info("file no: " + fileNoStr);
-    // sLogger.info("file pos: " + pos);
-
+    // Open up the SequenceFile.
     SequenceFile.Reader reader = new SequenceFile.Reader(fs, new Path(postingsPath + "/part-"
         + fileNoStr), conf);
+
+    IntWritable key = new IntWritable();
+    PostingsList value = null;
+    try {
+      value = (PostingsList) Class.forName(reader.getValueClassName()).newInstance();
+    } catch (InstantiationException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    } catch (IllegalAccessException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    } catch (ClassNotFoundException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
 
     reader.seek(pos);
     reader.next(key, value);
