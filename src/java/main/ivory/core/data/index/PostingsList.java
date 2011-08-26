@@ -59,7 +59,6 @@ public interface PostingsList extends Writable {
 
 	/**
 	 * Adds a posting to this postings list.
-	 *
 	 * @param docno docno of the posting
 	 * @param score score of the posting
 	 * @param pos positional information (optional)

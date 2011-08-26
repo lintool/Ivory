@@ -1,5 +1,5 @@
 /*
- * Ivory: A Hadoop toolkit for Web-scale information retrieval
+ * Ivory: A Hadoop toolkit for web-scale information retrieval
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You may
@@ -19,31 +19,28 @@ package ivory.core.index;
 import java.util.ArrayList;
 
 import edu.umd.cloud9.util.array.ArrayListOfInts;
-/**
- * @author Tamer
- *
- */
+
+
 public class TermOccurrences {
-	ArrayListOfInts docnos = new ArrayListOfInts();
-	ArrayList<int[]> positions = new ArrayList<int[]>();
-	
-	public void add(int docno, int[] tp){
-		docnos.add(docno);
-		positions.add(tp);
-	}
-	
-	public int size(){
-		return positions.size();
-	}
-	
-	public int[] getDocnos(){
-		return docnos.getArray();
-	}
-	
-	public int[][] getPositions(){
-		int[][] p = new int[positions.size()][];
-		positions.toArray(p);
-		return p;
-	}
-	
+  ArrayListOfInts docnos = new ArrayListOfInts();
+  ArrayList<int[]> positions = new ArrayList<int[]>();
+
+  public void add(int docno, int[] tp) {
+    docnos.add(docno);
+    positions.add(tp);
+  }
+
+  public int size() {
+    return positions.size();
+  }
+
+  public int[] getDocnos() {
+    return docnos.getArray();
+  }
+
+  public int[][] getPositions() {
+    int[][] p = new int[positions.size()][];
+    positions.toArray(p);
+    return p;
+  }
 }

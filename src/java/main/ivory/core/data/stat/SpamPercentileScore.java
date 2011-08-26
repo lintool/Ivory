@@ -1,11 +1,11 @@
 /*
  * Ivory: A Hadoop toolkit for Web-scale information retrieval
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You may
  * obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0 
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,7 +15,6 @@
  */
 
 package ivory.core.data.stat;
-
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -32,14 +31,13 @@ import com.google.common.base.Preconditions;
 import edu.umd.cloud9.debug.MemoryUsageUtils;
 
 public class SpamPercentileScore implements DocScoreTable {
-	static final Logger sLogger = Logger.getLogger(SpamPercentileScore.class);
+	static final Logger LOG = Logger.getLogger(SpamPercentileScore.class);
 
-	protected byte[] mScores;
-	protected int nDocs;
-	protected int mDocnoOffset;
+	protected byte[] scores;
+	protected int docs;
+	protected int docnoOffset;
 
-	public SpamPercentileScore() {
-	}
+	public SpamPercentileScore() {}
 
 	public void initialize(String file, FileSystem fs) throws IOException {
 		Preconditions.checkNotNull(file);
@@ -48,30 +46,30 @@ public class SpamPercentileScore implements DocScoreTable {
 		FSDataInputStream in = fs.open(new Path(file));
 
 		// Read the docno offset.
-		mDocnoOffset = in.readInt();
+		docnoOffset = in.readInt();
 
 		// Read the size of the document collection.
 		int sz = in.readInt() + 1;
 
-		sLogger.info("Docno offset: " + mDocnoOffset);
-		sLogger.info("Number of docs: " + (sz - 1));
+		LOG.info("Docno offset: " + docnoOffset);
+		LOG.info("Number of docs: " + (sz - 1));
 
 		// Initialize an array to hold all the doc scores.
-		mScores = new byte[sz];
+		scores = new byte[sz];
 
 		// Read each doc length.
 		for (int i = 1; i < sz; i++) {
-			mScores[i] = in.readByte();
-			nDocs++;
+			scores[i] = in.readByte();
+			docs++;
 
 			if (i % 1000000 == 0) {
-				sLogger.info(i + " docscores read");
+				LOG.info(i + " docscores read");
 			}
 		}
 
 		in.close();
 
-		sLogger.info("Total of " + nDocs + " docscores read");
+		LOG.info("Total of " + docs + " docscores read");
 	}
 
 	/**
@@ -82,23 +80,23 @@ public class SpamPercentileScore implements DocScoreTable {
 	public float getScore(int docno) {
 		// Remember that docnos are numbered starting from one. We add one to
 		// avoid computing log(0).
-		return (float) Math.log(mScores[docno - mDocnoOffset] + 1);
+		return (float) Math.log(scores[docno - docnoOffset] + 1);
 	}
 	
 	public byte getRawScore(int docno) {
 		// docnos are numbered starting from one
-		return mScores[docno - mDocnoOffset];
+		return scores[docno - docnoOffset];
 	}
 
 	public int getDocnoOffset() {
-		return mDocnoOffset;
+		return docnoOffset;
 	}
 
 	/**
 	 * Returns number of documents in the collection.
 	 */
 	public int getDocCount() {
-		return nDocs;
+		return docs;
 	}
 
 	public static void main(String[] args) throws Exception {

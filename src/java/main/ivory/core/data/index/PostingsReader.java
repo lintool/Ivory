@@ -1,5 +1,5 @@
 /*
- * Ivory: A Hadoop toolkit for Web-scale information retrieval
+ * Ivory: A Hadoop toolkit for web-scale information retrieval
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You may
@@ -26,7 +26,6 @@ import ivory.core.index.TermPositions;
 public interface PostingsReader {
   /**
    * Reads the next posting, consuming it from the stream of postings.
-   *
    * @param posting object for holding the posting
    * @return {@code true} if posting successfully read, {@code false} otherwise
    */
@@ -34,7 +33,6 @@ public interface PostingsReader {
 
   /**
    * Checks to see if there are any more postings to be read.
-   *
    * @return {@code true} if there are any more postings to be read, {@code false} otherwise
    */
   boolean hasMorePostings();

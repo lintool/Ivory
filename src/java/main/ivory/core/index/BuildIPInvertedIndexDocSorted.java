@@ -1,5 +1,5 @@
 /*
- * Ivory: A Hadoop toolkit for Web-scale information retrieval
+ * Ivory: A Hadoop toolkit for web-scale information retrieval
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You may
@@ -15,7 +15,6 @@
  */
 
 package ivory.core.index;
-
 
 import ivory.core.RetrievalEnvironment;
 import ivory.core.data.document.IntDocVector;
@@ -57,7 +56,6 @@ import edu.umd.cloud9.util.map.MapII;
  *
  * @author Jimmy Lin
  * @author Tamer Elsayed
- * 
  */
 @SuppressWarnings("deprecation")
 public class BuildIPInvertedIndexDocSorted extends PowerTool {

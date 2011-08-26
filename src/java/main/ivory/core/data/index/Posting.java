@@ -85,6 +85,7 @@ public class Posting implements Writable {
   /**
    * Deserializes this posting.
    */
+  @Override
   public void readFields(DataInput in) throws IOException {
     docno = in.readInt();
     score = in.readShort();
@@ -93,6 +94,7 @@ public class Posting implements Writable {
   /**
    * Serializes this posting.
    */
+  @Override
   public void write(DataOutput out) throws IOException {
     out.writeInt(docno);
     out.writeShort(score);
@@ -101,6 +103,7 @@ public class Posting implements Writable {
   /**
    * Clones this posting.
    */
+  @Override
   public Posting clone() {
     return new Posting(this.getDocno(), this.getScore());
   }
@@ -108,6 +111,7 @@ public class Posting implements Writable {
   /**
    * Generates a human-readable String representation of this object.
    */
+  @Override
   public String toString() {
     return "(" + docno + ", " + score + ")";
   }

@@ -1,11 +1,11 @@
 /*
- * Ivory: A Hadoop toolkit for Web-scale information retrieval
- *
+ * Ivory: A Hadoop toolkit for web-scale information retrieval
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You may
  * obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0 
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -57,7 +57,7 @@ public class PreprocessTREC2 extends Configured implements Tool {
     String indexRootPath = args[1];
     int numReducers = 10;
 
-    LOG.info("Tool name: PreprocessTREC");
+    LOG.info("Tool name: " + PreprocessTREC2.class.getCanonicalName());
     LOG.info(" - Collection path: " + collection);
     LOG.info(" - Index path: " + indexRootPath);
 
@@ -81,7 +81,7 @@ public class PreprocessTREC2 extends Configured implements Tool {
     if (!fs.exists(mappingFile)) {
       LOG.info("docno-mapping.dat doesn't exist, creating...");
       String[] arr = new String[] { collection, mappingDir.toString(),
-          mappingFile.toString(), "100" }; // "100" mappers (doesn't matter)
+              mappingFile.toString(), "100" }; // "100" mappers (doesn't matter)
       NumberTrecDocuments tool = new NumberTrecDocuments();
       tool.setConf(conf);
       tool.run(arr);
@@ -102,7 +102,7 @@ public class PreprocessTREC2 extends Configured implements Tool {
     conf.set(Constants.DocnoMappingFile, env.getDocnoMappingData().toString());
 
     conf.setInt(Constants.DocnoOffset, 0); // docnos start at 1
-    conf.setInt(Constants.MinDf, 2);       // toss away singleton terms
+    conf.setInt(Constants.MinDf, 2); // toss away singleton terms
     conf.setInt(Constants.MaxDf, Integer.MAX_VALUE);
     conf.setInt(Constants.TermIndexWindow, 8);
 
@@ -118,8 +118,7 @@ public class PreprocessTREC2 extends Configured implements Tool {
   }
 
   /**
-   * Dispatches command-line arguments to the tool via the
-   * <code>ToolRunner</code>.
+   * Dispatches command-line arguments to the tool via the {@code ToolRunner}.
    */
   public static void main(String[] args) throws Exception {
     int res = ToolRunner.run(new Configuration(), new PreprocessTREC(), args);

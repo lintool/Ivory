@@ -1,11 +1,11 @@
 /*
  * Ivory: A Hadoop toolkit for web-scale information retrieval
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You may
  * obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0 
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,7 +15,6 @@
  */
 
 package ivory.core.index;
-
 
 import ivory.core.RetrievalEnvironment;
 import ivory.core.data.index.PostingsList;
@@ -42,197 +41,190 @@ import org.apache.hadoop.mapred.SequenceFileInputFormat;
 import org.apache.hadoop.mapred.lib.NullOutputFormat;
 import org.apache.log4j.Logger;
 
-
 import edu.umd.cloud9.util.PowerTool;
 
+@SuppressWarnings("deprecation")
 public class BuildIntPostingsForwardIndex extends PowerTool {
+  private static final Logger LOG = Logger.getLogger(BuildIntPostingsForwardIndex.class);
+  protected static enum Dictionary { Size };
 
-	private static final Logger sLogger = Logger.getLogger(BuildIntPostingsForwardIndex.class);
+  private static class MyMapRunner implements
+      MapRunnable<IntWritable, PostingsList, IntWritable, Text> {
+    private String inputFile;
+    private Text outputValue = new Text();
 
-	protected static enum Dictionary {
-		Size
-	};
+    public void configure(JobConf job) {
+      inputFile = job.get("map.input.file");
+    }
 
-	private static class MyMapRunner implements
-			MapRunnable<IntWritable, PostingsList, IntWritable, Text> {
+    public void run(RecordReader<IntWritable, PostingsList> input,
+        OutputCollector<IntWritable, Text> output, Reporter reporter) throws IOException {
+      IntWritable key = input.createKey();
+      PostingsList value = input.createValue();
+      int fileNo = Integer.parseInt(inputFile.substring(inputFile.lastIndexOf("-") + 1));
 
-		private String mInputFile;
-		private Text outputValue = new Text();
+      long pos = input.getPos();
+      while (input.next(key, value)) {
+        outputValue.set(fileNo + "\t" + pos);
 
-		public void configure(JobConf job) {
-			mInputFile = job.get("map.input.file");
-		}
+        output.collect(key, outputValue);
+        reporter.incrCounter(Dictionary.Size, 1);
 
-		public void run(RecordReader<IntWritable, PostingsList> input,
-				OutputCollector<IntWritable, Text> output, Reporter reporter) throws IOException {
-			IntWritable key = input.createKey();
-			PostingsList value = input.createValue();
-			int fileNo = Integer.parseInt(mInputFile.substring(mInputFile.lastIndexOf("-") + 1));
+        pos = input.getPos();
+      }
+      LOG.info("last termid: " + key + "(" + fileNo + ", " + pos + ")");
+    }
+  }
 
-			long pos = input.getPos();
-			while (input.next(key, value)) {
-				outputValue.set(fileNo + "\t" + pos);
+  public static final long BIG_LONG_NUMBER = 1000000000;
 
-				output.collect(key, outputValue);
-				reporter.incrCounter(Dictionary.Size, 1);
+  private static class MyReducer extends MapReduceBase implements
+      Reducer<IntWritable, Text, Text, Text> {
+    private String positionsFile;
+    private int collectionTermCount;
+    private FSDataOutputStream out;
+    private int curKeyIndex = 0;
 
-				pos = input.getPos();
-			}
-			sLogger.info("last termid: " + key + "(" + fileNo + ", " + pos + ")");
-		}
-	}
+    public void configure(JobConf job) {
+      FileSystem fs;
+      try {
+        fs = FileSystem.get(job);
+      } catch (Exception e) {
+        throw new RuntimeException("Error opening the FileSystem!");
+      }
 
-	public static final long BIG_LONG_NUMBER = 1000000000;
+      String indexPath = job.get("Ivory.IndexPath");
 
-	private static class MyReducer extends MapReduceBase implements
-			Reducer<IntWritable, Text, Text, Text> {
-		String mPositionsFile;
-		int mCollectionTermCount;
+      RetrievalEnvironment env = null;
+      try {
+        env = new RetrievalEnvironment(indexPath, fs);
+      } catch (IOException e) {
+        throw new RuntimeException("Unable to create RetrievalEnvironment!");
+      }
 
-		FSDataOutputStream mOut;
+      positionsFile = env.getPostingsIndexData();
+      collectionTermCount = env.readCollectionTermCount();
 
-		int mCurKeyIndex = 0;
+      LOG.info("Ivory.PostingsPositionsFile: " + positionsFile);
+      LOG.info("Ivory.CollectionTermCount: " + collectionTermCount);
 
-		public void configure(JobConf job) {
-			FileSystem fs;
-			try {
-				fs = FileSystem.get(job);
-			} catch (Exception e) {
-				throw new RuntimeException("Error opening the FileSystem!");
-			}
+      try {
+        out = fs.create(new Path(positionsFile), true);
+        out.writeInt(collectionTermCount);
+      } catch (Exception e) {
+        throw new RuntimeException("Error in creating files!");
+      }
+    }
 
-			String indexPath = job.get("Ivory.IndexPath");
-			
-			RetrievalEnvironment env = null;
-			try {
-				env = new RetrievalEnvironment(indexPath, fs);
-			} catch (IOException e) {
-				throw new RuntimeException("Unable to create RetrievalEnvironment!");
-			}
+    public void reduce(IntWritable key, Iterator<Text> values,
+        OutputCollector<Text, Text> output, Reporter reporter) throws IOException {
+      String[] s = values.next().toString().split("\\s+");
 
-			mPositionsFile = env.getPostingsIndexData();
-			mCollectionTermCount = env.readCollectionTermCount();
+      if (values.hasNext()) {
+        throw new RuntimeException("There shouldn't be more than one value, key=" + key);
+      }
 
-			sLogger.info("Ivory.PostingsPositionsFile: " + mPositionsFile);
-			sLogger.info("Ivory.CollectionTermCount: " + mCollectionTermCount);
+      int fileNo = Integer.parseInt(s[0]);
+      long filePos = Long.parseLong(s[1]);
+      long pos = BIG_LONG_NUMBER * fileNo + filePos;
 
-			try {
-				mOut = fs.create(new Path(mPositionsFile), true);
-				mOut.writeInt(mCollectionTermCount);
-			} catch (Exception e) {
-				throw new RuntimeException("Error in creating files!");
-			}
+      curKeyIndex++;
 
-		}
+      // This is subtle point: Ivory.CollectionTermCount specifies the
+      // number of terms in the collection, computed by
+      // BuildTermIdMap. However, this number is sometimes greater than
+      // the number of postings that are in the index (as is the case for
+      // ClueWeb09). Here's what happens: when creating TermDocVectors,
+      // the vocabulary gets populated with tokens that contain special
+      // symbols. The vocabulary then gets compressed with front-coding.
+      // However, for whatever reason, the current implementation cannot
+      // properly handle these special characters. So when we convert from
+      // TermDocVectors to IntDocVectors, we can't find the term id for
+      // these special tokens. As a result, no postings list get created
+      // for them. So there are assigned term ids for which there are no
+      // postings. Since IntPostingsForwardIndex assumes consecutive term
+      // ids (since it loads position offsets into an array), we must
+      // insert "padding".
+      // - Jimmy, 5/29/2010
 
-		public void reduce(IntWritable key, Iterator<Text> values,
-				OutputCollector<Text, Text> output, Reporter reporter) throws IOException {
-			String[] s = values.next().toString().split("\\s+");
+      while (curKeyIndex < key.get()) {
+        out.writeLong(-1);
+        curKeyIndex++;
+      }
 
-			if (values.hasNext())
-				throw new RuntimeException("There shouldn't be more than one value, key=" + key);
+      out.writeLong(pos);
+    }
 
-			int fileNo = Integer.parseInt(s[0]);
-			long filePos = Long.parseLong(s[1]);
-			long pos = BIG_LONG_NUMBER * fileNo + filePos;
+    public void close() throws IOException {
+      // insert padding at the end
+      while (curKeyIndex < collectionTermCount) {
+        out.writeLong(-1);
+        curKeyIndex++;
+      }
 
-			mCurKeyIndex++;
+      out.close();
 
-			// This is subtle point: Ivory.CollectionTermCount specifies the
-			// number of terms in the collection, computed by
-			// BuildTermIdMap. However, this number is sometimes greater than
-			// the number of postings that are in the index (as is the case for
-			// ClueWeb09). Here's what happens: when creating TermDocVectors,
-			// the vocabulary gets populated with tokens that contain special
-			// symbols. The vocabulary then gets compressed with front-coding.
-			// However, for whatever reason, the current implementation cannot
-			// properly handle these special characters. So when we convert from
-			// TermDocVectors to IntDocVectors, we can't find the term id for
-			// these special tokens. As a result, no postings list get created
-			// for them. So there are assigned term ids for which there are no
-			// postings. Since IntPostingsForwardIndex assumes consecutive term
-			// ids (since it loads position offsets into an array), we must
-			// insert "padding".
-			// - Jimmy, 5/29/2010
+      if (curKeyIndex != collectionTermCount) {
+        throw new IOException("Expected " + collectionTermCount + " terms, actually got "
+            + curKeyIndex + " terms!");
+      }
+    }
+  }
 
-			while (mCurKeyIndex < key.get()) {
-				mOut.writeLong(-1);
-				mCurKeyIndex++;
-			}
+  public BuildIntPostingsForwardIndex(Configuration conf) {
+    super(conf);
+  }
 
-			mOut.writeLong(pos);
-		}
+  public static final String[] RequiredParameters = { "Ivory.IndexPath", "Ivory.NumMapTasks" };
 
-		public void close() throws IOException {
-			// insert padding at the end
-			while (mCurKeyIndex < mCollectionTermCount) {
-				mOut.writeLong(-1);
-				mCurKeyIndex++;
-			}
+  public String[] getRequiredParameters() {
+    return RequiredParameters;
+  }
 
-			mOut.close();
+  public int runTool() throws Exception {
+    JobConf conf = new JobConf(getConf(), BuildIntPostingsForwardIndex.class);
+    FileSystem fs = FileSystem.get(conf);
 
-			if (mCurKeyIndex != mCollectionTermCount) {
-				throw new IOException("Expected " + mCollectionTermCount + " terms, actually got "
-						+ mCurKeyIndex + " terms!");
-			}
-		}
-	}
+    int mapTasks = conf.getInt("Ivory.NumMapTasks", 0);
+    int minSplitSize = conf.getInt("Ivory.MinSplitSize", 0);
+    String indexPath = conf.get("Ivory.IndexPath");
 
-	public BuildIntPostingsForwardIndex(Configuration conf) {
-		super(conf);
-	}
+    RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fs);
+    String collectionName = env.readCollectionName();
 
-	public static final String[] RequiredParameters = { "Ivory.IndexPath", "Ivory.NumMapTasks" };
+    LOG.info("Tool: BuildIntPostingsForwardIndex");
+    LOG.info(" - IndexPath: " + indexPath);
+    LOG.info(" - CollectionName: " + collectionName);
 
-	public String[] getRequiredParameters() {
-		return RequiredParameters;
-	}
+    conf.setJobName("BuildIntPostingsForwardIndex:" + collectionName);
 
-	public int runTool() throws Exception {
-		JobConf conf = new JobConf(getConf(), BuildIntPostingsForwardIndex.class);
-		FileSystem fs = FileSystem.get(conf);
+    Path inputPath = new Path(env.getPostingsDirectory());
+    FileInputFormat.setInputPaths(conf, inputPath);
 
-		int mapTasks = conf.getInt("Ivory.NumMapTasks", 0);
-		int minSplitSize = conf.getInt("Ivory.MinSplitSize", 0);
-		String indexPath = conf.get("Ivory.IndexPath");
+    Path postingsIndexPath = new Path(env.getPostingsIndexData());
 
-		RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fs);
-		String collectionName = env.readCollectionName();
+    if (fs.exists(postingsIndexPath)) {
+      LOG.info("Postings forward index path already exists!");
+      return 0;
+    }
+    conf.setNumMapTasks(mapTasks);
+    conf.setNumReduceTasks(1);
 
-		sLogger.info("Tool: BuildIntPostingsForwardIndex");
-		sLogger.info(" - IndexPath: " + indexPath);
-		sLogger.info(" - CollectionName: " + collectionName);
+    conf.setInt("mapred.min.split.size", minSplitSize);
+    conf.set("mapred.child.java.opts", "-Xmx2048m");
 
-		conf.setJobName("BuildIntPostingsForwardIndex:" + collectionName);
+    conf.setInputFormat(SequenceFileInputFormat.class);
+    conf.setMapOutputKeyClass(IntWritable.class);
+    conf.setMapOutputValueClass(Text.class);
+    conf.setOutputKeyClass(Text.class);
+    conf.setOutputValueClass(Text.class);
+    conf.setOutputFormat(NullOutputFormat.class);
 
-		Path inputPath = new Path(env.getPostingsDirectory());
-		FileInputFormat.setInputPaths(conf, inputPath);
+    conf.setMapRunnerClass(MyMapRunner.class);
+    conf.setReducerClass(MyReducer.class);
 
-		Path postingsIndexPath = new Path(env.getPostingsIndexData());
+    JobClient.runJob(conf);
 
-		if (fs.exists(postingsIndexPath)){
-			sLogger.info("Postings forward index path already exists!");
-			return 0;
-		}
-		conf.setNumMapTasks(mapTasks);
-		conf.setNumReduceTasks(1);
-
-		conf.setInt("mapred.min.split.size", minSplitSize);
-		conf.set("mapred.child.java.opts", "-Xmx2048m");
-
-		conf.setInputFormat(SequenceFileInputFormat.class);
-		conf.setMapOutputKeyClass(IntWritable.class);
-		conf.setMapOutputValueClass(Text.class);
-		conf.setOutputKeyClass(Text.class);
-		conf.setOutputValueClass(Text.class);
-		conf.setOutputFormat(NullOutputFormat.class);
-
-		conf.setMapRunnerClass(MyMapRunner.class);
-		conf.setReducerClass(MyReducer.class);
-
-		JobClient.runJob(conf);
-
-		return 0;
-	}
+    return 0;
+  }
 }

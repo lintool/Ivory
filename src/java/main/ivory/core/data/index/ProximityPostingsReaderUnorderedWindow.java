@@ -1,11 +1,11 @@
 /*
- * Ivory: A Hadoop toolkit for Web-scale information retrieval
- * 
+ * Ivory: A Hadoop toolkit for web-scale information retrieval
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You may
  * obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0 
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -23,102 +23,102 @@ import java.util.BitSet;
  * @author Don Metzler
  */
 public class ProximityPostingsReaderUnorderedWindow extends ProximityPostingsReader {
+  private static final int BUFFER_SIZE = 4096;
 
-	protected int mNumReaders;
-	protected BitSet mMatchedIds = null;
-	private static final int BUFFER_SIZE = 4096;
-	protected int [] newPositions = new int[BUFFER_SIZE];
-	protected int [] newIds = new int[BUFFER_SIZE];
-	
-	public ProximityPostingsReaderUnorderedWindow(PostingsReader[] readers, int size) {
-		super(readers, size);
+  protected int numReaders;
+  protected BitSet matchedIds = null;
+  protected int[] newPositions = new int[BUFFER_SIZE];
+  protected int[] newIds = new int[BUFFER_SIZE];
 
-		mNumReaders = readers.length;
-		mMatchedIds = new BitSet(mNumReaders);
-	}
+  public ProximityPostingsReaderUnorderedWindow(PostingsReader[] readers, int size) {
+    super(readers, size);
 
-	protected short countMatches() {
-		int matches = 0;
+    numReaders = readers.length;
+    matchedIds = new BitSet(numReaders);
+  }
 
-		// merge all position lists into single stream
-		int[] positions = readers[0].getPositions();
-		int[] ids = new int[positions.length];
-		Arrays.fill(ids, 0);
-		int length = positions.length;
+  protected short countMatches() {
+    int matches = 0;
 
-		for (int id = 1; id < readers.length; id++) {
-			int [] p = readers[id].getPositions();
+    // Merge all position lists into single stream.
+    int[] positions = readers[0].getPositions();
+    int[] ids = new int[positions.length];
+    Arrays.fill(ids, 0);
+    int length = positions.length;
 
-			if(length + p.length > newPositions.length) {
-				newPositions = new int[length + p.length];
-				newIds = new int[length + p.length];
-			}
+    for (int id = 1; id < readers.length; id++) {
+      int[] p = readers[id].getPositions();
 
-			int posA = 0;
-			int posB = 0;
-			int i = 0;
-			while(i < length + p.length) {
-				if(posB == p.length || (posA < length && positions[posA] <= p[posB])) {
-					newPositions[i] = positions[posA];
-					newIds[i] = ids[posA];
-					posA++;
-				}
-				else {
-					newPositions[i] = p[posB];
-					newIds[i] = id;
-					posB++;
-				}
-				i++;
-			}
+      if (length + p.length > newPositions.length) {
+        newPositions = new int[length + p.length];
+        newIds = new int[length + p.length];
+      }
 
-			length += p.length;
-			positions = Arrays.copyOf(newPositions, length);
-			ids = Arrays.copyOf(newIds, length);
-		}
+      int posA = 0;
+      int posB = 0;
+      int i = 0;
+      while (i < length + p.length) {
+        if (posB == p.length || (posA < length && positions[posA] <= p[posB])) {
+          newPositions[i] = positions[posA];
+          newIds[i] = ids[posA];
+          posA++;
+        } else {
+          newPositions[i] = p[posB];
+          newIds[i] = id;
+          posB++;
+        }
+        i++;
+      }
 
-		// count matches
-		matches = countMatches(positions, ids);
+      length += p.length;
+      positions = Arrays.copyOf(newPositions, length);
+      ids = Arrays.copyOf(newIds, length);
+    }
 
-		// truncate tf to Short.MAX_VALUE
-		if (matches > Short.MAX_VALUE) {
-			matches = Short.MAX_VALUE;
-		}
+    // Count matches.
+    matches = countMatches(positions, ids);
 
-		return (short) matches;
-	}
-	@Override
-	public int countMatches(int [] positions, int [] ids) {
-		int matches = 0;
+    // Truncate tf to Short.MAX_VALUE.
+    if (matches > Short.MAX_VALUE) {
+      matches = Short.MAX_VALUE;
+    }
 
-		for( int i = 0; i < positions.length; i++ ) {
-			mMatchedIds.clear();
-			mMatchedIds.set(ids[i]);
-			int matchedIDCounts = 1;
-			
-			int startPos = positions[i];
-			
-			for( int j = i+1; j < positions.length; j++ ) {
-				int curID = ids[j];
-				int curPos = positions[j];
-				int windowSize = curPos - startPos + 1;
-				if(!mMatchedIds.get(curID)) {
-					mMatchedIds.set(curID);
-					matchedIDCounts++;
-				}
-				
-				// stop looking if we've exceeded the maximum window size
-				if(windowSize > size ) {
-					break;
-				}
-				
-				// did we match all the terms?
-				if(matchedIDCounts == mNumReaders) {
-					matches++;
-					break;
-				}
-			}
-		}
+    return (short) matches;
+  }
 
-		return matches;
-	}
+  @Override
+  public int countMatches(int[] positions, int[] ids) {
+    int matches = 0;
+
+    for (int i = 0; i < positions.length; i++) {
+      matchedIds.clear();
+      matchedIds.set(ids[i]);
+      int matchedIDCounts = 1;
+
+      int startPos = positions[i];
+
+      for (int j = i + 1; j < positions.length; j++) {
+        int curID = ids[j];
+        int curPos = positions[j];
+        int windowSize = curPos - startPos + 1;
+        if (!matchedIds.get(curID)) {
+          matchedIds.set(curID);
+          matchedIDCounts++;
+        }
+
+        // Stop looking if we've exceeded the maximum window size.
+        if (windowSize > size) {
+          break;
+        }
+
+        // Did we match all the terms?
+        if (matchedIDCounts == numReaders) {
+          matches++;
+          break;
+        }
+      }
+    }
+
+    return matches;
+  }
 }

@@ -47,153 +47,154 @@ import org.apache.log4j.Logger;
 import edu.umd.cloud9.util.PowerTool;
 
 public class BuildIntDocVectors2 extends PowerTool {
-	private static final Logger LOG = Logger.getLogger(BuildIntDocVectors2.class);
+  private static final Logger LOG = Logger.getLogger(BuildIntDocVectors2.class);
 
-	protected static enum Docs { Skipped, Total }
-	protected static enum MapTime { DecodingAndIdMapping, EncodingAndSpilling }
+  protected static enum Docs { Skipped, Total }
+  protected static enum MapTime { DecodingAndIdMapping, EncodingAndSpilling }
 
-	private static class MyMapper
-	    extends Mapper<IntWritable, TermDocVector, IntWritable, IntDocVector> {
-		private DefaultCachedFrequencySortedDictionary dictionary = null;
-		private static final LazyIntDocVector docVector = new LazyIntDocVector();
+  private static class MyMapper
+      extends Mapper<IntWritable, TermDocVector, IntWritable, IntDocVector> {
+    private DefaultCachedFrequencySortedDictionary dictionary = null;
+    private static final LazyIntDocVector docVector = new LazyIntDocVector();
 
-		@Override
-		public void setup(
-		    Mapper<IntWritable, TermDocVector, IntWritable, IntDocVector>.Context context) {
-			try {
-				Configuration conf = context.getConfiguration();
-				FileSystem fs;
-				try {
-					fs = FileSystem.get(conf);
-				} catch (IOException e) {
-					throw new RuntimeException("Error opening the FileSystem!");
-				}
-				
-				RetrievalEnvironment env;
-				try {
-					env = new RetrievalEnvironment(conf.get(Constants.IndexPath), fs);
-				} catch (IOException e) {
-					throw new RuntimeException("Unable to create RetrievalEnvironment!");
-				}
+    @Override
+    public void setup(
+        Mapper<IntWritable, TermDocVector, IntWritable, IntDocVector>.Context context) {
+      try {
+        Configuration conf = context.getConfiguration();
+        FileSystem fs;
+        try {
+          fs = FileSystem.get(conf);
+        } catch (IOException e) {
+          throw new RuntimeException("Error opening the FileSystem!");
+        }
 
-				String termsFile = env.getIndexTermsData();
-				String termidsFile = env.getIndexTermIdsData();
-				String idToTermFile = env.getIndexTermIdMappingData();
+        RetrievalEnvironment env;
+        try {
+          env = new RetrievalEnvironment(conf.get(Constants.IndexPath), fs);
+        } catch (IOException e) {
+          throw new RuntimeException("Unable to create RetrievalEnvironment!");
+        }
 
-				// We need to figure out which file in the DistributeCache is which...
-				Map<String, Path> pathMapping = new HashMap<String, Path>();
-				Path[] localFiles = DistributedCache.getLocalCacheFiles(context.getConfiguration());
-				for ( Path p : localFiles) {
-					LOG.info("In DistributedCache: " + p);
-					if ( p.toString().contains(termsFile)) {
-						pathMapping.put(termsFile, p);
-					} else if ( p.toString().contains(termidsFile)) {
-						pathMapping.put(termidsFile, p);
-					} if ( p.toString().contains(idToTermFile)) {
-						pathMapping.put(idToTermFile, p);
-					}
-				}
+        String termsFile = env.getIndexTermsData();
+        String termidsFile = env.getIndexTermIdsData();
+        String idToTermFile = env.getIndexTermIdMappingData();
 
-				LOG.info(" - terms: " + pathMapping.get(termsFile));
-				LOG.info(" - id: " + pathMapping.get(termidsFile));
-				LOG.info(" - idToTerms: " + pathMapping.get(idToTermFile));
+        // We need to figure out which file in the DistributeCache is which...
+        Map<String, Path> pathMapping = new HashMap<String, Path>();
+        Path[] localFiles = DistributedCache.getLocalCacheFiles(context.getConfiguration());
+        for (Path p : localFiles) {
+          LOG.info("In DistributedCache: " + p);
+          if (p.toString().contains(termsFile)) {
+            pathMapping.put(termsFile, p);
+          } else if (p.toString().contains(termidsFile)) {
+            pathMapping.put(termidsFile, p);
+          }
+          if (p.toString().contains(idToTermFile)) {
+            pathMapping.put(idToTermFile, p);
+          }
+        }
 
-				dictionary = new DefaultCachedFrequencySortedDictionary(pathMapping.get(termsFile),
-				    pathMapping.get(termidsFile), pathMapping.get(idToTermFile),
-						0.3f, FileSystem.getLocal(context.getConfiguration()));
-			} catch (Exception e) {
-				e.printStackTrace();
-				throw new RuntimeException("Error initializing DocnoMapping!");
-			}
-		}
+        LOG.info(" - terms: " + pathMapping.get(termsFile));
+        LOG.info(" - id: " + pathMapping.get(termidsFile));
+        LOG.info(" - idToTerms: " + pathMapping.get(idToTermFile));
 
-		@Override
-		public void map(IntWritable key, TermDocVector doc, Context context)
-		    throws IOException, InterruptedException {
-			long startTime = System.currentTimeMillis();
-			TreeMap<Integer, int[]> positions =
-			    DocumentProcessingUtils.getTermIDsPositionsMap(doc, dictionary);
-			context.getCounter(MapTime.DecodingAndIdMapping)
-			    .increment(System.currentTimeMillis() - startTime);
+        dictionary = new DefaultCachedFrequencySortedDictionary(pathMapping.get(termsFile),
+            pathMapping.get(termidsFile), pathMapping.get(idToTermFile),
+            0.3f, FileSystem.getLocal(context.getConfiguration()));
+      } catch (Exception e) {
+        e.printStackTrace();
+        throw new RuntimeException("Error initializing DocnoMapping!");
+      }
+    }
 
-			startTime = System.currentTimeMillis();
-			docVector.setTermPositionsMap(positions);
-			context.write(key, docVector);
-			context.getCounter(MapTime.EncodingAndSpilling)
-			    .increment(System.currentTimeMillis() - startTime);
-			context.getCounter(Docs.Total).increment(1);
-		}
-	}
+    @Override
+    public void map(IntWritable key, TermDocVector doc, Context context)
+        throws IOException, InterruptedException {
+      long startTime = System.currentTimeMillis();
+      TreeMap<Integer, int[]> positions =
+          DocumentProcessingUtils.getTermIDsPositionsMap(doc, dictionary);
+      context.getCounter(MapTime.DecodingAndIdMapping)
+          .increment(System.currentTimeMillis() - startTime);
 
-	public static final String[] RequiredParameters = { Constants.IndexPath };
+      startTime = System.currentTimeMillis();
+      docVector.setTermPositionsMap(positions);
+      context.write(key, docVector);
+      context.getCounter(MapTime.EncodingAndSpilling)
+          .increment(System.currentTimeMillis() - startTime);
+      context.getCounter(Docs.Total).increment(1);
+    }
+  }
 
-	public String[] getRequiredParameters() {
-		return RequiredParameters;
-	}
+  public static final String[] RequiredParameters = { Constants.IndexPath };
 
-	public BuildIntDocVectors2(Configuration conf) {
-		super(conf);
-	}
+  public String[] getRequiredParameters() {
+    return RequiredParameters;
+  }
 
-	public int runTool() throws Exception {
-		Configuration conf = getConf();
-		FileSystem fs = FileSystem.get(conf);
+  public BuildIntDocVectors2(Configuration conf) {
+    super(conf);
+  }
 
-		String indexPath = conf.get(Constants.IndexPath);
-		RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fs);
-		String collectionName = env.readCollectionName();
+  public int runTool() throws Exception {
+    Configuration conf = getConf();
+    FileSystem fs = FileSystem.get(conf);
 
-		LOG.info("PowerTool: BuildIntDocVectors2");
-		LOG.info(String.format(" - %s: %s", Constants.CollectionName, collectionName));
-		LOG.info(String.format(" - %s: %s", Constants.IndexPath, indexPath));
+    String indexPath = conf.get(Constants.IndexPath);
+    RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fs);
+    String collectionName = env.readCollectionName();
 
-		String termsFile = env.getIndexTermsData();
-		String termIDsFile = env.getIndexTermIdsData();
-		String idToTermFile = env.getIndexTermIdMappingData();
+    LOG.info("PowerTool: BuildIntDocVectors2");
+    LOG.info(String.format(" - %s: %s", Constants.CollectionName, collectionName));
+    LOG.info(String.format(" - %s: %s", Constants.IndexPath, indexPath));
 
-		Path termsFilePath = new Path(termsFile);
-		Path termIDsFilePath = new Path(termIDsFile);
+    String termsFile = env.getIndexTermsData();
+    String termIDsFile = env.getIndexTermIdsData();
+    String idToTermFile = env.getIndexTermIdMappingData();
 
-		if (!fs.exists(termsFilePath) || !fs.exists(termIDsFilePath)) {
-			LOG.error("Error, terms files don't exist!");
-			return 0;
-		}
+    Path termsFilePath = new Path(termsFile);
+    Path termIDsFilePath = new Path(termIDsFile);
 
-		Path outputPath = new Path(env.getIntDocVectorsDirectory());
-		if (fs.exists(outputPath)) {
-			LOG.info("IntDocVectors already exist: skipping!");
-			return 0;
-		}
+    if (!fs.exists(termsFilePath) || !fs.exists(termIDsFilePath)) {
+      LOG.error("Error, terms files don't exist!");
+      return 0;
+    }
 
-		DistributedCache.addCacheFile(new URI(termsFile), conf);
-		DistributedCache.addCacheFile(new URI(termIDsFile), conf);
-		DistributedCache.addCacheFile(new URI(idToTermFile), conf);
+    Path outputPath = new Path(env.getIntDocVectorsDirectory());
+    if (fs.exists(outputPath)) {
+      LOG.info("IntDocVectors already exist: skipping!");
+      return 0;
+    }
 
-		conf.set("mapred.child.java.opts", "-Xmx2048m");
+    DistributedCache.addCacheFile(new URI(termsFile), conf);
+    DistributedCache.addCacheFile(new URI(termIDsFile), conf);
+    DistributedCache.addCacheFile(new URI(idToTermFile), conf);
 
-		Job job = new Job(conf, "BuildIntDocVectors2:" + collectionName);
-		job.setJarByClass(BuildIntDocVectors2.class);
+    conf.set("mapred.child.java.opts", "-Xmx2048m");
 
-		job.setNumReduceTasks(0);
+    Job job = new Job(conf, "BuildIntDocVectors2:" + collectionName);
+    job.setJarByClass(BuildIntDocVectors2.class);
 
-		job.setInputFormatClass(SequenceFileInputFormat.class);
-		job.setOutputFormatClass(SequenceFileOutputFormat.class);
+    job.setNumReduceTasks(0);
 
-		FileInputFormat.setInputPaths(job, env.getTermDocVectorsDirectory());
-		FileOutputFormat.setOutputPath(job, outputPath);
-		SequenceFileOutputFormat.setOutputCompressionType(job, SequenceFile.CompressionType.RECORD);
+    job.setInputFormatClass(SequenceFileInputFormat.class);
+    job.setOutputFormatClass(SequenceFileOutputFormat.class);
 
-		job.setMapOutputKeyClass(IntWritable.class);
-		job.setMapOutputValueClass(LazyIntDocVector.class);
-		job.setOutputKeyClass(IntWritable.class);
-		job.setOutputValueClass(LazyIntDocVector.class);
+    FileInputFormat.setInputPaths(job, env.getTermDocVectorsDirectory());
+    FileOutputFormat.setOutputPath(job, outputPath);
+    SequenceFileOutputFormat.setOutputCompressionType(job, SequenceFile.CompressionType.RECORD);
 
-		job.setMapperClass(MyMapper.class);
+    job.setMapOutputKeyClass(IntWritable.class);
+    job.setMapOutputValueClass(LazyIntDocVector.class);
+    job.setOutputKeyClass(IntWritable.class);
+    job.setOutputValueClass(LazyIntDocVector.class);
 
-		long startTime = System.currentTimeMillis();
-		job.waitForCompletion(true);
-		LOG.info("Job Finished in " + (System.currentTimeMillis() - startTime) / 1000.0	+ " seconds");
+    job.setMapperClass(MyMapper.class);
 
-		return 0;
-	}
+    long startTime = System.currentTimeMillis();
+    job.waitForCompletion(true);
+    LOG.info("Job Finished in " + (System.currentTimeMillis() - startTime) / 1000.0 + " seconds");
+
+    return 0;
+  }
 }

@@ -1,11 +1,11 @@
 /*
  * Ivory: A Hadoop toolkit for Web-scale information retrieval
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You may
  * obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0 
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,7 +15,6 @@
  */
 
 package ivory.core.data.stat;
-
 
 import ivory.core.RetrievalEnvironment;
 import ivory.core.data.dictionary.PrefixEncodedLexicographicallySortedDictionary;
@@ -33,15 +32,13 @@ import org.apache.log4j.Logger;
 import edu.umd.cloud9.io.pair.PairOfIntLong;
 
 public class PrefixEncodedGlobalStats {
+	private static final Logger LOG = Logger.getLogger(PrefixEncodedGlobalStats.class);
 
-	/**
-	 * logger
-	 */
-	private static final Logger LOGGER = Logger.getLogger(PrefixEncodedGlobalStats.class);
+	 PrefixEncodedLexicographicallySortedDictionary prefixSet =
+	     new PrefixEncodedLexicographicallySortedDictionary();
 
 	Configuration conf = new Configuration();
 	FileSystem fileSys = FileSystem.get(conf);
-	PrefixEncodedLexicographicallySortedDictionary prefixSet = new PrefixEncodedLexicographicallySortedDictionary();
 	int[] df = null;
 	long[] cf = null;
 
@@ -105,7 +102,7 @@ public class PrefixEncodedGlobalStats {
 		if(df == null) 
 			throw new RuntimeException("DF-Stats must be loaded first!");
 		int index = prefixSet.getId(term);
-		LOGGER.info("index of " + term + ": " + index);
+		LOG.info("index of " + term + ": " + index);
 		if (index < 0)
 			return -1;
 		return df[index];
@@ -115,7 +112,7 @@ public class PrefixEncodedGlobalStats {
 		if(cf == null) 
 			throw new RuntimeException("CF-Stats must be loaded first!");
 		int index = prefixSet.getId(term);
-		LOGGER.info("index of " + term + ": " + index);
+		LOG.info("index of " + term + ": " + index);
 		if (index < 0)
 			return -1;
 		return cf[index];
@@ -123,7 +120,7 @@ public class PrefixEncodedGlobalStats {
 
 	public PairOfIntLong getStats(String term) {
 		int index = prefixSet.getId(term);
-		LOGGER.info("index of " + term + ": " + index);
+		LOG.info("index of " + term + ": " + index);
 		if (index < 0)
 			return null;
 		PairOfIntLong p = new PairOfIntLong();

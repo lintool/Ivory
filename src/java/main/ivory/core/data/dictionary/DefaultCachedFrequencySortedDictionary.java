@@ -16,7 +16,6 @@
 
 package ivory.core.data.dictionary;
 
-
 import ivory.core.RetrievalEnvironment;
 
 import java.io.BufferedReader;
@@ -27,111 +26,110 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 
-
 import edu.umd.cloud9.util.map.HMapKI;
 
 public class DefaultCachedFrequencySortedDictionary extends DefaultFrequencySortedDictionary {
   private final HMapKI<String> cache = new HMapKI<String>();
 
-	public DefaultCachedFrequencySortedDictionary(Path prefixSetPath, Path idsPath,
-	    Path idToTermPath, int cachedFrequent, FileSystem fs) throws IOException {
-		super(prefixSetPath, idsPath, idToTermPath, fs);
-		loadFrequentMap(cachedFrequent);
-	}
+  public DefaultCachedFrequencySortedDictionary(Path prefixSetPath, Path idsPath,
+      Path idToTermPath, int cachedFrequent, FileSystem fs) throws IOException {
+    super(prefixSetPath, idsPath, idToTermPath, fs);
+    loadFrequentMap(cachedFrequent);
+  }
 
-	public DefaultCachedFrequencySortedDictionary(Path prefixSetPath, Path idsPath,
-	    Path idToTermPath, float cachedFrequentPercent, FileSystem fs) throws IOException {
-		super(prefixSetPath, idsPath, idToTermPath, fs);
+  public DefaultCachedFrequencySortedDictionary(Path prefixSetPath, Path idsPath,
+      Path idToTermPath, float cachedFrequentPercent, FileSystem fs) throws IOException {
+    super(prefixSetPath, idsPath, idToTermPath, fs);
 
-		if (cachedFrequentPercent < 0 || cachedFrequentPercent > 1.0) {
-			return;
-		}
+    if (cachedFrequentPercent < 0 || cachedFrequentPercent > 1.0) {
+      return;
+    }
 
-		int cachedFrequent = (int) (cachedFrequentPercent * size());
-		loadFrequentMap(cachedFrequent);
-	}
+    int cachedFrequent = (int) (cachedFrequentPercent * size());
+    loadFrequentMap(cachedFrequent);
+  }
 
-	private void loadFrequentMap(int n) {
-		if (size() < n) {
-			n = size();
-		}
+  private void loadFrequentMap(int n) {
+    if (size() < n) {
+      n = size();
+    }
 
-		for (int id = 1; id <= n; id++) {
-			cache.put(getTerm(id), id);
-		}
-	}
+    for (int id = 1; id <= n; id++) {
+      cache.put(getTerm(id), id);
+    }
+  }
 
-	@Override
-	public int getId(String term) {
-		if (cache != null && cache.containsKey(term)) {
-				return cache.get(term);
-		}
+  @Override
+  public int getId(String term) {
+    if (cache != null && cache.containsKey(term)) {
+      return cache.get(term);
+    }
 
-		return super.getId(term);
-	}	
-	
-	public static void main(String[] args) throws Exception {
-		if (args.length != 1) {
-			System.out.println("usage: [index-path]");
-			System.exit(-1);
-		}
+    return super.getId(term);
+  }
 
-		String indexPath = args[0];
+  public static void main(String[] args) throws Exception {
+    if (args.length != 1) {
+      System.out.println("usage: [index-path]");
+      System.exit(-1);
+    }
 
-		Configuration conf = new Configuration();
-		FileSystem fs = FileSystem.get(conf);
+    String indexPath = args[0];
 
-		RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fs);
+    Configuration conf = new Configuration();
+    FileSystem fs = FileSystem.get(conf);
 
-		Path termsFilePath = new Path(env.getIndexTermsData());
-		Path termIDsFilePath = new Path(env.getIndexTermIdsData());
-		Path idToTermFilePath = new Path(env.getIndexTermIdMappingData());
+    RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fs);
 
-		DefaultCachedFrequencySortedDictionary dictionary =
-		    new DefaultCachedFrequencySortedDictionary(termsFilePath, termIDsFilePath,
-				    idToTermFilePath, 100, fs);
+    Path termsFilePath = new Path(env.getIndexTermsData());
+    Path termIDsFilePath = new Path(env.getIndexTermIdsData());
+    Path idToTermFilePath = new Path(env.getIndexTermIdMappingData());
 
-		int nTerms = dictionary.size();
-		System.out.println("nTerms: " + nTerms);
+    DefaultCachedFrequencySortedDictionary dictionary =
+        new DefaultCachedFrequencySortedDictionary(termsFilePath, termIDsFilePath,
+            idToTermFilePath, 100, fs);
 
-		System.out.println(" \"term word\" to lookup termid; \"termid 234\" to lookup term");
-		String cmd = null;
-		BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
-		System.out.print("lookup > ");
-		while ((cmd = stdin.readLine()) != null) {
+    int nTerms = dictionary.size();
+    System.out.println("nTerms: " + nTerms);
 
-			String[] tokens = cmd.split("\\s+");
+    System.out.println(" \"term word\" to lookup termid; \"termid 234\" to lookup term");
+    String cmd = null;
+    BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
+    System.out.print("lookup > ");
+    while ((cmd = stdin.readLine()) != null) {
 
-			if (tokens.length != 2) {
-				System.out.println("Error: unrecognized command!");
-				System.out.print("lookup > ");
+      String[] tokens = cmd.split("\\s+");
 
-				continue;
-			}
+      if (tokens.length != 2) {
+        System.out.println("Error: unrecognized command!");
+        System.out.print("lookup > ");
 
-			if (tokens[0].equals("termid")) {
-				int termid;
-				try {
-					termid = Integer.parseInt(tokens[1]);
-				} catch (Exception e) {
-					System.out.println("Error: invalid termid!");
-					System.out.print("lookup > ");
+        continue;
+      }
 
-					continue;
-				}
+      if (tokens[0].equals("termid")) {
+        int termid;
+        try {
+          termid = Integer.parseInt(tokens[1]);
+        } catch (Exception e) {
+          System.out.println("Error: invalid termid!");
+          System.out.print("lookup > ");
 
-				System.out.println("termid=" + termid + ", term=" + dictionary.getTerm(termid));
-			} else if (tokens[0].equals("term")) {
-				String term = tokens[1];
+          continue;
+        }
 
-				System.out.println("term=" + term + ", termid=" + dictionary.getId(term));
-			} else {
-				System.out.println("Error: unrecognized command!");
-				System.out.print("lookup > ");
-				continue;
-			}
+        System.out.println("termid=" + termid + ", term=" + dictionary.getTerm(termid));
+      } else if (tokens[0].equals("term")) {
+        String term = tokens[1];
 
-			System.out.print("lookup > ");
-		}
-	}
+        System.out.println("term=" + term + ", termid=" + dictionary.getId(term));
+      } else {
+        System.out.println("Error: unrecognized command!");
+        System.out.print("lookup > ");
+        continue;
+      }
+
+      System.out.print("lookup > ");
+    }
+  }
 }

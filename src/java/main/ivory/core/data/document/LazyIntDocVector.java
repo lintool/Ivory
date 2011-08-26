@@ -16,7 +16,6 @@
 
 package ivory.core.data.document;
 
-
 import ivory.core.data.dictionary.DefaultCachedFrequencySortedDictionary;
 import ivory.core.index.TermPositions;
 
@@ -33,7 +32,6 @@ import org.apache.hadoop.io.WritableUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
-
 import uk.ac.gla.terrier.compression.BitInputStream;
 import uk.ac.gla.terrier.compression.BitOutputStream;
 
@@ -43,7 +41,6 @@ import uk.ac.gla.terrier.compression.BitOutputStream;
  *
  * @author Tamer Elsayed
  * @author Jimmy Lin
- *
  */
 public class LazyIntDocVector implements IntDocVector {
 	private static final Logger LOG = Logger.getLogger (LazyIntDocVector.class);
@@ -70,6 +67,7 @@ public class LazyIntDocVector implements IntDocVector {
 		this.termPositionsMap = termPositionsMap;
 	}
 
+	@Override
   public void write(DataOutput out) throws IOException {
     if (bytes != null) {
       // This would happen if we're reading in an already-encoded
@@ -149,6 +147,7 @@ public class LazyIntDocVector implements IntDocVector {
 		}
 	}
 
+  @Override
 	public void readFields(DataInput in) throws IOException {
 		numTerms = WritableUtils.readVInt(in);
 		if (numTerms == 0) {
@@ -196,6 +195,7 @@ public class LazyIntDocVector implements IntDocVector {
 		}
 	}
 
+	@Override
 	public String toString() {
 		StringBuffer s = new StringBuffer("[");
 		try {
@@ -252,14 +252,17 @@ public class LazyIntDocVector implements IntDocVector {
 			}
 		}
 
+		@Override
 		public int getNumberOfTerms() {
 			return termCnt;
 		}
 
+		@Override
 		public short getTf() {
 			return prevTf;
 		}
 
+		@Override
 		public void reset() {
 			try {
 				bytesIn.reset();
@@ -273,6 +276,7 @@ public class LazyIntDocVector implements IntDocVector {
 			}
 		}
 
+		@Override
 		public int nextTerm() {
 			int id = -1;
 			try {
@@ -299,6 +303,7 @@ public class LazyIntDocVector implements IntDocVector {
 			}
 		}
 
+		@Override
 		public int[] getPositions() {
 			int[] pos = null;
 			try {
@@ -321,6 +326,7 @@ public class LazyIntDocVector implements IntDocVector {
 			return pos;
 		}
 
+		@Override
 		public boolean getPositions(TermPositions tp) {
 			int[] pos = getPositions();
 
@@ -332,6 +338,7 @@ public class LazyIntDocVector implements IntDocVector {
 			return true;
 		}
 
+		@Override
 		public boolean hasMoreTerms() {
 			return !(p >= termCnt - 1);
 		}

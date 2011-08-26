@@ -1,5 +1,5 @@
 /*
- * Ivory: A Hadoop toolkit for Web-scale information retrieval
+ * Ivory: A Hadoop toolkit for web-scale information retrieval
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You may
@@ -17,41 +17,36 @@
 package ivory.core.data.stat;
 
 /**
- * <p>
- * Interface to object that keeps track of the document frequency of each term
- * in the collection. Concrete classes may vary in terms of implementation,
- * e.g., hashes (faster lookup, but less memory efficient) or arrays (slower
- * binary search lookup, but more memory efficient).
- * </p>
+ * Interface to object that keeps track of the document frequency of each term in the collection.
+ * Concrete classes may vary in terms of implementation, e.g., hashes (faster lookup, but less
+ * memory efficient) or arrays (slower binary search lookup, but more memory efficient).
  *
  * @author Jimmy Lin
- *
  */
 public interface DfTable {
+  /**
+   * Returns the document frequency of a term.
+   */
+  int getDf(int term);
 
-	/**
-	 * Returns the document frequency of a term.
-	 */
-	public int getDf(int term);
+  /**
+   * Returns the number of unique terms in the collection.
+   */
+  int getVocabularySize();
 
-	/**
-	 * Returns the number of unique terms in the collection.
-	 */
-	public int getVocabularySize();
+  /**
+   * Returns the document frequency of the term with the highest document
+   * frequency.
+   */
+  int getMaxDf();
 
-	/**
-	 * Returns the document frequency of the term with the highest document
-	 * frequency.
-	 */
-	public int getMaxDf();
+  /**
+   * Returns the term with the highest document frequency.
+   */
+  int getMaxDfTerm();
 
-	/**
-	 * Returns the term with the highest document frequency.
-	 */
-	public int getMaxDfTerm();
-
-	/**
-	 * Returns the number of terms that only appear in one document.
-	 */
-	public int getNumOfSingletonTerms();
+  /**
+   * Returns the number of terms that only appear in one document.
+   */
+  int getNumOfSingletonTerms();
 }

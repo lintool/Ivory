@@ -162,13 +162,7 @@ public class XMLTools {
 	
 	public static String format(Document doc) {
 		DOMImplementation domImplementation = doc.getImplementation();
-		
-//		if ( node instanceof Node ) {
-//			domImplementation = node.getOwnerDocument().getImplementation();
-//		} else if ( node instanceof Document ) {
-//			domImplementation = ((Document) node).getImplementation();
-//		}
-		
+
 		if (domImplementation.hasFeature("LS", "3.0")
 				&& domImplementation.hasFeature("Core", "2.0")) {
 			DOMImplementationLS domImplementationLS = (DOMImplementationLS) domImplementation

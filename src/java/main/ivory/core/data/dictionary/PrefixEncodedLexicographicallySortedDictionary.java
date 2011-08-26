@@ -74,6 +74,7 @@ public class PrefixEncodedLexicographicallySortedDictionary
     resizeFactor = resizeF;
   }
 
+  @Override
   public void readFields(DataInput in) throws IOException {
     curKeyIndex = in.readInt();
 
@@ -104,6 +105,7 @@ public class PrefixEncodedLexicographicallySortedDictionary
     }
   }
 
+  @Override
   public void write(DataOutput out) throws IOException {
     out.writeInt(curKeyIndex);
     out.writeInt(window);

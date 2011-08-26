@@ -1,5 +1,5 @@
 /*
- * Ivory: A Hadoop toolkit for Web-scale information retrieval
+ * Ivory: A Hadoop toolkit for web-scale information retrieval
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You may
@@ -16,7 +16,6 @@
 
 package ivory.core.data.stat;
 
-
 import ivory.core.RetrievalEnvironment;
 
 import java.io.BufferedReader;
@@ -29,110 +28,115 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.WritableUtils;
 
+import com.google.common.base.Preconditions;
 
 /**
- * <p>
- * Array-based implementation of <code>DfTable</code>. Binary search is used
- * for lookup.
- * </p>
+ * Array-based implementation of {@link DfTable}. Binary search is used for lookup.
  *
  * @author Jimmy Lin
  * @author Tamer Elsayed
- *
  */
 public class DfTableArray implements DfTable {
-	private final int numTerms;
-	private final int[] dfs;
+  private final int numTerms;
+  private final int[] dfs;
 
-	private int maxDf = 0;
-	private int maxDfTerm;
+  private int maxDf = 0;
+  private int maxDfTerm;
 
-	private int numSingletonTerms = 0;
+  private int numSingletonTerms = 0;
 
-	/**
-	 * Creates a <code>DfTableArray</code> object.
-	 *
-	 * @param file collection frequency data file
-	 * @throws IOException
-	 */
-	public DfTableArray(Path file) throws IOException {
-		this(file, FileSystem.get(new Configuration()));
-	}
+  /**
+   * Creates a {@code DfTableArray} object.
+   *
+   * @param file collection frequency data file
+   * @throws IOException
+   */
+  public DfTableArray(Path file) throws IOException {
+    this(file, FileSystem.get(new Configuration()));
+  }
 
-	/**
-	 * Creates a <code>DfTableArray</code> object.
-	 *
-	 * @param file collection frequency data file path
-	 * @param fs   FileSystem to read from
-	 * @throws IOException
-	 */
-	public DfTableArray(Path file, FileSystem fs) throws IOException {
-		FSDataInputStream in = fs.open(file);
+  /**
+   * Creates a {@code DfTableArray} object.
+   *
+   * @param file collection frequency data file path
+   * @param fs FileSystem to read from
+   * @throws IOException
+   */
+  public DfTableArray(Path file, FileSystem fs) throws IOException {
+    Preconditions.checkNotNull(file);
+    Preconditions.checkNotNull(fs);
 
-		this.numTerms = in.readInt();
+    FSDataInputStream in = fs.open(file);
 
-		dfs = new int[numTerms];
+    this.numTerms = in.readInt();
 
-		for (int i = 0; i < numTerms; i++) {
-			int df = WritableUtils.readVInt(in);
+    dfs = new int[numTerms];
 
-			dfs[i] = df;
-			if (df > maxDf) {
-				maxDf = df;
-				maxDfTerm = i + 1;
-			}
+    for (int i = 0; i < numTerms; i++) {
+      int df = WritableUtils.readVInt(in);
 
-			if (df == 1) {
-				numSingletonTerms++;
-			}
-		}
+      dfs[i] = df;
+      if (df > maxDf) {
+        maxDf = df;
+        maxDfTerm = i + 1;
+      }
 
-		in.close();
-	}
+      if (df == 1) {
+        numSingletonTerms++;
+      }
+    }
 
-	public int getDf(int term) {
-		return dfs[term - 1];
-	}
+    in.close();
+  }
 
-	public int getVocabularySize() {
-		return numTerms;
-	}
+  @Override
+  public int getDf(int term) {
+    return dfs[term - 1];
+  }
 
-	public int getMaxDf() {
-		return maxDf;
-	}
+  @Override
+  public int getVocabularySize() {
+    return numTerms;
+  }
 
-	public int getMaxDfTerm() {
-		return maxDfTerm;
-	}
+  @Override
+  public int getMaxDf() {
+    return maxDf;
+  }
 
-	public int getNumOfSingletonTerms() {
-		return numSingletonTerms;
-	}
+  @Override
+  public int getMaxDfTerm() {
+    return maxDfTerm;
+  }
 
-	public static void main(String[] args) throws Exception {
-		if (args.length != 1) {
-			System.out.println("usage: [index-path]");
-			System.exit(-1);
-		}
+  @Override
+  public int getNumOfSingletonTerms() {
+    return numSingletonTerms;
+  }
 
-		String indexPath = args[0];
+  public static void main(String[] args) throws Exception {
+    if (args.length != 1) {
+      System.out.println("usage: [index-path]");
+      System.exit(-1);
+    }
 
-		Configuration conf = new Configuration();
-		FileSystem fs = FileSystem.get(conf);
+    String indexPath = args[0];
 
-		RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fs);
+    Configuration conf = new Configuration();
+    FileSystem fs = FileSystem.get(conf);
 
-		DfTableArray dfs = new DfTableArray(new Path(env.getDfByIntData()), fs);
+    RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fs);
 
-		String input = null;
-		BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
-		System.out.print("lookup > ");
-		while ((input = stdin.readLine()) != null) {
-			int termid = Integer.parseInt(input);
-			System.out.println("termid=" + termid + ", df=" + dfs.getDf(termid));
+    DfTableArray dfs = new DfTableArray(new Path(env.getDfByIntData()), fs);
 
-			System.out.print("lookup > ");
-		}
-	}
+    String input = null;
+    BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
+    System.out.print("lookup > ");
+    while ((input = stdin.readLine()) != null) {
+      int termid = Integer.parseInt(input);
+      System.out.println("termid=" + termid + ", df=" + dfs.getDf(termid));
+
+      System.out.print("lookup > ");
+    }
+  }
 }

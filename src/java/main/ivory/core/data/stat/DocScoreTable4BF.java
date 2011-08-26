@@ -1,11 +1,11 @@
 /*
  * Ivory: A Hadoop toolkit for Web-scale information retrieval
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You may
  * obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0 
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -29,63 +29,57 @@ import org.apache.log4j.Logger;
 import edu.umd.cloud9.debug.MemoryUsageUtils;
 
 public class DocScoreTable4BF implements DocScoreTable {
-	static final Logger sLogger = Logger.getLogger(DocScoreTable4BF.class);
+	static final Logger LOG = Logger.getLogger(DocScoreTable4BF.class);
 
-	protected float[] mScores;
-	protected int nDocs;
-	protected int mDocnoOffset;
+	protected float[] scores;
+	protected int docs;
+	protected int docnoOffset;
 
-	public DocScoreTable4BF() {
+	public DocScoreTable4BF() {	}
 
-	}
-
+	@Override
 	public void initialize(String file, FileSystem fs) throws IOException {
 		FSDataInputStream in = fs.open(new Path(file));
 
-		// docno offset
-		mDocnoOffset = in.readInt();
+		// Docno offset.
+		docnoOffset = in.readInt();
 
-		// this is the size of the document collection
+		// This is the size of the document collection.
 		int sz = in.readInt() + 1;
 
-		sLogger.info("Docno offset: " + mDocnoOffset);
-		sLogger.info("Number of docs: " + (sz - 1));
+		LOG.info("Docno offset: " + docnoOffset);
+		LOG.info("Number of docs: " + (sz - 1));
 
-		// initialize an array to hold all the doc scores
-		mScores = new float[sz];
+		// Initialize an array to hold all the doc scores.
+		scores = new float[sz];
 
-		// read each doc length
+		// Read each doc length.
 		for (int i = 1; i < sz; i++) {
-			mScores[i] = in.readFloat();
-			nDocs++;
+			scores[i] = in.readFloat();
+			docs++;
 
 			if (i % 1000000 == 0)
-				sLogger.info(i + " docscores read");
+				LOG.info(i + " docscores read");
 		}
 
 		in.close();
-
-		sLogger.info("Total of " + nDocs + " docscores read");
-
+		LOG.info("Total of " + docs + " docscores read");
 	}
 
-	/**
-	 * Returns the length of a document.
-	 */
-	public float getScore(int docno) {
-		// docnos are numbered starting from one
-		return mScores[docno - mDocnoOffset];
+  @Override
+  public float getScore(int docno) {
+		// Docnos are numbered starting from one.
+		return scores[docno - docnoOffset];
 	}
 
+  @Override
 	public int getDocnoOffset() {
-		return mDocnoOffset;
+		return docnoOffset;
 	}
 
-	/**
-	 * Returns number of documents in the collection.
-	 */
+	@Override
 	public int getDocCount() {
-		return nDocs;
+		return docs;
 	}
 
 	public static void main(String[] args) throws Exception {
@@ -109,6 +103,5 @@ public class DocScoreTable4BF implements DocScoreTable {
 			System.out.println(scores.getScore(Integer.parseInt(docno)));
 			System.out.print("Look up postings of term> ");
 		}
-
 	}
 }
