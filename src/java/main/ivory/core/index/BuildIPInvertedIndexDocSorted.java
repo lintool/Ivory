@@ -76,6 +76,11 @@ public class BuildIPInvertedIndexDocSorted extends PowerTool {
 		// Need to keep reference around for use in close().
 		private OutputCollector<PairOfInts, TermPositions> output;
 
+    public void configure(JobConf job) {
+      // This is needed to correctly index in standalone mode.
+      dfs.clear();
+    }
+
 		public void map(IntWritable key, IntDocVector doc, OutputCollector<PairOfInts, TermPositions> output, Reporter reporter) throws IOException {
 			this.output = output;
 			docno = key.get();
@@ -147,14 +152,17 @@ public class BuildIPInvertedIndexDocSorted extends PowerTool {
 				} else if (curTerm != prevTerm) {
 					// Encountered next term, so emit postings corresponding to previous term.
 					if (numPostings != postings.size()) {
-						throw new RuntimeException("Error: actual number of postings processed is different from expected!");
+						throw new RuntimeException(String.format(
+						    "Error: actual number of postings processed is different from expected! " +
+						    "expected: %d, got: %d for term %d", numPostings, postings.size(), prevTerm));
 					}
 
 					term.set(prevTerm);
 					output.collect(term, postings);
 					reporter.incrCounter(IndexedTerms.Unique, 1);
 
-					LOG.info(String.format("Finished processing postings for term \"%s\" (num postings=%d)", prevTerm, postings.size()));
+					LOG.info(String.format("Finished processing postings for term %d (num postings=%d)",
+					    prevTerm, postings.size()));
 					postings.clear();
 				}
 
@@ -186,14 +194,17 @@ public class BuildIPInvertedIndexDocSorted extends PowerTool {
 
 			// We need to flush out the final postings list.
 			if (numPostings != postings.size()) {
-				throw new RuntimeException("Error: actual number of postings processed is different from expected!");
+        throw new RuntimeException(String.format(
+            "Error: actual number of postings processed is different from expected! " +
+            "expected: %d, got: %d for term %d", numPostings, postings.size(), prevTerm));
 			}
 
 			term.set(prevTerm);
 			output.collect(term, postings);
 			reporter.incrCounter(IndexedTerms.Unique, 1);
 
-			LOG.info(String.format("Finished processing postings for term \"%s\" (num postings=%d)", prevTerm, postings.size()));
+      LOG.info(String.format("Finished processing postings for term %d (num postings=%d)",
+          prevTerm, postings.size()));
 			reporter.incrCounter(ReduceTime.Total, System.currentTimeMillis() - start);
 		}
 	}
