@@ -19,9 +19,9 @@ package ivory.core.driver;
 import ivory.core.Constants;
 import ivory.core.RetrievalEnvironment;
 import ivory.core.preprocess.BuildIntDocVectors2;
-import ivory.core.preprocess.BuildIntDocVectorsForwardIndex;
+import ivory.core.preprocess.BuildIntDocVectorsForwardIndex2;
 import ivory.core.preprocess.BuildTermDocVectors2;
-import ivory.core.preprocess.BuildTermDocVectorsForwardIndex;
+import ivory.core.preprocess.BuildTermDocVectorsForwardIndex2;
 import ivory.core.preprocess.BuildTermIdMap2;
 import ivory.core.preprocess.GetTermCount2;
 
@@ -33,10 +33,12 @@ import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Logger;
 
-import edu.umd.cloud9.collection.trec.NumberTrecDocuments;
+import edu.umd.cloud9.collection.trec.NumberTrecDocuments2;
 
 public class PreprocessTREC2 extends Configured implements Tool {
   private static final Logger LOG = Logger.getLogger(PreprocessTREC.class);
+  // Default number of reducers for the TREC collection.
+  private static final int DEFAULT_NUM_REDUCERS = 10;
 
   private static int printUsage() {
     System.out.println("usage: [input-path] [index-path]");
@@ -55,7 +57,7 @@ public class PreprocessTREC2 extends Configured implements Tool {
 
     String collection = args[0];
     String indexRootPath = args[1];
-    int numReducers = 10;
+    int numReducers = DEFAULT_NUM_REDUCERS;
 
     LOG.info("Tool name: " + PreprocessTREC2.class.getCanonicalName());
     LOG.info(" - Collection path: " + collection);
@@ -81,8 +83,8 @@ public class PreprocessTREC2 extends Configured implements Tool {
     if (!fs.exists(mappingFile)) {
       LOG.info("docno-mapping.dat doesn't exist, creating...");
       String[] arr = new String[] { collection, mappingDir.toString(),
-              mappingFile.toString(), "100" }; // "100" mappers (doesn't matter)
-      NumberTrecDocuments tool = new NumberTrecDocuments();
+              mappingFile.toString() };
+      NumberTrecDocuments2 tool = new NumberTrecDocuments2();
       tool.setConf(conf);
       tool.run(arr);
 
@@ -95,7 +97,7 @@ public class PreprocessTREC2 extends Configured implements Tool {
     conf.set(Constants.CollectionPath, collection);
     conf.set(Constants.IndexPath, indexRootPath);
     conf.set(Constants.InputFormat,
-        edu.umd.cloud9.collection.trec.TrecDocumentInputFormat.class.getCanonicalName());
+        edu.umd.cloud9.collection.trec.TrecDocumentInputFormat2.class.getCanonicalName());
     conf.set(Constants.Tokenizer, ivory.core.tokenize.GalagoTokenizer.class.getCanonicalName());
     conf.set(Constants.DocnoMappingClass,
         edu.umd.cloud9.collection.trec.TrecDocnoMapping.class.getCanonicalName());
@@ -111,8 +113,8 @@ public class PreprocessTREC2 extends Configured implements Tool {
     new BuildTermIdMap2(conf).run();
     new BuildIntDocVectors2(conf).run();
 
-    new BuildIntDocVectorsForwardIndex(conf).run();
-    new BuildTermDocVectorsForwardIndex(conf).run();
+    new BuildIntDocVectorsForwardIndex2(conf).run();
+    new BuildTermDocVectorsForwardIndex2(conf).run();
 
     return 0;
   }
@@ -121,7 +123,7 @@ public class PreprocessTREC2 extends Configured implements Tool {
    * Dispatches command-line arguments to the tool via the {@code ToolRunner}.
    */
   public static void main(String[] args) throws Exception {
-    int res = ToolRunner.run(new Configuration(), new PreprocessTREC(), args);
+    int res = ToolRunner.run(new Configuration(), new PreprocessTREC2(), args);
     System.exit(res);
   }
 }

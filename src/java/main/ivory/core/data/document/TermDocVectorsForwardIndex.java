@@ -99,8 +99,15 @@ public class TermDocVectorsForwardIndex {
     int fileNo = (int) (pos / BuildTermDocVectorsForwardIndex.BigNumber);
     pos = pos % BuildTermDocVectorsForwardIndex.BigNumber;
 
-    SequenceFile.Reader reader = new SequenceFile.Reader(fs,
-        new Path(path + "/part-" + FORMAT.format(fileNo)), conf);
+    SequenceFile.Reader reader = null;
+    try {
+      reader = new SequenceFile.Reader(fs,
+          new Path(path + "/part-" + FORMAT.format(fileNo)), conf);
+    } catch (IOException e) {
+      // Try alternative naming scheme for output of new API.
+      reader = new SequenceFile.Reader(fs,
+          new Path(path + "/part-m-" + FORMAT.format(fileNo)), conf);
+    }
 
     IntWritable key = new IntWritable();
     TermDocVector value;
@@ -145,11 +152,11 @@ public class TermDocVectorsForwardIndex {
 
     String term = null;
     BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
-    System.out.print("Look up postings of docno > ");
+    System.out.print("Look up postings of doc > ");
     while ((term = stdin.readLine()) != null) {
       int docno = Integer.parseInt(term);
       System.out.println(docno + ": " + index.getDocVector(docno));
-      System.out.print("Look up postings of docno > ");
+      System.out.print("Look up postings of doc > ");
     }
   }
 }

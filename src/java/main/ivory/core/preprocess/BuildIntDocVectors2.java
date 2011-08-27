@@ -26,7 +26,6 @@ import ivory.core.tokenize.DocumentProcessingUtils;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -43,6 +42,8 @@ import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 import org.apache.log4j.Logger;
+
+import com.google.common.collect.Maps;
 
 import edu.umd.cloud9.util.PowerTool;
 
@@ -62,49 +63,44 @@ public class BuildIntDocVectors2 extends PowerTool {
         Mapper<IntWritable, TermDocVector, IntWritable, IntDocVector>.Context context) {
       try {
         Configuration conf = context.getConfiguration();
-        FileSystem fs;
-        try {
-          fs = FileSystem.get(conf);
-        } catch (IOException e) {
-          throw new RuntimeException("Error opening the FileSystem!");
-        }
+        FileSystem fs = FileSystem.get(conf);
 
-        RetrievalEnvironment env;
-        try {
-          env = new RetrievalEnvironment(conf.get(Constants.IndexPath), fs);
-        } catch (IOException e) {
-          throw new RuntimeException("Unable to create RetrievalEnvironment!");
-        }
+        RetrievalEnvironment env = new RetrievalEnvironment(conf.get(Constants.IndexPath), fs);
 
         String termsFile = env.getIndexTermsData();
         String termidsFile = env.getIndexTermIdsData();
         String idToTermFile = env.getIndexTermIdMappingData();
 
-        // We need to figure out which file in the DistributeCache is which...
-        Map<String, Path> pathMapping = new HashMap<String, Path>();
-        Path[] localFiles = DistributedCache.getLocalCacheFiles(context.getConfiguration());
-        for (Path p : localFiles) {
-          LOG.info("In DistributedCache: " + p);
-          if (p.toString().contains(termsFile)) {
-            pathMapping.put(termsFile, p);
-          } else if (p.toString().contains(termidsFile)) {
-            pathMapping.put(termidsFile, p);
+        // Take a different code path if we're in standalone mode.
+        if (conf.get("mapred.job.tracker").equals("local")) {
+          dictionary = new DefaultCachedFrequencySortedDictionary(new Path(termsFile),
+              new Path(termidsFile), new Path(idToTermFile), 0.3f, FileSystem.getLocal(conf));
+        } else {
+          // We need to figure out which file in the DistributeCache is which...
+          Map<String, Path> pathMapping = Maps.newHashMap();
+          Path[] localFiles = DistributedCache.getLocalCacheFiles(context.getConfiguration());
+          for (Path p : localFiles) {
+            LOG.info("In DistributedCache: " + p);
+            if (p.toString().contains(termsFile)) {
+              pathMapping.put(termsFile, p);
+            } else if (p.toString().contains(termidsFile)) {
+              pathMapping.put(termidsFile, p);
+            } else if (p.toString().contains(idToTermFile)) {
+              pathMapping.put(idToTermFile, p);
+            }
           }
-          if (p.toString().contains(idToTermFile)) {
-            pathMapping.put(idToTermFile, p);
-          }
+
+          LOG.info(" - terms: " + pathMapping.get(termsFile));
+          LOG.info(" - id: " + pathMapping.get(termidsFile));
+          LOG.info(" - idToTerms: " + pathMapping.get(idToTermFile));
+
+          dictionary = new DefaultCachedFrequencySortedDictionary(pathMapping.get(termsFile),
+              pathMapping.get(termidsFile), pathMapping.get(idToTermFile),
+              0.3f, FileSystem.getLocal(context.getConfiguration()));
         }
-
-        LOG.info(" - terms: " + pathMapping.get(termsFile));
-        LOG.info(" - id: " + pathMapping.get(termidsFile));
-        LOG.info(" - idToTerms: " + pathMapping.get(idToTermFile));
-
-        dictionary = new DefaultCachedFrequencySortedDictionary(pathMapping.get(termsFile),
-            pathMapping.get(termidsFile), pathMapping.get(idToTermFile),
-            0.3f, FileSystem.getLocal(context.getConfiguration()));
       } catch (Exception e) {
         e.printStackTrace();
-        throw new RuntimeException("Error initializing DocnoMapping!");
+        throw new RuntimeException("Error initializing data!", e);
       }
     }
 
@@ -144,7 +140,7 @@ public class BuildIntDocVectors2 extends PowerTool {
     RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fs);
     String collectionName = env.readCollectionName();
 
-    LOG.info("PowerTool: BuildIntDocVectors2");
+    LOG.info("PowerTool: " + BuildIntDocVectors2.class.getCanonicalName());
     LOG.info(String.format(" - %s: %s", Constants.CollectionName, collectionName));
     LOG.info(String.format(" - %s: %s", Constants.IndexPath, indexPath));
 

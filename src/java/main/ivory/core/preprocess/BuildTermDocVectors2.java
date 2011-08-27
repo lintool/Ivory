@@ -77,11 +77,23 @@ public class BuildTermDocVectors2 extends PowerTool {
         throws IOException {
       Configuration conf = context.getConfiguration();
 
-      Path[] localFiles;
       try {
-        localFiles = DistributedCache.getLocalCacheFiles(conf);
-      } catch (IOException e) {
-        throw new RuntimeException("Local cache files not read properly.");
+        FileSystem localFs = FileSystem.getLocal(conf);
+        docMapping =
+          (DocnoMapping) Class.forName(conf.get(Constants.DocnoMappingClass)).newInstance();
+
+        // Take a different code path if we're in standalone mode.
+        if (conf.get("mapred.job.tracker").equals("local")) {
+          RetrievalEnvironment env = new RetrievalEnvironment(
+              context.getConfiguration().get(Constants.IndexPath), localFs);
+          docMapping.loadMapping(env.getDocnoMappingData(), localFs);
+        } else {
+          Path[] localFiles = DistributedCache.getLocalCacheFiles(conf);
+          // Load the docid to docno mappings. Assume file 0.
+          docMapping.loadMapping(localFiles[0], localFs);
+        }
+      } catch (Exception e) {
+        throw new RuntimeException("Error initializing docno mapping!", e);
       }
 
       // Initialize the tokenizer.
@@ -91,16 +103,6 @@ public class BuildTermDocVectors2 extends PowerTool {
       } catch (Exception e) {
         e.printStackTrace();
         throw new RuntimeException("Error initializing tokenizer!");
-      }
-
-      // Load the docid to docno mappings.
-      try {
-        docMapping =
-            (DocnoMapping) Class.forName(conf.get(Constants.DocnoMappingClass)).newInstance();
-        docMapping.loadMapping(localFiles[0], FileSystem.getLocal(conf));
-      } catch (Exception e) {
-        e.printStackTrace();
-        throw new RuntimeException("Error initializing docno mapping!");
       }
     }
 
@@ -315,7 +317,7 @@ public class BuildTermDocVectors2 extends PowerTool {
     String mappingClass = conf.get(Constants.DocnoMappingClass);
     int docnoOffset = conf.getInt(Constants.DocnoOffset, 0);
 
-    LOG.info("PowerTool: BuildTermDocVectors2");
+    LOG.info("PowerTool: " + BuildTermDocVectors2.class.getCanonicalName());
     LOG.info(String.format(" - %s: %s", Constants.IndexPath, indexPath));
     LOG.info(String.format(" - %s: %s", Constants.CollectionName, collectionName));
     LOG.info(String.format(" - %s: %s", Constants.CollectionPath, collectionPath));

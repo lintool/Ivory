@@ -28,9 +28,9 @@ import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
-import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.SequenceFile;
+import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
@@ -45,9 +45,9 @@ import org.apache.log4j.Logger;
 
 import edu.umd.cloud9.util.PowerTool;
 
-public class BuildIntDocVectorsForwardIndex2 extends PowerTool {
-  private static final Logger LOG = Logger.getLogger(BuildIntDocVectorsForwardIndex2.class);
-  protected static enum DocVectors { Count };
+public class BuildTermDocVectorsForwardIndex2 extends PowerTool {
+  private static final Logger LOG = Logger.getLogger(BuildTermDocVectorsForwardIndex2.class);
+  protected static enum Dictionary { Size };
 
   private static class MySequenceFileRecordReader<K, V> extends RecordReader<K, V> {
     private SequenceFile.Reader in;
@@ -121,11 +121,9 @@ public class BuildIntDocVectorsForwardIndex2 extends PowerTool {
     }
   }
 
-  public static final long BigNumber = 1000000000;
-
   private static class MyMapper
-      extends Mapper<IntWritable, IntDocVector, IntWritable, LongWritable> {
-    private static final LongWritable output = new LongWritable();
+      extends Mapper<IntWritable, IntDocVector, IntWritable, Text> {
+    private static final Text output = new Text();
 
     @Override
     public void run(Context context) throws IOException, InterruptedException {
@@ -139,10 +137,11 @@ public class BuildIntDocVectorsForwardIndex2 extends PowerTool {
       int fileNo = Integer.parseInt(file.substring(file.lastIndexOf("-") + 1));
       long filePos = reader.getPosition();
       while (reader.nextKeyValue()) {
-        output.set(BigNumber * fileNo + filePos);
+        IntWritable key = reader.getCurrentKey();
+        output.set(fileNo + "\t" + filePos);
 
-        context.write(reader.getCurrentKey(), output);
-        context.getCounter(DocVectors.Count).increment(1);
+        context.write(key, output);
+        context.getCounter(Dictionary.Size).increment(1);
 
         filePos = reader.getPosition();
       }
@@ -150,15 +149,18 @@ public class BuildIntDocVectorsForwardIndex2 extends PowerTool {
     }
   }
 
+  private static final long BigNumber = 1000000000;
+
   private static class MyReducer
-      extends Reducer<IntWritable, LongWritable, NullWritable, NullWritable> {
-    private FSDataOutputStream out;
-    private int collectionDocumentCount;
-    private int curDoc = 0;
+      extends Reducer<IntWritable, Text, NullWritable, NullWritable> {
+    FSDataOutputStream out;
+
+    int collectionDocumentCount;
+    int curDoc = 0;
 
     @Override
     public void setup(
-        Reducer<IntWritable, LongWritable, NullWritable, NullWritable>.Context context) {
+        Reducer<IntWritable, Text, NullWritable, NullWritable>.Context context) {
       Configuration conf = context.getConfiguration();
       FileSystem fs;
       try {
@@ -167,18 +169,17 @@ public class BuildIntDocVectorsForwardIndex2 extends PowerTool {
         throw new RuntimeException("Error opening the FileSystem!");
       }
 
-      RetrievalEnvironment env;
+      RetrievalEnvironment env = null;
       try {
         env = new RetrievalEnvironment(conf.get(Constants.IndexPath), fs);
       } catch (IOException e) {
         throw new RuntimeException("Unable to create RetrievalEnvironment!");
       }
 
-      String forwardIndexPath = env.getIntDocVectorsForwardIndex();
       collectionDocumentCount = env.readCollectionDocumentCount();
 
       try {
-        out = fs.create(new Path(forwardIndexPath), true);
+        out = fs.create(new Path(env.getTermDocVectorsForwardIndex()), true);
         out.writeInt(env.readDocnoOffset());
         out.writeInt(collectionDocumentCount);
       } catch (Exception e) {
@@ -187,33 +188,38 @@ public class BuildIntDocVectorsForwardIndex2 extends PowerTool {
     }
 
     @Override
-    public void reduce(IntWritable key, Iterable<LongWritable> values, Context context)
+    public void reduce(IntWritable key, Iterable<Text> values, Context context)
         throws IOException, InterruptedException {
-      Iterator<LongWritable> iter = values.iterator();
-      long pos = iter.next().get();
+      Iterator<Text> iter = values.iterator();
+      String[] s = iter.next().toString().split("\\s+");
 
+      LOG.info(key + ": " + s[0] + " " + s[1]);
       if (iter.hasNext()) {
         throw new RuntimeException("There shouldn't be more than one value, key=" + key);
       }
 
+      int fileNo = Integer.parseInt(s[0]);
+      long filePos = Long.parseLong(s[1]);
+      long pos = BigNumber * fileNo + filePos;
+
       curDoc++;
+
       out.writeLong(pos);
     }
 
     @Override
-    public void cleanup(
-        Reducer<IntWritable, LongWritable, NullWritable, NullWritable>.Context context)
+    public void cleanup(Reducer<IntWritable, Text, NullWritable, NullWritable>.Context context)
         throws IOException {
       out.close();
 
       if (curDoc != collectionDocumentCount) {
-        throw new IOException("Expected " + collectionDocumentCount + " docs, actually got "
-            + curDoc + " terms!");
+        throw new IOException("Expected " + collectionDocumentCount
+            + " docs, actually got " + curDoc + " terms!");
       }
     }
   }
 
-  public BuildIntDocVectorsForwardIndex2(Configuration conf) {
+  public BuildTermDocVectorsForwardIndex2(Configuration conf) {
     super(conf);
   }
 
@@ -231,34 +237,32 @@ public class BuildIntDocVectorsForwardIndex2 extends PowerTool {
     RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fs);
     String collectionName = env.readCollectionName();
 
-    LOG.info("Tool: " + BuildIntDocVectorsForwardIndex2.class.getCanonicalName());
+    LOG.info("Tool: " + BuildTermDocVectorsForwardIndex2.class.getCanonicalName());
     LOG.info(String.format(" - %s: %s", Constants.CollectionName, collectionName));
     LOG.info(String.format(" - %s: %s", Constants.IndexPath, indexPath));
 
-    String intDocVectorsPath = env.getIntDocVectorsDirectory();
-    String forwardIndexPath = env.getIntDocVectorsForwardIndex();
-
-    if (!fs.exists(new Path(intDocVectorsPath))) {
-      LOG.info("Error: IntDocVectors don't exist!");
+    if (!fs.exists(new Path(env.getTermDocVectorsDirectory()))) {
+      LOG.info("Error: TermDocVectors don't exist!");
       return 0;
     }
 
-    if (fs.exists(new Path(forwardIndexPath))) {
-      LOG.info("IntDocVectorIndex already exists: skipping!");
+    if (fs.exists(new Path(env.getTermDocVectorsForwardIndex()))) {
+      LOG.info("TermDocVectorIndex already exists: skipping!");
       return 0;
     }
 
-    Job job = new Job(conf, "BuildIntDocVectorsForwardIndex2:" + collectionName);
-    job.setJarByClass(BuildIntDocVectorsForwardIndex2.class);
+    Job job = new Job(conf, "BuildTermDocVectorsForwardIndex2:" + collectionName);
+    job.setJarByClass(BuildTermDocVectorsForwardIndex2.class);
 
-    FileInputFormat.setInputPaths(job, new Path(intDocVectorsPath));
+    FileInputFormat.setInputPaths(job, new Path(env.getTermDocVectorsDirectory()));
     job.setNumReduceTasks(1);
 
-    job.setInputFormatClass(SequenceFileInputFormat.class);
-    job.setOutputFormatClass(NullOutputFormat.class);
+    job.getConfiguration().set("mapred.child.java.opts", "-Xmx2048m");
 
+    job.setInputFormatClass(SequenceFileInputFormat.class);
     job.setMapOutputKeyClass(IntWritable.class);
-    job.setMapOutputValueClass(LongWritable.class);
+    job.setMapOutputValueClass(Text.class);
+    job.setOutputFormatClass(NullOutputFormat.class);
 
     job.setMapperClass(MyMapper.class);
     job.setReducerClass(MyReducer.class);
