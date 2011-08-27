@@ -37,6 +37,7 @@ public class ProximityPostingsReaderUnorderedWindow extends ProximityPostingsRea
     matchedIds = new BitSet(numReaders);
   }
 
+  @Override
   protected short countMatches() {
     int matches = 0;
 

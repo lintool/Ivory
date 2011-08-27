@@ -47,7 +47,6 @@ public class DfTableArray implements DfTable {
 
   /**
    * Creates a {@code DfTableArray} object.
-   *
    * @param file collection frequency data file
    * @throws IOException
    */
@@ -57,7 +56,6 @@ public class DfTableArray implements DfTable {
 
   /**
    * Creates a {@code DfTableArray} object.
-   *
    * @param file collection frequency data file path
    * @param fs FileSystem to read from
    * @throws IOException
