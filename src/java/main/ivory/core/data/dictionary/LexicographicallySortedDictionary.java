@@ -17,9 +17,8 @@
 package ivory.core.data.dictionary;
 
 /**
- * A lexicographically-sorted {@code Dictionary}. Term ids start at 0, which corresponds to the
- * first lexicographically-sorted term. Term id 1 is the second lexicographically-sorted term,
- * etc.
+ * A lexicographically-sorted dictionary. That is, smaller term ids correspond to terms
+ * that are sorted lexicographically earlier.
  *
  * @author Jimmy Lin
  */

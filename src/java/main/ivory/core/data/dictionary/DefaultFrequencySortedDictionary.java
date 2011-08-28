@@ -28,17 +28,26 @@ import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 
+/**
+ * An implementation of {@link FrequencySortedDictionary}. Term ids start at 1, which corresponds to
+ * the most frequent term. Term id 2 is the second most frequent term, etc.
+ *
+ * @author Jimmy Lin
+ */
 public class DefaultFrequencySortedDictionary implements FrequencySortedDictionary {
   private PrefixEncodedLexicographicallySortedDictionary dictionary =
       new PrefixEncodedLexicographicallySortedDictionary();
   private int[] ids;
   private int[] idsToTerm;
 
-  public DefaultFrequencySortedDictionary(Path prefixSetPath, Path idsPath, Path idToTermPath,
+  /**
+   * Constructs an instance of this dictionary from serialized data files.
+   */
+  public DefaultFrequencySortedDictionary(Path prefixPath, Path idsPath, Path idToTermPath,
       FileSystem fs) throws IOException {
     FSDataInputStream in;
 
-    in = fs.open(prefixSetPath);
+    in = fs.open(prefixPath);
     dictionary.readFields(in);
     in.close();
 
@@ -87,6 +96,9 @@ public class DefaultFrequencySortedDictionary implements FrequencySortedDictiona
     return term;
   }
 
+  /**
+   * Returns an iterator over the dictionary in order of term id.
+   */
   @Override
   public Iterator<String> iterator() {
     return new Iterator<String>() {
@@ -110,6 +122,9 @@ public class DefaultFrequencySortedDictionary implements FrequencySortedDictiona
     };
   }
 
+  /**
+   * Simple demo program for looking up terms and term ids.
+   */
   public static void main(String[] args) throws Exception {
     if (args.length != 1) {
       System.out.println("usage: [index-path]");

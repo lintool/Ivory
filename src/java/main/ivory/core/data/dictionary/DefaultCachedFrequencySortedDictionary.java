@@ -26,26 +26,41 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 
+import com.google.common.base.Preconditions;
+
 import edu.umd.cloud9.util.map.HMapKI;
 
+/**
+ * A subclass of {@link DefaultFrequencySortedDictionary} that caches frequent terms for
+ * faster term id lookup.
+ *
+ * @author Jimmy Lin
+ */
 public class DefaultCachedFrequencySortedDictionary extends DefaultFrequencySortedDictionary {
   private final HMapKI<String> cache = new HMapKI<String>();
 
-  public DefaultCachedFrequencySortedDictionary(Path prefixSetPath, Path idsPath,
+  /**
+   * Constructs an instance of this dictionary from serialized data files.
+   * @param cachedFrequent number of top terms to caches (i.e., 1000 means cache top 1000
+   *   most frequently-occurring terms)
+   */
+  public DefaultCachedFrequencySortedDictionary(Path prefixPath, Path idsPath,
       Path idToTermPath, int cachedFrequent, FileSystem fs) throws IOException {
-    super(prefixSetPath, idsPath, idToTermPath, fs);
+    super(prefixPath, idsPath, idToTermPath, fs);
     loadFrequentMap(cachedFrequent);
   }
 
-  public DefaultCachedFrequencySortedDictionary(Path prefixSetPath, Path idsPath,
-      Path idToTermPath, float cachedFrequentPercent, FileSystem fs) throws IOException {
-    super(prefixSetPath, idsPath, idToTermPath, fs);
+  /**
+   * Constructs an instance of this dictionary from serialized data files.
+   * @param cachedFrequentFraction fraction of top terms to cache
+   *   (i.e., 0.3 means cache top 30% of frequently-occurring terms)
+   */
+  public DefaultCachedFrequencySortedDictionary(Path prefixPath, Path idsPath,
+      Path idToTermPath, float cachedFrequentFraction, FileSystem fs) throws IOException {
+    super(prefixPath, idsPath, idToTermPath, fs);
+    Preconditions.checkArgument(cachedFrequentFraction > 0.0 && cachedFrequentFraction <= 1.0);
 
-    if (cachedFrequentPercent < 0 || cachedFrequentPercent > 1.0) {
-      return;
-    }
-
-    int cachedFrequent = (int) (cachedFrequentPercent * size());
+    int cachedFrequent = (int) (cachedFrequentFraction * size());
     loadFrequentMap(cachedFrequent);
   }
 
@@ -68,6 +83,9 @@ public class DefaultCachedFrequencySortedDictionary extends DefaultFrequencySort
     return super.getId(term);
   }
 
+  /**
+   * Simple demo program for looking up terms and term ids.
+   */
   public static void main(String[] args) throws Exception {
     if (args.length != 1) {
       System.out.println("usage: [index-path]");

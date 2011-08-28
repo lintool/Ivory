@@ -17,8 +17,8 @@
 package ivory.core.data.dictionary;
 
 /**
- * A frequency-sorted {@code Dictionary}. Term ids start at 1, which corresponds to the
- * most frequent term. Term id 2 is the second most frequent term, etc.
+ * A frequency-sorted dictionary. That is, smaller term ids are assigned to more
+ * frequently occurring terms.
  *
  * @author Jimmy Lin
  */

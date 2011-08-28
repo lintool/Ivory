@@ -17,8 +17,8 @@
 package ivory.core.data.dictionary;
 
 /**
- * A {@code Dictionary} provides a bidirectional mapping terms (Strings) and ids (ints). The
- * semantics of the mapping is left underspecified, but the iteration order is always in
+ * A dictionary provides a bidirectional mapping terms (Strings) and term ids (integers). The
+ * semantics of the mapping is left unspecified, but the iteration order is always in
  * increasing term id. 
  *
  * @author Jimmy Lin

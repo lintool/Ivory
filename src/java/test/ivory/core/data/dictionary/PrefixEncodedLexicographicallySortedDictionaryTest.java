@@ -88,7 +88,7 @@ public class PrefixEncodedLexicographicallySortedDictionaryTest {
     m.store("tmp.dat", fs);
 
     PrefixEncodedLexicographicallySortedDictionary n =
-        PrefixEncodedLexicographicallySortedDictionary.load("tmp.dat", fs);
+        PrefixEncodedLexicographicallySortedDictionary.load(new Path("tmp.dat"), fs);
 
     // Verify size.
     assertEquals(data.size(), n.size());
@@ -114,7 +114,7 @@ public class PrefixEncodedLexicographicallySortedDictionaryTest {
     FileSystem fs = FileSystem.getLocal(new Configuration());
     PrefixEncodedLexicographicallySortedDictionary m = 
         PrefixEncodedLexicographicallySortedDictionary.loadFromPlainTextFile(
-            "etc/dictionary-test.txt", fs, 8);
+            new Path("etc/dictionary-test.txt"), fs, 8);
 
     assertEquals(0, m.getId("a"));
     assertEquals(1, m.getId("a1"));
@@ -130,7 +130,8 @@ public class PrefixEncodedLexicographicallySortedDictionaryTest {
     m.store("tmp.dat", fs);
 
     PrefixEncodedLexicographicallySortedDictionary n =
-        PrefixEncodedLexicographicallySortedDictionary.load("tmp.dat", fs);
+        PrefixEncodedLexicographicallySortedDictionary.load(
+            new Path("tmp.dat"), fs);
 
     assertEquals(0, n.getId("a"));
     assertEquals(1, n.getId("a1"));

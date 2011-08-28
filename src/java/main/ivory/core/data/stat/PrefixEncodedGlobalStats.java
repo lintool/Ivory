@@ -141,7 +141,7 @@ public class PrefixEncodedGlobalStats {
 	}
 
 	public void printKeys() {
-		System.out.println("Window: " + this.prefixSet.getWindow());
+		System.out.println("Window: " + this.prefixSet.getWindowSize());
 		System.out.println("Length: " + this.length());
 		// int window = prefixSet.getWindow();
 		for (int i = 0; i < length() && i < 100; i++) {

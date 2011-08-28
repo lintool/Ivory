@@ -30,10 +30,17 @@ import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.util.LineReader;
 import org.apache.log4j.Logger;
 
+import com.google.common.base.Preconditions;
+
 /**
  * An implementation of {@link LexicographicallySortedDictionary} that encodes the dictionary
- * with prefix encoding.
- * 
+ * with prefix encoding. Term ids start at 0, which corresponds to the first
+ * lexicographically-sorted term. Term id 1 is the second lexicographically-sorted term, etc.
+ * This dictionary is associated with a window size (cf. {@link #getWindowSize()}), a parameter
+ * that controls how aggressively terms are stored based on their prefixes: for window size of
+ * <i>n</i>, every <i>n</i>-th word is stored verbatim (without prefix encoding). Larger
+ * window sizes lead to better compression, but slower lookups.
+ *
  * @author Jimmy Lin
  */
 public class PrefixEncodedLexicographicallySortedDictionary
@@ -41,39 +48,61 @@ public class PrefixEncodedLexicographicallySortedDictionary
   private static final Logger LOG =
       Logger.getLogger(PrefixEncodedLexicographicallySortedDictionary.class);
 
-  public long totalOriginalBytes = 0;
-  public long totalMemoryBytes = 0;
-
   private static final int DEFAULT_INITIAL_SIZE = 10000000;
+
+  private long totalOriginalBytes = 0;
+  private long totalMemoryBytes = 0;
+
   private String lastKey = "";
 
   private int curKeyIndex = 0;
   private byte[][] keys;
 
   private int window = 4;
-  float resizeFactor = 1; // >0 and <=1
+  private float resizeFactor = 1; // >0 and <=1
 
+  /**
+   * Creates an empty dictionary.
+   */
   public PrefixEncodedLexicographicallySortedDictionary() {
     keys = new byte[DEFAULT_INITIAL_SIZE][];
   }
 
-  public PrefixEncodedLexicographicallySortedDictionary(int indexWindow) {
+  /**
+   * Creates an empty dictionary.
+   * @param w window size
+   */
+  public PrefixEncodedLexicographicallySortedDictionary(int w) {
     keys = new byte[DEFAULT_INITIAL_SIZE][];
-    window = indexWindow;
+    window = w;
   }
 
-  public PrefixEncodedLexicographicallySortedDictionary(int initialSize, int indexWindow) {
+  /**
+   * Creates an empty dictionary.
+   * @param initialSize initial size of the dictionary
+   * @param w window size
+   */
+  public PrefixEncodedLexicographicallySortedDictionary(int initialSize, int w) {
     keys = new byte[initialSize][];
-    window = indexWindow;
+    window = w;
   }
 
-  public PrefixEncodedLexicographicallySortedDictionary(int initialSize, float resizeF,
-      int indexWindow) {
+  /**
+   * Creates an empty dictionary.
+   * @param initialSize initialize size of the dictionary
+   * @param f when needed, the dictionary grows by this fractor (>0 && <1.0)
+   * @param w window size
+   */
+  public PrefixEncodedLexicographicallySortedDictionary(int initialSize, float f, int w) {
+    Preconditions.checkArgument(f > 0.0f && f <= 1.0f);
     keys = new byte[initialSize][];
-    window = indexWindow;
-    resizeFactor = resizeF;
+    window = w;
+    resizeFactor = f;
   }
 
+  /**
+   * Deserializes this dictionary.
+   */
   @Override
   public void readFields(DataInput in) throws IOException {
     curKeyIndex = in.readInt();
@@ -105,6 +134,9 @@ public class PrefixEncodedLexicographicallySortedDictionary
     }
   }
 
+  /**
+   * Serializes this dictionary.
+   */
   @Override
   public void write(DataOutput out) throws IOException {
     out.writeInt(curKeyIndex);
@@ -125,14 +157,24 @@ public class PrefixEncodedLexicographicallySortedDictionary
     }
   }
 
+  /**
+   * Serializes this dictionary to a file.
+   * @param file filename
+   * @param fs reference to the {@code FileSystem}
+   * @throws IOException
+   */
   public void store(String file, FileSystem fs) throws IOException {
     DataOutputStream out = new DataOutputStream(fs.create(new Path(file)));
     write(out);
     out.close();
   }
 
-  public void add(String key) {
-    totalOriginalBytes += key.getBytes().length;
+  /**
+   * Adds another term to this dictionary. Note that terms must be added in lexicographical order.
+   * @param term term to insert into this dictionary
+   */
+  public void add(String term) {
+    totalOriginalBytes += term.getBytes().length;
     int prefix;
 
     if (curKeyIndex >= keys.length) {
@@ -142,10 +184,10 @@ public class PrefixEncodedLexicographicallySortedDictionary
     byte[] byteArray = null;
     if (curKeyIndex % window == 0) {
       prefix = 0;
-      byteArray = key.getBytes();
+      byteArray = term.getBytes();
     } else {
-      prefix = getPrefix(lastKey, key);
-      byte[] suffix = key.substring(prefix).getBytes();
+      prefix = getPrefix(lastKey, term);
+      byte[] suffix = term.substring(prefix).getBytes();
       byteArray = new byte[suffix.length + 1];
       byteArray[0] = (byte) prefix;
       for (int i = 0; i < suffix.length; i++) {
@@ -155,11 +197,14 @@ public class PrefixEncodedLexicographicallySortedDictionary
     totalMemoryBytes += byteArray.length;
     keys[curKeyIndex] = byteArray;
 
-    lastKey = key;
+    lastKey = term;
     curKeyIndex++;
   }
 
-  public int getWindow() {
+  /**
+   * Returns the window size used to encode this dictionary.
+   */
+  public int getWindowSize() {
     return window;
   }
 
@@ -220,6 +265,9 @@ public class PrefixEncodedLexicographicallySortedDictionary
     return -1;
   }
 
+  /**
+   * Returns an iterator over the dictionary in order of term id.
+   */
   @Override
   public Iterator<String> iterator() {
     return new Iterator<String>() {
@@ -243,6 +291,9 @@ public class PrefixEncodedLexicographicallySortedDictionary
     };
   }
 
+  /**
+   * Returns the compression ratio of this dictionary.
+   */
   public float getCompresssionRatio() {
     return (float) totalMemoryBytes / totalOriginalBytes;
   }
@@ -300,6 +351,9 @@ public class PrefixEncodedLexicographicallySortedDictionary
     return prefix;
   }
 
+  /**
+   * Returns the small character position <i>i</i> at which {@code s1} and {@code s2} differ.
+   */
   public static int getPrefix(String s1, String s2) {
     int i = 0;
     for (i = 0; i < s1.length() && i < s2.length(); i++) {
@@ -310,11 +364,18 @@ public class PrefixEncodedLexicographicallySortedDictionary
     return i;
   }
 
-  public static PrefixEncodedLexicographicallySortedDictionary load(String file, FileSystem fs)
+  /**
+   * Loads a dictionary from a file.
+   * @param path path to file
+   * @param fs reference to the {@code FileSystem}
+   * @return dictionary with loaded data
+   * @throws IOException
+   */
+  public static PrefixEncodedLexicographicallySortedDictionary load(Path path, FileSystem fs)
       throws IOException {
     FSDataInputStream in;
 
-    in = fs.open(new Path(file));
+    in = fs.open(path);
     PrefixEncodedLexicographicallySortedDictionary terms =
         new PrefixEncodedLexicographicallySortedDictionary();
     terms.readFields(in);
@@ -322,10 +383,18 @@ public class PrefixEncodedLexicographicallySortedDictionary
     return terms;
   }
 
-  public static PrefixEncodedLexicographicallySortedDictionary loadFromPlainTextFile(String file,
+  /**
+   * Loads a dictionary from a plain text containing lexicographically-sorted terms.
+   * @param path path to file
+   * @param fs reference to the {@code FileSystem}
+   * @param window window size
+   * @return dictionary with loaded data
+   * @throws IOException
+   */
+  public static PrefixEncodedLexicographicallySortedDictionary loadFromPlainTextFile(Path path,
       FileSystem fs, int window) throws IOException {
-    LOG.info("Reading from " + file);
-    LineReader reader = new LineReader(fs.open(new Path(file)));
+    LOG.info("Reading from " + path);
+    LineReader reader = new LineReader(fs.open(path));
     PrefixEncodedLexicographicallySortedDictionary terms =
         new PrefixEncodedLexicographicallySortedDictionary(window);
 
@@ -347,7 +416,7 @@ public class PrefixEncodedLexicographicallySortedDictionary
       }
     }
 
-    LOG.info("Finished reading from " + file);
+    LOG.info("Finished reading from " + path);
     LOG.info("compression ratio: " + terms.getCompresssionRatio());
 
     return terms;

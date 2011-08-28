@@ -192,7 +192,7 @@
 	</target>
 
 	<target name="javadoc">
-		<javadoc destdir="docs/api/" access="public" use="false" notree="false" nonavbar="false" noindex="false" splitindex="no" author="true" version="true" nodeprecatedlist="true" nodeprecated="true" classpathref="classpath">
+		<javadoc destdir="docs/api/" access="public" use="false" notree="false" nonavbar="false" noindex="false" splitindex="no" author="true" version="true" nodeprecatedlist="true" nodeprecated="true" classpathref="run.path.id">
 			<fileset dir="src">
 				<include name="java/main/**/*.java" />
 				<exclude name="java/main/ivory/util/AnnotateClueRunAllWithURLs.java" />
@@ -201,7 +201,7 @@
 				<exclude name="java/main/uk/**/*.java" />
 				<exclude name="java/main/org/**/*.java" />
 			</fileset>
-			<link href="http://java.sun.com/javase/6/docs/api/" />
+			<link href="http://download.oracle.com/javase/6/docs/api/" />
 			<link href="http://hadoop.apache.org/common/docs/current/api/" />
 			<link href="http://www.umiacs.umd.edu/~jimmylin/Cloud9/docs/api//" />
 		</javadoc>
