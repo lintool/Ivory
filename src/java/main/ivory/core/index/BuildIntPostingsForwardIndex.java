@@ -175,7 +175,7 @@ public class BuildIntPostingsForwardIndex extends PowerTool {
     super(conf);
   }
 
-  public static final String[] RequiredParameters = { "Ivory.IndexPath", "Ivory.NumMapTasks" };
+  public static final String[] RequiredParameters = { "Ivory.IndexPath" };
 
   public String[] getRequiredParameters() {
     return RequiredParameters;
@@ -185,7 +185,7 @@ public class BuildIntPostingsForwardIndex extends PowerTool {
     JobConf conf = new JobConf(getConf(), BuildIntPostingsForwardIndex.class);
     FileSystem fs = FileSystem.get(conf);
 
-    int mapTasks = conf.getInt("Ivory.NumMapTasks", 0);
+    int mapTasks = conf.getInt("Ivory.NumMapTasks", 100);
     int minSplitSize = conf.getInt("Ivory.MinSplitSize", 0);
     String indexPath = conf.get("Ivory.IndexPath");
 

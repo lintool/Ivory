@@ -132,7 +132,7 @@ public class GetTermCount2 extends PowerTool {
 		String indexPath = conf.get(Constants.IndexPath);
 		RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fs);
 
-		int reduceTasks = conf.getInt(Constants.NumReduceTasks, 0);
+		int reduceTasks = 10; //conf.getInt(Constants.NumReduceTasks, 0);
 
 		String collectionName = env.readCollectionName();
 		String termDocVectorsPath = env.getTermDocVectorsDirectory();
