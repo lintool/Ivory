@@ -16,6 +16,7 @@
 
 package ivory.core.index;
 
+import ivory.core.Constants;
 import ivory.core.RetrievalEnvironment;
 import ivory.core.data.document.IntDocVector;
 import ivory.core.data.document.IntDocVector.Reader;
@@ -218,7 +219,8 @@ public class BuildIPInvertedIndexDocSorted extends PowerTool {
 		}
 	}
 
-	public static final String[] RequiredParameters = { "Ivory.NumMapTasks", "Ivory.NumReduceTasks", "Ivory.IndexPath" };
+	public static final String[] RequiredParameters = {
+	  Constants.NumReduceTasks, Constants.IndexPath };
 
 	public String[] getRequiredParameters() {
 		return RequiredParameters;
@@ -233,23 +235,21 @@ public class BuildIPInvertedIndexDocSorted extends PowerTool {
 		JobConf conf = new JobConf(getConf(), BuildIPInvertedIndexDocSorted.class);
 		FileSystem fs = FileSystem.get(conf);
 
-		String indexPath = conf.get("Ivory.IndexPath");
+		String indexPath = conf.get(Constants.IndexPath);
 		RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fs);
 
 		String collectionName = env.readCollectionName();
 
-		int mapTasks = conf.getInt("Ivory.NumMapTasks", 0);
-		int reduceTasks = conf.getInt("Ivory.NumReduceTasks", 0);
-		int minSplitSize = conf.getInt("Ivory.MinSplitSize", 0);
+		int reduceTasks = conf.getInt(Constants.NumReduceTasks, 0);
+		int minSplitSize = conf.getInt(Constants.MinSplitSize, 0);
 		int collectionDocCnt = env.readCollectionDocumentCount();
 
-		LOG.info("PowerTool: BuildIPInvertedIndexDocSorted");
-		LOG.info(" - IndexPath: " + indexPath);
-		LOG.info(" - CollectionName: " + collectionName);
-		LOG.info(" - CollectionDocumentCount: " + collectionDocCnt);
-		LOG.info(" - NumMapTasks: " + mapTasks);
-		LOG.info(" - NumReduceTasks: " + reduceTasks);
-		LOG.info(" - MinSplitSize: " + minSplitSize);
+		LOG.info("PowerTool: " + BuildIPInvertedIndexDocSorted.class.getCanonicalName());
+		LOG.info(String.format(" - %s: %s", Constants.IndexPath, indexPath));
+		LOG.info(String.format(" - %s: %s", Constants.CollectionName, collectionName));
+		LOG.info(String.format(" - %s: %s", Constants.CollectionDocumentCount, collectionDocCnt));
+		LOG.info(String.format(" - %s: %s", Constants.NumReduceTasks, reduceTasks));
+		LOG.info(String.format(" - %s: %s", Constants.MinSplitSize, minSplitSize));
 
 		if (!fs.exists(new Path(indexPath))) {
 			fs.mkdirs(new Path(indexPath));
@@ -265,10 +265,9 @@ public class BuildIPInvertedIndexDocSorted extends PowerTool {
 
 		conf.setJobName("BuildIPInvertedIndex:" + collectionName);
 
-		conf.setNumMapTasks(mapTasks);
 		conf.setNumReduceTasks(reduceTasks);
 
-		conf.setInt("Ivory.CollectionDocumentCount", collectionDocCnt);
+		conf.setInt(Constants.CollectionDocumentCount, collectionDocCnt);
 
 		conf.setInt("mapred.min.split.size", minSplitSize);
 		conf.set("mapred.child.java.opts", "-Xmx2048m");
@@ -292,7 +291,7 @@ public class BuildIPInvertedIndexDocSorted extends PowerTool {
 		RunningJob job = JobClient.runJob(conf);
 		LOG.info("Job Finished in " + (System.currentTimeMillis() - startTime) / 1000.0	+ " seconds");
 
-		env.writePostingsType("ivory.data.PostingsListDocSortedPositional");
+		env.writePostingsType(PostingsListDocSortedPositional.class.getCanonicalName());
 
 		return 0;
 	}

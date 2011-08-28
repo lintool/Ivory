@@ -1,5 +1,5 @@
 /*
- * Ivory: A Hadoop toolkit for Web-scale information retrieval
+ * Ivory: A Hadoop toolkit for web-scale information retrieval
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You may
@@ -16,6 +16,7 @@
 
 package ivory.core.driver;
 
+import ivory.core.Constants;
 import ivory.core.index.BuildIPInvertedIndexDocSorted;
 import ivory.core.index.BuildIntPostingsForwardIndex;
 
@@ -31,7 +32,7 @@ public class BuildIPIndex extends Configured implements Tool {
   private static final Logger LOG = Logger.getLogger(BuildIPIndex.class);
 
   private static int printUsage() {
-    System.out.println("usage: [index-path] [num-of-mappers] [num-of-reducers]");
+    System.out.println("usage: [index-path] [num-of-reducers]");
     ToolRunner.printGenericCommandUsage(System.out);
     return -1;
   }
@@ -40,7 +41,7 @@ public class BuildIPIndex extends Configured implements Tool {
    * Runs this tool.
    */
   public int run(String[] args) throws Exception {
-    if (args.length != 3) {
+    if (args.length != 2) {
       printUsage();
       return -1;
     }
@@ -56,15 +57,13 @@ public class BuildIPIndex extends Configured implements Tool {
       return -1;
     }
 
-    int numMappers = Integer.parseInt(args[1]);
-    int numReducers = Integer.parseInt(args[2]);
+    int numReducers = Integer.parseInt(args[1]);
 
-    LOG.info("Tool name: BuildIPIndex");
+    LOG.info("Tool name: " + BuildIPIndex.class.getCanonicalName());
     LOG.info(" - Index path: " + indexPath);
 
-    conf.set("Ivory.IndexPath", indexPath);
-    conf.setInt("Ivory.NumMapTasks", numMappers);
-    conf.setInt("Ivory.NumReduceTasks", numReducers);
+    conf.set(Constants.IndexPath, indexPath);
+    conf.setInt(Constants.NumReduceTasks, numReducers);
 
     BuildIPInvertedIndexDocSorted indexTool = new BuildIPInvertedIndexDocSorted(conf);
     indexTool.run();

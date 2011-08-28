@@ -16,4 +16,5 @@ public class Constants {
 	public static final String MaxDf = "Ivory.MaxDf";
 	public static final String MinDf = "Ivory.MinDf";
 	public static final String TermIndexWindow = "Ivory.TermIndexWindow";
+	public static final String MinSplitSize = "Ivory.MinSplitSize";
 }

@@ -29,14 +29,10 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.NullWritable;
-import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
-import org.apache.hadoop.mapreduce.RecordReader;
 import org.apache.hadoop.mapreduce.Reducer;
-import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
@@ -47,79 +43,8 @@ import edu.umd.cloud9.util.PowerTool;
 
 public class BuildTermDocVectorsForwardIndex2 extends PowerTool {
   private static final Logger LOG = Logger.getLogger(BuildTermDocVectorsForwardIndex2.class);
+  private static final long BigNumber = 1000000000;
   protected static enum Dictionary { Size };
-
-  private static class MySequenceFileRecordReader<K, V> extends RecordReader<K, V> {
-    private SequenceFile.Reader in;
-    private long start;
-    private long end;
-    private boolean more = true;
-    private K key = null;
-    private V value = null;
-    protected Configuration conf;
-
-    @Override
-    public void initialize(InputSplit split, TaskAttemptContext context)
-        throws IOException, InterruptedException {
-      FileSplit fileSplit = (FileSplit) split;
-      conf = context.getConfiguration();
-      Path path = fileSplit.getPath();
-      FileSystem fs = path.getFileSystem(conf);
-      this.in = new SequenceFile.Reader(fs, path, conf);
-      this.end = fileSplit.getStart() + fileSplit.getLength();
-
-      if (fileSplit.getStart() > in.getPosition()) {
-        in.sync(fileSplit.getStart()); // sync to start
-      }
-
-      this.start = in.getPosition();
-      more = start < end;
-    }
-
-    public long getPosition() throws IOException {
-      return in.getPosition();
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public boolean nextKeyValue() throws IOException, InterruptedException {
-      if (!more) {
-        return false;
-      }
-      long pos = in.getPosition();
-      key = (K) in.next(key);
-      if (key == null || (pos >= end && in.syncSeen())) {
-        more = false;
-        key = null;
-        value = null;
-      } else {
-        value = (V) in.getCurrentValue(value);
-      }
-      return more;
-    }
-
-    @Override
-    public K getCurrentKey() {
-      return key;
-    }
-
-    @Override
-    public V getCurrentValue() {
-      return value;
-    }
-
-    public float getProgress() throws IOException {
-      if (end == start) {
-        return 0.0f;
-      } else {
-        return Math.min(1.0f, (in.getPosition() - start) / (float) (end - start));
-      }
-    }
-
-    public synchronized void close() throws IOException {
-      in.close();
-    }
-  }
 
   private static class MyMapper
       extends Mapper<IntWritable, IntDocVector, IntWritable, Text> {
@@ -130,8 +55,8 @@ public class BuildTermDocVectorsForwardIndex2 extends PowerTool {
       String file = ((FileSplit) context.getInputSplit()).getPath().getName();
       LOG.info("Input file: " + file);
 
-      MySequenceFileRecordReader<IntWritable, IntDocVector> reader =
-          new MySequenceFileRecordReader<IntWritable, IntDocVector>();
+      PositionalSequenceFileRecordReader<IntWritable, IntDocVector> reader =
+          new PositionalSequenceFileRecordReader<IntWritable, IntDocVector>();
       reader.initialize(context.getInputSplit(), context);
 
       int fileNo = Integer.parseInt(file.substring(file.lastIndexOf("-") + 1));
@@ -148,8 +73,6 @@ public class BuildTermDocVectorsForwardIndex2 extends PowerTool {
       reader.close();
     }
   }
-
-  private static final long BigNumber = 1000000000;
 
   private static class MyReducer
       extends Reducer<IntWritable, Text, NullWritable, NullWritable> {
@@ -193,7 +116,6 @@ public class BuildTermDocVectorsForwardIndex2 extends PowerTool {
       Iterator<Text> iter = values.iterator();
       String[] s = iter.next().toString().split("\\s+");
 
-      LOG.info(key + ": " + s[0] + " " + s[1]);
       if (iter.hasNext()) {
         throw new RuntimeException("There shouldn't be more than one value, key=" + key);
       }
