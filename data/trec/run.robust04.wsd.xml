@@ -1,6 +1,6 @@
 <parameters>
 
-     <index>/fs/clip-hadoop/indexes/trec</index>
+     <index>/scratch0/indexes/trec</index>
 
      <!-- Concept importance model definition -->
      <importancemodel id="wsd" type="ivory.smrf.model.importance.LinearImportanceModel">
