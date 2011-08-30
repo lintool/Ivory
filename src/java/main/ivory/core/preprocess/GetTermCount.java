@@ -1,5 +1,5 @@
 /*
- * Ivory: A Hadoop toolkit for Web-scale information retrieval
+ * Ivory: A Hadoop toolkit for web-scale information retrieval
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You may
@@ -16,127 +16,104 @@
 
 package ivory.core.preprocess;
 
-
 import ivory.core.Constants;
 import ivory.core.RetrievalEnvironment;
 import ivory.core.data.document.TermDocVector;
 
 import java.io.IOException;
-import java.util.Iterator;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapred.Counters;
-import org.apache.hadoop.mapred.FileInputFormat;
-import org.apache.hadoop.mapred.FileOutputFormat;
-import org.apache.hadoop.mapred.JobClient;
-import org.apache.hadoop.mapred.JobConf;
-import org.apache.hadoop.mapred.MapReduceBase;
-import org.apache.hadoop.mapred.Mapper;
-import org.apache.hadoop.mapred.OutputCollector;
-import org.apache.hadoop.mapred.Reducer;
-import org.apache.hadoop.mapred.Reporter;
-import org.apache.hadoop.mapred.RunningJob;
-import org.apache.hadoop.mapred.SequenceFileInputFormat;
-import org.apache.hadoop.mapred.SequenceFileOutputFormat;
-import org.apache.log4j.Level;
+import org.apache.hadoop.mapreduce.Counters;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 import org.apache.log4j.Logger;
 
 
 import edu.umd.cloud9.io.pair.PairOfIntLong;
 import edu.umd.cloud9.util.PowerTool;
 
-@SuppressWarnings("deprecation")
 public class GetTermCount extends PowerTool {
-	private static final Logger sLogger = Logger.getLogger(GetTermCount.class);
+	private static final Logger LOG = Logger.getLogger(GetTermCount.class);
 
-	protected static enum Statistics {
-		Docs, Terms, SumOfDocLengths
-	}
+	protected static enum Statistics { Docs, Terms, SumOfDocLengths }
 
-	private static class MyMapper extends MapReduceBase implements
-			Mapper<IntWritable, TermDocVector, Text, PairOfIntLong> {
+	private static class MyMapper extends Mapper<IntWritable, TermDocVector, Text, PairOfIntLong> {
+		private static final Text term = new Text();
+		private static final PairOfIntLong pair = new PairOfIntLong();
 
-		private static Text sTerm = new Text();
-		private static PairOfIntLong sPair = new PairOfIntLong();
-
-		public void configure(JobConf job) {
-			sLogger.setLevel(Level.WARN);
-		}
-
-		public void map(IntWritable key, TermDocVector doc,
-				OutputCollector<Text, PairOfIntLong> output, Reporter reporter) throws IOException {
-
+		@Override
+		public void map(IntWritable key, TermDocVector doc, Context context)
+		    throws IOException, InterruptedException {
 			TermDocVector.Reader r = doc.getReader();
-			reporter.setStatus("d" + key.get());
-			int dl = 0;
-			int tf;
+			int dl=0, tf=0;
 			while (r.hasMoreTerms()) {
-				sTerm.set(r.nextTerm());
+				term.set(r.nextTerm());
 				tf = r.getTf();
 				dl += tf;
-				sPair.set(1, tf);
-				output.collect(sTerm, sPair);
+				pair.set(1, tf);
+				context.write(term, pair);
 			}
 
-			reporter.incrCounter(Statistics.Docs, 1);
-			reporter.incrCounter(Statistics.SumOfDocLengths, dl);
+			context.getCounter(Statistics.Docs).increment(1);
+			context.getCounter(Statistics.SumOfDocLengths).increment(dl);
 		}
 	}
 
-	private static class MyCombiner extends MapReduceBase implements
-			Reducer<Text, PairOfIntLong, Text, PairOfIntLong> {
-
-		private static PairOfIntLong sPair = new PairOfIntLong();
-
-		public void reduce(Text key, Iterator<PairOfIntLong> values,
-				OutputCollector<Text, PairOfIntLong> output, Reporter reporter) throws IOException {
+	private static class MyCombiner extends Reducer<Text, PairOfIntLong, Text, PairOfIntLong> {
+		private static final PairOfIntLong output = new PairOfIntLong(); 
+		@Override
+		public void reduce(Text key, Iterable<PairOfIntLong> values, Context context)
+		    throws IOException, InterruptedException {
 			int df = 0;
 			long cf = 0;
-			while (values.hasNext()) {
-				sPair = values.next();
-				df += sPair.getLeftElement();
-				cf += sPair.getRightElement();
+			for ( PairOfIntLong pair : values) {
+				df += pair.getLeftElement();
+				cf += pair.getRightElement();
 			}
 
-			sPair.set(df, cf);
-			output.collect(key, sPair);
+			output.set(df, cf);
+			context.write(key, output);
 		}
 	}
 
-	private static class MyReducer extends MapReduceBase implements
-			Reducer<Text, PairOfIntLong, Text, PairOfIntLong> {
-
+	private static class MyReducer extends Reducer<Text, PairOfIntLong, Text, PairOfIntLong> {
+		private static final PairOfIntLong output = new PairOfIntLong();
 		private int minDf, maxDf;
 
-		public void configure(JobConf job) {
-			minDf = job.getInt("Ivory.MinDf", 2);
-			maxDf = job.getInt("Ivory.MaxDf", Integer.MAX_VALUE);
+		@Override
+		public void setup(Reducer<Text, PairOfIntLong, Text, PairOfIntLong>.Context context) {
+			minDf = context.getConfiguration().getInt(Constants.MinDf, 2);
+			maxDf = context.getConfiguration().getInt(Constants.MaxDf, Integer.MAX_VALUE);
 		}
 
-		PairOfIntLong dfcf = new PairOfIntLong();
-
-		public void reduce(Text key, Iterator<PairOfIntLong> values,
-				OutputCollector<Text, PairOfIntLong> output, Reporter reporter) throws IOException {
+		@Override
+		public void reduce(Text key, Iterable<PairOfIntLong> values, Context context)
+		    throws IOException, InterruptedException {
 			int df = 0;
 			long cf = 0;
-			while (values.hasNext()) {
-				dfcf = values.next();
-				df += dfcf.getLeftElement();
-				cf += dfcf.getRightElement();
+			for ( PairOfIntLong pair : values ) {
+				df += pair.getLeftElement();
+				cf += pair.getRightElement();
 			}
-			if (df < minDf || df > maxDf)
+			if (df < minDf || df > maxDf) {
 				return;
-			reporter.incrCounter(Statistics.Terms, 1);
-			dfcf.set(df, cf);
-			output.collect(key, dfcf);
+			}
+			context.getCounter(Statistics.Terms).increment(1);
+			output.set(df, cf);
+			context.write(key, output);
 		}
 	}
 
-	public static final String[] RequiredParameters = { Constants.NumMapTasks,
+	public static final String[] RequiredParameters = {
 			Constants.CollectionName, Constants.IndexPath, Constants.MinDf, Constants.MaxDf };
 
 	public String[] getRequiredParameters() {
@@ -148,74 +125,66 @@ public class GetTermCount extends PowerTool {
 	}
 
 	public int runTool() throws Exception {
-		// create a new JobConf, inheriting from the configuration of this
-		// PowerTool
-		JobConf conf = new JobConf(getConf(), GetTermCount.class);
+		Configuration conf = getConf();
+
 		FileSystem fs = FileSystem.get(conf);
 
 		String indexPath = conf.get(Constants.IndexPath);
 		RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fs);
 
-		int mapTasks = conf.getInt(Constants.NumMapTasks, 0);
-		int reduceTasks = conf.getInt(Constants.NumReduceTasks, 0);
+		int reduceTasks = 10;
 
 		String collectionName = env.readCollectionName();
 		String termDocVectorsPath = env.getTermDocVectorsDirectory();
 		String termDfCfPath = env.getTermDfCfDirectory();
 
 		if (!fs.exists(new Path(indexPath))) {
-			sLogger.info("index path doesn't existing: skipping!");
+			LOG.info("index path doesn't existing: skipping!");
 			return 0;
 		}
 
-		sLogger.info("PowerTool: GetTermCount");
-		sLogger.info(" - CollectionName: " + collectionName);
-		sLogger.info(" - NumMapTasks: " + mapTasks);
-		sLogger.info(" - NumReduceTasks: " + reduceTasks);
-		sLogger.info(" - MinDf: " + conf.getInt(Constants.MinDf, 0));
-		sLogger.info(" - MaxDf: " + conf.getInt(Constants.MaxDf, Integer.MAX_VALUE));
+		LOG.info("PowerTool: " + GetTermCount.class.getCanonicalName());
+		LOG.info(String.format(" - %s: %s", Constants.CollectionName, collectionName));
+		LOG.info(String.format(" - %s: %s", Constants.IndexPath, indexPath));
+		LOG.info(String.format(" - %s: %s", Constants.NumReduceTasks, reduceTasks));
 
 		Path outputPath = new Path(termDfCfPath);
 		if (fs.exists(outputPath)) {
-			sLogger.error("TermDfCf directory exist: skipping!");
+			LOG.info("TermDfCf directory exist: skipping!");
 			return 0;
 		}
 
-		conf.setJobName("GetTermCount:" + collectionName);
+		Job job = new Job(getConf(), GetTermCount.class.getSimpleName() + ":" + collectionName);
+		job.setJarByClass(GetTermCount.class);
 
-		conf.setNumMapTasks(mapTasks);
-		conf.setNumReduceTasks(reduceTasks);
-		conf.set("mapred.child.java.opts", "-Xmx2048m");
+		job.setNumReduceTasks(reduceTasks);
 
-		FileInputFormat.setInputPaths(conf, new Path(termDocVectorsPath));
-		FileOutputFormat.setOutputPath(conf, outputPath);
+		FileInputFormat.setInputPaths(job, new Path(termDocVectorsPath));
+		FileOutputFormat.setOutputPath(job, outputPath);
 
-		conf.setInputFormat(SequenceFileInputFormat.class);
-		conf.setOutputFormat(SequenceFileOutputFormat.class);
+		job.setInputFormatClass(SequenceFileInputFormat.class);
+		job.setOutputFormatClass(SequenceFileOutputFormat.class);
 
-		conf.setMapOutputKeyClass(Text.class);
-		conf.setMapOutputValueClass(PairOfIntLong.class);
-		conf.setOutputKeyClass(Text.class);
-		conf.setOutputValueClass(PairOfIntLong.class);
+		job.setMapOutputKeyClass(Text.class);
+		job.setMapOutputValueClass(PairOfIntLong.class);
+		job.setOutputKeyClass(Text.class);
+		job.setOutputValueClass(PairOfIntLong.class);
 
-		conf.setMapperClass(MyMapper.class);
-		conf.setCombinerClass(MyCombiner.class);
-		conf.setReducerClass(MyReducer.class);
+		job.setMapperClass(MyMapper.class);
+		job.setCombinerClass(MyCombiner.class);
+		job.setReducerClass(MyReducer.class);
 
 		long startTime = System.currentTimeMillis();
-		RunningJob job = JobClient.runJob(conf);
-		sLogger.info("Job Finished in " + (System.currentTimeMillis() - startTime) / 1000.0
-				+ " seconds");
+		job.waitForCompletion(true);
+		LOG.info("Job Finished in " + (System.currentTimeMillis() - startTime) / 1000.0 + " seconds");
 
 		Counters counters = job.getCounters();
-		// write out number of postings
-		int collectionTermCount = (int) counters.findCounter(Statistics.Terms).getCounter();
-		env.writeCollectionTermCount(collectionTermCount);
-		// NOTE: this value is not the same as number of postings, because
-		// postings for non-English terms are discarded, or as result of df cut
+		// Write out number of postings. NOTE: this value is not the same as
+		// number of postings, because postings for non-English terms are
+		// discarded, or as result of df cut.
+		env.writeCollectionTermCount((int) counters.findCounter(Statistics.Terms).getValue());
 
-		long collectionLength = counters.findCounter(Statistics.SumOfDocLengths).getCounter();
-		env.writeCollectionLength(collectionLength);
+		env.writeCollectionLength(counters.findCounter(Statistics.SumOfDocLengths).getValue());
 		return 0;
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Ivory: A Hadoop toolkit for Web-scale information retrieval
+ * Ivory: A Hadoop toolkit for web-scale information retrieval
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You may
@@ -16,7 +16,7 @@
 
 package ivory.core.preprocess;
 
-
+import ivory.core.Constants;
 import ivory.core.RetrievalEnvironment;
 import ivory.core.data.dictionary.PrefixEncodedLexicographicallySortedDictionary;
 import ivory.core.util.QuickSort;
@@ -31,58 +31,48 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.WritableUtils;
-import org.apache.hadoop.mapred.FileInputFormat;
-import org.apache.hadoop.mapred.FileOutputFormat;
-import org.apache.hadoop.mapred.JobClient;
-import org.apache.hadoop.mapred.JobConf;
-import org.apache.hadoop.mapred.MapReduceBase;
-import org.apache.hadoop.mapred.OutputCollector;
-import org.apache.hadoop.mapred.Reducer;
-import org.apache.hadoop.mapred.Reporter;
-import org.apache.hadoop.mapred.RunningJob;
-import org.apache.hadoop.mapred.SequenceFileInputFormat;
-import org.apache.hadoop.mapred.SequenceFileOutputFormat;
-import org.apache.hadoop.mapred.lib.IdentityMapper;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 import org.apache.log4j.Logger;
 
 
 import edu.umd.cloud9.io.pair.PairOfIntLong;
 import edu.umd.cloud9.util.PowerTool;
 
-@SuppressWarnings("deprecation")
 public class BuildTermIdMap extends PowerTool {
-	private static final Logger sLogger = Logger.getLogger(BuildTermIdMap.class);
+	private static final Logger LOG = Logger.getLogger(BuildTermIdMap.class);
 
-	protected static enum Terms {
-		Total
-	}
+	protected static enum Terms { Total }
 
-	private static class MyReducer extends MapReduceBase implements
-			Reducer<Text, PairOfIntLong, NullWritable, NullWritable> {
+	private static class MyReducer
+	    extends Reducer<Text, PairOfIntLong, NullWritable, NullWritable> {
+		private FSDataOutputStream termsOut, idsOut, idsToTermOut,
+		    dfByTermOut, cfByTermOut, dfByIntOut, cfByIntOut;
+		private int nTerms, window;
+		private int[] seqNums = null;
+		private int[] dfs = null;
+		private long[] cfs = null;
+		private int curKeyIndex = 0;
+		private String lastKey = "";
 
-		FSDataOutputStream mTermsOut, mIdsOut, mIdsToTermOut;
-		FSDataOutputStream mDfByTermOut, mCfByTermOut;
-		FSDataOutputStream mDfByIntOut, mCfByIntOut;
-
-		int nTerms, window;
-
-		int[] seqNums = null;
-		int[] dfs = null;
-		long[] cfs = null;
-
-		public void configure(JobConf job) {
+		@Override
+		public void setup(Reducer<Text, PairOfIntLong, NullWritable, NullWritable>.Context context) {
+			Configuration conf = context.getConfiguration();
 			FileSystem fs;
 			try {
-				fs = FileSystem.get(job);
+				fs = FileSystem.get(conf);
 			} catch (IOException e) {
 				throw new RuntimeException("Error opening the FileSystem!");
 			}
-
-			String indexPath = job.get("Ivory.IndexPath");
 			
-			RetrievalEnvironment env = null;
+			RetrievalEnvironment env;
 			try {
-				env = new RetrievalEnvironment(indexPath, fs);
+				env = new RetrievalEnvironment(conf.get(Constants.IndexPath), fs);
 			} catch (IOException e) {
 				throw new RuntimeException("Unable to create RetrievalEnvironment!");
 			}
@@ -96,56 +86,54 @@ public class BuildTermIdMap extends PowerTool {
 			String dfByIntFile = env.getDfByIntData();
 			String cfByIntFile = env.getCfByIntData();
 
-			nTerms = job.getInt("Ivory.CollectionTermCount", 0);
-			window = job.getInt("Ivory.TermIndexWindow", 8);
+			nTerms = conf.getInt(Constants.CollectionTermCount, 0);
+			window = conf.getInt(Constants.TermIndexWindow, 8);
 
 			seqNums = new int[nTerms];
 			dfs = new int[nTerms];
 			cfs = new long[nTerms];
 
-			sLogger.info("Ivory.PrefixEncodedTermsFile: " + termsFile);
-			sLogger.info("Ivory.TermIDsFile" + idsFile);
-			sLogger.info("Ivory.IDToTermFile" + idToTermFile);
-			sLogger.info("Ivory.CollectionTermCount: " + nTerms);
-			sLogger.info("Ivory.ForwardIndexWindow: " + window);
+			LOG.info("Ivory.PrefixEncodedTermsFile: " + termsFile);
+			LOG.info("Ivory.TermIDsFile" + idsFile);
+			LOG.info("Ivory.IDToTermFile" + idToTermFile);
+			LOG.info("Ivory.CollectionTermCount: " + nTerms);
+			LOG.info("Ivory.ForwardIndexWindow: " + window);
 
 			try {
-				mTermsOut = fs.create(new Path(termsFile), true);
-				mIdsOut = fs.create(new Path(idsFile), true);
-				mIdsToTermOut = fs.create(new Path(idToTermFile), true);
-				mTermsOut.writeInt(nTerms);
-				mTermsOut.writeInt(window);
-				mIdsOut.writeInt(nTerms);
-				mIdsToTermOut.writeInt(nTerms);
+				termsOut = fs.create(new Path(termsFile), true);
+				idsOut = fs.create(new Path(idsFile), true);
+				idsToTermOut = fs.create(new Path(idToTermFile), true);
+				termsOut.writeInt(nTerms);
+				termsOut.writeInt(window);
+				idsOut.writeInt(nTerms);
+				idsToTermOut.writeInt(nTerms);
 
-				mDfByTermOut = fs.create(new Path(dfByTermFile), true);
-				mCfByTermOut = fs.create(new Path(cfByTermFile), true);
-				mDfByTermOut.writeInt(nTerms);
-				mCfByTermOut.writeInt(nTerms);
+				dfByTermOut = fs.create(new Path(dfByTermFile), true);
+				cfByTermOut = fs.create(new Path(cfByTermFile), true);
+				dfByTermOut.writeInt(nTerms);
+				cfByTermOut.writeInt(nTerms);
 
-				mDfByIntOut = fs.create(new Path(dfByIntFile), true);
-				mCfByIntOut = fs.create(new Path(cfByIntFile), true);
-				mDfByIntOut.writeInt(nTerms);
-				mCfByIntOut.writeInt(nTerms);
+				dfByIntOut = fs.create(new Path(dfByIntFile), true);
+				cfByIntOut = fs.create(new Path(cfByIntFile), true);
+				dfByIntOut.writeInt(nTerms);
+				cfByIntOut.writeInt(nTerms);
 			} catch (Exception e) {
 				throw new RuntimeException("error in creating files");
 			}
-			sLogger.info("Finished config.");
+			LOG.info("Finished config.");
 		}
 
-		int curKeyIndex = 0;
-		String lastKey = "";
-
-		public void reduce(Text key, Iterator<PairOfIntLong> values,
-				OutputCollector<NullWritable, NullWritable> output, Reporter reporter)
-				throws IOException {
+		@Override
+		public void reduce(Text key, Iterable<PairOfIntLong> values, Context context)
+		    throws IOException, InterruptedException {
 			String term = key.toString();
-			PairOfIntLong p = values.next();
+			Iterator<PairOfIntLong> iter = values.iterator();
+			PairOfIntLong p = iter.next();
 			int df = p.getLeftElement();
 			long cf = p.getRightElement();
-			WritableUtils.writeVInt(mDfByTermOut, df);
-			WritableUtils.writeVLong(mCfByTermOut, cf);
-			if (values.hasNext()) {
+			WritableUtils.writeVInt(dfByTermOut, df);
+			WritableUtils.writeVLong(cfByTermOut, cf);
+			if (iter.hasNext()) {
 				throw new RuntimeException("More than one record for term: " + term);
 			}
 
@@ -153,9 +141,10 @@ public class BuildTermIdMap extends PowerTool {
 
 			if (curKeyIndex % window == 0) {
 				byte[] byteArray = term.getBytes();
-				mTermsOut.writeByte((byte) (byteArray.length)); // suffix length
-				for (int j = 0; j < byteArray.length; j++)
-					mTermsOut.writeByte(byteArray[j]);
+				termsOut.writeByte((byte) (byteArray.length)); // suffix length
+				for (int j = 0; j < byteArray.length; j++) {
+					termsOut.writeByte(byteArray[j]);
+				}
 			} else {
 				prefixLength = PrefixEncodedLexicographicallySortedDictionary.getPrefix(lastKey, term);
 				byte[] suffix = term.substring(prefixLength).getBytes();
@@ -163,10 +152,11 @@ public class BuildTermIdMap extends PowerTool {
 				if (prefixLength > Byte.MAX_VALUE || suffix.length > Byte.MAX_VALUE)
 					throw new RuntimeException("prefix/suffix length overflow");
 
-				mTermsOut.writeByte((byte) suffix.length); // suffix length
-				mTermsOut.writeByte((byte) prefixLength); // prefix length
-				for (int j = 0; j < suffix.length; j++)
-					mTermsOut.writeByte(suffix[j]);
+				termsOut.writeByte((byte) suffix.length); // suffix length
+				termsOut.writeByte((byte) prefixLength);  // prefix length
+				for (int j = 0; j < suffix.length; j++) {
+					termsOut.writeByte(suffix[j]);
+				}
 			}
 			lastKey = term;
 			seqNums[curKeyIndex] = curKeyIndex;
@@ -174,55 +164,57 @@ public class BuildTermIdMap extends PowerTool {
 			cfs[curKeyIndex] = cf;
 			curKeyIndex++;
 
-			reporter.incrCounter(Terms.Total, 1);
+			context.getCounter(Terms.Total).increment(1);
 		}
 
-		public void close() throws IOException {
-			sLogger.info("Finished reduce.");
-			if (curKeyIndex != nTerms)
-				throw new RuntimeException("Total expected Terms: " + nTerms
-						+ ", Total observed terms: " + curKeyIndex + "!!!");
-			// sort based on df and change seqNums accordingly
+		@Override
+		public void cleanup(
+		    Reducer<Text, PairOfIntLong, NullWritable, NullWritable>.Context context)
+		    throws IOException {
+			LOG.info("Finished reduce.");
+			if (curKeyIndex != nTerms) {
+				throw new RuntimeException("Total expected Terms: " + nTerms +
+				    ", Total observed terms: " + curKeyIndex + "!");
+			}
+			// Sort based on df and change seqNums accordingly.
 			QuickSort.quicksortWithSecondary(seqNums, dfs, cfs, 0, nTerms - 1);
 
-			// ========= write sorted dfs and cfs by int here
+			// Write sorted dfs and cfs by int here.
 			for (int i = 0; i < nTerms; i++) {
-				WritableUtils.writeVInt(mDfByIntOut, -dfs[i]);
-				WritableUtils.writeVLong(mCfByIntOut, cfs[i]);
+				WritableUtils.writeVInt(dfByIntOut, -dfs[i]);
+				WritableUtils.writeVLong(cfByIntOut, cfs[i]);
 			}
 			cfs = null;
-			// encode the sorted dfs into ids ==> df values erased and become
-			// ids instead
-			// notice that first term id is 1 not 0, because 0 cannot be easily
-			// encoded (?)
-			for (int i = 0; i < nTerms; i++)
+
+			// Encode the sorted dfs into ids ==> df values erased and become
+			// ids instead. Note that first term id is 1.
+			for (int i = 0; i < nTerms; i++) {
 				dfs[i] = i + 1;
+			}
 
-			// idToTermIndex = new int[nTerms];
-			// for(int i = 0; i<nTerms; i++) idToTermIndex[i] = seqNums[i];
-
-			// write current seq nums to be index into the term array
+			// Write current seq nums to be index into the term array.
 			for (int i = 0; i < nTerms; i++)
-				mIdsToTermOut.writeInt(seqNums[i]);
+				idsToTermOut.writeInt(seqNums[i]);
 
-			// sort on seqNums to get the right writing order
+			// Sort on seqNums to get the right writing order.
 			QuickSort.quicksort(dfs, seqNums, 0, nTerms - 1);
-			for (int i = 0; i < nTerms; i++)
-				mIdsOut.writeInt(dfs[i]);
+			for (int i = 0; i < nTerms; i++) {
+				idsOut.writeInt(dfs[i]);
+			}
 
-			mTermsOut.close();
-			mIdsOut.close();
-			mIdsToTermOut.close();
-			mDfByTermOut.close();
-			mCfByTermOut.close();
-			mDfByIntOut.close();
-			mCfByIntOut.close();
-			sLogger.info("Finished close.");
+			termsOut.close();
+			idsOut.close();
+			idsToTermOut.close();
+			dfByTermOut.close();
+			cfByTermOut.close();
+			dfByIntOut.close();
+			cfByIntOut.close();
+			LOG.info("Finished close.");
 		}
 	}
 
-	public static final String[] RequiredParameters = { "Ivory.NumMapTasks",
-			"Ivory.CollectionName", "Ivory.IndexPath", "Ivory.TermIndexWindow" };
+	public static final String[] RequiredParameters = { 
+			Constants.CollectionName, Constants.IndexPath, Constants.TermIndexWindow };
 
 	public String[] getRequiredParameters() {
 		return RequiredParameters;
@@ -232,30 +224,20 @@ public class BuildTermIdMap extends PowerTool {
 		super(conf);
 	}
 
-	@SuppressWarnings("unused")
 	public int runTool() throws Exception {
-		// create a new JobConf, inheriting from the configuration of this
-		// PowerTool
-		JobConf conf = new JobConf(getConf(), BuildTermIdMap.class);
+		Configuration conf = getConf();
 		FileSystem fs = FileSystem.get(conf);
 
-		String indexPath = conf.get("Ivory.IndexPath");
-		String collectionName = conf.get("Ivory.CollectionName");
+		String indexPath = conf.get(Constants.IndexPath);
+		String collectionName = conf.get(Constants.CollectionName);
 
-		int mapTasks = conf.getInt("Ivory.NumMapTasks", 0);
-		int reduceTasks = 1;
-		int minSplitSize = conf.getInt("Ivory.MinSplitSize", 0);
-
-		sLogger.info("PowerTool: BuildTermIdMap");
-		sLogger.info(" - CollectionName: " + collectionName);
-		sLogger.info(" - IndexPath: " + indexPath);
-		sLogger.info(" - NumMapTasks: " + mapTasks);
-		sLogger.info(" - NumReduceTasks: " + reduceTasks);
+		LOG.info("PowerTool: BuildTermIdMap2");
+		LOG.info(String.format(" - %s: %s", Constants.CollectionName, collectionName));
+		LOG.info(String.format(" - %s: %s", Constants.IndexPath, indexPath));
 
 		RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fs);
-
 		if (!fs.exists(new Path(indexPath))) {
-			sLogger.error("index path doesn't existing: skipping!");
+			LOG.error("index path doesn't existing: skipping!");
 			return 0;
 		}
 
@@ -270,39 +252,37 @@ public class BuildTermIdMap extends PowerTool {
 		if (fs.exists(termsFilePath) || fs.exists(termIDsFilePath) || fs.exists(idToTermFilePath)
 				|| fs.exists(dfByTermFilePath) || fs.exists(cfByTermFilePath)
 				|| fs.exists(dfByIntFilePath) || fs.exists(cfByIntFilePath)) {
-			sLogger.info("term and term id data exist: skipping!");
+			LOG.info("term and term id data exist: skipping!");
 			return 0;
 		}
+
+		conf.setInt(Constants.CollectionTermCount, (int) env.readCollectionTermCount());
 
 		Path tmpPath = new Path(env.getTempDirectory());
 		fs.delete(tmpPath, true);
 
-		conf.setJobName("BuildTermIdMap:" + collectionName);
+		Job job = new Job(conf,
+		    BuildTermIdMap.class.getSimpleName() + ":" + collectionName);
 
-		conf.setNumMapTasks(mapTasks);
-		conf.setNumReduceTasks(reduceTasks);
+		job.setJarByClass(BuildTermIdMap.class);
+		job.setNumReduceTasks(1);
 
-		conf.setInt("Ivory.CollectionTermCount", (int) env.readCollectionTermCount());
-		conf.setInt("mapred.min.split.size", minSplitSize);
-		conf.set("mapred.child.java.opts", "-Xmx2048m");
+		FileInputFormat.setInputPaths(job, new Path(env.getTermDfCfDirectory()));
+		FileOutputFormat.setOutputPath(job, tmpPath);
 
-		FileInputFormat.setInputPaths(conf, new Path(env.getTermDfCfDirectory()));
-		FileOutputFormat.setOutputPath(conf, tmpPath);
+		job.setInputFormatClass(SequenceFileInputFormat.class);
+		job.setOutputFormatClass(SequenceFileOutputFormat.class);
 
-		conf.setInputFormat(SequenceFileInputFormat.class);
-		conf.setOutputFormat(SequenceFileOutputFormat.class);
+		job.setMapOutputKeyClass(Text.class);
+		job.setMapOutputValueClass(PairOfIntLong.class);
+		job.setOutputKeyClass(Text.class);
 
-		conf.setMapOutputKeyClass(Text.class);
-		conf.setMapOutputValueClass(PairOfIntLong.class);
-		conf.setOutputKeyClass(Text.class);
-
-		conf.setMapperClass(IdentityMapper.class);
-		conf.setReducerClass(MyReducer.class);
+		job.setMapperClass(Mapper.class);
+		job.setReducerClass(MyReducer.class);
 
 		long startTime = System.currentTimeMillis();
-		RunningJob job = JobClient.runJob(conf);
-		sLogger.info("Job Finished in " + (System.currentTimeMillis() - startTime) / 1000.0
-				+ " seconds");
+		job.waitForCompletion(true);
+		LOG.info("Job Finished in " + (System.currentTimeMillis() - startTime) / 1000.0	+ " seconds");
 
 		fs.delete(tmpPath, true);
 

@@ -1,5 +1,5 @@
 /*
- * Ivory: A Hadoop toolkit for Web-scale information retrieval
+ * Ivory: A Hadoop toolkit for web-scale information retrieval
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You may
@@ -16,7 +16,7 @@
 
 package ivory.core.preprocess;
 
-
+import ivory.core.Constants;
 import ivory.core.RetrievalEnvironment;
 import ivory.core.data.document.LazyTermDocVector;
 import ivory.core.data.document.TermDocVector;
@@ -33,461 +33,383 @@ import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
-import org.apache.hadoop.mapred.Counters;
-import org.apache.hadoop.mapred.FileInputFormat;
-import org.apache.hadoop.mapred.FileOutputFormat;
-import org.apache.hadoop.mapred.InputFormat;
-import org.apache.hadoop.mapred.JobClient;
-import org.apache.hadoop.mapred.JobConf;
-import org.apache.hadoop.mapred.MapReduceBase;
-import org.apache.hadoop.mapred.Mapper;
-import org.apache.hadoop.mapred.OutputCollector;
-import org.apache.hadoop.mapred.Reporter;
-import org.apache.hadoop.mapred.RunningJob;
-import org.apache.hadoop.mapred.SequenceFileOutputFormat;
-import org.apache.log4j.Level;
+import org.apache.hadoop.mapreduce.InputFormat;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.mapreduce.lib.output.NullOutputFormat;
+import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 import org.apache.log4j.Logger;
-
 
 import edu.umd.cloud9.collection.DocnoMapping;
 import edu.umd.cloud9.collection.Indexable;
 import edu.umd.cloud9.io.FSLineReader;
-import edu.umd.cloud9.mapred.NullInputFormat;
-import edu.umd.cloud9.mapred.NullMapper;
-import edu.umd.cloud9.mapred.NullOutputFormat;
+import edu.umd.cloud9.mapreduce.NullInputFormat;
+import edu.umd.cloud9.mapreduce.NullMapper;
 import edu.umd.cloud9.util.PowerTool;
 import edu.umd.cloud9.util.array.ArrayListOfInts;
 import edu.umd.cloud9.util.map.HMapII;
 import edu.umd.cloud9.util.map.MapII;
 
-@SuppressWarnings("deprecation")
 public class BuildTermDocVectors extends PowerTool {
-	private static final Logger sLogger = Logger.getLogger(BuildTermDocVectors.class);
-	static {
-		sLogger.setLevel(Level.WARN);
-	}
-
-	protected static enum Docs {
-		Skipped, Total, Empty, Exception, Started, Created, Read
-	}
-
-	protected static enum MapTime {
-		Spilling, Parsing
-	}
-
-	protected static enum DocLengths {
-		Count, SumOfDocLengths, Files
-	}
-
-	private static class MyMapper extends MapReduceBase implements
-			Mapper<Writable, Indexable, IntWritable, TermDocVector> {
-
-		// key and value
-		private static IntWritable keyOut = new IntWritable();
-
-		// the tokenizer
-		private Tokenizer mTokenizer;
-
-		// keep reference to OutputCollector and Reporter to use in close()
-		private Reporter mReporter;
-
-		// need configuration to get FileSystem handle in close()
-		private JobConf mJobConf;
-
-		// keep track of index path to know where to write doclengths
-		private String indexPath;
-
-		// for mapping docids to docnos
-		private DocnoMapping mDocMapping;
-
-		// current docno
-		private int mDocno;
-
-		// holds document lengths
-		private HMapII mDocLengths;
-
-		private String mTaskId;
-
-		public void configure(JobConf job) {
-			mDocLengths = new HMapII();
-
-			mTaskId = job.get("mapred.task.id");
-			indexPath = job.get("Ivory.IndexPath");
-			mJobConf = job;
-
-			Path[] localFiles;
-			try {
-				localFiles = DistributedCache.getLocalCacheFiles(mJobConf);
-			} catch (IOException e) {
-				throw new RuntimeException("Local cache files not read properly.");
-			}
-
-			// initialize the tokenizer
-			try {
-				mTokenizer = (Tokenizer) Class.forName(job.get("Ivory.Tokenizer")).newInstance();
-				mTokenizer.configure(job);
-			} catch (Exception e) {
-				e.printStackTrace();
-				throw new RuntimeException("Error initializing Ivory.Tokenizer!");
-			}
-
-			// load the docid to docno mappings
-			try {
-				mDocMapping = (DocnoMapping) Class.forName(job.get("Ivory.DocnoMappingClass"))
-						.newInstance();
-
-				// Detect if we're in standalone mode; if so, we can't us the
-				// DistributedCache because it does not (currently) work in
-				// standalone mode...
-				if (job.get("mapred.job.tracker").equals("local")) {
-					FileSystem fs = FileSystem.get(job);
-					String indexPath = job.get("Ivory.IndexPath");
-					RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fs);
-					mDocMapping.loadMapping(env.getDocnoMappingData(), fs);
-				} else {
-					mDocMapping.loadMapping(localFiles[0], FileSystem.getLocal(job));
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-				throw new RuntimeException("Error initializing DocnoMapping!");
-			}
-		}
-
-		public void map(Writable key, Indexable doc,
-				OutputCollector<IntWritable, TermDocVector> output, Reporter reporter)
-				throws IOException {
-
-			mReporter = reporter;
-			mDocno = mDocMapping.getDocno(doc.getDocid());
-
-			// if invalid docno, skip doc; remember docnos start at one
-			if (mDocno <= 0) {
-				reporter.incrCounter(Docs.Skipped, 1);
-				return;
-			}
-			//if(mDocno > 50220423 + 51577077 + 50547493 /2) return;
-			long startTime = System.currentTimeMillis();
-			
-			Map<String, ArrayListOfInts> termPositionsMap = DocumentProcessingUtils
-					.getTermPositionsMap(doc, mTokenizer);
-			reporter.incrCounter(MapTime.Parsing, System.currentTimeMillis() - startTime);
-			if (termPositionsMap.size() == 0) {
-				reporter.incrCounter(Docs.Empty, 1);
-			}
-			sLogger.info ("in BuildTermDocVectors map, created term positions map: " + termPositionsMap);
-			TermDocVector docVector = new LazyTermDocVector(termPositionsMap);
-			sLogger.info ("in BuildTermDocVectors map, created term doc vector:" + docVector);
-			startTime = System.currentTimeMillis();
-			keyOut.set(mDocno);
-			reporter.incrCounter(Docs.Created, 1);
-			output.collect(keyOut, docVector);
-			reporter.incrCounter(MapTime.Spilling, System.currentTimeMillis() - startTime);
-			reporter.incrCounter(Docs.Total, 1);
-			int dl = DocumentProcessingUtils.getDocLengthFromPositionsMap(termPositionsMap);
-			// record the document length
-			sLogger.info ("in BuildTermDocVectors map, outputting mDocno: " + mDocno + ", dl: " + dl);
-			mDocLengths.put(mDocno, dl);
-		}
-
-		public void close() throws IOException {
-			// Now we want to write out the doclengths as "side data" onto HDFS.
-			// Since speculative execution is on, we'll append the task id to
-			// the filename to guarantee uniqueness. However, this means that
-			// the may be multiple files with the same doclength information,
-			// which we have the handle when we go to write out the binary
-			// encoding of the data.
-
-			if (mDocLengths.size() == 0) {
-				throw new RuntimeException("Error: DocLength table empty!");
-			}
-			long bytesCnt = 0;
-			FileSystem fs = FileSystem.get(mJobConf);
-			// use the last processed docno as the file name + task id
-			Path path = new Path(indexPath + "/doclengths/" + mDocno + "." + mTaskId);
-			FSDataOutputStream out = fs.create(path, false);
-
-			// iterate through the docs and write out doclengths
-			long dlSum = 0;
-			int cnt = 0;
-			for (MapII.Entry e : mDocLengths.entrySet()) {
-				String s = e.getKey() + "\t" + e.getValue() + "\n";
-				out.write(s.getBytes());
-				bytesCnt += s.getBytes().length;
-				cnt++;
-				dlSum += e.getValue();
-			}
-			out.close();
-
-			// We want to check if the file has actually been written
-			// successfully...
-			sLogger.info("Expected length of doclengths file: " + bytesCnt);
-
-			long bytesActual = fs.listStatus(path)[0].getLen();
-			sLogger.info("Actual length of doclengths file: " + bytesActual);
-
-			if (bytesCnt == 0)
-				throw new RuntimeException("Error: zero bytesCnt at " + path);
-			else if (bytesActual == 0)
-				throw new RuntimeException("Error: zero bytesActual at " + path);
-			else if (bytesCnt != bytesActual)
-				throw new RuntimeException("Error writing Doclengths file: " + bytesCnt + " "
-						+ bytesActual + " " + path);
-
-			mReporter.incrCounter(DocLengths.Count, cnt);
-			// sum of the document lengths, should match sum of tfs
-			mReporter.incrCounter(DocLengths.SumOfDocLengths, dlSum);
-		}
-	}
-
-	private static class DocLengthDataWriterMapper extends NullMapper {
-
-		int collectionDocCount = -1;
-
-		public void run(JobConf conf, Reporter reporter) throws IOException {
-			collectionDocCount = conf.getInt("Ivory.CollectionDocumentCount", -1);
-			String inputPath = conf.get("InputPath");
-			String dataFile = conf.get("DocLengthDataFile");
-
-			int docnoOffset = conf.getInt("Ivory.DocnoOffset", 0);
-
-			Path p = new Path(inputPath);
-
-			sLogger.info("InputPath: " + inputPath);
-			sLogger.info("DocLengthDataFile: " + dataFile);
-			sLogger.info("DocnoOffset: " + docnoOffset);
-
-			FileSystem fs = FileSystem.get(conf);
-			FileStatus[] fileStats = fs.listStatus(p);
-
-			// initial array to hold the doc lengths
-			int[] doclengths = new int[collectionDocCount + 1];
-
-			// largest docno
-			int maxDocno = 0;
-
-			// smallest docno
-			int minDocno = Integer.MAX_VALUE;
-
-			int nFiles = fileStats.length;
-			for (int i = 0; i < nFiles; i++) {
-				// skip log files
-				if (fileStats[i].getPath().getName().startsWith("_"))
-					continue;
-
-				FSLineReader reader = new FSLineReader(fileStats[i].getPath(), fs);
-
-				Text line = new Text();
-				while (reader.readLine(line) > 0) {
-					String[] arr = line.toString().split("\\t+", 2);
-
-					int docno = Integer.parseInt(arr[0]);
-					int len = Integer.parseInt(arr[1]);
-
-					// Note that because of speculative execution there may be
-					// multiple copies of doclength data. Therefore, we can't
-					// just count number of doclengths read. Instead, keep track
-					// of largest docno encountered.
-
-					if (docno < docnoOffset) {
-						throw new RuntimeException("Error: docno " + docno + " < docnoOffset "
-								+ docnoOffset + "!");
-					}
-
-					doclengths[docno - docnoOffset] = len;
-
-					if (docno > maxDocno)
-						maxDocno = docno;
-
-					if (docno < minDocno)
-						minDocno = docno;
-				}
-				reader.close();
-				reporter.incrCounter(DocLengths.Files, 1);
-			}
-
-			sLogger.info("min docno: " + minDocno);
-			sLogger.info("max docno: " + maxDocno);
-
-			// write out the doc length data into a single file
-			FSDataOutputStream out = fs.create(new Path(dataFile), true);
-
-			out.writeInt(docnoOffset);
-
-			// first, write out the collection size
-			out.writeInt(maxDocno - docnoOffset);
-
-			// write out length of each document (docnos are sequentially
-			// ordered starting from one, so no need to explicitly keep track)
-			int n = 0;
-			for (int i = 1; i <= maxDocno - docnoOffset; i++) {
-				out.writeInt(doclengths[i]);
-				n++;
-				reporter.incrCounter(DocLengths.Count, 1);
-				reporter.incrCounter(DocLengths.SumOfDocLengths, doclengths[i]);
-			}
-			sLogger.info(n + " doc lengths written");
-
-			out.close();
-		}
-	}
-
-	public static final String[] RequiredParameters = { "Ivory.NumMapTasks",
-			"Ivory.CollectionName", "Ivory.CollectionPath", "Ivory.IndexPath", "Ivory.InputFormat",
-			"Ivory.Tokenizer", "Ivory.DocnoMappingClass", };
-
-	public String[] getRequiredParameters() {
-		return RequiredParameters;
-	}
-
-	public BuildTermDocVectors(Configuration conf) {
-		super(conf);
-	}
-
-	@SuppressWarnings("unchecked")
-	public int runTool() throws Exception {
-		// create a new JobConf, inheriting from the configuration of this
-		// PowerTool
-		JobConf conf = new JobConf(getConf(), BuildTermDocVectors.class);
-		FileSystem fs = FileSystem.get(conf);
-
-		String indexPath = conf.get("Ivory.IndexPath");
-		int mapTasks = conf.getInt("Ivory.NumMapTasks", 0);
-
-		String collectionName = conf.get("Ivory.CollectionName");
-		String collectionPath = conf.get("Ivory.CollectionPath");
-		String inputFormat = conf.get("Ivory.InputFormat");
-		String tokenizer = conf.get("Ivory.Tokenizer");
-		String mappingClass = conf.get("Ivory.DocnoMappingClass");
-
-		sLogger.info("PowerTool: BuildTermDocVectors");
-		sLogger.info(" - CollectionName: " + collectionName);
-		sLogger.info(" - CollectionPath: " + collectionPath);
-		sLogger.info(" - InputputFormat: " + inputFormat);
-		sLogger.info(" - Tokenizer: " + tokenizer);
-		sLogger.info(" - DocnoMappingClass: " + mappingClass);
-		sLogger.info(" - NumMapTasks: " + mapTasks);
-		sLogger.info(" - NumReduceTasks: " + 0);
-
-		RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fs);
-		Path mappingFile = env.getDocnoMappingData();
-
-		if (!fs.exists(mappingFile)) {
-			sLogger.error("Error, docno mapping data file " + mappingFile
-					+ "doesn't exist!");
-			return 0;
-		}
-
-		DistributedCache.addCacheFile(mappingFile.toUri(), conf);
-
-		conf.setJobName("BuildTermDocVectors:" + collectionName);
-
-		conf.setNumMapTasks(mapTasks);
-		conf.setNumReduceTasks(0);
-
-		if (collectionPath.indexOf(",") == -1) {
-			FileInputFormat.setInputPaths(conf, new Path(collectionPath));
-			sLogger.info("Adding input path " + collectionPath);
-		} else {
-			String[] paths = collectionPath.split(",");
-			for (String p : paths) {
-				FileInputFormat.addInputPath(conf, new Path(p));
-				sLogger.info("Adding input path " + p);
-			}
-		}
-
-		Path outputPath = new Path(env.getTermDocVectorsDirectory());
-		if (fs.exists(outputPath)) {
-			sLogger.info("TermDocVectors already exist: Skipping!");
-		} else {
-			env.writeCollectionName(collectionName);
-			env.writeCollectionPath(collectionPath);
-			env.writeInputFormat(inputFormat);
-			env.writeDocnoMappingClass(mappingClass);
-			env.writeTokenizerClass(tokenizer);
-
-			conf.set("mapred.child.java.opts", "-Xmx2048m");
-			conf.setInt("mapred.task.timeout", 60000000);
-
-			FileOutputFormat.setOutputPath(conf, outputPath);
-
-			conf.setInputFormat((Class<? extends InputFormat>) Class.forName(inputFormat));
-			conf.setOutputFormat(SequenceFileOutputFormat.class);
-			SequenceFileOutputFormat.setOutputCompressionType(conf,
-					SequenceFile.CompressionType.RECORD);
-
-			conf.setMapOutputKeyClass(IntWritable.class);
-			conf.setMapOutputValueClass(LazyTermDocVector.class);
-			conf.setOutputKeyClass(IntWritable.class);
-			conf.setOutputValueClass(LazyTermDocVector.class);
-
-			conf.setMapperClass(MyMapper.class);
-
-			long startTime = System.currentTimeMillis();
-			RunningJob job = JobClient.runJob(conf);
-			sLogger.info("Job Finished in " + (System.currentTimeMillis() - startTime) / 1000.0
-					+ " seconds");
-
-			Counters counters = job.getCounters();
-
-			// write out number of postings
-			int collectionDocCount = (int) counters.findCounter(Docs.Total).getCounter();
-			env.writeCollectionDocumentCount(collectionDocCount);
-		}
-
-		if (fs.exists(env.getDoclengthsData())) {
-			sLogger.info("DocLength data exists: Skipping!");
-			return 0;
-		}
-
-		int collectionDocCount = env.readCollectionDocumentCount();
-		long startTime = System.currentTimeMillis();
-		writeDoclengthsData(collectionDocCount);
-		sLogger.info("Job Finished in " + (System.currentTimeMillis() - startTime) / 1000.0
-				+ " seconds");
-		return 0;
-	}
-
-	private void writeDoclengthsData(int collectionDocCount) throws IOException {
-		JobConf conf = new JobConf(getConf(), GetTermCount.class);
-
-		String indexPath = conf.get("Ivory.IndexPath");
-		String collectionName = conf.get("Ivory.CollectionName");
-		int docnoOffset = conf.getInt("Ivory.DocnoOffset", 0);
-
-		FileSystem fs = FileSystem.get(conf);
-		RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fs);
-
-		Path dlFile = env.getDoclengthsData();
-		Path inputPath = env.getDoclengthsDirectory();
-
-		sLogger.info("Writing doc length data to " + dlFile + "...");
-
-		conf.setJobName("DocLengthTable:" + collectionName);
-
-		conf.setInt("Ivory.CollectionDocumentCount", collectionDocCount);
-		conf.set("InputPath", inputPath.toString());
-		conf.set("DocLengthDataFile", dlFile.toString());
-		conf.set("mapred.child.java.opts", "-Xmx4096m");
-
-		conf.setNumMapTasks(1);
-		conf.setNumReduceTasks(0);
-		conf.setSpeculativeExecution(false);
-
-		conf.setInputFormat(NullInputFormat.class);
-		conf.setOutputFormat(NullOutputFormat.class);
-		conf.setMapperClass(DocLengthDataWriterMapper.class);
-
-		RunningJob job = JobClient.runJob(conf);
-
-		env.writeDocnoOffset(docnoOffset);
-		Counters counters = job.getCounters();
-
-		long collectionSumOfDocLengths = (long) counters.findCounter(DocLengths.SumOfDocLengths)
-				.getCounter();
-		env.writeCollectionAverageDocumentLength((float) collectionSumOfDocLengths / collectionDocCount);
-	}
-
+  private static final Logger LOG = Logger.getLogger(BuildTermDocVectors.class);
+
+  protected static enum Docs { Skipped, Total, Empty }
+  protected static enum MapTime { Spilling, Parsing }
+  protected static enum DocLengths { Count, SumOfDocLengths, Files }
+
+  protected static class MyMapper extends Mapper<Writable, Indexable, IntWritable, TermDocVector> {
+    private static final IntWritable key = new IntWritable();
+    private static final LazyTermDocVector docVector = new LazyTermDocVector();
+    private static final HMapII doclengths = new HMapII();
+
+    private Tokenizer tokenizer;
+    private DocnoMapping docMapping;
+    private int docno;
+
+    @Override
+    public void setup(Mapper<Writable, Indexable, IntWritable, TermDocVector>.Context context)
+        throws IOException {
+      Configuration conf = context.getConfiguration();
+
+      try {
+        FileSystem localFs = FileSystem.getLocal(conf);
+        docMapping =
+          (DocnoMapping) Class.forName(conf.get(Constants.DocnoMappingClass)).newInstance();
+
+        // Take a different code path if we're in standalone mode.
+        if (conf.get("mapred.job.tracker").equals("local")) {
+          RetrievalEnvironment env = new RetrievalEnvironment(
+              context.getConfiguration().get(Constants.IndexPath), localFs);
+          docMapping.loadMapping(env.getDocnoMappingData(), localFs);
+        } else {
+          Path[] localFiles = DistributedCache.getLocalCacheFiles(conf);
+          // Load the docid to docno mappings. Assume file 0.
+          docMapping.loadMapping(localFiles[0], localFs);
+        }
+      } catch (Exception e) {
+        throw new RuntimeException("Error initializing docno mapping!", e);
+      }
+
+      // Initialize the tokenizer.
+      try {
+        tokenizer = (Tokenizer) Class.forName(conf.get(Constants.Tokenizer)).newInstance();
+        tokenizer.configure(conf);
+      } catch (Exception e) {
+        e.printStackTrace();
+        throw new RuntimeException("Error initializing tokenizer!");
+      }
+    }
+
+    @Override
+    public void map(Writable in, Indexable doc, Context context)
+        throws IOException, InterruptedException {
+      docno = docMapping.getDocno(doc.getDocid());
+
+      // Skip invalid docnos.
+      if (docno <= 0) {
+        context.getCounter(Docs.Skipped).increment(1);
+        return;
+      }
+
+      long startTime;
+
+      startTime = System.currentTimeMillis();
+      Map<String, ArrayListOfInts> termPositionsMap =
+          DocumentProcessingUtils.getTermPositionsMap(doc, tokenizer);
+      context.getCounter(MapTime.Parsing).increment(System.currentTimeMillis() - startTime);
+
+      if (termPositionsMap.size() == 0) {
+        context.getCounter(Docs.Empty).increment(1);
+      }
+
+      startTime = System.currentTimeMillis();
+      key.set(docno);
+      docVector.setTermPositionsMap(termPositionsMap);
+      context.write(key, docVector);
+      context.getCounter(MapTime.Spilling).increment(System.currentTimeMillis() - startTime);
+      context.getCounter(Docs.Total).increment(1);
+
+      doclengths.put(docno,
+          DocumentProcessingUtils.getDocLengthFromPositionsMap(termPositionsMap));
+    }
+
+    @Override
+    public void cleanup(Mapper<Writable, Indexable, IntWritable, TermDocVector>.Context context)
+          throws IOException, InterruptedException {
+      // Now we want to write out the doclengths as "side data" onto HDFS.
+      // Since speculative execution is on, we'll append the task id to
+      // the filename to guarantee uniqueness. However, this means that
+      // the may be multiple files with the same doclength information,
+      // which we have the handle when we go to write out the binary
+      // encoding of the data.
+
+      if (doclengths.size() == 0) {
+        throw new RuntimeException("Error: Doclength table empty!");
+      }
+
+      long bytesCnt = 0;
+      Configuration conf = context.getConfiguration();
+      String taskId = conf.get("mapred.task.id");
+      String indexPath = conf.get("Ivory.IndexPath");
+
+      FileSystem fs = FileSystem.get(conf);
+      // Use the last processed docno as the file name + task id.
+      Path path = new Path(indexPath + "/doclengths/" + docno + "." + taskId);
+      FSDataOutputStream out = fs.create(path, false);
+
+      // Iterate through the docs and write out doclengths.
+      long dlSum = 0;
+      int cnt = 0;
+      for (MapII.Entry e : doclengths.entrySet()) {
+        String s = e.getKey() + "\t" + e.getValue() + "\n";
+        out.write(s.getBytes());
+        bytesCnt += s.getBytes().length;
+        cnt++;
+        dlSum += e.getValue();
+      }
+      out.close();
+
+      // We want to check if the file has actually been written successfully...
+      LOG.info("Expected length of doclengths file: " + bytesCnt);
+
+      long bytesActual = fs.listStatus(path)[0].getLen();
+      LOG.info("Actual length of doclengths file: " + bytesActual);
+
+      if (bytesCnt == 0) {
+        throw new RuntimeException("Error: zero bytesCnt at " + path);
+      } else if (bytesActual == 0) {
+        throw new RuntimeException("Error: zero bytesActual at " + path);
+      } else if (bytesCnt != bytesActual) {
+        throw new RuntimeException(String.format("Error writing Doclengths file: %d %d %s",
+            bytesCnt, bytesActual, path.toString()));
+      }
+
+      context.getCounter(DocLengths.Count).increment(cnt);
+      // Sum of the document lengths, should match sum of tfs.
+      context.getCounter(DocLengths.SumOfDocLengths).increment(dlSum);
+    }
+  }
+
+  private static class DocLengthDataWriterMapper extends NullMapper {
+    @Override
+    public void run(Mapper<NullWritable, NullWritable, NullWritable, NullWritable>.Context context)
+        throws IOException, InterruptedException {
+      Configuration conf = context.getConfiguration();
+      int collectionDocCount = conf.getInt(Constants.CollectionDocumentCount, -1);
+      String inputPath = conf.get(InputPath);
+      String dataFile = conf.get(DocLengthDataFile);
+
+      int docnoOffset = conf.getInt(Constants.DocnoOffset, 0);
+
+      Path p = new Path(inputPath);
+
+      LOG.info("InputPath: " + inputPath);
+      LOG.info("DocLengthDataFile: " + dataFile);
+      LOG.info("DocnoOffset: " + docnoOffset);
+
+      FileSystem fs = FileSystem.get(conf);
+      FileStatus[] fileStats = fs.listStatus(p);
+
+      int[] doclengths = new int[collectionDocCount + 1]; // Initial array to hold the doclengths.
+      int maxDocno = 0; // Largest docno.
+      int minDocno = Integer.MAX_VALUE; // Smallest docno.
+
+      int nFiles = fileStats.length;
+      for (int i = 0; i < nFiles; i++) {
+        // Skip log files
+        if (fileStats[i].getPath().getName().startsWith("_")) {
+          continue;
+        }
+
+        LOG.info("processing " + fileStats[i].getPath());
+        FSLineReader reader = new FSLineReader(fileStats[i].getPath(), fs);
+
+        Text line = new Text();
+        while (reader.readLine(line) > 0) {
+          String[] arr = line.toString().split("\\t+", 2);
+
+          int docno = Integer.parseInt(arr[0]);
+          int len = Integer.parseInt(arr[1]);
+
+          // Note that because of speculative execution there may be
+          // multiple copies of doclength data. Therefore, we can't
+          // just count number of doclengths read. Instead, keep track
+          // of largest docno encountered.
+          if (docno < docnoOffset) {
+            throw new RuntimeException(
+                "Error: docno " + docno + " < docnoOffset " + docnoOffset + "!");
+          }
+
+          doclengths[docno - docnoOffset] = len;
+
+          if (docno > maxDocno) {
+            maxDocno = docno;
+          }
+          if (docno < minDocno) {
+            minDocno = docno;
+          }
+        }
+        reader.close();
+        context.getCounter(DocLengths.Files).increment(1);
+      }
+
+      LOG.info("min docno: " + minDocno);
+      LOG.info("max docno: " + maxDocno);
+
+      // Write out the doc length data into a single file.
+      FSDataOutputStream out = fs.create(new Path(dataFile), true);
+
+      out.writeInt(docnoOffset); // Write out the docno offset.
+      out.writeInt(maxDocno - docnoOffset); // Write out the collection size.
+
+      // Write out length of each document (docnos are sequentially
+      // ordered, so no need to explicitly keep track).
+      int n = 0;
+      for (int i = 1; i <= maxDocno - docnoOffset; i++) {
+        out.writeInt(doclengths[i]);
+        n++;
+        context.getCounter(DocLengths.Count).increment(1);
+        context.getCounter(DocLengths.SumOfDocLengths).increment(doclengths[i]);
+      }
+      LOG.info(n + " doc lengths written");
+
+      out.close();
+    }
+  }
+
+  private static final String InputPath = "Ivory.InputPath";
+  private static final String DocLengthDataFile = "Ivory.DocLengthDataFile";
+
+  public static final String[] RequiredParameters = {
+          Constants.CollectionName,
+          Constants.CollectionPath,
+          Constants.IndexPath,
+          Constants.InputFormat,
+          Constants.Tokenizer,
+          Constants.DocnoMappingClass,
+          Constants.DocnoOffset };
+
+  @Override
+  public String[] getRequiredParameters() {
+    return RequiredParameters;
+  }
+
+  public BuildTermDocVectors(Configuration conf) {
+    super(conf);
+  }
+
+  @SuppressWarnings("unchecked")
+  public int runTool() throws Exception {
+    Configuration conf = getConf();
+    FileSystem fs = FileSystem.get(conf);
+
+    String indexPath = conf.get(Constants.IndexPath);
+    String collectionName = conf.get(Constants.CollectionName);
+    String collectionPath = conf.get(Constants.CollectionPath);
+    String inputFormat = conf.get(Constants.InputFormat);
+    String tokenizer = conf.get(Constants.Tokenizer);
+    String mappingClass = conf.get(Constants.DocnoMappingClass);
+    int docnoOffset = conf.getInt(Constants.DocnoOffset, 0);
+
+    LOG.info("PowerTool: " + BuildTermDocVectors.class.getCanonicalName());
+    LOG.info(String.format(" - %s: %s", Constants.IndexPath, indexPath));
+    LOG.info(String.format(" - %s: %s", Constants.CollectionName, collectionName));
+    LOG.info(String.format(" - %s: %s", Constants.CollectionPath, collectionPath));
+    LOG.info(String.format(" - %s: %s", Constants.InputFormat, inputFormat));
+    LOG.info(String.format(" - %s: %s", Constants.Tokenizer, tokenizer));
+    LOG.info(String.format(" - %s: %s", Constants.DocnoMappingClass, mappingClass));
+    LOG.info(String.format(" - %s: %s", Constants.DocnoOffset, docnoOffset));
+
+    RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fs);
+    Path mappingFile = env.getDocnoMappingData();
+
+    if (!fs.exists(mappingFile)) {
+      LOG.error("Error, docno mapping data file " + mappingFile + "doesn't exist!");
+      return 0;
+    }
+
+    DistributedCache.addCacheFile(mappingFile.toUri(), conf);
+
+    Path outputPath = new Path(env.getTermDocVectorsDirectory());
+    if (fs.exists(outputPath)) {
+      LOG.info("TermDocVectors already exist: Skipping!");
+      return 0;
+    }
+
+    env.writeCollectionName(collectionName);
+    env.writeCollectionPath(collectionPath);
+    env.writeInputFormat(inputFormat);
+    env.writeDocnoMappingClass(mappingClass);
+    env.writeTokenizerClass(tokenizer);
+    env.writeDocnoOffset(docnoOffset);
+
+    Job job1 = new Job(conf,
+        BuildTermDocVectors.class.getSimpleName() + ":" + collectionName);
+    job1.setJarByClass(BuildTermDocVectors.class);
+
+    job1.setNumReduceTasks(0);
+
+    FileInputFormat.addInputPaths(job1, collectionPath);
+    FileOutputFormat.setOutputPath(job1, outputPath);
+    SequenceFileOutputFormat.setOutputCompressionType(job1, SequenceFile.CompressionType.RECORD);
+
+    job1.setInputFormatClass((Class<? extends InputFormat>) Class.forName(inputFormat));
+    job1.setOutputFormatClass(SequenceFileOutputFormat.class);
+
+    job1.setMapOutputKeyClass(IntWritable.class);
+    job1.setMapOutputValueClass(LazyTermDocVector.class);
+    job1.setOutputKeyClass(IntWritable.class);
+    job1.setOutputValueClass(LazyTermDocVector.class);
+
+    job1.setMapperClass(MyMapper.class);
+
+    long startTime = System.currentTimeMillis();
+    job1.waitForCompletion(true);
+    LOG.info("Job Finished in " + (System.currentTimeMillis() - startTime) / 1000.0 + " seconds");
+
+    // Write out number of postings.
+    int collectionDocCount = (int) job1.getCounters().findCounter(Docs.Total).getValue();
+    env.writeCollectionDocumentCount(collectionDocCount);
+
+    Path dlFile = env.getDoclengthsData();
+    if (fs.exists(dlFile)) {
+      LOG.info("DocLength data exists: Skipping!");
+      return 0;
+    }
+
+    conf.setInt(Constants.CollectionDocumentCount, collectionDocCount);
+    conf.set(InputPath, env.getDoclengthsDirectory().toString());
+    conf.set(DocLengthDataFile, dlFile.toString());
+
+    conf.set("mapred.child.java.opts", "-Xmx2048m");
+    conf.setBoolean("mapred.map.tasks.speculative.execution", false);
+    conf.setBoolean("mapred.reduce.tasks.speculative.execution", false);
+
+    LOG.info("Writing doc length data to " + dlFile + "...");
+
+    Job job2 = new Job(conf, "DocLengthTable:" + collectionName);
+    job2.setJarByClass(BuildTermDocVectors.class);
+
+    job2.setNumReduceTasks(0);
+    job2.setInputFormatClass(NullInputFormat.class);
+    job2.setOutputFormatClass(NullOutputFormat.class);
+    job2.setMapperClass(DocLengthDataWriterMapper.class);
+
+    startTime = System.currentTimeMillis();
+    job2.waitForCompletion(true);
+    LOG.info("Job Finished in " + (System.currentTimeMillis() - startTime) / 1000.0 + " seconds");
+
+    long collectionSumOfDocLengths =
+        job2.getCounters().findCounter(DocLengths.SumOfDocLengths).getValue();
+    env.writeCollectionAverageDocumentLength(
+        (float) collectionSumOfDocLengths / collectionDocCount);
+
+    return 0;
+  }
 }

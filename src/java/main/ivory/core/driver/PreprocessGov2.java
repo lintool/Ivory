@@ -18,12 +18,12 @@ package ivory.core.driver;
 
 import ivory.core.Constants;
 import ivory.core.RetrievalEnvironment;
-import ivory.core.preprocess.BuildIntDocVectors2;
-import ivory.core.preprocess.BuildIntDocVectorsForwardIndex2;
-import ivory.core.preprocess.BuildTermDocVectors2;
-import ivory.core.preprocess.BuildTermDocVectorsForwardIndex2;
-import ivory.core.preprocess.BuildTermIdMap2;
-import ivory.core.preprocess.GetTermCount2;
+import ivory.core.preprocess.BuildIntDocVectors;
+import ivory.core.preprocess.BuildIntDocVectorsForwardIndex;
+import ivory.core.preprocess.BuildTermDocVectors;
+import ivory.core.preprocess.BuildTermDocVectorsForwardIndex;
+import ivory.core.preprocess.BuildTermIdMap;
+import ivory.core.preprocess.GetTermCount;
 import ivory.core.tokenize.GalagoTokenizer;
 
 import org.apache.hadoop.conf.Configuration;
@@ -104,13 +104,13 @@ public class PreprocessGov2 extends Configured implements Tool {
     conf.setInt(Constants.MaxDf, Integer.MAX_VALUE);
     conf.setInt(Constants.TermIndexWindow, 8);
 
-    new BuildTermDocVectors2(conf).run();
-    new GetTermCount2(conf).run();
-    new BuildTermIdMap2(conf).run();
-    new BuildIntDocVectors2(conf).run();
+    new BuildTermDocVectors(conf).run();
+    new GetTermCount(conf).run();
+    new BuildTermIdMap(conf).run();
+    new BuildIntDocVectors(conf).run();
 
-    new BuildIntDocVectorsForwardIndex2(conf).run();
-    new BuildTermDocVectorsForwardIndex2(conf).run();
+    new BuildIntDocVectorsForwardIndex(conf).run();
+    new BuildTermDocVectorsForwardIndex(conf).run();
 
     return 0;
   }

@@ -16,7 +16,7 @@
 
 package ivory.core.preprocess;
 
-
+import ivory.core.Constants;
 import ivory.core.RetrievalEnvironment;
 import ivory.core.data.document.IntDocVector;
 
@@ -28,198 +28,169 @@ import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
-import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapred.FileInputFormat;
-import org.apache.hadoop.mapred.JobClient;
-import org.apache.hadoop.mapred.JobConf;
-import org.apache.hadoop.mapred.MapReduceBase;
-import org.apache.hadoop.mapred.MapRunnable;
-import org.apache.hadoop.mapred.OutputCollector;
-import org.apache.hadoop.mapred.RecordReader;
-import org.apache.hadoop.mapred.Reducer;
-import org.apache.hadoop.mapred.Reporter;
-import org.apache.hadoop.mapred.SequenceFileInputFormat;
-import org.apache.hadoop.mapred.lib.NullOutputFormat;
+import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.NullWritable;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.input.FileSplit;
+import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.NullOutputFormat;
 import org.apache.log4j.Logger;
-
 
 import edu.umd.cloud9.util.PowerTool;
 
-@SuppressWarnings("deprecation")
 public class BuildIntDocVectorsForwardIndex extends PowerTool {
+  private static final Logger LOG = Logger.getLogger(BuildIntDocVectorsForwardIndex.class);
+  public static final long BigNumber = 1000000000;
+  protected static enum DocVectors { Count };
 
-	private static final Logger sLogger = Logger.getLogger(BuildIntDocVectorsForwardIndex.class);
+  private static class MyMapper
+      extends Mapper<IntWritable, IntDocVector, IntWritable, LongWritable> {
+    private static final LongWritable output = new LongWritable();
 
-	protected static enum Dictionary {
-		Size
-	};
+    @Override
+    public void run(Context context) throws IOException, InterruptedException {
+      String file = ((FileSplit) context.getInputSplit()).getPath().getName();
+      LOG.info("Input file: " + file);
 
-	private static class MyMapRunner implements
-			MapRunnable<IntWritable, IntDocVector, IntWritable, Text> {
+      PositionalSequenceFileRecordReader<IntWritable, IntDocVector> reader =
+          new PositionalSequenceFileRecordReader<IntWritable, IntDocVector>();
+      reader.initialize(context.getInputSplit(), context);
 
-		private String mInputFile;
-		private Text outputValue = new Text();
+      int fileNo = Integer.parseInt(file.substring(file.lastIndexOf("-") + 1));
+      long filePos = reader.getPosition();
+      while (reader.nextKeyValue()) {
+        output.set(BigNumber * fileNo + filePos);
 
-		public void configure(JobConf job) {
-			mInputFile = job.get("map.input.file");
-		}
+        context.write(reader.getCurrentKey(), output);
+        context.getCounter(DocVectors.Count).increment(1);
 
-		public void run(RecordReader<IntWritable, IntDocVector> input,
-				OutputCollector<IntWritable, Text> output, Reporter reporter) throws IOException {
-			IntWritable key = input.createKey();
-			IntDocVector value = input.createValue();
-			int fileNo = Integer.parseInt(mInputFile.substring(mInputFile.lastIndexOf("-") + 1));
+        filePos = reader.getPosition();
+      }
+      reader.close();
+    }
+  }
 
-			long pos = input.getPos();
-			while (input.next(key, value)) {
-				outputValue.set(fileNo + "\t" + pos);
+  private static class MyReducer
+      extends Reducer<IntWritable, LongWritable, NullWritable, NullWritable> {
+    private FSDataOutputStream out;
+    private int collectionDocumentCount;
+    private int curDoc = 0;
 
-				output.collect(key, outputValue);
-				reporter.incrCounter(Dictionary.Size, 1);
+    @Override
+    public void setup(
+        Reducer<IntWritable, LongWritable, NullWritable, NullWritable>.Context context) {
+      Configuration conf = context.getConfiguration();
+      FileSystem fs;
+      try {
+        fs = FileSystem.get(conf);
+      } catch (Exception e) {
+        throw new RuntimeException("Error opening the FileSystem!");
+      }
 
-				pos = input.getPos();
-			}
-			sLogger.info("last termid: " + key + "(" + fileNo + ", " + pos + ")");
-		}
-	}
+      RetrievalEnvironment env;
+      try {
+        env = new RetrievalEnvironment(conf.get(Constants.IndexPath), fs);
+      } catch (IOException e) {
+        throw new RuntimeException("Unable to create RetrievalEnvironment!");
+      }
 
-	public static final long BigNumber = 1000000000;
+      String forwardIndexPath = env.getIntDocVectorsForwardIndex();
+      collectionDocumentCount = env.readCollectionDocumentCount();
 
-	private static class MyReducer extends MapReduceBase implements
-			Reducer<IntWritable, Text, Text, Text> {
+      try {
+        out = fs.create(new Path(forwardIndexPath), true);
+        out.writeInt(env.readDocnoOffset());
+        out.writeInt(collectionDocumentCount);
+      } catch (Exception e) {
+        throw new RuntimeException("Error in creating files!");
+      }
+    }
 
-		FSDataOutputStream mOut;
+    @Override
+    public void reduce(IntWritable key, Iterable<LongWritable> values, Context context)
+        throws IOException, InterruptedException {
+      Iterator<LongWritable> iter = values.iterator();
+      long pos = iter.next().get();
 
-		int mCollectionDocumentCount;
-		int mCurDoc = 0;
+      if (iter.hasNext()) {
+        throw new RuntimeException("There shouldn't be more than one value, key=" + key);
+      }
 
-		public void configure(JobConf job) {
-			FileSystem fs;
-			try {
-				fs = FileSystem.get(job);
-			} catch (Exception e) {
-				throw new RuntimeException("Error opening the FileSystem!");
-			}
+      curDoc++;
+      out.writeLong(pos);
+    }
 
-			String indexPath = job.get("Ivory.IndexPath");
+    @Override
+    public void cleanup(
+        Reducer<IntWritable, LongWritable, NullWritable, NullWritable>.Context context)
+        throws IOException {
+      out.close();
 
-			RetrievalEnvironment env = null;
-			try {
-				env = new RetrievalEnvironment(indexPath, fs);
-			} catch (IOException e) {
-				throw new RuntimeException("Unable to create RetrievalEnvironment!");
-			}
+      if (curDoc != collectionDocumentCount) {
+        throw new IOException("Expected " + collectionDocumentCount + " docs, actually got "
+            + curDoc + " terms!");
+      }
+    }
+  }
 
-			boolean buildWeighted = job.getBoolean ("Ivory.BuildWeighted", false);
-			String forwardIndexPath = (buildWeighted ? 
-									   env.getWeightedIntDocVectorsForwardIndex () :
-									   env.getIntDocVectorsForwardIndex ());
-			mCollectionDocumentCount = env.readCollectionDocumentCount ();
+  public BuildIntDocVectorsForwardIndex(Configuration conf) {
+    super(conf);
+  }
 
-			try {
-				mOut = fs.create (new Path (forwardIndexPath), true);
-				mOut.writeInt(env.readDocnoOffset());
-				mOut.writeInt(mCollectionDocumentCount);
-			} catch (Exception e) {
-				throw new RuntimeException("Error in creating files!");
-			}
+  public static final String[] RequiredParameters = { Constants.IndexPath };
 
-		}
+  public String[] getRequiredParameters() {
+    return RequiredParameters;
+  }
 
-		public void reduce(IntWritable key, Iterator<Text> values,
-				OutputCollector<Text, Text> output, Reporter reporter) throws IOException {
-			String[] s = values.next().toString().split("\\s+");
+  public int runTool() throws Exception {
+    Configuration conf = getConf();
+    FileSystem fs = FileSystem.get(conf);
 
-			//sLogger.info (key + ": " + s[0] + " " + s[1]);
-			if (values.hasNext())
-				throw new RuntimeException("There shouldn't be more than one value, key=" + key);
+    String indexPath = conf.get(Constants.IndexPath);
+    RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fs);
+    String collectionName = env.readCollectionName();
 
-			int fileNo = Integer.parseInt(s[0]);
-			long filePos = Long.parseLong(s[1]);
-			long pos = BigNumber * fileNo + filePos;
+    LOG.info("Tool: " + BuildIntDocVectorsForwardIndex.class.getCanonicalName());
+    LOG.info(String.format(" - %s: %s", Constants.CollectionName, collectionName));
+    LOG.info(String.format(" - %s: %s", Constants.IndexPath, indexPath));
 
-			mCurDoc++;
+    String intDocVectorsPath = env.getIntDocVectorsDirectory();
+    String forwardIndexPath = env.getIntDocVectorsForwardIndex();
 
-			mOut.writeLong(pos);
-		}
+    if (!fs.exists(new Path(intDocVectorsPath))) {
+      LOG.info("Error: IntDocVectors don't exist!");
+      return 0;
+    }
 
-		public void close() throws IOException {
-			mOut.close();
+    if (fs.exists(new Path(forwardIndexPath))) {
+      LOG.info("IntDocVectorIndex already exists: skipping!");
+      return 0;
+    }
 
-			if (mCurDoc != mCollectionDocumentCount) {
-				throw new IOException("Expected " + mCollectionDocumentCount
-						+ " docs, actually got " + mCurDoc + " terms!");
-			}
-		}
-	}
+    Job job = new Job(conf,
+        BuildIntDocVectorsForwardIndex.class.getSimpleName()  + ":" + collectionName);
+    job.setJarByClass(BuildIntDocVectorsForwardIndex.class);
 
-	public BuildIntDocVectorsForwardIndex(Configuration conf) {
-		super(conf);
-	}
+    FileInputFormat.setInputPaths(job, new Path(intDocVectorsPath));
+    job.setNumReduceTasks(1);
 
-	public static final String[] RequiredParameters = { "Ivory.IndexPath", "Ivory.NumMapTasks" };
+    job.setInputFormatClass(SequenceFileInputFormat.class);
+    job.setOutputFormatClass(NullOutputFormat.class);
 
-	public String[] getRequiredParameters() {
-		return RequiredParameters;
-	}
+    job.setMapOutputKeyClass(IntWritable.class);
+    job.setMapOutputValueClass(LongWritable.class);
 
-	public int runTool() throws Exception {
-		JobConf conf = new JobConf(getConf(), BuildIntDocVectorsForwardIndex.class);
-		FileSystem fs = FileSystem.get(conf);
+    job.setMapperClass(MyMapper.class);
+    job.setReducerClass(MyReducer.class);
 
-		String indexPath = conf.get("Ivory.IndexPath");
-		RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fs);
+    long startTime = System.currentTimeMillis();
+    job.waitForCompletion(true);
+    LOG.info("Job Finished in " + (System.currentTimeMillis() - startTime) / 1000.0 + " seconds");
 
-		int mapTasks = conf.getInt("Ivory.NumMapTasks", 0);
-		String collectionName = env.readCollectionName();
-		boolean buildWeighted = conf.getBoolean ("Ivory.BuildWeighted", false);
-
-		sLogger.info("Tool: BuildIntDocVectorsIndex");
-		sLogger.info(" - IndexPath: " + indexPath);
-		sLogger.info(" - CollectionName: " + collectionName);
-		sLogger.info(" - BuildWeighted: " + buildWeighted);
-		sLogger.info(" - NumMapTasks: " + mapTasks);
-
-		String intDocVectorsPath;
-		String forwardIndexPath;
-		if (buildWeighted) {
-			intDocVectorsPath = env.getWeightedIntDocVectorsDirectory ();
-			forwardIndexPath = env.getWeightedIntDocVectorsForwardIndex ();
-		} else {
-			intDocVectorsPath = env.getIntDocVectorsDirectory ();
-			forwardIndexPath = env.getIntDocVectorsForwardIndex ();
-		}
-
-		if (!fs.exists(new Path(intDocVectorsPath))) {
-			sLogger.info("Error: IntDocVectors don't exist!");
-			return 0;
-		}
-
-		if (fs.exists (new Path (forwardIndexPath))) {
-			sLogger.info ("IntDocVectorIndex already exists: skipping!");
-			return 0;
-		}
-
-		conf.setJobName("BuildIntDocVectorsForwardIndex:" + collectionName);
-
-		Path inputPath = new Path(intDocVectorsPath);
-		FileInputFormat.setInputPaths(conf, inputPath);
-
-		conf.setNumMapTasks(mapTasks);
-		conf.setNumReduceTasks(1);
-
-		conf.set("mapred.child.java.opts", "-Xmx2048m");
-
-		conf.setInputFormat(SequenceFileInputFormat.class);
-		conf.setMapOutputKeyClass(IntWritable.class);
-		conf.setMapOutputValueClass(Text.class);
-		conf.setOutputFormat(NullOutputFormat.class);
-
-		conf.setMapRunnerClass(MyMapRunner.class);
-		conf.setReducerClass(MyReducer.class);
-
-		JobClient.runJob(conf);
-
-		return 0;
-	}
+    return 0;
+  }
 }

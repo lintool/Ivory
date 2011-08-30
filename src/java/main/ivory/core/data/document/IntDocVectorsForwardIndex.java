@@ -59,7 +59,6 @@ public class IntDocVectorsForwardIndex {
 
   /**
    * Creates an {@code IntDocVectorsIndex} object.
-   *
    * @param indexPath location of the index file
    * @param fs handle to the FileSystem
    * @throws IOException
