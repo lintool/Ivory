@@ -116,8 +116,8 @@ public class RetrievalEnvironment {
 		// get number of documents
 		numDocs = readCollectionDocumentCount();
 		collectionSize = readCollectionLength();
-		//postingsType = readPostingsType();
-		postingsType = "ivory.data.PostingsListDocSortedPositional";
+		postingsType = readPostingsType();
+		//postingsType = "ivory.data.PostingsListDocSortedPositional";
 
 		LOG.info("PostingsType: " + postingsType);
 		LOG.info("Collection document count: " + numDocs);

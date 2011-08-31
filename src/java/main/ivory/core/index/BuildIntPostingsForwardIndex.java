@@ -16,8 +16,10 @@
 
 package ivory.core.index;
 
+import ivory.core.Constants;
 import ivory.core.RetrievalEnvironment;
-import ivory.core.data.index.PostingsList;
+import ivory.core.data.document.IntDocVector;
+import ivory.core.preprocess.PositionalSequenceFileRecordReader;
 
 import java.io.IOException;
 import java.util.Iterator;
@@ -28,72 +30,70 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapred.FileInputFormat;
-import org.apache.hadoop.mapred.JobClient;
-import org.apache.hadoop.mapred.JobConf;
-import org.apache.hadoop.mapred.MapReduceBase;
-import org.apache.hadoop.mapred.MapRunnable;
-import org.apache.hadoop.mapred.OutputCollector;
-import org.apache.hadoop.mapred.RecordReader;
-import org.apache.hadoop.mapred.Reducer;
-import org.apache.hadoop.mapred.Reporter;
-import org.apache.hadoop.mapred.SequenceFileInputFormat;
-import org.apache.hadoop.mapred.lib.NullOutputFormat;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.input.FileSplit;
+import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.NullOutputFormat;
 import org.apache.log4j.Logger;
 
 import edu.umd.cloud9.util.PowerTool;
 
-@SuppressWarnings("deprecation")
 public class BuildIntPostingsForwardIndex extends PowerTool {
   private static final Logger LOG = Logger.getLogger(BuildIntPostingsForwardIndex.class);
-  protected static enum Dictionary { Size };
-
-  private static class MyMapRunner implements
-      MapRunnable<IntWritable, PostingsList, IntWritable, Text> {
-    private String inputFile;
-    private Text outputValue = new Text();
-
-    public void configure(JobConf job) {
-      inputFile = job.get("map.input.file");
-    }
-
-    public void run(RecordReader<IntWritable, PostingsList> input,
-        OutputCollector<IntWritable, Text> output, Reporter reporter) throws IOException {
-      IntWritable key = input.createKey();
-      PostingsList value = input.createValue();
-      int fileNo = Integer.parseInt(inputFile.substring(inputFile.lastIndexOf("-") + 1));
-
-      long pos = input.getPos();
-      while (input.next(key, value)) {
-        outputValue.set(fileNo + "\t" + pos);
-
-        output.collect(key, outputValue);
-        reporter.incrCounter(Dictionary.Size, 1);
-
-        pos = input.getPos();
-      }
-      LOG.info("last termid: " + key + "(" + fileNo + ", " + pos + ")");
-    }
-  }
 
   public static final long BIG_LONG_NUMBER = 1000000000;
 
-  private static class MyReducer extends MapReduceBase implements
-      Reducer<IntWritable, Text, Text, Text> {
+  protected static enum Dictionary { Size };
+
+  private static class MyMapper
+      extends Mapper<IntWritable, IntDocVector, IntWritable, Text> {
+    @Override
+    public void run(Context context) throws IOException, InterruptedException {
+      String file = ((FileSplit) context.getInputSplit()).getPath().getName();
+      LOG.info("Input file: " + file);
+
+      IntWritable key = new IntWritable();
+      Text outputValue = new Text();
+
+      PositionalSequenceFileRecordReader<IntWritable, IntDocVector> reader =
+          new PositionalSequenceFileRecordReader<IntWritable, IntDocVector>();
+      reader.initialize(context.getInputSplit(), context);
+
+      int fileNo = Integer.parseInt(file.substring(file.lastIndexOf("-") + 1));
+      long pos = reader.getPosition();
+      while (reader.nextKeyValue()) {
+        key = reader.getCurrentKey();
+        outputValue.set(fileNo + "\t" + pos);
+
+        context.write(key, outputValue);
+        context.getCounter(Dictionary.Size).increment(1);
+
+        pos = reader.getPosition();
+      }
+      reader.close();
+    }
+  }
+
+  private static class MyReducer extends Reducer<IntWritable, Text, Text, Text> {
     private String positionsFile;
     private int collectionTermCount;
     private FSDataOutputStream out;
     private int curKeyIndex = 0;
 
-    public void configure(JobConf job) {
+    @Override
+    public void setup(Context context) {
+      Configuration conf = context.getConfiguration();
       FileSystem fs;
       try {
-        fs = FileSystem.get(job);
+        fs = FileSystem.get(conf);
       } catch (Exception e) {
         throw new RuntimeException("Error opening the FileSystem!");
       }
 
-      String indexPath = job.get("Ivory.IndexPath");
+      String indexPath = conf.get(Constants.IndexPath);
 
       RetrievalEnvironment env = null;
       try {
@@ -116,11 +116,13 @@ public class BuildIntPostingsForwardIndex extends PowerTool {
       }
     }
 
-    public void reduce(IntWritable key, Iterator<Text> values,
-        OutputCollector<Text, Text> output, Reporter reporter) throws IOException {
-      String[] s = values.next().toString().split("\\s+");
+    @Override
+    public void reduce(IntWritable key, Iterable<Text> values, Context context)
+        throws IOException, InterruptedException {
+      Iterator<Text> iter = values.iterator();
+      String[] s = iter.next().toString().split("\\s+");
 
-      if (values.hasNext()) {
+      if (iter.hasNext()) {
         throw new RuntimeException("There shouldn't be more than one value, key=" + key);
       }
 
@@ -130,20 +132,16 @@ public class BuildIntPostingsForwardIndex extends PowerTool {
 
       curKeyIndex++;
 
-      // This is subtle point: Ivory.CollectionTermCount specifies the
-      // number of terms in the collection, computed by
-      // BuildTermIdMap. However, this number is sometimes greater than
-      // the number of postings that are in the index (as is the case for
-      // ClueWeb09). Here's what happens: when creating TermDocVectors,
-      // the vocabulary gets populated with tokens that contain special
-      // symbols. The vocabulary then gets compressed with front-coding.
-      // However, for whatever reason, the current implementation cannot
-      // properly handle these special characters. So when we convert from
-      // TermDocVectors to IntDocVectors, we can't find the term id for
-      // these special tokens. As a result, no postings list get created
-      // for them. So there are assigned term ids for which there are no
-      // postings. Since IntPostingsForwardIndex assumes consecutive term
-      // ids (since it loads position offsets into an array), we must
+      // This is subtle point: Ivory.CollectionTermCount specifies the number of terms in the
+      // collection, computed by BuildTermIdMap. However, this number is sometimes greater than the
+      // number of postings that are in the index (as is the case for ClueWeb09). Here's what
+      // happens: when creating TermDocVectors, the vocabulary gets populated with tokens that
+      // contain special symbols. The vocabulary then gets compressed with front-coding. However,
+      // for whatever reason, the current implementation cannot properly handle these special
+      // characters. So when we convert from TermDocVectors to IntDocVectors, we can't find the term
+      // id for these special tokens. As a result, no postings list get created for them. So there
+      // are assigned term ids for which there are no postings. Since IntPostingsForwardIndex
+      // assumes consecutive term ids (since it loads position offsets into an array), we must
       // insert "padding".
       // - Jimmy, 5/29/2010
 
@@ -155,8 +153,9 @@ public class BuildIntPostingsForwardIndex extends PowerTool {
       out.writeLong(pos);
     }
 
-    public void close() throws IOException {
-      // insert padding at the end
+    @Override
+    public void cleanup(Context context) throws IOException {
+      // Insert padding at the end.
       while (curKeyIndex < collectionTermCount) {
         out.writeLong(-1);
         curKeyIndex++;
@@ -165,8 +164,8 @@ public class BuildIntPostingsForwardIndex extends PowerTool {
       out.close();
 
       if (curKeyIndex != collectionTermCount) {
-        throw new IOException("Expected " + collectionTermCount + " terms, actually got "
-            + curKeyIndex + " terms!");
+        throw new IOException(String.format("Expected %d terms, actually got %d terms!",
+            collectionTermCount, curKeyIndex));
       }
     }
   }
@@ -175,31 +174,32 @@ public class BuildIntPostingsForwardIndex extends PowerTool {
     super(conf);
   }
 
-  public static final String[] RequiredParameters = { "Ivory.IndexPath" };
+  public static final String[] RequiredParameters = { Constants.IndexPath };
 
   public String[] getRequiredParameters() {
     return RequiredParameters;
   }
 
   public int runTool() throws Exception {
-    JobConf conf = new JobConf(getConf(), BuildIntPostingsForwardIndex.class);
+    Configuration conf = getConf();
     FileSystem fs = FileSystem.get(conf);
 
-    int mapTasks = conf.getInt("Ivory.NumMapTasks", 100);
-    int minSplitSize = conf.getInt("Ivory.MinSplitSize", 0);
-    String indexPath = conf.get("Ivory.IndexPath");
+    int minSplitSize = conf.getInt(Constants.MinSplitSize, 0);
+    String indexPath = conf.get(Constants.IndexPath);
 
     RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fs);
     String collectionName = env.readCollectionName();
 
-    LOG.info("Tool: BuildIntPostingsForwardIndex");
-    LOG.info(" - IndexPath: " + indexPath);
-    LOG.info(" - CollectionName: " + collectionName);
+    LOG.info("Tool: " + BuildIntPostingsForwardIndex.class.getCanonicalName());
+    LOG.info(String.format(" - %s: %s", Constants.IndexPath, indexPath));
+    LOG.info(String.format(" - %s: %s", Constants.CollectionName, collectionName));
 
-    conf.setJobName("BuildIntPostingsForwardIndex:" + collectionName);
+    Job job =
+      new Job(getConf(), BuildIntPostingsForwardIndex.class.getSimpleName() + ":" + collectionName);
+    job.setJarByClass(BuildIntPostingsForwardIndex.class);
 
     Path inputPath = new Path(env.getPostingsDirectory());
-    FileInputFormat.setInputPaths(conf, inputPath);
+    FileInputFormat.setInputPaths(job, inputPath);
 
     Path postingsIndexPath = new Path(env.getPostingsIndexData());
 
@@ -207,23 +207,22 @@ public class BuildIntPostingsForwardIndex extends PowerTool {
       LOG.info("Postings forward index path already exists!");
       return 0;
     }
-    conf.setNumMapTasks(mapTasks);
-    conf.setNumReduceTasks(1);
+    job.setNumReduceTasks(1);
 
     conf.setInt("mapred.min.split.size", minSplitSize);
     conf.set("mapred.child.java.opts", "-Xmx2048m");
 
-    conf.setInputFormat(SequenceFileInputFormat.class);
-    conf.setMapOutputKeyClass(IntWritable.class);
-    conf.setMapOutputValueClass(Text.class);
-    conf.setOutputKeyClass(Text.class);
-    conf.setOutputValueClass(Text.class);
-    conf.setOutputFormat(NullOutputFormat.class);
+    job.setInputFormatClass(SequenceFileInputFormat.class);
+    job.setMapOutputKeyClass(IntWritable.class);
+    job.setMapOutputValueClass(Text.class);
+    job.setOutputKeyClass(Text.class);
+    job.setOutputValueClass(Text.class);
+    job.setOutputFormatClass(NullOutputFormat.class);
 
-    conf.setMapRunnerClass(MyMapRunner.class);
-    conf.setReducerClass(MyReducer.class);
+    job.setMapperClass(MyMapper.class);
+    job.setReducerClass(MyReducer.class);
 
-    JobClient.runJob(conf);
+    job.waitForCompletion(true);
 
     return 0;
   }

@@ -30,22 +30,16 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
-import org.apache.hadoop.mapred.FileInputFormat;
-import org.apache.hadoop.mapred.FileOutputFormat;
-import org.apache.hadoop.mapred.JobClient;
-import org.apache.hadoop.mapred.JobConf;
-import org.apache.hadoop.mapred.MapReduceBase;
-import org.apache.hadoop.mapred.Mapper;
-import org.apache.hadoop.mapred.OutputCollector;
-import org.apache.hadoop.mapred.Partitioner;
-import org.apache.hadoop.mapred.Reducer;
-import org.apache.hadoop.mapred.Reporter;
-import org.apache.hadoop.mapred.RunningJob;
-import org.apache.hadoop.mapred.SequenceFileInputFormat;
-import org.apache.hadoop.mapred.SequenceFileOutputFormat;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.Partitioner;
+import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-
 
 import edu.umd.cloud9.io.pair.PairOfInts;
 import edu.umd.cloud9.util.PowerTool;
@@ -58,241 +52,245 @@ import edu.umd.cloud9.util.map.MapII;
  * @author Jimmy Lin
  * @author Tamer Elsayed
  */
-@SuppressWarnings("deprecation")
 public class BuildIPInvertedIndexDocSorted extends PowerTool {
-	private static final Logger LOG = Logger.getLogger(BuildIPInvertedIndexDocSorted.class);
+  private static final Logger LOG = Logger.getLogger(BuildIPInvertedIndexDocSorted.class);
 
-	protected static enum Docs { Total }
-	protected static enum IndexedTerms { Unique, Total }
-	protected static enum MapTime { Total }
-	protected static enum ReduceTime { Total }
+  protected static enum Docs { Total }
+  protected static enum IndexedTerms { Unique, Total }
+  protected static enum MapTime { Total }
+  protected static enum ReduceTime { Total }
 
-	private static class MyMapper extends MapReduceBase implements Mapper<IntWritable, IntDocVector, PairOfInts, TermPositions> {
-		private static final TermPositions termPositions = new TermPositions();
-		private static final PairOfInts pair = new PairOfInts();
-		private static final HMapII dfs = new HMapII();  // Holds dfs of terms processed by this mapper.
+  private static class MyMapper 
+      extends Mapper<IntWritable, IntDocVector, PairOfInts, TermPositions> {
+    private static final TermPositions termPositions = new TermPositions();
+    private static final PairOfInts pair = new PairOfInts();
+    private static final HMapII dfs = new HMapII(); // Holds dfs of terms processed by this mapper.
 
-		private int docno;
+    private int docno;
 
-		// Need to keep reference around for use in close().
-		private OutputCollector<PairOfInts, TermPositions> output;
-
-    public void configure(JobConf job) {
-      // This is needed to correctly index in standalone mode.
+    @Override
+    public void setup(Context context) {
       dfs.clear();
     }
 
-		public void map(IntWritable key, IntDocVector doc, OutputCollector<PairOfInts, TermPositions> output, Reporter reporter) throws IOException {
-			this.output = output;
-			docno = key.get();
+    @Override
+    public void map(IntWritable key, IntDocVector doc, Context context)
+        throws IOException, InterruptedException {
+      docno = key.get();
 
-			long startTime = System.currentTimeMillis();
-			Reader r = doc.getReader();
+      long startTime = System.currentTimeMillis();
+      Reader r = doc.getReader();
 
-			int dl = 0;
-			while (r.hasMoreTerms()) {
-				int term = r.nextTerm();
-				r.getPositions(termPositions);
+      int dl = 0;
+      while (r.hasMoreTerms()) {
+        int term = r.nextTerm();
+        r.getPositions(termPositions);
 
-				// Set up the key and value, and emit.
-				pair.set(term, docno);
-				output.collect(pair, termPositions);
+        // Set up the key and value, and emit.
+        pair.set(term, docno);
+        context.write(pair, termPositions);
 
-				// Document length of the current doc.
-				dl += termPositions.getTf();
+        // Document length of the current doc.
+        dl += termPositions.getTf();
 
-				// Df of the term in the partition handled by this mapper.
-				dfs.increment(term);
-			}
+        // Df of the term in the partition handled by this mapper.
+        dfs.increment(term);
+      }
 
-			reporter.incrCounter(IndexedTerms.Total, dl);   // Update number of indexed terms.
-			reporter.incrCounter(Docs.Total, 1);            // Update number of docs.
-			reporter.incrCounter(MapTime.Total, System.currentTimeMillis() - startTime);
-		}
+      context.getCounter(IndexedTerms.Total).increment(dl); // Update number of indexed terms.
+      context.getCounter(Docs.Total).increment(1);          // Update number of docs.
+      context.getCounter(MapTime.Total).increment(System.currentTimeMillis() - startTime);
+    }
 
-		public void close() throws IOException {
-			int[] arr = new int[1];
+    @Override
+    public void cleanup(Context context) throws IOException, InterruptedException {
+      int[] arr = new int[1];
 
-			// Emit dfs for terms encountered in this partition of the collection.
-			for (MapII.Entry e : dfs.entrySet()) {
-				arr[0] = e.getValue();
-				termPositions.set(arr, (short) 1);          // Dummy value.
-				// Special docno of "-1" to make sure this key-value pair
-				// comes before all other postings in reducer.
-				pair.set(e.getKey(), -1);
-				output.collect(pair, termPositions);
-			}
-		}
-	}
+      // Emit dfs for terms encountered in this partition of the collection.
+      for (MapII.Entry e : dfs.entrySet()) {
+        arr[0] = e.getValue();
+        termPositions.set(arr, (short) 1); // Dummy value.
+        // Special docno of "-1" to make sure this key-value pair comes before all other postings in
+        // the reducer phase.
+        pair.set(e.getKey(), -1);
+        context.write(pair, termPositions);
+      }
+    }
+  }
 
-	private static class MyReducer extends MapReduceBase implements	Reducer<PairOfInts, TermPositions, IntWritable, PostingsList> {
-		private static final IntWritable term = new IntWritable();
-		private static final PostingsList postings = new PostingsListDocSortedPositional();
+  private static class MyReducer
+      extends Reducer<PairOfInts, TermPositions, IntWritable, PostingsList> {
+    private static final IntWritable term = new IntWritable();
+    private static final PostingsList postings = new PostingsListDocSortedPositional();
 
-		private int prevTerm = -1;
-		private int numPostings = 0;
+    private int prevTerm = -1;
+    private int numPostings = 0;
 
-		private OutputCollector<IntWritable, PostingsList> output;
-		private Reporter reporter;
+    @Override
+    public void setup(Context context) {
+      LOG.setLevel(Level.WARN);
+      int cnt = context.getConfiguration().getInt(Constants.CollectionDocumentCount, 0);
+      if (cnt == 0) {
+        throw new RuntimeException("Error: size of collection cannot be zero!");
+      }
+      postings.setCollectionDocumentCount(cnt);
+    }
 
-		@Override
-		public void configure(JobConf job) {
-			LOG.setLevel(Level.WARN);
-			postings.setCollectionDocumentCount(job.getInt("Ivory.CollectionDocumentCount", 0));
-		}
+    @Override
+    public void reduce(PairOfInts pair, Iterable<TermPositions> values, Context context)
+        throws IOException, InterruptedException {
+      long start = System.currentTimeMillis();
+      int curTerm = pair.getLeftElement();
 
-		public void reduce(PairOfInts pair, Iterator<TermPositions> values, OutputCollector<IntWritable, PostingsList> output, Reporter reporter) throws IOException {
-			long start = System.currentTimeMillis();
-			int curTerm = pair.getLeftElement();
+      if (pair.getRightElement() == -1) {
+        if (prevTerm != -1 && curTerm != prevTerm) {
+          // Encountered next term, so emit postings corresponding to previous term.
+          if (numPostings != postings.size()) {
+            throw new RuntimeException(String.format(
+                "Error: actual number of postings processed is different from expected! " +
+                    "expected: %d, got: %d for term %d", numPostings, postings.size(), prevTerm));
+          }
 
-			if (pair.getRightElement() == -1) {
-				if (prevTerm == -1) {
-					// First term, so save references.
-					this.output = output;
-					this.reporter = reporter;
-				} else if (curTerm != prevTerm) {
-					// Encountered next term, so emit postings corresponding to previous term.
-					if (numPostings != postings.size()) {
-						throw new RuntimeException(String.format(
-						    "Error: actual number of postings processed is different from expected! " +
-						    "expected: %d, got: %d for term %d", numPostings, postings.size(), prevTerm));
-					}
+          term.set(prevTerm);
+          context.write(term, postings);
+          context.getCounter(IndexedTerms.Unique).increment(1);
 
-					term.set(prevTerm);
-					output.collect(term, postings);
-					reporter.incrCounter(IndexedTerms.Unique, 1);
+          LOG.info(String.format("Finished processing postings for term %d (num postings=%d)",
+              prevTerm, postings.size()));
+          postings.clear();
+        }
 
-					LOG.info(String.format("Finished processing postings for term %d (num postings=%d)",
-					    prevTerm, postings.size()));
-					postings.clear();
-				}
+        numPostings = 0;
+        Iterator<TermPositions> iter = values.iterator();
+        while (iter.hasNext()) {
+          TermPositions positions = iter.next();
+          numPostings += positions.getPositions()[0];
+        }
 
-				numPostings = 0;
-				while (values.hasNext()) {
-					TermPositions positions = values.next();
-					numPostings += positions.getPositions()[0];
-				}
+        postings.setNumberOfPostings(numPostings);
+        return;
+      }
 
-				postings.setNumberOfPostings(numPostings);
-				return;
-			}
+      Iterator<TermPositions> iter = values.iterator();
+      TermPositions positions = iter.next();
+      postings.add(pair.getRightElement(), positions.getTf(), positions);
 
-			TermPositions positions = values.next();
-			postings.add(pair.getRightElement(), positions.getTf(), positions);
+      if (iter.hasNext()) {
+        throw new RuntimeException(
+            String.format("Error: values with the same (term, docno): docno=%d, term=%d",
+                pair.getRightElement(), curTerm));
+      }
 
-			if (values.hasNext()) {
-				throw new RuntimeException("Error: values with the same (term, docno): docno=" + pair.getRightElement() + ", term=" + curTerm);
-			}
+      prevTerm = curTerm;
 
-			prevTerm = curTerm;
+      long duration = System.currentTimeMillis() - start;
+      context.getCounter(ReduceTime.Total).increment(duration);
+    }
 
-			long duration = System.currentTimeMillis() - start;
-			reporter.incrCounter(ReduceTime.Total, duration);
-		}
+    @Override
+    public void cleanup(Context context) throws IOException, InterruptedException {
+      long start = System.currentTimeMillis();
 
-		public void close() throws IOException {
-			long start = System.currentTimeMillis();
-
-			// We need to flush out the final postings list.
-			if (numPostings != postings.size()) {
+      // We need to flush out the final postings list.
+      if (numPostings != postings.size()) {
         throw new RuntimeException(String.format(
             "Error: actual number of postings processed is different from expected! " +
-            "expected: %d, got: %d for term %d", numPostings, postings.size(), prevTerm));
-			}
+                "expected: %d, got: %d for term %d", numPostings, postings.size(), prevTerm));
+      }
 
-			term.set(prevTerm);
-			output.collect(term, postings);
-			reporter.incrCounter(IndexedTerms.Unique, 1);
+      term.set(prevTerm);
+      context.write(term, postings);
+      context.getCounter(IndexedTerms.Unique).increment(1);
 
       LOG.info(String.format("Finished processing postings for term %d (num postings=%d)",
           prevTerm, postings.size()));
-			reporter.incrCounter(ReduceTime.Total, System.currentTimeMillis() - start);
-		}
-	}
+      context.getCounter(ReduceTime.Total).increment(System.currentTimeMillis() - start);
+    }
+  }
 
-	private static class MyPartitioner implements Partitioner<PairOfInts, TermPositions> {
-		public void configure(JobConf job) {}
+  private static class MyPartitioner extends Partitioner<PairOfInts, TermPositions> {
+    // Keys with the same terms should go to the same reducer.
+    @Override
+    public int getPartition(PairOfInts key, TermPositions value, int numReduceTasks) {
+      return (key.getLeftElement() & Integer.MAX_VALUE) % numReduceTasks;
+    }
+  }
 
-		// Keys with the same terms should go to the same reducer.
-		public int getPartition(PairOfInts key, TermPositions value, int numReduceTasks) {
-			return (key.getLeftElement() & Integer.MAX_VALUE) % numReduceTasks;
-		}
-	}
+  public static final String[] RequiredParameters = {
+          Constants.NumReduceTasks, Constants.IndexPath };
 
-	public static final String[] RequiredParameters = {
-	  Constants.NumReduceTasks, Constants.IndexPath };
+  public String[] getRequiredParameters() {
+    return RequiredParameters;
+  }
 
-	public String[] getRequiredParameters() {
-		return RequiredParameters;
-	}
+  public BuildIPInvertedIndexDocSorted(Configuration conf) {
+    super(conf);
+  }
 
-	public BuildIPInvertedIndexDocSorted(Configuration conf) {
-		super(conf);
-	}
+  public int runTool() throws Exception {
+    Configuration conf = getConf();
+    FileSystem fs = FileSystem.get(conf);
 
-	@SuppressWarnings("unused")
-	public int runTool() throws Exception {
-		JobConf conf = new JobConf(getConf(), BuildIPInvertedIndexDocSorted.class);
-		FileSystem fs = FileSystem.get(conf);
+    String indexPath = conf.get(Constants.IndexPath);
+    RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fs);
 
-		String indexPath = conf.get(Constants.IndexPath);
-		RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fs);
+    String collectionName = env.readCollectionName();
 
-		String collectionName = env.readCollectionName();
+    int reduceTasks = conf.getInt(Constants.NumReduceTasks, 0);
+    int minSplitSize = conf.getInt(Constants.MinSplitSize, 0);
+    int collectionDocCnt = env.readCollectionDocumentCount();
 
-		int reduceTasks = conf.getInt(Constants.NumReduceTasks, 0);
-		int minSplitSize = conf.getInt(Constants.MinSplitSize, 0);
-		int collectionDocCnt = env.readCollectionDocumentCount();
+    LOG.info("PowerTool: " + BuildIPInvertedIndexDocSorted.class.getCanonicalName());
+    LOG.info(String.format(" - %s: %s", Constants.IndexPath, indexPath));
+    LOG.info(String.format(" - %s: %s", Constants.CollectionName, collectionName));
+    LOG.info(String.format(" - %s: %s", Constants.CollectionDocumentCount, collectionDocCnt));
+    LOG.info(String.format(" - %s: %s", Constants.NumReduceTasks, reduceTasks));
+    LOG.info(String.format(" - %s: %s", Constants.MinSplitSize, minSplitSize));
 
-		LOG.info("PowerTool: " + BuildIPInvertedIndexDocSorted.class.getCanonicalName());
-		LOG.info(String.format(" - %s: %s", Constants.IndexPath, indexPath));
-		LOG.info(String.format(" - %s: %s", Constants.CollectionName, collectionName));
-		LOG.info(String.format(" - %s: %s", Constants.CollectionDocumentCount, collectionDocCnt));
-		LOG.info(String.format(" - %s: %s", Constants.NumReduceTasks, reduceTasks));
-		LOG.info(String.format(" - %s: %s", Constants.MinSplitSize, minSplitSize));
+    if (!fs.exists(new Path(indexPath))) {
+      fs.mkdirs(new Path(indexPath));
+    }
 
-		if (!fs.exists(new Path(indexPath))) {
-			fs.mkdirs(new Path(indexPath));
-		}
+    Path inputPath = new Path(env.getIntDocVectorsDirectory());
+    Path postingsPath = new Path(env.getPostingsDirectory());
 
-		Path inputPath = new Path(env.getIntDocVectorsDirectory());
-		Path postingsPath = new Path(env.getPostingsDirectory());
+    if (fs.exists(postingsPath)) {
+      LOG.info("Postings already exist: no indexing will be performed.");
+      return 0;
+    }
 
-		if (fs.exists(postingsPath)) {
-			LOG.info("Postings already exist: no indexing will be performed.");
-			return 0;
-		}
+    conf.setInt(Constants.CollectionDocumentCount, collectionDocCnt);
 
-		conf.setJobName("BuildIPInvertedIndex:" + collectionName);
+    conf.setInt("mapred.min.split.size", minSplitSize);
+    conf.set("mapred.child.java.opts", "-Xmx2048m");
 
-		conf.setNumReduceTasks(reduceTasks);
+    Job job = new Job(conf,
+        BuildIPInvertedIndexDocSorted.class.getSimpleName() + ":" + collectionName);
+    job.setJarByClass(BuildIPInvertedIndexDocSorted.class);
 
-		conf.setInt(Constants.CollectionDocumentCount, collectionDocCnt);
+    job.setNumReduceTasks(reduceTasks);
 
-		conf.setInt("mapred.min.split.size", minSplitSize);
-		conf.set("mapred.child.java.opts", "-Xmx2048m");
+    FileInputFormat.setInputPaths(job, inputPath);
+    FileOutputFormat.setOutputPath(job, postingsPath);
 
-		FileInputFormat.setInputPaths(conf, inputPath);
-		FileOutputFormat.setOutputPath(conf, postingsPath);
+    job.setInputFormatClass(SequenceFileInputFormat.class);
+    job.setOutputFormatClass(SequenceFileOutputFormat.class);
 
-		conf.setInputFormat(SequenceFileInputFormat.class);
-		conf.setOutputFormat(SequenceFileOutputFormat.class);
+    job.setMapOutputKeyClass(PairOfInts.class);
+    job.setMapOutputValueClass(TermPositions.class);
+    job.setOutputKeyClass(IntWritable.class);
+    job.setOutputValueClass(PostingsListDocSortedPositional.class);
 
-		conf.setMapOutputKeyClass(PairOfInts.class);
-		conf.setMapOutputValueClass(TermPositions.class);
-		conf.setOutputKeyClass(IntWritable.class);
-		conf.setOutputValueClass(PostingsListDocSortedPositional.class);
+    job.setMapperClass(MyMapper.class);
+    job.setReducerClass(MyReducer.class);
+    job.setPartitionerClass(MyPartitioner.class);
 
-		conf.setMapperClass(MyMapper.class);
-		conf.setReducerClass(MyReducer.class);
-		conf.setPartitionerClass(MyPartitioner.class);
+    long startTime = System.currentTimeMillis();
+    job.waitForCompletion(true);
+    LOG.info("Job Finished in " + (System.currentTimeMillis() - startTime) / 1000.0 + " seconds");
 
-		long startTime = System.currentTimeMillis();
-		RunningJob job = JobClient.runJob(conf);
-		LOG.info("Job Finished in " + (System.currentTimeMillis() - startTime) / 1000.0	+ " seconds");
+    env.writePostingsType(PostingsListDocSortedPositional.class.getCanonicalName());
 
-		env.writePostingsType(PostingsListDocSortedPositional.class.getCanonicalName());
-
-		return 0;
-	}
+    return 0;
+  }
 }

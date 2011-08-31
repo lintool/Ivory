@@ -83,8 +83,15 @@ public class IntPostingsForwardIndex {
     fileNoStr = padd + fileNoStr;
 
     // Open up the SequenceFile.
-    SequenceFile.Reader reader = new SequenceFile.Reader(fs, new Path(postingsPath + "/part-"
-        + fileNoStr), conf);
+    SequenceFile.Reader reader = null;
+    try {
+      reader = new SequenceFile.Reader(fs,
+          new Path(postingsPath + "/part-" + fileNoStr), conf);
+    } catch (IOException e) {
+      // Try alternative naming scheme for output of new API.
+      reader = new SequenceFile.Reader(fs,
+          new Path(postingsPath + "/part-r-" + fileNoStr), conf);
+    }
 
     IntWritable key = new IntWritable();
     PostingsList value = null;
