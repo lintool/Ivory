@@ -25,7 +25,7 @@
  *  Craig Macdonald <craigm{a.}dcs.gla.ac.uk
  */
 
-package uk.ac.gla.terrier.compression;
+package ivory.core.compression;
 /** Utility methods for use in the BitFile classes.
  * @author Craig Macdonald
  * @version $Revision: 1.3 $ 

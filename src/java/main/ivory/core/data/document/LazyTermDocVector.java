@@ -16,6 +16,8 @@
 
 package ivory.core.data.document;
 
+import ivory.core.compression.BitInputStream;
+import ivory.core.compression.BitOutputStream;
 import ivory.core.index.TermPositions;
 
 import java.io.ByteArrayInputStream;
@@ -27,8 +29,6 @@ import java.util.Map;
 
 import org.apache.hadoop.io.WritableUtils;
 
-import uk.ac.gla.terrier.compression.BitInputStream;
-import uk.ac.gla.terrier.compression.BitOutputStream;
 import edu.umd.cloud9.util.array.ArrayListOfInts;
 
 /**
@@ -36,19 +36,17 @@ import edu.umd.cloud9.util.array.ArrayListOfInts;
  * positional information on demand.
  *
  * @author Tamer Elsayed
+ * @author Jimmy Lin
  */
 public class LazyTermDocVector implements TermDocVector {
-
-  // Term to list of positions
-  // notice that this is an ArrayListOfInts, not ArrayList<Integer>
   private Map<String, ArrayListOfInts> termPositionsMap = null;
-  private byte[] mRawBytes = null;
-  private String[] mTerms = null;
-  private int nTerms;
+  private byte[] rawBytes = null;
+  private String[] terms = null;
+  private int numTerms;
   private static boolean read = false;
 
-  transient private ByteArrayOutputStream mBytesOut = null;
-  transient private BitOutputStream mBitsOut = null;
+  transient private ByteArrayOutputStream bytesOut = null;
+  transient private BitOutputStream bitsOut = null;
 
   public LazyTermDocVector() {}
 
@@ -62,22 +60,18 @@ public class LazyTermDocVector implements TermDocVector {
     read = false;
   }
 
-  public int getNum() {
-    return nTerms;
-  }
-
   @Override
   public void write(DataOutput out) throws IOException {
     if (!read) {
-      nTerms = termPositionsMap.size();
+      numTerms = termPositionsMap.size();
       // write # of terms
-      WritableUtils.writeVInt(out, nTerms);
-      if (nTerms == 0)
+      WritableUtils.writeVInt(out, numTerms);
+      if (numTerms == 0)
         return;
 
       try {
-        mBytesOut = new ByteArrayOutputStream();
-        mBitsOut = new BitOutputStream(mBytesOut);
+        bytesOut = new ByteArrayOutputStream();
+        bitsOut = new BitOutputStream(bytesOut);
 
         ArrayListOfInts positions;
         TermPositions tp = new TermPositions();
@@ -88,16 +82,16 @@ public class LazyTermDocVector implements TermDocVector {
           positions = posting.getValue();
           tp.set(positions.getArray(), (short) positions.size());
 
-          // write the term
+          // Write the term.
           out.writeUTF(term);
-          // write out the tf value
-          mBitsOut.writeGamma((short) positions.size());
-          // write out the positions
-          LazyIntDocVector.writePositions(mBitsOut, tp);
+          // Write out the tf value.
+          bitsOut.writeGamma((short) positions.size());
+          // Write out the positions.
+          LazyIntDocVector.writePositions(bitsOut, tp);
         }
-        mBitsOut.padAndFlush();
-        mBitsOut.close();
-        byte[] bytes = mBytesOut.toByteArray();
+        bitsOut.padAndFlush();
+        bitsOut.close();
+        byte[] bytes = bytesOut.toByteArray();
         WritableUtils.writeVInt(out, bytes.length);
         out.write(bytes);
       } catch (IOException e) {
@@ -105,43 +99,43 @@ public class LazyTermDocVector implements TermDocVector {
         throw new RuntimeException("Error adding postings.");
       } catch (ArithmeticException e) {
         e.printStackTrace();
-        throw new RuntimeException("ArithmeticException caught \"" + e.getMessage());
+        throw new RuntimeException(e.getMessage());
       }
 
     } else {
-      WritableUtils.writeVInt(out, nTerms);
-      if (nTerms == 0)
+      WritableUtils.writeVInt(out, numTerms);
+      if (numTerms == 0)
         return;
 
-      for (int i = 0; i < nTerms; i++)
-        out.writeUTF(mTerms[i]);
+      for (int i = 0; i < numTerms; i++)
+        out.writeUTF(terms[i]);
 
-      WritableUtils.writeVInt(out, mRawBytes.length);
-      out.write(mRawBytes);
+      WritableUtils.writeVInt(out, rawBytes.length);
+      out.write(rawBytes);
     }
   }
 
   @Override
   public void readFields(DataInput in) throws IOException {
     read = true;
-    nTerms = WritableUtils.readVInt(in);
-    if (nTerms == 0) {
-      mRawBytes = null;
-      mTerms = null;
+    numTerms = WritableUtils.readVInt(in);
+    if (numTerms == 0) {
+      rawBytes = null;
+      terms = null;
       return;
     }
-    mTerms = new String[nTerms];
-    for (int i = 0; i < nTerms; i++) {
-      mTerms[i] = in.readUTF();
+    terms = new String[numTerms];
+    for (int i = 0; i < numTerms; i++) {
+      terms[i] = in.readUTF();
     }
-    mRawBytes = new byte[WritableUtils.readVInt(in)];
-    in.readFully(mRawBytes);
+    rawBytes = new byte[WritableUtils.readVInt(in)];
+    in.readFully(rawBytes);
   }
 
   @Override
   public String toString() {
-    StringBuffer s = new StringBuffer(this.getClass().getName() + "," + nTerms + ","
-        + mRawBytes + "," + mTerms + "\n" + "[");
+    StringBuffer s = new StringBuffer(this.getClass().getName() + "," + numTerms + ","
+        + rawBytes + "," + terms + "\n" + "[");
     try {
       Reader r = this.getReader();
       while (r.hasMoreTerms()) {
@@ -159,45 +153,45 @@ public class LazyTermDocVector implements TermDocVector {
 
   @Override
   public Reader getReader() throws IOException {
-    return new Reader(nTerms, mRawBytes, mTerms);
+    return new Reader(numTerms, rawBytes, terms);
   }
 
   public static class Reader implements TermDocVector.Reader {
-    private ByteArrayInputStream mBytesIn;
-    private BitInputStream mBitsIn;
+    private ByteArrayInputStream bytesIn;
+    private BitInputStream bitsIn;
     private int p = -1;
-    private short mPrevTf = -1;
-    private int nTerms;
-    private boolean mNeedToReadPositions = false;
-    private String[] mTerms = null;
+    private short prevTf = -1;
+    private int n;
+    private boolean needToReadPositions = false;
+    private String[] innerTerms = null;
 
     public Reader(int nTerms, byte[] bytes, String[] terms) throws IOException {
-      this.nTerms = nTerms;
+      this.n = nTerms;
       if (nTerms > 0) {
-        mBytesIn = new ByteArrayInputStream(bytes);
-        mBitsIn = new BitInputStream(mBytesIn);
-        mTerms = terms;
+        bytesIn = new ByteArrayInputStream(bytes);
+        bitsIn = new BitInputStream(bytesIn);
+        innerTerms = terms;
       }
     }
 
     @Override
     public int getNumberOfTerms() {
-      return nTerms;
+      return n;
     }
 
     @Override
     public short getTf() {
-      return mPrevTf;
+      return prevTf;
     }
 
     @Override
     public void reset() {
       try {
-        mBytesIn.reset();
-        mBitsIn = new BitInputStream(mBytesIn);
+        bytesIn.reset();
+        bitsIn = new BitInputStream(bytesIn);
         p = -1;
-        mPrevTf = -1;
-        mNeedToReadPositions = false;
+        prevTf = -1;
+        needToReadPositions = false;
       } catch (IOException e) {
         e.printStackTrace();
         throw new RuntimeException("Error resetting postings.");
@@ -208,18 +202,18 @@ public class LazyTermDocVector implements TermDocVector {
     public String nextTerm() {
       try {
         p++;
-        if (mNeedToReadPositions) {
-          skipPositions(mPrevTf);
+        if (needToReadPositions) {
+          skipPositions(prevTf);
         }
-        mNeedToReadPositions = true;
-        if (p <= nTerms - 1) {
-          mPrevTf = (short) mBitsIn.readGamma();
-          return mTerms[p];
-        } else
+        needToReadPositions = true;
+        if (p <= n - 1) {
+          prevTf = (short) bitsIn.readGamma();
+          return innerTerms[p];
+        } else {
           return null;
+        }
       } catch (IOException e) {
-        e.printStackTrace();
-        throw new RuntimeException();
+        throw new RuntimeException(e);
       }
     }
 
@@ -227,22 +221,21 @@ public class LazyTermDocVector implements TermDocVector {
     public int[] getPositions() {
       int[] pos = null;
       try {
-        if (mPrevTf == 1) {
+        if (prevTf == 1) {
           pos = new int[1];
-          pos[0] = mBitsIn.readGamma();
+          pos[0] = bitsIn.readGamma();
         } else {
-          mBitsIn.readGamma();
-          pos = new int[mPrevTf];
-          pos[0] = mBitsIn.readGamma();
-          for (int i = 1; i < mPrevTf; i++) {
-            pos[i] = (pos[i - 1] + mBitsIn.readGamma());
+          bitsIn.readGamma();
+          pos = new int[prevTf];
+          pos[0] = bitsIn.readGamma();
+          for (int i = 1; i < prevTf; i++) {
+            pos[i] = (pos[i - 1] + bitsIn.readGamma());
           }
         }
       } catch (IOException e) {
-        e.printStackTrace();
-        throw new RuntimeException("A problem in reading bits?" + e);
+        throw new RuntimeException(e);
       }
-      mNeedToReadPositions = false;
+      needToReadPositions = false;
 
       return pos;
     }
@@ -251,8 +244,9 @@ public class LazyTermDocVector implements TermDocVector {
     public boolean getPositions(TermPositions tp) {
       int[] pos = getPositions();
 
-      if (pos == null)
+      if (pos == null) {
         return false;
+      }
 
       tp.set(pos, (short) pos.length);
       return true;
@@ -260,14 +254,14 @@ public class LazyTermDocVector implements TermDocVector {
 
     @Override
     public boolean hasMoreTerms() {
-      return !(p >= nTerms - 1);
+      return !(p >= n - 1);
     }
 
     private void skipPositions(int tf) throws IOException {
       if (tf == 1) {
-        mBitsIn.readGamma();
+        bitsIn.readGamma();
       } else {
-        mBitsIn.skipBits(mBitsIn.readGamma());
+        bitsIn.skipBits(bitsIn.readGamma());
       }
     }
   }

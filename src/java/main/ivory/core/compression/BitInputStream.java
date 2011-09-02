@@ -25,7 +25,7 @@
  *  Roi Blanco
  */
 
-package uk.ac.gla.terrier.compression;
+package ivory.core.compression;
 
 
 import java.io.DataInputStream;

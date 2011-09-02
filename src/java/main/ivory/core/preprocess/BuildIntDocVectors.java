@@ -27,7 +27,7 @@ import ivory.core.tokenize.DocumentProcessingUtils;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Map;
-import java.util.TreeMap;
+import java.util.SortedMap;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.filecache.DistributedCache;
@@ -108,8 +108,8 @@ public class BuildIntDocVectors extends PowerTool {
     public void map(IntWritable key, TermDocVector doc, Context context)
         throws IOException, InterruptedException {
       long startTime = System.currentTimeMillis();
-      TreeMap<Integer, int[]> positions =
-          DocumentProcessingUtils.getTermIDsPositionsMap(doc, dictionary);
+      SortedMap<Integer, int[]> positions =
+          DocumentProcessingUtils.integerizeTermDocVector(doc, dictionary);
       context.getCounter(MapTime.DecodingAndIdMapping)
           .increment(System.currentTimeMillis() - startTime);
 

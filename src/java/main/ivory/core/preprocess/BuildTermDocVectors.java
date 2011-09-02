@@ -121,11 +121,16 @@ public class BuildTermDocVectors extends PowerTool {
 
       startTime = System.currentTimeMillis();
       Map<String, ArrayListOfInts> termPositionsMap =
-          DocumentProcessingUtils.getTermPositionsMap(doc, tokenizer);
+          DocumentProcessingUtils.parseDocument(doc, tokenizer);
       context.getCounter(MapTime.Parsing).increment(System.currentTimeMillis() - startTime);
 
+      int doclength;
       if (termPositionsMap.size() == 0) {
         context.getCounter(Docs.Empty).increment(1);
+        doclength = 0;
+      } else {
+        doclength = termPositionsMap.get("").get(0);
+        termPositionsMap.remove("");
       }
 
       startTime = System.currentTimeMillis();
@@ -135,8 +140,7 @@ public class BuildTermDocVectors extends PowerTool {
       context.getCounter(MapTime.Spilling).increment(System.currentTimeMillis() - startTime);
       context.getCounter(Docs.Total).increment(1);
 
-      doclengths.put(docno,
-          DocumentProcessingUtils.getDocLengthFromPositionsMap(termPositionsMap));
+      doclengths.put(docno, doclength);
     }
 
     @Override

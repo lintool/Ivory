@@ -16,6 +16,9 @@
 
 package ivory.core.index;
 
+import ivory.core.compression.BitInputStream;
+import ivory.core.compression.BitOutputStream;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInput;
@@ -26,8 +29,6 @@ import java.io.IOException;
 
 import org.apache.hadoop.io.Writable;
 
-import uk.ac.gla.terrier.compression.BitInputStream;
-import uk.ac.gla.terrier.compression.BitOutputStream;
 
 /**
  * <p>

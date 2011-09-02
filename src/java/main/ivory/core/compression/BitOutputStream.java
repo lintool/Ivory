@@ -27,7 +27,7 @@
  */
 
 
-package uk.ac.gla.terrier.compression;
+package ivory.core.compression;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;

@@ -16,6 +16,8 @@
 
 package ivory.core.data.index;
 
+import ivory.core.compression.BitInputStream;
+import ivory.core.compression.BitOutputStream;
 import ivory.core.index.TermPositions;
 
 import java.io.ByteArrayInputStream;
@@ -33,8 +35,6 @@ import org.apache.hadoop.io.WritableUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
-import uk.ac.gla.terrier.compression.BitInputStream;
-import uk.ac.gla.terrier.compression.BitOutputStream;
 
 /**
  * Object representing a document-sorted postings list that holds positional information for terms.
