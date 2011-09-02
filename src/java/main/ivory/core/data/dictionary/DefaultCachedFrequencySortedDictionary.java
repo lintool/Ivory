@@ -1,5 +1,5 @@
 /*
- * Ivory: A Hadoop toolkit for Web-scale information retrieval
+ * Ivory: A Hadoop toolkit for web-scale information retrieval
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You may
@@ -41,6 +41,7 @@ public class DefaultCachedFrequencySortedDictionary extends DefaultFrequencySort
 
   /**
    * Constructs an instance of this dictionary from serialized data files.
+   *
    * @param cachedFrequent number of top terms to caches (i.e., 1000 means cache top 1000
    *   most frequently-occurring terms)
    */
@@ -52,6 +53,7 @@ public class DefaultCachedFrequencySortedDictionary extends DefaultFrequencySort
 
   /**
    * Constructs an instance of this dictionary from serialized data files.
+   *
    * @param cachedFrequentFraction fraction of top terms to cache
    *   (i.e., 0.3 means cache top 30% of frequently-occurring terms)
    */

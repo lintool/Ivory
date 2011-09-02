@@ -147,25 +147,25 @@ public class DocumentProcessingUtils {
 		return positions;
 	}
 
-	public static TreeMap<String, ArrayListOfInts> getTermPositionsMap(TermDocVector doc, Set<String> terms){
-		// for storing the positions
-		TreeMap<String, ArrayListOfInts> strPositions = new TreeMap<String, ArrayListOfInts>();
-		
-		TermDocVector.Reader r = null;
-		try {
-			r = doc.getReader();
-		} catch (IOException e1) {
-			throw new RuntimeException("Error getting TermDocVectorReader: "+e1.getMessage());
-		}
-		String term;
-		int[] tp;
-		while(r.hasMoreTerms()){
-			term = r.nextTerm();
-			//TermPositions tp = new TermPositions();
-			tp = r.getPositions();
-			if(terms.contains(term))
-				strPositions.put(term, new ArrayListOfInts(tp));
-		}
-		return strPositions;
-	}
+//	public static TreeMap<String, ArrayListOfInts> getTermPositionsMap(TermDocVector doc, Set<String> terms){
+//		// for storing the positions
+//		TreeMap<String, ArrayListOfInts> strPositions = new TreeMap<String, ArrayListOfInts>();
+//		
+//		TermDocVector.Reader r = null;
+//		try {
+//			r = doc.getReader();
+//		} catch (IOException e1) {
+//			throw new RuntimeException("Error getting TermDocVectorReader: "+e1.getMessage());
+//		}
+//		String term;
+//		int[] tp;
+//		while(r.hasMoreTerms()){
+//			term = r.nextTerm();
+//			//TermPositions tp = new TermPositions();
+//			tp = r.getPositions();
+//			if(terms.contains(term))
+//				strPositions.put(term, new ArrayListOfInts(tp));
+//		}
+//		return strPositions;
+//	}
 }

@@ -1,5 +1,5 @@
 /*
- * Ivory: A Hadoop toolkit for Web-scale information retrieval
+ * Ivory: A Hadoop toolkit for web-scale information retrieval
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You may
@@ -70,6 +70,7 @@ public class PrefixEncodedLexicographicallySortedDictionary
 
   /**
    * Creates an empty dictionary.
+   *
    * @param w window size
    */
   public PrefixEncodedLexicographicallySortedDictionary(int w) {
@@ -79,6 +80,7 @@ public class PrefixEncodedLexicographicallySortedDictionary
 
   /**
    * Creates an empty dictionary.
+   *
    * @param initialSize initial size of the dictionary
    * @param w window size
    */
@@ -89,6 +91,7 @@ public class PrefixEncodedLexicographicallySortedDictionary
 
   /**
    * Creates an empty dictionary.
+   *
    * @param initialSize initialize size of the dictionary
    * @param f when needed, the dictionary grows by this fractor (>0 && <1.0)
    * @param w window size
@@ -102,6 +105,8 @@ public class PrefixEncodedLexicographicallySortedDictionary
 
   /**
    * Deserializes this dictionary.
+   *
+   * @throws IOException
    */
   @Override
   public void readFields(DataInput in) throws IOException {
@@ -136,6 +141,8 @@ public class PrefixEncodedLexicographicallySortedDictionary
 
   /**
    * Serializes this dictionary.
+   *
+   * @throws IOException
    */
   @Override
   public void write(DataOutput out) throws IOException {
@@ -159,6 +166,7 @@ public class PrefixEncodedLexicographicallySortedDictionary
 
   /**
    * Serializes this dictionary to a file.
+   *
    * @param file filename
    * @param fs reference to the {@code FileSystem}
    * @throws IOException
@@ -171,6 +179,7 @@ public class PrefixEncodedLexicographicallySortedDictionary
 
   /**
    * Adds another term to this dictionary. Note that terms must be added in lexicographical order.
+   *
    * @param term term to insert into this dictionary
    */
   public void add(String term) {
@@ -203,6 +212,8 @@ public class PrefixEncodedLexicographicallySortedDictionary
 
   /**
    * Returns the window size used to encode this dictionary.
+   *
+   * @return window size used to encode this dictionary
    */
   public int getWindowSize() {
     return window;
@@ -267,6 +278,8 @@ public class PrefixEncodedLexicographicallySortedDictionary
 
   /**
    * Returns an iterator over the dictionary in order of term id.
+   *
+   * @return iterator over terms in the dictionary
    */
   @Override
   public Iterator<String> iterator() {
@@ -293,6 +306,8 @@ public class PrefixEncodedLexicographicallySortedDictionary
 
   /**
    * Returns the compression ratio of this dictionary.
+   *
+   * @return compression ratio achieved by this dictionary
    */
   public float getCompresssionRatio() {
     return (float) totalMemoryBytes / totalOriginalBytes;
@@ -352,7 +367,9 @@ public class PrefixEncodedLexicographicallySortedDictionary
   }
 
   /**
-   * Returns the small character position <i>i</i> at which {@code s1} and {@code s2} differ.
+   * Returns the smallest character position <i>i</i> at which {@code s1} and {@code s2} differ.
+   *
+   * @return smallest character position <i>i</i> at which {@code s1} and {@code s2} differ
    */
   public static int getPrefix(String s1, String s2) {
     int i = 0;
@@ -366,6 +383,7 @@ public class PrefixEncodedLexicographicallySortedDictionary
 
   /**
    * Loads a dictionary from a file.
+   *
    * @param path path to file
    * @param fs reference to the {@code FileSystem}
    * @return dictionary with loaded data
@@ -385,6 +403,7 @@ public class PrefixEncodedLexicographicallySortedDictionary
 
   /**
    * Loads a dictionary from a plain text containing lexicographically-sorted terms.
+   *
    * @param path path to file
    * @param fs reference to the {@code FileSystem}
    * @param window window size

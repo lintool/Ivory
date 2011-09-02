@@ -32,6 +32,9 @@ public interface IntDocVector extends Writable {
 
   /**
    * Returns the reader for this {@code IntDocVector}.
+   *
+   * @return reader for this {@code IntDocVector}
+   * @throws IOException
    */
   IntDocVector.Reader getReader() throws IOException;
 
@@ -44,36 +47,48 @@ public interface IntDocVector extends Writable {
   public interface Reader {
     /**
      * Returns the next term.
+     *
+     * @return termid of the next term
      */
     int nextTerm();
 
     /**
      * Returns {@code true} if there are more terms to read.
+     *
+     * @returns {@code true} if there are more terms to read
      */
     boolean hasMoreTerms();
 
     /**
-     * Returns the total number of terms.
+     * Returns the total number of terms in this document.
+     *
+     * @return total number of terms in this document
      */
     int getNumberOfTerms();
 
     /**
-     * Resets the reader.
+     * Resets the reader to the beginning of the document.
      */
     void reset();
 
     /**
      * Returns the position offsets of the current term as an array.
+     *
+     * @return array containing position offsets of the current term
      */
     int[] getPositions();
 
     /**
      * Returns the position offsets of the current term as a {@link TermPositions} object.
+     *
+     * @return {@code TermPositions} representing offsets of the current term.
      */
     boolean getPositions(TermPositions tp);
 
     /**
      * Returns the term frequency of the current term.
+     *
+     * @return term frequency of the current term
      */
     short getTf();
   }

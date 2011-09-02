@@ -59,6 +59,7 @@ public class IntDocVectorsForwardIndex {
 
   /**
    * Creates an {@code IntDocVectorsIndex} object.
+   *
    * @param indexPath location of the index file
    * @param fs handle to the FileSystem
    * @throws IOException
@@ -67,6 +68,14 @@ public class IntDocVectorsForwardIndex {
     this(indexPath, fs, false);
   }
 
+  /**
+   * Creates an {@code IntDocVectorsIndex} object.
+   *
+   * @param indexPath location of the index file
+   * @param fs handle to the FileSystem
+   * @param weighted {@code true} to load weighted document vectors
+   * @throws IOException
+   */
   public IntDocVectorsForwardIndex(String indexPath, FileSystem fs, boolean weighted)
       throws IOException {
     this.fs = Preconditions.checkNotNull(fs);
@@ -90,10 +99,11 @@ public class IntDocVectorsForwardIndex {
 
   /**
    * Returns the document vector given a docno.
+   *
+   * @return {@code IntDocVector} for the appropriate docno
    */
   public IntDocVector getDocVector(int docno) throws IOException {
-    if (docno > collectionDocumentCount || docno < 1)
-      return null;
+    Preconditions.checkArgument(!(docno > collectionDocumentCount || docno < 1));
 
     long pos = positions[docno - docnoOffset - 1];
 
@@ -103,11 +113,11 @@ public class IntDocVectorsForwardIndex {
     SequenceFile.Reader reader = null;
     try {
       reader = new SequenceFile.Reader(fs,
-          new Path(path + "/part-" + FORMAT.format(fileNo)), conf);
-    } catch (IOException e) {
-      // Try alternative naming scheme for output of new API.
-      reader = new SequenceFile.Reader(fs,
           new Path(path + "/part-m-" + FORMAT.format(fileNo)), conf);
+    } catch (IOException e) {
+      // Try alternative naming scheme for the old API.
+      reader = new SequenceFile.Reader(fs,
+          new Path(path + "/part-" + FORMAT.format(fileNo)), conf);
     }
 
     IntWritable key = new IntWritable();
@@ -142,11 +152,8 @@ public class IntDocVectorsForwardIndex {
     }
 
     long startingMemoryUse = MemoryUsageUtils.getUsedMemory();
-
     Configuration conf = new Configuration();
-
     IntDocVectorsForwardIndex index = new IntDocVectorsForwardIndex(args[0], FileSystem.get(conf));
-
     long endingMemoryUse = MemoryUsageUtils.getUsedMemory();
 
     System.out.println("Memory usage: " + (endingMemoryUse - startingMemoryUse) + " bytes\n");

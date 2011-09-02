@@ -1,5 +1,5 @@
 /*
- * Ivory: A Hadoop toolkit for Web-scale information retrieval
+ * Ivory: A Hadoop toolkit for web-scale information retrieval
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You may
@@ -20,10 +20,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-
-import ivory.core.data.document.IntDocVector;
-import ivory.core.data.document.LazyIntDocVector;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
@@ -34,7 +30,6 @@ import java.util.TreeMap;
 import junit.framework.JUnit4TestAdapter;
 
 import org.junit.Test;
-
 
 import com.google.common.collect.Maps;
 

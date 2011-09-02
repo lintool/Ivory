@@ -102,11 +102,11 @@ public class TermDocVectorsForwardIndex {
     SequenceFile.Reader reader = null;
     try {
       reader = new SequenceFile.Reader(fs,
-          new Path(path + "/part-" + FORMAT.format(fileNo)), conf);
-    } catch (IOException e) {
-      // Try alternative naming scheme for output of new API.
-      reader = new SequenceFile.Reader(fs,
           new Path(path + "/part-m-" + FORMAT.format(fileNo)), conf);
+    } catch (IOException e) {
+      // Try alternative naming scheme for output of old API.
+      reader = new SequenceFile.Reader(fs,
+          new Path(path + "/part-" + FORMAT.format(fileNo)), conf);
     }
 
     IntWritable key = new IntWritable();
@@ -141,11 +141,8 @@ public class TermDocVectorsForwardIndex {
     }
 
     long startingMemoryUse = MemoryUsageUtils.getUsedMemory();
-
     Configuration conf = new Configuration();
-
     TermDocVectorsForwardIndex index = new TermDocVectorsForwardIndex(args[0], FileSystem.get(conf));
-
     long endingMemoryUse = MemoryUsageUtils.getUsedMemory();
 
     System.out.println("Memory usage: " + (endingMemoryUse - startingMemoryUse) + " bytes\n");

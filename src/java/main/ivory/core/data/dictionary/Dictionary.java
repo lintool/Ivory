@@ -1,5 +1,5 @@
 /*
- * Ivory: A Hadoop toolkit for Web-scale information retrieval
+ * Ivory: A Hadoop toolkit for web-scale information retrieval
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You may
@@ -26,6 +26,7 @@ package ivory.core.data.dictionary;
 public interface Dictionary extends Iterable<String> {
   /**
    * Returns the term associated with this term id.
+   *
    * @param id term id
    * @return term associated with this term id
    */
@@ -33,13 +34,15 @@ public interface Dictionary extends Iterable<String> {
 
   /**
    * Returns the id associated with this term.
+   *
    * @param term term
    * @return id associated with this term
    */
   int getId(String term);
 
   /**
-   * Returns the size of this dictionary. 
+   * Returns the size of this dictionary.
+   *
    * @return number of terms in this dictionary
    */
   int size();
