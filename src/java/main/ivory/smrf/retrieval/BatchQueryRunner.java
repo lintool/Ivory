@@ -67,6 +67,11 @@ public class BatchQueryRunner {
 		init(args,fs);
 	}
 
+    public BatchQueryRunner(String[] args, FileSystem fs, String indexPath) throws ConfigurationException {
+		this.indexPath = indexPath;
+		init(args,fs);
+	}
+
 	public void init(String[] args, FileSystem fs) throws ConfigurationException {
 		this.fs = Preconditions.checkNotNull(fs);
 		Preconditions.checkNotNull(args);
@@ -357,10 +362,11 @@ public class BatchQueryRunner {
 		NodeList indexList = d.getElementsByTagName("index");
 
 		if (indexList.getLength() > 0) {
-			if (indexPath != null) {
-				throw new ConfigurationException("Must specify only one index! There is no support for multiple indexes!");
-			}
+			if (indexPath == null) {
+			    //				throw new ConfigurationException("Must specify only one index! There is no support for multiple indexes!");
+			    //}
 			indexPath = indexList.item(0).getTextContent();
+			}
 		}
 	}
 
