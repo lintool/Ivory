@@ -42,7 +42,35 @@ public class VerifyWt10gIndex {
   }
 
   @Test
-  public void verifyResults() throws Exception {}
+  public void verifyResults() throws Exception {
+    Configuration conf = IntegrationUtils.getBespinConfiguration();
+    FileSystem fs = FileSystem.get(conf);
+
+    fs.copyFromLocalFile(false, true, new Path("data/wt10g/run.wt10g.basic.xml"),
+        new Path(index + "/" + "run.wt10g.basic.xml"));
+    fs.copyFromLocalFile(false, true, new Path("data/wt10g/queries.wt10g.451-500.xml"),
+        new Path(index + "/" + "queries.wt10g.451-500.xml"));
+    fs.copyFromLocalFile(false, true, new Path("data/wt10g/queries.wt10g.501-550.xml"),
+        new Path(index + "/" + "queries.wt10g.501-550.xml"));
+
+    String[] params = new String[] {
+            index + "/run.wt10g.basic.xml",
+            index + "/queries.wt10g.451-500.xml",
+            index + "/queries.wt10g.501-550.xml"};
+
+    BatchQueryRunner qr = new BatchQueryRunner(params, fs, index);
+
+    long start = System.currentTimeMillis();
+    qr.runQueries();
+    long end = System.currentTimeMillis();
+
+    LOG.info("Total query time: " + (end - start) + "ms");
+
+    Robust04_Basic.verifyAllResults(qr.getModels(), qr.getAllResults(), qr.getDocnoMapping(),
+        new Qrels("data/wt10g/qrels.wt10g.all"));
+
+    LOG.info("Done!");
+  }
 
   public static junit.framework.Test suite() {
     return new JUnit4TestAdapter(VerifyWt10gIndex.class);

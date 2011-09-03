@@ -42,7 +42,35 @@ public class VerifyGov2Index {
   }
 
   @Test
-  public void verifyResults() throws Exception {}
+  public void verifyResults() throws Exception {
+    Configuration conf = IntegrationUtils.getBespinConfiguration();
+    FileSystem fs = FileSystem.get(conf);
+
+    fs.copyFromLocalFile(false, true, new Path("data/gov2/run.gov2.basic.xml"),
+        new Path(index + "/" + "run.gov2.basic.xml"));
+    fs.copyFromLocalFile(false, true, new Path("data/gov2/gov2.title.701-775"),
+        new Path(index + "/" + "gov2.title.701-775"));
+    fs.copyFromLocalFile(false, true, new Path("data/gov2/gov2.title.776-850"),
+        new Path(index + "/" + "gov2.title.776-850"));
+
+    String[] params = new String[] {
+            index + "/run.gov2.basic.xml",
+            index + "/gov2.title.701-775",
+            index + "/gov2.title.776-850"};
+
+    BatchQueryRunner qr = new BatchQueryRunner(params, fs, index);
+
+    long start = System.currentTimeMillis();
+    qr.runQueries();
+    long end = System.currentTimeMillis();
+
+    LOG.info("Total query time: " + (end - start) + "ms");
+
+    Robust04_Basic.verifyAllResults(qr.getModels(), qr.getAllResults(), qr.getDocnoMapping(),
+        new Qrels("data/gov2/qrels.gov2.all"));
+
+    LOG.info("Done!");
+  }
 
   public static junit.framework.Test suite() {
     return new JUnit4TestAdapter(VerifyGov2Index.class);

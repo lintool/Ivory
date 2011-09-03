@@ -45,7 +45,32 @@ public class VerifyClueIndex {
   }
 
   @Test
-  public void verifyResults() throws Exception {}
+  public void verifyResults() throws Exception {
+    Configuration conf = IntegrationUtils.getBespinConfiguration();
+    FileSystem fs = FileSystem.get(conf);
+
+    fs.copyFromLocalFile(false, true, new Path("data/clue/run.web09catB.all.xml"),
+        new Path(index + "/" + "run.web09catB.all.xml"));
+    fs.copyFromLocalFile(false, true, new Path("data/clue/queries.web09.xml"),
+        new Path(index + "/" + "queries.web09.xml"));
+
+    String[] params = new String[] {
+            index + "/run.web09catB.all.xml",
+            index + "/queries.web09.xml" };
+
+    BatchQueryRunner qr = new BatchQueryRunner(params, fs, index);
+
+    long start = System.currentTimeMillis();
+    qr.runQueries();
+    long end = System.currentTimeMillis();
+
+    LOG.info("Total query time: " + (end - start) + "ms");
+
+    Robust04_Basic.verifyAllResults(qr.getModels(), qr.getAllResults(), qr.getDocnoMapping(),
+        new Qrels("data/clue/qrels.web09catB.txt"));
+
+    LOG.info("Done!");
+  }
 
   public static junit.framework.Test suite() {
     return new JUnit4TestAdapter(VerifyClueIndex.class);
