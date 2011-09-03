@@ -202,6 +202,14 @@ public class BatchQueryRunner {
 		return queryRunners.get(model).getResults();
 	}
 
+	public Map<String, Map<String, Accumulator[]>> getAllResults() {
+	  Map<String, Map<String, Accumulator[]>> results = Maps.newHashMap();
+	  for ( String model : getModels()) {
+	    results.put(model, getResults(model));
+	  }
+	  return results;
+	}
+
 	public DocnoMapping getDocnoMapping() {
 		return docnoMapping;
 	}
