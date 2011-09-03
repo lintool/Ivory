@@ -203,7 +203,7 @@
 			<formatter type="xml" />
 			<batchtest todir="${integration.dir}">
 				<fileset dir="${build.dir}">
-                                        <include name="ivory/integration/**/*.class" />
+                                        <include name="ivory/integration/**/Verify*.class" />
 				</fileset>
 			</batchtest>
 		</junit>

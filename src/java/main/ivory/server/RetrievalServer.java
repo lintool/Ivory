@@ -229,7 +229,7 @@ public class RetrievalServer {
 				try {
 					mForwardIndex = (DocumentForwardIndex<Indexable>) Class.forName(indexClass)
 					.newInstance();
-					mForwardIndex.loadIndex(findexPath, mEnv.getDocnoMappingData().toString());
+					mForwardIndex.loadIndex(new Path(findexPath), new Path(mEnv.getDocnoMappingData().toString()), fs);
 				} catch (Exception e) {
 					e.printStackTrace();
 					throw new RuntimeException("Error initializing forward index!");

@@ -43,7 +43,7 @@ public class AnnotateClueRunWithURLs extends Configured implements Tool {
 			String docnoMapping = conf.get("DocnoMappingFile");
 
 			ClueWarcForwardIndex findex = new ClueWarcForwardIndex();
-			findex.loadIndex(findexFile, docnoMapping);
+			findex.loadIndex(new Path(findexFile), new Path(docnoMapping), FileSystem.get(conf));
 
 			FileSystem fs = FileSystem.get(conf);
 

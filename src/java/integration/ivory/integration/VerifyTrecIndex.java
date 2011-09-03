@@ -27,14 +27,13 @@ public class VerifyTrecIndex {
 
     assertTrue(fs.exists(collectionPath));
 
-    FileSystem.get(conf).delete(new Path(index), true);
+    fs.delete(new Path(index), true);
 
     String cloud9Jar = IntegrationUtils.getJar("lib", "cloud9");
     String guavaJar = IntegrationUtils.getJar("lib", "guava");
     String ivoryJar = IntegrationUtils.getJar("dist", "ivory");
 
     String libjars = String.format("-libjars=%s,%s,%s", cloud9Jar, guavaJar, ivoryJar);
-    System.out.println(libjars);
 
     PreprocessTREC.main(new String[] { libjars, IntegrationUtils.D_JT, IntegrationUtils.D_NN,
         collectionPath.toString(), index });
