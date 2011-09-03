@@ -16,7 +16,6 @@
 
 package ivory.core.data.index;
 
-import ivory.core.index.TermPositions;
 
 import com.google.common.base.Preconditions;
 
@@ -63,11 +62,6 @@ public abstract class ProximityPostingsReader implements PostingsReader {
 
   @Override
   public boolean getPositions(TermPositions tp) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public byte[] getBytePositions() {
     throw new UnsupportedOperationException();
   }
 

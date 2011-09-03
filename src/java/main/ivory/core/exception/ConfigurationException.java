@@ -17,13 +17,13 @@
 package ivory.core.exception;
 
 public class ConfigurationException extends Exception {
-	private static final long serialVersionUID = 3443583832454125315L;
+  private static final long serialVersionUID = 3443583832454125315L;
 
-	public ConfigurationException(String msg) {
-		super(msg);
-	}
+  public ConfigurationException(String msg) {
+    super(msg);
+  }
 
-	public ConfigurationException(String msg, Throwable cause) {
-		super(msg, cause);
-	}
+  public ConfigurationException(String msg, Throwable cause) {
+    super(msg, cause);
+  }
 }

@@ -74,13 +74,7 @@ public class BitOutputStream  {
 		buffer = new byte[DEFAULT_SIZE];
 		bufferSize = DEFAULT_SIZE;		
 	}
-	
-	/** sleep for the specified ms */ 
-	private static void sleep(long millis)
-	{
-		try {Thread.sleep(millis); } catch (Exception e) {/* ignore */}
-	}
-	
+		
 	/**
 	 * Empty constructor
 	 */
@@ -95,34 +89,6 @@ public class BitOutputStream  {
 		dos = new DataOutputStream(os);		
 		init();
 	}
-		
-
-	/**
-	 * Constructs an instance of the class for a given filename
-	 * Note that on a FileNotFoundException, this contructor will sleep for 2 seconds
-	 * before retrying to open the file.
-	 * @param filename String with the name of the underlying file
-	 * @throws java.io.IOException if an I/O error occurs
-	 */	
-	/*public BitOutputStream(String filename) throws IOException {		
-		try{
-			dos = new DataOutputStream(Files.writeFileStream(filename));
-		} catch(FileNotFoundException fnfe) {
-			final String dir = Files.getParent(filename);
-			logger.warn("Could not open new BitOutputStream because it alleged file could not be found.", fnfe);
-			if (logger.isDebugEnabled())
-				logger.debug("File.canRead()="+Files.canWrite(filename)+ "Dir.exists()=" +Files.exists(dir) 
-					+ " Dir.canWrite()="+Files.canWrite(dir) +" Dir.contentsSize="+Files.list(dir).length);
-			sleep(1000);
-			if (logger.isDebugEnabled())
-				logger.debug("File.canRead()="+Files.canWrite(filename)+ "Dir.exists()=" +Files.exists(dir) 
-					+ " Dir.canWrite()="+Files.canWrite(dir)+" Dir.contentsSize="+Files.list(dir).length);
-			logger.warn("Retrying to write BitOutputStream.");
-			dos = new DataOutputStream(Files.writeFileStream(filename));
-			logger.info("Previous warning can be ignored, BitOutputStream "+filename+" has opened successfully");
-		}
-		init();
-	}*/
 
 	/**
 	 * Returns the byte offset of the stream.

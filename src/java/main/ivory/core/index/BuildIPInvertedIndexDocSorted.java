@@ -22,6 +22,7 @@ import ivory.core.data.document.IntDocVector;
 import ivory.core.data.document.IntDocVector.Reader;
 import ivory.core.data.index.PostingsList;
 import ivory.core.data.index.PostingsListDocSortedPositional;
+import ivory.core.data.index.TermPositions;
 
 import java.io.IOException;
 import java.util.Iterator;

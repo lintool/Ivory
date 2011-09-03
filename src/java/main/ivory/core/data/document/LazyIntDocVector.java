@@ -19,7 +19,7 @@ package ivory.core.data.document;
 import ivory.core.compression.BitInputStream;
 import ivory.core.compression.BitOutputStream;
 import ivory.core.data.dictionary.DefaultCachedFrequencySortedDictionary;
-import ivory.core.index.TermPositions;
+import ivory.core.data.index.TermPositions;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

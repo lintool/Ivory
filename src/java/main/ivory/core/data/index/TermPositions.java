@@ -14,7 +14,7 @@
  * permissions and limitations under the License.
  */
 
-package ivory.core.index;
+package ivory.core.data.index;
 
 import ivory.core.compression.BitInputStream;
 import ivory.core.compression.BitOutputStream;
@@ -29,12 +29,13 @@ import java.io.IOException;
 
 import org.apache.hadoop.io.Writable;
 
+import com.google.common.base.Preconditions;
 
 /**
  * <p>
- * A Hadoop {@code Writable} that encodes the position of term occurrences within a document.
- * Term occurrences are represented as an array of ints, where each int represents a term position.
- * These objects serve as intermediate values in building document-sorted inverted indexes.
+ * A Hadoop {@code Writable} that encodes the position of term occurrences within a document. Term
+ * occurrences are represented as an array of ints, where each int represents a term position. These
+ * objects serve as intermediate values in building document-sorted inverted indexes.
  * </p>
  *
  * <p>
@@ -57,30 +58,33 @@ public class TermPositions implements Writable {
   /**
    * Creates an empty {@code TermPositions} object.
    */
-  public TermPositions() {
-  }
+  public TermPositions() {}
 
   /**
-   * Creates a {@code TermPositions} object with initial parameters.
-   * Note that the length of the term positions array does not need to be the
-   * term frequency; this supports reusing arrays of mismatching sizes.
+   * Creates a {@code TermPositions} object with initial parameters. Note that the length of the
+   * term positions array does not need to be the term frequency; this supports reusing arrays of
+   * mismatching sizes.
+   *
    * @param pos array of term positions
    * @param tf the term frequency
    */
   public TermPositions(int[] pos, short tf) {
-    this.positions = pos;
+    Preconditions.checkArgument(tf > 0);
+    this.positions = Preconditions.checkNotNull(pos);
     this.tf = tf;
   }
 
   /**
-   * Sets the term positions and term frequency of this object. Note that the
-   * length of the term positions array does not need to be the term
-   * frequency; this supports reusing arrays of mismatching sizes.
+   * Sets the term positions and term frequency of this object. Note that the length of the term
+   * positions array does not need to be the term frequency; this supports reusing arrays of
+   * mismatching sizes.
+   *
    * @param pos array of term positions
    * @param tf the term frequency
    */
   public void set(int[] pos, short tf) {
-    this.positions = pos;
+    Preconditions.checkArgument(tf > 0);
+    this.positions = Preconditions.checkNotNull(pos);
     this.tf = tf;
     // Reset so we will recompute encoded size.
     totalBits = 0;
@@ -88,6 +92,8 @@ public class TermPositions implements Writable {
 
   /**
    * Deserializes this object.
+   *
+   * @param in data source
    */
   @Override
   public void readFields(DataInput in) throws IOException {
@@ -112,6 +118,8 @@ public class TermPositions implements Writable {
 
   /**
    * Serializes this object.
+   *
+   * @param out where to write the serialized representation
    */
   @Override
   public void write(DataOutput out) throws IOException {
@@ -143,8 +151,9 @@ public class TermPositions implements Writable {
   }
 
   /**
-   * Serializes this object and returns the raw serialized form in a byte
-   * array.
+   * Serializes this object and returns the raw serialized form in a byte array.
+   *
+   * @return raw serialized representation
    */
   public byte[] serialize() throws IOException {
     ByteArrayOutputStream bytesOut = new ByteArrayOutputStream();
@@ -156,6 +165,7 @@ public class TermPositions implements Writable {
 
   /**
    * Factory method for creating {@code TermPositions} objects.
+   *
    * @param in source to read from
    * @return newly created {@code TermPositions} object
    * @throws IOException
@@ -169,6 +179,7 @@ public class TermPositions implements Writable {
 
   /**
    * Factory method for creating {@code TermPositions} objects.
+   *
    * @param bytes raw serialized form
    * @return newly created {@code TermPositions} object
    * @throws IOException
@@ -179,6 +190,8 @@ public class TermPositions implements Writable {
 
   /**
    * Returns the array of term positions.
+   * 
+   * @return array of term positions
    */
   public int[] getPositions() {
     return positions;
@@ -186,6 +199,8 @@ public class TermPositions implements Writable {
 
   /**
    * Returns the term frequency.
+   * 
+   * @return term frequency
    */
   public short getTf() {
     return tf;
@@ -193,12 +208,13 @@ public class TermPositions implements Writable {
 
   /**
    * Returns the size (in bits) of serialized form of this object.
+   *
+   * @return size in bits of the serialized object
    */
   public int getEncodedSize() {
-    // If this is a newly created object, then we haven't computed the
-    // encoded size yet, since this is done as part of the deserialization
-    // process... if this is the case, then run through a mock encoding to
-    // compute the encoded size.
+    // If this is a newly created object, then we haven't computed the encoded size yet, since this
+    // is done as part of the deserialization process... if this is the case, then run through a
+    // mock encoding to compute the encoded size.
     if (totalBits == 0) {
       try {
         ByteArrayOutputStream b = new ByteArrayOutputStream();
@@ -232,6 +248,8 @@ public class TermPositions implements Writable {
 
   /**
    * Generates a human-readable String representation of this object.
+   *
+   * @return human-readable String representation of this object
    */
   @Override
   public String toString() {
@@ -249,8 +267,9 @@ public class TermPositions implements Writable {
   }
 
   /**
-   * Returns a shallow copy of this object. Note that the underlying int array
-   * is not duplicated.
+   * Returns a shallow copy of this object. Note that the underlying int array is not duplicated.
+   *
+   * @return shallow copy of this object
    */
   @Override
   public TermPositions clone() {

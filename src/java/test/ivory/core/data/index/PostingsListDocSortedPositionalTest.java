@@ -1,5 +1,5 @@
 /*
- * Ivory: A Hadoop toolkit for Web-scale information retrieval
+ * Ivory: A Hadoop toolkit for web-scale information retrieval
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You may
@@ -21,7 +21,6 @@ import static org.junit.Assert.assertEquals;
 import ivory.core.data.index.Posting;
 import ivory.core.data.index.PostingsListDocSortedPositional;
 import ivory.core.data.index.PostingsReader;
-import ivory.core.index.TermPositions;
 
 import java.io.IOException;
 
@@ -92,7 +91,7 @@ public class PostingsListDocSortedPositionalTest {
         PostingsListDocSortedPositional.create(postings.serialize());
     postings2.setCollectionDocumentCount(30);
 
-    // verify tf and cf
+    // Verify tf and cf.
     assertEquals(3, postings2.getDf());
     assertEquals(8, postings2.getCf());
 
@@ -125,11 +124,11 @@ public class PostingsListDocSortedPositionalTest {
     assertEquals(1, posting.getScore());
     assertEquals(1, arr[0]);
 
-    // set new tf and cf
+    // Set new tf and cf.
     postings2.setDf(6);
     postings2.setCf(16);
 
-    // verify tf and cf
+    // Verify tf and cf.
     assertEquals(6, postings2.getDf());
     assertEquals(16, postings2.getCf());
 
@@ -163,7 +162,7 @@ public class PostingsListDocSortedPositionalTest {
         PostingsListDocSortedPositional.create(postings2.serialize());
     postings3.setCollectionDocumentCount(20);
 
-    // verify tf and cf
+    // Verify tf and cf.
     assertEquals(6, postings2.getDf());
     assertEquals(16, postings2.getCf());
 
@@ -196,7 +195,7 @@ public class PostingsListDocSortedPositionalTest {
 
   @Test
   public void testMerge1() throws IOException {
-    // create postings list 1
+    // Create postings list 1.
     PostingsListDocSortedPositional postings1a = new PostingsListDocSortedPositional();
     postings1a.setCollectionDocumentCount(30);
     postings1a.setNumberOfPostings(3);
@@ -210,7 +209,7 @@ public class PostingsListDocSortedPositionalTest {
 
     postings1b.setCollectionDocumentCount(30);
 
-    // create postings list 2
+    // Create postings list 2.
     PostingsListDocSortedPositional postings2a = new PostingsListDocSortedPositional();
     postings2a.setCollectionDocumentCount(30);
     postings2a.setNumberOfPostings(4);
@@ -225,7 +224,7 @@ public class PostingsListDocSortedPositionalTest {
 
     postings2b.setCollectionDocumentCount(30);
 
-    // now merge and test
+    // Now merge and test.
     Posting p = new Posting();
 
     PostingsListDocSortedPositional merged;
@@ -304,7 +303,7 @@ public class PostingsListDocSortedPositionalTest {
 
   @Test
   public void testMerge2() throws IOException {
-    // create postings list 1
+    // Create postings list 1.
     PostingsListDocSortedPositional postings1a = new PostingsListDocSortedPositional();
     postings1a.setCollectionDocumentCount(30);
     postings1a.setNumberOfPostings(1);
@@ -316,7 +315,7 @@ public class PostingsListDocSortedPositionalTest {
 
     postings1b.setCollectionDocumentCount(30);
 
-    // create postings list 2
+    // Create postings list 2.
     PostingsListDocSortedPositional postings2a = new PostingsListDocSortedPositional();
     postings2a.setCollectionDocumentCount(30);
     postings2a.setNumberOfPostings(1);
@@ -328,7 +327,7 @@ public class PostingsListDocSortedPositionalTest {
 
     postings2b.setCollectionDocumentCount(30);
 
-    // now merge and test
+    // Now merge and test.
     Posting p = new Posting();
 
     PostingsListDocSortedPositional merged;
@@ -367,7 +366,7 @@ public class PostingsListDocSortedPositionalTest {
 
   @Test
   public void testMerge3() throws IOException {
-    // create postings list 1
+    // Create postings list 1.
     PostingsListDocSortedPositional postings1a = new PostingsListDocSortedPositional();
     postings1a.setCollectionDocumentCount(30);
     postings1a.setNumberOfPostings(1);
@@ -379,7 +378,7 @@ public class PostingsListDocSortedPositionalTest {
 
     postings1b.setCollectionDocumentCount(30);
 
-    // create postings list 2
+    // Create postings list 2.
     PostingsListDocSortedPositional postings2a = new PostingsListDocSortedPositional();
     postings2a.setCollectionDocumentCount(30);
     postings2a.setNumberOfPostings(4);
@@ -394,7 +393,7 @@ public class PostingsListDocSortedPositionalTest {
 
     postings2b.setCollectionDocumentCount(30);
 
-    // now merge and test
+    // Now merge and test.
     Posting p = new Posting();
 
     PostingsListDocSortedPositional merged;
@@ -454,8 +453,6 @@ public class PostingsListDocSortedPositionalTest {
     assertEquals(25, p.getDocno());
     assertEquals(2, p.getScore());
   }
-
-  // test for not setting collection size
 
   public static junit.framework.Test suite() {
     return new JUnit4TestAdapter(PostingsListDocSortedPositionalTest.class);
