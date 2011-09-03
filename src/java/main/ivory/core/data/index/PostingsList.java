@@ -16,7 +16,6 @@
 
 package ivory.core.data.index;
 
-import ivory.core.index.TermPositions;
 
 import java.io.IOException;
 

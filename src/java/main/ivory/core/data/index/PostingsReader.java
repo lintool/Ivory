@@ -16,7 +16,6 @@
 
 package ivory.core.data.index;
 
-import ivory.core.index.TermPositions;
 
 /**
  * Interface for a postings reader.
@@ -26,6 +25,7 @@ import ivory.core.index.TermPositions;
 public interface PostingsReader {
   /**
    * Reads the next posting, consuming it from the stream of postings.
+   *
    * @param posting object for holding the posting
    * @return {@code true} if posting successfully read, {@code false} otherwise
    */
@@ -33,15 +33,17 @@ public interface PostingsReader {
 
   /**
    * Checks to see if there are any more postings to be read.
+   *
    * @return {@code true} if there are any more postings to be read, {@code false} otherwise
    */
   boolean hasMorePostings();
 
   /**
-   * Returns the number of postings in this postings list. Note that this
-   * value <i>may not</i> be the same as the document frequency of the term
-   * (e.g., if this postings list contains only a partition of the entire
-   * collection).
+   * Returns the number of postings in this postings list. Note that this value <i>may not</i> be
+   * the same as the document frequency of the term (e.g., if this postings list contains only a
+   * partition of the entire collection).
+   *
+   * @return number of postings
    */
   int getNumberOfPostings();
 
@@ -51,52 +53,62 @@ public interface PostingsReader {
   void reset();
 
   /**
-   * Returns an array of term positions corresponding to the current posting.
-   * This is an optional operation valid only for postings that store
-   * positional information.
+   * Returns an array of term positions corresponding to the current posting. This is an optional
+   * operation valid only for postings that store positional information.
+   *
+   * @return array of term positions
    */
   int[] getPositions();
 
   /**
-   * Loads a {@code TermPositions} object corresponding to the current posting.
-   * This is an optional operation valid only for postings that store
-   * positional information.
+   * Loads a {@code TermPositions} object corresponding to the current posting. This is an optional
+   * operation valid only for postings that store positional information.
    *
    * @return {code true} if there are any more postings to be read, {@code false} otherwise
    */
   boolean getPositions(TermPositions tp);
 
   /**
-   * Returns the score of the next posting, without consuming it from the
-   * stream of postings. This is an optional operation.
+   * Returns the score of the next posting, without consuming it from the stream of postings. This
+   * is an optional operation.
+   *
+   * @return score of the next posting
    */
   short peekNextScore();
 
   /**
-   * Returns the docno of the next posting, without consuming it from the
-   * stream of postings. This is an optional operation.
+   * Returns the docno of the next posting, without consuming it from the stream of postings. This
+   * is an optional operation.
+   *
+   * @return docno of the next posting 
    */
   int peekNextDocno();
 
   /**
-   * Returns the score corresponding to the current posting
+   * Returns the score corresponding to the current posting.
+   *
+   * @return score of the current posting
    */
   short getScore();
 
-  /**
-   * Returns the window size of term proximity features
-   */
-  int getWindowSize();
+//  /**
+//   * Returns the window size of term proximity feature.
+//   *
+//   * @return window size of term proximity features
+//   */
+//  int getWindowSize();
 
   /**
-   * Returns the docno corresponding to the current posting
+   * Returns the docno of the current posting.
+   *
+   * @return docno of the current posting.
    */
   int getDocno();
 
   /**
    * Returns the {@code PostingsList} associated with this reader.
+   *
+   * @return {@code PostingsList} associated with this reader
    */
   PostingsList getPostingsList();
-
-  byte[] getBytePositions();
 }

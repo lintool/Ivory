@@ -33,6 +33,7 @@ import edu.umd.cloud9.util.array.ArrayListOfInts;
 
 /**
  * @author Tamer Elsayed
+ * @author Jimmy Lin
  */
 public class DocumentProcessingUtils {
   private static final Logger LOG = Logger.getLogger(DocumentProcessingUtils.class);

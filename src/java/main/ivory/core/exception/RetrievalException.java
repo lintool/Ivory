@@ -17,13 +17,13 @@
 package ivory.core.exception;
 
 public class RetrievalException extends RuntimeException {
-	private static final long serialVersionUID = 4875722587648912695L;
-	
-	public RetrievalException(String msg) {
-		super(msg);
-	}
+  private static final long serialVersionUID = 4875722587648912695L;
 
-	public RetrievalException(String msg, Throwable cause) {
-		super(msg, cause);
-	}
+  public RetrievalException(String msg) {
+    super(msg);
+  }
+
+  public RetrievalException(String msg, Throwable cause) {
+    super(msg, cause);
+  }
 }

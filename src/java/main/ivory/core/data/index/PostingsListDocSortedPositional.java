@@ -18,7 +18,6 @@ package ivory.core.data.index;
 
 import ivory.core.compression.BitInputStream;
 import ivory.core.compression.BitOutputStream;
-import ivory.core.index.TermPositions;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -337,8 +336,8 @@ public class PostingsListDocSortedPositional implements PostingsList {
   }
 
   public static PostingsListDocSortedPositional create(byte[] bytes) throws IOException {
-    return PostingsListDocSortedPositional.create(new DataInputStream(new ByteArrayInputStream(
-        bytes)));
+    return PostingsListDocSortedPositional.create(
+        new DataInputStream(new ByteArrayInputStream(bytes)));
   }
 
   public static String positionsToString(int[] pos) {
@@ -501,11 +500,6 @@ public class PostingsListDocSortedPositional implements PostingsList {
       throw new UnsupportedOperationException();
     }
 
-    @Override
-    public int getWindowSize() {
-      return -1;
-    }
-
     private void skipPositions(int tf) throws IOException {
       if (tf == 1) {
         bitsIn.readGamma();
@@ -527,11 +521,6 @@ public class PostingsListDocSortedPositional implements PostingsList {
     @Override
     public short getScore() {
       return prevTf;
-    }
-
-    @Override
-    public byte[] getBytePositions() {
-      throw new UnsupportedOperationException();
     }
   }
 
@@ -731,7 +720,7 @@ public class PostingsListDocSortedPositional implements PostingsList {
     LOG.info("\tdone.");
   }
 
-  public static class DocList {
+  private static class DocList {
     public int id;
     public int listIndex;
 
