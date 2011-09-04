@@ -4,7 +4,7 @@ import static org.junit.Assert.assertTrue;
 import ivory.core.driver.BuildIPIndex;
 import ivory.core.driver.PreprocessClueWebEnglish;
 import ivory.core.eval.Qrels;
-import ivory.regression.basic.Robust04_Basic;
+import ivory.regression.basic.Web09catB_All;
 import ivory.smrf.retrieval.BatchQueryRunner;
 import junit.framework.JUnit4TestAdapter;
 
@@ -66,7 +66,7 @@ public class VerifyClueIndex {
 
     LOG.info("Total query time: " + (end - start) + "ms");
 
-    Robust04_Basic.verifyAllResults(qr.getModels(), qr.getAllResults(), qr.getDocnoMapping(),
+    Web09catB_All.verifyAllResults(qr.getModels(), qr.getAllResults(), qr.getDocnoMapping(),
         new Qrels("data/clue/qrels.web09catB.txt"));
 
     LOG.info("Done!");

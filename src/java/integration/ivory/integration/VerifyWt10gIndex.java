@@ -4,7 +4,7 @@ import static org.junit.Assert.assertTrue;
 import ivory.core.driver.BuildIPIndex;
 import ivory.core.driver.PreprocessWt10g;
 import ivory.core.eval.Qrels;
-import ivory.regression.basic.Robust04_Basic;
+import ivory.regression.basic.Wt10g_Basic;
 import ivory.smrf.retrieval.BatchQueryRunner;
 import junit.framework.JUnit4TestAdapter;
 
@@ -66,7 +66,7 @@ public class VerifyWt10gIndex {
 
     LOG.info("Total query time: " + (end - start) + "ms");
 
-    Robust04_Basic.verifyAllResults(qr.getModels(), qr.getAllResults(), qr.getDocnoMapping(),
+    Wt10g_Basic.verifyAllResults(qr.getModels(), qr.getAllResults(), qr.getDocnoMapping(),
         new Qrels("data/wt10g/qrels.wt10g.all"));
 
     LOG.info("Done!");
