@@ -1,5 +1,6 @@
 package ivory.lsh.eval;
-import ivory.util.RetrievalEnvironment;
+
+import ivory.core.RetrievalEnvironment;
 
 import java.io.IOException;
 
@@ -19,6 +20,7 @@ import org.apache.hadoop.mapred.SequenceFileInputFormat;
 import org.apache.hadoop.mapred.SequenceFileOutputFormat;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+
 
 import edu.umd.cloud9.io.map.HMapIFW;
 import edu.umd.cloud9.io.pair.PairOfInts;

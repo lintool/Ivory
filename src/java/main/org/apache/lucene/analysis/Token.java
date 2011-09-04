@@ -2,7 +2,7 @@
 
 package org.apache.lucene.analysis;
 
-import ivory.index.TermPositions;
+import ivory.core.data.index.TermPositions;
 
 /**
  * Licensed to the Apache Software Foundation (ASF) under one or more
@@ -167,7 +167,7 @@ public class Token implements Cloneable {
    * occur with no intervening stop words.
    *
    * </ul>
-   * @see org.apache.lucene.index.TermPositions
+   * @see ivory.core.data.index.index.TermPositions
    */
   public void setPositionIncrement(int positionIncrement) {
     if (positionIncrement < 0)

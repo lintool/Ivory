@@ -16,11 +16,12 @@
 
 package ivory.smrf.model;
 
-import ivory.exception.ConfigurationException;
+import ivory.core.exception.ConfigurationException;
 import ivory.smrf.model.potential.PotentialFunction;
 
 import java.util.Comparator;
 import java.util.List;
+
 
 import com.google.common.base.Preconditions;
 

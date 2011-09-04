@@ -16,7 +16,7 @@
 
 package ivory.smrf.retrieval;
 
-import ivory.exception.ConfigurationException;
+import ivory.core.exception.ConfigurationException;
 import ivory.smrf.model.MarkovRandomField;
 import ivory.smrf.model.builder.MRFBuilder;
 import ivory.smrf.model.expander.MRFExpander;
@@ -30,6 +30,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import org.apache.log4j.Logger;
+
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;

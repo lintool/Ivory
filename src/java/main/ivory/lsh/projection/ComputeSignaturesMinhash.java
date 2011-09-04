@@ -1,10 +1,11 @@
 package ivory.lsh.projection;
-import ivory.data.WeightedIntDocVector;
+
+import ivory.core.RetrievalEnvironment;
+import ivory.core.data.document.WeightedIntDocVector;
 import ivory.lsh.data.MinhashSignature;
 import ivory.lsh.data.Permutation;
 import ivory.lsh.data.PermutationByBit;
 import ivory.lsh.driver.PwsimEnvironment;
-import ivory.util.RetrievalEnvironment;
 
 import java.io.IOException;
 import java.net.URI;
@@ -29,6 +30,7 @@ import org.apache.hadoop.mapred.SequenceFileOutputFormat;
 import org.apache.hadoop.mapred.lib.IdentityReducer;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+
 
 import edu.umd.cloud9.io.SequenceFileUtils;
 import edu.umd.cloud9.io.array.ArrayListOfIntsWritable;

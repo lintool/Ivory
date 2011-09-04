@@ -16,12 +16,14 @@
 
 package ivory.cascade.model.potential;
 
+import ivory.core.RetrievalEnvironment;
+import ivory.core.data.index.ProximityPostingsReader;
 import ivory.smrf.model.builder.ExpressionGenerator;
 import ivory.smrf.model.potential.QueryPotential;
 import ivory.smrf.model.score.ScoringFunction;
-import ivory.util.RetrievalEnvironment;
 
 import java.util.Arrays;
+
 
 /**
  * @author Lidan Wang
@@ -127,7 +129,10 @@ public class CascadeQueryPotential extends QueryPotential {
   }
 
   public int getWindowSize(){
-    return postingsReader.getWindowSize();
+    if ( postingsReader instanceof ProximityPostingsReader) {
+      return ((ProximityPostingsReader) postingsReader).getWindowSize();
+    }
+    return -1;
   }
 
   public String getScoringFunctionName(){

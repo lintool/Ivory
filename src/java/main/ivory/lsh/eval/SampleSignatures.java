@@ -1,4 +1,5 @@
 package ivory.lsh.eval;
+
 import ivory.lsh.data.MinhashSignature;
 import ivory.lsh.data.NBitSignature;
 import ivory.lsh.data.Signature;
@@ -29,6 +30,7 @@ import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+
 
 import edu.umd.cloud9.io.FSLineReader;
 import edu.umd.cloud9.io.map.HMapIIW;

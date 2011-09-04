@@ -19,14 +19,15 @@ package ivory.smrf.model.builder;
 import java.io.IOException;
 
 import ivory.cascade.model.builder.CascadeFeatureBasedMRFBuilder;
-import ivory.exception.ConfigurationException;
-import ivory.exception.RetrievalException;
+import ivory.core.RetrievalEnvironment;
+import ivory.core.exception.ConfigurationException;
+import ivory.core.exception.RetrievalException;
+import ivory.core.util.XMLTools;
 import ivory.smrf.model.MarkovRandomField;
 import ivory.smrf.model.constrained.GreedyConstrainedMRFBuilder;
-import ivory.util.RetrievalEnvironment;
-import ivory.util.XMLTools;
 
 import org.w3c.dom.Node;
+
 
 import com.google.common.base.Preconditions;
 

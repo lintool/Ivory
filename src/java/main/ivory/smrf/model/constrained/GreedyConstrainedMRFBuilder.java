@@ -16,13 +16,13 @@
 
 package ivory.smrf.model.constrained;
 
-import ivory.exception.ConfigurationException;
-import ivory.exception.RetrievalException;
+import ivory.core.RetrievalEnvironment;
+import ivory.core.exception.ConfigurationException;
+import ivory.core.exception.RetrievalException;
+import ivory.core.util.XMLTools;
 import ivory.smrf.model.Clique;
 import ivory.smrf.model.MarkovRandomField;
 import ivory.smrf.model.importance.LinearImportanceModel;
-import ivory.util.RetrievalEnvironment;
-import ivory.util.XMLTools;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.w3c.dom.Node;
+
 
 import edu.umd.cloud9.util.map.HMapKF;
 

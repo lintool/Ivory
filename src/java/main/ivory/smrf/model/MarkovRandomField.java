@@ -16,12 +16,14 @@
 
 package ivory.smrf.model;
 
-import ivory.exception.ConfigurationException;
-import ivory.util.RetrievalEnvironment;
-import ivory.util.XMLTools;
+
+import ivory.core.RetrievalEnvironment;
+import ivory.core.exception.ConfigurationException;
+import ivory.core.util.XMLTools;
 
 import java.util.Iterator;
 import java.util.List;
+
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;

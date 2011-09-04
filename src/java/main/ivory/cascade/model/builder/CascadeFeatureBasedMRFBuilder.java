@@ -18,14 +18,14 @@ package ivory.cascade.model.builder;
 
 import ivory.cascade.model.CascadeClique;
 import ivory.cascade.model.builder.CascadeCliqueSet;
-import ivory.exception.ConfigurationException;
-import ivory.exception.RetrievalException;
+import ivory.core.RetrievalEnvironment;
+import ivory.core.exception.ConfigurationException;
+import ivory.core.exception.RetrievalException;
+import ivory.core.util.XMLTools;
 import ivory.smrf.model.builder.FeatureBasedMRFBuilder;
 import ivory.smrf.model.Clique;
 import ivory.smrf.model.MarkovRandomField;
 import ivory.smrf.model.importance.ConceptImportanceModel;
-import ivory.util.RetrievalEnvironment;
-import ivory.util.XMLTools;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -37,6 +37,7 @@ import java.lang.Integer;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;

@@ -1,8 +1,8 @@
 <parameters>
 
-     <index>/fs/clip-clueweb/indexes/clue.en.01</index>
+     <index>/scratch0/indexes/clue.en.01</index>
 
-     <docscore type="spam" provider="ivory.data.SpamPercentileScore">/fs/clip-clueweb/indexes/clue.en.01/docscores-spam.dat</docscore>
+     <docscore type="spam" provider="ivory.core.data.stat.SpamPercentileScore">/scratch0/indexes/clue.en.01/docscores-spam.dat</docscore>
      
      <model id="ql-base" type="Feature" output="ranking.web09catB.spam.ql.base.txt" hits="1000" >
          <feature id="termWt" weight="1.0" 

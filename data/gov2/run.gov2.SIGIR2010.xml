@@ -1,6 +1,6 @@
 <parameters>
 
-     <index>/fs/clip-clueweb/indexes/gov2</index>
+     <index>/scratch0/indexes/gov2</index>
 
      <!-- Concept importance model definition -->
      <importancemodel id="wsd" type="ivory.smrf.model.importance.LinearImportanceModel">

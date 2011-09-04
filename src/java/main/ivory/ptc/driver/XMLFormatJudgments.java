@@ -16,6 +16,9 @@
 
 package ivory.ptc.driver;
 
+import ivory.ptc.data.PseudoJudgments;
+import ivory.ptc.data.PseudoQuery;
+
 import java.io.IOException;
 import java.net.URI;
 import java.util.Iterator;
@@ -42,10 +45,9 @@ import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
+
 import edu.umd.cloud9.collection.clue.ClueWarcDocnoMapping;
 
-import ivory.ptc.data.PseudoJudgments;
-import ivory.ptc.data.PseudoQuery;
 
 /**
  * Driver that formats the pseudo judgments and outputs an XML file

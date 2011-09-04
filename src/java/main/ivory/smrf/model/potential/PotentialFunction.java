@@ -16,14 +16,15 @@
 
 package ivory.smrf.model.potential;
 
-import ivory.exception.ConfigurationException;
+import ivory.core.RetrievalEnvironment;
+import ivory.core.exception.ConfigurationException;
 import ivory.smrf.model.GlobalEvidence;
 import ivory.smrf.model.GraphNode;
-import ivory.util.RetrievalEnvironment;
 
 import java.util.List;
 
 import org.w3c.dom.Node;
+
 
 import com.google.common.base.Preconditions;
 

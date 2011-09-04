@@ -16,7 +16,8 @@
 
 package ivory.server;
 
-import ivory.util.XMLTools;
+
+import ivory.core.util.XMLTools;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -47,6 +48,7 @@ import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
 
 import edu.umd.cloud9.io.FSProperty;
 import edu.umd.cloud9.mapred.NullOutputFormat;

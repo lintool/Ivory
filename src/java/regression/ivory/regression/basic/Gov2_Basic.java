@@ -1,13 +1,13 @@
 package ivory.regression.basic;
 
-import ivory.eval.Qrels;
+import ivory.core.eval.Qrels;
 import ivory.regression.GroundTruth;
 import ivory.regression.GroundTruth.Metric;
 import ivory.smrf.retrieval.Accumulator;
 import ivory.smrf.retrieval.BatchQueryRunner;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import junit.framework.JUnit4TestAdapter;
 
@@ -16,11 +16,12 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.log4j.Logger;
 import org.junit.Test;
 
+import com.google.common.collect.Maps;
+
 import edu.umd.cloud9.collection.DocnoMapping;
 
 public class Gov2_Basic {
-
-	private static final Logger sLogger = Logger.getLogger(Gov2_Basic.class);
+	private static final Logger LOG = Logger.getLogger(Gov2_Basic.class);
 
 	private static String[] sDirBaseRawAP = new String[] { 
           "701", "0.1037", "702", "0.0562", "703", "0.0000", "704", "0.2736", "705", "0.2713",
@@ -408,28 +409,6 @@ public class Gov2_Basic {
 
 	@Test
 	public void runRegression() throws Exception {
-		Map<String, GroundTruth> g = new HashMap<String, GroundTruth>();
-
-		// One topic didn't contain qrels, so trec_eval only picked up 149.
-		g.put("gov2-dir-base", new GroundTruth(Metric.AP, 149, sDirBaseRawAP, 0.3077f));
-		g.put("gov2-dir-sd", new GroundTruth(Metric.AP, 149, sDirSDRawAP, 0.3239f));
-		g.put("gov2-dir-fd", new GroundTruth(Metric.AP, 149, sDirFDRawAP, 0.3235f));
-		g.put("gov2-bm25-base", new GroundTruth(Metric.AP, 149, sBm25BaseRawAP, 0.2999f));
-		g.put("gov2-bm25-sd", new GroundTruth(Metric.AP, 149, sBm25SDRawAP, 0.3294f));
-		g.put("gov2-bm25-fd", new GroundTruth(Metric.AP, 149, sBm25FDRawAP, 0.3306f));
-
-		Map<String, GroundTruth> h = new HashMap<String, GroundTruth>();
-
-		// One topic didn't contain qrels, so trec_eval only picked up 149.
-		h.put("gov2-dir-base", new GroundTruth(Metric.P10, 149, sDirBaseRawP10, 0.5631f));
-		h.put("gov2-dir-sd", new GroundTruth(Metric.P10, 149, sDirSDRawP10, 0.6007f));
-		h.put("gov2-dir-fd", new GroundTruth(Metric.P10, 149, sDirFDRawP10, 0.5980f));
-		h.put("gov2-bm25-base", new GroundTruth(Metric.P10, 149, sBm25BaseRawP10, 0.5846f));
-		h.put("gov2-bm25-sd", new GroundTruth(Metric.P10, 149, sBm25SDRawP10, 0.6081f));
-		h.put("gov2-bm25-fd", new GroundTruth(Metric.P10, 149, sBm25FDRawP10, 0.6168f));
-
-		Qrels qrels = new Qrels("data/gov2/qrels.gov2.all");
-
     String[] params = new String[] {
             "data/gov2/run.gov2.basic.xml",
             "data/gov2/gov2.title.701-775",
@@ -443,18 +422,41 @@ public class Gov2_Basic {
 		qr.runQueries();
 		long end = System.currentTimeMillis();
 
-		sLogger.info("Total query time: " + (end - start) + "ms");
+		LOG.info("Total query time: " + (end - start) + "ms");
 
-		DocnoMapping mapping = qr.getDocnoMapping();
+    verifyAllResults(qr.getModels(), qr.getAllResults(), qr.getDocnoMapping(),
+        new Qrels("data/gov2/qrels.gov2.all"));
+	}
 
-		for (String model : qr.getModels()) {
-			sLogger.info("Verifying results of model \"" + model + "\"");
+  public static void verifyAllResults(Set<String> models,
+      Map<String, Map<String, Accumulator[]>> results, DocnoMapping mapping, Qrels qrels) {
 
-			Map<String, Accumulator[]> results = qr.getResults(model);
-			g.get(model).verify(results, mapping, qrels);
-			h.get(model).verify(results, mapping, qrels);
+    Map<String, GroundTruth> g = Maps.newHashMap();
+    // One topic didn't contain qrels, so trec_eval only picked up 149.
+    g.put("gov2-dir-base", new GroundTruth(Metric.AP, 149, sDirBaseRawAP, 0.3077f));
+    g.put("gov2-dir-sd", new GroundTruth(Metric.AP, 149, sDirSDRawAP, 0.3239f));
+    g.put("gov2-dir-fd", new GroundTruth(Metric.AP, 149, sDirFDRawAP, 0.3235f));
+    g.put("gov2-bm25-base", new GroundTruth(Metric.AP, 149, sBm25BaseRawAP, 0.2999f));
+    g.put("gov2-bm25-sd", new GroundTruth(Metric.AP, 149, sBm25SDRawAP, 0.3294f));
+    g.put("gov2-bm25-fd", new GroundTruth(Metric.AP, 149, sBm25FDRawAP, 0.3306f));
 
-			sLogger.info("Done!");
+    Map<String, GroundTruth> h = Maps.newHashMap();
+    // One topic didn't contain qrels, so trec_eval only picked up 149.
+    h.put("gov2-dir-base", new GroundTruth(Metric.P10, 149, sDirBaseRawP10, 0.5631f));
+    h.put("gov2-dir-sd", new GroundTruth(Metric.P10, 149, sDirSDRawP10, 0.6007f));
+    h.put("gov2-dir-fd", new GroundTruth(Metric.P10, 149, sDirFDRawP10, 0.5980f));
+    h.put("gov2-bm25-base", new GroundTruth(Metric.P10, 149, sBm25BaseRawP10, 0.5846f));
+    h.put("gov2-bm25-sd", new GroundTruth(Metric.P10, 149, sBm25SDRawP10, 0.6081f));
+    h.put("gov2-bm25-fd", new GroundTruth(Metric.P10, 149, sBm25FDRawP10, 0.6168f));
+
+		for (String model : models) {
+			LOG.info("Verifying results of model \"" + model + "\"");
+
+			Map<String, Accumulator[]> r = results.get(model);
+			g.get(model).verify(r, mapping, qrels);
+			h.get(model).verify(r, mapping, qrels);
+
+			LOG.info("Done!");
 		}
 	}
 

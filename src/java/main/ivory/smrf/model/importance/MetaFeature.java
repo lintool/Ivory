@@ -1,5 +1,5 @@
 /*
- * Ivory: A Hadoop toolkit for Web-scale information retrieval
+ * Ivory: A Hadoop toolkit for web-scale information retrieval
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You may
@@ -17,28 +17,28 @@
 package ivory.smrf.model.importance;
 
 public class MetaFeature {
-	private String name;
-	private float weight;
+  private String name;
+  private float weight;
 
-	public MetaFeature(String name, float weight) {
-		this.name = name;
-		this.weight = weight;
-	}
+  public MetaFeature(String name, float weight) {
+    this.name = name;
+    this.weight = weight;
+  }
 
-	public void setWeight(float weight) {
-		this.weight = weight;
-	}
+  public void setWeight(float weight) {
+    this.weight = weight;
+  }
 
-	public float getWeight() {
-		return weight;
-	}
+  public float getWeight() {
+    return weight;
+  }
 
-	public String getName() {
-		return name;
-	}
+  public String getName() {
+    return name;
+  }
 
-	@Override
-	public String toString() {
-		return "[" + name + ": " + weight + "]";
-	}
+  @Override
+  public String toString() {
+    return "[" + name + ": " + weight + "]";
+  }
 }

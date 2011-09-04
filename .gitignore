@@ -7,5 +7,4 @@ etc/junit.sh
 etc/run.sh
 ivy/ivy.jar
 lib/
-test/
 ranking.*

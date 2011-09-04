@@ -1,9 +1,10 @@
 package ivory.lsh.projection;
+
+import ivory.core.RetrievalEnvironment;
+import ivory.core.data.document.WeightedIntDocVector;
 import ivory.lsh.data.FloatAsBytesWritable;
 import ivory.lsh.data.NBitSignature;
 import ivory.lsh.driver.PwsimEnvironment;
-import ivory.util.RetrievalEnvironment;
-import ivory.data.WeightedIntDocVector;
 
 import java.io.IOException;
 import java.net.URI;
@@ -29,6 +30,7 @@ import org.apache.hadoop.mapred.SequenceFileOutputFormat;
 import org.apache.hadoop.mapred.lib.IdentityReducer;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+
 
 import edu.umd.cloud9.io.array.ArrayListOfFloatsWritable;
 import edu.umd.cloud9.io.map.HMapIFW;

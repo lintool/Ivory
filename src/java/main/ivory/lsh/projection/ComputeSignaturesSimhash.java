@@ -1,7 +1,8 @@
 package ivory.lsh.projection;
+
+import ivory.core.RetrievalEnvironment;
 import ivory.lsh.data.SixtyFourBitSignature;
 import ivory.lsh.driver.PwsimEnvironment;
-import ivory.util.RetrievalEnvironment;
 
 import java.io.IOException;
 
@@ -22,6 +23,7 @@ import org.apache.hadoop.mapred.SequenceFileOutputFormat;
 import org.apache.hadoop.mapred.lib.IdentityReducer;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+
 
 import edu.umd.cloud9.io.map.HMapSFW;
 import edu.umd.cloud9.util.PowerTool;

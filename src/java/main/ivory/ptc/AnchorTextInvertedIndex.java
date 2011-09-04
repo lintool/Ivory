@@ -16,6 +16,9 @@
 
 package ivory.ptc;
 
+import ivory.ptc.data.AnchorTextTarget;
+import ivory.ptc.judgments.weighting.WeightingScheme;
+
 import java.io.IOException;
 import java.net.URI;
 import java.util.Collections;
@@ -41,13 +44,12 @@ import org.apache.hadoop.mapred.SequenceFileOutputFormat;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
+
 import edu.umd.cloud9.util.PowerTool;
 import edu.umd.cloud9.webgraph.data.AnchorText;
 import edu.umd.cloud9.io.array.ArrayListOfIntsWritable;
 import edu.umd.cloud9.io.array.ArrayListWritable;
 
-import ivory.ptc.data.AnchorTextTarget;
-import ivory.ptc.judgments.weighting.WeightingScheme;
 
 /**
  * Map-Reduce job that constructs anchor text-inverted index.

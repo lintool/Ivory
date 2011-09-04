@@ -37,6 +37,7 @@ import org.apache.hadoop.mapred.SequenceFileOutputFormat;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
+
 import edu.umd.cloud9.io.array.ArrayListWritable;
 import edu.umd.cloud9.util.PowerTool;
 

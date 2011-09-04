@@ -1,6 +1,6 @@
 package ivory.regression.basic;
 
-import ivory.eval.Qrels;
+import ivory.core.eval.Qrels;
 import ivory.regression.GroundTruth;
 import ivory.regression.GroundTruth.Metric;
 import ivory.smrf.retrieval.Accumulator;
@@ -15,6 +15,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.log4j.Logger;
 import org.junit.Test;
+
 
 import edu.umd.cloud9.collection.DocnoMapping;
 

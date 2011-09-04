@@ -16,11 +16,12 @@
 
 package ivory.smrf.model.score;
 
+import ivory.core.util.XMLTools;
 import ivory.smrf.model.GlobalEvidence;
 import ivory.smrf.model.GlobalTermEvidence;
-import ivory.util.XMLTools;
 
 import org.w3c.dom.Node;
+
 
 /**
  * Computes score based on F2EXP.

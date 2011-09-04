@@ -16,19 +16,20 @@
 
 package ivory.smrf.model.builder;
 
-import ivory.exception.ConfigurationException;
-import ivory.exception.RetrievalException;
+import ivory.core.RetrievalEnvironment;
+import ivory.core.exception.ConfigurationException;
+import ivory.core.exception.RetrievalException;
+import ivory.core.util.XMLTools;
 import ivory.smrf.model.Clique;
 import ivory.smrf.model.MarkovRandomField;
 import ivory.smrf.model.importance.ConceptImportanceModel;
-import ivory.util.RetrievalEnvironment;
-import ivory.util.XMLTools;
 
 import java.util.List;
 import java.util.Set;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;

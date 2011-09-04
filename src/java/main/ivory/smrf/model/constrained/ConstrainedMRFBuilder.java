@@ -16,13 +16,14 @@
  
 package ivory.smrf.model.constrained;
 
-import ivory.exception.ConfigurationException;
+import ivory.core.RetrievalEnvironment;
+import ivory.core.exception.ConfigurationException;
 import ivory.smrf.model.MarkovRandomField;
 import ivory.smrf.model.builder.MRFBuilder;
-import ivory.util.RetrievalEnvironment;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
 
 /**
  * @author Don Metzler

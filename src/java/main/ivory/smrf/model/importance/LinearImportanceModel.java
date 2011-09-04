@@ -16,10 +16,10 @@
 
 package ivory.smrf.model.importance;
 
-import ivory.exception.ConfigurationException;
-import ivory.exception.RetrievalException;
+import ivory.core.exception.ConfigurationException;
+import ivory.core.exception.RetrievalException;
+import ivory.core.util.XMLTools;
 import ivory.smrf.model.Clique;
-import ivory.util.XMLTools;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -32,6 +32,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;

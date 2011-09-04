@@ -17,8 +17,9 @@
 package ivory.cascade.retrieval;
 
 import ivory.cascade.model.CascadeClique;
-import ivory.exception.ConfigurationException;
-import ivory.exception.RetrievalException;
+import ivory.core.RetrievalEnvironment;
+import ivory.core.exception.ConfigurationException;
+import ivory.core.exception.RetrievalException;
 import ivory.smrf.model.Clique;
 import ivory.smrf.model.DocumentNode;
 import ivory.smrf.model.GlobalTermEvidence;
@@ -26,7 +27,6 @@ import ivory.smrf.model.GraphNode;
 import ivory.smrf.model.MarkovRandomField;
 import ivory.smrf.model.score.ScoringFunction;
 import ivory.smrf.retrieval.Accumulator;
-import ivory.util.RetrievalEnvironment;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,6 +39,7 @@ import java.util.PriorityQueue;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;

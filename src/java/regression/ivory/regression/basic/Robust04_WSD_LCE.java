@@ -2,8 +2,8 @@ package ivory.regression.basic;
 
 import static ivory.regression.RegressionUtils.loadScoresIntoMap;
 import static org.junit.Assert.assertEquals;
-import ivory.eval.Qrels;
-import ivory.eval.RankedListEvaluator;
+import ivory.core.eval.Qrels;
+import ivory.core.eval.RankedListEvaluator;
 import ivory.smrf.retrieval.Accumulator;
 import ivory.smrf.retrieval.BatchQueryRunner;
 
@@ -16,6 +16,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.log4j.Logger;
 import org.junit.Test;
+
 
 import edu.umd.cloud9.collection.DocnoMapping;
 

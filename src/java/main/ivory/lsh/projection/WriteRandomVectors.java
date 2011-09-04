@@ -1,8 +1,9 @@
 package ivory.lsh.projection;
 
+
+import ivory.core.RetrievalEnvironment;
 import ivory.lsh.data.FloatAsBytesWritable;
 import ivory.lsh.driver.PwsimEnvironment;
-import ivory.util.RetrievalEnvironment;
 
 import java.io.IOException;
 import java.util.Iterator;
@@ -24,6 +25,7 @@ import org.apache.hadoop.mapred.Reporter;
 import org.apache.hadoop.mapred.SequenceFileInputFormat;
 import org.apache.hadoop.mapred.SequenceFileOutputFormat;
 import org.apache.log4j.Logger;
+
 
 import edu.umd.cloud9.io.array.ArrayListOfFloatsWritable;
 import edu.umd.cloud9.util.PowerTool;

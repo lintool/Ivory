@@ -16,13 +16,13 @@
 
 package ivory.smrf.retrieval;
 
-import ivory.exception.ConfigurationException;
+import ivory.core.RetrievalEnvironment;
+import ivory.core.exception.ConfigurationException;
+import ivory.core.util.ResultWriter;
+import ivory.core.util.XMLTools;
 import ivory.smrf.model.builder.MRFBuilder;
 import ivory.smrf.model.expander.MRFExpander;
 import ivory.smrf.model.importance.ConceptImportanceModel;
-import ivory.util.ResultWriter;
-import ivory.util.RetrievalEnvironment;
-import ivory.util.XMLTools;
 
 import java.io.IOException;
 import java.util.Map;
@@ -38,6 +38,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
@@ -63,6 +64,11 @@ public class BatchQueryRunner {
 	protected final Set<String> stopwords = Sets.newHashSet();
 
 	public BatchQueryRunner(String[] args, FileSystem fs) throws ConfigurationException {
+		init(args,fs);
+	}
+
+    public BatchQueryRunner(String[] args, FileSystem fs, String indexPath) throws ConfigurationException {
+		this.indexPath = indexPath;
 		init(args,fs);
 	}
 
@@ -194,6 +200,14 @@ public class BatchQueryRunner {
 
 	public Map<String, Accumulator[]> getResults(String model) {
 		return queryRunners.get(model).getResults();
+	}
+
+	public Map<String, Map<String, Accumulator[]>> getAllResults() {
+	  Map<String, Map<String, Accumulator[]>> results = Maps.newHashMap();
+	  for ( String model : getModels()) {
+	    results.put(model, getResults(model));
+	  }
+	  return results;
 	}
 
 	public DocnoMapping getDocnoMapping() {
@@ -356,10 +370,11 @@ public class BatchQueryRunner {
 		NodeList indexList = d.getElementsByTagName("index");
 
 		if (indexList.getLength() > 0) {
-			if (indexPath != null) {
-				throw new ConfigurationException("Must specify only one index! There is no support for multiple indexes!");
-			}
+			if (indexPath == null) {
+			    //				throw new ConfigurationException("Must specify only one index! There is no support for multiple indexes!");
+			    //}
 			indexPath = indexList.item(0).getTextContent();
+			}
 		}
 	}
 

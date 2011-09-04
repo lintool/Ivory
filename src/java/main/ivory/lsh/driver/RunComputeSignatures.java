@@ -1,15 +1,17 @@
 package ivory.lsh.driver;
 
+import ivory.core.RetrievalEnvironment;
 import ivory.lsh.projection.ComputeSignaturesMinhash;
 import ivory.lsh.projection.ComputeSignaturesRandom;
 import ivory.lsh.projection.ComputeSignaturesSimhash;
 import ivory.lsh.projection.WriteRandomVectors;
-import ivory.util.RetrievalEnvironment;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Logger;
+
 
 /**
  *	A Hadoop task to compute signatures from document vectors.

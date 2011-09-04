@@ -16,13 +16,13 @@
 
 package ivory.server;
 
+import ivory.core.RetrievalEnvironment;
+import ivory.core.util.XMLTools;
 import ivory.smrf.model.builder.MRFBuilder;
 import ivory.smrf.model.importance.ConceptImportanceModel;
 import ivory.smrf.retrieval.Accumulator;
 import ivory.smrf.retrieval.QueryRunner;
 import ivory.smrf.retrieval.ThreadedQueryRunner;
-import ivory.util.RetrievalEnvironment;
-import ivory.util.XMLTools;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -44,6 +44,7 @@ import org.mortbay.jetty.servlet.ServletHolder;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
 
 import edu.umd.cloud9.collection.DocnoMapping;
 import edu.umd.cloud9.collection.DocumentForwardIndex;
@@ -228,7 +229,7 @@ public class RetrievalServer {
 				try {
 					mForwardIndex = (DocumentForwardIndex<Indexable>) Class.forName(indexClass)
 					.newInstance();
-					mForwardIndex.loadIndex(findexPath, mEnv.getDocnoMappingData().toString());
+					mForwardIndex.loadIndex(new Path(findexPath), new Path(mEnv.getDocnoMappingData().toString()), fs);
 				} catch (Exception e) {
 					e.printStackTrace();
 					throw new RuntimeException("Error initializing forward index!");

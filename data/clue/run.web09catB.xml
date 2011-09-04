@@ -1,6 +1,6 @@
 <parameters>
 
-     <index>/fs/clip-clueweb/indexes/clue.en.01</index>
+     <index>/scratch0/indexes/clue.en.01</index>
 
      <!-- bm25 -->
      <model id="UMHOO-BM25-catB" type="Feature" output="ranking.web09catB-bm25.txt" hits="1000">
