@@ -14,7 +14,7 @@
  * permissions and limitations under the License.
  */
 
-package ivory.server;
+package ivory.smrf.retrieval.distributed;
 
 import ivory.smrf.retrieval.Accumulator;
 

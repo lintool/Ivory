@@ -14,10 +14,10 @@
  * permissions and limitations under the License.
  */
 
-package ivory.smrf.retrieval;
+package ivory.smrf.retrieval.distributed;
 
-import ivory.server.HttpUtils;
-import ivory.server.RunRetrievalBroker;
+import ivory.smrf.retrieval.Accumulator;
+import ivory.smrf.retrieval.QueryRunner;
 
 import java.net.MalformedURLException;
 import java.net.URL;

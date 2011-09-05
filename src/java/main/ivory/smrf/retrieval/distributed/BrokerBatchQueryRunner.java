@@ -14,11 +14,13 @@
  * permissions and limitations under the License.
  */
 
-package ivory.smrf.retrieval;
+package ivory.smrf.retrieval.distributed;
 
 
 import ivory.core.util.ResultWriter;
 import ivory.core.util.XMLTools;
+import ivory.smrf.retrieval.Accumulator;
+import ivory.smrf.retrieval.QueryRunner;
 
 import java.io.IOException;
 import java.rmi.NotBoundException;
