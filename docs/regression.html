@@ -98,6 +98,9 @@ work.</p>
   <li>Experiments from Wang et al.'s <a href="#cikm2010">CIKM 2010 
   paper</a>: temporally constrained linear models on Wt10g, Gov2, and Clue</li>
 
+  <li>Experiments from Wang et al.'s <a href="#sigir2011">SIGIR 2011
+  paper</a>: cascade model on Wt10g, Gov2, and Clue</li>
+
 </ul>
 
 </div></div>
@@ -138,7 +141,7 @@ etc/junit.sh ivory.regression.basic.Robust04_Basic
 <tr><td class="mycell">Dirichlet, sequential dependence</td>
     <td class="mycell">robust04-dir-sd</td>
     <td class="mycell">0.3194</td>
-    <td class="mycell"> 0.4485</td></tr>
+    <td class="mycell">0.4485</td></tr>
 
 <tr><td class="mycell">Dirichlet, full dependence</td>
     <td class="mycell">robust04-dir-fd</td>
@@ -200,8 +203,7 @@ etc/junit.sh ivory.regression.basic.Robust04_WSD
 <p><b>Basic + LCE models</b></p>
 
 <p>LCE refers to Metzler et al's Latent Concept Expansion model (SIGIR
-2007).  These models take a long time to run (approximately 1.5 hours
-on our production machine).</p>
+2007).</p>
 
 <pre>
 # command-line
@@ -589,7 +591,7 @@ etc/junit.sh ivory.regression.basic.Web09catB_All_Spam
 
 <p>These regression runs represent experiments presented in:</p>
 
-<p style="padding-left: 30px">Lidan Wang, Jimmy Lin, and Donald Metzler. <b><a href="publications/Wang_etal_SIGIR2010.pdf">Learning to Efficiently Rank.</a></b> <i>Proceedings of the 33rd Annual International ACM SIGIR Conference on Research and Development in Information Retrieval (SIGIR 2010)</i>, July 2010, Geneva, Switzerland.</p>
+<p style="padding-left: 30px">Lidan Wang, Jimmy Lin, and Donald Metzler. <b><a href="publications/Wang_etal_SIGIR2010.pdf">Learning to Efficiently Rank.</a></b> <i>Proceedings of the 33rd Annual International ACM SIGIR Conference on Research and Development in Information Retrieval (SIGIR 2010)</i>, pages 138-145, July 2010, Geneva, Switzerland.</p>
 
 <p>Note that Bendersky et al.'s WSD model (WSDM 2010) is a special
 case of the ESD model (without any time constraints).  These runs
@@ -629,7 +631,7 @@ etc/junit.sh ivory.regression.sigir2010.Wt10g_ESD
 
 <tr><td class="mycell">Dirichlet, ESD, no time constraints (=WSD)</td>
     <td class="mycell">wt10g-wsd-sd</td>
-    <td class="mycell"> 0.2411</td>
+    <td class="mycell">0.2411</td>
     <td class="mycell">0.3820</td></tr>
 
 </table>
@@ -668,7 +670,7 @@ etc/junit.sh ivory.regression.sigir2010.Gov2_ESD
 
 <tr><td class="mycell">Dirichlet, ESD, no time constraints (=WSD)</td>
     <td class="mycell">gov2-wsd-sd</td>
-    <td class="mycell"> 0.3435</td>
+    <td class="mycell">0.3435</td>
     <td class="mycell">0.5827</td></tr>
 
 </table>
@@ -727,7 +729,7 @@ etc/junit.sh ivory.regression.sigir2010.Clue_ESD
 <div class="content">
 
 <p>These regression runs represent experiments presented in:</p>
-<p style="padding-left: 30px">Lidan Wang, Donald Metzler, and Jimmy Lin. <b><a href="publications/Wang_etal_CIKM2010.pdf">Ranking under Temporal Constraints.</a></b> <i>Proceedings of 19th International Conference on Information and Knowledge Management (CIKM 2010)</i>, October 2010, Toronto, Canada.</p>
+<p style="padding-left: 30px">Lidan Wang, Donald Metzler, and Jimmy Lin. <b><a href="publications/Wang_etal_CIKM2010.pdf">Ranking under Temporal Constraints.</a></b> <i>Proceedings of 19th International Conference on Information and Knowledge Management (CIKM 2010)</i>, pages 79-88, October 2010, Toronto, Canada.</p>
 
 
 <p><b>Wt10g results</b></p>
@@ -736,13 +738,10 @@ etc/junit.sh ivory.regression.sigir2010.Clue_ESD
 # command-line
 etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/wt10g/run.wt10g.CIKM2010.title.indep.xml \
   data/wt10g/wt10g_queries_501-550.xml
-
 etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/wt10g/run.wt10g.CIKM2010.title.joint.xml \
   data/wt10g/wt10g_queries_501-550.xml
-
 etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/wt10g/run.wt10g.CIKM2010.desc.indep.xml \
   data/wt10g/wt10g_queries_501-550_desc.xml
-
 etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/wt10g/run.wt10g.CIKM2010.desc.joint.xml \
   data/wt10g/wt10g_queries_501-550_desc.xml
  
@@ -850,13 +849,10 @@ etc/junit.sh ivory.regression.cikm2010.Wt10g_Desc_Joint
 # command-line
 etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/gov2/run.gov2.CIKM2010.title.indep.xml \
   data/gov2/gov2.title.776-850
-
 etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/gov2/run.gov2.CIKM2010.title.joint.xml \
   data/gov2/gov2.title.776-850
-
 etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/gov2/run.gov2.CIKM2010.desc.indep.xml \
   data/gov2/gov2.desc.776-850
-
 etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/gov2/run.gov2.CIKM2010.desc.joint.xml \
   data/gov2/gov2.desc.776-850
 
@@ -965,13 +961,10 @@ etc/junit.sh ivory.regression.cikm2010.Gov2_Desc_Joint
 # command-line
 etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/clue/run.clue.CIKM2010.title.indep.xml \
   data/clue/queries.web09.26-50.xml
-
 etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/clue/run.clue.CIKM2010.title.joint.xml \
   data/clue/queries.web09.26-50.xml
-
 etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/clue/run.clue.CIKM2010.desc.indep.xml \
   data/clue/queries.web09.26-50.desc.xml
-
 etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/clue/run.clue.CIKM2010.desc.joint.xml \
   data/clue/queries.web09.26-50.desc.xml
 
@@ -1078,6 +1071,199 @@ etc/junit.sh ivory.regression.cikm2010.Web09catB_Desc_Joint
 values, not standard MAP values reported in the table above.)</p>
 
 <p style="padding-top: 25px"><a href="./index.html">Back to main page</a></p>
+
+</div></div>
+
+<div class="post">
+<h2><a style="text-decoration:none; color:#555;" id="sigir2011">Results from SIGIR 2011</a></h2>
+<div class="content">
+
+<p>These regression runs represent experiments presented in:</p>
+
+<p style="padding-left: 30px">Lidan Wang, Jimmy Lin, and Donald Metzler. <b><a href="publications/Wang_etal_SIGIR2011.pdf">A Cascade Ranking Model for Efficient Ranked Retrieval.</a></b> <i>Proceedings of the 34th Annual International ACM SIGIR Conference on Research and Development in Information Retrieval (SIGIR 2011)</i>, page 105-114, July 2011, Beijing, China.</p>
+
+<p><b>Wt10g results</b></p>
+
+<p>Main results in Table 2:</p>
+
+<pre>
+# command-line
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/wt10g/run.wt10g.SIGIR2011.xml \
+  data/wt10g/queries.wt10g.501-550.xml
+
+# evaluating effectiveness
+trec_eval data/wt10g/qrels.wt10g.all ranking.SIGIR2011-Wt10g-QL.txt
+trec_eval data/wt10g/qrels.wt10g.all ranking.SIGIR2011-Wt10g-AdaRank.txt
+trec_eval data/wt10g/qrels.wt10g.all ranking.SIGIR2011-Wt10g-FeaturePrune.txt
+trec_eval data/wt10g/qrels.wt10g.all ranking.SIGIR2011-Wt10g-Cascade.txt
+
+# junit
+etc/junit.sh ivory.regression.sigir2011.Wt10g_Cascade
+</pre>
+
+<table>
+<tr><td class="myheader" style="width: 300px;"><b>description</b></td>
+    <td class="myheader" style="width: 300px;"><b>tag</b></td>
+    <td class="myheader"><b>NDCG20</b></td>
+    <td class="myheader"><b>P20</b></td></tr>
+
+<tr><td class="mycell">Baseline query-likelihood (Dirichlet scoring)</td>
+    <td class="mycell">Wt10g-QL</td>
+    <td class="mycell">0.3407</td>
+    <td class="mycell">0.3240</td></tr>
+
+<tr><td class="mycell">AdaRank</td>
+    <td class="mycell">Wt10g-AdaRank</td>
+    <td class="mycell">0.3549</td>
+    <td class="mycell">0.3350</td></tr>
+
+<tr><td class="mycell">Feature pruning (SIGIR 2010)</td>
+    <td class="mycell">Wt10g-FeaturePrune</td>
+    <td class="mycell">0.3486</td>
+    <td class="mycell">0.3310</td></tr>
+
+<tr><td class="mycell">Cascade</td>
+    <td class="mycell">Wt10g-Cascade</td>
+    <td class="mycell">0.3560</td>
+    <td class="mycell">0.3380</td></tr>
+
+</table>
+
+<p>Results in Figure 3:</p>
+
+<pre>
+# command-line
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/wt10g/run.wt10g.SIGIR2011.varying.tradeoff.featureprune.xml \
+  data/wt10g/queries.wt10g.501-550.xml
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/wt10g/run.wt10g.SIGIR2011.varying.tradeoff.cascade.xml \
+  data/wt10g/queries.wt10g.501-550.xml
+
+# junit
+etc/junit.sh ivory.regression.sigir2011.Wt10g_VaryingTradeoff_FeaturePrune
+etc/junit.sh ivory.regression.sigir2011.Wt10g_VaryingTradeoff_Cascade
+</pre>
+
+<p><b>Gov2 results</b></p>
+
+<p>Main results in Table 2:</p>
+
+<pre>
+# command-line
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/gov2/run.gov2.SIGIR2011.xml \
+  data/gov2/gov2.title.776-850
+
+# evaluating effectiveness
+trec_eval data/gov2/qrels.gov2.all ranking.SIGIR2011-Gov2-QL.txt
+trec_eval data/gov2/qrels.gov2.all ranking.SIGIR2011-Gov2-AdaRank.txt
+trec_eval data/gov2/qrels.gov2.all ranking.SIGIR2011-Gov2-FeaturePrune.txt
+trec_eval data/gov2/qrels.gov2.all ranking.SIGIR2011-Gov2-Cascade.txt
+
+# junit
+etc/junit.sh ivory.regression.sigir2011.Gov2_Cascade
+</pre>
+
+<table>
+<tr><td class="myheader" style="width: 300px;"><b>description</b></td>
+    <td class="myheader" style="width: 300px;"><b>tag</b></td>
+    <td class="myheader"><b>NDCG</b></td>
+    <td class="myheader"><b>P20</b></td></tr>
+
+<tr><td class="mycell">Baseline query-likelihood (Dirichlet scoring)</td>
+    <td class="mycell">Gov2-QL</td>
+    <td class="mycell">0.4457</td>
+    <td class="mycell">0.5093</td></tr>
+
+<tr><td class="mycell">AdaRank</td>
+    <td class="mycell">Gov2-AdaRank</td>
+    <td class="mycell">0.4737</td>
+    <td class="mycell">0.5360</td></tr>
+
+<tr><td class="mycell">Feature pruning (SIGIR 2010)</td>
+    <td class="mycell">Gov2-FeaturePrune</td>
+    <td class="mycell">0.4716</td>
+    <td class="mycell">0.5187</td></tr>
+
+<tr><td class="mycell">Cascade</td>
+    <td class="mycell">Gov2-Cascade</td>
+    <td class="mycell">0.4744</td>
+    <td class="mycell">0.5447</td></tr>
+
+</table>
+
+<p>Results in Figure 3:</p>
+
+<pre>
+# command-line
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/gov2/run.gov2.SIGIR2011.varying.tradeoff.featureprune.xml \
+  data/gov2/gov2.title.776-850
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/gov2/run.gov2.SIGIR2011.varying.tradeoff.cascade.xml \
+  data/gov2/gov2.title.776-850
+
+# junit
+etc/junit.sh ivory.regression.sigir2011.Gov2_VaryingTradeoff_FeaturePrune
+etc/junit.sh ivory.regression.sigir2011.Gov2_VaryingTradeoff_Cascade
+</pre>
+
+<p><b>Web09 category B results (i.e. Clue)</b></p>
+
+<p>Main results in Table 2:</p>
+
+<pre>
+# command-line
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/clue/run.clue.SIGIR2011.xml \
+  data/clue/queries.web09.26-50.xml
+
+# evaluating effectiveness
+trec_eval data/clue/qrels.web09catB.txt ranking.SIGIR2011-Clue-QL.txt
+trec_eval data/clue/qrels.web09catB.txt ranking.SIGIR2011-Clue-AdaRank.txt
+trec_eval data/clue/qrels.web09catB.txt ranking.SIGIR2011-Clue-FeaturePrune.txt
+trec_eval data/clue/qrels.web09catB.txt ranking.SIGIR2011-Clue-Cascade.txt
+
+# junit
+etc/junit.sh ivory.regression.sigir2011.Clue_Cascade
+</pre>
+
+<table>
+<tr><td class="myheader" style="width: 300px;"><b>description</b></td>
+    <td class="myheader" style="width: 300px;"><b>tag</b></td>
+    <td class="myheader"><b>NDCG</b></td>
+    <td class="myheader"><b>P20</b></td></tr>
+
+<tr><td class="mycell">Baseline query-likelihood (Dirichlet scoring)</td>
+    <td class="mycell">Clue-QL</td>
+    <td class="mycell">0.2750</td>
+    <td class="mycell">0.3420</td></tr>
+
+<tr><td class="mycell">AdaRank</td>
+    <td class="mycell">Clue-AdaRank</td>
+    <td class="mycell">0.3094</td>
+    <td class="mycell">0.3740</td></tr>
+
+<tr><td class="mycell">Feature pruning (SIGIR 2010)</td>
+    <td class="mycell">Clue-FeaturePrune</td>
+    <td class="mycell">0.2966</td>
+    <td class="mycell">0.3620</td></tr>
+
+<tr><td class="mycell">Cascade</td>
+    <td class="mycell">Clue-Cascade</td>
+    <td class="mycell">0.3060</td>
+    <td class="mycell">0.3740</td></tr>
+
+</table>
+
+<p>Results in Figure 3:</p>
+
+<pre>
+# command-line
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/clue/run.clue.SIGIR2011.varying.tradeoff.featureprune.xml \
+  data/clue/queries.web09.26-50.xml
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/clue/run.clue.SIGIR2011.varying.tradeoff.cascade.xml \
+  data/clue/queries.web09.26-50.xml
+
+# junit
+etc/junit.sh ivory.regression.sigir2011.Clue_VaryingTradeoff_FeaturePrune
+etc/junit.sh ivory.regression.sigir2011.Clue_VaryingTradeoff_Cascade
+</pre>
 
 </div></div>
 
