@@ -20,23 +20,22 @@ package ivory.smrf.model;
  * Object encapsulating collection-level global evidence for ranking purposes.
  *
  * @author Don Metzler
- *
  */
 public class GlobalEvidence {
-	public long numDocs;          // Number of documents in the collection.
-	public long collectionLength; // Collection length.
-	public int queryLength;       // Query length.
+  public long numDocs;          // Number of documents in the collection.
+  public long collectionLength; // Collection length.
+  public int queryLength;       // Query length.
 
-	/**
-	 * Creates a <code>GlobalEvidence</code> object.
-	 *
-	 * @param ndocs    number of documents in the collection
-	 * @param collen   collection length
-	 * @param querylen query length
-	 */
-	public GlobalEvidence(long ndocs, long collen, int querylen) {
-		this.numDocs = ndocs;
-		this.collectionLength = collen;
-		this.queryLength = querylen;
-	}
+  /**
+   * Creates a {@code GlobalEvidence} object.
+   *
+   * @param ndocs number of documents in the collection
+   * @param collen collection length
+   * @param querylen query length
+   */
+  public GlobalEvidence(long ndocs, long collen, int querylen) {
+    this.numDocs = ndocs;
+    this.collectionLength = collen;
+    this.queryLength = querylen;
+  }
 }
