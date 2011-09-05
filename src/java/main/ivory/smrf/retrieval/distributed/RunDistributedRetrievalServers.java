@@ -223,7 +223,7 @@ public class RunDistributedRetrievalServers extends Configured implements Tool {
 		out.writeBytes(sb.toString());
 		out.close();
 
-		JobConf conf = new JobConf(RetrievalServer.class);
+		JobConf conf = new JobConf(getConf(), RetrievalServer.class);
 
 		conf.setNumMapTasks(1);
 		conf.setNumReduceTasks(0);

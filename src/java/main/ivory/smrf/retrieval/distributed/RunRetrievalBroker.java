@@ -194,7 +194,7 @@ public class RunRetrievalBroker extends Configured implements Tool {
 			ids += sid;
 		}
 
-		JobConf conf = new JobConf(RunRetrievalBroker.class);
+		JobConf conf = new JobConf(getConf(), RunRetrievalBroker.class);
 		conf.setJobName("RetrievalBroker");
 
 		conf.setNumMapTasks(1);

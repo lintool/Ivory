@@ -115,7 +115,7 @@ public class RunQueryBroker extends Configured implements Tool {
 		String resultsFilePath = args[3];
 		int numHits = Integer.parseInt(args[4]);
 
-		JobConf conf = new JobConf(RunQueryBroker.class);
+		JobConf conf = new JobConf(getConf(), RunQueryBroker.class);
 		conf.setJobName("RunQueryBroker");
 
 		conf.setNumMapTasks(1);
