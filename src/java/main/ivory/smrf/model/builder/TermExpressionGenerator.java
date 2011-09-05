@@ -24,17 +24,17 @@ import com.google.common.base.Preconditions;
  * @author Don Metzler
  */
 public class TermExpressionGenerator extends ExpressionGenerator {
-	@Override
-	public void configure(Node domNode) {}
+  @Override
+  public void configure(Node domNode) {}
 
-	@Override
-	public Expression getExpression(String[] terms) {
-		Preconditions.checkNotNull(terms);
-		return new Expression(terms[0]);
-	}
+  @Override
+  public Expression getExpression(String[] terms) {
+    Preconditions.checkNotNull(terms);
+    return new Expression(terms[0]);
+  }
 
-	@Override
-	public String toString() {
-		return "<expressiongenerator type=\"Term\" />\n";
-	}
+  @Override
+  public String toString() {
+    return "<expressiongenerator type=\"Term\" />\n";
+  }
 }

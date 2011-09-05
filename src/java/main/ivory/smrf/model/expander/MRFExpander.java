@@ -319,28 +319,28 @@ public abstract class MRFExpander {
 		return entries;
 	}
 
-	public class TFDoclenStatistics {
-		private VocabFrequencyPair[] mVocab = null;
-		private Map<String, Short>[] mTfs = null;
-		private int[] mDoclens = null;
+	protected class TFDoclenStatistics {
+		private VocabFrequencyPair[] vocab = null;
+		private Map<String, Short>[] tfs = null;
+		private int[] doclengths = null;
 
 		public TFDoclenStatistics(VocabFrequencyPair[] entries, Map<String, Short>[] tfs,
-				int[] doclens) {
-			mVocab = entries;
-			mTfs = tfs;
-			mDoclens = doclens;
+				int[] doclengths) {
+			this.vocab = Preconditions.checkNotNull(entries);
+			this.tfs = Preconditions.checkNotNull(tfs);
+			this.doclengths = Preconditions.checkNotNull(doclengths);
 		}
 
 		public VocabFrequencyPair[] getVocab() {
-			return mVocab;
+			return vocab;
 		}
 
 		public Map<String, Short>[] getTfs() {
-			return mTfs;
+			return tfs;
 		}
 
 		public int[] getDoclens() {
-			return mDoclens;
+			return doclengths;
 		}
 	}
 }

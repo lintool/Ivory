@@ -31,148 +31,141 @@ import java.util.List;
 
 import org.w3c.dom.Node;
 
-
 import com.google.common.collect.Lists;
 
 /**
  * @author Don Metzler
  */
 public class CliqueFactory {
-	public static List<Clique> getSequentialDependenceCliques(RetrievalEnvironment env,
-			String[] queryTerms, Node domNode, boolean docDependent) throws ConfigurationException {
-		// Clique set.
-		List<Clique> cliques = Lists.newArrayList();
+  public static List<Clique> getSequentialDependenceCliques(RetrievalEnvironment env,
+      String[] queryTerms, Node domNode, boolean docDependent) throws ConfigurationException {
+    List<Clique> cliques = Lists.newArrayList();     // Clique set.
+    DocumentNode docNode = new DocumentNode();       // The document node.
 
-		// The document node.
-		DocumentNode docNode = new DocumentNode();
+    // If there are no terms, then return an empty MRF.
+    if (queryTerms.length == 0) {
+      return cliques;
+    }
 
-		// If there are no terms, then return an empty MRF.
-		if (queryTerms.length == 0) {
-			return cliques;
-		}
+    // Default parameter associated with CliqueSet.
+    Parameter parameter = new Parameter(Parameter.DEFAULT, 1.0f);
 
-		// Default parameter associated with CliqueSet.
-		Parameter parameter = new Parameter(Parameter.DEFAULT, 1.0f);
+    // Get potential type.
+    String potentialType = XMLTools.getAttributeValueOrThrowException(domNode, "potential",
+        "A potential attribute must be specified in order to generate a clique set!");
 
-		// Get potential type.
-		String potentialType = XMLTools.getAttributeValueOrThrowException(domNode, "potential",
-		    "A potential attribute must be specified in order to generate a clique set!");
+    // If there is more than one term, then add appropriate cliques.
+    List<GraphNode> cliqueNodes = null;
+    Clique c = null;
+    TermNode lastTermNode = null;
 
-		// If there is more than one term, then add appropriate cliques.
-		List<GraphNode> cliqueNodes = null;
-		Clique c = null;
-		TermNode lastTermNode = null;
+    for (String element : queryTerms) {
+      // Term node.
+      TermNode termNode = new TermNode(element);
 
-		for (String element : queryTerms) {
-			// Term node.
-			TermNode termNode = new TermNode(element);
+      // Add sequential cliques.
+      if (lastTermNode != null) {
+        cliqueNodes = Lists.newArrayList();
+        if (docDependent) {
+          cliqueNodes.add(docNode);
+        }
+        cliqueNodes.add(lastTermNode);
+        cliqueNodes.add(termNode);
 
-			// Add sequential cliques.
-			if (lastTermNode != null) {
-				cliqueNodes = Lists.newArrayList();
-				if (docDependent) {
-					cliqueNodes.add(docNode);
-				}
-				cliqueNodes.add(lastTermNode);
-				cliqueNodes.add(termNode);
+        // Get the potential function.
+        PotentialFunction potential = PotentialFunction.create(env, potentialType, domNode);
 
-				// Get the potential function.
-				PotentialFunction potential = PotentialFunction.create(env, potentialType, domNode);
+        c = new Clique(cliqueNodes, potential, parameter);
+        cliques.add(c);
+      }
 
-				c = new Clique(cliqueNodes, potential, parameter);
-				cliques.add(c);
-			}
+      // Update last term node.
+      lastTermNode = termNode;
+    }
 
-			// Update last term node.
-			lastTermNode = termNode;
-		}
+    return cliques;
+  }
 
-		return cliques;
-	}
+  public static List<Clique> getFullDependenceCliques(RetrievalEnvironment env,
+      String[] queryTerms, Node domNode, boolean ordered, boolean docDependent)
+      throws ConfigurationException {
+    List<Clique> cliques = Lists.newArrayList();     // Clique set.
+    DocumentNode docNode = new DocumentNode();       // The document node.
 
-	public static List<Clique> getFullDependenceCliques(RetrievalEnvironment env,
-			String[] queryTerms, Node domNode, boolean ordered, boolean docDependent)
-			throws ConfigurationException {
-		// Clique set.
-		List<Clique> cliques = Lists.newArrayList();
+    // If there are no terms, then return an empty MRF.
+    if (queryTerms.length == 0) {
+      return cliques;
+    }
 
-		// The document node.
-		DocumentNode docNode = new DocumentNode();
+    // Default parameter associated with CliqueSet.
+    Parameter parameter = new Parameter(Parameter.DEFAULT, 1.0f);
 
-		// If there are no terms, then return an empty MRF.
-		if (queryTerms.length == 0) {
-			return cliques;
-		}
+    // Get potential type.
+    String potentialType = XMLTools.getAttributeValueOrThrowException(domNode, "potential",
+        "A potential attribute must be specified in order to generate a clique set!");
 
-		// Default parameter associated with CliqueSet.
-		Parameter parameter = new Parameter(Parameter.DEFAULT, 1.0f);
+    // If there is more than one term, then add appropriate cliques.
+    ArrayList<GraphNode> cliqueNodes = null;
+    Clique c = null;
 
-		// Get potential type.
-		String potentialType = XMLTools.getAttributeValueOrThrowException(domNode, "potential",
-		    "A potential attribute must be specified in order to generate a clique set!");
+    for (int i = 1; i < Math.pow(2, queryTerms.length); i++) {
+      String binary = Integer.toBinaryString(i);
+      int padding = queryTerms.length - binary.length();
+      for (int j = 0; j < padding; j++) {
+        binary = "0" + binary;
+      }
 
-		// If there is more than one term, then add appropriate cliques.
-		ArrayList<GraphNode> cliqueNodes = null;
-		Clique c = null;
+      boolean singleTerm = false;
+      boolean contiguous = true;
 
-		for (int i = 1; i < Math.pow(2, queryTerms.length); i++) {
-			String binary = Integer.toBinaryString(i);
-			int padding = queryTerms.length - binary.length();
-			for (int j = 0; j < padding; j++) {
-				binary = "0" + binary;
-			}
+      int firstOne = binary.indexOf('1');
+      int lastOne = binary.lastIndexOf('1');
+      if (lastOne == firstOne) {
+        singleTerm = true;
+      }
 
-			boolean singleTerm = false;
-			boolean contiguous = true;
+      for (int j = binary.indexOf('1') + 1; j <= binary.lastIndexOf('1') - 1; j++) {
+        if (binary.charAt(j) == '0') {
+          contiguous = false;
+          break;
+        }
+      }
 
-			int firstOne = binary.indexOf('1');
-			int lastOne = binary.lastIndexOf('1');
-			if (lastOne == firstOne) {
-				singleTerm = true;
-			}
+      if (ordered && !singleTerm && contiguous) {
+        cliqueNodes = Lists.newArrayList();
+        if (docDependent) {
+          cliqueNodes.add(docNode);
+        }
+        for (int j = firstOne; j <= lastOne; j++) {
+          TermNode termNode = new TermNode(queryTerms[j]);
+          cliqueNodes.add(termNode);
+        }
 
-			for (int j = binary.indexOf('1') + 1; j <= binary.lastIndexOf('1') - 1; j++) {
-				if (binary.charAt(j) == '0') {
-					contiguous = false;
-					break;
-				}
-			}
+        // Get the potential function.
+        PotentialFunction potential = PotentialFunction.create(env, potentialType, domNode);
 
-			if (ordered && !singleTerm && contiguous) {
-				cliqueNodes = Lists.newArrayList();
-				if (docDependent) {
-					cliqueNodes.add(docNode);
-				}
-				for (int j = firstOne; j <= lastOne; j++) {
-					TermNode termNode = new TermNode(queryTerms[j]);
-					cliqueNodes.add(termNode);
-				}
+        c = new Clique(cliqueNodes, potential, parameter);
+        cliques.add(c);
+      } else if (!ordered && !singleTerm && !contiguous) {
+        cliqueNodes = Lists.newArrayList();
+        if (docDependent) {
+          cliqueNodes.add(docNode);
+        }
+        for (int j = 0; j < binary.length(); j++) {
+          if (binary.charAt(j) == '1') {
+            TermNode termNode = new TermNode(queryTerms[j]);
+            cliqueNodes.add(termNode);
+          }
+        }
 
-				// Get the potential function.
-				PotentialFunction potential = PotentialFunction.create(env, potentialType, domNode);
+        // Get the potential function.
+        PotentialFunction potential = PotentialFunction.create(env, potentialType, domNode);
 
-				c = new Clique(cliqueNodes, potential, parameter);
-				cliques.add(c);
-			} else if (!ordered && !singleTerm && !contiguous) {
-				cliqueNodes = Lists.newArrayList();
-				if (docDependent) {
-					cliqueNodes.add(docNode);
-				}
-				for (int j = 0; j < binary.length(); j++) {
-					if (binary.charAt(j) == '1') {
-						TermNode termNode = new TermNode(queryTerms[j]);
-						cliqueNodes.add(termNode);
-					}
-				}
+        c = new Clique(cliqueNodes, potential, parameter);
+        cliques.add(c);
+      }
+    }
 
-				// Get the potential function.
-				PotentialFunction potential = PotentialFunction.create(env, potentialType, domNode);
-
-				c = new Clique(cliqueNodes, potential, parameter);
-				cliques.add(c);
-			}
-		}
-
-		return cliques;
-	}
+    return cliques;
+  }
 }
