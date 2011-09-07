@@ -22,76 +22,96 @@ import ivory.smrf.model.GlobalTermEvidence;
 
 import org.w3c.dom.Node;
 
-
 import com.google.common.base.Preconditions;
 
 /**
  * Abstract base class of all scoring functions.
  *
  * @author Don Metzler
- *
  */
 public abstract class ScoringFunction {
   protected GlobalTermEvidence termEvidence;
   protected GlobalEvidence globalEvidence;
-  
-	/**
-	 * Configures this scoring function.
-	 */
-	public void configure(Node domNode) {}
 
-	/**
-	 * Initializes this scoring function with global evidence.
-	 */
-	public void initialize(GlobalTermEvidence termEvidence, GlobalEvidence globalEvidence) {
-	  this.termEvidence = termEvidence;
-	  this.globalEvidence = globalEvidence;
-	}
+  /**
+   * Configures this scoring function.
+   *
+   * @param domNode DOM node containing configuration data
+   */
+  public void configure(Node domNode) {}
 
-	public GlobalEvidence getGlobalEvidence() {
-	  return globalEvidence;
-	}
+  /**
+   * Initializes this scoring function with global evidence.
+   *
+   * @param termEvidence term evidence
+   * @param globalEvidence global evidence
+   */
+  public void initialize(GlobalTermEvidence termEvidence, GlobalEvidence globalEvidence) {
+    this.termEvidence = termEvidence;
+    this.globalEvidence = globalEvidence;
+  }
 
-	public GlobalTermEvidence getGlobalTermEvidence() {
-	  return termEvidence;
-	}
+  /**
+   * Returns the global evidence associated with this scoring function.
+   *
+   * @return global evidence associated with this scoring function
+   */
+  public GlobalEvidence getGlobalEvidence() {
+    return globalEvidence;
+  }
 
-	/**
-	 * Computes score.
-	 */
-	public abstract float getScore(int tf, int docLen);
+  /**
+   * Returns the global term evidence associated with this scoring function.
+   *
+   * @return global term evidence associated with this scoing function
+   */
+  public GlobalTermEvidence getGlobalTermEvidence() {
+    return termEvidence;
+  }
 
-	/**
-	 * Returns the minimum possible score.
-	 */
-	public float getMinScore() {
-		return Float.NEGATIVE_INFINITY;
-	}
-	
-	/**
-	 * Returns the maximum possible score.
-	 */
-	public float getMaxScore() {
-		return Float.POSITIVE_INFINITY;
-	}
+  /**
+   * Computes score.
+   */
+  public abstract float getScore(int tf, int docLen);
 
-	/**
-	 * Creates a scoring function. 
-	 */
-	@SuppressWarnings("unchecked")
-	public static ScoringFunction create(String functionType, Node functionNode) throws ConfigurationException {
-		Preconditions.checkNotNull(functionType);
-		Preconditions.checkNotNull(functionNode);
+  /**
+   * Returns the minimum possible score.
+   *
+   * @return minimum possible score
+   */
+  public float getMinScore() {
+    return Float.NEGATIVE_INFINITY;
+  }
 
-		try {
-			Class<? extends ScoringFunction> clz = (Class<? extends ScoringFunction>) Class.forName(functionType);
-			ScoringFunction f = clz.newInstance();
-			f.configure(functionNode);
+  /**
+   * Returns the maximum possible score.
+   *
+   * @return maximum possible score
+   */
+  public float getMaxScore() {
+    return Float.POSITIVE_INFINITY;
+  }
 
-			return f;
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new ConfigurationException("Unable to instantiate scoring function \"" + functionType + "\"!", e);
-		}
-	}
+  /**
+   * Creates a scoring function.
+   */
+  @SuppressWarnings("unchecked")
+  public static ScoringFunction create(String functionType, Node functionNode)
+      throws ConfigurationException {
+    Preconditions.checkNotNull(functionType);
+    Preconditions.checkNotNull(functionNode);
+
+    try {
+      Class<? extends ScoringFunction> clz = 
+        (Class<? extends ScoringFunction>) Class.forName(functionType);
+      ScoringFunction f = clz.newInstance();
+      f.configure(functionNode);
+
+      return f;
+    } catch (Exception e) {
+      e.printStackTrace();
+      throw new ConfigurationException(
+          "Unable to instantiate scoring function \"" + functionType + "\"!", e);
+    }
+  }
 }

@@ -22,7 +22,6 @@ import ivory.smrf.model.Clique;
 
 import org.w3c.dom.Node;
 
-
 import com.google.common.base.Preconditions;
 
 /**
@@ -30,35 +29,36 @@ import com.google.common.base.Preconditions;
  */
 public abstract class ConceptImportanceModel {
 
-	// Configures the model.
-	public abstract void configure(Node model) throws ConfigurationException;
+  // Configures the model.
+  public abstract void configure(Node model) throws ConfigurationException;
 
-	// Returns the importance of the concept.
-	public abstract float getConceptWeight(String concept);
+  // Returns the importance of the concept.
+  public abstract float getConceptWeight(String concept);
 
-	// Returns the importance of the concepts currently associated with a clique.
-	public abstract float getCliqueWeight(Clique c);
+  // Returns the importance of the concepts currently associated with a clique.
+  public abstract float getCliqueWeight(Clique c);
 
-	@SuppressWarnings("unchecked")
-	public static ConceptImportanceModel get(Node model) throws ConfigurationException {
-		Preconditions.checkNotNull(model);
+  @SuppressWarnings("unchecked")
+  public static ConceptImportanceModel get(Node model) throws ConfigurationException {
+    Preconditions.checkNotNull(model);
 
-		// Get model type.
-		String modelType = XMLTools.getAttributeValue(model, "type", null);
-		if (modelType == null) {
-			throw new ConfigurationException("Model type must be specified!");
-		}
+    // Get model type.
+    String modelType = XMLTools.getAttributeValue(model, "type", null);
+    if (modelType == null) {
+      throw new ConfigurationException("Model type must be specified!");
+    }
 
-		// Dynamically construct importance model.
-		ConceptImportanceModel importanceModel = null;
-		try {
-			Class<? extends ConceptImportanceModel> clz = (Class<? extends ConceptImportanceModel>) Class.forName(modelType);
-			importanceModel = clz.newInstance();
-			importanceModel.configure(model);
-		} catch (Exception e) {
-			throw new ConfigurationException("Error instantiating ConceptImportanceModel! " + e);
-		}
+    // Dynamically construct importance model.
+    ConceptImportanceModel importanceModel = null;
+    try {
+      Class<? extends ConceptImportanceModel> clz =
+        (Class<? extends ConceptImportanceModel>) Class.forName(modelType);
+      importanceModel = clz.newInstance();
+      importanceModel.configure(model);
+    } catch (Exception e) {
+      throw new ConfigurationException("Error instantiating ConceptImportanceModel! " + e);
+    }
 
-		return importanceModel;
-	}
+    return importanceModel;
+  }
 }

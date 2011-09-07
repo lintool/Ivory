@@ -25,39 +25,49 @@ import java.util.List;
 
 import org.w3c.dom.Node;
 
-
 import com.google.common.base.Preconditions;
 
 /**
  * Abstract base class for potential functions.
  *
  * @author Don Metzler
- *
  */
 public abstract class PotentialFunction {
-	public abstract void configure(RetrievalEnvironment env, Node domNode) throws ConfigurationException;
-	public abstract void initialize(List<GraphNode> nodes, GlobalEvidence evidence)	throws ConfigurationException;
-	public abstract float computePotential();
-	public abstract int getNextCandidate();
-	public abstract void reset();
-	public abstract float getMinScore();
-	public abstract float getMaxScore();
-	public abstract void setNextCandidate(int docno);
+  public abstract void configure(RetrievalEnvironment env, Node domNode)
+      throws ConfigurationException;
 
-	@SuppressWarnings("unchecked")
-	public static PotentialFunction create(RetrievalEnvironment env, String type, Node functionNode) throws ConfigurationException {
-		Preconditions.checkNotNull(env);
-		Preconditions.checkNotNull(type);
-		Preconditions.checkNotNull(functionNode);
+  public abstract void initialize(List<GraphNode> nodes, GlobalEvidence evidence)
+      throws ConfigurationException;
 
-		try {
-			Class<? extends PotentialFunction> clz = (Class<? extends PotentialFunction>) Class.forName(type);
-			PotentialFunction f = clz.newInstance();
-			f.configure(env, functionNode);
+  public abstract float computePotential();
 
-			return f;
-		} catch (Exception e) {
-			throw new ConfigurationException("Unable to instantiate scoring function \"" + type	+ "\"!", e);
-		}
-	}
+  public abstract int getNextCandidate();
+
+  public abstract void reset();
+
+  public abstract float getMinScore();
+
+  public abstract float getMaxScore();
+
+  public abstract void setNextCandidate(int docno);
+
+  @SuppressWarnings("unchecked")
+  public static PotentialFunction create(RetrievalEnvironment env, String type, Node functionNode)
+      throws ConfigurationException {
+    Preconditions.checkNotNull(env);
+    Preconditions.checkNotNull(type);
+    Preconditions.checkNotNull(functionNode);
+
+    try {
+      Class<? extends PotentialFunction> clz =
+        (Class<? extends PotentialFunction>) Class.forName(type);
+      PotentialFunction f = clz.newInstance();
+      f.configure(env, functionNode);
+
+      return f;
+    } catch (Exception e) {
+      throw new ConfigurationException(
+          "Unable to instantiate scoring function \"" + type + "\"!", e);
+    }
+  }
 }

@@ -20,21 +20,20 @@ package ivory.smrf.model.score;
  * Computes score based on binary presence/absence of term.
  *
  * @author Don Metzler
- *
  */
 public class BinaryTFScoringFunction extends ScoringFunction {
-	@Override
-	public float getScore(int tf, int docLen) {
-		return tf > 0.0 ? 1.0f : 0.0f;
-	}
-	
-	@Override
-	public float getMinScore() {
-		return 0.0f;
-	}
-	
-	@Override
-	public float getMaxScore() {
-		return 1.0f;
-	}
+  @Override
+  public float getScore(int tf, int docLen) {
+    return tf > 0.0 ? 1.0f : 0.0f;
+  }
+
+  @Override
+  public float getMinScore() {
+    return 0.0f;
+  }
+
+  @Override
+  public float getMaxScore() {
+    return 1.0f;
+  }
 }

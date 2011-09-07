@@ -20,15 +20,19 @@ package ivory.smrf.model;
  * Abstract base class for a node in a MRF.
  *
  * @author Don Metzler
- *
  */
 public abstract class GraphNode {
-	public static enum Type { DOCUMENT, TERM };
+  public static enum Type { DOCUMENT, TERM };
 
-	@Override
-	public String toString() {
-		return "<node type=\"GraphNode\" />\n";
-	}
+  @Override
+  public String toString() {
+    return "<node type=\"GraphNode\" />\n";
+  }
 
-	public abstract Type getType();
+  /**
+   * Returns the type of this node.
+   *
+   * @return type of this node
+   */
+  public abstract Type getType();
 }

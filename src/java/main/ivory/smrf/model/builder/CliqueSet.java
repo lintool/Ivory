@@ -24,52 +24,85 @@ import java.util.List;
 
 import org.w3c.dom.Node;
 
-
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
 /**
+ * A set of cliques.
+ *
  * @author Don Metzler
  */
 public abstract class CliqueSet {
-	protected final List<Clique> cliques = Lists.newArrayList();
+  protected final List<Clique> cliques = Lists.newArrayList();
 
+  /**
+   * Configures this {@code CliqueSet}.
+   *
+   * @param env retrieval environment
+   * @param queryTerms array of query terms
+   * @param domNode XML DOM node with configuration information
+   * @throws ConfigurationException
+   */
   public abstract void configure(RetrievalEnvironment env, String[] queryTerms, Node domNode)
       throws ConfigurationException;
 
-	protected void addClique(Clique c) {
-		cliques.add(c);
-	}
+  /**
+   * Returns the type of this clique.
+   *
+   * @return type of this clique
+   */
+  public abstract Clique.Type getType();
 
-	protected void addCliques(List<Clique> cliques) {
-		this.cliques.addAll(cliques);
-	}
+  /**
+   * Adds a clique to this set.
+   *
+   * @param c clique to add
+   */
+  protected void addClique(Clique c) {
+    cliques.add(c);
+  }
 
-	public List<Clique> getCliques() {
-		return cliques;
-	}
+  /**
+   * Adds a list of cliques of this set.
+   *
+   * @param cliques cliques to add
+   */
+  protected void addCliques(List<Clique> cliques) {
+    this.cliques.addAll(cliques);
+  }
 
-	protected void clearCliques() {
-		cliques.clear();
-	}
-	
-	public abstract Clique.Type getType();
+  /**
+   * Returns the list of cliques in this set.
+   *
+   * @return list of cliques in this set
+   */
+  public List<Clique> getCliques() {
+    return cliques;
+  }
 
-	@SuppressWarnings("unchecked")
-	public static CliqueSet create(String type, RetrievalEnvironment env, String[] queryTerms, Node domNode) throws ConfigurationException {
-		Preconditions.checkNotNull(type);
-		Preconditions.checkNotNull(env);
-		Preconditions.checkNotNull(queryTerms);
-		Preconditions.checkNotNull(domNode);
+  /**
+   * Clears all cliques in this set.
+   */
+  protected void clearCliques() {
+    cliques.clear();
+  }
 
-		try {
-			Class<? extends CliqueSet> clz = (Class<? extends CliqueSet>) Class.forName(type);
-			CliqueSet f = clz.newInstance();
-			f.configure(env, queryTerms, domNode);
+  @SuppressWarnings("unchecked")
+  public static CliqueSet create(String type, RetrievalEnvironment env, String[] queryTerms,
+      Node domNode) throws ConfigurationException {
+    Preconditions.checkNotNull(type);
+    Preconditions.checkNotNull(env);
+    Preconditions.checkNotNull(queryTerms);
+    Preconditions.checkNotNull(domNode);
 
-			return f;
-		} catch (Exception e) {
-			throw new ConfigurationException("Unable to instantiate CliqueSet type " + type, e);
-		}
-	}
+    try {
+      Class<? extends CliqueSet> clz = (Class<? extends CliqueSet>) Class.forName(type);
+      CliqueSet f = clz.newInstance();
+      f.configure(env, queryTerms, domNode);
+
+      return f;
+    } catch (Exception e) {
+      throw new ConfigurationException("Unable to instantiate CliqueSet type " + type, e);
+    }
+  }
 }
