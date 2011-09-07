@@ -29,7 +29,6 @@ import java.util.ArrayList;
 
 import org.w3c.dom.Node;
 
-
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
@@ -37,34 +36,35 @@ import com.google.common.collect.Lists;
  * @author Don Metzler
  */
 public class DocumentCliqueSet extends CliqueSet {
-	@Override
-	public void configure(RetrievalEnvironment env, String[] queryTerms, Node domNode) throws ConfigurationException {
-		Preconditions.checkNotNull(env);
-		Preconditions.checkNotNull(domNode);
+  @Override
+  public void configure(RetrievalEnvironment env, String[] queryTerms, Node domNode)
+      throws ConfigurationException {
+    Preconditions.checkNotNull(env);
+    Preconditions.checkNotNull(domNode);
 
-		// Initialize clique set.
-		clearCliques();
+    // Initialize clique set.
+    clearCliques();
 
-		DocumentNode docNode = new DocumentNode();
-		ArrayList<GraphNode> cliqueNodes = Lists.newArrayList();
-		cliqueNodes.add(docNode);
+    DocumentNode docNode = new DocumentNode();
+    ArrayList<GraphNode> cliqueNodes = Lists.newArrayList();
+    cliqueNodes.add(docNode);
 
-		String paramId = XMLTools.getAttributeValueOrThrowException(domNode, "id",
-		    "Error: A potential attribute must be specified in order to generate a clique set!");
+    String paramId = XMLTools.getAttributeValueOrThrowException(domNode, "id",
+        "Error: A potential attribute must be specified in order to generate a clique set!");
 
-		float weight = XMLTools.getAttributeValue(domNode, "weight", 1.0f);
-		Parameter parameter = new Parameter(paramId, weight);
-		String potentialType = XMLTools.getAttributeValueOrThrowException(domNode, "potential",
-		    "Error: A potential type must be specified!");
+    float weight = XMLTools.getAttributeValue(domNode, "weight", 1.0f);
+    Parameter parameter = new Parameter(paramId, weight);
+    String potentialType = XMLTools.getAttributeValueOrThrowException(domNode, "potential",
+        "Error: A potential type must be specified!");
 
-		PotentialFunction potential = PotentialFunction.create(env, potentialType, domNode);
+    PotentialFunction potential = PotentialFunction.create(env, potentialType, domNode);
 
-		Clique c = new Clique(cliqueNodes, potential, parameter, 1.0f, getType(), true);
-		addClique(c);
-	}
+    Clique c = new Clique(cliqueNodes, potential, parameter, 1.0f, getType(), true);
+    addClique(c);
+  }
 
-	@Override
-	public Clique.Type getType() {
-		return Clique.Type.Document;
-	}
+  @Override
+  public Clique.Type getType() {
+    return Clique.Type.Document;
+  }
 }

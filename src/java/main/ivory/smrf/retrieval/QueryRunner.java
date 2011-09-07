@@ -20,8 +20,12 @@ import java.util.Map;
 
 public interface QueryRunner {
   Accumulator[] runQuery(String[] query);
+
   void runQuery(String qid, String[] query);
+
   Accumulator[] getResults(String qid);
+
   Map<String, Accumulator[]> getResults();
+
   void clearResults();
 }

@@ -7,7 +7,6 @@ import ivory.core.eval.RankedListEvaluator;
 import ivory.smrf.retrieval.Accumulator;
 import ivory.smrf.retrieval.BatchQueryRunner;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import junit.framework.JUnit4TestAdapter;
@@ -17,14 +16,14 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.log4j.Logger;
 import org.junit.Test;
 
+import com.google.common.collect.Maps;
 
 import edu.umd.cloud9.collection.DocnoMapping;
 
 public class Robust04_WSD_LCE {
+  private static final Logger LOG = Logger.getLogger(Robust04_WSD_LCE.class);
 
-	private static final Logger sLogger = Logger.getLogger(Robust04_WSD_LCE.class);
-
-	private static String[] sDir_WSD_LCE_RawAP = new String[] { 
+  private static String[] sDir_WSD_LCE_RawAP = new String[] {
           "601", "0.6388", "602", "0.2729", "603", "0.2653", "604", "0.8518", "605", "0.0879",
           "606", "0.6670", "607", "0.4088", "608", "0.1252", "609", "0.3729", "610", "0.0177",
           "611", "0.3111", "612", "0.6127", "613", "0.2555", "614", "0.4461", "615", "0.0408",
@@ -46,7 +45,7 @@ public class Robust04_WSD_LCE {
           "692", "0.5250", "693", "0.3853", "694", "0.4690", "695", "0.4106", "696", "0.2934",
           "697", "0.1565", "698", "0.4551", "699", "0.5363", "700", "0.6709" };
 
-	private static String[] sDir_WSD_LCE_RawP10 = new String[] {
+  private static String[] sDir_WSD_LCE_RawP10 = new String[] {
           "601", "0.3000", "602", "0.2000", "603", "0.3000", "604", "0.6000", "605", "0.2000",
           "606", "0.5000", "607", "0.5000", "608", "0.0000", "609", "0.6000", "610", "0.0000",
           "611", "0.5000", "612", "0.6000", "613", "0.6000", "614", "0.4000", "615", "0.0000",
@@ -68,82 +67,75 @@ public class Robust04_WSD_LCE {
           "692", "0.8000", "693", "0.6000", "694", "0.4000", "695", "0.9000", "696", "0.7000",
           "697", "0.4000", "698", "0.3000", "699", "0.7000", "700", "0.9000" };
 
-	private static Qrels sQrels;
-	private static DocnoMapping sMapping;
+  private static Qrels sQrels;
+  private static DocnoMapping sMapping;
 
-	@Test
-	public void runRegression() throws Exception {
+  @Test
+  public void runRegression() throws Exception {
+    Map<String, Map<String, Float>> AllModelsAPScores = Maps.newHashMap();
+    AllModelsAPScores.put("robust04-dir-wsd-lce", loadScoresIntoMap(sDir_WSD_LCE_RawAP));
 
-		Map<String, Map<String, Float>> AllModelsAPScores = new HashMap<String, Map<String, Float>>();
+    Map<String, Map<String, Float>> AllModelsP10Scores = Maps.newHashMap();
+    AllModelsP10Scores.put("robust04-dir-wsd-lce", loadScoresIntoMap(sDir_WSD_LCE_RawP10));
 
-		AllModelsAPScores.put("robust04-dir-wsd-lce", loadScoresIntoMap(sDir_WSD_LCE_RawAP));
-
-		Map<String, Map<String, Float>> AllModelsP10Scores = new HashMap<String, Map<String, Float>>();
-
-		AllModelsP10Scores.put("robust04-dir-wsd-lce", loadScoresIntoMap(sDir_WSD_LCE_RawP10));
-
-		sQrels = new Qrels("data/trec/qrels.robust04.noCRFR.txt");
+    sQrels = new Qrels("data/trec/qrels.robust04.noCRFR.txt");
 
     String[] params = new String[] {
-            "data/trec/run.robust04.wsd.lce.xml",
-            "data/trec/queries.robust04.xml" };
+       "data/trec/run.robust04.wsd.lce.xml",
+       "data/trec/queries.robust04.xml" };
 
-		FileSystem fs = FileSystem.getLocal(new Configuration());
+    FileSystem fs = FileSystem.getLocal(new Configuration());
 
-		BatchQueryRunner qr = new BatchQueryRunner(params, fs);
+    BatchQueryRunner qr = new BatchQueryRunner(params, fs);
 
-		long start = System.currentTimeMillis();
-		qr.runQueries();
-		long end = System.currentTimeMillis();
+    long start = System.currentTimeMillis();
+    qr.runQueries();
+    long end = System.currentTimeMillis();
 
-		sLogger.info("Total query time: " + (end - start) + "ms");
+    LOG.info("Total query time: " + (end - start) + "ms");
 
-		sMapping = qr.getDocnoMapping();
+    sMapping = qr.getDocnoMapping();
 
-		for (String model : qr.getModels()) {
-			sLogger.info("Verifying results of model \"" + model + "\"");
+    for (String model : qr.getModels()) {
+      LOG.info("Verifying results of model \"" + model + "\"");
+      Map<String, Accumulator[]> results = qr.getResults(model);
+      verifyResults(model, results, AllModelsAPScores.get(model), AllModelsP10Scores.get(model));
+      LOG.info("Done!");
+    }
+  }
 
-			Map<String, Accumulator[]> results = qr.getResults(model);
+  private static void verifyResults(String model, Map<String, Accumulator[]> results,
+      Map<String, Float> apScores, Map<String, Float> p10Scores) {
+    float apSum = 0, p10Sum = 0;
+    for (String qid : results.keySet()) {
+      float ap = (float) RankedListEvaluator.computeAP(results.get(qid), sMapping,
+          sQrels.getReldocsForQid(qid));
 
-			verifyResults(model, results, AllModelsAPScores.get(model), AllModelsP10Scores.get(model));
+      float p10 = (float) RankedListEvaluator.computePN(10, results.get(qid), sMapping,
+          sQrels.getReldocsForQid(qid));
 
-			sLogger.info("Done!");
-		}
+      apSum += ap;
+      p10Sum += p10;
 
-	}
+      if ((apScores.get(qid)) != null && ap != 0) {
 
-	private static void verifyResults(String model, Map<String, Accumulator[]> results,
-			Map<String, Float> apScores, Map<String, Float> p10Scores) {
-		float apSum = 0, p10Sum = 0;
-		for (String qid : results.keySet()) {
-			float ap = (float) RankedListEvaluator.computeAP(results.get(qid), sMapping, sQrels
-					.getReldocsForQid(qid));
+        LOG.info("verifying qid " + qid + " for model " + model);
+        assertEquals(apScores.get(qid), ap, 10e-5);
+        assertEquals(p10Scores.get(qid), p10, 10e-5);
+      }
+    }
 
-			float p10 = (float) RankedListEvaluator.computePN(10, results.get(qid), sMapping,
-					sQrels.getReldocsForQid(qid));
+    // one topic didn't contain qrels, so trec_eval only picked up 99 topics
+    float MAP = (float) RankedListEvaluator.roundTo4SigFigs(apSum / 99f);
+    float P10Avg = (float) RankedListEvaluator.roundTo4SigFigs(p10Sum / 99f);
 
-			apSum += ap;
-			p10Sum += p10;
+    if (model.equals("robust04-dir-wsd-lce")) {
+      assertEquals(0.3941, MAP, 10e-5);
+      assertEquals(0.4980, P10Avg, 10e-5);
+    }
+  }
 
-			if ((apScores.get(qid))!=null && ap!=0){
-
-				sLogger.info("verifying qid " + qid + " for model " + model);
-				assertEquals(apScores.get(qid), ap, 10e-5);
-				assertEquals(p10Scores.get(qid), p10, 10e-5);
-			}
-		}
-
-		// one topic didn't contain qrels, so trec_eval only picked up 99 topics
-		float MAP = (float) RankedListEvaluator.roundTo4SigFigs(apSum / 99f);
-		float P10Avg = (float) RankedListEvaluator.roundTo4SigFigs(p10Sum / 99f);
-
-		if (model.equals("robust04-dir-wsd-lce")) {
-			assertEquals(0.3941, MAP, 10e-5);
-			assertEquals(0.4980, P10Avg, 10e-5);
-		}
-	}
-
-	public static junit.framework.Test suite() {
-		return new JUnit4TestAdapter(Robust04_WSD_LCE.class);
-	}
+  public static junit.framework.Test suite() {
+    return new JUnit4TestAdapter(Robust04_WSD_LCE.class);
+  }
 }

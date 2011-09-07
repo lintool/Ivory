@@ -27,44 +27,42 @@ import org.apache.log4j.Logger;
 import org.xml.sax.SAXException;
 
 public class RunQueryLocal {
-	private static final Logger LOG = Logger.getLogger(RunQueryLocal.class);
+  private static final Logger LOG = Logger.getLogger(RunQueryLocal.class);
+  private BatchQueryRunner runner = null;
 
-	private BatchQueryRunner runner = null;
+  public RunQueryLocal(String[] args) throws SAXException, IOException,
+      ParserConfigurationException, Exception, NotBoundException {
+    Configuration conf = new Configuration();
+    FileSystem fs = FileSystem.getLocal(conf);
+    try {
+      LOG.info("initilaize runquery ...");
+      runner = new BatchQueryRunner(args, fs);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
 
-	public RunQueryLocal(String[] args) throws SAXException, IOException,
-			ParserConfigurationException, Exception, NotBoundException {
-		Configuration conf = new Configuration();
-		FileSystem fs = FileSystem.getLocal(conf);
-		try {
-			LOG.info("initilaize runquery ...");
-			runner = new BatchQueryRunner(args, fs);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+  /**
+   * runs the queries
+   */
+  public void runQueries() throws Exception {
+    LOG.info("Running the queries ...");
+    long start = System.currentTimeMillis();
+    runner.runQueries();
+    long end = System.currentTimeMillis();
 
-	/**
-	 * runs the queries
-	 */
-	public void runQueries() throws Exception {
-		// run the queries
-		LOG.info("run the queries ...");
-		long start = System.currentTimeMillis();
-		runner.runQueries();
-		long end = System.currentTimeMillis();
+    LOG.info("Total query time: " + (end - start) + "ms");
+    System.out.println("Total\t" + (end - start) + " ms");
+  }
 
-		LOG.info("Total query time: " + (end - start) + "ms");
-		System.out.println("Total\t" + (end - start) + " ms");
-	}
-
-	public static void main(String[] args) throws Exception {
-		RunQueryLocal s;
-		try {
-			s = new RunQueryLocal(args);
-			s.runQueries();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		System.exit(0);
-	}
+  public static void main(String[] args) throws Exception {
+    RunQueryLocal s;
+    try {
+      s = new RunQueryLocal(args);
+      s.runQueries();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    System.exit(0);
+  }
 }

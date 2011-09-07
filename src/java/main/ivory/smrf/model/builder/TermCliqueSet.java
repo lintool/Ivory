@@ -30,7 +30,6 @@ import java.util.List;
 
 import org.w3c.dom.Node;
 
-
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
@@ -38,49 +37,50 @@ import com.google.common.collect.Lists;
  * @author Don Metzler
  */
 public class TermCliqueSet extends CliqueSet {
-	@Override
-	public void configure(RetrievalEnvironment env, String[] queryTerms, Node domNode) throws ConfigurationException {
-		Preconditions.checkNotNull(env);
-		Preconditions.checkNotNull(queryTerms);
-		Preconditions.checkNotNull(domNode);
+  @Override
+  public void configure(RetrievalEnvironment env, String[] queryTerms, Node domNode)
+      throws ConfigurationException {
+    Preconditions.checkNotNull(env);
+    Preconditions.checkNotNull(queryTerms);
+    Preconditions.checkNotNull(domNode);
 
-		boolean docDependent = XMLTools.getAttributeValue(domNode, "docDependent", true);
+    boolean docDependent = XMLTools.getAttributeValue(domNode, "docDependent", true);
 
-		// Initialize clique set.
-		clearCliques();
+    // Initialize clique set.
+    clearCliques();
 
-		// The document node.
-		DocumentNode docNode = new DocumentNode();
+    // The document node.
+    DocumentNode docNode = new DocumentNode();
 
-		// Default parameter associated with clique set.
-		Parameter termParameter = new Parameter(Parameter.DEFAULT, 1.0f);
+    // Default parameter associated with clique set.
+    Parameter termParameter = new Parameter(Parameter.DEFAULT, 1.0f);
 
-		// Get potential type.
-		String potentialType = XMLTools.getAttributeValueOrThrowException(domNode, "potential",
-		    "A potential attribute must be specified in order to generate a CliqueSet!");
+    // Get potential type.
+    String potentialType = XMLTools.getAttributeValueOrThrowException(domNode, "potential",
+        "A potential attribute must be specified in order to generate a CliqueSet!");
 
-		// Add clique for each query term.
-		for (String element : queryTerms) {
-			// Add term node.
-			TermNode termNode = new TermNode(element);
+    // Add clique for each query term.
+    for (String element : queryTerms) {
+      // Add term node.
+      TermNode termNode = new TermNode(element);
 
-			// Add document/term clique.
-			List<GraphNode> cliqueNodes = Lists.newArrayList();
-			if (docDependent) {
-				cliqueNodes.add(docNode);
-			}
-			cliqueNodes.add(termNode);
+      // Add document/term clique.
+      List<GraphNode> cliqueNodes = Lists.newArrayList();
+      if (docDependent) {
+        cliqueNodes.add(docNode);
+      }
+      cliqueNodes.add(termNode);
 
-			// Get the potential function.
-			PotentialFunction potential = PotentialFunction.create(env, potentialType, domNode);
+      // Get the potential function.
+      PotentialFunction potential = PotentialFunction.create(env, potentialType, domNode);
 
-			Clique c = new Clique(cliqueNodes, potential, termParameter);
-			addClique(c);
-		}
-	}
+      Clique c = new Clique(cliqueNodes, potential, termParameter);
+      addClique(c);
+    }
+  }
 
-	@Override
-	public Clique.Type getType() {
-		return Clique.Type.Term;
-	}
+  @Override
+  public Clique.Type getType() {
+    return Clique.Type.Term;
+  }
 }

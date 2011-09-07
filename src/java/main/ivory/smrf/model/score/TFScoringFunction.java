@@ -20,16 +20,15 @@ package ivory.smrf.model.score;
  * Scoring function based on term frequency only.
  *
  * @author Don Metzler
- *
  */
 public class TFScoringFunction extends ScoringFunction {
-	@Override
-	public float getScore(int tf, int docLen) {
-		return tf;
-	}
-	
-	@Override
-	public float getMinScore() {
-		return 0.0f;
-	}
+  @Override
+  public float getScore(int tf, int docLen) {
+    return tf;
+  }
+
+  @Override
+  public float getMinScore() {
+    return 0.0f;
+  }
 }

@@ -22,33 +22,33 @@ import java.util.Map.Entry;
  * @author Don Metzler
  */
 public class VocabFrequencyPair implements Entry<String, Integer>, Comparable<VocabFrequencyPair> {
-	private String key;
-	private Integer value;
+  private String key;
+  private Integer value;
 
-	public VocabFrequencyPair(String key, Integer value) {
-		this.key = key;
-		this.value = value;
-	}
+  public VocabFrequencyPair(String key, Integer value) {
+    this.key = key;
+    this.value = value;
+  }
 
-	public String getKey() {
-		return key;
-	}
+  public String getKey() {
+    return key;
+  }
 
-	public Integer getValue() {
-		return value;
-	}
+  public Integer getValue() {
+    return value;
+  }
 
-	public Integer setValue(Integer value) {
-		this.value = value;
-		return value;
-	}
+  public Integer setValue(Integer value) {
+    this.value = value;
+    return value;
+  }
 
-	public int compareTo(VocabFrequencyPair o) {
-		return o.getValue().compareTo(this.getValue());
-	}
+  public int compareTo(VocabFrequencyPair o) {
+    return o.getValue().compareTo(this.getValue());
+  }
 
-	@Override
-	public String toString() {
-		return key + "\t" + value;
-	}
+  @Override
+  public String toString() {
+    return key + "\t" + value;
+  }
 }

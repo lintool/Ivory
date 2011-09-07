@@ -20,46 +20,45 @@ package ivory.smrf.model;
  * A term node in a MRF.
  *
  * @author Don Metzler
- *
  */
 public class TermNode extends GraphNode {
-	private String term = null;
+  private String term = null;
 
-	/**
-	 * Creates a <code>TermNode</code> for a particular term.
-	 */
-	public TermNode(String term) {
-		this.term = term;
-	}
+  /**
+   * Creates a {@code TermNode} for a particular term.
+   */
+  public TermNode(String term) {
+    this.term = term;
+  }
 
-	/**
-	 * Returns the term associated with this node.
-	 */
-	public String getTerm() {
-		return term;
-	}
+  /**
+   * Returns the term associated with this node.
+   */
+  public String getTerm() {
+    return term;
+  }
 
-	/**
-	 * Sets the term associated with this node.
-	 */
-	public void setTerm(String term) {
-		this.term = term;
-	}
+  /**
+   * Sets the term associated with this node.
+   */
+  public void setTerm(String term) {
+    this.term = term;
+  }
 
-	/**
-	 * Clones this node.
-	 */
-	public TermNode clone() {
-		return new TermNode(term);
-	}
+  /**
+   * Clones this node.
+   */
+  public TermNode clone() {
+    return new TermNode(term);
+  }
 
-	@Override
-	public Type getType() {
-		return Type.TERM;
-	}
+  @Override
+  public Type getType() {
+    return Type.TERM;
+  }
 
-	@Override
-	public String toString() {
-		return "<node type=\"Term\" term=\"" + term + "\" />\n";
-	}
+  @Override
+  public String toString() {
+    return "<node type=\"Term\" term=\"" + term + "\" />\n";
+  }
 }

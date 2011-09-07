@@ -16,14 +16,12 @@
 
 package ivory.smrf.model;
 
-
 import ivory.core.RetrievalEnvironment;
 import ivory.core.exception.ConfigurationException;
 import ivory.core.util.XMLTools;
 
 import java.util.Iterator;
 import java.util.List;
-
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
@@ -32,121 +30,145 @@ import com.google.common.collect.Lists;
  * A Markov Random Field.
  *
  * @author Don Metzler
- *
  */
 public class MarkovRandomField {
-	private final List<Clique> cliques = Lists.newArrayList();
-	private final RetrievalEnvironment env;
-	private final GlobalEvidence globalEvidence;
-	private final String[] queryTerms;
+  private final List<Clique> cliques = Lists.newArrayList();
+  private final RetrievalEnvironment env;
+  private final GlobalEvidence globalEvidence;
+  private final String[] queryTerms;
 
-	/**
-	 * Creates a <code>MarkovRandomField</code> object.
-	 *
-	 * @param queryTerms query terms
-	 * @param env        retrieval environment (for computing global evidence)
-	 */
-	public MarkovRandomField(String[] queryTerms, RetrievalEnvironment env) {
-		this.queryTerms = Preconditions.checkNotNull(queryTerms);
-		this.env = Preconditions.checkNotNull(env);
-		this.globalEvidence = new GlobalEvidence(env.getDocumentCount(), env.getCollectionSize(), queryTerms.length);
-	}
+  /**
+   * Creates a {@code MarkovRandomField} object.
+   *
+   * @param queryTerms query terms
+   * @param env retrieval environment (for computing global evidence)
+   */
+  public MarkovRandomField(String[] queryTerms, RetrievalEnvironment env) {
+    this.queryTerms = Preconditions.checkNotNull(queryTerms);
+    this.env = Preconditions.checkNotNull(env);
+    this.globalEvidence = new GlobalEvidence(env.getDocumentCount(), env.getCollectionSize(),
+        queryTerms.length);
+  }
 
-	/**
-	 * Initializes this MRF.
-	 */
-	public void initialize() throws ConfigurationException {
-		env.clearPostingsReaderCache();
-		for(Clique c : cliques) {
-			c.initialize(globalEvidence);
-		}
-	}
-	
-	/**
-	 * Returns the nodes associated with this MRF.
-	 */
-	public List<GraphNode> getNodes() {
-		List<GraphNode> nodes = Lists.newArrayList();
-		for (Clique clique : cliques) {
-			List<GraphNode> cliqueNodes = clique.getNodes();
-			for (GraphNode node : cliqueNodes) {
-				if (!nodes.contains(node)) {
-					nodes.add(node);
-				}
-			}
-		}
-		return nodes;
-	}
+  /**
+   * Initializes this MRF.
+   */
+  public void initialize() throws ConfigurationException {
+    env.clearPostingsReaderCache();
+    for (Clique c : cliques) {
+      c.initialize(globalEvidence);
+    }
+  }
 
-	/**
-	 * Adds a clique to this MRF.
-	 */
-	public void addClique(Clique c) {
-		cliques.add(c);
-	}
+  /**
+   * Returns the nodes associated with this MRF.
+   *
+   * @return list of nodes associated with this MRF.
+   */
+  public List<GraphNode> getNodes() {
+    List<GraphNode> nodes = Lists.newArrayList();
+    for (Clique clique : cliques) {
+      List<GraphNode> cliqueNodes = clique.getNodes();
+      for (GraphNode node : cliqueNodes) {
+        if (!nodes.contains(node)) {
+          nodes.add(node);
+        }
+      }
+    }
+    return nodes;
+  }
 
-	 /**             
+  /**
+   * Adds a clique to this MRF.
+   *
+   * @param c clique to add
+   */
+  public void addClique(Clique c) {
+    cliques.add(c);
+  }
+
+  /**
    * Removes all cliques from this MRF.
    */
   public void removeAllCliques() {
     cliques.clear();
   }
 
-	/**
-	 * Returns the cliques associated with this MRF.
-	 */
-	public List<Clique> getCliques() {
-		return cliques;
-	}
+  /**
+   * Returns the cliques in this MRF.
+   *
+   * @return all cliques in this MRF
+   */
+  public List<Clique> getCliques() {
+    return cliques;
+  }
 
-	/**
-	 * Returns the next candidate for scoring.
-	 */
-	public int getNextCandidate() {
-		int nextCandidate = Integer.MAX_VALUE;
+  /**
+   * Returns the next candidate for scoring.
+   *
+   * @return docno of the next candidate
+   */
+  public int getNextCandidate() {
+    int nextCandidate = Integer.MAX_VALUE;
 
-		for (Clique clique : cliques) {
-			int candidate = clique.getNextCandidate();
-			if (candidate < nextCandidate) {
-				nextCandidate = candidate;
-			}
-		}
+    for (Clique clique : cliques) {
+      int candidate = clique.getNextCandidate();
+      if (candidate < nextCandidate) {
+        nextCandidate = candidate;
+      }
+    }
 
-		return nextCandidate;
-	}
+    return nextCandidate;
+  }
 
-	/**
-	 * Returns the <code>GlobalEvidence</code> associated with this MRF.
-	 */
-	public GlobalEvidence getGlobalEvidence() {
-		return globalEvidence;
-	}
+  /**
+   * Returns the {@code GlobalEvidence} associated with this MRF.
+   *
+   * @return {@code GlobalEvidence} associated with this MRF
+   */
+  public GlobalEvidence getGlobalEvidence() {
+    return globalEvidence;
+  }
 
-	/**
-	 * Returns the query terms.
-	 */
-	public String[] getQueryTerms() {
-		return queryTerms;
-	}
+  /**
+   * Returns the query terms.
+   *
+   * @return query terms
+   */
+  public String[] getQueryTerms() {
+    return queryTerms;
+  }
 
-	/**
-	 * Returns a human-readable representation of this MRF.
-	 */
-	@Override
-	public String toString() {
-		return toString(false);
-	}
+  /**
+   * Returns a human-readable representation of this MRF.
+   *
+   * @return human-readable representation of this MRF
+   */
+  @Override
+  public String toString() {
+    return toString(false);
+  }
 
-	/**
-	 * Returns a human-readable representation of this MRF.
-	 * @param verbose verbose output
-	 */
-	public String toString(boolean verbose) {
-		StringBuilder sb = new StringBuilder("<mrf>\n");
+  /**
+   * Returns a human-readable representation of this MRF.
+   *
+   * @param verbose verbose output
+   */
+  public String toString(boolean verbose) {
+    StringBuilder sb = new StringBuilder("<mrf>\n");
 
-		for (Iterator<Clique> cliqueIter = cliques.iterator(); cliqueIter.hasNext();) {
-			sb.append(cliqueIter.next().toString(verbose));
-		}
-		return XMLTools.format(sb.append("</mrf>").toString());
-	}
+    for (Iterator<Clique> cliqueIter = cliques.iterator(); cliqueIter.hasNext();) {
+      sb.append(cliqueIter.next().toString(verbose));
+    }
+    return XMLTools.format(sb.append("</mrf>").toString());
+  }
+
+  /**
+   * Returns the retrieval environment associated with this MRF.
+   *
+   * @return the retrieval environment associated with this MRF
+   */
+  public RetrievalEnvironment getRetrievalEnvironment() {
+    return env;
+  }
 }
