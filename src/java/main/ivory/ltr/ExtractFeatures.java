@@ -244,7 +244,7 @@ public class ExtractFeatures {
 									String featId = modelName + "-" + metaFeat.getName() + "-" + paramId;
 
 									// score = meta-feature weight * (raw) clique potential
-									double score = model.computeFeatureVal(c.getConcept(), metaFeat) * c.getPotential();
+									double score = model.computeFeatureValue(c.getConcept(), metaFeat) * c.getPotential();
 
 									// update feature values
 									Double curVal = docFeatures.get(featId);

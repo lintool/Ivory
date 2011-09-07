@@ -21,249 +21,287 @@ import ivory.smrf.model.Clique;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-
 /**
  * @author Lidan Wang
+ *
  */
-public class ConstraintModel {
-  public static List<ConstrainedClique> greedyJoint(List<ConstrainedClique> cliques,
-      double binConstraint, double unigramAddThreshold, double bigramAddThreshold,
-      double unigramRedundThreshold, double bigramRedundThreshold, double beta) {
-    Deque<ConstrainedClique> sortedCliques = orderByProfitDensity(cliques);
-    List<ConstrainedClique> selectedCliques = Lists.newArrayList();
+ public class ConstraintModel {
 
-    double totalCost = 0.0;
-    Set<String> addedConcepts = Sets.newHashSet();
-    Deque<ConstrainedClique> sortedCliques2 = Lists.newLinkedList();
+	public static List<ConstrainedClique> greedyJoint (List<ConstrainedClique> cliques, double binConstraint, double unigramAddThreshold, double bigramAddThreshold, double unigramRedundThreshold, double bigramRedundThreshold, double beta){
+		Deque<ConstrainedClique> sortedCliques = orderByProfitDensity(cliques);
 
-    while (sortedCliques.size() != 0 || sortedCliques2.size() != 0) {
-      boolean fromQueue2 = false;
-      ConstrainedClique c;
-      if (sortedCliques.size() != 0) {
-        c = sortedCliques.removeFirst();
-      } else {
-        c = sortedCliques2.removeFirst();
-        fromQueue2 = true;
-      }
+		List<ConstrainedClique> selectedCliques =  new ArrayList<ConstrainedClique>();
 
-      double cost = c.getAnalyticalCost();
-      double newCost = totalCost + cost;
+		double totalCost = 0.0;
 
-      double conceptWgt = c.getWeight();
+		Set<String> addedConcepts = new HashSet<String>();
 
-      if (((newCost - binConstraint)) < binConstraint * 0.07 && (c.getWeight() >= 0.00001)) {
-        String concept = c.getConcept();
-        Clique.Type conceptType = c.getType();
+		Deque<ConstrainedClique> sortedCliques2 = new LinkedList<ConstrainedClique>();
+		
+		while (sortedCliques.size()!=0 || sortedCliques2.size()!=0){
+			boolean fromQueue2 = false;
+			ConstrainedClique c;
+			if (sortedCliques.size()!=0){
+				c = sortedCliques.removeFirst();
+			}			
+			else{
+				c = sortedCliques2.removeFirst();
+				fromQueue2 = true;
+			}
 
-        boolean addConcept = false;
+			double cost = c.getAnalyticalCost();
+			double newCost = totalCost + cost;
 
-        // See if passing the redundancy threshold.
-        if (addedConcepts.contains(concept)) {
-          if (conceptType.equals(Clique.Type.Term) && conceptWgt > unigramRedundThreshold) {
-            addConcept = true;
-          } else if (conceptWgt > bigramRedundThreshold) {
-            addConcept = true;
-          }
-        } else {
-          // See if passing the add threshold.
-          if (conceptType.equals(Clique.Type.Term) && conceptWgt > unigramAddThreshold) {
-            addConcept = true;
-          } else if (conceptWgt > bigramAddThreshold) {
-            addConcept = true;
-          }
-        }
+			double conceptWgt = c.getWeight();
 
-        if (!addConcept && !fromQueue2) {
-          if ((conceptWgt - beta) > 0) {
-            sortedCliques2.add(c);
-          }
-        } else {
-          totalCost = newCost;
-          selectedCliques.add(c);
+			if (((newCost- binConstraint))<binConstraint*0.07 && (c.getWeight() >= 0.00001)){ 
 
-          addedConcepts.add(concept);
-        }
-      }
-    }
+				String concept = c.getConcept();
+				Clique.Type conceptType = c.getType();
 
-    return selectedCliques;
-  }
+				boolean addConcept = false;
 
-  public static List<ConstrainedClique> greedyKnapsack(List<ConstrainedClique> cliques,
-      double binConstraint, double unigramAddThreshold, double bigramAddThreshold) {
-    Deque<ConstrainedClique> sortedCliques = orderByProfitDensity(cliques);
-    List<ConstrainedClique> selectedCliques = Lists.newArrayList();
+				//see if passing the redundancy threshold
+				if (addedConcepts.contains(concept)){
+					if (conceptType.equals(Clique.Type.Term)) {
+						if (conceptWgt >  unigramRedundThreshold){
+							addConcept = true;
+						}
+					}
+					else{
+						if (conceptWgt >  bigramRedundThreshold){
+							addConcept = true;
+						}
+					}
 
-    double totalCost = 0.0;
+				}
+				//see if passing the add threshold
+				else{
+					if (conceptType.equals(Clique.Type.Term)){
+						if (conceptWgt > unigramAddThreshold){
+							addConcept = true;
+						}
+					}
+					else{
+						if (conceptWgt > bigramAddThreshold) {
+							addConcept = true;
+						}
+					}
+				}
 
-    while (sortedCliques.size() != 0) {
-      ConstrainedClique c = sortedCliques.removeFirst();
-      Clique.Type conceptType = c.getType();
-      double conceptWgt = c.getWeight();
+				if (!addConcept && !fromQueue2){
+					if ((conceptWgt - beta) > 0){
+						sortedCliques2.add(c);
+					}
 
-      double cost = c.getAnalyticalCost();
-      double newCost = totalCost + cost;
+				}
+				else{
+					totalCost = newCost;
+					selectedCliques.add(c);
 
-      if (((newCost - binConstraint) < binConstraint * 0.07) && (conceptWgt >= 0.00001)) {
-        boolean addConcept = false;
+					addedConcepts.add(concept);
+				}
+			}
+		}
 
-        if (conceptType.equals(Clique.Type.Term) && conceptWgt > unigramAddThreshold) {
-          addConcept = true;
-        } else if (conceptWgt > bigramAddThreshold) {
-          addConcept = true;
-        }
+		return selectedCliques;
+	}
 
-        if (addConcept) {
-          totalCost = newCost;
-          selectedCliques.add(c);
-        }
-      }
-    }
 
-    return selectedCliques;
-  }
 
-  public static Deque<ConstrainedClique> orderByProfitDensity(List<ConstrainedClique> cliques) {
-    // hold unique concept terms
-    List<String> holder1 = Lists.newArrayList();
+	public static List<ConstrainedClique> greedyKnapsack (List<ConstrainedClique> cliques, double binConstraint, double unigramAddThreshold, double bigramAddThreshold) {
 
-    // hold profit/weight/profitDensity value of each unique concept term
-    List<String> holder2 = Lists.newArrayList();
+		//System.out.println("Using independent model with add threshold... binConstraint is "+binConstraint);
 
-    HashMap<String, List<ConstrainedClique>> featureOrder = Maps.newHashMap();
+		Deque<ConstrainedClique> sortedCliques = orderByProfitDensity (cliques);
 
-    for (int i = 0; i < cliques.size(); i++) {
-      ConstrainedClique c = cliques.get(i);
-      String term = c.getConcept();
-      if (featureOrder.containsKey(term)) {
-        List<ConstrainedClique> l = featureOrder.get(term);
-        l.add(c);
-      } else {
-        List<ConstrainedClique> l = new ArrayList<ConstrainedClique>();
-        l.add(c);
-        featureOrder.put(term, l);
-        holder1.add(term);
+		List<ConstrainedClique> selectedCliques = new ArrayList<ConstrainedClique>();
 
-        double p = 0 - c.getProfitDensity();
+		double totalCost = 0.0;
 
-        holder2.add(p + "");
-      }
-    }
+		while (sortedCliques.size()!=0){
 
-    double[] values = new double[holder2.size()];
-    for (int i = 0; i < values.length; i++) {
-      values[i] = Double.parseDouble((String) (holder2.get(i)));
-    }
+			ConstrainedClique c = sortedCliques.removeFirst();
+			Clique.Type conceptType = c.getType();
+			double conceptWgt = c.getWeight();
 
-    List<String> reorderedTerms = orderCliques(holder1, values);
+			double cost = c.getAnalyticalCost();
+			double newCost = totalCost + cost;
 
-    Deque<ConstrainedClique> sortedCliques = new LinkedList<ConstrainedClique>();
+			if (((newCost- binConstraint)<binConstraint*0.07) && (conceptWgt  >= 0.00001)){
+				boolean addConcept = false;
 
-    for (int i = 0; i < reorderedTerms.size(); i++) {
-      String term = reorderedTerms.get(i);
-      List<ConstrainedClique> l = featureOrder.get(term);
+				if (conceptType.equals(Clique.Type.Term)){
+					if (conceptWgt > unigramAddThreshold){
+						addConcept = true;
+					}
+				}
+				else{
+					if (conceptWgt > bigramAddThreshold){
+						addConcept = true;
+					}
+				}
+				if (addConcept) {
+					totalCost = newCost;
+					selectedCliques.add(c);
+				}
+			}                      
+		}
 
-      for (int j = 0; j < l.size(); j++) {
-        sortedCliques.add(l.get(j));
-      }
-    }
+		return selectedCliques;             
+	}
 
-    return sortedCliques;
-  }
 
-  // order cliques by asending order of values[]
-  public static List<String> orderCliques(List<String> cliques, double[] values) {
-    int[] order = new int[values.length];
+	public static Deque<ConstrainedClique> orderByProfitDensity (List<ConstrainedClique> cliques){
 
-    for (int i = 0; i < order.length; i++) {
-      order[i] = i;
-    }
+		//hold unique concept terms
+		List<String> holder1 = new ArrayList<String>(); 
 
-    Quicksort(values, order, 0, order.length - 1);
+		//hold profit/weight/profitDensity value of each unique concept term
+		List<String> holder2 = new ArrayList<String>();
 
-    List<String> returnCliques = new ArrayList<String>();
+		HashMap<String, List<ConstrainedClique>> featureOrder = new HashMap<String, List<ConstrainedClique>>();
 
-    for (int i = 0; i < order.length; i++) {
-      int index = order[i];
+		for (int i=0; i<cliques.size(); i++){
+			ConstrainedClique c = cliques.get(i);
+			String term = c.getConcept();
+			if (featureOrder.containsKey(term)){
+				List<ConstrainedClique> l = featureOrder.get(term);
+				l.add(c);
+			}
+			else{
+				List<ConstrainedClique> l = new ArrayList<ConstrainedClique>();
+				l.add(c);
+				featureOrder.put(term, l);
+				holder1.add(term);
 
-      returnCliques.add(cliques.get(index));
-    }
+				double p = 0 - c.getProfitDensity();
 
-    return returnCliques;
-  }
+				holder2.add(p+"");
+			}
+		}
 
-  // ..................................................................
-  // PRE: Assigned(loBound) && Assigned(hiBound)
-  // && Assigned(vec[loBound..hiBound])
-  // POST: vec[loBound..hiBound] contain same values as
-  // at invocation but are sorted into ascending order
-  // ..................................................................
-  public static void Quicksort(double vec[], int order[], int loBound, int hiBound) {
-    double pivot;
+		double [] values = new double[holder2.size()];
+		for (int i=0; i<values.length; i++){
+			values[i] = Double.parseDouble((String)(holder2.get(i)));
+		}               
 
-    int loSwap;
-    int hiSwap;
-    double temp;
-    int orderTemp;
-    int orderPivot;
+		List<String> reorderedTerms = orderCliques(holder1, values);
 
-    if (loBound >= hiBound) // Zero or one item to sort
-      return;
-    if (hiBound - loBound == 1) { // Just two items to sort
-      if (vec[loBound] > vec[hiBound]) {
-        temp = vec[loBound];
-        orderTemp = order[loBound];
-        vec[loBound] = vec[hiBound];
-        order[loBound] = order[hiBound];
-        vec[hiBound] = temp;
-        order[hiBound] = orderTemp;
+		Deque<ConstrainedClique> sortedCliques = new LinkedList<ConstrainedClique>();
 
-      }
-      return;
-    }
-    // 3 or more items to sort
-    pivot = vec[(loBound + hiBound) / 2]; // use middle as pivot for performance
-    orderPivot = order[(loBound + hiBound) / 2];
-    vec[(loBound + hiBound) / 2] = vec[loBound];
-    order[(loBound + hiBound) / 2] = order[loBound];
+		for (int i=0; i<reorderedTerms.size(); i++){
+			String term = reorderedTerms.get(i);
+			List<ConstrainedClique> l = featureOrder.get(term);
 
-    vec[loBound] = pivot;
-    order[loBound] = orderPivot;
+			for (int j=0; j<l.size(); j++){
+				sortedCliques.add(l.get(j));
+			}
+		}
 
-    loSwap = loBound + 1;
-    hiSwap = hiBound;
+		return sortedCliques;
 
-    do { // the partitioning
-      while (loSwap <= hiSwap && vec[loSwap] <= pivot) {
-        loSwap++;
-      }
-      while (vec[hiSwap] > pivot) {
-        hiSwap--;
-      }
-      if (loSwap < hiSwap) {
-        temp = vec[loSwap];
-        orderTemp = order[loSwap];
-        vec[loSwap] = vec[hiSwap];
-        vec[hiSwap] = temp;
-        order[loSwap] = order[hiSwap];
-        order[hiSwap] = orderTemp;
-      }
-    } while (loSwap < hiSwap);
+	}
 
-    // put pivot back in correct position
-    vec[loBound] = vec[hiSwap];
-    vec[hiSwap] = pivot;
-    order[loBound] = order[hiSwap];
-    order[hiSwap] = orderPivot;
 
-    Quicksort(vec, order, loBound, hiSwap - 1);
-    Quicksort(vec, order, hiSwap + 1, hiBound);
-  }
-}
+	//order cliques by asending order of values[]
+	public static List<String> orderCliques (List<String> cliques, double[] values){
+
+		int [] order = new int[values.length];
+
+		for (int i=0; i<order.length; i++){
+			order[i] = i;
+		}
+
+		Quicksort (values, order, 0, order.length-1);
+
+		List<String> returnCliques = new ArrayList<String>();
+
+		for (int i=0; i<order.length; i++){
+			int index = order[i];
+
+			returnCliques.add(cliques.get(index));
+		}
+
+		return returnCliques;		
+	}
+
+
+
+	public static void Quicksort( double vec[], int order [], int loBound, int hiBound )
+	//..................................................................
+	// PRE: Assigned(loBound) && Assigned(hiBound)
+	//      && Assigned(vec[loBound..hiBound])
+	// POST: vec[loBound..hiBound] contain same values as
+	//      at invocation but are sorted into ascending order
+	//..................................................................
+	{
+
+		double pivot;
+
+		int loSwap;
+		int hiSwap;
+		double temp;
+		int orderTemp;
+		int orderPivot;
+
+		if (loBound >= hiBound) // Zero or one item to sort
+		return;
+		if (hiBound-loBound == 1) { // Just two items to sort
+			if (vec[loBound] > vec[hiBound]) {
+				temp = vec[loBound];
+				orderTemp=order[loBound];
+				vec[loBound] = vec[hiBound];
+				order[loBound]=order[hiBound];
+				vec[hiBound] = temp;
+				order[hiBound]=orderTemp;
+
+			}
+			return;
+		}
+		// 3 or more items to sort
+		pivot = vec[(loBound+hiBound)/2]; //use middle as pivot for performance
+		orderPivot=order[(loBound+hiBound)/2]; 
+		vec[(loBound+hiBound)/2] = vec[loBound];
+		order[(loBound+hiBound)/2]=order[loBound];
+
+		vec[loBound] = pivot;
+		order[loBound]=orderPivot;
+
+		loSwap = loBound + 1;
+		hiSwap = hiBound;
+
+		do { //the partitioning
+			while (loSwap <= hiSwap && vec[loSwap] <= pivot){
+				loSwap++;
+			}
+			while (vec[hiSwap] > pivot){
+				hiSwap--;
+			}
+			if (loSwap < hiSwap) {
+				temp = vec[loSwap];
+				orderTemp=order[loSwap];
+				vec[loSwap] = vec[hiSwap];
+				vec[hiSwap] = temp;
+				order[loSwap]=order[hiSwap];  
+				order[hiSwap]=orderTemp;
+			}
+		} while (loSwap < hiSwap);
+
+		//put pivot back in correct position
+		vec[loBound] = vec[hiSwap];
+		vec[hiSwap] = pivot;
+		order[loBound]=order[hiSwap];
+		order[hiSwap]=orderPivot;
+
+		Quicksort(vec, order, loBound, hiSwap-1); 
+		Quicksort(vec, order, hiSwap+1, hiBound);
+	}
+
+
+ }
