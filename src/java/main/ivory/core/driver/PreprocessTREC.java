@@ -22,7 +22,7 @@ import ivory.core.preprocess.BuildIntDocVectors;
 import ivory.core.preprocess.BuildIntDocVectorsForwardIndex;
 import ivory.core.preprocess.BuildTermDocVectors;
 import ivory.core.preprocess.BuildTermDocVectorsForwardIndex;
-import ivory.core.preprocess.BuildTermIdMap;
+import ivory.core.preprocess.BuildTermIdMap2;
 import ivory.core.preprocess.GetTermCount;
 import ivory.core.tokenize.GalagoTokenizer;
 
@@ -106,7 +106,7 @@ public class PreprocessTREC extends Configured implements Tool {
 
     new BuildTermDocVectors(conf).run();
     new GetTermCount(conf).run();
-    new BuildTermIdMap(conf).run();
+    new BuildTermIdMap2(conf).run();
     new BuildIntDocVectors(conf).run();
 
     new BuildIntDocVectorsForwardIndex(conf).run();

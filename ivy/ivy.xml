@@ -11,6 +11,7 @@
         <exclude org="org.apache.hadoop"/>
         <exclude org="com.cloudera.hadoop"/>
         <exclude org="info.bliki.wiki"/>
+        <exclude org="fastutil"/>
     </dependency>
 
     <dependency org="" name="dsiutils" rev="1.0.12" />

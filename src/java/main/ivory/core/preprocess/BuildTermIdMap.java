@@ -40,7 +40,6 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 import org.apache.log4j.Logger;
 
-
 import edu.umd.cloud9.io.pair.PairOfIntLong;
 import edu.umd.cloud9.util.PowerTool;
 
@@ -231,7 +230,7 @@ public class BuildTermIdMap extends PowerTool {
 		String indexPath = conf.get(Constants.IndexPath);
 		String collectionName = conf.get(Constants.CollectionName);
 
-		LOG.info("PowerTool: BuildTermIdMap2");
+		LOG.info("PowerTool: " + BuildTermIdMap.class.getCanonicalName());
 		LOG.info(String.format(" - %s: %s", Constants.CollectionName, collectionName));
 		LOG.info(String.format(" - %s: %s", Constants.IndexPath, indexPath));
 
