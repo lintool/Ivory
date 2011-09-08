@@ -233,4 +233,13 @@ public class QueryPotential extends PotentialFunction {
       }
     }
   }
+
+  /**
+   * Returns the scoring function associated with this potential.
+   *
+   * @return scoring function associated with this potential
+   */
+  public ScoringFunction getScoringFunction() {
+    return this.scoringFunction;
+  }
 }
