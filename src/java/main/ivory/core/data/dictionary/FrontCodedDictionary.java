@@ -1,6 +1,5 @@
 package ivory.core.data.dictionary;
 
-import it.unimi.dsi.bits.TransformationStrategies;
 import it.unimi.dsi.sux4j.mph.TwoStepsLcpMonotoneMinimalPerfectHashFunction;
 import it.unimi.dsi.util.FrontCodedStringList;
 import it.unimi.dsi.util.ShiftAddXorSignedStringMap;
@@ -11,11 +10,14 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.Writable;
+
+import com.google.common.collect.Lists;
 
 public class FrontCodedDictionary implements Writable, LexicographicallySortedDictionary {
 
@@ -47,39 +49,16 @@ public class FrontCodedDictionary implements Writable, LexicographicallySortedDi
 
   @Override
   public void readFields(final DataInput in) throws IOException {
-    final int size = in.readInt();
+    int size = in.readInt();
+    List<String> list = Lists.newArrayList();
+    for ( int i=0; i<size; i++) {
+      list.add(in.readUTF());
+    }
 
-    stringList = new FrontCodedStringList(new Iterator<String>() {
-      int cnt = 0;
-
-      @Override
-      public boolean hasNext() {
-        return cnt < size;
-      }
-
-      @Override
-      public String next() {
-        String s = null;
-        try {
-          s = in.readUTF();
-        } catch (IOException e) {
-          e.printStackTrace();
-        }
-        cnt++;
-        return s;
-      }
-
-      @Override
-      public void remove() {
-        // TODO Auto-generated method stub
-      }
-
-    }, 8, true);
-
-    dict = new ShiftAddXorSignedStringMap(stringList.iterator(),
-        new TwoStepsLcpMonotoneMinimalPerfectHashFunction<CharSequence>(stringList,
-            TransformationStrategies.prefixFreeIso()));
-
+    stringList = new FrontCodedStringList(list, 8, true);
+    dict = new ShiftAddXorSignedStringMap(list.iterator(),
+        new TwoStepsLcpMonotoneMinimalPerfectHashFunction<CharSequence>(list,
+            new DictionaryTransformationStrategy(true)));
   }
 
   @Override

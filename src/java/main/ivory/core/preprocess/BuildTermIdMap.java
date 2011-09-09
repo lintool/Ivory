@@ -16,11 +16,14 @@
 
 package ivory.core.preprocess;
 
+import it.unimi.dsi.bits.TransformationStrategy;
 import ivory.core.Constants;
 import ivory.core.RetrievalEnvironment;
+import ivory.core.data.dictionary.DictionaryTransformationStrategy;
 import ivory.core.util.QuickSort;
 
 import java.io.IOException;
+import java.nio.charset.CharacterCodingException;
 import java.util.Iterator;
 
 import org.apache.hadoop.conf.Configuration;
@@ -29,6 +32,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.WritableComparator;
 import org.apache.hadoop.io.WritableUtils;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
@@ -138,6 +142,7 @@ public class BuildTermIdMap extends PowerTool {
         throw new RuntimeException("More than one record for term: " + term);
       }
 
+      System.out.println(term);
       termsOut.writeUTF(term);
 
       seqNums[curKeyIndex] = curKeyIndex;
@@ -230,12 +235,12 @@ public class BuildTermIdMap extends PowerTool {
     Path dfByIntFilePath = new Path(env.getDfByIntData());
     Path cfByIntFilePath = new Path(env.getCfByIntData());
 
-    if (fs.exists(termsFilePath) || fs.exists(termIDsFilePath) || fs.exists(idToTermFilePath)
-        || fs.exists(dfByTermFilePath) || fs.exists(cfByTermFilePath)
-        || fs.exists(dfByIntFilePath) || fs.exists(cfByIntFilePath)) {
-      LOG.info("term and term id data exist: skipping!");
-      return 0;
-    }
+//    if (fs.exists(termsFilePath) || fs.exists(termIDsFilePath) || fs.exists(idToTermFilePath)
+//        || fs.exists(dfByTermFilePath) || fs.exists(cfByTermFilePath)
+//        || fs.exists(dfByIntFilePath) || fs.exists(cfByIntFilePath)) {
+//      LOG.info("term and term id data exist: skipping!");
+//      return 0;
+//    }
 
     conf.setInt(Constants.CollectionTermCount, (int) env.readCollectionTermCount());
 
@@ -257,6 +262,7 @@ public class BuildTermIdMap extends PowerTool {
     job.setMapOutputKeyClass(Text.class);
     job.setMapOutputValueClass(PairOfIntLong.class);
     job.setOutputKeyClass(Text.class);
+    job.setSortComparatorClass(MyComparator.class);
 
     job.setMapperClass(Mapper.class);
     job.setReducerClass(MyReducer.class);
@@ -269,4 +275,37 @@ public class BuildTermIdMap extends PowerTool {
 
     return 0;
   }
+
+  /** A WritableComparator optimized for Text keys. */
+  public static class MyComparator extends WritableComparator {
+    private TransformationStrategy strategy = new DictionaryTransformationStrategy(true);
+
+    public MyComparator() {
+      super(Text.class);
+    }
+
+    public int compare(byte[] b1, int s1, int l1,
+                       byte[] b2, int s2, int l2) {
+      int n1 = WritableUtils.decodeVIntSize(b1[s1]);
+      int n2 = WritableUtils.decodeVIntSize(b2[s2]);
+
+      String t1=null, t2=null;
+      try {
+        t1 = Text.decode(b1, s1+n1, l1-n1);
+        t2 = Text.decode(b2, s2+n2, l2-n2);
+      } catch (CharacterCodingException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      }
+
+      try{
+      return strategy.toBitVector(t1).compareTo(strategy.toBitVector(t2));
+      } catch (Exception e) {
+        System.out.println(t1 + " " +t2);
+        throw new RuntimeException();
+      }
+      //return compareBytes(b1, s1+n1, l1-n1, b2, s2+n2, l2-n2);
+    }
+  }
+
 }
