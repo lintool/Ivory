@@ -17,8 +17,8 @@
     <dependency org="" name="dsiutils" rev="1.0.12" />
     <dependency org="" name="sux4j" rev="2.0.1" />
     <dependency org="" name="fastutil" rev="6.0.0" />
-    <dependency org="" name="jsap" rev="2.1" />
-    <dependency org="" name="jakarta-commons-collections" rev="3.2.1" />
+    <dependency org="com.martiansoftware" name="jsap" rev="2.1" />
+    <dependency org="commons-collections" name="commons-collections" rev="3.2.1" />
 
     <dependency org="xerces" name="xercesImpl" rev="2.9.1" />
     <dependency org="javax.mail" name="mail" rev="1.4.1"/>    
