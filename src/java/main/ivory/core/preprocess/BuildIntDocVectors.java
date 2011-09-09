@@ -18,7 +18,7 @@ package ivory.core.preprocess;
 
 import ivory.core.Constants;
 import ivory.core.RetrievalEnvironment;
-import ivory.core.data.dictionary.DefaultFrequencySortedDictionary2;
+import ivory.core.data.dictionary.DefaultFrequencySortedDictionary;
 import ivory.core.data.document.IntDocVector;
 import ivory.core.data.document.LazyIntDocVector;
 import ivory.core.data.document.TermDocVector;
@@ -55,7 +55,7 @@ public class BuildIntDocVectors extends PowerTool {
 
   private static class MyMapper
       extends Mapper<IntWritable, TermDocVector, IntWritable, IntDocVector> {
-    private DefaultFrequencySortedDictionary2 dictionary = null;
+    private DefaultFrequencySortedDictionary dictionary = null;
     private static final LazyIntDocVector docVector = new LazyIntDocVector();
 
     @Override
@@ -73,7 +73,7 @@ public class BuildIntDocVectors extends PowerTool {
 
         // Take a different code path if we're in standalone mode.
         if (conf.get("mapred.job.tracker").equals("local")) {
-          dictionary = new DefaultFrequencySortedDictionary2(new Path(termsFile),
+          dictionary = new DefaultFrequencySortedDictionary(new Path(termsFile),
               new Path(termidsFile), new Path(idToTermFile), FileSystem.getLocal(conf));
         } else {
           // We need to figure out which file in the DistributeCache is which...
@@ -94,7 +94,7 @@ public class BuildIntDocVectors extends PowerTool {
           LOG.info(" - id: " + pathMapping.get(termidsFile));
           LOG.info(" - idToTerms: " + pathMapping.get(idToTermFile));
 
-          dictionary = new DefaultFrequencySortedDictionary2(pathMapping.get(termsFile),
+          dictionary = new DefaultFrequencySortedDictionary(pathMapping.get(termsFile),
               pathMapping.get(termidsFile), pathMapping.get(idToTermFile),
               FileSystem.getLocal(context.getConfiguration()));
         }

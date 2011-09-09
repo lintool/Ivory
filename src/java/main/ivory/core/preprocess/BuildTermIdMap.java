@@ -18,7 +18,6 @@ package ivory.core.preprocess;
 
 import ivory.core.Constants;
 import ivory.core.RetrievalEnvironment;
-import ivory.core.data.dictionary.PrefixEncodedLexicographicallySortedDictionary;
 import ivory.core.util.QuickSort;
 
 import java.io.IOException;
@@ -44,247 +43,230 @@ import edu.umd.cloud9.io.pair.PairOfIntLong;
 import edu.umd.cloud9.util.PowerTool;
 
 public class BuildTermIdMap extends PowerTool {
-	private static final Logger LOG = Logger.getLogger(BuildTermIdMap.class);
+  private static final Logger LOG = Logger.getLogger(BuildTermIdMap.class);
 
-	protected static enum Terms { Total }
+  protected static enum Terms { Total }
 
-	private static class MyReducer
-	    extends Reducer<Text, PairOfIntLong, NullWritable, NullWritable> {
-		private FSDataOutputStream termsOut, idsOut, idsToTermOut,
-		    dfByTermOut, cfByTermOut, dfByIntOut, cfByIntOut;
-		private int nTerms, window;
-		private int[] seqNums = null;
-		private int[] dfs = null;
-		private long[] cfs = null;
-		private int curKeyIndex = 0;
-		private String lastKey = "";
+  private static class MyReducer
+      extends Reducer<Text, PairOfIntLong, NullWritable, NullWritable> {
+    private FSDataOutputStream termsOut, idsOut, idsToTermOut,
+        dfByTermOut, cfByTermOut, dfByIntOut, cfByIntOut;
+    private int nTerms, window;
+    private int[] seqNums = null;
+    private int[] dfs = null;
+    private long[] cfs = null;
+    private int curKeyIndex = 0;
 
-		@Override
-		public void setup(Reducer<Text, PairOfIntLong, NullWritable, NullWritable>.Context context) {
-			Configuration conf = context.getConfiguration();
-			FileSystem fs;
-			try {
-				fs = FileSystem.get(conf);
-			} catch (IOException e) {
-				throw new RuntimeException("Error opening the FileSystem!");
-			}
-			
-			RetrievalEnvironment env;
-			try {
-				env = new RetrievalEnvironment(conf.get(Constants.IndexPath), fs);
-			} catch (IOException e) {
-				throw new RuntimeException("Unable to create RetrievalEnvironment!");
-			}
+    @Override
+    public void setup(Reducer<Text, PairOfIntLong, NullWritable, NullWritable>.Context context) {
+      Configuration conf = context.getConfiguration();
+      FileSystem fs;
+      try {
+        fs = FileSystem.get(conf);
+      } catch (IOException e) {
+        throw new RuntimeException("Error opening the FileSystem!");
+      }
 
-			String termsFile = env.getIndexTermsData();
-			String idsFile = env.getIndexTermIdsData();
-			String idToTermFile = env.getIndexTermIdMappingData();
+      RetrievalEnvironment env;
+      try {
+        env = new RetrievalEnvironment(conf.get(Constants.IndexPath), fs);
+      } catch (IOException e) {
+        throw new RuntimeException("Unable to create RetrievalEnvironment!");
+      }
 
-			String dfByTermFile = env.getDfByTermData();
-			String cfByTermFile = env.getCfByTermData();
-			String dfByIntFile = env.getDfByIntData();
-			String cfByIntFile = env.getCfByIntData();
+      String termsFile = env.getIndexTermsData();
+      String idsFile = env.getIndexTermIdsData();
+      String idToTermFile = env.getIndexTermIdMappingData();
 
-			nTerms = conf.getInt(Constants.CollectionTermCount, 0);
-			window = conf.getInt(Constants.TermIndexWindow, 8);
+      String dfByTermFile = env.getDfByTermData();
+      String cfByTermFile = env.getCfByTermData();
+      String dfByIntFile = env.getDfByIntData();
+      String cfByIntFile = env.getCfByIntData();
 
-			seqNums = new int[nTerms];
-			dfs = new int[nTerms];
-			cfs = new long[nTerms];
+      nTerms = conf.getInt(Constants.CollectionTermCount, 0);
+      window = conf.getInt(Constants.TermIndexWindow, 8);
 
-			LOG.info("Ivory.PrefixEncodedTermsFile: " + termsFile);
-			LOG.info("Ivory.TermIDsFile" + idsFile);
-			LOG.info("Ivory.IDToTermFile" + idToTermFile);
-			LOG.info("Ivory.CollectionTermCount: " + nTerms);
-			LOG.info("Ivory.ForwardIndexWindow: " + window);
+      seqNums = new int[nTerms];
+      dfs = new int[nTerms];
+      cfs = new long[nTerms];
 
-			try {
-				termsOut = fs.create(new Path(termsFile), true);
-				idsOut = fs.create(new Path(idsFile), true);
-				idsToTermOut = fs.create(new Path(idToTermFile), true);
-				termsOut.writeInt(nTerms);
-				termsOut.writeInt(window);
-				idsOut.writeInt(nTerms);
-				idsToTermOut.writeInt(nTerms);
+      LOG.info("Ivory.PrefixEncodedTermsFile: " + termsFile);
+      LOG.info("Ivory.TermIDsFile" + idsFile);
+      LOG.info("Ivory.IDToTermFile" + idToTermFile);
+      LOG.info("Ivory.CollectionTermCount: " + nTerms);
+      LOG.info("Ivory.ForwardIndexWindow: " + window);
 
-				dfByTermOut = fs.create(new Path(dfByTermFile), true);
-				cfByTermOut = fs.create(new Path(cfByTermFile), true);
-				dfByTermOut.writeInt(nTerms);
-				cfByTermOut.writeInt(nTerms);
+      try {
+        termsOut = fs.create(new Path(termsFile), true);
+        termsOut.writeInt(nTerms);
 
-				dfByIntOut = fs.create(new Path(dfByIntFile), true);
-				cfByIntOut = fs.create(new Path(cfByIntFile), true);
-				dfByIntOut.writeInt(nTerms);
-				cfByIntOut.writeInt(nTerms);
-			} catch (Exception e) {
-				throw new RuntimeException("error in creating files");
-			}
-			LOG.info("Finished config.");
-		}
+        idsOut = fs.create(new Path(idsFile), true);
+        idsOut.writeInt(nTerms);
 
-		@Override
-		public void reduce(Text key, Iterable<PairOfIntLong> values, Context context)
-		    throws IOException, InterruptedException {
-			String term = key.toString();
-			Iterator<PairOfIntLong> iter = values.iterator();
-			PairOfIntLong p = iter.next();
-			int df = p.getLeftElement();
-			long cf = p.getRightElement();
-			WritableUtils.writeVInt(dfByTermOut, df);
-			WritableUtils.writeVLong(cfByTermOut, cf);
-			if (iter.hasNext()) {
-				throw new RuntimeException("More than one record for term: " + term);
-			}
+        idsToTermOut = fs.create(new Path(idToTermFile), true);
+        idsToTermOut.writeInt(nTerms);
 
-			int prefixLength;
+        dfByTermOut = fs.create(new Path(dfByTermFile), true);
+        dfByTermOut.writeInt(nTerms);
 
-			if (curKeyIndex % window == 0) {
-				byte[] byteArray = term.getBytes();
-				termsOut.writeByte((byte) (byteArray.length)); // suffix length
-				for (int j = 0; j < byteArray.length; j++) {
-					termsOut.writeByte(byteArray[j]);
-				}
-			} else {
-				prefixLength = PrefixEncodedLexicographicallySortedDictionary.getPrefix(lastKey, term);
-				byte[] suffix = term.substring(prefixLength).getBytes();
+        cfByTermOut = fs.create(new Path(cfByTermFile), true);
+        cfByTermOut.writeInt(nTerms);
 
-				if (prefixLength > Byte.MAX_VALUE || suffix.length > Byte.MAX_VALUE)
-					throw new RuntimeException("prefix/suffix length overflow");
+        dfByIntOut = fs.create(new Path(dfByIntFile), true);
+        dfByIntOut.writeInt(nTerms);
 
-				termsOut.writeByte((byte) suffix.length); // suffix length
-				termsOut.writeByte((byte) prefixLength);  // prefix length
-				for (int j = 0; j < suffix.length; j++) {
-					termsOut.writeByte(suffix[j]);
-				}
-			}
-			lastKey = term;
-			seqNums[curKeyIndex] = curKeyIndex;
-			dfs[curKeyIndex] = -df;
-			cfs[curKeyIndex] = cf;
-			curKeyIndex++;
+        cfByIntOut = fs.create(new Path(cfByIntFile), true);
+        cfByIntOut.writeInt(nTerms);
+      } catch (Exception e) {
+        throw new RuntimeException("error in creating files");
+      }
+      LOG.info("Finished config.");
+    }
 
-			context.getCounter(Terms.Total).increment(1);
-		}
+    @Override
+    public void reduce(Text key, Iterable<PairOfIntLong> values, Context context)
+        throws IOException, InterruptedException {
+      String term = key.toString();
+      Iterator<PairOfIntLong> iter = values.iterator();
+      PairOfIntLong p = iter.next();
+      int df = p.getLeftElement();
+      long cf = p.getRightElement();
+      WritableUtils.writeVInt(dfByTermOut, df);
+      WritableUtils.writeVLong(cfByTermOut, cf);
 
-		@Override
-		public void cleanup(
-		    Reducer<Text, PairOfIntLong, NullWritable, NullWritable>.Context context)
-		    throws IOException {
-			LOG.info("Finished reduce.");
-			if (curKeyIndex != nTerms) {
-				throw new RuntimeException("Total expected Terms: " + nTerms +
-				    ", Total observed terms: " + curKeyIndex + "!");
-			}
-			// Sort based on df and change seqNums accordingly.
-			QuickSort.quicksortWithSecondary(seqNums, dfs, cfs, 0, nTerms - 1);
+      if (iter.hasNext()) {
+        throw new RuntimeException("More than one record for term: " + term);
+      }
 
-			// Write sorted dfs and cfs by int here.
-			for (int i = 0; i < nTerms; i++) {
-				WritableUtils.writeVInt(dfByIntOut, -dfs[i]);
-				WritableUtils.writeVLong(cfByIntOut, cfs[i]);
-			}
-			cfs = null;
+      termsOut.writeUTF(term);
 
-			// Encode the sorted dfs into ids ==> df values erased and become
-			// ids instead. Note that first term id is 1.
-			for (int i = 0; i < nTerms; i++) {
-				dfs[i] = i + 1;
-			}
+      seqNums[curKeyIndex] = curKeyIndex;
+      dfs[curKeyIndex] = -df;
+      cfs[curKeyIndex] = cf;
+      curKeyIndex++;
 
-			// Write current seq nums to be index into the term array.
-			for (int i = 0; i < nTerms; i++)
-				idsToTermOut.writeInt(seqNums[i]);
+      context.getCounter(Terms.Total).increment(1);
+    }
 
-			// Sort on seqNums to get the right writing order.
-			QuickSort.quicksort(dfs, seqNums, 0, nTerms - 1);
-			for (int i = 0; i < nTerms; i++) {
-				idsOut.writeInt(dfs[i]);
-			}
+    @Override
+    public void cleanup(
+        Reducer<Text, PairOfIntLong, NullWritable, NullWritable>.Context context)
+        throws IOException {
+      LOG.info("Finished reduce.");
+      if (curKeyIndex != nTerms) {
+        throw new RuntimeException("Total expected Terms: " + nTerms +
+            ", Total observed terms: " + curKeyIndex + "!");
+      }
+      // Sort based on df and change seqNums accordingly.
+      QuickSort.quicksortWithSecondary(seqNums, dfs, cfs, 0, nTerms - 1);
 
-			termsOut.close();
-			idsOut.close();
-			idsToTermOut.close();
-			dfByTermOut.close();
-			cfByTermOut.close();
-			dfByIntOut.close();
-			cfByIntOut.close();
-			LOG.info("Finished close.");
-		}
-	}
+      // Write sorted dfs and cfs by int here.
+      for (int i = 0; i < nTerms; i++) {
+        WritableUtils.writeVInt(dfByIntOut, -dfs[i]);
+        WritableUtils.writeVLong(cfByIntOut, cfs[i]);
+      }
+      cfs = null;
 
-	public static final String[] RequiredParameters = { 
-			Constants.CollectionName, Constants.IndexPath, Constants.TermIndexWindow };
+      // Encode the sorted dfs into ids ==> df values erased and become ids instead. Note that first
+      // term id is 1.
+      for (int i = 0; i < nTerms; i++) {
+        dfs[i] = i + 1;
+      }
 
-	public String[] getRequiredParameters() {
-		return RequiredParameters;
-	}
+      // Write current seq nums to be index into the term array.
+      for (int i = 0; i < nTerms; i++)
+        idsToTermOut.writeInt(seqNums[i]);
 
-	public BuildTermIdMap(Configuration conf) {
-		super(conf);
-	}
+      // Sort on seqNums to get the right writing order.
+      QuickSort.quicksort(dfs, seqNums, 0, nTerms - 1);
+      for (int i = 0; i < nTerms; i++) {
+        idsOut.writeInt(dfs[i]);
+      }
 
-	public int runTool() throws Exception {
-		Configuration conf = getConf();
-		FileSystem fs = FileSystem.get(conf);
+      termsOut.close();
+      idsOut.close();
+      idsToTermOut.close();
+      dfByTermOut.close();
+      cfByTermOut.close();
+      dfByIntOut.close();
+      cfByIntOut.close();
+      LOG.info("Finished close.");
+    }
+  }
 
-		String indexPath = conf.get(Constants.IndexPath);
-		String collectionName = conf.get(Constants.CollectionName);
+  public static final String[] RequiredParameters = {
+      Constants.CollectionName, Constants.IndexPath, Constants.TermIndexWindow };
 
-		LOG.info("PowerTool: " + BuildTermIdMap.class.getCanonicalName());
-		LOG.info(String.format(" - %s: %s", Constants.CollectionName, collectionName));
-		LOG.info(String.format(" - %s: %s", Constants.IndexPath, indexPath));
+  public String[] getRequiredParameters() {
+    return RequiredParameters;
+  }
 
-		RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fs);
-		if (!fs.exists(new Path(indexPath))) {
-			LOG.error("index path doesn't existing: skipping!");
-			return 0;
-		}
+  public BuildTermIdMap(Configuration conf) {
+    super(conf);
+  }
 
-		Path termsFilePath = new Path(env.getIndexTermsData());
-		Path termIDsFilePath = new Path(env.getIndexTermIdsData());
-		Path idToTermFilePath = new Path(env.getIndexTermIdMappingData());
-		Path dfByTermFilePath = new Path(env.getDfByTermData());
-		Path cfByTermFilePath = new Path(env.getCfByTermData());
-		Path dfByIntFilePath = new Path(env.getDfByIntData());
-		Path cfByIntFilePath = new Path(env.getCfByIntData());
+  public int runTool() throws Exception {
+    Configuration conf = getConf();
+    FileSystem fs = FileSystem.get(conf);
 
-		if (fs.exists(termsFilePath) || fs.exists(termIDsFilePath) || fs.exists(idToTermFilePath)
-				|| fs.exists(dfByTermFilePath) || fs.exists(cfByTermFilePath)
-				|| fs.exists(dfByIntFilePath) || fs.exists(cfByIntFilePath)) {
-			LOG.info("term and term id data exist: skipping!");
-			return 0;
-		}
+    String indexPath = conf.get(Constants.IndexPath);
+    String collectionName = conf.get(Constants.CollectionName);
 
-		conf.setInt(Constants.CollectionTermCount, (int) env.readCollectionTermCount());
+    LOG.info("PowerTool: " + BuildTermIdMap.class.getCanonicalName());
+    LOG.info(String.format(" - %s: %s", Constants.CollectionName, collectionName));
+    LOG.info(String.format(" - %s: %s", Constants.IndexPath, indexPath));
 
-		Path tmpPath = new Path(env.getTempDirectory());
-		fs.delete(tmpPath, true);
+    RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fs);
+    if (!fs.exists(new Path(indexPath))) {
+      LOG.error("index path doesn't existing: skipping!");
+      return 0;
+    }
 
-		Job job = new Job(conf,
-		    BuildTermIdMap.class.getSimpleName() + ":" + collectionName);
+    Path termsFilePath = new Path(env.getIndexTermsData());
+    Path termIDsFilePath = new Path(env.getIndexTermIdsData());
+    Path idToTermFilePath = new Path(env.getIndexTermIdMappingData());
+    Path dfByTermFilePath = new Path(env.getDfByTermData());
+    Path cfByTermFilePath = new Path(env.getCfByTermData());
+    Path dfByIntFilePath = new Path(env.getDfByIntData());
+    Path cfByIntFilePath = new Path(env.getCfByIntData());
 
-		job.setJarByClass(BuildTermIdMap.class);
-		job.setNumReduceTasks(1);
+    if (fs.exists(termsFilePath) || fs.exists(termIDsFilePath) || fs.exists(idToTermFilePath)
+        || fs.exists(dfByTermFilePath) || fs.exists(cfByTermFilePath)
+        || fs.exists(dfByIntFilePath) || fs.exists(cfByIntFilePath)) {
+      LOG.info("term and term id data exist: skipping!");
+      return 0;
+    }
 
-		FileInputFormat.setInputPaths(job, new Path(env.getTermDfCfDirectory()));
-		FileOutputFormat.setOutputPath(job, tmpPath);
+    conf.setInt(Constants.CollectionTermCount, (int) env.readCollectionTermCount());
 
-		job.setInputFormatClass(SequenceFileInputFormat.class);
-		job.setOutputFormatClass(SequenceFileOutputFormat.class);
+    Path tmpPath = new Path(env.getTempDirectory());
+    fs.delete(tmpPath, true);
 
-		job.setMapOutputKeyClass(Text.class);
-		job.setMapOutputValueClass(PairOfIntLong.class);
-		job.setOutputKeyClass(Text.class);
+    Job job = new Job(conf,
+        BuildTermIdMap.class.getSimpleName() + ":" + collectionName);
 
-		job.setMapperClass(Mapper.class);
-		job.setReducerClass(MyReducer.class);
+    job.setJarByClass(BuildTermIdMap.class);
+    job.setNumReduceTasks(1);
 
-		long startTime = System.currentTimeMillis();
-		job.waitForCompletion(true);
-		LOG.info("Job Finished in " + (System.currentTimeMillis() - startTime) / 1000.0	+ " seconds");
+    FileInputFormat.setInputPaths(job, new Path(env.getTermDfCfDirectory()));
+    FileOutputFormat.setOutputPath(job, tmpPath);
 
-		fs.delete(tmpPath, true);
+    job.setInputFormatClass(SequenceFileInputFormat.class);
+    job.setOutputFormatClass(SequenceFileOutputFormat.class);
 
-		return 0;
-	}
+    job.setMapOutputKeyClass(Text.class);
+    job.setMapOutputValueClass(PairOfIntLong.class);
+    job.setOutputKeyClass(Text.class);
+
+    job.setMapperClass(Mapper.class);
+    job.setReducerClass(MyReducer.class);
+
+    long startTime = System.currentTimeMillis();
+    job.waitForCompletion(true);
+    LOG.info("Job Finished in " + (System.currentTimeMillis() - startTime) / 1000.0 + " seconds");
+
+    fs.delete(tmpPath, true);
+
+    return 0;
+  }
 }

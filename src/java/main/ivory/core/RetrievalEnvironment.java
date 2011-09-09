@@ -16,7 +16,7 @@
 
 package ivory.core;
 
-import ivory.core.data.dictionary.DefaultFrequencySortedDictionary2;
+import ivory.core.data.dictionary.DefaultFrequencySortedDictionary;
 import ivory.core.data.document.IntDocVector;
 import ivory.core.data.document.IntDocVectorsForwardIndex;
 import ivory.core.data.document.TermDocVector;
@@ -77,7 +77,7 @@ public class RetrievalEnvironment {
 	protected String postingsType;           // Type of postings in the index.
 	protected DocLengthTable doclengths;     // Document length lookup.
 	protected Tokenizer tokenizer;           // Tokenizer for parsing queries.
-	protected DefaultFrequencySortedDictionary2 termidMap;  // Mapping from terms to term ids.
+	protected DefaultFrequencySortedDictionary termidMap;  // Mapping from terms to term ids.
 
 	protected IntPostingsForwardIndex postingsIndex;     // Forward index into postings.
 	protected IntDocVectorsForwardIndex docvectorsIndex; // Forward index into int doc vectors.
@@ -155,8 +155,8 @@ public class RetrievalEnvironment {
 		LOG.info("Done!");
 
 		try {
-			termidMap = new DefaultFrequencySortedDictionary2(new Path(getIndexTermsData()), new Path(getIndexTermIdsData()),
-					new Path(getIndexTermIdMappingData()), fs);
+			termidMap = new DefaultFrequencySortedDictionary(new Path(getIndexTermsData()),
+			    new Path(getIndexTermIdsData()), new Path(getIndexTermIdMappingData()), fs);
 		} catch (Exception e) {
 			throw new ConfigurationException("Error initializing term to term id mapping!", e);
 		}
