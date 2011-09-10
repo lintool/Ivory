@@ -6,6 +6,11 @@ import it.unimi.dsi.bits.TransformationStrategy;
 
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.CharacterCodingException;
+
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.WritableComparator;
+import org.apache.hadoop.io.WritableUtils;
 
 public class DictionaryTransformationStrategy implements TransformationStrategy<CharSequence>, Serializable {
   private static final long serialVersionUID = 1L;
@@ -22,13 +27,11 @@ public class DictionaryTransformationStrategy implements TransformationStrategy<
   
   public static class ISOCharSequenceBitVector extends AbstractBitVector implements Serializable {
     private static final long serialVersionUID = 1L;
-    private transient CharSequence s;
     private transient long length;
     private transient long actualEnd;
     byte[] bytes;
 
     public ISOCharSequenceBitVector( final CharSequence s, final boolean prefixFree) {
-      this.s = s;
       try {
         bytes = s.toString().getBytes("UTF16");
       } catch (UnsupportedEncodingException e) {
@@ -68,4 +71,35 @@ public class DictionaryTransformationStrategy implements TransformationStrategy<
 //  private Object readResolve() {
 //    return prefixFree ? PREFIX_FREE_ISO : ISO; 
 //  }
+
+  public static class Comparator extends WritableComparator {
+    private TransformationStrategy<CharSequence> strategy = new DictionaryTransformationStrategy(true);
+
+    public Comparator() {
+      super(Text.class);
+    }
+
+    public int compare(byte[] b1, int s1, int l1,
+                       byte[] b2, int s2, int l2) {
+      int n1 = WritableUtils.decodeVIntSize(b1[s1]);
+      int n2 = WritableUtils.decodeVIntSize(b2[s2]);
+
+      String t1=null, t2=null;
+      try {
+        t1 = Text.decode(b1, s1+n1, l1-n1);
+        t2 = Text.decode(b2, s2+n2, l2-n2);
+      } catch (CharacterCodingException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      }
+
+      try{
+      return strategy.toBitVector(t1).compareTo(strategy.toBitVector(t2));
+      } catch (Exception e) {
+        System.out.println(t1 + " " +t2);
+        throw new RuntimeException();
+      }
+      //return compareBytes(b1, s1+n1, l1-n1, b2, s2+n2, l2-n2);
+    }
+  }
 }

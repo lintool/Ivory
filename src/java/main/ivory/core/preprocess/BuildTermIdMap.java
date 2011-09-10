@@ -262,7 +262,7 @@ public class BuildTermIdMap extends PowerTool {
     job.setMapOutputKeyClass(Text.class);
     job.setMapOutputValueClass(PairOfIntLong.class);
     job.setOutputKeyClass(Text.class);
-    job.setSortComparatorClass(MyComparator.class);
+    job.setSortComparatorClass(DictionaryTransformationStrategy.Comparator.class);
 
     job.setMapperClass(Mapper.class);
     job.setReducerClass(MyReducer.class);
@@ -275,37 +275,4 @@ public class BuildTermIdMap extends PowerTool {
 
     return 0;
   }
-
-  /** A WritableComparator optimized for Text keys. */
-  public static class MyComparator extends WritableComparator {
-    private TransformationStrategy strategy = new DictionaryTransformationStrategy(true);
-
-    public MyComparator() {
-      super(Text.class);
-    }
-
-    public int compare(byte[] b1, int s1, int l1,
-                       byte[] b2, int s2, int l2) {
-      int n1 = WritableUtils.decodeVIntSize(b1[s1]);
-      int n2 = WritableUtils.decodeVIntSize(b2[s2]);
-
-      String t1=null, t2=null;
-      try {
-        t1 = Text.decode(b1, s1+n1, l1-n1);
-        t2 = Text.decode(b2, s2+n2, l2-n2);
-      } catch (CharacterCodingException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
-      }
-
-      try{
-      return strategy.toBitVector(t1).compareTo(strategy.toBitVector(t2));
-      } catch (Exception e) {
-        System.out.println(t1 + " " +t2);
-        throw new RuntimeException();
-      }
-      //return compareBytes(b1, s1+n1, l1-n1, b2, s2+n2, l2-n2);
-    }
-  }
-
 }
