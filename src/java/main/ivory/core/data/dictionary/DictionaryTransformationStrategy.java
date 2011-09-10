@@ -9,10 +9,9 @@ import java.io.UnsupportedEncodingException;
 import java.nio.charset.CharacterCodingException;
 
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.io.WritableComparator;
 import org.apache.hadoop.io.WritableUtils;
 
-public class DictionaryTransformationStrategy implements TransformationStrategy<CharSequence>, Serializable {
+public class DictionaryTransformationStrategy implements TransformationStrategy<CharSequence> {
   private static final long serialVersionUID = 1L;
   /** Whether we should guarantee prefix-freeness by adding 0 to the end of each string. */
   private final boolean prefixFree;
@@ -62,25 +61,33 @@ public class DictionaryTransformationStrategy implements TransformationStrategy<
     return new ISOCharSequenceBitVector( s, prefixFree );
   }
 
+  @Override
   public long numBits() { return 0; }
 
+  @Override
   public TransformationStrategy<CharSequence> copy() {
-    return this;
+    return new DictionaryTransformationStrategy(prefixFree);
   }
-  
-//  private Object readResolve() {
-//    return prefixFree ? PREFIX_FREE_ISO : ISO; 
-//  }
 
-  public static class Comparator extends WritableComparator {
-    private TransformationStrategy<CharSequence> strategy = new DictionaryTransformationStrategy(true);
+  public static class Comparator implements java.util.Comparator<String> {
+    private final TransformationStrategy<CharSequence> strategy =
+      new DictionaryTransformationStrategy(true);
 
-    public Comparator() {
+    @Override
+    public int compare(String s1, String s2) {
+      return strategy.toBitVector(s1).compareTo(strategy.toBitVector(s2));
+    }
+  }
+
+  public static class WritableComparator extends org.apache.hadoop.io.WritableComparator {
+    private final TransformationStrategy<CharSequence> strategy =
+        new DictionaryTransformationStrategy(true);
+
+    public WritableComparator() {
       super(Text.class);
     }
 
-    public int compare(byte[] b1, int s1, int l1,
-                       byte[] b2, int s2, int l2) {
+    public int compare(byte[] b1, int s1, int l1, byte[] b2, int s2, int l2) {
       int n1 = WritableUtils.decodeVIntSize(b1[s1]);
       int n2 = WritableUtils.decodeVIntSize(b2[s2]);
 
@@ -89,17 +96,10 @@ public class DictionaryTransformationStrategy implements TransformationStrategy<
         t1 = Text.decode(b1, s1+n1, l1-n1);
         t2 = Text.decode(b2, s2+n2, l2-n2);
       } catch (CharacterCodingException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
+        throw new RuntimeException(e);
       }
 
-      try{
       return strategy.toBitVector(t1).compareTo(strategy.toBitVector(t2));
-      } catch (Exception e) {
-        System.out.println(t1 + " " +t2);
-        throw new RuntimeException();
-      }
-      //return compareBytes(b1, s1+n1, l1-n1, b2, s2+n2, l2-n2);
     }
   }
 }

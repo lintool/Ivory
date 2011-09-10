@@ -41,8 +41,8 @@ import org.apache.log4j.Logger;
 import edu.umd.cloud9.io.pair.PairOfIntLong;
 import edu.umd.cloud9.util.PowerTool;
 
-public class GetTermCount extends PowerTool {
-	private static final Logger LOG = Logger.getLogger(GetTermCount.class);
+public class ComputeGlobalTermStatistics extends PowerTool {
+	private static final Logger LOG = Logger.getLogger(ComputeGlobalTermStatistics.class);
 
 	protected static enum Statistics { Docs, Terms, SumOfDocLengths }
 
@@ -120,7 +120,7 @@ public class GetTermCount extends PowerTool {
 		return RequiredParameters;
 	}
 
-	public GetTermCount(Configuration conf) {
+	public ComputeGlobalTermStatistics(Configuration conf) {
 		super(conf);
 	}
 
@@ -143,7 +143,7 @@ public class GetTermCount extends PowerTool {
 			return 0;
 		}
 
-		LOG.info("PowerTool: " + GetTermCount.class.getCanonicalName());
+		LOG.info("PowerTool: " + ComputeGlobalTermStatistics.class.getCanonicalName());
 		LOG.info(String.format(" - %s: %s", Constants.CollectionName, collectionName));
 		LOG.info(String.format(" - %s: %s", Constants.IndexPath, indexPath));
 		LOG.info(String.format(" - %s: %s", Constants.NumReduceTasks, reduceTasks));
@@ -154,8 +154,8 @@ public class GetTermCount extends PowerTool {
 			return 0;
 		}
 
-		Job job = new Job(getConf(), GetTermCount.class.getSimpleName() + ":" + collectionName);
-		job.setJarByClass(GetTermCount.class);
+		Job job = new Job(getConf(), ComputeGlobalTermStatistics.class.getSimpleName() + ":" + collectionName);
+		job.setJarByClass(ComputeGlobalTermStatistics.class);
 
 		job.setNumReduceTasks(reduceTasks);
 

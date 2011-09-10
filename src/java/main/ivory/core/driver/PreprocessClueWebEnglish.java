@@ -23,6 +23,7 @@ import ivory.core.preprocess.BuildIntDocVectors;
 import ivory.core.preprocess.BuildIntDocVectorsForwardIndex;
 import ivory.core.preprocess.BuildTermDocVectors;
 import ivory.core.preprocess.BuildTermDocVectorsForwardIndex;
+import ivory.core.preprocess.ComputeGlobalTermStatistics;
 import ivory.core.tokenize.GalagoTokenizer;
 
 import org.apache.hadoop.conf.Configuration;
@@ -98,9 +99,8 @@ public class PreprocessClueWebEnglish extends Configured implements Tool {
     conf.setInt(Constants.TermIndexWindow, 8);
 
     new BuildTermDocVectors(conf).run();
+    new ComputeGlobalTermStatistics(conf).run();
     new BuildDictionary(conf).run();
-//    new GetTermCount(conf).run();
-//    new BuildTermIdMap(conf).run();
     new BuildIntDocVectors(conf).run();
 
     new BuildIntDocVectorsForwardIndex(conf).run();

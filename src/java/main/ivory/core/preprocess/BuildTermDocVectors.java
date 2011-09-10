@@ -44,11 +44,11 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.NullOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
+import org.apache.hadoop.util.LineReader;
 import org.apache.log4j.Logger;
 
 import edu.umd.cloud9.collection.DocnoMapping;
 import edu.umd.cloud9.collection.Indexable;
-import edu.umd.cloud9.io.FSLineReader;
 import edu.umd.cloud9.mapreduce.NullInputFormat;
 import edu.umd.cloud9.mapreduce.NullMapper;
 import edu.umd.cloud9.util.PowerTool;
@@ -232,7 +232,7 @@ public class BuildTermDocVectors extends PowerTool {
         }
 
         LOG.info("processing " + fileStats[i].getPath());
-        FSLineReader reader = new FSLineReader(fileStats[i].getPath(), fs);
+        LineReader reader = new LineReader(fs.open(fileStats[i].getPath()));
 
         Text line = new Text();
         while (reader.readLine(line) > 0) {
