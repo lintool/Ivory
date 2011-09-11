@@ -320,6 +320,7 @@ public class BuildTermDocVectors extends PowerTool {
     String tokenizer = conf.get(Constants.Tokenizer);
     String mappingClass = conf.get(Constants.DocnoMappingClass);
     int docnoOffset = conf.getInt(Constants.DocnoOffset, 0);
+    int numReducers = conf.getInt(Constants.TermDocVectorSegments, 0);
 
     LOG.info("PowerTool: " + BuildTermDocVectors.class.getCanonicalName());
     LOG.info(String.format(" - %s: %s", Constants.IndexPath, indexPath));
@@ -329,6 +330,7 @@ public class BuildTermDocVectors extends PowerTool {
     LOG.info(String.format(" - %s: %s", Constants.Tokenizer, tokenizer));
     LOG.info(String.format(" - %s: %s", Constants.DocnoMappingClass, mappingClass));
     LOG.info(String.format(" - %s: %s", Constants.DocnoOffset, docnoOffset));
+    LOG.info(String.format(" - %s: %s", Constants.TermDocVectorSegments, numReducers));
 
     RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fs);
     Path mappingFile = env.getDocnoMappingData();
@@ -357,7 +359,7 @@ public class BuildTermDocVectors extends PowerTool {
         BuildTermDocVectors.class.getSimpleName() + ":" + collectionName);
     job1.setJarByClass(BuildTermDocVectors.class);
 
-    job1.setNumReduceTasks(0);
+    job1.setNumReduceTasks(numReducers);
 
     FileInputFormat.addInputPaths(job1, collectionPath);
     FileOutputFormat.setOutputPath(job1, outputPath);

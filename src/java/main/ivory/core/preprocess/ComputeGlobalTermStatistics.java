@@ -37,154 +37,157 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 import org.apache.log4j.Logger;
 
-
 import edu.umd.cloud9.io.pair.PairOfIntLong;
 import edu.umd.cloud9.util.PowerTool;
 
 public class ComputeGlobalTermStatistics extends PowerTool {
-	private static final Logger LOG = Logger.getLogger(ComputeGlobalTermStatistics.class);
+  private static final Logger LOG = Logger.getLogger(ComputeGlobalTermStatistics.class);
 
-	protected static enum Statistics { Docs, Terms, SumOfDocLengths }
+  protected static enum Statistics {
+    Docs, Terms, SumOfDocLengths
+  }
 
-	private static class MyMapper extends Mapper<IntWritable, TermDocVector, Text, PairOfIntLong> {
-		private static final Text term = new Text();
-		private static final PairOfIntLong pair = new PairOfIntLong();
+  private static class MyMapper extends Mapper<IntWritable, TermDocVector, Text, PairOfIntLong> {
+    private static final Text term = new Text();
+    private static final PairOfIntLong pair = new PairOfIntLong();
 
-		@Override
-		public void map(IntWritable key, TermDocVector doc, Context context)
-		    throws IOException, InterruptedException {
-			TermDocVector.Reader r = doc.getReader();
-			int dl=0, tf=0;
-			while (r.hasMoreTerms()) {
-				term.set(r.nextTerm());
-				tf = r.getTf();
-				dl += tf;
-				pair.set(1, tf);
-				context.write(term, pair);
-			}
+    @Override
+    public void map(IntWritable key, TermDocVector doc, Context context)
+        throws IOException, InterruptedException {
+      TermDocVector.Reader r = doc.getReader();
+      int dl = 0, tf = 0;
+      while (r.hasMoreTerms()) {
+        term.set(r.nextTerm());
+        tf = r.getTf();
+        dl += tf;
+        pair.set(1, tf);
+        context.write(term, pair);
+      }
 
-			context.getCounter(Statistics.Docs).increment(1);
-			context.getCounter(Statistics.SumOfDocLengths).increment(dl);
-		}
-	}
+      context.getCounter(Statistics.Docs).increment(1);
+      context.getCounter(Statistics.SumOfDocLengths).increment(dl);
+    }
+  }
 
-	private static class MyCombiner extends Reducer<Text, PairOfIntLong, Text, PairOfIntLong> {
-		private static final PairOfIntLong output = new PairOfIntLong(); 
-		@Override
-		public void reduce(Text key, Iterable<PairOfIntLong> values, Context context)
-		    throws IOException, InterruptedException {
-			int df = 0;
-			long cf = 0;
-			for ( PairOfIntLong pair : values) {
-				df += pair.getLeftElement();
-				cf += pair.getRightElement();
-			}
+  private static class MyCombiner extends Reducer<Text, PairOfIntLong, Text, PairOfIntLong> {
+    private static final PairOfIntLong output = new PairOfIntLong();
 
-			output.set(df, cf);
-			context.write(key, output);
-		}
-	}
+    @Override
+    public void reduce(Text key, Iterable<PairOfIntLong> values, Context context)
+        throws IOException, InterruptedException {
+      int df = 0;
+      long cf = 0;
+      for (PairOfIntLong pair : values) {
+        df += pair.getLeftElement();
+        cf += pair.getRightElement();
+      }
 
-	private static class MyReducer extends Reducer<Text, PairOfIntLong, Text, PairOfIntLong> {
-		private static final PairOfIntLong output = new PairOfIntLong();
-		private int minDf, maxDf;
+      output.set(df, cf);
+      context.write(key, output);
+    }
+  }
 
-		@Override
-		public void setup(Reducer<Text, PairOfIntLong, Text, PairOfIntLong>.Context context) {
-			minDf = context.getConfiguration().getInt(Constants.MinDf, 2);
-			maxDf = context.getConfiguration().getInt(Constants.MaxDf, Integer.MAX_VALUE);
-		}
+  private static class MyReducer extends Reducer<Text, PairOfIntLong, Text, PairOfIntLong> {
+    private static final PairOfIntLong output = new PairOfIntLong();
+    private int minDf, maxDf;
 
-		@Override
-		public void reduce(Text key, Iterable<PairOfIntLong> values, Context context)
-		    throws IOException, InterruptedException {
-			int df = 0;
-			long cf = 0;
-			for ( PairOfIntLong pair : values ) {
-				df += pair.getLeftElement();
-				cf += pair.getRightElement();
-			}
-			if (df < minDf || df > maxDf) {
-				return;
-			}
-			context.getCounter(Statistics.Terms).increment(1);
-			output.set(df, cf);
-			context.write(key, output);
-		}
-	}
+    @Override
+    public void setup(Reducer<Text, PairOfIntLong, Text, PairOfIntLong>.Context context) {
+      minDf = context.getConfiguration().getInt(Constants.MinDf, 2);
+      maxDf = context.getConfiguration().getInt(Constants.MaxDf, Integer.MAX_VALUE);
+    }
 
-	public static final String[] RequiredParameters = {
-			Constants.CollectionName, Constants.IndexPath, Constants.MinDf, Constants.MaxDf };
+    @Override
+    public void reduce(Text key, Iterable<PairOfIntLong> values, Context context)
+        throws IOException, InterruptedException {
+      int df = 0;
+      long cf = 0;
+      for (PairOfIntLong pair : values) {
+        df += pair.getLeftElement();
+        cf += pair.getRightElement();
+      }
+      if (df < minDf || df > maxDf) {
+        return;
+      }
+      context.getCounter(Statistics.Terms).increment(1);
+      output.set(df, cf);
+      context.write(key, output);
+    }
+  }
 
-	public String[] getRequiredParameters() {
-		return RequiredParameters;
-	}
+  public static final String[] RequiredParameters = {
+          Constants.CollectionName, Constants.IndexPath, Constants.MinDf, Constants.MaxDf };
 
-	public ComputeGlobalTermStatistics(Configuration conf) {
-		super(conf);
-	}
+  public String[] getRequiredParameters() {
+    return RequiredParameters;
+  }
 
-	public int runTool() throws Exception {
-		Configuration conf = getConf();
+  public ComputeGlobalTermStatistics(Configuration conf) {
+    super(conf);
+  }
 
-		FileSystem fs = FileSystem.get(conf);
+  public int runTool() throws Exception {
+    Configuration conf = getConf();
 
-		String indexPath = conf.get(Constants.IndexPath);
-		RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fs);
+    FileSystem fs = FileSystem.get(conf);
 
-		int reduceTasks = 10;
+    String indexPath = conf.get(Constants.IndexPath);
+    RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fs);
 
-		String collectionName = env.readCollectionName();
-		String termDocVectorsPath = env.getTermDocVectorsDirectory();
-		String termDfCfPath = env.getTermDfCfDirectory();
+    int reduceTasks = 10;
 
-		if (!fs.exists(new Path(indexPath))) {
-			LOG.info("index path doesn't existing: skipping!");
-			return 0;
-		}
+    String collectionName = env.readCollectionName();
+    String termDocVectorsPath = env.getTermDocVectorsDirectory();
+    String termDfCfPath = env.getTermDfCfDirectory();
 
-		LOG.info("PowerTool: " + ComputeGlobalTermStatistics.class.getCanonicalName());
-		LOG.info(String.format(" - %s: %s", Constants.CollectionName, collectionName));
-		LOG.info(String.format(" - %s: %s", Constants.IndexPath, indexPath));
-		LOG.info(String.format(" - %s: %s", Constants.NumReduceTasks, reduceTasks));
+    if (!fs.exists(new Path(indexPath))) {
+      LOG.info("index path doesn't existing: skipping!");
+      return 0;
+    }
 
-		Path outputPath = new Path(termDfCfPath);
-		if (fs.exists(outputPath)) {
-			LOG.info("TermDfCf directory exist: skipping!");
-			return 0;
-		}
+    LOG.info("PowerTool: " + ComputeGlobalTermStatistics.class.getCanonicalName());
+    LOG.info(String.format(" - %s: %s", Constants.CollectionName, collectionName));
+    LOG.info(String.format(" - %s: %s", Constants.IndexPath, indexPath));
+    LOG.info(String.format(" - %s: %s", Constants.NumReduceTasks, reduceTasks));
 
-		Job job = new Job(getConf(), ComputeGlobalTermStatistics.class.getSimpleName() + ":" + collectionName);
-		job.setJarByClass(ComputeGlobalTermStatistics.class);
+    Path outputPath = new Path(termDfCfPath);
+    if (fs.exists(outputPath)) {
+      LOG.info("TermDfCf directory exist: skipping!");
+      return 0;
+    }
 
-		job.setNumReduceTasks(reduceTasks);
+    Job job = new Job(getConf(), ComputeGlobalTermStatistics.class.getSimpleName() + ":"
+        + collectionName);
+    job.setJarByClass(ComputeGlobalTermStatistics.class);
 
-		FileInputFormat.setInputPaths(job, new Path(termDocVectorsPath));
-		FileOutputFormat.setOutputPath(job, outputPath);
+    job.setNumReduceTasks(reduceTasks);
 
-		job.setInputFormatClass(SequenceFileInputFormat.class);
-		job.setOutputFormatClass(SequenceFileOutputFormat.class);
+    FileInputFormat.setInputPaths(job, new Path(termDocVectorsPath));
+    FileOutputFormat.setOutputPath(job, outputPath);
 
-		job.setMapOutputKeyClass(Text.class);
-		job.setMapOutputValueClass(PairOfIntLong.class);
-		job.setOutputKeyClass(Text.class);
-		job.setOutputValueClass(PairOfIntLong.class);
+    job.setInputFormatClass(SequenceFileInputFormat.class);
+    job.setOutputFormatClass(SequenceFileOutputFormat.class);
 
-		job.setMapperClass(MyMapper.class);
-		job.setCombinerClass(MyCombiner.class);
-		job.setReducerClass(MyReducer.class);
+    job.setMapOutputKeyClass(Text.class);
+    job.setMapOutputValueClass(PairOfIntLong.class);
+    job.setOutputKeyClass(Text.class);
+    job.setOutputValueClass(PairOfIntLong.class);
 
-		long startTime = System.currentTimeMillis();
-		job.waitForCompletion(true);
-		LOG.info("Job Finished in " + (System.currentTimeMillis() - startTime) / 1000.0 + " seconds");
+    job.setMapperClass(MyMapper.class);
+    job.setCombinerClass(MyCombiner.class);
+    job.setReducerClass(MyReducer.class);
 
-		Counters counters = job.getCounters();
-		// Write out number of postings. NOTE: this value is not the same as
-		// number of postings, because postings for non-English terms are
-		// discarded, or as result of df cut.
-		env.writeCollectionTermCount((int) counters.findCounter(Statistics.Terms).getValue());
+    long startTime = System.currentTimeMillis();
+    job.waitForCompletion(true);
+    LOG.info("Job Finished in " + (System.currentTimeMillis() - startTime) / 1000.0 + " seconds");
 
-		env.writeCollectionLength(counters.findCounter(Statistics.SumOfDocLengths).getValue());
-		return 0;
-	}
+    Counters counters = job.getCounters();
+    // Write out number of postings. NOTE: this value is not the same as
+    // number of postings, because postings for non-English terms are
+    // discarded, or as result of df cut.
+    env.writeCollectionTermCount((int) counters.findCounter(Statistics.Terms).getValue());
+
+    env.writeCollectionLength(counters.findCounter(Statistics.SumOfDocLengths).getValue());
+    return 0;
+  }
 }

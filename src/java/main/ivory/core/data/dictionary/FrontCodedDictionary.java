@@ -1,35 +1,34 @@
 package ivory.core.data.dictionary;
 
-import it.unimi.dsi.sux4j.mph.TwoStepsLcpMonotoneMinimalPerfectHashFunction;
 import it.unimi.dsi.util.FrontCodedStringList;
 import it.unimi.dsi.util.ShiftAddXorSignedStringMap;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
 import java.util.Iterator;
-import java.util.List;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.Writable;
-
-import com.google.common.collect.Lists;
+import org.apache.log4j.Logger;
 
 public class FrontCodedDictionary implements Writable, LexicographicallySortedDictionary {
+  private static final Logger LOG = Logger.getLogger(FrontCodedDictionary.class);
 
   private FrontCodedStringList stringList;
-  private ShiftAddXorSignedStringMap dict;
+  private ShiftAddXorSignedStringMap dictionary;
 
-  public FrontCodedDictionary() {
-  }
+  public FrontCodedDictionary() {}
 
   @Override
   public int getId(String term) {
-    return (int) dict.getLong(term);
+    return (int) dictionary.getLong(term);
   }
 
   @Override
@@ -49,16 +48,31 @@ public class FrontCodedDictionary implements Writable, LexicographicallySortedDi
 
   @Override
   public void readFields(final DataInput in) throws IOException {
-    int size = in.readInt();
-    List<String> list = Lists.newArrayList();
-    for ( int i=0; i<size; i++) {
-      list.add(in.readUTF());
-    }
+    byte[] bytes;
+    ObjectInputStream obj;
 
-    stringList = new FrontCodedStringList(list, 8, true);
-    dict = new ShiftAddXorSignedStringMap(list.iterator(),
-        new TwoStepsLcpMonotoneMinimalPerfectHashFunction<CharSequence>(list,
-            new DictionaryTransformationStrategy(true)));
+    bytes = new byte[in.readInt()];
+    LOG.info("Loading front-coded list of terms: " + bytes.length + " bytes.");
+    in.readFully(bytes);
+    obj = new ObjectInputStream(new ByteArrayInputStream(bytes));
+    try {
+      stringList = (FrontCodedStringList) obj.readObject();
+    } catch (ClassNotFoundException e) {
+      throw new RuntimeException(e);
+    }
+    obj.close();
+
+    bytes = new byte[in.readInt()];
+    LOG.info("Loading dictionary hash: " + bytes.length + " bytes.");
+    in.readFully(bytes);
+    obj = new ObjectInputStream(new ByteArrayInputStream(bytes));
+    try {
+      dictionary = (ShiftAddXorSignedStringMap) obj.readObject();
+    } catch (ClassNotFoundException e) {
+      throw new RuntimeException(e);
+    }
+    obj.close();
+    LOG.info("Finished loading.");
   }
 
   @Override

@@ -1,11 +1,13 @@
 package ivory.core.data.dictionary;
 
 import it.unimi.dsi.bits.TransformationStrategies;
+import it.unimi.dsi.fastutil.io.BinIO;
 import it.unimi.dsi.sux4j.mph.MinimalPerfectHashFunction;
 import it.unimi.dsi.sux4j.mph.TwoStepsLcpMonotoneMinimalPerfectHashFunction;
 import it.unimi.dsi.util.FrontCodedStringList;
 import it.unimi.dsi.util.ShiftAddXorSignedStringMap;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Random;
@@ -57,7 +59,7 @@ public class Sux4jDictionaryTest extends TestCase {
             new Path("etc/trec-index-terms.dat"), fs);
 
     String[] testTerms = new String[] {
-    "apple", "appl", "bannana", "banan", "cherry", "cherri", "grape", "watermelon" };
+        "apple", "appl", "bannana", "banan", "cherry", "cherri", "grape", "watermelon" };
 
     for (String testTerm : testTerms) {
       System.out.println(String.format("Term %s, termid=%d",
@@ -83,6 +85,7 @@ public class Sux4jDictionaryTest extends TestCase {
 
     for (String testTerm : testTerms) {
       System.out.println(String.format("Term %s, termid=%d", testTerm, dict.getLong(testTerm)));
+      assertEquals(dictionary.getId(testTerm), dict.getLong(testTerm));
     }
 
     start = System.currentTimeMillis();
@@ -90,6 +93,20 @@ public class Sux4jDictionaryTest extends TestCase {
       dict.getLong(t);
     }
     System.out.println("Total time (lookup): " + (System.currentTimeMillis() - start) + "ms");
+
+    File f = new File("test.dat");
+    BinIO.storeObject(dict, f);
+    try {
+      ShiftAddXorSignedStringMap dict2 =
+        (ShiftAddXorSignedStringMap) BinIO.loadObject(f);
+      for (String testTerm : testTerms) {
+        assertEquals(dictionary.getId(testTerm), dict2.getLong(testTerm));
+      }
+    } catch (ClassNotFoundException e) {
+      e.printStackTrace();
+    }
+
+    f.delete();
   }
 
   // Looking up terms from termids, comparing DSI utils with Ivory.
@@ -132,5 +149,33 @@ public class Sux4jDictionaryTest extends TestCase {
     for (Integer i : randomTermIds) {
       assertTrue(dictionary.getTerm(i).equals(dsiStringList.get(i).toString()));
     }
+  }
+
+  @Test
+  public void test4() throws IOException {
+    List<String> terms = Lists.newArrayList("apple", "bannana", "cherry", "grape", "watermelon");
+    FrontCodedStringList list = new FrontCodedStringList(terms, 8, true);
+
+    assertEquals("apple", list.get(0).toString());
+    assertEquals("bannana", list.get(1).toString());
+    assertEquals("cherry", list.get(2).toString());
+    assertEquals("grape", list.get(3).toString());
+    assertEquals("watermelon", list.get(4).toString());
+
+    File f = new File("test.dat");
+    BinIO.storeObject(list, f);
+    try {
+      FrontCodedStringList list2 = (FrontCodedStringList) BinIO.loadObject(f);
+
+      assertEquals("apple", list2.get(0).toString());
+      assertEquals("bannana", list2.get(1).toString());
+      assertEquals("cherry", list2.get(2).toString());
+      assertEquals("grape", list2.get(3).toString());
+      assertEquals("watermelon", list2.get(4).toString());
+    } catch (ClassNotFoundException e) {
+      e.printStackTrace();
+    }
+
+    f.delete();
   }
 }

@@ -16,13 +16,19 @@
 
 package ivory.core.preprocess;
 
+import it.unimi.dsi.sux4j.mph.TwoStepsLcpMonotoneMinimalPerfectHashFunction;
+import it.unimi.dsi.util.FrontCodedStringList;
+import it.unimi.dsi.util.ShiftAddXorSignedStringMap;
 import ivory.core.Constants;
 import ivory.core.RetrievalEnvironment;
 import ivory.core.data.dictionary.DictionaryTransformationStrategy;
 import ivory.core.util.QuickSort;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataOutputStream;
@@ -40,6 +46,8 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 import org.apache.log4j.Logger;
 
+import com.google.common.collect.Lists;
+
 import edu.umd.cloud9.io.pair.PairOfIntLong;
 import edu.umd.cloud9.util.PowerTool;
 
@@ -52,76 +60,50 @@ public class BuildDictionary extends PowerTool {
       extends Reducer<Text, PairOfIntLong, NullWritable, NullWritable> {
     private FSDataOutputStream termsOut, idsOut, idsToTermOut,
         dfByTermOut, cfByTermOut, dfByIntOut, cfByIntOut;
-    private int nTerms, window;
+    private int numTerms;
     private int[] seqNums = null;
     private int[] dfs = null;
     private long[] cfs = null;
     private int curKeyIndex = 0;
 
+    private String[] terms;
+
     @Override
-    public void setup(Reducer<Text, PairOfIntLong, NullWritable, NullWritable>.Context context) {
+    public void setup(Reducer<Text, PairOfIntLong, NullWritable, NullWritable>.Context context)
+        throws IOException {
+      LOG.info("Starting setup.");
       Configuration conf = context.getConfiguration();
-      FileSystem fs;
-      try {
-        fs = FileSystem.get(conf);
-      } catch (IOException e) {
-        throw new RuntimeException("Error opening the FileSystem!");
-      }
+      FileSystem fs = FileSystem.get(conf);
+      RetrievalEnvironment env = new RetrievalEnvironment(conf.get(Constants.IndexPath), fs);
 
-      RetrievalEnvironment env;
-      try {
-        env = new RetrievalEnvironment(conf.get(Constants.IndexPath), fs);
-      } catch (IOException e) {
-        throw new RuntimeException("Unable to create RetrievalEnvironment!");
-      }
+      numTerms = conf.getInt(Constants.CollectionTermCount, 0);
 
-      String termsFile = env.getIndexTermsData();
-      String idsFile = env.getIndexTermIdsData();
-      String idToTermFile = env.getIndexTermIdMappingData();
+      terms = new String[numTerms];
+      seqNums = new int[numTerms];
+      dfs = new int[numTerms];
+      cfs = new long[numTerms];
 
-      String dfByTermFile = env.getDfByTermData();
-      String cfByTermFile = env.getCfByTermData();
-      String dfByIntFile = env.getDfByIntData();
-      String cfByIntFile = env.getCfByIntData();
+      termsOut = fs.create(new Path(env.getIndexTermsData()), true);
+      //termsOut.writeInt(numTerms);
 
-      nTerms = conf.getInt(Constants.CollectionTermCount, 0);
-      window = conf.getInt(Constants.TermIndexWindow, 8);
+      idsOut = fs.create(new Path(env.getIndexTermIdsData()), true);
+      idsOut.writeInt(numTerms);
 
-      seqNums = new int[nTerms];
-      dfs = new int[nTerms];
-      cfs = new long[nTerms];
+      idsToTermOut = fs.create(new Path(env.getIndexTermIdMappingData()), true);
+      idsToTermOut.writeInt(numTerms);
 
-      LOG.info("Ivory.PrefixEncodedTermsFile: " + termsFile);
-      LOG.info("Ivory.TermIDsFile" + idsFile);
-      LOG.info("Ivory.IDToTermFile" + idToTermFile);
-      LOG.info("Ivory.CollectionTermCount: " + nTerms);
-      LOG.info("Ivory.ForwardIndexWindow: " + window);
+      dfByTermOut = fs.create(new Path(env.getDfByTermData()), true);
+      dfByTermOut.writeInt(numTerms);
 
-      try {
-        termsOut = fs.create(new Path(termsFile), true);
-        termsOut.writeInt(nTerms);
+      cfByTermOut = fs.create(new Path(env.getCfByTermData()), true);
+      cfByTermOut.writeInt(numTerms);
 
-        idsOut = fs.create(new Path(idsFile), true);
-        idsOut.writeInt(nTerms);
+      dfByIntOut = fs.create(new Path(env.getDfByIntData()), true);
+      dfByIntOut.writeInt(numTerms);
 
-        idsToTermOut = fs.create(new Path(idToTermFile), true);
-        idsToTermOut.writeInt(nTerms);
-
-        dfByTermOut = fs.create(new Path(dfByTermFile), true);
-        dfByTermOut.writeInt(nTerms);
-
-        cfByTermOut = fs.create(new Path(cfByTermFile), true);
-        cfByTermOut.writeInt(nTerms);
-
-        dfByIntOut = fs.create(new Path(dfByIntFile), true);
-        dfByIntOut.writeInt(nTerms);
-
-        cfByIntOut = fs.create(new Path(cfByIntFile), true);
-        cfByIntOut.writeInt(nTerms);
-      } catch (Exception e) {
-        throw new RuntimeException("error in creating files");
-      }
-      LOG.info("Finished config.");
+      cfByIntOut = fs.create(new Path(env.getCfByIntData()), true);
+      cfByIntOut.writeInt(numTerms);
+      LOG.info("Finished setup.");
     }
 
     @Override
@@ -139,8 +121,9 @@ public class BuildDictionary extends PowerTool {
         throw new RuntimeException("More than one record for term: " + term);
       }
 
-      termsOut.writeUTF(term);
+      //termsOut.writeUTF(term);
 
+      terms[curKeyIndex] = term;
       seqNums[curKeyIndex] = curKeyIndex;
       dfs[curKeyIndex] = -df;
       cfs[curKeyIndex] = cf;
@@ -153,16 +136,16 @@ public class BuildDictionary extends PowerTool {
     public void cleanup(
         Reducer<Text, PairOfIntLong, NullWritable, NullWritable>.Context context)
         throws IOException {
-      LOG.info("Finished reduce.");
-      if (curKeyIndex != nTerms) {
-        throw new RuntimeException("Total expected Terms: " + nTerms +
+      LOG.info("Starting cleanup.");
+      if (curKeyIndex != numTerms) {
+        throw new RuntimeException("Total expected Terms: " + numTerms +
             ", Total observed terms: " + curKeyIndex + "!");
       }
       // Sort based on df and change seqNums accordingly.
-      QuickSort.quicksortWithSecondary(seqNums, dfs, cfs, 0, nTerms - 1);
+      QuickSort.quicksortWithSecondary(seqNums, dfs, cfs, 0, numTerms - 1);
 
       // Write sorted dfs and cfs by int here.
-      for (int i = 0; i < nTerms; i++) {
+      for (int i = 0; i < numTerms; i++) {
         WritableUtils.writeVInt(dfByIntOut, -dfs[i]);
         WritableUtils.writeVLong(cfByIntOut, cfs[i]);
       }
@@ -170,19 +153,48 @@ public class BuildDictionary extends PowerTool {
 
       // Encode the sorted dfs into ids ==> df values erased and become ids instead. Note that first
       // term id is 1.
-      for (int i = 0; i < nTerms; i++) {
+      for (int i = 0; i < numTerms; i++) {
         dfs[i] = i + 1;
       }
 
       // Write current seq nums to be index into the term array.
-      for (int i = 0; i < nTerms; i++)
+      for (int i = 0; i < numTerms; i++)
         idsToTermOut.writeInt(seqNums[i]);
 
       // Sort on seqNums to get the right writing order.
-      QuickSort.quicksort(dfs, seqNums, 0, nTerms - 1);
-      for (int i = 0; i < nTerms; i++) {
+      QuickSort.quicksort(dfs, seqNums, 0, numTerms - 1);
+      for (int i = 0; i < numTerms; i++) {
         idsOut.writeInt(dfs[i]);
       }
+
+      ByteArrayOutputStream bytesOut;
+      ObjectOutputStream objOut;
+      byte[] bytes;
+
+      List<String> termList = Lists.newArrayList(terms);
+      FrontCodedStringList frontcodedList = new FrontCodedStringList(termList, 8, true);
+
+      bytesOut = new ByteArrayOutputStream();
+      objOut = new ObjectOutputStream(bytesOut);
+      objOut.writeObject(frontcodedList);
+      objOut.close();
+
+      bytes = bytesOut.toByteArray();
+      termsOut.writeInt(bytes.length);
+      termsOut.write(bytes);
+
+      ShiftAddXorSignedStringMap dict = new ShiftAddXorSignedStringMap(termList.iterator(),
+          new TwoStepsLcpMonotoneMinimalPerfectHashFunction<CharSequence>(termList,
+              new DictionaryTransformationStrategy(true)));
+
+      bytesOut = new ByteArrayOutputStream();
+      objOut = new ObjectOutputStream(bytesOut);
+      objOut.writeObject(dict);
+      objOut.close();
+
+      bytes = bytesOut.toByteArray();
+      termsOut.writeInt(bytes.length);
+      termsOut.write(bytes);
 
       termsOut.close();
       idsOut.close();
@@ -191,12 +203,12 @@ public class BuildDictionary extends PowerTool {
       cfByTermOut.close();
       dfByIntOut.close();
       cfByIntOut.close();
-      LOG.info("Finished close.");
+      LOG.info("Finished cleanup.");
     }
   }
 
   public static final String[] RequiredParameters = {
-      Constants.CollectionName, Constants.IndexPath, Constants.TermIndexWindow };
+      Constants.CollectionName, Constants.IndexPath };
 
   public String[] getRequiredParameters() {
     return RequiredParameters;
@@ -235,6 +247,7 @@ public class BuildDictionary extends PowerTool {
     }
 
     conf.setInt(Constants.CollectionTermCount, (int) env.readCollectionTermCount());
+    conf.set("mapred.child.java.opts", "-Xmx2048m");
 
     Path tmpPath = new Path(env.getTempDirectory());
     fs.delete(tmpPath, true);
