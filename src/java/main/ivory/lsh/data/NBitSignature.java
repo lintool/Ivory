@@ -82,8 +82,8 @@ public class NBitSignature extends Signature {
 	}
 
 	public void readFields(DataInput in) throws IOException {
-		short numBits = in.readShort();
-		short numBytes = in.readShort();
+		int numBits = in.readInt();
+		int numBytes = in.readInt();
 		byte[] bytearray = new byte[numBytes];
 
 		for(int i=0;i<numBytes;i++){
