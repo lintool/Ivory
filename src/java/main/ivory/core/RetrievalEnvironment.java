@@ -146,7 +146,7 @@ public class RetrievalEnvironment {
 			LOG.info("Tokenizer: " + tokenizerClassName);
 			tokenizer = (Tokenizer) Class.forName(tokenizerClassName).newInstance();
 		} catch (Exception e) {
-			throw new ConfigurationException("Error initializing tokenizer!", e);
+			throw new ConfigurationException("Error initializing tokenizer!");
 		}
 
 		LOG.info("Loading postings index...");
@@ -158,7 +158,7 @@ public class RetrievalEnvironment {
 			termidMap = new DefaultFrequencySortedDictionary(new Path(getIndexTermsData()),
 			    new Path(getIndexTermIdsData()), new Path(getIndexTermIdMappingData()), fs);
 		} catch (Exception e) {
-			throw new ConfigurationException("Error initializing term to term id mapping!", e);
+			throw new ConfigurationException("Error initializing dictionary!");
 		}
 
 		try {
