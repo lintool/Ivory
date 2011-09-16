@@ -82,8 +82,8 @@ public class NBitSignature extends Signature {
 	}
 
 	public void readFields(DataInput in) throws IOException {
-		short numBits = in.readShort();
-		short numBytes = in.readShort();
+		int numBits = in.readInt();
+		int numBytes = in.readInt();
 		byte[] bytearray = new byte[numBytes];
 
 		for(int i=0;i<numBytes;i++){
@@ -94,13 +94,13 @@ public class NBitSignature extends Signature {
 	}
 
 	public void write(DataOutput out) throws IOException {
-		short numBits = (short) size(), numBytes = (short) bits.bits.length;
+		int numBits = size(), numBytes = bits.bits.length;
 
 		//		System.out.println("# bits: "+size());
 		//		System.out.println("# bytes: "+bits.bits.length);
 
-		out.writeShort(numBits);
-		out.writeShort(numBytes);
+		out.writeInt(numBits);
+		out.writeInt(numBytes);
 
 		for(int i=0;i<numBytes;i++){
 			out.writeByte(bits.bits[i]);
