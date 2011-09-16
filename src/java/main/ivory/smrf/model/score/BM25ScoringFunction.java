@@ -83,4 +83,22 @@ public class BM25ScoringFunction extends ScoringFunction {
   public float getMaxScore() {
     return maxScore;
   }
+
+  /**
+   * Sets the k1 parameter.
+   *
+   * @param k1 k1 parameter value
+   */
+  public void setK1(float k1) {
+    this.k1 = k1;
+  }
+
+  /**
+   * Sets the b parameter.
+   *
+   * @param b b parameter value
+   */
+  public void setB(float b) {
+    this.b = b;
+  }
 }
