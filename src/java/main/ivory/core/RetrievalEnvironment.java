@@ -386,6 +386,10 @@ public class RetrievalEnvironment {
 		return termidMap.getTerm(termid);
 	}
 
+  public int getIdFromTerm(String term) {
+    return termidMap.getId(term);
+  }
+
 	/**
 	 * Tokenizes text according to the tokenizer used to process the document
 	 * collection. This typically includes stopwords filtering, stemming, etc.
