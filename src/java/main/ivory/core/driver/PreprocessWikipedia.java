@@ -21,11 +21,11 @@ import ivory.core.RetrievalEnvironment;
 import ivory.core.preprocess.BuildIntDocVectors;
 import ivory.core.preprocess.BuildTargetLangWeightedIntDocVectors;
 import ivory.core.preprocess.BuildTermDocVectors;
-import ivory.core.preprocess.BuildTermIdMap;
+import ivory.core.preprocess.BuildDictionary;
 import ivory.core.preprocess.BuildTranslatedTermDocVectors;
 import ivory.core.preprocess.BuildWeightedIntDocVectors;
 import ivory.core.preprocess.BuildWeightedTermDocVectors;
-import ivory.core.preprocess.GetTermCount;
+import ivory.core.preprocess.ComputeGlobalTermStatistics;
 
 import java.io.IOException;
 import org.apache.hadoop.conf.Configuration;
@@ -196,7 +196,7 @@ public class PreprocessWikipedia extends Configured implements Tool {
 		// Get CF and DF counts
 		startTime = System.currentTimeMillis();
 		LOG.info("Counting terms...");
-		GetTermCount termCountWithDfAndCfTool = new GetTermCount(conf);
+		ComputeGlobalTermStatistics termCountWithDfAndCfTool = new ComputeGlobalTermStatistics(conf);
 		termCountWithDfAndCfTool.run();
 		LOG.info("TermCount = "+env.readCollectionTermCount()+"\nJob finished in "+(System.currentTimeMillis()-startTime)/1000.0+" seconds");
 
@@ -204,7 +204,7 @@ public class PreprocessWikipedia extends Configured implements Tool {
 		startTime = System.currentTimeMillis();
 		conf.setInt("Ivory.TermIndexWindow", TermIndexWindow);
 		LOG.info("Building term-to-integer id mapping...");
-		BuildTermIdMap termIDsDfCfTool = new BuildTermIdMap(conf);
+		BuildDictionary termIDsDfCfTool = new BuildDictionary(conf);
 		termIDsDfCfTool.run();
 		LOG.info("Job finished in "+(System.currentTimeMillis()-startTime)/1000.0+" seconds");
 

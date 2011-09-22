@@ -105,6 +105,5 @@ public class DocumentPotential extends PotentialFunction {
    * Does nothing in the context of this potential.
    */
   @Override
-  public void setNextCandidate(int docid) {
-  }
+  public void setNextCandidate(int docid) {}
 }
