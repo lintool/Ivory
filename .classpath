@@ -63,6 +63,5 @@
 	<classpathentry kind="lib" path="lib/fastutil-6.0.0.jar"/>
 	<classpathentry kind="lib" path="lib/sux4j-2.0.1.jar"/>
 	<classpathentry kind="lib" path="lib/jsap-2.1.jar"/>
-	<classpathentry kind="lib" path="lib/jakarta-commons-collections-3.2.1.jar"/>
 	<classpathentry kind="output" path="build"/>
 </classpath>
