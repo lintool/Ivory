@@ -19,6 +19,7 @@ package ivory.core.tokenize;
 import org.apache.hadoop.conf.Configuration;
 
 public interface Tokenizer {
-	void configure(Configuration conf);
-	String[] processContent(String text);
+  void configure(Configuration conf);
+
+  String[] processContent(String text);
 }
