@@ -16,7 +16,6 @@
 
 package ivory.core.data.index;
 
-
 import com.google.common.base.Preconditions;
 
 /**
@@ -113,7 +112,7 @@ public abstract class ProximityPostingsReader implements PostingsReader {
   }
 
   @Override
-  public short peekNextScore() {
+  public short peekNextTf() {
     throw new UnsupportedOperationException();
   }
 
@@ -131,7 +130,7 @@ public abstract class ProximityPostingsReader implements PostingsReader {
   }
 
   @Override
-  public short getScore() {
+  public short getTf() {
     if (isMatching()) {
       return countMatches();
     }

@@ -35,65 +35,64 @@ import edu.umd.cloud9.mapred.NullOutputFormat;
 
 @SuppressWarnings("deprecation")
 public class RunQueryHDFS extends Configured implements Tool {
-	private static final Logger LOG = Logger.getLogger(RunQueryHDFS.class);
+  private static final Logger LOG = Logger.getLogger(RunQueryHDFS.class);
+  private static enum Time { Query };
 
-	private static enum Time { Query };
-	
-	private static class QueryRunner extends NullMapper {
-		public void run(JobConf conf, Reporter reporter) throws IOException {
-			String[] args  = conf.get("args").split(";");
-			FileSystem fs = FileSystem.get(conf);
-			BatchQueryRunner qr;
-			try {
-				LOG.info("Initializing BatchQueryRunner...");
-				qr = new BatchQueryRunner(args, fs);
-				LOG.info("Running the queries ...");
-				long start = System.currentTimeMillis();
-				qr.runQueries();
-				long end = System.currentTimeMillis();
+  private static class QueryRunner extends NullMapper {
+    public void run(JobConf conf, Reporter reporter) throws IOException {
+      String[] args = conf.get("args").split(";");
+      FileSystem fs = FileSystem.get(conf);
+      BatchQueryRunner qr;
+      try {
+        LOG.info("Initializing BatchQueryRunner...");
+        qr = new BatchQueryRunner(args, fs);
+        LOG.info("Running the queries ...");
+        long start = System.currentTimeMillis();
+        qr.runQueries();
+        long end = System.currentTimeMillis();
 
-				reporter.incrCounter(Time.Query, (end - start));
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
-		}
-	}
+        reporter.incrCounter(Time.Query, (end - start));
+      } catch (Exception e) {
+        throw new RuntimeException(e);
+      }
+    }
+  }
 
-	public int run(String[] args) throws Exception {
-		if (args.length != 2) {
-			System.out.println("usage: [queries-file] [models-file]");
-			ToolRunner.printGenericCommandUsage(System.out);
-			return -1;
-		}
+  public int run(String[] args) throws Exception {
+    if (args.length != 2) {
+      System.out.println("usage: [queries-file] [models-file]");
+      ToolRunner.printGenericCommandUsage(System.out);
+      return -1;
+    }
 
-		String argsStr = Joiner.on(";").join(args);
+    String argsStr = Joiner.on(";").join(args);
 
-		JobConf conf = new JobConf(getConf(), RunQueryHDFS.class);
-		conf.setJobName("RunQueryHDFS");
+    JobConf conf = new JobConf(getConf(), RunQueryHDFS.class);
+    conf.setJobName("RunQueryHDFS");
 
-		conf.setNumMapTasks(1);
-		conf.setNumReduceTasks(0);
+    conf.setNumMapTasks(1);
+    conf.setNumReduceTasks(0);
 
-		conf.setInputFormat(NullInputFormat.class);
-		conf.setOutputFormat(NullOutputFormat.class);
-		conf.setMapperClass(QueryRunner.class);
+    conf.setInputFormat(NullInputFormat.class);
+    conf.setOutputFormat(NullOutputFormat.class);
+    conf.setMapperClass(QueryRunner.class);
 
-		conf.set("args", argsStr);
-		conf.set("mapred.child.java.opts", "-Xmx16g");
+    conf.set("args", argsStr);
+    conf.set("mapred.child.java.opts", "-Xmx16g");
 
-		LOG.info("argsStr: "+argsStr);
-		
-		JobClient client = new JobClient(conf);
-		client.submitJob(conf);
+    LOG.info("argsStr: " + argsStr);
 
-		LOG.info("runner started!");
+    JobClient client = new JobClient(conf);
+    client.submitJob(conf);
 
-		return 0;
-	}
+    LOG.info("runner started!");
 
-	public RunQueryHDFS() {}
+    return 0;
+  }
 
-	public static void main(String[] args) throws Exception {
-		ToolRunner.run(new RunQueryHDFS(), args);
-	}
+  public RunQueryHDFS() {}
+
+  public static void main(String[] args) throws Exception {
+    ToolRunner.run(new RunQueryHDFS(), args);
+  }
 }

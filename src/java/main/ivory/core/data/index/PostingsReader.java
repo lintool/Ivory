@@ -16,7 +16,6 @@
 
 package ivory.core.data.index;
 
-
 /**
  * Interface for a postings reader.
  *
@@ -72,9 +71,9 @@ public interface PostingsReader {
    * Returns the score of the next posting, without consuming it from the stream of postings. This
    * is an optional operation.
    *
-   * @return score of the next posting
+   * @return term frequency of the next posting
    */
-  short peekNextScore();
+  short peekNextTf();
 
   /**
    * Returns the docno of the next posting, without consuming it from the stream of postings. This
@@ -87,16 +86,9 @@ public interface PostingsReader {
   /**
    * Returns the score corresponding to the current posting.
    *
-   * @return score of the current posting
+   * @return term frequency of the current posting
    */
-  short getScore();
-
-//  /**
-//   * Returns the window size of term proximity feature.
-//   *
-//   * @return window size of term proximity features
-//   */
-//  int getWindowSize();
+  short getTf();
 
   /**
    * Returns the docno of the current posting.

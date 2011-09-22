@@ -22,8 +22,8 @@ import ivory.core.preprocess.BuildIntDocVectors;
 import ivory.core.preprocess.BuildIntDocVectorsForwardIndex;
 import ivory.core.preprocess.BuildTermDocVectors;
 import ivory.core.preprocess.BuildTermDocVectorsForwardIndex;
-import ivory.core.preprocess.BuildTermIdMap;
-import ivory.core.preprocess.GetTermCount;
+import ivory.core.preprocess.BuildDictionary;
+import ivory.core.preprocess.ComputeGlobalTermStatistics;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
@@ -107,8 +107,8 @@ public class PreprocessMedline extends Configured implements Tool {
 		conf.setInt("Ivory.TermIndexWindow", 8);
 
 		new BuildTermDocVectors(conf).run();
-		new GetTermCount(conf).run();
-		new BuildTermIdMap(conf).run();
+		new ComputeGlobalTermStatistics(conf).run();
+		new BuildDictionary(conf).run();
 		new BuildIntDocVectors(conf).run();
 
 		new BuildIntDocVectorsForwardIndex(conf).run();

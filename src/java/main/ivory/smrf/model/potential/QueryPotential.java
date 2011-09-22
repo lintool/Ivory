@@ -158,7 +158,7 @@ public class QueryPotential extends PotentialFunction {
     // Compute term frequency.
     int tf = 0;
     if (docNode.getDocno() == postingsReader.getDocno()) {
-      tf = postingsReader.getScore();
+      tf = postingsReader.getTf();
     }
 
     int docLen = env.getDocumentLength(docNode.getDocno());
