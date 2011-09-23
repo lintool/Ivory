@@ -138,6 +138,7 @@
                          classpath="lib/jarjar-1.1.jar"/>
                 <jarjar jarfile="ivory-dist.jar">
                   <fileset dir="${build.dir}"/>
+				  <zipgroupfileset dir="lib" includes="*.jar" />
                 </jarjar>
         </target>
 
