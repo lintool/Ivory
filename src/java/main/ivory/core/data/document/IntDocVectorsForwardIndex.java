@@ -142,6 +142,10 @@ public class IntDocVectorsForwardIndex {
     return value;
   }
 
+  public int getDocCount() {
+    return collectionDocumentCount;
+  }
+
   /**
    * Simple test program.
    */
