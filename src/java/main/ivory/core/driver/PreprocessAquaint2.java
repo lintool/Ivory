@@ -96,6 +96,10 @@ public class PreprocessAquaint2 extends Configured implements Tool {
       fs.delete(mappingDir, true);
     }
 
+	int numMappers = 100;
+	int numReducers = 100;
+	conf.setInt("Ivory.NumMapTasks", numMappers);
+	conf.setInt("Ivory.NumReduceTasks", numReducers);
     conf.set(Constants.CollectionName, "Aquaint2");
     conf.set(Constants.CollectionPath, collection);
     conf.set(Constants.IndexPath, indexRootPath);
@@ -117,15 +121,23 @@ public class PreprocessAquaint2 extends Configured implements Tool {
     new BuildIntDocVectorsForwardIndex(conf).run();
     new BuildTermDocVectorsForwardIndex(conf).run();
 
-
 	new BuildIPInvertedIndexDocSorted(conf).run();
+
+	conf.set("Ivory.ScoringModel", "ivory.pwsim.score.TfIdf");
+	conf.setBoolean ("Ivory.Normalize", true);
+
 	new BuildIntPostingsForwardIndex(conf).run();
+
 	String findexDirPath = indexRootPath + "/findex";
 	String findexFilePath = indexRootPath + "/findex.dat";
 	new BuildWeightedIntDocVectors(conf).run();
-
 	new BuildIntDocVectorsForwardIndex(conf).run();
-	new BuildAquaint2ForwardIndex ().runTool (conf, collection, findexDirPath, findexFilePath, mappingFile.toString ());
+
+    if (fs.exists(new Path(findexDirPath))) {
+      LOG.info("ForwardIndex already exists: Skipping!");
+    } else {
+		new BuildAquaint2ForwardIndex ().runTool (conf, collection, findexDirPath, findexFilePath, mappingFile.toString ());
+	}
 
     return 0;
   }

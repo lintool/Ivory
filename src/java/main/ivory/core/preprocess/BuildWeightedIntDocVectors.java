@@ -15,6 +15,8 @@
  */
 
 package ivory.core.preprocess;
+
+import ivory.core.Constants;
 import ivory.core.RetrievalEnvironment;
 import ivory.core.data.document.IntDocVector;
 import ivory.core.data.document.WeightedIntDocVector;
@@ -46,18 +48,19 @@ import org.apache.hadoop.mapred.SequenceFileOutputFormat;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
-
 import edu.umd.cloud9.io.map.HMapIFW;
 import edu.umd.cloud9.util.PowerTool;
 import edu.umd.cloud9.util.map.MapIF;
 
+
 public class BuildWeightedIntDocVectors extends PowerTool {
 	private static final Logger sLogger = Logger.getLogger(BuildWeightedIntDocVectors.class);
-	static{
-		sLogger.setLevel(Level.WARN);
-	}
+
+	//	static{
+	//		sLogger.setLevel(Level.WARN);
+	//	}
 	protected static enum Docs{
-		Total
+		Total, ZERO, SHORT
 	}
 	private static class MyMapper extends MapReduceBase implements
 	Mapper<IntWritable, IntDocVector, IntWritable, WeightedIntDocVector> {
@@ -65,17 +68,17 @@ public class BuildWeightedIntDocVectors extends PowerTool {
 		static IntWritable mDocno = new IntWritable();
 		private static DocLengthTable mDLTable;
 		private static ScoringModel mScoreFn;
+		int MIN_SIZE = 0;
 
+		boolean shortDocLengths = false; 
 		private static DfTableArray mDFTable;
 		private boolean normalize = false;
-		private boolean shortDocLengths = false;
-		
-		public void configure(JobConf conf){
-			sLogger.setLevel(Level.WARN);
 
+		public void configure(JobConf conf){
 			normalize = conf.getBoolean("Ivory.Normalize", false);
 			shortDocLengths = conf.getBoolean("Ivory.ShortDocLengths", false);
-			
+			MIN_SIZE = conf.getInt("Ivory.MinNumTerms", 0);
+
 			Path[] localFiles;
 			try {
 				// Detect if we're in standalone mode; if so, we can't us the
@@ -89,33 +92,30 @@ public class BuildWeightedIntDocVectors extends PowerTool {
 					RetrievalEnvironment env = new RetrievalEnvironment (indexPath, fs);
 					//					sLogger.info ("env: " + env);
 					localFiles = new Path [3];
-					localFiles [0] = new Path (env.getDfByIntData ());
-					localFiles [1] = new Path (env.getCfByIntData ());
+					localFiles [0] = new Path (env.getCfByIntData ());
+					localFiles [1] = new Path (env.getDfByIntData ());
 					localFiles [2] = env.getDoclengthsData ();
 				} else {
 					localFiles = DistributedCache.getLocalCacheFiles (conf);
 				}
 			} catch (IOException e2) {
-				throw new RuntimeException("Local cache files not read properly.");
+				throw new RuntimeException ("Local cache files not read properly.");
 			}
 
-			sLogger.info ("localFiles: " + localFiles);
-			sLogger.info ("localFiles [0]: " + localFiles [0]);
-			sLogger.info ("localFiles [1]: " + localFiles [1]);
-			sLogger.info ("localFiles [2]: " + localFiles [2]);
+ 			try {
+ 				mDFTable = new DfTableArray(localFiles[1], FileSystem.getLocal(conf));
+ 			} catch(IOException e1) {
+ 				throw new RuntimeException("Error loading df table from "+localFiles[1]);
+ 			}	
 
-			try {
-				mDFTable = new DfTableArray(localFiles[0], FileSystem.getLocal(conf));
-			} catch (IOException e1) {
-				throw new RuntimeException("Error loading df table from "+localFiles[0]);
-			}	
-			
+			sLogger.info("Global Stats table loaded successfully.");
+
 			try {
 				if(shortDocLengths)
 					mDLTable = new DocLengthTable2B(localFiles[2], FileSystem.getLocal(conf));
 				else 
 					mDLTable = new DocLengthTable4B(localFiles[2], FileSystem.getLocal(conf));
-			} catch (IOException e1) {
+			} catch(IOException e1) {
 				throw new RuntimeException("Error loading dl table from "+localFiles[2]);
 			}	
 			try {
@@ -141,14 +141,15 @@ public class BuildWeightedIntDocVectors extends PowerTool {
 
 			vectorWeights.clear();
 			IntDocVector.Reader r = doc.getReader();
+
 			sLogger.debug("===================================BEGIN READ DOC");
 			sum2 = 0;
 			while(r.hasMoreTerms()){
 				term = r.nextTerm();
-				mScoreFn.setDF(mDFTable.getDf(term));
-				wt = mScoreFn.computeDocumentWeight(r.getTf(), docLen);
-				vectorWeights.put(term, wt);
-				sum2 += wt * wt;
+ 				mScoreFn.setDF(mDFTable.getDf(term));
+ 				wt = mScoreFn.computeDocumentWeight(r.getTf(), docLen);
+ 				vectorWeights.put(term, wt);
+ 				sum2 += wt * wt;
 			}
 			sLogger.debug("===================================END READ DOC");
 			if(normalize){
@@ -159,18 +160,25 @@ public class BuildWeightedIntDocVectors extends PowerTool {
 					vectorWeights.put(e.getKey(), score/sum2);
 				}
 			}
-			WeightedIntDocVector weightedVector = new WeightedIntDocVector (docLen, vectorWeights);
-			output.collect(mDocno, weightedVector);
-			reporter.incrCounter(Docs.Total, 1);
+			if(vectorWeights.size()==0){
+				reporter.incrCounter(Docs.ZERO, 1);
+			}else if(vectorWeights.size()<MIN_SIZE){
+				reporter.incrCounter(Docs.SHORT, 1);
+			}
+			else{
+				WeightedIntDocVector vector = new WeightedIntDocVector(docLen, vectorWeights);
+				output.collect(mDocno, vector);
+				reporter.incrCounter(Docs.Total, 1);
+			}
 		}
 	}
 
 	public static final String[] RequiredParameters = { "Ivory.NumMapTasks",
 		"Ivory.IndexPath", 
 		//"Ivory.OutputPath",
-		"Ivory.ScoringModel", 
+		"Ivory.ScoringModel",
 		"Ivory.Normalize",
-		};
+	};
 
 	public String[] getRequiredParameters() {
 		return RequiredParameters;
@@ -182,10 +190,6 @@ public class BuildWeightedIntDocVectors extends PowerTool {
 
 	@SuppressWarnings("deprecation")
 	public int runTool() throws Exception {
-		sLogger.setLevel(Level.WARN);
-
-		sLogger.info("PowerTool: GetWeightedIntDocVectors");
-
 		// create a new JobConf, inheriting from the configuration of this
 		// PowerTool
 		JobConf conf = new JobConf(getConf(), BuildWeightedIntDocVectors.class);
@@ -198,27 +202,33 @@ public class BuildWeightedIntDocVectors extends PowerTool {
 		int minSplitSize = conf.getInt("Ivory.MinSplitSize", 0);
 		String collectionName = conf.get("Ivory.CollectionName");
 
+		sLogger.info("PowerTool: " + BuildWeightedIntDocVectors.class.getCanonicalName());
+		sLogger.info(String.format(" - %s: %s", Constants.CollectionName, collectionName));
+		sLogger.info(String.format(" - %s: %s", Constants.IndexPath, indexPath));
 
-		sLogger.info("Characteristics of the collection:");
-		sLogger.info(" - CollectionName: " + collectionName);
-		sLogger.info("Characteristics of the job:");
-		sLogger.info(" - NumMapTasks: " + mapTasks);
-		sLogger.info(" - MinSplitSize: " + minSplitSize);
-
-		String dfByIntFilePath = env.getDfByIntData();
 		String cfByIntFilePath = env.getCfByIntData();
+		String dfByIntFilePath = env.getDfByIntData();
+
+		Path inputPath = new Path(env.getIntDocVectorsDirectory());
+		Path vectorWeightsPath = new Path(outputPath);
+
+		if (fs.exists(vectorWeightsPath)) {
+			//fs.delete(vectorWeightsPath, true);
+			sLogger.info("Output path already exists!");
+			return 0;
+		}
+
+		/* add cf file to cache */
+		if (!fs.exists(new Path(cfByIntFilePath))) {
+			throw new RuntimeException("Error, df data file " + cfByIntFilePath + "doesn't exist!");
+		}
+		DistributedCache.addCacheFile(new URI(cfByIntFilePath), conf);
 
 		/* add df table to cache */
 		if (!fs.exists(new Path(dfByIntFilePath))) {
 			throw new RuntimeException("Error, df data file " + dfByIntFilePath + "doesn't exist!");
 		}
 		DistributedCache.addCacheFile(new URI(dfByIntFilePath), conf);
-
-		/* add cf table to cache */
-		if (!fs.exists(new Path(cfByIntFilePath))) {
-			throw new RuntimeException("Error, cf data file " + cfByIntFilePath + "doesn't exist!");
-		}
-		DistributedCache.addCacheFile(new URI(cfByIntFilePath), conf);
 
 		/* add dl table to cache */
 		Path docLengthFile = env.getDoclengthsData();
@@ -227,16 +237,8 @@ public class BuildWeightedIntDocVectors extends PowerTool {
 		}
 		DistributedCache.addCacheFile(docLengthFile.toUri(), conf);
 
-		Path inputPath = new Path(env.getIntDocVectorsDirectory());
-		Path weightedVectorsPath = new Path(outputPath);
-
-		if (fs.exists(weightedVectorsPath)) {
-			sLogger.info("Output path already exists!");
-			return 0;
-		}
-
-		//fs.delete(weightedVectirsPath, true);
-
+		conf.setMapperClass(MyMapper.class);
+		//conf.setInt("mapred.task.timeout",3600000);
 		conf.setJobName("GetWeightedIntDocVectors:" + collectionName);
 		conf.setNumMapTasks(mapTasks);
 		conf.setNumReduceTasks(0);
@@ -244,8 +246,7 @@ public class BuildWeightedIntDocVectors extends PowerTool {
 		conf.set("mapred.child.java.opts", "-Xmx2048m");
 
 		FileInputFormat.setInputPaths(conf, inputPath);
-		FileOutputFormat.setOutputPath(conf, weightedVectorsPath);
-
+		FileOutputFormat.setOutputPath(conf, vectorWeightsPath);
 		conf.setInputFormat(SequenceFileInputFormat.class);
 		conf.setMapOutputKeyClass(IntWritable.class);
 		conf.setMapOutputValueClass(WeightedIntDocVector.class);
@@ -253,11 +254,9 @@ public class BuildWeightedIntDocVectors extends PowerTool {
 		conf.setOutputKeyClass(IntWritable.class);
 		conf.setOutputValueClass(WeightedIntDocVector.class);
 
-		conf.setMapperClass(MyMapper.class);
-		//conf.setInt("mapred.task.timeout",3600000);
-
+		sLogger.info("Running job: "+conf.getJobName());
+		
 		long startTime = System.currentTimeMillis();
-
 		RunningJob job = JobClient.runJob(conf);
 		sLogger.info("Job Finished in " + (System.currentTimeMillis() - startTime) / 1000.0
 				+ " seconds");
