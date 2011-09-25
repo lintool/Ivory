@@ -11,6 +11,9 @@ public class IntegrationUtils {
   public static final String D_JT = "-Dmapred.job.tracker=bespin00.umiacs.umd.edu:8021";
   public static final String D_NN = "-Dfs.default.name=hdfs://bespin00.umiacs.umd.edu:8020";
 
+  public static final String D_JT_LOCAL = "-D mapred.job.tracker=local";
+  public static final String D_NN_LOCAL = "-D fs.default.name=file:///";
+   
   public static String getJar(String path, final String prefix) {
       File[] arr = new File(path).listFiles(new FilenameFilter() {
       @Override
