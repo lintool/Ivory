@@ -6,6 +6,9 @@ import ivory.core.driver.PreprocessWt10g;
 import ivory.core.eval.Qrels;
 import ivory.regression.basic.Wt10g_Basic;
 import ivory.smrf.retrieval.BatchQueryRunner;
+
+import java.util.List;
+
 import junit.framework.JUnit4TestAdapter;
 
 import org.apache.hadoop.conf.Configuration;
@@ -13,6 +16,9 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
 import org.junit.Test;
+
+import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
 
 public class VerifyWt10gIndex {
   private static final Logger LOG = Logger.getLogger(VerifyWt10gIndex.class);
@@ -29,11 +35,17 @@ public class VerifyWt10gIndex {
 
     fs.delete(new Path(index), true);
 
-    String cloud9Jar = IntegrationUtils.getJar("lib", "cloud9");
-    String guavaJar = IntegrationUtils.getJar("lib", "guava");
-    String ivoryJar = IntegrationUtils.getJar("dist", "ivory");
+    List<String> jars = Lists.newArrayList();
+    jars.add(IntegrationUtils.getJar("lib", "cloud9"));
+    jars.add(IntegrationUtils.getJar("lib", "guava"));
+    jars.add(IntegrationUtils.getJar("lib", "dsiutils"));
+    jars.add(IntegrationUtils.getJar("lib", "fastutil"));
+    jars.add(IntegrationUtils.getJar("lib", "jsap"));
+    jars.add(IntegrationUtils.getJar("lib", "sux4j"));
+    jars.add(IntegrationUtils.getJar("lib", "commons-collections"));
+    jars.add(IntegrationUtils.getJar("dist", "ivory"));
 
-    String libjars = String.format("-libjars=%s,%s,%s", cloud9Jar, guavaJar, ivoryJar);
+    String libjars = String.format("-libjars=%s", Joiner.on(",").join(jars));
 
     PreprocessWt10g.main(new String[] { libjars, IntegrationUtils.D_JT, IntegrationUtils.D_NN,
         collectionPath.toString(), index });
