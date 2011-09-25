@@ -97,7 +97,10 @@ public class BuildIntDocVectorsForwardIndex extends PowerTool {
         throw new RuntimeException("Unable to create RetrievalEnvironment!");
       }
 
-      String forwardIndexPath = env.getIntDocVectorsForwardIndex();
+      boolean buildWeighted = conf.getBoolean(Constants.BuildWeighted, false);
+      String forwardIndexPath =(buildWeighted ? 
+                                env.getWeightedIntDocVectorsForwardIndex() :
+                                env.getIntDocVectorsForwardIndex());
       collectionDocumentCount = env.readCollectionDocumentCount();
 
       try {
@@ -153,13 +156,22 @@ public class BuildIntDocVectorsForwardIndex extends PowerTool {
     String indexPath = conf.get(Constants.IndexPath);
     RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fs);
     String collectionName = env.readCollectionName();
+    boolean buildWeighted = conf.getBoolean(Constants.BuildWeighted, false);
 
     LOG.info("Tool: " + BuildIntDocVectorsForwardIndex.class.getCanonicalName());
     LOG.info(String.format(" - %s: %s", Constants.CollectionName, collectionName));
     LOG.info(String.format(" - %s: %s", Constants.IndexPath, indexPath));
+    LOG.info(String.format(" - %s: %s", Constants.BuildWeighted, buildWeighted));
 
-    String intDocVectorsPath = env.getIntDocVectorsDirectory();
-    String forwardIndexPath = env.getIntDocVectorsForwardIndex();
+    String intDocVectorsPath;
+    String forwardIndexPath;
+    if (buildWeighted) {
+      intDocVectorsPath = env.getWeightedIntDocVectorsDirectory ();
+      forwardIndexPath = env.getWeightedIntDocVectorsForwardIndex ();
+    } else {
+      intDocVectorsPath = env.getIntDocVectorsDirectory();
+      forwardIndexPath = env.getIntDocVectorsForwardIndex();
+    }
 
     if (!fs.exists(new Path(intDocVectorsPath))) {
       LOG.info("Error: IntDocVectors don't exist!");

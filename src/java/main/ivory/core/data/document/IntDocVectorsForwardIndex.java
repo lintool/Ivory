@@ -31,6 +31,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.SequenceFile;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import com.google.common.base.Preconditions;
@@ -78,14 +79,16 @@ public class IntDocVectorsForwardIndex {
    */
   public IntDocVectorsForwardIndex(String indexPath, FileSystem fs, boolean weighted)
       throws IOException {
+	  LOG.setLevel(Level.TRACE);
     this.fs = Preconditions.checkNotNull(fs);
     this.conf = fs.getConf();
 
     RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fs);
     path = (weighted ? env.getWeightedIntDocVectorsDirectory() : env.getIntDocVectorsDirectory());
 
-    String forwardIndexPath = (weighted ? env.getWeightedIntDocVectorsForwardIndex()
-        : env.getIntDocVectorsForwardIndex());
+    String forwardIndexPath =(weighted 
+							   ? env.getWeightedIntDocVectorsForwardIndex()
+							   : env.getIntDocVectorsForwardIndex());
     FSDataInputStream posInput = fs.open(new Path(forwardIndexPath));
 
     docnoOffset = posInput.readInt();
