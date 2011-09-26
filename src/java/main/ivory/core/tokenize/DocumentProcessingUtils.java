@@ -116,6 +116,7 @@ public class DocumentProcessingUtils {
       return positions;
     }
 
+    // We're going to stick the doclength here as a special case.
     positions.put("", new ArrayListOfInts(new int[] { doclength }));
     return positions;
   }
