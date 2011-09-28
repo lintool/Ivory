@@ -98,7 +98,7 @@ public class CascadeQueryPotential extends QueryPotential {
         positions = Arrays.copyOf(p, p.length);
 
       }
-      tf = postingsReader.getScore();  //even if two terms match, tf can be 0, i.e., if they aren't within the window size in the doc
+      tf = postingsReader.getTf();  //even if two terms match, tf can be 0, i.e., if they aren't within the window size in the doc
     }
 
     float score = scoringFunction.getScore(tf, docLen);

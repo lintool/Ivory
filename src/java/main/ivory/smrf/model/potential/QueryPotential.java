@@ -158,7 +158,7 @@ public class QueryPotential extends PotentialFunction {
     // Compute term frequency.
     int tf = 0;
     if (docNode.getDocno() == postingsReader.getDocno()) {
-      tf = postingsReader.getScore();
+      tf = postingsReader.getTf();
     }
 
     int docLen = env.getDocumentLength(docNode.getDocno());
@@ -232,5 +232,14 @@ public class QueryPotential extends PotentialFunction {
         endOfList = true;
       }
     }
+  }
+
+  /**
+   * Returns the scoring function associated with this potential.
+   *
+   * @return scoring function associated with this potential
+   */
+  public ScoringFunction getScoringFunction() {
+    return this.scoringFunction;
   }
 }

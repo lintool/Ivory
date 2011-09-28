@@ -18,7 +18,7 @@ package ivory.core.data.document;
 
 import ivory.core.compression.BitInputStream;
 import ivory.core.compression.BitOutputStream;
-import ivory.core.data.dictionary.DefaultCachedFrequencySortedDictionary;
+import ivory.core.data.dictionary.DefaultFrequencySortedDictionary;
 import ivory.core.data.index.TermPositions;
 
 import java.io.ByteArrayInputStream;
@@ -201,7 +201,7 @@ public class LazyIntDocVector implements IntDocVector {
     return s.toString();
   }
 
-  public String toStringWithTerms(DefaultCachedFrequencySortedDictionary map) {
+  public String toStringWithTerms(DefaultFrequencySortedDictionary map) {
     StringBuffer s = new StringBuffer("");
     try {
       Reader r = this.getReader();

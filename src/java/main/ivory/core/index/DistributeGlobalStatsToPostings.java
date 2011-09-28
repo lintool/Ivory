@@ -2,7 +2,7 @@ package ivory.core.index;
 
 
 import ivory.core.RetrievalEnvironment;
-import ivory.core.data.dictionary.DefaultCachedFrequencySortedDictionary;
+import ivory.core.data.dictionary.DefaultFrequencySortedDictionary;
 import ivory.core.data.index.PostingsList;
 import ivory.core.data.index.PostingsListDocSortedPositional;
 import ivory.core.data.stat.PrefixEncodedGlobalStats;
@@ -28,7 +28,6 @@ import org.apache.hadoop.mapred.SequenceFileOutputFormat;
 import org.apache.hadoop.mapred.lib.IdentityReducer;
 import org.apache.log4j.Logger;
 
-
 import edu.umd.cloud9.io.pair.PairOfIntLong;
 import edu.umd.cloud9.util.PowerTool;
 
@@ -40,7 +39,7 @@ public class DistributeGlobalStatsToPostings extends PowerTool {
 
 		private PrefixEncodedGlobalStats gs;
 
-		private DefaultCachedFrequencySortedDictionary mTermIdMap;
+		private DefaultFrequencySortedDictionary mTermIdMap;
 
 		public void configure(JobConf job) {
 			try {
@@ -61,8 +60,8 @@ public class DistributeGlobalStatsToPostings extends PowerTool {
 
 				String indexPath = job.get("Ivory.IndexPath");
 				sLogger.info("loading TermIdMap from " + indexPath);
-				mTermIdMap = new DefaultCachedFrequencySortedDictionary(localFiles[3], localFiles[4],
-						localFiles[5], 0.2f, fs);
+				mTermIdMap = new DefaultFrequencySortedDictionary(localFiles[3], localFiles[4],
+						localFiles[5], fs);
 			} catch (IOException e) {
 				e.printStackTrace();
 				throw new RuntimeException("Error loading global term stats!");

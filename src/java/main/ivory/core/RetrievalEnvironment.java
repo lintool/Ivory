@@ -1,11 +1,11 @@
 /*
  * Ivory: A Hadoop toolkit for web-scale information retrieval
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You may
  * obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0 
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,7 +16,7 @@
 
 package ivory.core;
 
-import ivory.core.data.dictionary.DefaultCachedFrequencySortedDictionary;
+import ivory.core.data.dictionary.DefaultFrequencySortedDictionary;
 import ivory.core.data.document.IntDocVector;
 import ivory.core.data.document.IntDocVectorsForwardIndex;
 import ivory.core.data.document.TermDocVector;
@@ -77,7 +77,7 @@ public class RetrievalEnvironment {
 	protected String postingsType;           // Type of postings in the index.
 	protected DocLengthTable doclengths;     // Document length lookup.
 	protected Tokenizer tokenizer;           // Tokenizer for parsing queries.
-	protected DefaultCachedFrequencySortedDictionary termidMap;  // Mapping from terms to term ids.
+	protected DefaultFrequencySortedDictionary termidMap;  // Mapping from terms to term ids.
 
 	protected IntPostingsForwardIndex postingsIndex;     // Forward index into postings.
 	protected IntDocVectorsForwardIndex docvectorsIndex; // Forward index into int doc vectors.
@@ -149,7 +149,7 @@ public class RetrievalEnvironment {
 			LOG.info("Tokenizer: " + tokenizerClassName);
 			tokenizer = (Tokenizer) Class.forName(tokenizerClassName).newInstance();
 		} catch (Exception e) {
-			throw new ConfigurationException("Error initializing tokenizer!", e);
+			throw new ConfigurationException("Error initializing tokenizer!");
 		}
 
 		LOG.info("Loading postings index...");
@@ -158,10 +158,10 @@ public class RetrievalEnvironment {
 		LOG.info("Done!");
 
 		try {
-			termidMap = new DefaultCachedFrequencySortedDictionary(new Path(getIndexTermsData()), new Path(getIndexTermIdsData()),
-					new Path(getIndexTermIdMappingData()), 0.2f,	fs);
+			termidMap = new DefaultFrequencySortedDictionary(new Path(getIndexTermsData()),
+			    new Path(getIndexTermIdsData()), new Path(getIndexTermIdMappingData()), fs);
 		} catch (Exception e) {
-			throw new ConfigurationException("Error initializing term to term id mapping!", e);
+			throw new ConfigurationException("Error initializing dictionary!");
 		}
 
 		try {
@@ -388,6 +388,10 @@ public class RetrievalEnvironment {
 	public String getTermFromId(int termid) {
 		return termidMap.getTerm(termid);
 	}
+
+  public int getIdFromTerm(String term) {
+    return termidMap.getId(term);
+  }
 
 	/**
 	 * Tokenizes text according to the tokenizer used to process the document
