@@ -135,9 +135,10 @@
 
         <target name="jarjar" depends="compile">
                 <taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask"
-                         classpath="lib/jarjar-1.0.jar"/>
+                         classpath="lib/jarjar-1.1.jar"/>
                 <jarjar jarfile="ivory-dist.jar">
                   <fileset dir="${build.dir}"/>
+				  <zipgroupfileset dir="lib" includes="*.jar" />
                 </jarjar>
         </target>
 

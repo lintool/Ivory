@@ -330,4 +330,6 @@ public class SixtyFourBitSignature extends Signature{//implements WritableCompar
 		return bits;
 	}
 
+	public void and(Signature signature) {}
+	public void or(Signature signature) {}
 }
