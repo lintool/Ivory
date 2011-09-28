@@ -14,7 +14,7 @@ import edu.umd.cloud9.io.array.ArrayListOfIntsWritable;
  * @author ferhanture
  *
  */
-public class MinhashSignature extends Signature{//implements WritableComparable<BitsSignature64> {
+public class MinhashSignature extends Signature{
 	private ArrayListOfIntsWritable terms;
 	
 	/**
@@ -247,7 +247,4 @@ public class MinhashSignature extends Signature{//implements WritableComparable<
 		}
 		return sublst;
 	}
-
-	public void and(Signature signature) {}
-	public void or(Signature signature) {}
 }

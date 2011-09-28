@@ -28,6 +28,7 @@ import ivory.pwsim.score.ScoringModel;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.Map;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.filecache.DistributedCache;
@@ -42,16 +43,15 @@ import org.apache.hadoop.mapred.MapReduceBase;
 import org.apache.hadoop.mapred.Mapper;
 import org.apache.hadoop.mapred.OutputCollector;
 import org.apache.hadoop.mapred.Reporter;
-import org.apache.hadoop.mapred.RunningJob;
 import org.apache.hadoop.mapred.SequenceFileInputFormat;
 import org.apache.hadoop.mapred.SequenceFileOutputFormat;
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+
+import com.google.common.collect.Maps;
 
 import edu.umd.cloud9.io.map.HMapIFW;
 import edu.umd.cloud9.util.PowerTool;
 import edu.umd.cloud9.util.map.MapIF;
-
 
 public class BuildWeightedIntDocVectors extends PowerTool {
 	private static final Logger sLogger = Logger.getLogger(BuildWeightedIntDocVectors.class);
@@ -80,44 +80,40 @@ public class BuildWeightedIntDocVectors extends PowerTool {
 			MIN_SIZE = conf.getInt("Ivory.MinNumTerms", 0);
 
 			Path[] localFiles;
-			try {
-				// Detect if we're in standalone mode; if so, we can't us the
-				// DistributedCache because it does not (currently) work in
-				// standalone mode...
-				if (conf.get ("mapred.job.tracker").equals ("local")) {
-					FileSystem fs = FileSystem.get (conf);
-					//sLogger.info ("fs: " + fs);
-					String indexPath = conf.get ("Ivory.IndexPath");
-					//sLogger.info ("indexPath: " + indexPath);
-					RetrievalEnvironment env = new RetrievalEnvironment (indexPath, fs);
-					//					sLogger.info ("env: " + env);
-					localFiles = new Path [3];
-					localFiles [0] = new Path (env.getCfByIntData ());
-					localFiles [1] = new Path (env.getDfByIntData ());
-					localFiles [2] = env.getDoclengthsData ();
-				} else {
-					localFiles = DistributedCache.getLocalCacheFiles (conf);
-				}
-			} catch (IOException e2) {
-				throw new RuntimeException ("Local cache files not read properly.");
-			}
+      try {
+        localFiles = DistributedCache.getLocalCacheFiles(conf);
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
 
- 			try {
- 				mDFTable = new DfTableArray(localFiles[1], FileSystem.getLocal(conf));
- 			} catch(IOException e1) {
- 				throw new RuntimeException("Error loading df table from "+localFiles[1]);
- 			}	
+      Map<String, Path> pathMapping = Maps.newHashMap();
+      for (Path p : localFiles) {
+        sLogger.info("In DistributedCache: " + p);
+        if (p.toString().contains("df")) {
+          pathMapping.put("df", p);
+        } else if (p.toString().contains("doclengths")) {
+          pathMapping.put("doclengths", p);
+        }
+      }
+
+      try {
+        mDFTable = new DfTableArray(pathMapping.get("df"), FileSystem.getLocal(conf));
+      } catch (IOException e1) {
+        throw new RuntimeException("Error loading df table from " + pathMapping.get("df"));
+      }
 
 			sLogger.info("Global Stats table loaded successfully.");
 
-			try {
-				if(shortDocLengths)
-					mDLTable = new DocLengthTable2B(localFiles[2], FileSystem.getLocal(conf));
-				else 
-					mDLTable = new DocLengthTable4B(localFiles[2], FileSystem.getLocal(conf));
-			} catch(IOException e1) {
-				throw new RuntimeException("Error loading dl table from "+localFiles[2]);
-			}	
+      try {
+        if (shortDocLengths) {
+          mDLTable = new DocLengthTable2B(pathMapping.get("doclengths"), FileSystem.getLocal(conf));
+        } else {
+          mDLTable = new DocLengthTable4B(pathMapping.get("doclengths"), FileSystem.getLocal(conf));
+        }
+      } catch (IOException e1) {
+        throw new RuntimeException("Error loading dl table from " + pathMapping.get("doclengths"));
+      }
+
 			try {
 				mScoreFn = (ScoringModel) Class.forName(conf.get("Ivory.ScoringModel")).newInstance();
 
@@ -188,7 +184,6 @@ public class BuildWeightedIntDocVectors extends PowerTool {
 		super(conf);
 	}
 
-	@SuppressWarnings("deprecation")
 	public int runTool() throws Exception {
 		// create a new JobConf, inheriting from the configuration of this
 		// PowerTool
@@ -257,7 +252,7 @@ public class BuildWeightedIntDocVectors extends PowerTool {
 		sLogger.info("Running job: "+conf.getJobName());
 		
 		long startTime = System.currentTimeMillis();
-		RunningJob job = JobClient.runJob(conf);
+		JobClient.runJob(conf);
 		sLogger.info("Job Finished in " + (System.currentTimeMillis() - startTime) / 1000.0
 				+ " seconds");
 

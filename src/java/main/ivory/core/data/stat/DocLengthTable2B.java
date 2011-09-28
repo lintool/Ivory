@@ -141,14 +141,14 @@ public class DocLengthTable2B implements DocLengthTable {
   // Main program for interactively querying document lengths.
   public static void main(String[] args) throws Exception {
     if (args.length != 1) {
-      System.out.println("usage: [doc-length-data]");
+      System.err.println("usage: [doc-length-data]");
       System.exit(-1);
     }
 
     long startingMemoryUse = MemoryUsageUtils.getUsedMemory();
 
-    DocLengthTable2B lengths = new DocLengthTable2B(new Path(args[0]), FileSystem
-        .get(new Configuration()));
+    DocLengthTable2B lengths = new DocLengthTable2B(new Path(args[0]),
+        FileSystem.get(new Configuration()));
     long endingMemoryUse = MemoryUsageUtils.getUsedMemory();
 
     System.out.println("Memory usage: " + (endingMemoryUse - startingMemoryUse) + " bytes\n");

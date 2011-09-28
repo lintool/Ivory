@@ -16,13 +16,17 @@
 
 package ivory.core.data.stat;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
+
+import edu.umd.cloud9.debug.MemoryUsageUtils;
 
 /**
  * <p>
@@ -130,5 +134,31 @@ public class DocLengthTable4B implements DocLengthTable {
   @Override
   public int getDocCount() {
     return docCount;
+  }
+
+  // Main program for interactively querying document lengths.
+  public static void main(String[] args) throws Exception {
+    if (args.length != 1) {
+      System.err.println("usage: [doc-length-data]");
+      System.exit(-1);
+    }
+
+    long startingMemoryUse = MemoryUsageUtils.getUsedMemory();
+
+    DocLengthTable4B lengths = new DocLengthTable4B(new Path(args[0]),
+        FileSystem.get(new Configuration()));
+    long endingMemoryUse = MemoryUsageUtils.getUsedMemory();
+
+    System.out.println("Memory usage: " + (endingMemoryUse - startingMemoryUse) + " bytes\n");
+    System.out.println("Average doc length: " + lengths.getAvgDocLength());
+    System.out.println("Docno offset: " + lengths.getDocnoOffset());
+
+    String docno = null;
+    BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
+    System.out.print("Look up doclength for docno> ");
+    while ((docno = stdin.readLine()) != null) {
+      System.out.println(lengths.getDocLength(Integer.parseInt(docno)));
+      System.out.print("Look up doclength for docno> ");
+    }
   }
 }

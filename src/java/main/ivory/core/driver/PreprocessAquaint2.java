@@ -18,15 +18,15 @@ package ivory.core.driver;
 
 import ivory.core.Constants;
 import ivory.core.RetrievalEnvironment;
-import ivory.core.index.BuildIntPostingsForwardIndex;
 import ivory.core.index.BuildIPInvertedIndexDocSorted;
+import ivory.core.index.BuildIntPostingsForwardIndex;
+import ivory.core.preprocess.BuildDictionary;
 import ivory.core.preprocess.BuildIntDocVectors;
 import ivory.core.preprocess.BuildIntDocVectorsForwardIndex;
 import ivory.core.preprocess.BuildTermDocVectors;
 import ivory.core.preprocess.BuildTermDocVectorsForwardIndex;
-import ivory.core.preprocess.BuildTermIdMap;
 import ivory.core.preprocess.BuildWeightedIntDocVectors;
-import ivory.core.preprocess.GetTermCount;
+import ivory.core.preprocess.ComputeGlobalTermStatistics;
 import ivory.core.tokenize.GalagoTokenizer;
 
 import org.apache.hadoop.conf.Configuration;
@@ -41,7 +41,6 @@ import edu.umd.cloud9.collection.aquaint2.Aquaint2DocnoMapping;
 import edu.umd.cloud9.collection.aquaint2.Aquaint2DocumentInputFormat2;
 import edu.umd.cloud9.collection.aquaint2.BuildAquaint2ForwardIndex;
 import edu.umd.cloud9.collection.aquaint2.NumberAquaint2Documents2;
-
 
 public class PreprocessAquaint2 extends Configured implements Tool {
   private static final Logger LOG = Logger.getLogger(PreprocessAquaint2.class);
@@ -96,10 +95,10 @@ public class PreprocessAquaint2 extends Configured implements Tool {
       fs.delete(mappingDir, true);
     }
 
-	int numMappers = 100;
-	int numReducers = 100;
-	conf.setInt("Ivory.NumMapTasks", numMappers);
-	conf.setInt("Ivory.NumReduceTasks", numReducers);
+    int numMappers = 100;
+    int numReducers = 100;
+    conf.setInt(Constants.NumMapTasks, numMappers);
+    conf.setInt(Constants.NumReduceTasks, numReducers);
     conf.set(Constants.CollectionName, "Aquaint2");
     conf.set(Constants.CollectionPath, collection);
     conf.set(Constants.IndexPath, indexRootPath);
@@ -114,30 +113,31 @@ public class PreprocessAquaint2 extends Configured implements Tool {
     conf.setInt(Constants.TermIndexWindow, 8);
 
     new BuildTermDocVectors(conf).run();
-    new GetTermCount(conf).run();
-    new BuildTermIdMap(conf).run();
+    new ComputeGlobalTermStatistics(conf).run();
+    new BuildDictionary(conf).run();
     new BuildIntDocVectors(conf).run();
 
     new BuildIntDocVectorsForwardIndex(conf).run();
     new BuildTermDocVectorsForwardIndex(conf).run();
 
-	new BuildIPInvertedIndexDocSorted(conf).run();
+    new BuildIPInvertedIndexDocSorted(conf).run();
+    new BuildIntPostingsForwardIndex(conf).run();
 
-	conf.set("Ivory.ScoringModel", "ivory.pwsim.score.TfIdf");
-	conf.setBoolean ("Ivory.Normalize", true);
+    conf.set("Ivory.ScoringModel", "ivory.pwsim.score.TfIdf");
+    conf.setBoolean("Ivory.Normalize", true);
 
-	new BuildIntPostingsForwardIndex(conf).run();
+    new BuildWeightedIntDocVectors(conf).run();
+    new BuildIntDocVectorsForwardIndex(conf).run();
 
-	String findexDirPath = indexRootPath + "/findex";
-	String findexFilePath = indexRootPath + "/findex.dat";
-	new BuildWeightedIntDocVectors(conf).run();
-	new BuildIntDocVectorsForwardIndex(conf).run();
+    String findexDirPath = indexRootPath + "/findex";
+    String findexFilePath = indexRootPath + "/findex.dat";
 
     if (fs.exists(new Path(findexDirPath))) {
       LOG.info("ForwardIndex already exists: Skipping!");
     } else {
-		new BuildAquaint2ForwardIndex ().runTool (conf, collection, findexDirPath, findexFilePath, mappingFile.toString ());
-	}
+      new BuildAquaint2ForwardIndex().runTool(conf, collection, findexDirPath, findexFilePath,
+          mappingFile.toString());
+    }
 
     return 0;
   }

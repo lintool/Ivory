@@ -18,7 +18,7 @@ import edu.umd.cloud9.io.array.ArrayListOfIntsWritable;
  * @author ferhanture
  *
  */
-public class SixtyFourBitSignature extends Signature{//implements WritableComparable<BitsSignature64> {
+public class SixtyFourBitSignature extends Signature{
 	private byte[] bits;
 	static int NUM_BITS = 64;
 	static int NUM_BYTES = 8;
@@ -329,7 +329,4 @@ public class SixtyFourBitSignature extends Signature{//implements WritableCompar
 	public byte[] getBits() {
 		return bits;
 	}
-
-	public void and(Signature signature) {}
-	public void or(Signature signature) {}
 }
