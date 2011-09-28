@@ -63,6 +63,7 @@ public class DocLengthTable2B implements DocLengthTable {
 
   /**
    * Creates a new {@code DocLengthTable2B}.
+   *
    * @param file document length data file
    * @throws IOException
    */
@@ -72,6 +73,7 @@ public class DocLengthTable2B implements DocLengthTable {
 
   /**
    * Creates a new {@code DocLengthTable2B}.
+   *
    * @param file document length data file
    * @param fs FileSystem to read from
    * @throws IOException

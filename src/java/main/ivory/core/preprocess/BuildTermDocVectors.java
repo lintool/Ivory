@@ -44,11 +44,11 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.NullOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
+import org.apache.hadoop.util.LineReader;
 import org.apache.log4j.Logger;
 
 import edu.umd.cloud9.collection.DocnoMapping;
 import edu.umd.cloud9.collection.Indexable;
-import edu.umd.cloud9.io.FSLineReader;
 import edu.umd.cloud9.mapreduce.NullInputFormat;
 import edu.umd.cloud9.mapreduce.NullMapper;
 import edu.umd.cloud9.util.PowerTool;
@@ -232,7 +232,7 @@ public class BuildTermDocVectors extends PowerTool {
         }
 
         LOG.info("processing " + fileStats[i].getPath());
-        FSLineReader reader = new FSLineReader(fileStats[i].getPath(), fs);
+        LineReader reader = new LineReader(fs.open(fileStats[i].getPath()));
 
         Text line = new Text();
         while (reader.readLine(line) > 0) {
@@ -320,6 +320,7 @@ public class BuildTermDocVectors extends PowerTool {
     String tokenizer = conf.get(Constants.Tokenizer);
     String mappingClass = conf.get(Constants.DocnoMappingClass);
     int docnoOffset = conf.getInt(Constants.DocnoOffset, 0);
+    int numReducers = conf.getInt(Constants.TermDocVectorSegments, 0);
 
     LOG.info("PowerTool: " + BuildTermDocVectors.class.getCanonicalName());
     LOG.info(String.format(" - %s: %s", Constants.IndexPath, indexPath));
@@ -329,6 +330,7 @@ public class BuildTermDocVectors extends PowerTool {
     LOG.info(String.format(" - %s: %s", Constants.Tokenizer, tokenizer));
     LOG.info(String.format(" - %s: %s", Constants.DocnoMappingClass, mappingClass));
     LOG.info(String.format(" - %s: %s", Constants.DocnoOffset, docnoOffset));
+    LOG.info(String.format(" - %s: %s", Constants.TermDocVectorSegments, numReducers));
 
     RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fs);
     Path mappingFile = env.getDocnoMappingData();
@@ -357,7 +359,7 @@ public class BuildTermDocVectors extends PowerTool {
         BuildTermDocVectors.class.getSimpleName() + ":" + collectionName);
     job1.setJarByClass(BuildTermDocVectors.class);
 
-    job1.setNumReduceTasks(0);
+    job1.setNumReduceTasks(numReducers);
 
     FileInputFormat.addInputPaths(job1, collectionPath);
     FileOutputFormat.setOutputPath(job1, outputPath);

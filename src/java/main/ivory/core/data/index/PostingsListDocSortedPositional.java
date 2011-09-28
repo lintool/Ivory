@@ -491,7 +491,7 @@ public class PostingsListDocSortedPositional implements PostingsList {
     }
 
     @Override
-    public short peekNextScore() {
+    public short peekNextTf() {
       throw new UnsupportedOperationException();
     }
 
@@ -519,7 +519,7 @@ public class PostingsListDocSortedPositional implements PostingsList {
     }
 
     @Override
-    public short getScore() {
+    public short getTf() {
       return prevTf;
     }
   }

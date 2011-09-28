@@ -16,7 +16,7 @@
 
 package ivory.core.tokenize;
 
-import ivory.core.data.dictionary.DefaultCachedFrequencySortedDictionary;
+import ivory.core.data.dictionary.Dictionary;
 import ivory.core.data.document.TermDocVector;
 
 import java.io.IOException;
@@ -41,7 +41,7 @@ public class DocumentProcessingUtils {
   public static short TF_CUT = Short.MAX_VALUE;
 
   public static SortedMap<Integer, int[]> integerizeTermDocVector(TermDocVector doc,
-      DefaultCachedFrequencySortedDictionary termIDMap) {
+      Dictionary termIDMap) {
     SortedMap<Integer, int[]> positions = Maps.newTreeMap();
 
     TermDocVector.Reader reader = null;
@@ -116,6 +116,7 @@ public class DocumentProcessingUtils {
       return positions;
     }
 
+    // We're going to stick the doclength here as a special case.
     positions.put("", new ArrayListOfInts(new int[] { doclength }));
     return positions;
   }

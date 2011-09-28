@@ -19,6 +19,7 @@ package ivory.core.index;
 import ivory.core.Constants;
 import ivory.core.RetrievalEnvironment;
 import ivory.core.data.document.IntDocVector;
+import ivory.core.data.index.IntPostingsForwardIndex;
 import ivory.core.preprocess.PositionalSequenceFileRecordReader;
 
 import java.io.IOException;
@@ -43,8 +44,6 @@ import edu.umd.cloud9.util.PowerTool;
 
 public class BuildIntPostingsForwardIndex extends PowerTool {
   private static final Logger LOG = Logger.getLogger(BuildIntPostingsForwardIndex.class);
-
-  public static final long BIG_LONG_NUMBER = 1000000000;
 
   protected static enum Dictionary { Size };
 
@@ -128,7 +127,7 @@ public class BuildIntPostingsForwardIndex extends PowerTool {
 
       int fileNo = Integer.parseInt(s[0]);
       long filePos = Long.parseLong(s[1]);
-      long pos = BIG_LONG_NUMBER * fileNo + filePos;
+      long pos = IntPostingsForwardIndex.BigNumber * fileNo + filePos;
 
       curKeyIndex++;
 

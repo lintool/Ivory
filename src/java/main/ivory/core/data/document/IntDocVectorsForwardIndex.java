@@ -50,6 +50,10 @@ public class IntDocVectorsForwardIndex {
   private static final Logger LOG = Logger.getLogger(IntDocVectorsForwardIndex.class);
   private static final NumberFormat FORMAT = new DecimalFormat("00000");
 
+  // This is 10^15 (i.e., an exabyte). We're assuming that each individual file is smaller than
+  // this value, which seems safe, at least for a while... :)
+  public static final long BigNumber = 1000000000000000L;
+
   private final FileSystem fs;
   private final Configuration conf;
   private final long[] positions;
@@ -107,8 +111,8 @@ public class IntDocVectorsForwardIndex {
 
     long pos = positions[docno - docnoOffset - 1];
 
-    int fileNo = (int) (pos / BuildIntDocVectorsForwardIndex.BigNumber);
-    pos = pos % BuildIntDocVectorsForwardIndex.BigNumber;
+    int fileNo = (int) (pos / BigNumber);
+    pos = pos % BigNumber;
 
     SequenceFile.Reader reader = null;
     try {

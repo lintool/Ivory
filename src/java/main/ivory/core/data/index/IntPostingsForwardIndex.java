@@ -1,5 +1,5 @@
 /*
- * Ivory: A Hadoop toolkit for Web-scale information retrieval
+ * Ivory: A Hadoop toolkit for web-scale information retrieval
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You may
@@ -21,6 +21,8 @@ import ivory.core.RetrievalEnvironment;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
@@ -28,40 +30,35 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.SequenceFile;
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import edu.umd.cloud9.debug.MemoryUsageUtils;
 
 public class IntPostingsForwardIndex {
   private static final Logger LOG = Logger.getLogger(IntPostingsForwardIndex.class);
-  public static final long BIG_LONG_NUMBER = 1000000000;
+  private static final NumberFormat FORMAT = new DecimalFormat("00000");
 
-  static {
-    LOG.setLevel(Level.INFO);
-  }
+  // This is 10^15 (i.e., an exabyte). We're assuming that each individual file is smaller than
+  // this value, which seems safe, at least for a while... :)
+  public static final long BigNumber = 1000000000000000L;
 
-  long[] positions;
-  String postingsPath;
-  FileSystem fs;
-  Configuration conf;
-  String postingsType;
+  private final long[] positions;
+  private final String postingsPath;
+  private final FileSystem fs;
+  private final Configuration conf;
 
   public IntPostingsForwardIndex(String indexPath, FileSystem fs) throws IOException {
     this.fs = fs;
     this.conf = fs.getConf();
-    postingsType = ivory.core.data.index.PostingsListDocSortedPositional.class.getCanonicalName();
     RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fs);
     postingsPath = env.getPostingsDirectory();
 
-    FSDataInputStream posInput = fs.open(new Path(env
-        .getPostingsIndexData()));
+    FSDataInputStream posInput = fs.open(new Path(env.getPostingsIndexData()));
 
     int l = posInput.readInt();
     positions = new long[l];
     for (int i = 0; i < l; i++) {
       positions[i] = posInput.readLong();
-      // sLogger.info(positions[i]);
     }
   }
 
@@ -69,43 +66,29 @@ public class IntPostingsForwardIndex {
     // TODO: This method re-opens the SequenceFile on every access. Would be more efficient to cache
     // the file handles.
 
-    // sLogger.info("getPostingsList("+termid+")");
     long pos = positions[termid - 1];
 
-    int fileNo = (int) (pos / BIG_LONG_NUMBER);
-
-    pos = pos % BIG_LONG_NUMBER;
-
-    String fileNoStr = fileNo + "";
-    String padd = "";
-    for (int i = 5; i > fileNoStr.length(); i--)
-      padd += "0";
-    fileNoStr = padd + fileNoStr;
+    int fileNo = (int) (pos / BigNumber);
+    pos = pos % BigNumber;
 
     // Open up the SequenceFile.
     SequenceFile.Reader reader = null;
     try {
       reader = new SequenceFile.Reader(fs,
-          new Path(postingsPath + "/part-" + fileNoStr), conf);
+          new Path(postingsPath + "/part-" + FORMAT.format(fileNo)), conf);
     } catch (IOException e) {
       // Try alternative naming scheme for output of new API.
       reader = new SequenceFile.Reader(fs,
-          new Path(postingsPath + "/part-r-" + fileNoStr), conf);
+          new Path(postingsPath + "/part-r-" + FORMAT.format(fileNo)), conf);
     }
 
     IntWritable key = new IntWritable();
     PostingsList value = null;
     try {
       value = (PostingsList) Class.forName(reader.getValueClassName()).newInstance();
-    } catch (InstantiationException e) {
-      // TODO Auto-generated catch block
+    } catch (Exception e) {
       e.printStackTrace();
-    } catch (IllegalAccessException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (ClassNotFoundException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+      return null;
     }
 
     reader.seek(pos);
@@ -128,11 +111,8 @@ public class IntPostingsForwardIndex {
     }
 
     long startingMemoryUse = MemoryUsageUtils.getUsedMemory();
-
     Configuration conf = new Configuration();
-
-    IntPostingsForwardIndex index = new IntPostingsForwardIndex(args[0], FileSystem.get(conf));
-
+    IntPostingsForwardIndex index = new IntPostingsForwardIndex(args[0], FileSystem.getLocal(conf));
     long endingMemoryUse = MemoryUsageUtils.getUsedMemory();
 
     System.out.println("Memory usage: " + (endingMemoryUse - startingMemoryUse) + " bytes\n");
@@ -146,5 +126,4 @@ public class IntPostingsForwardIndex {
       System.out.print("Look up postings of termid > ");
     }
   }
-
 }
