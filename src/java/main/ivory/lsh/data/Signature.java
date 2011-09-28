@@ -33,9 +33,6 @@ public abstract class Signature implements WritableComparable {
 
   public abstract int hammingDistance(Signature signature, int threshold);
 
-  public abstract void and(Signature signature);
-  public abstract void or(Signature signature);
-
   public abstract void perm(ArrayListOfIntsWritable arrayListOfIntsWritable, Signature permSign);
   public abstract Signature perm(ArrayListOfIntsWritable arrayListOfIntsWritable);
 

@@ -269,16 +269,16 @@ public class NBitSignature extends Signature {
     return count;
   }
 
-  @Override public void and(Signature other) {
-    byte[] obb = ((NBitSignature) other).bits.bits;
+  public void and(NBitSignature other) {
+    byte[] obb = other.bits.bits;
 
     for(int i = 0; i < obb.length; i++) {
       bits.bits[i] &= obb[i];
     }
   }
 
-  @Override public void or(Signature other) {
-    byte[] obb = ((NBitSignature) other).bits.bits;
+  public void or(NBitSignature other) {
+    byte[] obb = other.bits.bits;
 
     for(int i = 0; i < obb.length; i++) {
       bits.bits[i] |= obb[i];

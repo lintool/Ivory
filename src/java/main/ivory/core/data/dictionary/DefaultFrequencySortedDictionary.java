@@ -35,8 +35,7 @@ import org.apache.hadoop.fs.Path;
  * @author Jimmy Lin
  */
 public class DefaultFrequencySortedDictionary implements FrequencySortedDictionary {
-  private PrefixEncodedLexicographicallySortedDictionary dictionary =
-      new PrefixEncodedLexicographicallySortedDictionary();
+  private FrontCodedDictionary dictionary = new FrontCodedDictionary();
   private int[] ids;
   private int[] idsToTerm;
 

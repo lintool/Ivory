@@ -19,6 +19,7 @@ package ivory.core.preprocess;
 import ivory.core.Constants;
 import ivory.core.RetrievalEnvironment;
 import ivory.core.data.document.IntDocVector;
+import ivory.core.data.document.IntDocVectorsForwardIndex;
 
 import java.io.IOException;
 import java.util.Iterator;
@@ -43,7 +44,6 @@ import edu.umd.cloud9.util.PowerTool;
 
 public class BuildIntDocVectorsForwardIndex extends PowerTool {
   private static final Logger LOG = Logger.getLogger(BuildIntDocVectorsForwardIndex.class);
-  public static final long BigNumber = 1000000000;
   protected static enum DocVectors { Count };
 
   private static class MyMapper
@@ -62,7 +62,7 @@ public class BuildIntDocVectorsForwardIndex extends PowerTool {
       int fileNo = Integer.parseInt(file.substring(file.lastIndexOf("-") + 1));
       long filePos = reader.getPosition();
       while (reader.nextKeyValue()) {
-        output.set(BigNumber * fileNo + filePos);
+        output.set(IntDocVectorsForwardIndex.BigNumber * fileNo + filePos);
 
         context.write(reader.getCurrentKey(), output);
         context.getCounter(DocVectors.Count).increment(1);
