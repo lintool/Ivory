@@ -20,8 +20,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import ivory.core.data.dictionary.PrefixEncodedLexicographicallySortedDictionary;
-
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
@@ -29,11 +27,9 @@ import java.util.Map;
 import junit.framework.JUnit4TestAdapter;
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.junit.Test;
-
 
 import com.google.common.collect.Maps;
 
@@ -143,28 +139,6 @@ public class PrefixEncodedLexicographicallySortedDictionaryTest {
     assertEquals(12339, n.getId("azzuz"));
 
     fs.delete(new Path("tmp.dat"), true);
-  }
-
-  // Test the actual dictionary for the TREC corpus.
-  @Test
-  public void test3() throws IOException {
-    FileSystem fs = FileSystem.getLocal(new Configuration());
-    PrefixEncodedLexicographicallySortedDictionary dictionary =
-        new PrefixEncodedLexicographicallySortedDictionary(); 
-
-    FSDataInputStream in = fs.open(new Path("etc/trec-index-terms.dat"));
-    dictionary.readFields(in);
-    in.close();
-
-    assertEquals(312232, dictionary.size());
-    // Note: termids start at 0;
-    assertEquals("0", dictionary.getTerm(0));
-    assertEquals("mainichi", dictionary.getTerm(200000));
-    assertEquals("wassberg", dictionary.getTerm(300000));
-
-    // Check bounds.
-    assertEquals(null, dictionary.getTerm(-1));
-    assertEquals(null, dictionary.getTerm(312232));
   }
 
   public static junit.framework.Test suite() {
