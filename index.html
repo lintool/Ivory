@@ -65,26 +65,18 @@
 
 
 <p>Ivory is a Hadoop toolkit for web-scale information retrieval
-research that features a retrieval engine based on Markov Random
-Fields, appropriately named SMRF (Searching with Markov Random
-Fields).  Ivory takes full advantage of
-the <a href="http://hadoop.apache.org/core/">Hadoop</a> distributed
-environment (the MapReduce programming model and the underlying
-distributed file system) for both indexing and retrieval.  The current
-release of Ivory (release 0.4) works with Hadoop (release 0.20.1).</p>
+research.</p>
 
-<p>In order to temper expectations, please note that Ivory is not
-meant to serve as a full-featured search engine, but rather aimed at
-information retrieval researchers who generally know their way around
-retrieval algorithms.  As a result, a lot of "niceties" are simply
-missing&mdash;for example, fancy interfaces or ingestion support for
-different file types.  It goes without saying that Ivory is a bit
-rough around the edges, but our philosophy is to release early and
-release often.  In short, Ivory is <b>experimental</b>!  If you just
-want search capabilities as a "black
+<p>In order to temper expectations: Ivory is a research system, not a
+full-featured search engine! It's aimed at information retrieval
+researchers who generally know their way around retrieval algorithms,
+postings lists, etc. If you want to, for example, play with the latest
+research coming out of SIGIR and related venues, then Ivory is for
+you. On the other hand, if you just want search capabilities as a
+"black
 box", <a href="http://lucene.apache.org/java/docs/index.html">Lucene</a>
 is a likely a better
-choice.  <a href="http://katta.sourceforge.net/">Katta</a> is a
+choice. <a href="http://katta.sourceforge.net/">Katta</a> is a
 framework for serving distributed Lucene indexes that plays well with
 Hadoop clusters.</p>
 
@@ -94,7 +86,7 @@ the <a href="http://boston.lti.cs.cmu.edu/clueweb09/wiki/tiki-index.php?page=Clu
 collection</a>, a 1 billion page (25 TB) Web crawl distributed by
 Carnegie Mellon University.  The initial release of Ivory is meant to
 serve as a reference implementation of indexing and retrieval
-algorithms that can operate at the multi-terabyte scale.  Another
+algorithms that can operate at the multi-terabyte scale. Another
 interesting experimental aspect of Ivory is the retrieval
 architecture: we've been playing with retrieval engines that directly
 read postings from HDFS.</p>
@@ -106,28 +98,7 @@ read postings from HDFS.</p>
 <h2>Download</h2>
 <div class="content">
 
-<p>Ivory is available on <a href="http://github.com/lintool/Ivory">github</a> and also as tarballs:</p>
-
-<ul>
-
-  <!-- r2592 -->
-  <li>Ivory, release 0.4 (2010/10/24): <a href="http://www.umiacs.umd.edu/~jimmylin/dist/ivory-r0.4.tar.gz">ivory-r0.4.tar.gz</a> (21.0 MB) [<a href="release-notes.html">Release Notes</a>]</li>
-
-  <!-- r2262 -->
-  <li>Ivory, release 0.3 (2010/07/19): <a href="http://www.umiacs.umd.edu/~jimmylin/dist/ivory-r0.3.tar.gz">ivory-r0.3.tar.gz</a> (21.0 MB) [<a href="release-notes.html">Release Notes</a>]</li>
-
-  <!-- r1055 -->
-  <li>Ivory, release 0.2 (2009/11/18): <a href="http://www.umiacs.umd.edu/~jimmylin/dist/ivory-r0.2.tar.gz">ivory-r0.2.tar.gz</a> (8.1 MB) [<a href="release-notes.html">Release Notes</a>]</li>
-
-  <!-- r796 -->
-  <li>Ivory, release 0.1 (2009/07/18): <a href="http://www.umiacs.umd.edu/~jimmylin/dist/ivory-r0.1.tar.gz">ivory-r0.1.tar.gz</a> (4.9 MB) [<a href="release-notes.html">Release Notes</a>]</li>
-
-</ul>
-
-<p>Ivory
-depends on <a href="http://cloud9lib.org/">Cloud<sup><small>9</small></sup></a>,
-a MapReduce library for Hadoop developed at the University of
-Maryland, which is included in the distribution.</p>
+<p>Ivory is available on <a href="http://github.com/lintool/Ivory">github</a>.</p>
 
 </div></div>
 
@@ -138,23 +109,23 @@ Maryland, which is included in the distribution.</p>
 
 <ul>
 
-  <li><a href="api/index.html">Ivory API javadoc</a></li>
+  <li><a href="docs/api/index.html">Ivory API javadoc</a></li>
 
-  <li>Getting started with <a href="trec.html">TREC disks 4-5</a></li>
+  <li>Getting started with <a href="docs/trec.html">TREC disks 4-5</a></li>
 
-  <li>Getting started with <a href="wt10g.html">the Wt10g collection</a></li>
+  <li>Getting started with <a href="docs/wt10g.html">the Wt10g collection</a></li>
 
-  <li>Getting started with <a href="gov2.html">the Gov2 collection</a></li>
+  <li>Getting started with <a href="docs/gov2.html">the Gov2 collection</a></li>
 
-  <li>Getting started with <a href="clue.html">the ClueWeb09 collection</a></li>
+  <li>Getting started with <a href="docs/clue.html">the ClueWeb09 collection</a></li>
 
-  <li>Ivory <a href="pipeline.html">preprocessing and indexing pipeline</a></li>
+  <li>Ivory <a href="docs/pipeline.html">preprocessing and indexing pipeline</a></li>
   
-  <li>Ivory <a href="pwsim.html">pairwise document similarity computation</a></li>
+  <li>Ivory <a href="docs/pwsim.html">pairwise document similarity computation</a></li>
 
-  <li><a href="regression.html">Experimental results</a> with Ivory</li>
+  <li><a href="docs/regression.html">Experimental results</a> with Ivory</li>
 
-  <li><a href="team.html">Project team</a></li>
+  <li><a href="docs/team.html">Project team</a></li>
 
 </ul>
 
