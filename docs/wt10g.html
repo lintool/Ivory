@@ -149,18 +149,18 @@ command-line parameters.</p>
 <div class="content">
 
 <p>To demonstrate batch retrieval, we're going to use topics from the
-2000 and 2001 TREC Web tracks.  In the <code>docs/data/wt10g/</code>
+2000 and 2001 TREC Web tracks.  In the <code>data/wt10g/</code>
 directory, you'll find the following configuration files:</p>
 
 <ul>
 
-  <li><a href="data/wt10g/run.wt10g.basic.xml"><code>docs/data/wt10g/run.wt10g.basic.xml</code></a>:
+  <li><a href="../data/wt10g/run.wt10g.basic.xml"><code>data/wt10g/run.wt10g.basic.xml</code></a>:
   retrieval models and parameters</li>
 
-  <li><a href="data/wt10g/wt10g_queries_451-500.xml"><code>docs/data/wt10g/wt10g_queries_451-500.xml</code></a>:
+  <li><a href="../data/wt10g/queries.wt10g.451-500.xml"><code>data/wt10g/queries.wt10g.451-500.xml</code></a>:
   queries (TREC 2000 Web track)</li>
 
-  <li><a href="data/wt10g/wt10g_queries_501-550.xml"><code>docs/data/wt10g/wt10g_queries_501-550.xml</code></a>:
+  <li><a href="../data/wt10g/queries.wt10g.501-550.xml"><code>data/wt10g/queries.wt10g.501-550.xml</code></a>:
   queries (TREC 2001 Web track)</li>
 
 </ul>
@@ -190,7 +190,7 @@ directory, you'll find the following configuration files:</p>
 </ul>
 
 <p>You might want to tweak the index location and output paths in <a
-href="data/wt10g/run.wt10g.basic.xml"><code>docs/data/wt10g/run.wt10g.basic.xml</code></a>,
+href="../data/wt10g/run.wt10g.basic.xml"><code>data/wt10g/run.wt10g.basic.xml</code></a>,
 specifying where the index resides and where the retrieval results go.
 After that, put both configuration files in HDFS.  The class
 <b><code>ivory.smrf.retrieval.RunQueryHDFS</code></b> performs a batch
@@ -215,14 +215,14 @@ etc/run.sh ivory.smrf.retrieval.RunQueryLocal \
 </pre>
 
 <p>Document relevance information (qrels) is found in the <a
-href="data/wt10g/qrels.wt10g"><code>docs/data/wt10g/qrels.wt10g</code></a> file.
+href="../data/wt10g/qrels.wt10g.all"><code>data/wt10g/qrels.wt10g.all</code></a> file.
 With the <a
 href="http://trec.nist.gov/trec_eval/index.html">trec_eval</a>
 program, you should be able to evaluate the runs.  See
 our <a href="regression.html#wt10g">experimental results page</a> for the
 effectiveness numbers you should be getting.</p>
 
-<p style="padding-top: 25px"><a href="./index.html">Back to main page</a></p>
+<p style="padding-top: 25px"><a href="../index.html">Back to main page</a></p>
 
 </div></div>
 
