@@ -2,9 +2,9 @@ package ivory.integration;
 
 import static org.junit.Assert.assertTrue;
 import ivory.core.driver.BuildPositionalIndexIP;
-import ivory.core.driver.PreprocessWt10g;
+import ivory.core.driver.PreprocessClueWebEnglish;
 import ivory.core.eval.Qrels;
-import ivory.regression.basic.Wt10g_Basic;
+import ivory.regression.basic.Web09catB_All;
 import ivory.smrf.retrieval.BatchQueryRunner;
 
 import java.util.List;
@@ -20,10 +20,10 @@ import org.junit.Test;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
-public class VerifyWt10gIndex {
-  private static final Logger LOG = Logger.getLogger(VerifyWt10gIndex.class);
+public class VerifyCluePositionalIndexIP {
+  private static final Logger LOG = Logger.getLogger(VerifyCluePositionalIndexIP.class);
 
-  private Path collectionPath = new Path("/shared/collections/wt10g/collection.compressed.block");
+  private Path collectionPath = new Path("/shared/collections/ClueWeb09/collection.compressed.block/en.01");
   private String index = "/tmp/" + this.getClass().getCanonicalName() + "-index";
 
   @Test
@@ -47,10 +47,13 @@ public class VerifyWt10gIndex {
 
     String libjars = String.format("-libjars=%s", Joiner.on(",").join(jars));
 
-    PreprocessWt10g.main(new String[] { libjars, IntegrationUtils.D_JT, IntegrationUtils.D_NN,
-        collectionPath.toString(), index });
+    fs.copyFromLocalFile(false, true, new Path("data/clue/docno-mapping.dat"),
+        new Path(index + "/" + "docno-mapping.dat"));
+
+    PreprocessClueWebEnglish.main(new String[] { libjars, IntegrationUtils.D_JT, IntegrationUtils.D_NN,
+        collectionPath.toString(), index, "1" });
     BuildPositionalIndexIP.main(new String[] { libjars, IntegrationUtils.D_JT, IntegrationUtils.D_NN,
-        index, "10" });
+        index, "200" });
   }
 
   @Test
@@ -58,17 +61,14 @@ public class VerifyWt10gIndex {
     Configuration conf = IntegrationUtils.getBespinConfiguration();
     FileSystem fs = FileSystem.get(conf);
 
-    fs.copyFromLocalFile(false, true, new Path("data/wt10g/run.wt10g.basic.xml"),
-        new Path(index + "/" + "run.wt10g.basic.xml"));
-    fs.copyFromLocalFile(false, true, new Path("data/wt10g/queries.wt10g.451-500.xml"),
-        new Path(index + "/" + "queries.wt10g.451-500.xml"));
-    fs.copyFromLocalFile(false, true, new Path("data/wt10g/queries.wt10g.501-550.xml"),
-        new Path(index + "/" + "queries.wt10g.501-550.xml"));
+    fs.copyFromLocalFile(false, true, new Path("data/clue/run.web09catB.all.xml"),
+        new Path(index + "/" + "run.web09catB.all.xml"));
+    fs.copyFromLocalFile(false, true, new Path("data/clue/queries.web09.xml"),
+        new Path(index + "/" + "queries.web09.xml"));
 
     String[] params = new String[] {
-            index + "/run.wt10g.basic.xml",
-            index + "/queries.wt10g.451-500.xml",
-            index + "/queries.wt10g.501-550.xml"};
+            index + "/run.web09catB.all.xml",
+            index + "/queries.web09.xml" };
 
     BatchQueryRunner qr = new BatchQueryRunner(params, fs, index);
 
@@ -78,13 +78,13 @@ public class VerifyWt10gIndex {
 
     LOG.info("Total query time: " + (end - start) + "ms");
 
-    Wt10g_Basic.verifyAllResults(qr.getModels(), qr.getAllResults(), qr.getDocnoMapping(),
-        new Qrels("data/wt10g/qrels.wt10g.all"));
+    Web09catB_All.verifyAllResults(qr.getModels(), qr.getAllResults(), qr.getDocnoMapping(),
+        new Qrels("data/clue/qrels.web09catB.txt"));
 
     LOG.info("Done!");
   }
 
   public static junit.framework.Test suite() {
-    return new JUnit4TestAdapter(VerifyWt10gIndex.class);
+    return new JUnit4TestAdapter(VerifyCluePositionalIndexIP.class);
   }
 }

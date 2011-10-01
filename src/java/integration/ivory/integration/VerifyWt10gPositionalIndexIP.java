@@ -2,9 +2,9 @@ package ivory.integration;
 
 import static org.junit.Assert.assertTrue;
 import ivory.core.driver.BuildPositionalIndexIP;
-import ivory.core.driver.PreprocessGov2;
+import ivory.core.driver.PreprocessWt10g;
 import ivory.core.eval.Qrels;
-import ivory.regression.basic.Gov2_Basic;
+import ivory.regression.basic.Wt10g_Basic;
 import ivory.smrf.retrieval.BatchQueryRunner;
 
 import java.util.List;
@@ -20,10 +20,10 @@ import org.junit.Test;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
-public class VerifyGov2Index {
-  private static final Logger LOG = Logger.getLogger(VerifyGov2Index.class);
+public class VerifyWt10gPositionalIndexIP {
+  private static final Logger LOG = Logger.getLogger(VerifyWt10gPositionalIndexIP.class);
 
-  private Path collectionPath = new Path("/shared/collections/gov2/collection.compressed.block");
+  private Path collectionPath = new Path("/shared/collections/wt10g/collection.compressed.block");
   private String index = "/tmp/" + this.getClass().getCanonicalName() + "-index";
 
   @Test
@@ -47,10 +47,10 @@ public class VerifyGov2Index {
 
     String libjars = String.format("-libjars=%s", Joiner.on(",").join(jars));
 
-    PreprocessGov2.main(new String[] { libjars, IntegrationUtils.D_JT, IntegrationUtils.D_NN,
+    PreprocessWt10g.main(new String[] { libjars, IntegrationUtils.D_JT, IntegrationUtils.D_NN,
         collectionPath.toString(), index });
     BuildPositionalIndexIP.main(new String[] { libjars, IntegrationUtils.D_JT, IntegrationUtils.D_NN,
-        index, "100" });
+        index, "10" });
   }
 
   @Test
@@ -58,17 +58,17 @@ public class VerifyGov2Index {
     Configuration conf = IntegrationUtils.getBespinConfiguration();
     FileSystem fs = FileSystem.get(conf);
 
-    fs.copyFromLocalFile(false, true, new Path("data/gov2/run.gov2.basic.xml"),
-        new Path(index + "/" + "run.gov2.basic.xml"));
-    fs.copyFromLocalFile(false, true, new Path("data/gov2/gov2.title.701-775"),
-        new Path(index + "/" + "gov2.title.701-775"));
-    fs.copyFromLocalFile(false, true, new Path("data/gov2/gov2.title.776-850"),
-        new Path(index + "/" + "gov2.title.776-850"));
+    fs.copyFromLocalFile(false, true, new Path("data/wt10g/run.wt10g.basic.xml"),
+        new Path(index + "/" + "run.wt10g.basic.xml"));
+    fs.copyFromLocalFile(false, true, new Path("data/wt10g/queries.wt10g.451-500.xml"),
+        new Path(index + "/" + "queries.wt10g.451-500.xml"));
+    fs.copyFromLocalFile(false, true, new Path("data/wt10g/queries.wt10g.501-550.xml"),
+        new Path(index + "/" + "queries.wt10g.501-550.xml"));
 
     String[] params = new String[] {
-            index + "/run.gov2.basic.xml",
-            index + "/gov2.title.701-775",
-            index + "/gov2.title.776-850"};
+            index + "/run.wt10g.basic.xml",
+            index + "/queries.wt10g.451-500.xml",
+            index + "/queries.wt10g.501-550.xml"};
 
     BatchQueryRunner qr = new BatchQueryRunner(params, fs, index);
 
@@ -78,13 +78,13 @@ public class VerifyGov2Index {
 
     LOG.info("Total query time: " + (end - start) + "ms");
 
-    Gov2_Basic.verifyAllResults(qr.getModels(), qr.getAllResults(), qr.getDocnoMapping(),
-        new Qrels("data/gov2/qrels.gov2.all"));
+    Wt10g_Basic.verifyAllResults(qr.getModels(), qr.getAllResults(), qr.getDocnoMapping(),
+        new Qrels("data/wt10g/qrels.wt10g.all"));
 
     LOG.info("Done!");
   }
 
   public static junit.framework.Test suite() {
-    return new JUnit4TestAdapter(VerifyGov2Index.class);
+    return new JUnit4TestAdapter(VerifyWt10gPositionalIndexIP.class);
   }
 }

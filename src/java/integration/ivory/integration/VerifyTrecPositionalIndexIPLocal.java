@@ -20,16 +20,16 @@ import org.junit.Test;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
-public class VerifyTrecIndex {
-  private static final Logger LOG = Logger.getLogger(VerifyTrecIndex.class);
+public class VerifyTrecPositionalIndexIPLocal {
+  private static final Logger LOG = Logger.getLogger(VerifyTrecPositionalIndexIPLocal.class);
 
-  private Path collectionPath = new Path("/shared/collections/trec/trec4-5_noCRFR.xml");
-  private String index = "/tmp/" + this.getClass().getCanonicalName() + "-index";
+  private Path collectionPath = new Path("/scratch0/collections/trec/trec4-5_noCRFR.xml");
+  private String index = this.getClass().getCanonicalName() + "-index";
 
   @Test
   public void runBuildIndex() throws Exception {
-    Configuration conf = IntegrationUtils.getBespinConfiguration();
-    FileSystem fs = FileSystem.get(conf);
+    Configuration conf = new Configuration();
+    FileSystem fs = FileSystem.getLocal(conf);
 
     assertTrue(fs.exists(collectionPath));
 
@@ -47,25 +47,20 @@ public class VerifyTrecIndex {
 
     String libjars = String.format("-libjars=%s", Joiner.on(",").join(jars));
 
-    PreprocessTREC.main(new String[] { libjars, IntegrationUtils.D_JT, IntegrationUtils.D_NN,
-        collectionPath.toString(), index });
-    BuildPositionalIndexIP.main(new String[] { libjars, IntegrationUtils.D_JT, IntegrationUtils.D_NN,
-        index, "10" });
+    PreprocessTREC.main(new String[] { libjars, IntegrationUtils.D_JT_LOCAL,
+        IntegrationUtils.D_NN_LOCAL, collectionPath.toString(), index });
+    BuildPositionalIndexIP.main(new String[] { libjars, IntegrationUtils.D_JT_LOCAL,
+        IntegrationUtils.D_NN_LOCAL, index, "10" });
   }
 
   @Test
   public void verifyResults() throws Exception {
-    Configuration conf = IntegrationUtils.getBespinConfiguration();
-    FileSystem fs = FileSystem.get(conf);
-
-    fs.copyFromLocalFile(false, true, new Path("data/trec/run.robust04.basic.xml"),
-        new Path(index + "/" + "run.robust04.basic.xml"));
-    fs.copyFromLocalFile(false, true, new Path("data/trec/queries.robust04.xml"),
-        new Path(index + "/" + "queries.robust04.xml"));
+    Configuration conf = new Configuration();
+    FileSystem fs = FileSystem.getLocal(conf);
 
     String[] params = new String[] {
-            index + "/run.robust04.basic.xml",
-            index + "/queries.robust04.xml" };
+        "data/trec/run.robust04.basic.xml",
+        "data/trec/queries.robust04.xml" };
 
     BatchQueryRunner qr = new BatchQueryRunner(params, fs, index);
 
@@ -82,6 +77,6 @@ public class VerifyTrecIndex {
   }
 
   public static junit.framework.Test suite() {
-    return new JUnit4TestAdapter(VerifyTrecIndex.class);
+    return new JUnit4TestAdapter(VerifyTrecPositionalIndexIPLocal.class);
   }
 }

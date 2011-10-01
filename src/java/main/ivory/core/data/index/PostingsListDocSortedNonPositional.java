@@ -301,10 +301,12 @@ public class PostingsListDocSortedNonPositional implements PostingsList {
       postingsList = list;
     }
 
+    @Override
     public int getNumberOfPostings() {
       return innerNumPostings;
     }
 
+    @Override
     public void reset() {
       try {
         bytesIn.reset();
@@ -316,6 +318,7 @@ public class PostingsListDocSortedNonPositional implements PostingsList {
       }
     }
 
+    @Override
     public boolean nextPosting(Posting p) {
       try {
         if (cnt == 0) {
@@ -341,38 +344,42 @@ public class PostingsListDocSortedNonPositional implements PostingsList {
       return true;
     }
 
+    @Override
     public int[] getPositions() {
       throw new UnsupportedOperationException();
     }
-    
-    public byte[] getBytePositions(){
-      throw new UnsupportedOperationException();
-    }
-    
+
+    @Override
     public boolean getPositions(TermPositions tp){
       throw new UnsupportedOperationException();
     }
 
+    @Override
     public boolean hasMorePostings() {
       return !(cnt >= innerNumPostings);
     }
 
+    @Override
     public short peekNextTf() {
       throw new UnsupportedOperationException();
     }
 
+    @Override
     public int peekNextDocno() {
       throw new UnsupportedOperationException();
     }
 
+    @Override
     public PostingsList getPostingsList() {
       return postingsList;
     }
-    
+
+    @Override
     public short getTf(){
       return prevTf;
     }
-    
+
+    @Override
     public int getDocno(){
       return innerPrevDocno;
     }    

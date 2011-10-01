@@ -355,8 +355,8 @@ public class PostingsListDocSortedPositional implements PostingsList {
     private ByteArrayInputStream bytesIn;
     private BitInputStream bitsIn;
     private int cnt = 0;
-    private short prevTf;
     private int[] curPositions;
+    private short innerPrevTf;
     private int innerPrevDocno;
     private int innerNumPostings;
     private int innerGolombParam;
@@ -407,7 +407,7 @@ public class PostingsListDocSortedPositional implements PostingsList {
 
       try {
         if (needToReadPositions) {
-          skipPositions(prevTf);
+          skipPositions(innerPrevTf);
           needToReadPositions = false;
         }
 
@@ -425,7 +425,7 @@ public class PostingsListDocSortedPositional implements PostingsList {
 
       cnt++;
       innerPrevDocno = p.getDocno();
-      prevTf = p.getTf();
+      innerPrevTf = p.getTf();
       curPositions = null;
       needToReadPositions = true;
 
@@ -440,14 +440,14 @@ public class PostingsListDocSortedPositional implements PostingsList {
 
       int[] pos = null;
       try {
-        if (prevTf == 1) {
+        if (innerPrevTf == 1) {
           pos = new int[1];
           pos[0] = bitsIn.readGamma();
         } else {
           bitsIn.readGamma();
-          pos = new int[prevTf];
+          pos = new int[innerPrevTf];
           pos[0] = bitsIn.readGamma();
-          for (int i = 1; i < prevTf; i++) {
+          for (int i = 1; i < innerPrevTf; i++) {
             pos[i] = (pos[i - 1] + bitsIn.readGamma());
           }
         }
@@ -509,7 +509,7 @@ public class PostingsListDocSortedPositional implements PostingsList {
 
     @Override
     public short getTf() {
-      return prevTf;
+      return innerPrevTf;
     }
   }
 
