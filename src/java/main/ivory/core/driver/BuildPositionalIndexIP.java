@@ -28,8 +28,8 @@ import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Logger;
 
-public class BuildIPIndex extends Configured implements Tool {
-  private static final Logger LOG = Logger.getLogger(BuildIPIndex.class);
+public class BuildPositionalIndexIP extends Configured implements Tool {
+  private static final Logger LOG = Logger.getLogger(BuildPositionalIndexIP.class);
 
   private static int printUsage() {
     System.out.println("usage: [index-path] [num-of-reducers]");
@@ -59,17 +59,16 @@ public class BuildIPIndex extends Configured implements Tool {
 
     int numReducers = Integer.parseInt(args[1]);
 
-    LOG.info("Tool name: " + BuildIPIndex.class.getCanonicalName());
+    LOG.info("Tool name: " + BuildPositionalIndexIP.class.getCanonicalName());
     LOG.info(" - Index path: " + indexPath);
 
     conf.set(Constants.IndexPath, indexPath);
     conf.setInt(Constants.NumReduceTasks, numReducers);
+    conf.set(Constants.PostingsListsType,
+        ivory.core.data.index.PostingsListDocSortedPositional.class.getCanonicalName());
 
-    BuildIPInvertedIndexDocSorted indexTool = new BuildIPInvertedIndexDocSorted(conf);
-    indexTool.run();
-
-    BuildIntPostingsForwardIndex postingsIndexer = new BuildIntPostingsForwardIndex(conf);
-    postingsIndexer.run();
+    new BuildIPInvertedIndexDocSorted(conf).run();
+    new BuildIntPostingsForwardIndex(conf).run();
 
     return 0;
   }
@@ -78,6 +77,6 @@ public class BuildIPIndex extends Configured implements Tool {
    * Dispatches command-line arguments to the tool via the {@code ToolRunner}.
    */
   public static void main(String[] args) throws Exception {
-    ToolRunner.run(new Configuration(), new BuildIPIndex(), args);
+    ToolRunner.run(new Configuration(), new BuildPositionalIndexIP(), args);
   }
 }

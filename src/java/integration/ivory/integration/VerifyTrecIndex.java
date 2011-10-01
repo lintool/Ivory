@@ -1,7 +1,7 @@
 package ivory.integration;
 
 import static org.junit.Assert.assertTrue;
-import ivory.core.driver.BuildIPIndex;
+import ivory.core.driver.BuildPositionalIndexIP;
 import ivory.core.driver.PreprocessTREC;
 import ivory.core.eval.Qrels;
 import ivory.regression.basic.Robust04_Basic;
@@ -49,7 +49,7 @@ public class VerifyTrecIndex {
 
     PreprocessTREC.main(new String[] { libjars, IntegrationUtils.D_JT, IntegrationUtils.D_NN,
         collectionPath.toString(), index });
-    BuildIPIndex.main(new String[] { libjars, IntegrationUtils.D_JT, IntegrationUtils.D_NN,
+    BuildPositionalIndexIP.main(new String[] { libjars, IntegrationUtils.D_JT, IntegrationUtils.D_NN,
         index, "10" });
   }
 

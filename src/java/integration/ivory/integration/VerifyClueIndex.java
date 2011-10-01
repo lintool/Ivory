@@ -1,7 +1,7 @@
 package ivory.integration;
 
 import static org.junit.Assert.assertTrue;
-import ivory.core.driver.BuildIPIndex;
+import ivory.core.driver.BuildPositionalIndexIP;
 import ivory.core.driver.PreprocessClueWebEnglish;
 import ivory.core.eval.Qrels;
 import ivory.regression.basic.Web09catB_All;
@@ -52,7 +52,7 @@ public class VerifyClueIndex {
 
     PreprocessClueWebEnglish.main(new String[] { libjars, IntegrationUtils.D_JT, IntegrationUtils.D_NN,
         collectionPath.toString(), index, "1" });
-    BuildIPIndex.main(new String[] { libjars, IntegrationUtils.D_JT, IntegrationUtils.D_NN,
+    BuildPositionalIndexIP.main(new String[] { libjars, IntegrationUtils.D_JT, IntegrationUtils.D_NN,
         index, "200" });
   }
 
