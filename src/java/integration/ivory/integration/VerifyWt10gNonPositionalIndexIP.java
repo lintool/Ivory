@@ -20,8 +20,8 @@ import org.junit.Test;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
-public class VerifyTrecNonPositionalIndexIP {
-  private static final Logger LOG = Logger.getLogger(VerifyTrecNonPositionalIndexIP.class);
+public class VerifyWt10gNonPositionalIndexIP {
+  private static final Logger LOG = Logger.getLogger(VerifyWt10gNonPositionalIndexIP.class);
 
   private Path collectionPath = new Path("/shared/collections/trec/trec4-5_noCRFR.xml");
   private String index = "/tmp/" + this.getClass().getCanonicalName() + "-index";
@@ -62,7 +62,7 @@ public class VerifyTrecNonPositionalIndexIP {
         new Path("data/trec/run.robust04.nonpositional.baselines.xml"),
         new Path(index + "/run.robust04.nonpositional.baselines.xml"));
     fs.copyFromLocalFile(false, true, new Path("data/trec/queries.robust04.xml"),
-        new Path(index + "/queries.robust04.xml"));
+        new Path(index + "/" + "queries.robust04.xml"));
 
     String[] params = new String[] {
             index + "/run.robust04.nonpositional.baselines.xml",
@@ -83,6 +83,6 @@ public class VerifyTrecNonPositionalIndexIP {
   }
 
   public static junit.framework.Test suite() {
-    return new JUnit4TestAdapter(VerifyTrecNonPositionalIndexIP.class);
+    return new JUnit4TestAdapter(VerifyWt10gNonPositionalIndexIP.class);
   }
 }

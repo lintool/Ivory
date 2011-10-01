@@ -2,7 +2,6 @@ package ivory.regression.basic;
 
 import static ivory.regression.RegressionUtils.loadScoresIntoMap;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import ivory.core.eval.Qrels;
 import ivory.core.eval.RankedListEvaluator;
 import ivory.smrf.retrieval.Accumulator;
@@ -22,8 +21,8 @@ import com.google.common.collect.Maps;
 
 import edu.umd.cloud9.collection.DocnoMapping;
 
-public class Robust04_Baselines {
-  private static final Logger LOG = Logger.getLogger(Robust04_Baselines.class);
+public class Robust04_NonPositional_Baselines {
+  private static final Logger LOG = Logger.getLogger(Robust04_NonPositional_Baselines.class);
 
   private static String[] sDirBaseRawAP = new String[] {
       "601", "0.4648", "602", "0.2787", "603", "0.2931", "604", "0.8289", "605", "0.0758",
@@ -116,7 +115,7 @@ public class Robust04_Baselines {
   @Test
   public void runRegression() throws Exception {
     String[] params = new String[] {
-            "data/trec/run.robust04.baselines.xml",
+            "data/trec/run.robust04.nonpositional.baselines.xml",
             "data/trec/queries.robust04.xml" };
 
     FileSystem fs = FileSystem.getLocal(new Configuration());
@@ -140,7 +139,7 @@ public class Robust04_Baselines {
     Map<String, Map<String, Float>> AllModelsP10Scores = Maps.newHashMap();
     AllModelsP10Scores.put("robust04-dir-base", loadScoresIntoMap(sDirBaseRawP10));
     AllModelsP10Scores.put("robust04-bm25-base", loadScoresIntoMap(sBm25BaseRawP10));
-    
+
     for (String model : models) {
       LOG.info("Verifying results of model \"" + model + "\"");
       verifyResults(model, results.get(model),
@@ -164,18 +163,8 @@ public class Robust04_Baselines {
       p10Sum += p10;
 
       LOG.info("verifying qid " + qid + " for model " + model);
-      // For this topic, the results don't appear to be deterministic, so manually check the two
-      // alternatives.
-      if (qid.equals("684") && model.equals("robust04-bm25-sd")) {
-        assertTrue(Math.abs(ap - 0.1005) < 10e-6 || Math.abs(ap - 0.1016) < 10e-6);
-        assertEquals(p10Scores.get(qid), p10, 10e-6);
-      } else if (qid.equals("684") && model.equals("robust04-bm25-fd")) {
-        assertTrue(Math.abs(ap - 0.0800) < 10e-6 || Math.abs(ap - 0.0803) < 10e-6);
-        assertEquals(p10Scores.get(qid), p10, 10e-6);
-      } else {
-        assertEquals(apScores.get(qid), ap, 10e-6);
-        assertEquals(p10Scores.get(qid), p10, 10e-6);
-      }
+      assertEquals(apScores.get(qid), ap, 10e-6);
+      assertEquals(p10Scores.get(qid), p10, 10e-6);
     }
 
     // One topic didn't contain qrels, so trec_eval only picked up 99 topics.
@@ -192,6 +181,6 @@ public class Robust04_Baselines {
   }
 
   public static junit.framework.Test suite() {
-    return new JUnit4TestAdapter(Robust04_Baselines.class);
+    return new JUnit4TestAdapter(Robust04_NonPositional_Baselines.class);
   }
 }
