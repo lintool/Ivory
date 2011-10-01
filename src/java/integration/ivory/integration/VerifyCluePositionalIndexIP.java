@@ -23,7 +23,8 @@ import com.google.common.collect.Lists;
 public class VerifyCluePositionalIndexIP {
   private static final Logger LOG = Logger.getLogger(VerifyCluePositionalIndexIP.class);
 
-  private Path collectionPath = new Path("/shared/collections/ClueWeb09/collection.compressed.block/en.01");
+  private Path collectionPath =
+      new Path("/shared/collections/ClueWeb09/collection.compressed.block/en.01");
   private String index = "/tmp/" + this.getClass().getCanonicalName() + "-index";
 
   @Test
@@ -50,10 +51,10 @@ public class VerifyCluePositionalIndexIP {
     fs.copyFromLocalFile(false, true, new Path("data/clue/docno-mapping.dat"),
         new Path(index + "/" + "docno-mapping.dat"));
 
-    PreprocessClueWebEnglish.main(new String[] { libjars, IntegrationUtils.D_JT, IntegrationUtils.D_NN,
-        collectionPath.toString(), index, "1" });
-    BuildPositionalIndexIP.main(new String[] { libjars, IntegrationUtils.D_JT, IntegrationUtils.D_NN,
-        index, "200" });
+    PreprocessClueWebEnglish.main(new String[] { libjars,
+        IntegrationUtils.D_JT, IntegrationUtils.D_NN, collectionPath.toString(), index, "1" });
+    BuildPositionalIndexIP.main(new String[] { libjars,
+        IntegrationUtils.D_JT, IntegrationUtils.D_NN, index, "200" });
   }
 
   @Test
