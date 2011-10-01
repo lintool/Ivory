@@ -279,6 +279,7 @@ public class PostingsListDocSortedNonPositional implements PostingsList {
     private ByteArrayInputStream bytesIn;
     private BitInputStream bitsIn;
     private int cnt = 0;
+    private short prevTf;
     private int innerPrevDocno;
     private int innerNumPostings;
     private int innerGolombParam;
@@ -335,6 +336,7 @@ public class PostingsListDocSortedNonPositional implements PostingsList {
 
       cnt++;
       innerPrevDocno = p.getDocno();
+      prevTf = p.getTf();
 
       return true;
     }
@@ -368,11 +370,11 @@ public class PostingsListDocSortedNonPositional implements PostingsList {
     }
     
     public short getTf(){
-      throw new UnsupportedOperationException();
+      return prevTf;
     }
     
     public int getDocno(){
-      throw new UnsupportedOperationException();
+      return innerPrevDocno;
     }    
   }
   
