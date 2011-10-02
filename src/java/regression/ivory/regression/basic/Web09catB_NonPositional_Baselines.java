@@ -73,12 +73,12 @@ public class Web09catB_NonPositional_Baselines {
   @Test
   public void runRegression() throws Exception {
     Map<String, GroundTruth> g = Maps.newHashMap();
-    g.put("UMHOO-BM25-catB", new GroundTruth(Metric.AP, 50, bm25_rawAP, 0.2051f));
-    g.put("UMHOO-QL-catB", new GroundTruth(Metric.AP, 50, ql_rawAP, 0.1931f));
+    g.put("bm25-base", new GroundTruth(Metric.AP, 50, bm25_rawAP, 0.2051f));
+    g.put("ql-base", new GroundTruth(Metric.AP, 50, ql_rawAP, 0.1931f));
 
     Map<String, GroundTruth> h = Maps.newHashMap();
-    h.put("UMHOO-BM25-catB", new GroundTruth(Metric.P10, 50, bm25_rawP10, 0.3720f));
-    h.put("UMHOO-QL-catB", new GroundTruth(Metric.P10, 50, ql_rawP10, 0.3380f));
+    h.put("bm25-base", new GroundTruth(Metric.P10, 50, bm25_rawP10, 0.3720f));
+    h.put("ql-base", new GroundTruth(Metric.P10, 50, ql_rawP10, 0.3380f));
 
     Qrels qrels = new Qrels("data/clue/qrels.web09catB.txt");
 

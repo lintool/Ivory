@@ -59,7 +59,7 @@ public class VerifyWt10gNonPositionalIndexIP {
     FileSystem fs = FileSystem.get(conf);
 
     fs.copyFromLocalFile(false, true, new Path("data/wt10g/run.wt10g.nonpositional.baselines.xml"),
-        new Path(index + "/" + "run.wt10g.basic.xml"));
+        new Path(index + "/" + "run.wt10g.nonpositional.baselines.xml"));
     fs.copyFromLocalFile(false, true, new Path("data/wt10g/queries.wt10g.451-500.xml"),
         new Path(index + "/" + "queries.wt10g.451-500.xml"));
     fs.copyFromLocalFile(false, true, new Path("data/wt10g/queries.wt10g.501-550.xml"),
