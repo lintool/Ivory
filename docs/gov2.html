@@ -30,8 +30,11 @@
 <div id="navigation">
 <ul id="menus">
 
-  <li class="page_item"><a class="home" title="Home" href="index.html">Home</a></li>
+  <li class="page_item"><a class="home" title="Home" href="../index.html">Home</a></li>
   <li class="page_item"><a href="api/index.html" title="API">API</a></li>
+  <li class="page_item"><a href="publications.html" title="Publications">Publications</a></li>
+  <li class="page_item"><a href="regression.html" title="Experiments">Experiments</a></li>
+  <li class="page_item"><a href="team.html" title="Team">Team</a></li>
 
 </ul>
 
@@ -151,14 +154,14 @@ find the following configuration files:</p>
 
 <ul>
 
-  <li><a href="data/gov2/run.gov2.basic.xml"><code>docs/data/gov2/run.gov2.basic.xml</code></a>:
+  <li><a href="../data/gov2/run.gov2.basic.xml"><code>data/gov2/run.gov2.basic.xml</code></a>:
   retrieval models and parameters</li>
 
-  <li><a href="data/gov2/gov2.title.701-775"><code>docs/data/gov2/gov2.title.701-775</code></a>:
+  <li><a href="../data/gov2/gov2.title.701-775"><code>data/gov2/gov2.title.701-775</code></a>:
   queries (topics 701-750 from TREC
   2004 and topics 751-775 from TREC 2005)</li>
 
-  <li><a href="data/gov2/gov2.title.776-850"><code>docs/data/gov2/gov2.title.776-850</code></a>:
+  <li><a href="../data/gov2/gov2.title.776-850"><code>data/gov2/gov2.title.776-850</code></a>:
   queries (topics 776-800 from TREC
   2005 and topics 801-850 from TREC 2006)</li>
 
@@ -188,7 +191,7 @@ find the following configuration files:</p>
 </ul>
 
 <p>You might want to tweak the index location and output paths in <a
-href="data/gov2/run.gov2.basic.xml"><code>docs/data/gov2/run.gov2.basic.xml</code></a>,
+href="../data/gov2/run.gov2.basic.xml"><code>data/gov2/run.gov2.basic.xml</code></a>,
 specifying where the index resides and where the retrieval results go.
 After that, put both configuration files in HDFS.  The class
 <b><code>ivory.smrf.retrieval.RunQueryHDFS</code></b> performs a batch
@@ -213,14 +216,14 @@ etc/run.sh ivory.smrf.retrieval.RunQueryLocal \
 </pre>
 
 <p>Document relevance information (qrels) is found in the <a
-href="data/gov2/qrels.gov2.all"><code>docs/data/gov2/qrels.gov2.all</code></a>
+href="../data/gov2/qrels.gov2.all"><code>data/gov2/qrels.gov2.all</code></a>
 file.  With the <a
 href="http://trec.nist.gov/trec_eval/index.html">trec_eval</a>
 program, you should be able to evaluate the runs.  See
 our <a href="regression.html#gov2">experimental results page</a> for the
 effectiveness numbers you should be getting.</p>
 
-<p style="padding-top: 25px"><a href="./index.html">Back to main page</a></p>
+<p style="padding-top: 25px"><a href="../index.html">Back to main page</a></p>
 
 </div></div>
 
