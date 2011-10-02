@@ -26,14 +26,15 @@ import java.io.DataInputStream;
 import java.io.DataOutput;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.PriorityQueue;
 
 import org.apache.hadoop.io.WritableUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
+import com.google.common.base.Preconditions;
 
 /**
  * Object representing a document-sorted postings list that holds positional information for terms.
@@ -74,7 +75,7 @@ public class PostingsListDocSortedPositional implements PostingsList {
       bytesOut = new ByteArrayOutputStream();
       bitsOut = new BitOutputStream(bytesOut);
     } catch (IOException e) {
-      e.printStackTrace();
+      throw new RuntimeException(e);
     }
   }
 
@@ -91,30 +92,25 @@ public class PostingsListDocSortedPositional implements PostingsList {
       bytesOut = new ByteArrayOutputStream();
       bitsOut = new BitOutputStream(bytesOut);
     } catch (IOException e) {
-      e.printStackTrace();
+      throw new RuntimeException(e);
     }
   }
 
   @Override
-  public void add(int docno, short score, TermPositions pos) {
-    LOG.info("adding posting: " + docno + ", " + score + ", " + pos.toString());
-    if (pos.getPositions().length == 0) {
-      throw new RuntimeException("Error: encountered invalid number of positions = 0");
-    }
-    if (score != pos.getTf()) {
-      throw new RuntimeException("Error: tf and number of positions don't match. docno="
-          + docno + ", tf=" + score + ", positions=" + pos.toString());
-    }
+  public void add(int docno, short tf, TermPositions pos) {
+    Preconditions.checkArgument(pos.getPositions().length != 0);
+    Preconditions.checkArgument(tf == pos.getTf());
+
     try {
       if (postingsAdded == 0) {
-        // write out the first docno
+        // Write out the first docno.
         bitsOut.writeBinary(MAX_DOCNO_BITS, docno);
-        bitsOut.writeGamma(score);
-        writePositions(bitsOut, pos, docno, score);
+        bitsOut.writeGamma(tf);
+        writePositions(bitsOut, pos, docno, tf);
 
         prevDocno = docno;
       } else {
-        // use d-gaps for subsequent docnos
+        // Use d-gaps for subsequent docnos.
         int dgap = docno - prevDocno;
 
         if (dgap <= 0) {
@@ -122,24 +118,22 @@ public class PostingsListDocSortedPositional implements PostingsList {
         }
 
         bitsOut.writeGolomb(dgap, golombParam);
-        bitsOut.writeGamma(score);
-        writePositions(bitsOut, pos, docno, score);
+        bitsOut.writeGamma(tf);
+        writePositions(bitsOut, pos, docno, tf);
 
         prevDocno = docno;
       }
     } catch (IOException e) {
-      e.printStackTrace();
       throw new RuntimeException("Error adding postings.");
     } catch (ArithmeticException e) {
-      e.printStackTrace();
       throw new RuntimeException("ArithmeticException caught \"" + e.getMessage()
           + "\": check to see if collection size or df is set properly. docno=" + docno
-          + ", tf=" + score + ", previous docno=" + prevDocno + ", df=" + numPostings
+          + ", tf=" + tf + ", previous docno=" + prevDocno + ", df=" + numPostings
           + ", collection size=" + collectionDocumentCount + ", Golomb param=" + golombParam);
     }
 
     postingsAdded++;
-    sumOfPostingsScore += score;
+    sumOfPostingsScore += tf;
   }
 
   // passing in docno and tf basically for error checking purposes
@@ -148,47 +142,48 @@ public class PostingsListDocSortedPositional implements PostingsList {
     int[] pos = p.getPositions();
 
     if (tf != p.getTf()) {
-      throw new RuntimeException("Error: tf and number of positions don't match. docno="
-          + docno + ", tf=" + tf + ", positions=" + p.toString());
+      throw new RuntimeException(String.format(
+          "Error: tf and number of positions don't match. docno=%d, tf=%d, positions=%s",
+          docno, tf, pos.toString()));
     }
 
     if (p.getTf() == 1) {
-      // if tf=1, just write out the single term position
+      // If tf=1, just write out the single term position.
       t.writeGamma(pos[0]);
     } else {
-      // if tf > 1, write out skip information if we want to bypass the
-      // positional information during decoding
+      // If tf > 1, write out skip information if we want to bypass the positional information
+      // during decoding.
       t.writeGamma(p.getEncodedSize());
 
-      // keep track of where we are in the stream
-      int skip_pos1 = (int) t.getByteOffset() * 8 + t.getBitOffset();
+      // Keep track of where we are in the stream.
+      int skip1 = (int) t.getByteOffset() * 8 + t.getBitOffset();
 
       if (pos[0] <= 0) {
-        throw new RuntimeException("Error: invalid term positions. positions="
-            + p.toString() + ", docno=" + docno + ", tf=" + tf);
+        throw new RuntimeException(String.format(
+            "Error: invalid term positions. docno=%d, tf=%d, positions=%s",
+            docno, tf, pos.toString()));
       }
-      // write out first position
+      // Write out first position.
       t.writeGamma(pos[0]);
-      // write out rest of positions using p-gaps (first order positional
-      // differences)
+      // Write out rest of positions using p-gaps (first order positional differences).
       for (int c = 1; c < p.getTf(); c++) {
         int pgap = pos[c] - pos[c - 1];
         if (pos[c] <= 0 || pgap == 0) {
-          throw new RuntimeException("Error: invalid term positions. positions="
-              + p.toString() + ", docno=" + docno + ", tf=" + tf);
+          throw new RuntimeException(String.format(
+              "Error: invalid term positions. docno=%d, tf=%d, positions=%s",
+              docno, tf, pos.toString()));
         }
         t.writeGamma(pgap);
       }
 
-      // find out where we are in the stream no
-      int skip_pos2 = (int) t.getByteOffset() * 8 + t.getBitOffset();
+      // Find out where we are in the stream.
+      int skip2 = (int) t.getByteOffset() * 8 + t.getBitOffset();
 
-      // verify that the skip information is indeed valid
-      if (skip_pos1 + p.getEncodedSize() != skip_pos2) {
-        throw new RuntimeException("Ivalid skip information: skip_pos1=" + skip_pos1
-            + ", skip_pos2=" + skip_pos2 + ", size=" + p.getEncodedSize());
+      // Verify that the skip information is indeed valid.
+      if (skip1 + p.getEncodedSize() != skip2) {
+        throw new RuntimeException("Ivalid skip information: skip1=" + skip1
+            + ", skip2=" + skip2 + ", size=" + p.getEncodedSize());
       }
-
     }
   }
 
@@ -199,13 +194,11 @@ public class PostingsListDocSortedPositional implements PostingsList {
 
   @Override
   public PostingsReader getPostingsReader() {
+    Preconditions.checkNotNull(rawBytes);
+    Preconditions.checkArgument(collectionDocumentCount > 0);
+    Preconditions.checkArgument(postingsAdded > 0);
+
     try {
-      if (collectionDocumentCount <= 0)
-        throw new RuntimeException("Invalid Collection Document Count: " + collectionDocumentCount);
-      if (rawBytes == null)
-        throw new RuntimeException("Invalid rawBytes .. Postings must be serialized!!");
-      if (postingsAdded <= 0)
-        throw new RuntimeException("Invalid number of postings: " + postingsAdded);
       return new PostingsReader(rawBytes, postingsAdded, collectionDocumentCount, this);
     } catch (IOException e) {
       e.printStackTrace();
@@ -220,9 +213,8 @@ public class PostingsListDocSortedPositional implements PostingsList {
 
   @Override
   public void setCollectionDocumentCount(int docs) {
-    if (docs <= 0) {
-      throw new RuntimeException("Invalid Collection Document Count: " + collectionDocumentCount);
-    }
+    Preconditions.checkArgument(docs > 0);
+
     collectionDocumentCount = docs;
     recomputeGolombParameter();
   }
@@ -284,11 +276,11 @@ public class PostingsListDocSortedPositional implements PostingsList {
   @Override
   public void write(DataOutput out) throws IOException {
     if (rawBytes != null) {
-      // this would happen if we're reading in an already-encoded
-      // postings; if that's the case, simply write out the byte array
+      // This would happen if we're reading in an already-encoded postings; if that's the case,
+      // simply write out the byte array.
       WritableUtils.writeVInt(out, postingsAdded);
-      WritableUtils.writeVInt(out, df == 0 ? postingsAdded : df); // df
-      WritableUtils.writeVLong(out, cf == 0 ? sumOfPostingsScore : cf); // cf
+      WritableUtils.writeVInt(out, df == 0 ? postingsAdded : df);
+      WritableUtils.writeVLong(out, cf == 0 ? sumOfPostingsScore : cf);
       WritableUtils.writeVInt(out, rawBytes.length);
       out.write(rawBytes);
     } else {
@@ -298,13 +290,13 @@ public class PostingsListDocSortedPositional implements PostingsList {
 
         if (numPostings != postingsAdded) {
           throw new RuntimeException(
-              "Error, number of postings added doesn't match number of expected postings.  Expected "
+              "Error: number of postings added doesn't match number of expected postings. Expected "
                   + numPostings + ", got " + postingsAdded);
         }
 
         WritableUtils.writeVInt(out, postingsAdded);
-        WritableUtils.writeVInt(out, df == 0 ? postingsAdded : df); // df
-        WritableUtils.writeVLong(out, cf == 0 ? sumOfPostingsScore : cf); // cf
+        WritableUtils.writeVInt(out, df == 0 ? postingsAdded : df);
+        WritableUtils.writeVLong(out, cf == 0 ? sumOfPostingsScore : cf);
         byte[] bytes = bytesOut.toByteArray();
         WritableUtils.writeVInt(out, bytes.length);
         out.write(bytes);
@@ -318,9 +310,8 @@ public class PostingsListDocSortedPositional implements PostingsList {
   }
 
   public byte[] serialize() throws IOException {
-    if (postingsAdded <= 0)
-      throw new RuntimeException("Invalid number of added postings: " + postingsAdded
-          + " !! nPostings=" + numPostings + ", CollSize=" + collectionDocumentCount);
+    Preconditions.checkArgument(postingsAdded > 0);
+
     ByteArrayOutputStream bytesOut = new ByteArrayOutputStream();
     DataOutputStream dataOut = new DataOutputStream(bytesOut);
     write(dataOut);
@@ -345,8 +336,9 @@ public class PostingsListDocSortedPositional implements PostingsList {
     sb.append("[");
 
     for (int i = 0; i < pos.length; i++) {
-      if (i != 0)
+      if (i != 0) {
         sb.append(", ");
+      }
       sb.append(pos[i]);
     }
     sb.append("]");
@@ -363,8 +355,8 @@ public class PostingsListDocSortedPositional implements PostingsList {
     private ByteArrayInputStream bytesIn;
     private BitInputStream bitsIn;
     private int cnt = 0;
-    private short prevTf;
     private int[] curPositions;
+    private short innerPrevTf;
     private int innerPrevDocno;
     private int innerNumPostings;
     private int innerGolombParam;
@@ -372,17 +364,16 @@ public class PostingsListDocSortedPositional implements PostingsList {
     private boolean needToReadPositions = false;
     private PostingsList postingsList;
 
-    public PostingsReader(byte[] bytes, int n, int collectionSize,
+    protected PostingsReader(byte[] bytes, int numPostings, int collectionSize,
         PostingsListDocSortedPositional list) throws IOException {
+      Preconditions.checkNotNull(bytes);
+      Preconditions.checkArgument(numPostings > 0);
+      Preconditions.checkArgument(collectionSize > 0);
+
       bytesIn = new ByteArrayInputStream(bytes);
       bitsIn = new BitInputStream(bytesIn);
-      if (n <= 0) {
-        throw new RuntimeException("Invalid number of postings: " + n);
-      }
-      innerNumPostings = n;
-      if (collectionSize <= 0) {
-        throw new RuntimeException("Invalid Collection size: " + collectionSize);
-      }
+
+      innerNumPostings = numPostings;
       innerCollectionSize = collectionSize;
       innerGolombParam = (int) Math.ceil(0.69 * ((float) innerCollectionSize)
           / (float) innerNumPostings);
@@ -416,26 +407,25 @@ public class PostingsListDocSortedPositional implements PostingsList {
 
       try {
         if (needToReadPositions) {
-          skipPositions(prevTf);
+          skipPositions(innerPrevTf);
           needToReadPositions = false;
         }
 
         if (cnt == 0) {
           p.setDocno(bitsIn.readBinary(MAX_DOCNO_BITS));
-          p.setScore((short) bitsIn.readGamma());
+          p.setTf((short) bitsIn.readGamma());
         } else {
           p.setDocno(innerPrevDocno + bitsIn.readGolomb(innerGolombParam));
-          p.setScore((short) bitsIn.readGamma());
+          p.setTf((short) bitsIn.readGamma());
         }
       } catch (IOException e) {
-        e.printStackTrace();
-        throw new RuntimeException("Error in reading posting: mCnt=" + cnt
-            + ", mInnerNumPostings=" + innerNumPostings + ", " + e);
+        throw new RuntimeException("Error in reading posting: cnt=" + cnt
+            + ", innerNumPostings=" + innerNumPostings + ", " + e);
       }
 
       cnt++;
       innerPrevDocno = p.getDocno();
-      prevTf = p.getScore();
+      innerPrevTf = p.getTf();
       curPositions = null;
       needToReadPositions = true;
 
@@ -450,20 +440,19 @@ public class PostingsListDocSortedPositional implements PostingsList {
 
       int[] pos = null;
       try {
-        if (prevTf == 1) {
+        if (innerPrevTf == 1) {
           pos = new int[1];
           pos[0] = bitsIn.readGamma();
         } else {
           bitsIn.readGamma();
-          pos = new int[prevTf];
+          pos = new int[innerPrevTf];
           pos[0] = bitsIn.readGamma();
-          for (int i = 1; i < prevTf; i++) {
+          for (int i = 1; i < innerPrevTf; i++) {
             pos[i] = (pos[i - 1] + bitsIn.readGamma());
           }
         }
       } catch (IOException e) {
-        e.printStackTrace();
-        throw new RuntimeException("A problem in reading bits! " + e);
+        throw new RuntimeException("A problem in reading bits!", e);
       }
 
       needToReadPositions = false;
@@ -520,12 +509,14 @@ public class PostingsListDocSortedPositional implements PostingsList {
 
     @Override
     public short getTf() {
-      return prevTf;
+      return innerPrevTf;
     }
   }
 
   public static PostingsListDocSortedPositional merge(PostingsListDocSortedPositional plist1,
       PostingsListDocSortedPositional plist2, int docs) {
+    Preconditions.checkNotNull(plist1);
+    Preconditions.checkNotNull(plist2);
 
     plist1.setCollectionDocumentCount(docs);
     plist2.setCollectionDocumentCount(docs);
@@ -554,28 +545,28 @@ public class PostingsListDocSortedPositional implements PostingsList {
 
     while (true) {
       if (posting1 == null) {
-        newPostings.add(posting2.getDocno(), posting2.getScore(), tp2);
+        newPostings.add(posting2.getDocno(), posting2.getTf(), tp2);
 
-        // read the rest from reader 2
+        // Read the rest from reader 2.
         while (reader2.nextPosting(posting2)) {
           reader2.getPositions(tp2);
-          newPostings.add(posting2.getDocno(), posting2.getScore(), tp2);
+          newPostings.add(posting2.getDocno(), posting2.getTf(), tp2);
         }
 
         break;
       } else if (posting2 == null) {
-        newPostings.add(posting1.getDocno(), posting1.getScore(), tp1);
+        newPostings.add(posting1.getDocno(), posting1.getTf(), tp1);
 
-        // read the rest from reader 1
+        // Read the rest from reader 1.
         while (reader1.nextPosting(posting1)) {
           reader1.getPositions(tp1);
-          newPostings.add(posting1.getDocno(), posting1.getScore(), tp1);
+          newPostings.add(posting1.getDocno(), posting1.getTf(), tp1);
         }
 
         break;
 
       } else if (posting1.getDocno() < posting2.getDocno()) {
-        newPostings.add(posting1.getDocno(), posting1.getScore(), tp1);
+        newPostings.add(posting1.getDocno(), posting1.getTf(), tp1);
 
         if (reader1.nextPosting(posting1) == false) {
           posting1 = null;
@@ -583,7 +574,7 @@ public class PostingsListDocSortedPositional implements PostingsList {
           reader1.getPositions(tp1);
         }
       } else {
-        newPostings.add(posting2.getDocno(), posting2.getScore(), tp2);
+        newPostings.add(posting2.getDocno(), posting2.getTf(), tp2);
 
         if (reader2.nextPosting(posting2) == false) {
           posting2 = null;
@@ -598,6 +589,8 @@ public class PostingsListDocSortedPositional implements PostingsList {
 
   public static PostingsListDocSortedPositional merge(PostingsList plist1,
       PostingsList plist2, int docs) {
+    Preconditions.checkNotNull(plist1);
+    Preconditions.checkNotNull(plist2);
 
     plist1.setCollectionDocumentCount(docs);
     plist2.setCollectionDocumentCount(docs);
@@ -626,27 +619,27 @@ public class PostingsListDocSortedPositional implements PostingsList {
 
     while (true) {
       if (posting1 == null) {
-        newPostings.add(posting2.getDocno(), posting2.getScore(), tp2);
+        newPostings.add(posting2.getDocno(), posting2.getTf(), tp2);
 
-        // read the rest from reader 2
+        // Read the rest from reader 2.
         while (reader2.nextPosting(posting2)) {
           reader2.getPositions(tp2);
-          newPostings.add(posting2.getDocno(), posting2.getScore(), tp2);
+          newPostings.add(posting2.getDocno(), posting2.getTf(), tp2);
         }
 
         break;
       } else if (posting2 == null) {
-        newPostings.add(posting1.getDocno(), posting1.getScore(), tp1);
+        newPostings.add(posting1.getDocno(), posting1.getTf(), tp1);
 
-        // read the rest from reader 1
+        // Read the rest from reader 1.
         while (reader1.nextPosting(posting1)) {
           reader1.getPositions(tp1);
-          newPostings.add(posting1.getDocno(), posting1.getScore(), tp1);
+          newPostings.add(posting1.getDocno(), posting1.getTf(), tp1);
         }
 
         break;
       } else if (posting1.getDocno() < posting2.getDocno()) {
-        newPostings.add(posting1.getDocno(), posting1.getScore(), tp1);
+        newPostings.add(posting1.getDocno(), posting1.getTf(), tp1);
 
         if (reader1.nextPosting(posting1) == false) {
           posting1 = null;
@@ -654,7 +647,7 @@ public class PostingsListDocSortedPositional implements PostingsList {
           reader1.getPositions(tp1);
         }
       } else {
-        newPostings.add(posting2.getDocno(), posting2.getScore(), tp2);
+        newPostings.add(posting2.getDocno(), posting2.getTf(), tp2);
 
         if (reader2.nextPosting(posting2) == false) {
           posting2 = null;
@@ -667,17 +660,15 @@ public class PostingsListDocSortedPositional implements PostingsList {
     return newPostings;
   }
 
-  public static void mergeList(PostingsList newPostings, ArrayList<PostingsList> list, int nCollDocs) {
+  public static void mergeList(PostingsList newPostings, List<PostingsList> list, int nCollDocs) {
+    Preconditions.checkNotNull(list);
     int nLists = list.size();
 
-    // a reader for each pl
+    // A reader for each postings list.
     ivory.core.data.index.PostingsReader[] reader = new PostingsReader[nLists];
 
-    // the cur posting of each list
-    Posting[] posting = new Posting[nLists];
-
-    // the cur positions of each list
-    TermPositions[] tp = new TermPositions[nLists];
+    Posting[] posting = new Posting[nLists];        // The cur posting of each list.
+    TermPositions[] tp = new TermPositions[nLists]; // The cur positions of each list.
 
     // min-heap for merging
     PriorityQueue<DocList> heap = new PriorityQueue<DocList>(nLists, comparator);
@@ -700,16 +691,15 @@ public class PostingsListDocSortedPositional implements PostingsList {
 
       i++;
     }
-    LOG.info(">> merging a list of " + list.size() + " partial lists");
+
     newPostings.setCollectionDocumentCount(nCollDocs);
     newPostings.setNumberOfPostings(totalPostings);
-    LOG.info("\ttotalPostings: " + totalPostings);
 
     DocList dl;
     while (heap.size() > 0) {
       dl = heap.remove();
       i = dl.listIndex;
-      newPostings.add(dl.id, posting[i].getScore(), tp[i]);
+      newPostings.add(dl.id, posting[i].getTf(), tp[i]);
 
       if (reader[i].nextPosting(posting[i])) {
         reader[i].getPositions(tp[i]);
@@ -717,7 +707,6 @@ public class PostingsListDocSortedPositional implements PostingsList {
         heap.add(dl);
       }
     }
-    LOG.info("\tdone.");
   }
 
   private static class DocList {

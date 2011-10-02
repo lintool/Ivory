@@ -1,7 +1,7 @@
 package ivory.integration;
 
 import static org.junit.Assert.assertTrue;
-import ivory.core.driver.BuildIPIndex;
+import ivory.core.driver.BuildPositionalIndexIP;
 import ivory.core.driver.PreprocessGov2;
 import ivory.core.eval.Qrels;
 import ivory.regression.basic.Gov2_Basic;
@@ -20,8 +20,8 @@ import org.junit.Test;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
-public class VerifyGov2Index {
-  private static final Logger LOG = Logger.getLogger(VerifyGov2Index.class);
+public class VerifyGov2PositionalIndexIP {
+  private static final Logger LOG = Logger.getLogger(VerifyGov2PositionalIndexIP.class);
 
   private Path collectionPath = new Path("/shared/collections/gov2/collection.compressed.block");
   private String index = "/tmp/" + this.getClass().getCanonicalName() + "-index";
@@ -49,7 +49,7 @@ public class VerifyGov2Index {
 
     PreprocessGov2.main(new String[] { libjars, IntegrationUtils.D_JT, IntegrationUtils.D_NN,
         collectionPath.toString(), index });
-    BuildIPIndex.main(new String[] { libjars, IntegrationUtils.D_JT, IntegrationUtils.D_NN,
+    BuildPositionalIndexIP.main(new String[] { libjars, IntegrationUtils.D_JT, IntegrationUtils.D_NN,
         index, "100" });
   }
 
@@ -85,6 +85,6 @@ public class VerifyGov2Index {
   }
 
   public static junit.framework.Test suite() {
-    return new JUnit4TestAdapter(VerifyGov2Index.class);
+    return new JUnit4TestAdapter(VerifyGov2PositionalIndexIP.class);
   }
 }

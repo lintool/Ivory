@@ -56,7 +56,7 @@ public class PostingsListDocSortedPositionalTest {
     reader.nextPosting(posting);
     arr = reader.getPositions();
     assertEquals(13, posting.getDocno());
-    assertEquals(5, posting.getScore());
+    assertEquals(5, posting.getTf());
     assertEquals(1, arr[0]);
     assertEquals(4, arr[1]);
     assertEquals(5, arr[2]);
@@ -66,14 +66,14 @@ public class PostingsListDocSortedPositionalTest {
     reader.nextPosting(posting);
     arr = reader.getPositions();
     assertEquals(14, posting.getDocno());
-    assertEquals(2, posting.getScore());
+    assertEquals(2, posting.getTf());
     assertEquals(2, arr[0]);
     assertEquals(23, arr[1]);
 
     reader.nextPosting(posting);
     arr = reader.getPositions();
     assertEquals(24, posting.getDocno());
-    assertEquals(1, posting.getScore());
+    assertEquals(1, posting.getTf());
     assertEquals(1, arr[0]);
   }
 
@@ -104,7 +104,7 @@ public class PostingsListDocSortedPositionalTest {
     reader.nextPosting(posting);
     arr = reader.getPositions();
     assertEquals(13, posting.getDocno());
-    assertEquals(5, posting.getScore());
+    assertEquals(5, posting.getTf());
     assertEquals(1, arr[0]);
     assertEquals(4, arr[1]);
     assertEquals(5, arr[2]);
@@ -114,14 +114,14 @@ public class PostingsListDocSortedPositionalTest {
     reader.nextPosting(posting);
     arr = reader.getPositions();
     assertEquals(14, posting.getDocno());
-    assertEquals(2, posting.getScore());
+    assertEquals(2, posting.getTf());
     assertEquals(2, arr[0]);
     assertEquals(23, arr[1]);
 
     reader.nextPosting(posting);
     arr = reader.getPositions();
     assertEquals(24, posting.getDocno());
-    assertEquals(1, posting.getScore());
+    assertEquals(1, posting.getTf());
     assertEquals(1, arr[0]);
 
     // Set new tf and cf.
@@ -138,7 +138,7 @@ public class PostingsListDocSortedPositionalTest {
     reader.nextPosting(posting);
     arr = reader.getPositions();
     assertEquals(13, posting.getDocno());
-    assertEquals(5, posting.getScore());
+    assertEquals(5, posting.getTf());
     assertEquals(1, arr[0]);
     assertEquals(4, arr[1]);
     assertEquals(5, arr[2]);
@@ -148,14 +148,14 @@ public class PostingsListDocSortedPositionalTest {
     reader.nextPosting(posting);
     arr = reader.getPositions();
     assertEquals(14, posting.getDocno());
-    assertEquals(2, posting.getScore());
+    assertEquals(2, posting.getTf());
     assertEquals(2, arr[0]);
     assertEquals(23, arr[1]);
 
     reader.nextPosting(posting);
     arr = reader.getPositions();
     assertEquals(24, posting.getDocno());
-    assertEquals(1, posting.getScore());
+    assertEquals(1, posting.getTf());
     assertEquals(1, arr[0]);
 
     PostingsListDocSortedPositional postings3 =
@@ -172,7 +172,7 @@ public class PostingsListDocSortedPositionalTest {
     reader.nextPosting(posting);
     arr = reader.getPositions();
     assertEquals(13, posting.getDocno());
-    assertEquals(5, posting.getScore());
+    assertEquals(5, posting.getTf());
     assertEquals(1, arr[0]);
     assertEquals(4, arr[1]);
     assertEquals(5, arr[2]);
@@ -182,14 +182,14 @@ public class PostingsListDocSortedPositionalTest {
     reader.nextPosting(posting);
     arr = reader.getPositions();
     assertEquals(14, posting.getDocno());
-    assertEquals(2, posting.getScore());
+    assertEquals(2, posting.getTf());
     assertEquals(2, arr[0]);
     assertEquals(23, arr[1]);
 
     reader.nextPosting(posting);
     arr = reader.getPositions();
     assertEquals(24, posting.getDocno());
-    assertEquals(1, posting.getScore());
+    assertEquals(1, posting.getTf());
     assertEquals(1, arr[0]);
   }
 
@@ -239,31 +239,31 @@ public class PostingsListDocSortedPositionalTest {
     assertEquals(7, merged.getNumberOfPostings());
     mergedReader.nextPosting(p);
     assertEquals(2, p.getDocno());
-    assertEquals(3, p.getScore());
+    assertEquals(3, p.getTf());
 
     mergedReader.nextPosting(p);
     assertEquals(11, p.getDocno());
-    assertEquals(4, p.getScore());
+    assertEquals(4, p.getTf());
 
     mergedReader.nextPosting(p);
     assertEquals(13, p.getDocno());
-    assertEquals(5, p.getScore());
+    assertEquals(5, p.getTf());
 
     mergedReader.nextPosting(p);
     assertEquals(14, p.getDocno());
-    assertEquals(2, p.getScore());
+    assertEquals(2, p.getTf());
 
     mergedReader.nextPosting(p);
     assertEquals(19, p.getDocno());
-    assertEquals(1, p.getScore());
+    assertEquals(1, p.getTf());
 
     mergedReader.nextPosting(p);
     assertEquals(24, p.getDocno());
-    assertEquals(1, p.getScore());
+    assertEquals(1, p.getTf());
 
     mergedReader.nextPosting(p);
     assertEquals(25, p.getDocno());
-    assertEquals(2, p.getScore());
+    assertEquals(2, p.getTf());
 
     merged = PostingsListDocSortedPositional.create(PostingsListDocSortedPositional.merge(
         postings2b, postings1b, 30).serialize());
@@ -274,31 +274,31 @@ public class PostingsListDocSortedPositionalTest {
     assertEquals(7, merged.getNumberOfPostings());
     mergedReader.nextPosting(p);
     assertEquals(2, p.getDocno());
-    assertEquals(3, p.getScore());
+    assertEquals(3, p.getTf());
 
     mergedReader.nextPosting(p);
     assertEquals(11, p.getDocno());
-    assertEquals(4, p.getScore());
+    assertEquals(4, p.getTf());
 
     mergedReader.nextPosting(p);
     assertEquals(13, p.getDocno());
-    assertEquals(5, p.getScore());
+    assertEquals(5, p.getTf());
 
     mergedReader.nextPosting(p);
     assertEquals(14, p.getDocno());
-    assertEquals(2, p.getScore());
+    assertEquals(2, p.getTf());
 
     mergedReader.nextPosting(p);
     assertEquals(19, p.getDocno());
-    assertEquals(1, p.getScore());
+    assertEquals(1, p.getTf());
 
     mergedReader.nextPosting(p);
     assertEquals(24, p.getDocno());
-    assertEquals(1, p.getScore());
+    assertEquals(1, p.getTf());
 
     mergedReader.nextPosting(p);
     assertEquals(25, p.getDocno());
-    assertEquals(2, p.getScore());
+    assertEquals(2, p.getTf());
   }
 
   @Test
@@ -342,11 +342,11 @@ public class PostingsListDocSortedPositionalTest {
     assertEquals(2, merged.getNumberOfPostings());
     mergedReader.nextPosting(p);
     assertEquals(2, p.getDocno());
-    assertEquals(3, p.getScore());
+    assertEquals(3, p.getTf());
 
     mergedReader.nextPosting(p);
     assertEquals(13, p.getDocno());
-    assertEquals(5, p.getScore());
+    assertEquals(5, p.getTf());
 
     merged = PostingsListDocSortedPositional.create(PostingsListDocSortedPositional.merge(
         postings2b, postings1b, 30).serialize());
@@ -357,11 +357,11 @@ public class PostingsListDocSortedPositionalTest {
     assertEquals(2, merged.getNumberOfPostings());
     mergedReader.nextPosting(p);
     assertEquals(2, p.getDocno());
-    assertEquals(3, p.getScore());
+    assertEquals(3, p.getTf());
 
     mergedReader.nextPosting(p);
     assertEquals(13, p.getDocno());
-    assertEquals(5, p.getScore());
+    assertEquals(5, p.getTf());
   }
 
   @Test
@@ -408,23 +408,23 @@ public class PostingsListDocSortedPositionalTest {
     assertEquals(5, merged.getNumberOfPostings());
     mergedReader.nextPosting(p);
     assertEquals(2, p.getDocno());
-    assertEquals(3, p.getScore());
+    assertEquals(3, p.getTf());
 
     mergedReader.nextPosting(p);
     assertEquals(11, p.getDocno());
-    assertEquals(4, p.getScore());
+    assertEquals(4, p.getTf());
 
     mergedReader.nextPosting(p);
     assertEquals(13, p.getDocno());
-    assertEquals(5, p.getScore());
+    assertEquals(5, p.getTf());
 
     mergedReader.nextPosting(p);
     assertEquals(19, p.getDocno());
-    assertEquals(1, p.getScore());
+    assertEquals(1, p.getTf());
 
     mergedReader.nextPosting(p);
     assertEquals(25, p.getDocno());
-    assertEquals(2, p.getScore());
+    assertEquals(2, p.getTf());
 
     merged = PostingsListDocSortedPositional.create(PostingsListDocSortedPositional.merge(
         postings2b, postings1b, 30).serialize());
@@ -435,23 +435,23 @@ public class PostingsListDocSortedPositionalTest {
     assertEquals(5, merged.getNumberOfPostings());
     mergedReader.nextPosting(p);
     assertEquals(2, p.getDocno());
-    assertEquals(3, p.getScore());
+    assertEquals(3, p.getTf());
 
     mergedReader.nextPosting(p);
     assertEquals(11, p.getDocno());
-    assertEquals(4, p.getScore());
+    assertEquals(4, p.getTf());
 
     mergedReader.nextPosting(p);
     assertEquals(13, p.getDocno());
-    assertEquals(5, p.getScore());
+    assertEquals(5, p.getTf());
 
     mergedReader.nextPosting(p);
     assertEquals(19, p.getDocno());
-    assertEquals(1, p.getScore());
+    assertEquals(1, p.getTf());
 
     mergedReader.nextPosting(p);
     assertEquals(25, p.getDocno());
-    assertEquals(2, p.getScore());
+    assertEquals(2, p.getTf());
   }
 
   public static junit.framework.Test suite() {

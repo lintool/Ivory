@@ -1,7 +1,7 @@
 package ivory.integration;
 
 import static org.junit.Assert.assertTrue;
-import ivory.core.driver.BuildIPIndex;
+import ivory.core.driver.BuildPositionalIndexIP;
 import ivory.core.driver.PreprocessTREC;
 import ivory.core.eval.Qrels;
 import ivory.regression.basic.Robust04_Basic;
@@ -20,8 +20,8 @@ import org.junit.Test;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
-public class VerifyTrecIndexLocal {
-  private static final Logger LOG = Logger.getLogger(VerifyTrecIndexLocal.class);
+public class VerifyTrecPositionalIndexIPLocal {
+  private static final Logger LOG = Logger.getLogger(VerifyTrecPositionalIndexIPLocal.class);
 
   private Path collectionPath = new Path("/scratch0/collections/trec/trec4-5_noCRFR.xml");
   private String index = this.getClass().getCanonicalName() + "-index";
@@ -49,7 +49,7 @@ public class VerifyTrecIndexLocal {
 
     PreprocessTREC.main(new String[] { libjars, IntegrationUtils.D_JT_LOCAL,
         IntegrationUtils.D_NN_LOCAL, collectionPath.toString(), index });
-    BuildIPIndex.main(new String[] { libjars, IntegrationUtils.D_JT_LOCAL,
+    BuildPositionalIndexIP.main(new String[] { libjars, IntegrationUtils.D_JT_LOCAL,
         IntegrationUtils.D_NN_LOCAL, index, "10" });
   }
 
@@ -77,6 +77,6 @@ public class VerifyTrecIndexLocal {
   }
 
   public static junit.framework.Test suite() {
-    return new JUnit4TestAdapter(VerifyTrecIndexLocal.class);
+    return new JUnit4TestAdapter(VerifyTrecPositionalIndexIPLocal.class);
   }
 }
