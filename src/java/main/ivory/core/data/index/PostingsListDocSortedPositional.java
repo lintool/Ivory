@@ -31,8 +31,6 @@ import java.util.List;
 import java.util.PriorityQueue;
 
 import org.apache.hadoop.io.WritableUtils;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 
 import com.google.common.base.Preconditions;
 
@@ -43,12 +41,7 @@ import com.google.common.base.Preconditions;
  * @author Tamer Elsayed
  */
 public class PostingsListDocSortedPositional implements PostingsList {
-  private static final Logger LOG = Logger.getLogger(PostingsListDocSortedPositional.class);
   private static final int MAX_DOCNO_BITS = 32;
-
-  static {
-    LOG.setLevel(Level.WARN);
-  }
 
   private int collectionDocumentCount = -1;
   private int numPostings = -1;
@@ -304,8 +297,6 @@ public class PostingsListDocSortedPositional implements PostingsList {
         throw new RuntimeException("ArithmeticException caught \"" + e.getMessage()
             + "\": check to see if collection size or df is set properly.");
       }
-
-      LOG.info("writing postings: cf=" + sumOfPostingsScore + ", df=" + numPostings);
     }
   }
 
@@ -329,21 +320,6 @@ public class PostingsListDocSortedPositional implements PostingsList {
   public static PostingsListDocSortedPositional create(byte[] bytes) throws IOException {
     return PostingsListDocSortedPositional.create(
         new DataInputStream(new ByteArrayInputStream(bytes)));
-  }
-
-  public static String positionsToString(int[] pos) {
-    StringBuffer sb = new StringBuffer();
-    sb.append("[");
-
-    for (int i = 0; i < pos.length; i++) {
-      if (i != 0) {
-        sb.append(", ");
-      }
-      sb.append(pos[i]);
-    }
-    sb.append("]");
-
-    return sb.toString();
   }
 
   /**

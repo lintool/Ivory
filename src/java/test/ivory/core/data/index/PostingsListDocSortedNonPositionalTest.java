@@ -34,7 +34,8 @@ public class PostingsListDocSortedNonPositionalTest extends TestCase {
     postings.add(14, (short) 2, null);
     postings.add(24, (short) 1, null);
 
-    PostingsListDocSortedNonPositional postings2 = PostingsListDocSortedNonPositional.create(postings.serialize());
+    PostingsListDocSortedNonPositional postings2 =
+        PostingsListDocSortedNonPositional.create(postings.serialize());
     postings2.setCollectionDocumentCount(10);
 
     Posting posting = new Posting();
@@ -63,7 +64,8 @@ public class PostingsListDocSortedNonPositionalTest extends TestCase {
     postings.add(14, (short) 2, null);
     postings.add(24, (short) 1, null);
 
-    PostingsListDocSortedNonPositional postings2 = PostingsListDocSortedNonPositional.create(postings.serialize());
+    PostingsListDocSortedNonPositional postings2 =
+        PostingsListDocSortedNonPositional.create(postings.serialize());
     // verify cf and df
     assertEquals(8, postings2.getCf());
     assertEquals(3, postings2.getDf());
@@ -105,7 +107,6 @@ public class PostingsListDocSortedNonPositionalTest extends TestCase {
 
     reader.nextPosting(posting);
     assertEquals(24, posting.getDocno());
-    
     
     PostingsListDocSortedNonPositional postings3 =
       PostingsListDocSortedNonPositional.create(postings2.serialize());

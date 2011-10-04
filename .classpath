@@ -6,7 +6,6 @@
 	<classpathentry kind="src" path="src/java/test"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/activation-1.1.jar"/>
-	<classpathentry kind="lib" path="lib/ant-1.6.5.jar"/>
 	<classpathentry kind="lib" path="lib/cloud9-1.2.5-javadoc.jar"/>
 	<classpathentry kind="lib" path="lib/cloud9-1.2.5-sources.jar"/>
 	<classpathentry kind="lib" path="lib/cloud9-1.2.5.jar"/>
@@ -27,7 +26,6 @@
 	<classpathentry kind="lib" path="lib/dsiutils-1.0.12.jar"/>
 	<classpathentry kind="lib" path="lib/fastutil-6.0.0.jar"/>
 	<classpathentry kind="lib" path="lib/guava-r09.jar"/>
-	<classpathentry kind="lib" path="lib/hadoop-ant-3.0-u1.pom"/>
 	<classpathentry kind="lib" path="lib/hadoop-core-0.20.2-cdh3u1-sources.jar"/>
 	<classpathentry kind="lib" path="lib/hadoop-core-0.20.2-cdh3u1.jar"/>
 	<classpathentry kind="lib" path="lib/hsqldb-1.8.0.7.jar"/>
@@ -50,6 +48,7 @@
 	<classpathentry kind="lib" path="lib/log4j-1.2.16.jar"/>
 	<classpathentry kind="lib" path="lib/mail-1.4.1-sources.jar"/>
 	<classpathentry kind="lib" path="lib/mail-1.4.1.jar"/>
+	<classpathentry kind="lib" path="lib/maven.jar"/>
 	<classpathentry kind="lib" path="lib/maxent-3.0.0.jar"/>
 	<classpathentry kind="lib" path="lib/memcached-2.2.jar"/>
 	<classpathentry kind="lib" path="lib/mockito-all-1.8.5.jar"/>
