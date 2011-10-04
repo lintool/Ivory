@@ -1,6 +1,5 @@
 package ivory.util;
 
-import ivory.data.DfTable;
 import ivory.data.PrefixEncodedGlobalStats;
 import ivory.data.TermDocVector;
 import ivory.data.TermDocVector.Reader;
@@ -14,6 +13,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -120,7 +120,7 @@ public abstract class CLIRUtils extends Configured {
 			return (float) (sum/(Math.sqrt(magA) * Math.sqrt(magB)));
 		}
 	}
-	
+
 	/**
 	 * @param vectorA
 	 * 		a term document vector
@@ -168,22 +168,7 @@ public abstract class CLIRUtils extends Configured {
 		}
 		return sum;
 	}
-	
-	/**
-************
-	 */
-	public static float cosineNormalized2(HMapSFW vectorA, HMapSFW vectorB) {
-		logger.setLevel(Level.DEBUG);
-		float sum = 0;
-		for(edu.umd.cloud9.util.map.MapKF.Entry<String> e : vectorA.entrySet()){
-			float value = e.getValue();
-			if(vectorB.containsKey(e.getKey())){
-				logger.debug("Matched "+ e.getKey()+"="+value+" x "+vectorB.get(e.getKey()));
-				sum+= value*vectorB.get(e.getKey());
-			}
-		}
-		return sum;
-	}
+
 
 	/**
 	 * Given a mapping from F-terms to their df values, compute a df value for each E-term using the CLIR algorithm: df(e) = sum_f{df(f)*prob(f|e)}
@@ -285,7 +270,7 @@ public abstract class CLIRUtils extends Configured {
 	public static HMapIFW updateTFsByTerm(String fTerm, int tf, HMapIFW tfTable, Vocab eVocabSrc, Vocab eVocabTrg, Vocab fVocabSrc, Vocab fVocabTrg, TTable_monolithic_IFAs e2fProbs, TTable_monolithic_IFAs f2eProbs, Logger sLogger){
 		int f = fVocabSrc.get(fTerm);
 		if(f <= 0){
-			sLogger.warn(f+","+fTerm+" word not in aligner's vocab (foreign side of f2e)");
+			//			sLogger.warn(f+","+fTerm+" word not in aligner's vocab (foreign side of f2e)");
 			return tfTable;
 		}
 
@@ -293,7 +278,7 @@ public abstract class CLIRUtils extends Configured {
 
 		int f2 = fVocabTrg.get(fTerm);		//convert between two F vocabs  (different ids)
 		if(f2 <= 0){
-			sLogger.warn(fTerm+" word not in aligner's vocab (foreign side of e2f)");
+			//			sLogger.warn(fTerm+" word not in aligner's vocab (foreign side of e2f)");
 			return tfTable;
 		}
 		//tf(e) = sum_f{tf(f)*prob(f|e)}
@@ -302,7 +287,7 @@ public abstract class CLIRUtils extends Configured {
 			String eTerm = eVocabTrg.get(e);
 			int e2 = eVocabSrc.get(eTerm);		//convert between two E vocabs (different ids)
 			if(e2 <= 0){
-				sLogger.warn(eTerm+" word not in aligner's vocab (english side of e2f)");
+				//				sLogger.warn(eTerm+" word not in aligner's vocab (english side of e2f)");
 				continue;
 			}
 			probEF = e2fProbs.get(e2, f2);
@@ -358,14 +343,14 @@ public abstract class CLIRUtils extends Configured {
 
 			int f = fVocabSrc.get(fTerm);
 			if(f <= 0){
-				sLogger.warn(f+","+fTerm+": word not in aligner's vocab (source side of f2e)");
+				//				sLogger.warn(f+","+fTerm+": word not in aligner's vocab (source side of f2e)");
 				continue;
 			}
 			int[] eS = f2eProbs.get(f).getTranslations(0.0f);
 
 			int f2 = fVocabTrg.get(fTerm);		//convert between two F vocabs (different ids)
 			if(f2 <= 0){
-				sLogger.warn(fTerm+": word not in aligner's vocab (target side of e2f)");
+				//				sLogger.warn(fTerm+": word not in aligner's vocab (target side of e2f)");
 				continue;
 			}
 			//tf(e) = sum_f{tf(f)*prob(f|e)}
@@ -374,12 +359,12 @@ public abstract class CLIRUtils extends Configured {
 				String eTerm = eVocabTrg.get(e);
 				int e2 = eVocabSrc.get(eTerm);		//convert between two E vocabs (different ids)
 				if(e2 <= 0){
-					sLogger.debug(eTerm+": word not in aligner's final vocab (source side of e2f)");
+					//					sLogger.debug(eTerm+": word not in aligner's final vocab (source side of e2f)");
 					continue;
 				}
 				probEF = e2fProbs.get(e2, f2);
 				if(probEF > 0){
-					sLogger.debug(eVocabSrc.get(e2)+" ==> "+probEF);
+					//					sLogger.debug(eVocabSrc.get(e2)+" ==> "+probEF);
 					if(tfTable.containsKey(e2)){
 						tfTable.put(e2, tfTable.get(e2)+tf*probEF);
 					}else{
@@ -428,14 +413,14 @@ public abstract class CLIRUtils extends Configured {
 			docLen += tf;
 			int f = fVocabSrc.get(fTerm);
 			if(f <= 0){
-				sLogger.warn(f+","+fTerm+": word not in aligner's vocab (source side of f2e)");
+				//				sLogger.warn(f+","+fTerm+": word not in aligner's vocab (source side of f2e)");
 				continue;
 			}
 			int[] eS = f2eProbs.get(f).getTranslations(0.0f);
 
 			int f2 = fVocabTrg.get(fTerm);		//convert between two F vocabs (different ids)
 			if(f2 <= 0){
-				sLogger.warn(fTerm+": word not in aligner's vocab (target side of e2f)");
+				//				sLogger.warn(fTerm+": word not in aligner's vocab (target side of e2f)");
 				continue;
 			}
 			//tf(e) = sum_f{tf(f)*prob(f|e)}
@@ -444,12 +429,12 @@ public abstract class CLIRUtils extends Configured {
 				String eTerm = eVocabTrg.get(e);
 				int e2 = eVocabSrc.get(eTerm);		//convert between two E vocabs (different ids)
 				if(e2 <= 0){
-					sLogger.debug(eTerm+": word not in aligner's final vocab (source side of e2f)");
+					//					sLogger.debug(eTerm+": word not in aligner's final vocab (source side of e2f)");
 					continue;
 				}
 				prob = e2fProbs.get(e2, f2);
 				if(prob > 0){
-					sLogger.debug(eVocabSrc.get(e2)+" ==> "+prob);
+					//					sLogger.debug(eVocabSrc.get(e2)+" ==> "+prob);
 					if(tfTable.containsKey(e2)){
 						tfTable.put(e2, tfTable.get(e2)+tf*prob);
 					}else{
@@ -495,7 +480,7 @@ public abstract class CLIRUtils extends Configured {
 
 			// compute score via scoring model
 			float score = ((Bm25) scoringModel).computeDocumentWeight(tf, df, docLen);
-//			sLogger.debug(eTerm+" "+tf+" "+df+" "+score);
+			//			sLogger.debug(eTerm+" "+tf+" "+df+" "+score);
 			if(score>0){
 				v.put(eTerm, score);
 				if(isNormalize){
@@ -537,7 +522,7 @@ public abstract class CLIRUtils extends Configured {
 		if(sLogger == null){
 			sLogger = logger;
 		}
-		
+
 		HMapSFW v = new HMapSFW();
 		float normalization=0;
 		for(edu.umd.cloud9.util.map.MapKI.Entry<String> entry : tfTable.entrySet()){
@@ -545,10 +530,10 @@ public abstract class CLIRUtils extends Configured {
 			String eTerm = entry.getKey();
 			int tf = entry.getValue();
 			int df = dfTable.getDF(eTerm);
-		
+
 			// compute score via scoring model
 			float score = ((Bm25) scoringModel).computeDocumentWeight(tf, df, docLen);
-//			sLogger.debug(eTerm+" "+tf+" "+df+" "+score);
+			//			sLogger.debug(eTerm+" "+tf+" "+df+" "+score);
 			if(score>0){
 				v.put(eTerm, score);
 				if(isNormalize){
@@ -1014,6 +999,95 @@ public abstract class CLIRUtils extends Configured {
 		dos3.close();
 	}
 
+	public static String[] computeFeaturesF1(HMapSFW eVector, HMapSFW fVector, float eSentLength, float fSentLength,
+			Vocab eVocabSrc, Vocab eVocabTrg, Vocab fVocabSrc, Vocab fVocabTrg, TTable_monolithic_IFAs f2e_Probs, TTable_monolithic_IFAs e2f_Probs) {
+		String[] features = new String[1];
+
+		float cosine = CLIRUtils.cosineNormalized(eVector, fVector);
+		if(fSentLength == 0 || eSentLength == 0){
+			return null;
+		}
+
+		features[0] = "cosine="+cosine;
+		return features;
+	}
+
+	public static String[] computeFeaturesF2(HMapSFW eVector, HMapSFW fVector, float eSentLength, float fSentLength,
+			Vocab eVocabSrc, Vocab eVocabTrg, Vocab fVocabSrc, Vocab fVocabTrg, TTable_monolithic_IFAs f2e_Probs, TTable_monolithic_IFAs e2f_Probs) {
+		String[] features = new String[3];
+
+		float cosine = CLIRUtils.cosineNormalized(eVector, fVector);
+		if(fSentLength == 0 || eSentLength == 0){
+			return null;
+		}
+
+		features[0] = "cosine="+cosine;
+		float lengthratio1, lengthratio2;
+		lengthratio1 = eSentLength/fSentLength;
+		lengthratio2 = fSentLength/eSentLength;
+		features[1] = "lengthratio1="+lengthratio1;
+		features[2] = "lengthratio2="+lengthratio2;		
+		return features;
+	}
+
+	public static String[] computeFeaturesF3(HMapSFW eVector, HMapSFW fVector, float eSentLength, float fSentLength,
+			Vocab eVocabSrc, Vocab eVocabTrg, Vocab fVocabSrc, Vocab fVocabTrg, TTable_monolithic_IFAs f2e_Probs, TTable_monolithic_IFAs e2f_Probs) {
+		String[] features = new String[5];
+
+		float cosine = CLIRUtils.cosineNormalized(eVector, fVector);
+		if(fSentLength == 0 || eSentLength == 0){
+			return null;
+		}
+
+		features[0] = "cosine="+cosine;
+		float lengthratio1, lengthratio2;
+		lengthratio1 = eSentLength/fSentLength;
+		lengthratio2 = fSentLength/eSentLength;
+		features[1] = "lengthratio1="+lengthratio1;
+		features[2] = "lengthratio2="+lengthratio2;				
+		int cntTrans = 0, cntTrans2 = 0;
+		float cnt = 0, transratio = 0.0f, cnt2 = 0, transratio2 = 0.0f;
+		for(String fTerm : fVector.keySet()){
+			int f = fVocabSrc.get(fTerm);
+			if(f < 0){
+				continue;
+			}
+			int[] eS = f2e_Probs.get(f).getTranslations(0.0f);
+			for(int e : eS){
+				String eTerm = eVocabTrg.get(e);
+				if(eVector.containsKey(eTerm)){
+					cntTrans++;
+					break;
+				}
+			}
+			cnt++;
+		}
+		for(String eTerm : eVector.keySet()){
+			int e = eVocabSrc.get(eTerm);
+			if(e < 0){
+				continue;
+			}
+			int[] fS = e2f_Probs.get(e).getTranslations(0.0f);
+			for(int f : fS){
+				String fTerm = fVocabTrg.get(f);
+				if(fVector.containsKey(fTerm)){
+					cntTrans2++;
+					break;
+				}
+			}
+			cnt2++;
+		}
+		//when there are terms in fSent but none of them has a translation or vocab entry, set trans ratio to 0
+		if(cnt!=0){
+			transratio = cntTrans/cnt;
+		}			
+		if(cnt2!=0){
+			transratio2 = cntTrans2/cnt2;
+		}
+		features[3] ="wordtransratio1="+transratio;
+		features[4] ="wordtransratio2="+transratio2;
+		return features;
+	}
 
 
 }
