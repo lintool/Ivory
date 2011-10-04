@@ -87,16 +87,16 @@ public class PostingsListDocSortedNonPositional implements PostingsList {
   }
 
   @Override
-  public void add(int docno, short score, TermPositions pos) {
-    add(docno, score);
+  public void add(int docno, short tf, TermPositions pos) {
+    add(docno, tf);
   }
 
-  public void add(int docno, short score) {
+  public void add(int docno, short tf) {
     try {
       if (postingsAdded == 0) {
         // write out the first docno
         bitOut.writeBinary(MAX_DOCNO_BITS, docno);
-        bitOut.writeGamma(score);
+        bitOut.writeGamma(tf);
 
         prevDocno = docno;
       } else {
@@ -108,7 +108,7 @@ public class PostingsListDocSortedNonPositional implements PostingsList {
         }
 
         bitOut.writeGolomb(dgap, golombParam);
-        bitOut.writeGamma(score);
+        bitOut.writeGamma(tf);
 
         prevDocno = docno;
       }
@@ -119,12 +119,12 @@ public class PostingsListDocSortedNonPositional implements PostingsList {
       e.printStackTrace();
       throw new RuntimeException("ArithmeticException caught \"" + e.getMessage()
           + "\": check to see if collection size or df is set properly. docno=" + docno
-          + ", tf=" + score + ", previous docno=" + prevDocno + ", df=" + numPostings
+          + ", tf=" + tf + ", previous docno=" + prevDocno + ", df=" + numPostings
           + ", collection size=" + collectionSize + ", Golomb param=" + golombParam);
     }
 
     postingsAdded++;
-    sumOfPostingsScore += score;
+    sumOfPostingsScore += tf;
   }
 
   @Override
