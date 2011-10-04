@@ -171,23 +171,6 @@ public abstract class CLIRUtils extends Configured {
 	}
 	
 	/**
-************
-	 */
-	public static float cosineNormalized2(HMapSFW vectorA, HMapSFW vectorB) {
-		logger.setLevel(Level.DEBUG);
-		float sum = 0;
-		for(edu.umd.cloud9.util.map.MapKF.Entry<String> e : vectorA.entrySet()){
-			float value = e.getValue();
-			if(vectorB.containsKey(e.getKey())){
-				logger.debug("Matched "+ e.getKey()+"="+value+" x "+vectorB.get(e.getKey()));
-				sum+= value*vectorB.get(e.getKey());
-			}
-		}
-		return sum;
-	}
-
-
-	/**
 	 * Given a mapping from F-terms to their df values, compute a df value for each E-term using the CLIR algorithm: df(e) = sum_f{df(f)*prob(f|e)}
 	 * 
 	 * @param eVocabSrc
@@ -497,11 +480,8 @@ public abstract class CLIRUtils extends Configured {
 
 			// compute score via scoring model
 			float score = ((Bm25) scoringModel).computeDocumentWeight(tf, df, docLen);
-<<<<<<< HEAD
-			sLogger.debug(eTerm+" "+tf+" "+df+" "+score);
-=======
+
 			//			sLogger.debug(eTerm+" "+tf+" "+df+" "+score);
->>>>>>> sentence_extraction
 			if(score>0){
 				v.put(eTerm, score);
 				if(isNormalize){
@@ -543,11 +523,7 @@ public abstract class CLIRUtils extends Configured {
 		if(sLogger == null){
 			sLogger = logger;
 		}
-<<<<<<< HEAD
-		
-=======
 
->>>>>>> sentence_extraction
 		HMapSFW v = new HMapSFW();
 		float normalization=0;
 		for(edu.umd.cloud9.util.map.MapKI.Entry<String> entry : tfTable.entrySet()){
@@ -555,17 +531,11 @@ public abstract class CLIRUtils extends Configured {
 			String eTerm = entry.getKey();
 			int tf = entry.getValue();
 			int df = dfTable.getDF(eTerm);
-<<<<<<< HEAD
-		
-			// compute score via scoring model
-			float score = ((Bm25) scoringModel).computeDocumentWeight(tf, df, docLen);
-			sLogger.debug(eTerm+" "+tf+" "+df+" "+score);
-=======
 
 			// compute score via scoring model
 			float score = ((Bm25) scoringModel).computeDocumentWeight(tf, df, docLen);
 			//			sLogger.debug(eTerm+" "+tf+" "+df+" "+score);
->>>>>>> sentence_extraction
+
 			if(score>0){
 				v.put(eTerm, score);
 				if(isNormalize){
