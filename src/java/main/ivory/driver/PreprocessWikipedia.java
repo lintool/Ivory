@@ -165,7 +165,7 @@ public class PreprocessWikipedia extends Configured implements Tool {
 		p = new Path(seqCollection);
 		if (!fs.exists(p)) {
 			LOG.info(seqCollection + " doesn't exist, creating...");
-			String[] arr = new String[] { rawCollection, seqCollection, mappingFile.toString(), "block"};
+			String[] arr = new String[] { rawCollection, seqCollection, mappingFile.toString(), "block", collectionLang};
 			RepackWikipedia tool = new RepackWikipedia();
 			tool.setConf(conf);
 			tool.run(arr);

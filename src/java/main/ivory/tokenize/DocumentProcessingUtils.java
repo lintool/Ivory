@@ -40,9 +40,9 @@ public class DocumentProcessingUtils {
 	static{
 		sLogger.setLevel(Level.WARN);
 	}
-
+	
 	public static short TF_CUT = Short.MAX_VALUE;
-
+	
 	// TODO: refactor this class to get rid of duplicate code
 	public static int getDocLengthFromPositionsMap(Map<String, ArrayListOfInts> termPositionsMap){
 		int dl = 0;
@@ -86,30 +86,30 @@ public class DocumentProcessingUtils {
 		}
 		return positions;
 	}
-
+	
 	public static Map<String, ArrayListOfInts> getTermPositionsMap(Indexable doc, Tokenizer mTokenizer){
 		// for storing the positions
 		Map<String, ArrayListOfInts> positions = new HashMap<String, ArrayListOfInts>();
 		
 		String text = doc.getContent();
 		String[] terms = mTokenizer.processContent(text);
-
+		
 		// the tokenizer may return
 		// terms with zero length (empty terms), and the tf may exceed the
 		// capacity of a short (in which case we need to handle separately).
 		// The doc length and contribution to term count is computed as the
 		// sum of all tfs of indexed terms a bit later.
-
+		
 		for (int i = 0; i < terms.length; i++) {
 			String term = terms[i];
-
+			
 			// guard against bad tokenization
 			if (term.length() == 0)
 				continue;
-
+			
 			if (term.length() >= Byte.MAX_VALUE)
 				continue;
-	
+			
 			// remember, token position is numbered started from one...
 			if (positions.containsKey(term)) {
 				positions.get(term).add(i + 1);
@@ -119,7 +119,7 @@ public class DocumentProcessingUtils {
 				positions.put(term, l);
 			}
 		}
-
+		
 		Iterator<Map.Entry<String, ArrayListOfInts>> it = positions.entrySet().iterator();
 		Map.Entry<String, ArrayListOfInts> e;
 		ArrayListOfInts positionsList;
@@ -134,8 +134,8 @@ public class DocumentProcessingUtils {
 				// junk doc. The current implementation simply skips this
 				// posting...
 				sLogger.warn("Error: tf of " + e.getValue()
-						+ " will overflow max short value. docno=" + doc.getDocid() + ", term="
-						+ e.getKey());
+							 + " will overflow max short value. docno=" + doc.getDocid() + ", term="
+							 + e.getKey());
 				//continue;
 				it.remove();
 				
@@ -144,7 +144,7 @@ public class DocumentProcessingUtils {
 		}
 		return positions;
 	}
-
+	
 	public static TreeMap<String, ArrayListOfInts> getTermPositionsMap(TermDocVector doc, Set<String> terms){
 		// for storing the positions
 		TreeMap<String, ArrayListOfInts> strPositions = new TreeMap<String, ArrayListOfInts>();
