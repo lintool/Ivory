@@ -25,9 +25,8 @@ import ivory.core.preprocess.BuildIntDocVectorsForwardIndex;
 import ivory.core.preprocess.BuildTermDocVectors;
 import ivory.core.preprocess.BuildTermDocVectorsForwardIndex;
 import ivory.core.preprocess.ComputeGlobalTermStatistics;
-//import ivory.core.preprocess.BuildTermIdMap;
+import ivory.core.preprocess.BuildDictionary;
 import ivory.core.preprocess.BuildWeightedIntDocVectors;
-//import ivory.core.preprocess.GetTermCount;
 import ivory.core.tokenize.GalagoTokenizer;
 
 import org.apache.hadoop.conf.Configuration;
@@ -93,8 +92,41 @@ public class PreprocessAquaint2 extends Configured implements Tool {
       NumberAquaint2Documents2 tool = new NumberAquaint2Documents2();
       tool.setConf(conf);
       tool.run(arr);
-
       fs.delete(mappingDir, true);
+
+	  Aquaint2DocnoMapping dm = new Aquaint2DocnoMapping();
+	  dm.loadMapping(mappingFile, fs);
+
+	  int docno; int expectedDocno; String expectedDocid; String docid;
+	  boolean testAquaint2 = false;
+	  if (testAquaint2) {
+		  docno = 500; expectedDocid = "AFP_ENG_20041001.0500"; docid = dm.getDocid(docno);
+		  System.out.println ("dm.getDocid(" + docno + "): " + docid + ", should be: " + expectedDocid + ", " + (expectedDocid.equals(docid)));
+		  docno = 600; expectedDocid = "AFP_ENG_20041001.0600"; docid = dm.getDocid(docno);
+		  System.out.println ("dm.getDocid(" + docno + "): " + docid + ", should be: " + expectedDocid + ", " + (expectedDocid.equals(docid)));
+		  docno = 700; expectedDocid = "AFP_ENG_20041001.0701"; docid = dm.getDocid(docno);
+		  System.out.println ("dm.getDocid(" + docno + "): " + docid + ", should be: " + expectedDocid + ", " + (expectedDocid.equals(docid)));
+		  docno = 800; expectedDocid = "AFP_ENG_20041003.0019"; docid = dm.getDocid(docno);
+		  System.out.println ("dm.getDocid(" + docno + "): " + docid + ", should be: " + expectedDocid + ", " + (expectedDocid.equals(docid)));
+		  expectedDocno = 500; docid = "AFP_ENG_20041001.0500"; docno = dm.getDocno(docid);
+		  System.out.println ("dm.getDocno(" + docid + "): " + docno + ", should be: " + expectedDocno + ", " + (expectedDocno == docno));
+		  expectedDocno = 600; docid = "AFP_ENG_20041001.0600"; docno = dm.getDocno(docid);
+		  System.out.println ("dm.getDocno(" + docid + "): " + docno + ", should be: " + expectedDocno + ", " + (expectedDocno == docno));
+		  expectedDocno = 700; docid = "AFP_ENG_20041001.0701"; docno = dm.getDocno(docid);
+		  System.out.println ("dm.getDocno(" + docid + "): " + docno + ", should be: " + expectedDocno + ", " + (expectedDocno == docno));
+		  expectedDocno = 800; docid = "AFP_ENG_20041003.0019"; docno = dm.getDocno(docid);
+		  System.out.println ("dm.getDocno(" + docid + "): " + docno + ", should be: " + expectedDocno + ", " + (expectedDocno == docno));
+		  return 0;
+	  }
+	  boolean testGigaword = false;
+	  if (testGigaword) {
+		  for (int i = 1; i < 301; i++) {
+			  docno = i * 1000;
+			  docid = dm.getDocid(docno);
+			  System.out.println ("dm.getDocid(" + docno + "): " + docid);
+		  }
+		  return 0;
+	  }
     }
 
 	int numMappers = 100;
@@ -115,9 +147,9 @@ public class PreprocessAquaint2 extends Configured implements Tool {
     conf.setInt(Constants.TermIndexWindow, 8);
 
     new BuildTermDocVectors(conf).run();
+
     new ComputeGlobalTermStatistics(conf).run();
-	//    new GetTermCount(conf).run();
-    //new BuildTermIdMap(conf).run();
+    new BuildDictionary(conf).run();
     new BuildIntDocVectors(conf).run();
 
     new BuildIntDocVectorsForwardIndex(conf).run();
@@ -130,18 +162,22 @@ public class PreprocessAquaint2 extends Configured implements Tool {
 
 	new BuildIntPostingsForwardIndex(conf).run();
 
-	// String findexDirPath = indexRootPath + "/findex";
-	// String findexFilePath = indexRootPath + "/findex.dat";
-	// new BuildWeightedIntDocVectors(conf).run();
 
-	// conf.setBoolean(Constants.BuildWeighted, true);
-    // new BuildIntDocVectorsForwardIndex(conf).run();
+	boolean buildingVectors = true;
+	if (buildingVectors) {
+		new BuildWeightedIntDocVectors(conf).run();
 
-    // if (fs.exists(new Path(findexDirPath))) {
-    //   LOG.info("ForwardIndex already exists: Skipping!");
-    // } else {
-	// 	new BuildAquaint2ForwardIndex ().runTool (conf, collection, findexDirPath, findexFilePath, mappingFile.toString ());
-	// }
+		conf.setBoolean(Constants.BuildWeighted, true);
+		new BuildIntDocVectorsForwardIndex(conf).run();
+
+		String findexDirPath = indexRootPath + "/findex";
+		String findexFilePath = indexRootPath + "/findex.dat";
+		if (fs.exists(new Path(findexDirPath))) {
+			LOG.info("ForwardIndex already exists: Skipping!");
+		} else {
+			new BuildAquaint2ForwardIndex ().runTool (conf, collection, findexDirPath, findexFilePath, mappingFile.toString ());
+		}
+	}
 
     return 0;
   }
