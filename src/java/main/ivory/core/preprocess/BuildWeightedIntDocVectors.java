@@ -1,11 +1,11 @@
 /*
  * Ivory: A Hadoop toolkit for Web-scale information retrieval
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You may
  * obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0 
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -56,9 +56,9 @@ import edu.umd.cloud9.util.map.MapIF;
 public class BuildWeightedIntDocVectors extends PowerTool {
 	private static final Logger sLogger = Logger.getLogger(BuildWeightedIntDocVectors.class);
 
-	//	static{
-	//		sLogger.setLevel(Level.WARN);
-	//	}
+	//      static{
+	//	      sLogger.setLevel(Level.WARN);
+	//      }
 	protected static enum Docs{
 		Total, ZERO, SHORT
 	}
@@ -70,7 +70,7 @@ public class BuildWeightedIntDocVectors extends PowerTool {
 		private static ScoringModel mScoreFn;
 		int MIN_SIZE = 0;
 
-		boolean shortDocLengths = false; 
+		boolean shortDocLengths = false;
 		private static DfTableArray mDFTable;
 		private boolean normalize = false;
 
@@ -79,24 +79,24 @@ public class BuildWeightedIntDocVectors extends PowerTool {
 			shortDocLengths = conf.getBoolean("Ivory.ShortDocLengths", false);
 			MIN_SIZE = conf.getInt("Ivory.MinNumTerms", 0);
 
-			Path[] localFiles;
+			Path dfByIntDataPath;
+			Path docLengthsDataPath;
 			try {
+				FileSystem fs = FileSystem.get (conf);
+					//sLogger.info ("fs: " + fs);
+				String indexPath = conf.get ("Ivory.IndexPath");
+					//sLogger.info ("indexPath: " + indexPath);
+				RetrievalEnvironment env = new RetrievalEnvironment (indexPath, fs);
 				// Detect if we're in standalone mode; if so, we can't us the
 				// DistributedCache because it does not (currently) work in
 				// standalone mode...
 				if (conf.get ("mapred.job.tracker").equals ("local")) {
-					FileSystem fs = FileSystem.get (conf);
-					//sLogger.info ("fs: " + fs);
-					String indexPath = conf.get ("Ivory.IndexPath");
-					//sLogger.info ("indexPath: " + indexPath);
-					RetrievalEnvironment env = new RetrievalEnvironment (indexPath, fs);
-					//					sLogger.info ("env: " + env);
-					localFiles = new Path [3];
-					localFiles [0] = new Path (env.getCfByIntData ());
-					localFiles [1] = new Path (env.getDfByIntData ());
-					localFiles [2] = env.getDoclengthsData ();
+					dfByIntDataPath = new Path(env.getDfByIntData());
+					docLengthsDataPath = env.getDoclengthsData();
 				} else {
-					localFiles = DistributedCache.getLocalCacheFiles (conf);
+					Path[] localFiles = DistributedCache.getLocalCacheFiles (conf);
+					dfByIntDataPath = (localFiles[0].toString().contains(env.getDfByIntData().toString ()) ? localFiles[0] : localFiles[1]);
+					docLengthsDataPath = (localFiles[0].toString().contains(env.getDoclengthsData().toString ()) ? localFiles[0] : localFiles[1]);
 				}
 			} catch (IOException e2) {
 				throw new RuntimeException ("Local cache files not read properly.");
@@ -106,27 +106,27 @@ public class BuildWeightedIntDocVectors extends PowerTool {
  				mDFTable = new DfTableArray(localFiles[1], FileSystem.getLocal(conf));
  			} catch(IOException e1) {
  				throw new RuntimeException("Error loading df table from "+localFiles[1]);
- 			}	
+ 			}
 
 			sLogger.info("Global Stats table loaded successfully.");
 
 			try {
 				if(shortDocLengths)
 					mDLTable = new DocLengthTable2B(localFiles[2], FileSystem.getLocal(conf));
-				else 
+				else
 					mDLTable = new DocLengthTable4B(localFiles[2], FileSystem.getLocal(conf));
 			} catch(IOException e1) {
 				throw new RuntimeException("Error loading dl table from "+localFiles[2]);
-			}	
+			}
 			try {
 				mScoreFn = (ScoringModel) Class.forName(conf.get("Ivory.ScoringModel")).newInstance();
-
+ 
 				// this only needs to be set once for the entire collection
 				mScoreFn.setDocCount(mDLTable.getDocCount());
 				mScoreFn.setAvgDocLength(mDLTable.getAvgDocLength());
 			} catch (Exception e) {
 				throw new RuntimeException("Error initializing Ivory.ScoringModel from "+conf.get("Ivory.ScoringModel"));
-			}	
+			}
 		}
 
 		HMapIFW vectorWeights = new HMapIFW();
@@ -145,7 +145,7 @@ public class BuildWeightedIntDocVectors extends PowerTool {
 			sLogger.debug("===================================BEGIN READ DOC");
 			sum2 = 0;
 			while(r.hasMoreTerms()){
-				term = r.nextTerm();
+ 				term = r.nextTerm();
  				mScoreFn.setDF(mDFTable.getDf(term));
  				wt = mScoreFn.computeDocumentWeight(r.getTf(), docLen);
  				vectorWeights.put(term, wt);
@@ -173,8 +173,8 @@ public class BuildWeightedIntDocVectors extends PowerTool {
 		}
 	}
 
-	public static final String[] RequiredParameters = { "Ivory.NumMapTasks",
-		"Ivory.IndexPath", 
+	public static final String[] RequiredParameters = {
+		"Ivory.IndexPath",
 		//"Ivory.OutputPath",
 		"Ivory.ScoringModel",
 		"Ivory.Normalize",
@@ -198,7 +198,6 @@ public class BuildWeightedIntDocVectors extends PowerTool {
 		String indexPath = conf.get("Ivory.IndexPath");
 		RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fs);
 		String outputPath = env.getWeightedIntDocVectorsDirectory();
-		int mapTasks = conf.getInt("Ivory.NumMapTasks", 0);
 		int minSplitSize = conf.getInt("Ivory.MinSplitSize", 0);
 		String collectionName = conf.get("Ivory.CollectionName");
 
@@ -240,7 +239,6 @@ public class BuildWeightedIntDocVectors extends PowerTool {
 		conf.setMapperClass(MyMapper.class);
 		//conf.setInt("mapred.task.timeout",3600000);
 		conf.setJobName("GetWeightedIntDocVectors:" + collectionName);
-		conf.setNumMapTasks(mapTasks);
 		conf.setNumReduceTasks(0);
 		conf.setInt("mapred.min.split.size", minSplitSize);
 		conf.set("mapred.child.java.opts", "-Xmx2048m");
