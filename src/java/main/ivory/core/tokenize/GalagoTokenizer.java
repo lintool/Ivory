@@ -30,7 +30,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-public class GalagoTokenizer implements Tokenizer {
+public class GalagoTokenizer extends Tokenizer {
   private static final String[] TERRIER_STOP_WORDS = {
     "a",
     "abaft",

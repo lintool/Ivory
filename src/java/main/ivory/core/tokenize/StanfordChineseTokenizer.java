@@ -11,7 +11,7 @@ import org.apache.log4j.Logger;
 import edu.stanford.nlp.ie.crf.CRFClassifier;
 import edu.stanford.nlp.sequences.DocumentReaderAndWriter;
 
-public class StanfordChineseTokenizer extends ivory.tokenize.Tokenizer {
+public class StanfordChineseTokenizer extends Tokenizer {
 	private static final Logger sLogger = Logger.getLogger(StanfordChineseTokenizer.class);
 	static{
 		sLogger.setLevel(Level.INFO);
