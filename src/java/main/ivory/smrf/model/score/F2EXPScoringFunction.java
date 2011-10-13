@@ -16,9 +16,9 @@
 
 package ivory.smrf.model.score;
 
+import ivory.core.util.XMLTools;
 import ivory.smrf.model.GlobalEvidence;
 import ivory.smrf.model.GlobalTermEvidence;
-import ivory.util.XMLTools;
 
 import org.w3c.dom.Node;
 
@@ -26,28 +26,27 @@ import org.w3c.dom.Node;
  * Computes score based on F2EXP.
  *
  * @author Don Metzler
- *
  */
 public class F2EXPScoringFunction extends ScoringFunction {
-	private float s;
-	private float k;
-	private float avgDocLen;
-	private float idf;
+  private float s;
+  private float k;
+  private float avgDocLen;
+  private float idf;
 
-	@Override
-	public void configure(Node domNode) {
-		s = XMLTools.getAttributeValue(domNode, "s", 0.5f);
-		k = XMLTools.getAttributeValue(domNode, "k", 1.0f);
-	}
+  @Override
+  public void configure(Node domNode) {
+    s = XMLTools.getAttributeValue(domNode, "s", 0.5f);
+    k = XMLTools.getAttributeValue(domNode, "k", 1.0f);
+  }
 
-	@Override
-	public float getScore(int tf, int docLen) {
-		return (tf / (tf + s + s * avgDocLen)) * idf;
-	}
+  @Override
+  public float getScore(int tf, int docLen) {
+    return (tf / (tf + s + s * avgDocLen)) * idf;
+  }
 
-	@Override
-	public void initialize(GlobalTermEvidence termEvidence, GlobalEvidence globalEvidence) {
-		avgDocLen = (float) globalEvidence.collectionLength / (float) globalEvidence.numDocs;
-		idf = (float) Math.pow((globalEvidence.numDocs + 1.0f) / (float) termEvidence.getDf(), k);
-	}
+  @Override
+  public void initialize(GlobalTermEvidence termEvidence, GlobalEvidence globalEvidence) {
+    avgDocLen = (float) globalEvidence.collectionLength / (float) globalEvidence.numDocs;
+    idf = (float) Math.pow((globalEvidence.numDocs + 1.0f) / (float) termEvidence.getDf(), k);
+  }
 }

@@ -1,6 +1,6 @@
 <parameters>
 
-     <index>/fs/clip-clueweb/indexes/gov2</index>
+     <index>/scratch0/indexes/gov2</index>
 
      <!-- Dirichlet, full independence -->
      <model id="gov2-dir-base" type="Feature" output="ranking.gov2-dir-base.txt" hits="1000">

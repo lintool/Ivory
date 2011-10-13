@@ -1,8 +1,10 @@
 package ivory.lsh.data;
 
+import ivory.lsh.data.Permutation;
+
 import java.util.ArrayList;
 import java.util.Collections;
-import ivory.lsh.data.Permutation;
+
 
 import edu.umd.cloud9.io.array.ArrayListOfIntsWritable;
 import edu.umd.cloud9.util.array.ArrayListOfInts;

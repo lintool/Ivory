@@ -16,7 +16,7 @@
 
 package ivory.smrf.model.builder;
 
-import ivory.exception.ConfigurationException;
+import ivory.core.exception.ConfigurationException;
 
 import org.w3c.dom.Node;
 
@@ -27,23 +27,25 @@ import com.google.common.base.Preconditions;
  */
 public abstract class ExpressionGenerator {
 
-	public abstract void configure(Node domNode) throws ConfigurationException;
+  public abstract void configure(Node domNode) throws ConfigurationException;
 
-	public abstract Expression getExpression(String[] terms);
+  public abstract Expression getExpression(String[] terms);
 
-	@SuppressWarnings("unchecked")
-	public static ExpressionGenerator create(String type, Node domNode) throws ConfigurationException {
-		Preconditions.checkNotNull(type);
-		Preconditions.checkNotNull(domNode);
+  @SuppressWarnings("unchecked")
+  public static ExpressionGenerator create(String type, Node domNode) throws ConfigurationException {
+    Preconditions.checkNotNull(type);
+    Preconditions.checkNotNull(domNode);
 
-		try {
-			Class<? extends ExpressionGenerator> clz = (Class<? extends ExpressionGenerator>) Class.forName(type);
-			ExpressionGenerator f = clz.newInstance();
-			f.configure(domNode);
+    try {
+      Class<? extends ExpressionGenerator> clz =
+        (Class<? extends ExpressionGenerator>) Class.forName(type);
+      ExpressionGenerator f = clz.newInstance();
+      f.configure(domNode);
 
-			return f;
-		} catch (Exception e) {
-			throw new ConfigurationException("Unable to instantiate ExpressionGenerator \"" + type + "\"!", e);
-		}
-	}
+      return f;
+    } catch (Exception e) {
+      throw new ConfigurationException(
+          "Unable to instantiate ExpressionGenerator \"" + type + "\"!", e);
+    }
+  }
 }

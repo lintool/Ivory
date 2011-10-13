@@ -1,4 +1,5 @@
 package ivory.lsh.pwsim;
+
 import ivory.lsh.data.BitsSignatureTable;
 import ivory.lsh.data.PairOfIntSignature;
 import ivory.lsh.data.Permutation;
@@ -33,6 +34,7 @@ import org.apache.hadoop.mapred.SequenceFileInputFormat;
 import org.apache.hadoop.mapred.SequenceFileOutputFormat;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+
 
 import edu.umd.cloud9.io.SequenceFileUtils;
 import edu.umd.cloud9.io.array.ArrayListOfIntsWritable;

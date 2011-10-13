@@ -16,10 +16,10 @@
 
 package ivory.smrf.model.builder;
 
-import ivory.exception.ConfigurationException;
+import ivory.core.RetrievalEnvironment;
+import ivory.core.exception.ConfigurationException;
+import ivory.core.util.XMLTools;
 import ivory.smrf.model.Clique;
-import ivory.util.RetrievalEnvironment;
-import ivory.util.XMLTools;
 
 import org.w3c.dom.Node;
 
@@ -29,30 +29,34 @@ import com.google.common.base.Preconditions;
  * @author Don Metzler
  */
 public class OrderedCliqueSet extends CliqueSet {
-	@Override
-	public void configure(RetrievalEnvironment env, String[] queryTerms, Node domNode) throws ConfigurationException {
-		Preconditions.checkNotNull(env);
-		Preconditions.checkNotNull(queryTerms);
-		Preconditions.checkNotNull(domNode);
+  @Override
+  public void configure(RetrievalEnvironment env, String[] queryTerms, Node domNode)
+      throws ConfigurationException {
+    Preconditions.checkNotNull(env);
+    Preconditions.checkNotNull(queryTerms);
+    Preconditions.checkNotNull(domNode);
 
-		String dependenceType = XMLTools.getAttributeValue(domNode, "dependence", "sequential");
-		boolean docDependent = XMLTools.getAttributeValue(domNode, "docDependent", true);
+    String dependenceType = XMLTools.getAttributeValue(domNode, "dependence", "sequential");
+    boolean docDependent = XMLTools.getAttributeValue(domNode, "docDependent", true);
 
-		// Initialize clique set.
-		clearCliques();
+    // Initialize clique set.
+    clearCliques();
 
-		// generate clique set
+    // generate clique set
     if ("sequential".equals(dependenceType)) {
-			addCliques(CliqueFactory.getSequentialDependenceCliques(env, queryTerms, domNode, docDependent));
-		} else if ("full".equals(dependenceType)) {
-			addCliques(CliqueFactory.getFullDependenceCliques(env, queryTerms, domNode, true, docDependent));
-		} else {
-			throw new ConfigurationException("Unrecognized OrderedCliqueSet type \"" + dependenceType + "\"!");
-		}
-	}
+      addCliques(CliqueFactory.getSequentialDependenceCliques(env, queryTerms, domNode,
+          docDependent));
+    } else if ("full".equals(dependenceType)) {
+      addCliques(CliqueFactory.getFullDependenceCliques(env, queryTerms, domNode, true,
+          docDependent));
+    } else {
+      throw new ConfigurationException(
+          "Unrecognized OrderedCliqueSet type \"" + dependenceType + "\"!");
+    }
+  }
 
-	@Override
-	public Clique.Type getType() {
-		return Clique.Type.Ordered;
-	}
+  @Override
+  public Clique.Type getType() {
+    return Clique.Type.Ordered;
+  }
 }

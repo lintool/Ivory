@@ -1,15 +1,16 @@
 package ivory.regression;
 
 import static org.junit.Assert.assertEquals;
-import ivory.eval.Qrels;
-import ivory.eval.GradedQrels;
-import ivory.eval.RankedListEvaluator;
+import ivory.core.eval.GradedQrels;
+import ivory.core.eval.Qrels;
+import ivory.core.eval.RankedListEvaluator;
 import ivory.smrf.retrieval.Accumulator;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+
 
 import edu.umd.cloud9.collection.DocnoMapping;
 

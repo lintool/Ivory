@@ -1,9 +1,12 @@
 package ivory.lsh.driver;
 
-import ivory.util.RetrievalEnvironment;
+
+import ivory.core.RetrievalEnvironment;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
+
 
 /**
  * Runner class for pairwise similarity algorithms.

@@ -17,7 +17,8 @@
 package ivory.ltr;
 
 
-import ivory.exception.ConfigurationException;
+
+import ivory.core.exception.ConfigurationException;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -38,6 +39,7 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+
 
 /**
  * @author Don Metzler

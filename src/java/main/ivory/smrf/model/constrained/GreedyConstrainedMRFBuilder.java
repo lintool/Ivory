@@ -16,13 +16,13 @@
 
 package ivory.smrf.model.constrained;
 
-import ivory.exception.ConfigurationException;
-import ivory.exception.RetrievalException;
+import ivory.core.RetrievalEnvironment;
+import ivory.core.exception.ConfigurationException;
+import ivory.core.exception.RetrievalException;
+import ivory.core.util.XMLTools;
 import ivory.smrf.model.Clique;
 import ivory.smrf.model.MarkovRandomField;
 import ivory.smrf.model.importance.LinearImportanceModel;
-import ivory.util.RetrievalEnvironment;
-import ivory.util.XMLTools;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -35,147 +35,151 @@ import org.w3c.dom.Node;
 import edu.umd.cloud9.util.map.HMapKF;
 
 /**
- * @author metzler
- *
+ * @author Lidan Wang
  */
 public class GreedyConstrainedMRFBuilder extends ConstrainedMRFBuilder {
 
-	// document frequencies, from which costs will be computed
-	private HMapKF<String> mDfs;
+  // document frequencies, from which costs will be computed
+  private HMapKF<String> dfs;
 
-	// model style (either Indep or Joint)
-	private String mModelStyle;
+  // model style (either Indep or Joint)
+  private String modelType;
 
-	// bin multiple
-	private float mQlMultiple;
+  // bin multiple
+  private float qlMultiple;
 
-	// basic thresholds
-	private float mUnigramAddThreshold;
-	private float mBigramAddThreshold;
+  // basic thresholds
+  private float unigramAddThreshold;
+  private float bigramAddThreshold;
 
-	// redundancy thresholds
-	private float mUnigramRedundThreshold;
-	private float mBigramRedundThreshold;
+  // redundancy thresholds
+  private float unigramRedundThreshold;
+  private float bigramRedundThreshold;
 
-	// beta value
-	private float mBeta;
+  // beta value
+  private float beta;
 
-	public GreedyConstrainedMRFBuilder(RetrievalEnvironment env, Node model) throws ConfigurationException, IOException {
-		super(env, model);
+  public GreedyConstrainedMRFBuilder(RetrievalEnvironment env, Node model)
+      throws ConfigurationException, IOException {
+    super(env, model);
 
-		// model type
-		mModelStyle = XMLTools.getAttributeValue(model, "style", null);
-		if(mModelStyle == null || (!"Indep".equals(mModelStyle) && !"Joint".equals(mModelStyle))) {
-			throw new RetrievalException("Error: GreedyConstrainedMRFBuilder requires a model type attribute of Indep or Joint!");
-		}
+    // model type
+    modelType = XMLTools.getAttributeValue(model, "style", null);
+    if (modelType == null || (!"Indep".equals(modelType) && !"Joint".equals(modelType))) {
+      throw new RetrievalException(
+          "Error: GreedyConstrainedMRFBuilder requires a model type attribute of Indep or Joint!");
+    }
 
-		// query likelihood
-		mQlMultiple = XMLTools.getAttributeValue(model, "qlMultiple", -1.0f);
+    // query likelihood
+    qlMultiple = XMLTools.getAttributeValue(model, "qlMultiple", -1.0f);
 
-		// unigram and bigram basic thresholds
-		mUnigramAddThreshold = XMLTools.getAttributeValue(model, "unigramAddThreshold", -1.0f);
-		mBigramAddThreshold = XMLTools.getAttributeValue(model, "bigramAddThreshold", -1.0f);
+    // unigram and bigram basic thresholds
+    unigramAddThreshold = XMLTools.getAttributeValue(model, "unigramAddThreshold", -1.0f);
+    bigramAddThreshold = XMLTools.getAttributeValue(model, "bigramAddThreshold", -1.0f);
 
-		// unigram and bigram redundancy thresholds
-		mUnigramRedundThreshold = XMLTools.getAttributeValue(model, "unigramRedundThreshold", -1.0f);
-		mBigramRedundThreshold = XMLTools.getAttributeValue(model, "bigramRedundThreshold", -1.0f);
+    // unigram and bigram redundancy thresholds
+    unigramRedundThreshold = XMLTools.getAttributeValue(model, "unigramRedundThreshold", -1.0f);
+    bigramRedundThreshold = XMLTools.getAttributeValue(model, "bigramRedundThreshold", -1.0f);
 
-		// beta value
-		mBeta = XMLTools.getAttributeValue(model, "beta", -1.0f);
+    // beta value
+    beta = XMLTools.getAttributeValue(model, "beta", -1.0f);
 
-		if ("Indep".equals(mModelStyle) && (mQlMultiple == -1 || mUnigramAddThreshold == -1)) {
-			throw new RetrievalException ("Error: Indep model must specify valid qlMultiple, unigramAddThreshold, and bigramAddThreshold attributes!");			
-		}
+    if ("Indep".equals(modelType) && (qlMultiple == -1 || unigramAddThreshold == -1)) {
+      throw new RetrievalException(
+          "Error: Indep model must specify valid qlMultiple, unigramAddThreshold, and bigramAddThreshold attributes!");
+    }
 
-		if("Joint".equals(mModelStyle) && (mQlMultiple == -1 || mUnigramAddThreshold == -1 || mBigramAddThreshold == -1 || mUnigramRedundThreshold == -1 || mBigramRedundThreshold == -1 || mBeta == -1)) {
-			throw new RetrievalException ("Error: Joint model must specify valid qlMultiple, unigramAddThreshold, bigramAddThreshold, unigramRedundThreshold, bigramRedundThreshold, and beta attributes!");			
-		}
+    if ("Joint".equals(modelType) &&
+         (qlMultiple == -1 || unigramAddThreshold == -1 || bigramAddThreshold == -1
+            || unigramRedundThreshold == -1 || bigramRedundThreshold == -1 || beta == -1)) {
+      throw new RetrievalException(
+          "Error: Joint model must specify valid qlMultiple, unigramAddThreshold, bigramAddThreshold, unigramRedundThreshold, bigramRedundThreshold, and beta attributes!");
+    }
 
-		String file = XMLTools.getAttributeValue(model, "file", null);
-		if(file == null) {
-			throw new RetrievalException("Error: GreedyConstrainedMRFBuilder requires a file attribute specifying the location of the document frequencies!");
-		}
+    String file = XMLTools.getAttributeValue(model, "file", null);
+    if (file == null) {
+      throw new RetrievalException(
+          "Error: GreedyConstrainedMRFBuilder requires a file attribute specifying the location of the document frequencies!");
+    }
 
-		// read document frequencies
-		mDfs = LinearImportanceModel.readDataStats(file);
-	}
+    // Read document frequencies.
+    dfs = LinearImportanceModel.readDataStats(file);
+  }
 
-	/* (non-Javadoc)
-	 * @see ivory.smrf.model.builder.ConstrainedMRFBuilder#buildConstrainedMRF(ivory.smrf.model.MarkovRandomField)
-	 */
-	@Override
-	protected MarkovRandomField buildConstrainedMRF(String [] queryTerms, MarkovRandomField mrf) {
-		List<Clique> cliques = mrf.getCliques();
+  @Override
+  protected MarkovRandomField buildConstrainedMRF(String[] queryTerms, MarkovRandomField mrf) {
+    List<Clique> cliques = mrf.getCliques();
 
-		float qlCost = 0.0f;
-		Set<String> seenTerms = new HashSet<String>();
+    float qlCost = 0.0f;
+    Set<String> seenTerms = new HashSet<String>();
 
-		int numQueryTerms = queryTerms.length;
+    int numQueryTerms = queryTerms.length;
 
-		// generate constrained cliques
-		List<ConstrainedClique> constrainedCliques = new ArrayList<ConstrainedClique>();
-		for(Clique c : cliques) {
-			// type of clique
-			Clique.Type cliqueType = c.getType();
+    // generate constrained cliques
+    List<ConstrainedClique> constrainedCliques = new ArrayList<ConstrainedClique>();
+    for (Clique c : cliques) {
+      // type of clique
+      Clique.Type cliqueType = c.getType();
 
-			// terms associated with clique
-			String cliqueTerms = c.getConcept();
+      // terms associated with clique
+      String cliqueTerms = c.getConcept();
 
-			ConstrainedClique newClique = new ConstrainedClique(c);
-			
-			// get+set analytical cost
-			float analyticalCost = getCost(cliqueTerms);
-			newClique.setAnalyticalCost(analyticalCost);
+      ConstrainedClique newClique = new ConstrainedClique(c);
 
-			// get+set profit density
-			float profitDensity = c.getWeight() / analyticalCost;
-			newClique.setProfitDensity (profitDensity);
+      // get+set analytical cost
+      float analyticalCost = getCost(cliqueTerms);
+      newClique.setAnalyticalCost(analyticalCost);
 
-			if (cliqueType.equals(Clique.Type.Term)){
-				if(!(seenTerms.contains(cliqueTerms))){
-					qlCost += analyticalCost;
-					seenTerms.add(cliqueTerms);
-				}
-			}
+      // get+set profit density
+      float profitDensity = c.getWeight() / analyticalCost;
+      newClique.setProfitDensity(profitDensity);
 
-			constrainedCliques.add(newClique);
-		}
+      if (cliqueType.equals(Clique.Type.Term)) {
+        if (!(seenTerms.contains(cliqueTerms))) {
+          qlCost += analyticalCost;
+          seenTerms.add(cliqueTerms);
+        }
+      }
 
-		float binConstraint = mQlMultiple * qlCost;
+      constrainedCliques.add(newClique);
+    }
 
-		List<ConstrainedClique> selectedCliques = null;
-		if ("Indep".equals(mModelStyle) || numQueryTerms == 1){
-			selectedCliques = ConstraintModel.greedyKnapsack(constrainedCliques, binConstraint, mUnigramAddThreshold, mBigramAddThreshold);
-		}
-		else if ("Joint".equals(mModelStyle)){
-			selectedCliques = ConstraintModel.greedyJoint(constrainedCliques, binConstraint, mUnigramAddThreshold, mBigramAddThreshold, mUnigramRedundThreshold, mBigramRedundThreshold, mBeta);
-		}
+    float binConstraint = qlMultiple * qlCost;
 
-		// construct constrained mrf
-		MarkovRandomField constrainedMRF = new MarkovRandomField(queryTerms, env);
-		for(Clique c : selectedCliques) {
-			constrainedMRF.addClique(c);
-		}
+    List<ConstrainedClique> selectedCliques = null;
+    if ("Indep".equals(modelType) || numQueryTerms == 1) {
+      selectedCliques = ConstraintModel.greedyKnapsack(constrainedCliques, binConstraint,
+          unigramAddThreshold, bigramAddThreshold);
+    } else if ("Joint".equals(modelType)) {
+      selectedCliques = ConstraintModel.greedyJoint(constrainedCliques, binConstraint,
+          unigramAddThreshold, bigramAddThreshold, unigramRedundThreshold,
+          bigramRedundThreshold, beta);
+    }
 
-		return constrainedMRF;
-	}
+    // construct constrained mrf
+    MarkovRandomField constrainedMRF = new MarkovRandomField(queryTerms, env);
+    for (Clique c : selectedCliques) {
+      constrainedMRF.addClique(c);
+    }
 
-	private float getCost(String cliqueTerms) {
-		float r = 0; 
+    return constrainedMRF;
+  }
 
-		String [] terms = cliqueTerms.trim().split("\\s+");
+  private float getCost(String cliqueTerms) {
+    float r = 0;
 
-		for (int k=0; k<terms.length; k++){
+    String[] terms = cliqueTerms.trim().split("\\s+");
 
-			if(mDfs.containsKey(terms[k])) {
-				r += Math.log(mDfs.get(terms[k])+1.01); //Lidan: add 0.01 in case df = 1, log(1) = 0.
-			}
-			else {
-				r += Math.log(1.01);
-			}
+    for (int k = 0; k < terms.length; k++) {
 
-		}
+      if (dfs.containsKey(terms[k])) {
+        r += Math.log(dfs.get(terms[k]) + 1.01);
+        // Lidan: add 0.01 in case df = 1, log(1) = 0.
+      } else {
+        r += Math.log(1.01);
+      }
+    }
 
-		return r;
-	}       
+    return r;
+  }
 }

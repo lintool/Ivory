@@ -1,11 +1,11 @@
 /*
- * Ivory: A Hadoop toolkit for Web-scale information retrieval
- * 
+ * Ivory: A Hadoop toolkit for web-scale information retrieval
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You may
  * obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0 
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,9 +19,13 @@ package ivory.smrf.retrieval;
 import java.util.Map;
 
 public interface QueryRunner {
-	public Accumulator[] runQuery(String[] query);
-	public void runQuery(String qid, String[] query);
-	public Accumulator[] getResults(String qid);
-	public Map<String, Accumulator[]> getResults();
-	public void clearResults();
+  Accumulator[] runQuery(String[] query);
+
+  void runQuery(String qid, String[] query);
+
+  Accumulator[] getResults(String qid);
+
+  Map<String, Accumulator[]> getResults();
+
+  void clearResults();
 }

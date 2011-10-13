@@ -19,12 +19,12 @@ package ivory.smrf.model.builder;
 import java.io.IOException;
 
 import ivory.cascade.model.builder.CascadeFeatureBasedMRFBuilder;
-import ivory.exception.ConfigurationException;
-import ivory.exception.RetrievalException;
+import ivory.core.RetrievalEnvironment;
+import ivory.core.exception.ConfigurationException;
+import ivory.core.exception.RetrievalException;
+import ivory.core.util.XMLTools;
 import ivory.smrf.model.MarkovRandomField;
 import ivory.smrf.model.constrained.GreedyConstrainedMRFBuilder;
-import ivory.util.RetrievalEnvironment;
-import ivory.util.XMLTools;
 
 import org.w3c.dom.Node;
 
@@ -34,39 +34,39 @@ import com.google.common.base.Preconditions;
  * @author Don Metzler
  */
 public abstract class MRFBuilder {
-	protected final RetrievalEnvironment env;
+  protected final RetrievalEnvironment env;
 
-	public MRFBuilder(RetrievalEnvironment env) {
-		this.env = Preconditions.checkNotNull(env);
-	}
+  public MRFBuilder(RetrievalEnvironment env) {
+    this.env = Preconditions.checkNotNull(env);
+  }
 
-	public abstract MarkovRandomField buildMRF(String[] queryTerms) throws ConfigurationException;
+  public abstract MarkovRandomField buildMRF(String[] queryTerms) throws ConfigurationException;
 
-	public static MRFBuilder get(RetrievalEnvironment env, Node model) throws ConfigurationException {
-		Preconditions.checkNotNull(env);
-		Preconditions.checkNotNull(model);
+  public static MRFBuilder get(RetrievalEnvironment env, Node model) throws ConfigurationException {
+    Preconditions.checkNotNull(env);
+    Preconditions.checkNotNull(model);
 
-		// Get model type.
-		String modelType = XMLTools.getAttributeValueOrThrowException(model, "type",
-		    "Model type must be specified!");
+    // Get model type.
+    String modelType = XMLTools.getAttributeValueOrThrowException(model, "type",
+        "Model type must be specified!");
 
-		// Build the builder.
-		MRFBuilder builder = null;
+    // Build the builder.
+    MRFBuilder builder = null;
 
-		try {
+    try {
       if ("Feature".equals(modelType)) {
         builder = new FeatureBasedMRFBuilder(env, model);
       } else if ("GreedyConstrained".equals(modelType)) {
         builder = new GreedyConstrainedMRFBuilder(env, model);
-      } else if (modelType.equals("New")){
+      } else if (modelType.equals("New")) {
         builder = new CascadeFeatureBasedMRFBuilder(env, model);
       } else {
         throw new ConfigurationException("Unrecognized model type: " + modelType);
       }
-		} catch (IOException e) {
-			throw new RetrievalException("Error getting MRFBuilder: " + e);
-		}
+    } catch (IOException e) {
+      throw new RetrievalException("Error getting MRFBuilder: " + e);
+    }
 
-		return builder;
-	}
+    return builder;
+  }
 }

@@ -16,6 +16,9 @@
 
 package ivory.ptc.driver;
 
+import ivory.ptc.data.PseudoJudgments;
+import ivory.ptc.data.PseudoQuery;
+
 import java.io.IOException;
 import java.util.Iterator;
 
@@ -40,8 +43,7 @@ import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
-import ivory.ptc.data.PseudoJudgments;
-import ivory.ptc.data.PseudoQuery;
+
 
 /**
  * Driver that formats the pseudo queries and outputs an XML file

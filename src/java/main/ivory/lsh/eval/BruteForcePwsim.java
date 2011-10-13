@@ -1,8 +1,9 @@
 package ivory.lsh.eval;
 
-import ivory.data.WeightedIntDocVector;
+
+import ivory.core.data.document.WeightedIntDocVector;
+import ivory.core.util.CLIRUtils;
 import ivory.lsh.data.Signature;
-import ivory.util.CLIRUtils;
 
 import java.io.IOException;
 import java.net.URI;
@@ -35,6 +36,7 @@ import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+
 
 import edu.umd.cloud9.io.SequenceFileUtils;
 import edu.umd.cloud9.io.pair.PairOfFloatInt;

@@ -1,10 +1,11 @@
 package ivory.lsh.driver;
+
+import ivory.core.RetrievalEnvironment;
 import ivory.lsh.eval.BruteForcePwsim;
 import ivory.lsh.eval.FilterResults;
 import ivory.lsh.eval.SampleDocVectors;
 import ivory.lsh.pwsim.GenerateChunkedPermutedTables;
 import ivory.lsh.pwsim.cl.CLSlidingWindowPwsim;
-import ivory.util.RetrievalEnvironment;
 
 import java.util.SortedMap;
 import java.util.Map.Entry;
@@ -19,6 +20,7 @@ import org.apache.hadoop.io.WritableComparable;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Logger;
+
 
 import edu.umd.cloud9.io.SequenceFileUtils;
 

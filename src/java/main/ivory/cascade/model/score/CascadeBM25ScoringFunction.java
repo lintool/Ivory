@@ -16,12 +16,13 @@
 
 package ivory.cascade.model.score;
 
+import ivory.core.RetrievalEnvironment;
 import ivory.smrf.model.GlobalEvidence;
 import ivory.smrf.model.GlobalTermEvidence;
 import ivory.smrf.model.score.BM25ScoringFunction;
-import ivory.util.RetrievalEnvironment;
 
 import org.w3c.dom.Node;
+
 
 /**
  * @author Lidan Wang

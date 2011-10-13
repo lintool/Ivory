@@ -16,9 +16,9 @@
 
 package ivory.smrf.model.score;
 
+import ivory.core.util.XMLTools;
 import ivory.smrf.model.GlobalEvidence;
 import ivory.smrf.model.GlobalTermEvidence;
-import ivory.util.XMLTools;
 
 import org.w3c.dom.Node;
 
@@ -26,43 +26,42 @@ import org.w3c.dom.Node;
  * Computes score based on language modeling using Dirichlet smoothing.
  *
  * @author Don Metzler
- *
  */
 public class DirichletScoringFunction extends ScoringFunction {
-	protected float mu = 2500.0f;     // Smoothing parameter.
-	protected float backgroundProb; 	// Background probability.
-	protected boolean isOOV = false;  // Is this term OOV?
+  protected float mu = 2500.0f;    // Smoothing parameter.
+  protected float backgroundProb;  // Background probability.
+  protected boolean isOOV = false; // Is this term OOV?
 
-	@Override
-	public void configure(Node domNode) {
-		mu = XMLTools.getAttributeValue(domNode, "mu", 2500.0f);
-	}
+  @Override
+  public void configure(Node domNode) {
+    mu = XMLTools.getAttributeValue(domNode, "mu", 2500.0f);
+  }
 
-	@Override
-	public float getScore(int tf, int docLen) {
-		return isOOV ? 0.0f : (float) Math.log(((float) tf + mu * backgroundProb) / (docLen + mu));
-	}
+  @Override
+  public float getScore(int tf, int docLen) {
+    return isOOV ? 0.0f : (float) Math.log(((float) tf + mu * backgroundProb) / (docLen + mu));
+  }
 
-	@Override
-	public String toString() {
-		return "<scoringfunction type=\"Dirichlet\" mu=\"" + mu + "\" />\n";
-	}
+  @Override
+  public String toString() {
+    return "<scoringfunction type=\"Dirichlet\" mu=\"" + mu + "\" />\n";
+  }
 
-	@Override
-	public void initialize(GlobalTermEvidence termEvidence, GlobalEvidence globalEvidence) {
-	  super.initialize(termEvidence, globalEvidence);
-		isOOV = termEvidence.getCf() == 0 ? true : false;
-		backgroundProb = (float) termEvidence.getCf() / (float) globalEvidence.collectionLength;
-	}
+  @Override
+  public void initialize(GlobalTermEvidence termEvidence, GlobalEvidence globalEvidence) {
+    super.initialize(termEvidence, globalEvidence);
+    isOOV = termEvidence.getCf() == 0 ? true : false;
+    backgroundProb = (float) termEvidence.getCf() / (float) globalEvidence.collectionLength;
+  }
 
-	@Override 
-	public float getMinScore() {
-		return Float.NEGATIVE_INFINITY;
-	}
-	
-	@Override
-	public float getMaxScore() {
-		// TODO: make a tighter upper bound for this score
-		return 0.0f;
-	}
+  @Override
+  public float getMinScore() {
+    return Float.NEGATIVE_INFINITY;
+  }
+
+  @Override
+  public float getMaxScore() {
+    // TODO: make a tighter upper bound for this score
+    return 0.0f;
+  }
 }

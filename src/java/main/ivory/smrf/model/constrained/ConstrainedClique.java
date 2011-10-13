@@ -1,5 +1,5 @@
 /*
- * Ivory: A Hadoop toolkit for Web-scale information retrieval
+ * Ivory: A Hadoop toolkit for web-scale information retrieval
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You may
@@ -19,34 +19,27 @@ package ivory.smrf.model.constrained;
 import ivory.smrf.model.Clique;
 
 public class ConstrainedClique extends Clique {
-	
-	/**
-	 * analytical cost
-	 */
-	private float mAnalyticalCost;
+  private float analyticalCost;   // Analytical cost.
+  private float profitDensity;    // Profit density.
 
-	/**
-	 * profit density
-	 */
-	private float mProfitDensity;
+  public ConstrainedClique(Clique c) {
+    super(c.getNodes(), c.getPotentialFunction(), c.getParameter(), c.getImportance(), c.getType(),
+        c.isDocDependent());
+  }
 
-	public ConstrainedClique(Clique c) {
-		super(c.getNodes(), c.getPotentialFunction(), c.getParameter(), c.getImportance(), c.getType(), c.isDocDependent());
-	}
+  public void setAnalyticalCost(float cost) {
+    this.analyticalCost = cost;
+  }
 
-	public void setAnalyticalCost(float cost) {
-		mAnalyticalCost = cost;
-	}
+  public float getAnalyticalCost() {
+    return analyticalCost;
+  }
 
-	public float getAnalyticalCost() {
-		return mAnalyticalCost;
-	}
+  public void setProfitDensity(float theProfitDensity) {
+    this.profitDensity = theProfitDensity;
+  }
 
-	public void setProfitDensity(float theProfitDensity) {
-		mProfitDensity = theProfitDensity;
-	}
-
-	public float getProfitDensity() {
-		return mProfitDensity;
-	}	
+  public float getProfitDensity() {
+    return profitDensity;
+  }
 }

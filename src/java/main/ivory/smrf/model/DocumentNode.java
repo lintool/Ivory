@@ -20,32 +20,31 @@ package ivory.smrf.model;
  * A document node in a MRF.
  *
  * @author Don Metzler
- *
  */
 public class DocumentNode extends GraphNode {
-	private int docno = 0;
+  private int docno = 0;
 
-	/**
-	 * Returns the docno associated with this node.
-	 */
-	public int getDocno() {
-		return docno;
-	}
+  /**
+   * Returns the docno associated with this node.
+   */
+  public int getDocno() {
+    return docno;
+  }
 
-	/**
-	 * Sets the docno associated with this node.
-	 */
-	public void setDocno(int docno) {
-		this.docno = docno;
-	}
+  /**
+   * Sets the docno associated with this node.
+   */
+  public void setDocno(int docno) {
+    this.docno = docno;
+  }
 
-	@Override
-	public Type getType() {
-		return Type.DOCUMENT;
-	}
+  @Override
+  public Type getType() {
+    return Type.DOCUMENT;
+  }
 
-	@Override
-	public String toString() {
-	  return String.format("<node type=\"Document\" docno=\"%d\" />\n", docno);
-	}
+  @Override
+  public String toString() {
+    return String.format("<node type=\"Document\" docno=\"%d\" />\n", docno);
+  }
 }

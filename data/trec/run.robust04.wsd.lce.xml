@@ -1,6 +1,6 @@
 <parameters>
 
-     <index>/fs/clip-hadoop/indexes/trec</index>
+     <index>/scratch0/indexes/trec</index>
 
      <importancemodel id="wsd" type="ivory.smrf.model.importance.LinearImportanceModel">
          <feature id="collection_freq" weight="0.0688" file="data/trec/stats.robust04.cf.collection.txt.norm" default="0.0" />

@@ -1,9 +1,11 @@
 package ivory.lsh.data;
 
 import static org.junit.Assert.*;
-import java.util.Random;
-import edu.umd.cloud9.io.array.ArrayListOfIntsWritable;
 import ivory.lsh.data.Permutation;
+
+import java.util.Random;
+
+import edu.umd.cloud9.io.array.ArrayListOfIntsWritable;
 
 public class PermutationByBit extends Permutation {
 

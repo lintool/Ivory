@@ -16,11 +16,12 @@
 
 package ivory.ptc.judgments.weighting;
 
+import ivory.core.data.stat.SpamPercentileScore;
 import edu.umd.cloud9.webgraph.data.AnchorText;
 
 import org.apache.hadoop.fs.FileSystem;
 
-import ivory.data.SpamPercentileScore;
+
 
 /**
  * Weighting scheme originally introduced in

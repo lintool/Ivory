@@ -16,12 +16,12 @@
 
 package ivory.smrf.model.potential;
 
-import ivory.exception.ConfigurationException;
+import ivory.core.RetrievalEnvironment;
+import ivory.core.exception.ConfigurationException;
+import ivory.core.util.XMLTools;
 import ivory.smrf.model.DocumentNode;
 import ivory.smrf.model.GlobalEvidence;
 import ivory.smrf.model.GraphNode;
-import ivory.util.RetrievalEnvironment;
-import ivory.util.XMLTools;
 
 import java.util.List;
 
@@ -33,74 +33,77 @@ import com.google.common.base.Preconditions;
  * Document potential.
  *
  * @author Don Metzler
- *
  */
 public class DocumentPotential extends PotentialFunction {
-	private RetrievalEnvironment env;
-	private DocumentNode docNode;
-	private String type;
+  private RetrievalEnvironment env;
+  private DocumentNode docNode;
+  private String type;
 
-	@Override
-	public void configure(RetrievalEnvironment env, Node domNode) throws ConfigurationException {
-		this.env = Preconditions.checkNotNull(env);
-		Preconditions.checkNotNull(domNode);
+  @Override
+  public void configure(RetrievalEnvironment env, Node domNode) throws ConfigurationException {
+    this.env = Preconditions.checkNotNull(env);
+    Preconditions.checkNotNull(domNode);
 
-		String type = XMLTools.getAttributeValueOrThrowException(domNode, "type",
-		    "A DocumentPotential requires a type attribute!");
+    String type = XMLTools.getAttributeValueOrThrowException(domNode, "type",
+        "A DocumentPotential requires a type attribute!");
 
-		this.type = type;
-	}
+    this.type = type;
+  }
 
-	@Override
-	public void initialize(List<GraphNode> nodes, GlobalEvidence globalEvidence) throws ConfigurationException {
-		Preconditions.checkNotNull(nodes);
-		Preconditions.checkNotNull(globalEvidence);
-		
-		docNode = null;
+  @Override
+  public void initialize(List<GraphNode> nodes, GlobalEvidence globalEvidence)
+      throws ConfigurationException {
+    Preconditions.checkNotNull(nodes);
+    Preconditions.checkNotNull(globalEvidence);
 
-		for (GraphNode node : nodes) {
-			if (node.getType().equals(GraphNode.Type.DOCUMENT) && docNode != null) {
-				throw new ConfigurationException("Only one document node allowed in DocumentPotential!");
-			} else if (node.getType().equals(GraphNode.Type.DOCUMENT)) {
-				docNode = (DocumentNode) node;
-			} else if (node.getType().equals(GraphNode.Type.TERM)) {
-				throw new ConfigurationException("TermNodes are not allowed in DocumentPotential!");
-			}
-		}
-	}
+    docNode = null;
 
-	@Override
-	public float computePotential() {
-		return env.getDocScore(type, docNode.getDocno());
-	}
+    for (GraphNode node : nodes) {
+      if (node.getType().equals(GraphNode.Type.DOCUMENT) && docNode != null) {
+        throw new ConfigurationException("Only one document node allowed in DocumentPotential!");
+      } else if (node.getType().equals(GraphNode.Type.DOCUMENT)) {
+        docNode = (DocumentNode) node;
+      } else if (node.getType().equals(GraphNode.Type.TERM)) {
+        throw new ConfigurationException("TermNodes are not allowed in DocumentPotential!");
+      }
+    }
+  }
 
-	@Override
-	public int getNextCandidate() {
-		return Integer.MAX_VALUE;
-	}
+  @Override
+  public float computePotential() {
+    return env.getDocScore(type, docNode.getDocno());
+  }
 
-	@Override
-	public String toString() {
-		return "<potential type=\"DocumentPotential\" />\n";
-	}
+  @Override
+  public int getNextCandidate() {
+    return Integer.MAX_VALUE;
+  }
 
-	@Override
-	public float getMinScore() {
-		return Float.NEGATIVE_INFINITY;
-	}
-	
-	@Override
-	public float getMaxScore() {
-		return Float.POSITIVE_INFINITY;
-	}
+  @Override
+  public String toString() {
+    return "<potential type=\"DocumentPotential\" />\n";
+  }
 
-	/**
-	 * Does nothing in the context of this potential.
-	 */
-	@Override public void reset() {}
+  @Override
+  public float getMinScore() {
+    return Float.NEGATIVE_INFINITY;
+  }
 
-	/**
-	 * Does nothing in the context of this potential.
-	 */
-	@Override public void setNextCandidate(int docid) {}
+  @Override
+  public float getMaxScore() {
+    return Float.POSITIVE_INFINITY;
+  }
+
+  /**
+   * Does nothing in the context of this potential.
+   */
+  @Override
+  public void reset() {
+  }
+
+  /**
+   * Does nothing in the context of this potential.
+   */
+  @Override
+  public void setNextCandidate(int docid) {}
 }

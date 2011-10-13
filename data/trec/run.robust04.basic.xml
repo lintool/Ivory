@@ -1,6 +1,6 @@
 <parameters>
 
-     <index>/fs/clip-hadoop/indexes/trec</index>
+     <index>/scratch0/indexes/trec</index>
 
      <!-- Dirichlet, full independence -->
      <model id="robust04-dir-base" type="Feature" output="ranking.robust04-dir-base.txt" hits="1000">

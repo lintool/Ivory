@@ -25,6 +25,7 @@ import ivory.smrf.model.score.ScoringFunction;
 
 import java.util.List;
 
+
 /**
  * @author Lidan Wang
  */

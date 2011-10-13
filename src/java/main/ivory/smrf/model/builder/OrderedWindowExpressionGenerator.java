@@ -16,9 +16,9 @@
 
 package ivory.smrf.model.builder;
 
-import ivory.exception.ConfigurationException;
+import ivory.core.exception.ConfigurationException;
+import ivory.core.util.XMLTools;
 import ivory.smrf.model.builder.Expression.Type;
-import ivory.util.XMLTools;
 
 import org.w3c.dom.Node;
 
@@ -28,22 +28,22 @@ import com.google.common.base.Preconditions;
  * @author Don Metzler
  */
 public class OrderedWindowExpressionGenerator extends ExpressionGenerator {
-	private int width;  // With of the ordered window.
+  private int width; // With of the ordered window.
 
-	@Override
-	public void configure(Node domNode) throws ConfigurationException {
-		Preconditions.checkNotNull(domNode);
-		width = XMLTools.getAttributeValue(domNode, "width", 1);
-	}
+  @Override
+  public void configure(Node domNode) throws ConfigurationException {
+    Preconditions.checkNotNull(domNode);
+    width = XMLTools.getAttributeValue(domNode, "width", 1);
+  }
 
-	@Override
-	public Expression getExpression(String[] terms) {
-		Preconditions.checkNotNull(terms);
-		return new Expression(Type.OD, width, terms);
-	}
+  @Override
+  public Expression getExpression(String[] terms) {
+    Preconditions.checkNotNull(terms);
+    return new Expression(Type.OD, width, terms);
+  }
 
-	@Override
-	public String toString() {
-		return "<expressiongenerator type=\"Ordered\" width=\"" + width + "\"/>\n";
-	}
+  @Override
+  public String toString() {
+    return "<expressiongenerator type=\"Ordered\" width=\"" + width + "\"/>\n";
+  }
 }

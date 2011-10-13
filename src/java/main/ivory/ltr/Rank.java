@@ -17,10 +17,12 @@
 package ivory.ltr;
 
 
-import ivory.exception.ConfigurationException;
+
+import ivory.core.exception.ConfigurationException;
 
 import java.io.IOException;
 import java.util.List;
+
 
 /**
  * @author Don Metzler

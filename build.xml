@@ -1,16 +1,18 @@
-<project name="ivory" default="scripts" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
-  <description>Ivory</description>
+<project name="ivory" default="scripts" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant" xmlns:artifact="antlib:org.apache.maven.artifact.ant">
+  <description>Ivory: A Hadoop toolkit for web-scale information retrieval</description>
 
   <property name="lib.dir" value="lib" />
   <property name="build.dir" value="build"/>
   <property name="src.dir" value="src"/>
   <property name="dist.dir" value="dist"/>
+  <property name="javadoc.dir" location="docs/api/" />
   <property name="test.dir" value="test"/>
   <property name="test.junit.dir" location="${test.dir}/junit" />
   <property name="regression.complete.dir" location="${test.dir}/regression.complete" />
   <property name="regression.quick.dir" location="${test.dir}/regression.quick" />
+  <property name="integration.dir" location="${test.dir}/integration" />
 
-  <property name="version" value="0.5.0"/>
+  <property name="version" value="0.6.0"/>
 
   <!-- paths used for compilation and run  -->
   <path id="lib.path.id">
@@ -26,6 +28,21 @@
   <property name="ivy.jar.file" value="${ivy.jar.dir}/ivy.jar"/>
   <property name="ivy.settings.file" value="${basedir}/ivy/ivysettings.xml" />
   <property name="ivy.dep.file" value="${basedir}/ivy/ivy.xml" />
+
+  <property name="maven.ant.task.version" value="2.1.2"/>
+  <property name="maven.jar.dir" value="${basedir}/${lib.dir}"/>
+  <property name="maven.jar.file" value="${maven.jar.dir}/maven.jar"/>
+
+  <!-- define Maven coordinates, repository url and artifacts name etc -->
+  <property name="groupId" value="cc.ivory" />
+  <property name="artifactId" value="ivory" />
+  <property name="version" value="${version}" />
+
+  <property name="maven-repository-url" value="https://oss.sonatype.org/service/local/staging/deploy/maven2" />
+  <property name="maven-repository-id" value="sonatype-nexus-staging" />
+  <property name="maven-jar" value="${dist.dir}/${artifactId}-${version}.jar" />
+  <property name="maven-javadoc-jar" value="${dist.dir}/${artifactId}-${version}-javadoc.jar" />
+  <property name="maven-sources-jar" value="${dist.dir}/${artifactId}-${version}-sources.jar" />
 
   <target name="download-ivy" unless="skip.download">
     <mkdir dir="${ivy.jar.dir}"/>
@@ -48,6 +65,25 @@
 
   <target name="resolve" depends="install-ivy" description="--> retreive dependencies with ivy">
     <ivy:retrieve/>
+  </target>
+
+  <!-- download maven from web site so that it can be used even without any special installation -->
+  <target name="download-maven" depends="init" unless="skip.download">
+    <mkdir dir="${maven.jar.dir}"/>
+    <echo message="installing maven ant tasks..."/>
+    <get src="http://repo1.maven.org/maven2/org/apache/maven/maven-ant-tasks/${maven.ant.task.version}/maven-ant-tasks-${maven.ant.task.version}.jar"
+         dest="${maven.jar.file}" usetimestamp="true"/>
+  </target>
+
+  <!-- try to load ivy here from local ivy dir, in case the user has not already dropped
+       it into ant's lib dir (note that the latter copy will always take precedence).
+       We will not fail as long as local lib dir exists (it may be empty) and
+       ivy is in at least one of ant's lib dir or the local lib dir. -->
+  <target name="install-maven" depends="download-maven" description="--> install ivy">
+    <path id="maven.lib.path">
+      <fileset dir="${maven.jar.dir}" includes="*.jar"/>
+    </path>
+    <taskdef uri="antlib:org.apache.maven.artifact.ant" classpathref="maven.lib.path"/>
   </target>
 
   <target name="report" depends="resolve" description="--> generates a report of dependencies">
@@ -77,6 +113,7 @@
 		</javac>
 		<javac classpathref="lib.path.id" srcdir="${src.dir}/java/test" destdir="${build.dir}" optimize="on" debug="on" />
 		<javac classpathref="lib.path.id" srcdir="${src.dir}/java/regression" destdir="${build.dir}" optimize="on" debug="on" />
+		<javac classpathref="lib.path.id" srcdir="${src.dir}/java/integration" destdir="${build.dir}" optimize="on" debug="on" />
 
 		<!-- javac classpathref="classpath" srcdir="${src.dir}/sandbox" destdir="${build.dir}" optimize="on" debug="on" -->
 			<!-- compilerarg value="-Xlint:unchecked"/ uncomment this to check for generics -->
@@ -91,6 +128,11 @@
 		<jar jarfile="${dist.dir}/ivory-${version}.jar" basedir="${build.dir}" />
 	</target>
 
+  <target name="dist" depends="jar,javadoc" description="generate the distribution">
+    <jar jarfile="${dist.dir}/ivory-${version}-sources.jar" basedir="${src.dir}" />
+    <jar jarfile="${dist.dir}/ivory-${version}-javadoc.jar" basedir="${javadoc.dir}" />
+  </target>
+
         <target name="jarjar" depends="compile">
                 <taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask"
                          classpath="lib/jarjar-1.0.jar"/>
@@ -104,6 +146,7 @@
 		<delete dir="${dist.dir}" />
 		<delete dir="${lib.dir}" />
 		<delete dir="${test.dir}" />
+    <delete dir="${javadoc.dir}" />
 	</target>
 
 	<target name="test" depends="jar" description="Execute Unit Tests">
@@ -191,8 +234,32 @@
 
 	</target>
 
+	<target name="integration" depends="jar" description="Run integration tests">
+		<mkdir dir="${integration.dir}" />
+		<junit printsummary="yes" fork="yes" maxmemory="2048m">
+			<sysproperty key="java.library.path" path="${lib.dir}" />
+			<sysproperty key="org.xml.sax.driver" value="org.apache.xerces.parsers.SAXParser" />
+			<classpath refid="run.path.id" />
+
+			<formatter type="xml" />
+			<batchtest todir="${integration.dir}">
+				<fileset dir="${build.dir}">
+                                        <include name="ivory/integration/**/Verify*.class" />
+				</fileset>
+			</batchtest>
+		</junit>
+
+		<junitreport todir="${integration.dir}">
+			<fileset dir="${integration.dir}">
+				<include name="TEST-*.xml" />
+			</fileset>
+			<report format="noframes" styledir="etc/" todir="${integration.dir}" />
+		</junitreport>
+
+	</target>
+
 	<target name="javadoc">
-		<javadoc destdir="docs/api/" access="public" use="false" notree="false" nonavbar="false" noindex="false" splitindex="no" author="true" version="true" nodeprecatedlist="true" nodeprecated="true" classpathref="classpath">
+		<javadoc destdir="${javadoc.dir}" access="public" use="false" notree="false" nonavbar="false" noindex="false" splitindex="no" author="true" version="true" nodeprecatedlist="true" nodeprecated="true" classpathref="run.path.id">
 			<fileset dir="src">
 				<include name="java/main/**/*.java" />
 				<exclude name="java/main/ivory/util/AnnotateClueRunAllWithURLs.java" />
@@ -201,7 +268,7 @@
 				<exclude name="java/main/uk/**/*.java" />
 				<exclude name="java/main/org/**/*.java" />
 			</fileset>
-			<link href="http://java.sun.com/javase/6/docs/api/" />
+			<link href="http://download.oracle.com/javase/6/docs/api/" />
 			<link href="http://hadoop.apache.org/common/docs/current/api/" />
 			<link href="http://www.umiacs.umd.edu/~jimmylin/Cloud9/docs/api//" />
 		</javadoc>
@@ -256,5 +323,50 @@
 		<echo file="./etc/run.${suffix}" message="${param_prefix}1 ${param_prefix}2 ${param_prefix}3 ${param_prefix}4 ${param_prefix}5 ${param_prefix}6 ${param_prefix}7 ${param_prefix}8 ${param_prefix}9" append="true" />
 
 	</target>
+
+  <target name="gen-pom" depends="install-ivy">
+    <ivy:makepom ivyfile="ivy/ivy.xml" pomfile="ivory.pom" />
+  </target>
+
+  <target name="publish-local" depends="jar" description="publish jar/source to maven repo mounted at ~/.m2/repository">
+    <ivy:publish resolver="local-m2-publish" forcedeliver="true" overwrite="true" publishivy="false">
+      <artifacts pattern="${dist.dir}/[artifact]-[revision].[ext]"/>
+      <artifacts pattern="pom.xml"/>
+    </ivy:publish>
+  </target>
+
+  <target name="deploy" depends="dist,install-maven" description="deploy to Nexus">
+    <!-- sign and deploy the main artifact -->
+    <artifact:mvn>
+      <arg value="org.apache.maven.plugins:maven-gpg-plugin:1.1:sign-and-deploy-file" />
+      <arg value="-Durl=${maven-repository-url}" />
+      <arg value="-DrepositoryId=${maven-repository-id}" />
+      <arg value="-DpomFile=pom.xml" />
+      <arg value="-Dfile=${maven-jar}" />
+      <arg value="-Pgpg" />
+    </artifact:mvn>
+
+    <!-- sign and deploy the sources artifact -->
+    <artifact:mvn>
+      <arg value="org.apache.maven.plugins:maven-gpg-plugin:1.1:sign-and-deploy-file" />
+      <arg value="-Durl=${maven-repository-url}" />
+      <arg value="-DrepositoryId=${maven-repository-id}" />
+      <arg value="-DpomFile=pom.xml" />
+      <arg value="-Dfile=${maven-sources-jar}" />
+      <arg value="-Dclassifier=sources" />
+      <arg value="-Pgpg" />
+    </artifact:mvn>
+
+    <!-- sign and deploy the javadoc artifact -->
+    <artifact:mvn>
+      <arg value="org.apache.maven.plugins:maven-gpg-plugin:1.1:sign-and-deploy-file" />
+      <arg value="-Durl=${maven-repository-url}" />
+      <arg value="-DrepositoryId=${maven-repository-id}" />
+      <arg value="-DpomFile=pom.xml" />
+      <arg value="-Dfile=${maven-javadoc-jar}" />
+      <arg value="-Dclassifier=javadoc" />
+      <arg value="-Pgpg" />
+    </artifact:mvn>
+  </target>
 
 </project>

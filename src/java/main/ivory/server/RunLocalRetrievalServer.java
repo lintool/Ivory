@@ -16,7 +16,8 @@
 
 package ivory.server;
 
-import ivory.util.XMLTools;
+
+import ivory.core.util.XMLTools;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -27,6 +28,7 @@ import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
 
 public class RunLocalRetrievalServer {
 

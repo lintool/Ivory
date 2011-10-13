@@ -16,17 +16,17 @@
 
 package ivory.cascade.retrieval;
 
-import ivory.eval.GradedQrels;
-import ivory.eval.RankedListEvaluator;
-import ivory.exception.ConfigurationException;
+import ivory.core.RetrievalEnvironment;
+import ivory.core.eval.GradedQrels;
+import ivory.core.eval.RankedListEvaluator;
+import ivory.core.exception.ConfigurationException;
+import ivory.core.util.ResultWriter;
+import ivory.core.util.XMLTools;
 import ivory.smrf.model.builder.MRFBuilder;
 import ivory.smrf.model.expander.MRFExpander;
 import ivory.smrf.retrieval.Accumulator;
 import ivory.smrf.retrieval.BatchQueryRunner;
 import ivory.smrf.retrieval.QueryRunner;
-import ivory.util.ResultWriter;
-import ivory.util.RetrievalEnvironment;
-import ivory.util.XMLTools;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -47,6 +47,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+
 
 import com.google.common.collect.Maps;
 

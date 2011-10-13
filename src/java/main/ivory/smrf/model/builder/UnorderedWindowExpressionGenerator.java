@@ -16,8 +16,8 @@
 
 package ivory.smrf.model.builder;
 
+import ivory.core.util.XMLTools;
 import ivory.smrf.model.builder.Expression.Type;
-import ivory.util.XMLTools;
 
 import org.w3c.dom.Node;
 
@@ -27,22 +27,22 @@ import com.google.common.base.Preconditions;
  * @author Don Metzler
  */
 public class UnorderedWindowExpressionGenerator extends ExpressionGenerator {
-	private int width;	// Width of unordered window.
+  private int width; // Width of unordered window.
 
-	@Override
-	public void configure(Node domNode) {
-		Preconditions.checkNotNull(domNode);
-		width = XMLTools.getAttributeValue(domNode, "width", 4);
-	}
+  @Override
+  public void configure(Node domNode) {
+    Preconditions.checkNotNull(domNode);
+    width = XMLTools.getAttributeValue(domNode, "width", 4);
+  }
 
-	@Override
-	public Expression getExpression(String[] terms) {
+  @Override
+  public Expression getExpression(String[] terms) {
     Preconditions.checkNotNull(terms);
     return new Expression(Type.UW, terms.length * width, terms);
-	}
+  }
 
-	@Override
-	public String toString() {
-		return "<expressiongenerator type=\"Unordered\" width=\"" + width + "\"/>\n";
-	}
+  @Override
+  public String toString() {
+    return "<expressiongenerator type=\"Unordered\" width=\"" + width + "\"/>\n";
+  }
 }

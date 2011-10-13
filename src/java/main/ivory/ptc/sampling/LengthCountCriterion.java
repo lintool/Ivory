@@ -16,14 +16,15 @@
 
 package ivory.ptc.sampling;
 
+import ivory.ptc.data.PseudoJudgments;
+import ivory.ptc.data.PseudoQuery;
 import edu.umd.cloud9.util.map.HMapII;
 
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 
-import ivory.ptc.data.PseudoJudgments;
-import ivory.ptc.data.PseudoQuery;
+
 
 /**
  * Sampling criterion based on the length of the query.
