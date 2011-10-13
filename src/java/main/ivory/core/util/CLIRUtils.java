@@ -18,6 +18,8 @@ import java.util.List;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -167,7 +169,7 @@ public abstract class CLIRUtils extends Configured {
 		}
 		return sum;
 	}
-	
+
 	/**
 ************
 	 */
@@ -752,7 +754,7 @@ public abstract class CLIRUtils extends Configured {
 	 * For each source language term, top NUM_TRANS entries (with highest translation probability) are kept, unless the top K < NUM_TRANS entries have a cumulatite probability above PROB_THRESHOLD.
 	 * 
 	 * @param inputFile
-	 * 		output of Berkeley Aligner (probability values from source language to target language)
+	 * 		output of GIZA (probability values from source language to target language; in GIZA, target word appears before source word each line)
 	 * @param srcVocabFile
 	 * 		path where created source vocabulary (VocabularyWritable) will be written
 	 * @param trgVocabFile
@@ -786,12 +788,12 @@ public abstract class CLIRUtils extends Configured {
 			float sumOfProbs = 0.0f, prob;
 			int cntLongTail = 0, cntShortTail = 0, sumShortTail = 0;		// for statistical purposes only
 
-			while (true) {
+			while (true) {	
 				line = bis.readLine();
 				if(line == null)	break;
 				String[] parts = line.split(" ");
 				if(parts.length != 3){
-					throw new RuntimeException("Unknown format: "+line);
+					throw new RuntimeException("Unknown format: "+cnt+" = \n"+line);
 				}
 				cnt++;
 				trgTerm = parts[0];
@@ -858,7 +860,7 @@ public abstract class CLIRUtils extends Configured {
 			// dispose all the resources after using them.
 			fis.close();
 			bis.close();
-
+			logger.info("File "+filename+": read "+cnt+" lines");
 			logger.info("Vocabulary Target: "+trgVocab.size()+" elements");
 			logger.info("Vocabulary Source: "+srcVocab.size()+" elements");
 			logger.info("# source terms with > "+PROB_THRESHOLD+" probability covered: "+cntShortTail+" and average translations per term: "+(sumShortTail/(cntShortTail+0.0f)));
@@ -1018,7 +1020,7 @@ public abstract class CLIRUtils extends Configured {
 	}
 
 	public static String[] computeFeaturesF1(HMapSFW eVector, HMapSFW fVector, float eSentLength, float fSentLength,
-			Vocab eVocabSrc, Vocab eVocabTrg, Vocab fVocabSrc, Vocab fVocabTrg, TTable_monolithic_IFAs f2e_Probs, TTable_monolithic_IFAs e2f_Probs) {
+			Vocab eVocabSrc, Vocab eVocabTrg, Vocab fVocabSrc, Vocab fVocabTrg, TTable_monolithic_IFAs e2f_Probs, TTable_monolithic_IFAs f2e_Probs) {
 		String[] features = new String[1];
 
 		float cosine = CLIRUtils.cosineNormalized(eVector, fVector);
@@ -1107,5 +1109,36 @@ public abstract class CLIRUtils extends Configured {
 		return features;
 	}
 
+
+	private static int printUsage() {
+		System.out.println("usage: [input-lexicalprob-file_f2e] [input-lexicalprob-file_e2f] [type=giza|berkeley] [src-vocab_f] [trg-vocab_e] [prob-table_f-->e] [src-vocab_e] [trg-vocab_f] [prob-table_e-->f])");
+
+		return -1;
+	}
+
+
+	public static void main(String args[]){
+		if(args.length < 9){
+			printUsage();
+		}
+		String lex_f2e = args[0];
+		String lex_e2f = args[1];
+		String type = args[2];
+		
+		try {
+			if(type.equals("giza")){
+//				CLIRUtils.createTTableFromGIZA(lex_f2e, args[3], args[4], args[5], FileSystem.getLocal(new Configuration()));
+				CLIRUtils.createTTableFromGIZA(lex_e2f, args[6], args[7], args[8], FileSystem.getLocal(new Configuration()));
+			}else if(type.equals("berkeley")){
+				CLIRUtils.createTTableFromBerkeleyAligner(lex_f2e, args[3], args[4], args[5], FileSystem.getLocal(new Configuration()));
+				CLIRUtils.createTTableFromBerkeleyAligner(lex_e2f, args[6], args[7], args[8], FileSystem.getLocal(new Configuration()));
+			}else{
+				printUsage();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
 
 }
