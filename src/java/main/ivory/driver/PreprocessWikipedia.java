@@ -150,8 +150,8 @@ public class PreprocessWikipedia extends Configured implements Tool {
 		Path mappingFile = env.getDocnoMappingData();
 		if (!fs.exists(mappingFile)) {
 			LOG.info(mappingFile + " doesn't exist, creating...");
-			String[] arr = new String[] { rawCollection, indexRootPath + "/wiki-docid-tmp",
-					mappingFile.toString(), new Integer(numMappers).toString() };
+			String[] arr = new String[] { "-input="+rawCollection, "-output_path="+ indexRootPath+"/wiki-docid-tmp", "-output_file="+mappingFile.toString()};
+			
 			BuildWikipediaDocnoMapping tool = new BuildWikipediaDocnoMapping();
 			tool.setConf(conf);
 			tool.run(arr);
@@ -165,7 +165,7 @@ public class PreprocessWikipedia extends Configured implements Tool {
 		p = new Path(seqCollection);
 		if (!fs.exists(p)) {
 			LOG.info(seqCollection + " doesn't exist, creating...");
-			String[] arr = new String[] { rawCollection, seqCollection, mappingFile.toString(), "block", collectionLang};
+			String[] arr = new String[] { "-input="+rawCollection, "-output="+seqCollection, "-mapping_file="+mappingFile.toString(), "-compression_type=block", "-wiki_language="+collectionLang};
 			RepackWikipedia tool = new RepackWikipedia();
 			tool.setConf(conf);
 			tool.run(arr);
