@@ -27,7 +27,7 @@ import org.galagosearch.core.parse.Document;
 import org.galagosearch.core.parse.TagTokenizer;
 import org.tartarus.snowball.ext.englishStemmer;
 
-public class GalagoTokenizer implements Tokenizer {
+public class GalagoTokenizer extends Tokenizer {
 
 	englishStemmer mStemmer = new englishStemmer();
 	HashMap<String, String> mCache = new HashMap<String, String>();

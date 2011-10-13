@@ -18,8 +18,38 @@ package ivory.tokenize;
 
 import org.apache.hadoop.conf.Configuration;
 
-public interface Tokenizer {
-	public void configure(Configuration conf);
+public abstract class Tokenizer {
+	public abstract void configure(Configuration conf);
+	public abstract String[] processContent(String text);
+		
+	/**
+	 * Method to return number of tokens in text. Subclasses may override for more efficient implementations.
+	 * 
+	 * @param text
+	 * 		text to be processed.
+	 * @return
+	 * 		number of tokens in text.
+	 */
+	public int getNumberTokens(String text){
+		return processContent(text).length;
+	}
 	
-	public String[] processContent(String text);
+	/**
+	 * Method to remove non-unicode characters from token, to prevent errors in the preprocessing pipeline. Such cases exist in German Wikipedia. 
+	 * 
+	 * @param token
+	 * 		token to check for non-unicode character
+	 * @return
+	 * 		token without the non-unicode characters
+	 */
+	public String removeNonUnicodeChars(String token) {
+		StringBuffer fixedToken = new StringBuffer();
+		for(int i=0; i<token.length(); i++){
+			char c = token.charAt(i);
+			if(Character.getNumericValue(c)>=0){
+				fixedToken.append(c);
+			}
+		}
+		return fixedToken.toString();
+	}
 }
