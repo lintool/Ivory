@@ -103,20 +103,20 @@ public class BuildWeightedIntDocVectors extends PowerTool {
       }
 
       try {
-        mDFTable = new DfTableArray(localFiles[1], FileSystem.getLocal(conf));
+        mDFTable = new DfTableArray(dfByIntDataPath, FileSystem.getLocal(conf));
       } catch(IOException e1) {
-        throw new RuntimeException("Error loading df table from "+localFiles[1]);
+        throw new RuntimeException("Error loading df table from "+dfByIntDataPath);
       }
 
       sLogger.info("Global Stats table loaded successfully.");
 
       try {
         if(shortDocLengths)
-          mDLTable = new DocLengthTable2B(localFiles[2], FileSystem.getLocal(conf));
+          mDLTable = new DocLengthTable2B(docLengthsDataPath, FileSystem.getLocal(conf));
         else
-          mDLTable = new DocLengthTable4B(localFiles[2], FileSystem.getLocal(conf));
+          mDLTable = new DocLengthTable4B(docLengthsDataPath, FileSystem.getLocal(conf));
       } catch(IOException e1) {
-        throw new RuntimeException("Error loading dl table from "+localFiles[2]);
+        throw new RuntimeException("Error loading dl table from "+docLengthsDataPath);
       }
       try {
         mScoreFn = (ScoringModel) Class.forName(conf.get("Ivory.ScoringModel")).newInstance();
@@ -205,8 +205,6 @@ public class BuildWeightedIntDocVectors extends PowerTool {
     sLogger.info(String.format(" - %s: %s", Constants.CollectionName, collectionName));
     sLogger.info(String.format(" - %s: %s", Constants.IndexPath, indexPath));
 
-    String cfByIntFilePath = env.getCfByIntData();
-    String dfByIntFilePath = env.getDfByIntData();
 
     Path inputPath = new Path(env.getIntDocVectorsDirectory());
     Path vectorWeightsPath = new Path(outputPath);
@@ -217,13 +215,8 @@ public class BuildWeightedIntDocVectors extends PowerTool {
       return 0;
     }
 
-    /* add cf file to cache */
-    if (!fs.exists(new Path(cfByIntFilePath))) {
-      throw new RuntimeException("Error, df data file " + cfByIntFilePath + "doesn't exist!");
-    }
-    DistributedCache.addCacheFile(new URI(cfByIntFilePath), conf);
-
     /* add df table to cache */
+    String dfByIntFilePath = env.getDfByIntData();
     if (!fs.exists(new Path(dfByIntFilePath))) {
       throw new RuntimeException("Error, df data file " + dfByIntFilePath + "doesn't exist!");
     }
