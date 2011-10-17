@@ -78,6 +78,7 @@ public class BuildIntDocVectorsForwardIndex extends PowerTool {
     private FSDataOutputStream out;
     private int collectionDocumentCount;
     private int curDoc = 0;
+    private boolean buildWeighted = false;
 
     @Override
     public void setup(
@@ -97,8 +98,8 @@ public class BuildIntDocVectorsForwardIndex extends PowerTool {
         throw new RuntimeException("Unable to create RetrievalEnvironment!");
       }
 
-      boolean buildWeighted = conf.getBoolean(Constants.BuildWeighted, false);
-      String forwardIndexPath =(buildWeighted ? 
+      buildWeighted = conf.getBoolean(Constants.BuildWeighted, false);
+      String forwardIndexPath =(buildWeighted ?
                                 env.getWeightedIntDocVectorsForwardIndex() :
                                 env.getIntDocVectorsForwardIndex());
       collectionDocumentCount = env.readCollectionDocumentCount();
@@ -133,8 +134,12 @@ public class BuildIntDocVectorsForwardIndex extends PowerTool {
       out.close();
 
       if (curDoc != collectionDocumentCount) {
-        throw new IOException("Expected " + collectionDocumentCount + " docs, actually got "
-            + curDoc + " terms!");
+        if (!buildWeighted) {
+          throw new IOException("Expected " + collectionDocumentCount + " docs, actually got "
+                                 + curDoc);
+        } else {
+          LOG.warn("Expected " + collectionDocumentCount + " docs, actually got " + curDoc);
+        }
       }
     }
   }
