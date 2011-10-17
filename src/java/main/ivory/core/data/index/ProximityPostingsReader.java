@@ -98,9 +98,9 @@ public abstract class ProximityPostingsReader implements PostingsReader {
 
     posting.setDocno(maxReader.getDocno());
     if (isMatching()) {
-      posting.setScore(countMatches());
+      posting.setTf(countMatches());
     } else {
-      posting.setScore((short) 0);
+      posting.setTf((short) 0);
     }
 
     return true;

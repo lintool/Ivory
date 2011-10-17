@@ -30,8 +30,11 @@
 <div id="navigation">
 <ul id="menus">
 
-  <li class="page_item"><a class="home" title="Home" href="index.html">Home</a></li>
+  <li class="page_item"><a class="home" title="Home" href="../index.html">Home</a></li>
   <li class="page_item"><a href="api/index.html" title="API">API</a></li>
+  <li class="page_item"><a href="publications.html" title="Publications">Publications</a></li>
+  <li class="page_item"><a href="regression.html" title="Experiments">Experiments</a></li>
+  <li class="page_item"><a href="team.html" title="Team">Team</a></li>
 
 </ul>
 
@@ -88,11 +91,11 @@ something similar.</p>
 
 <p>There are a total of 472,525 documents in the collection as
 described above, distributed in a number of files;
-see <a href="data/trec/files.TREC45-noCRFR.txt">complete list of all
+see <a href="../data/trec/files.TREC45-noCRFR.txt">complete list of all
 files</a>.  Since Hadoop doesn't work well will lots of small files,
 the first step is to prepare the collection by concatenating all the
 documents into a large file.  This is most easily done with a Perl or
-Python script.  See this <a href="data/trec/cat_all_docs.pl">simple
+Python script.  See this <a href="../data/trec/cat_all_docs.pl">simple
 Perl script</a>, but it should be very easy to write your own.</p>
 
 </div></div>
@@ -161,15 +164,15 @@ hadoop jar cloud9.jar edu.umd.cloud9.collection.trec.BuildTrecForwardIndex \
 <p>Now we're ready to perform batch retrieval!  To demonstrate, we're
 going to use topics from the TREC 2004 robust track.  In information
 retrieval parlance, topics define information needs, from which the
-actual queries derive.  In the <code>docs/data/trec/</code> directory, you'll find
+actual queries derive.  In the <code>data/trec/</code> directory, you'll find
 two configuration files:</p>
 
 <ul>
 
-  <li><a href="data/trec/run.robust04.basic.xml"><code>docs/data/trec/run.robust04.basic.xml</code></a>:
+  <li><a href="../data/trec/run.robust04.basic.xml"><code>data/trec/run.robust04.basic.xml</code></a>:
   retrieval models and parameters</li>
 
-  <li><a href="data/trec/queries.robust04.xml"><code>docs/data/trec/queries.robust04.xml</code></a>:
+  <li><a href="../data/trec/queries.robust04.xml"><code>data/trec/queries.robust04.xml</code></a>:
   queries (TREC 2004 robust track)</li>
 
 </ul>
@@ -199,7 +202,7 @@ two configuration files:</p>
 </ul>
 
 <p>You might want to tweak the index location and output paths
-in <a href="data/trec/run.robust04.basic.xml"><code>docs/data/trec/run.robust04.basic.xml</code></a>,
+in <a href="../data/trec/run.robust04.basic.xml"><code>data/trec/run.robust04.basic.xml</code></a>,
 specifying where the index resides and where the retrieval results go.
 After that, put both configuration files in HDFS.  The
 class <b><code>ivory.smrf.retrieval.RunQueryHDFS</code></b> performs a
@@ -227,11 +230,11 @@ relevance information (qrels) is included below:</p>
 
 <ul>
 
-  <li><a href="data/trec/qrels.robust04.noCR.txt">docs/data/trec/qrels.robust04.noCR.txt</a>:
+  <li><a href="../data/trec/qrels.robust04.noCR.txt">data/trec/qrels.robust04.noCR.txt</a>:
   original qrels file; does not contain CR documents, but contains FR
   documents.</li>
 
-  <li><a href="data/trec/qrels.robust04.noCRFR.txt">docs/data/trec/qrels.robust04.noCRFR.txt</a>:
+  <li><a href="../data/trec/qrels.robust04.noCRFR.txt">data/trec/qrels.robust04.noCRFR.txt</a>:
   modified qrels file; does not contain CR and FR documents.</li>
 
 </ul>
@@ -321,10 +324,10 @@ to HDFS):</p>
 
 <ul>
 
-  <li><a href="data/trec/server.trec.ql.xml">data/trec/server.trec.ql.xml</a>:
+  <li><a href="../data/trec/server.trec.ql.xml">data/trec/server.trec.ql.xml</a>:
     configuration file for launching a query-likelihood server.</li>
 
-  <li><a href="data/trec/server.trec.bm25.xml">data/trec/server.trec.bm25.xml</a>:
+  <li><a href="../data/trec/server.trec.bm25.xml">data/trec/server.trec.bm25.xml</a>:
   configuration file for launching a bm25 server.</li>
 
 </ul>
@@ -409,7 +412,7 @@ Ant.</p>
 <p>And that's it.  We've covered indexing, batch retrieval, and
 interactive retrieval.  Enjoy!</p>
 
-<p style="padding-top: 25px"><a href="./index.html">Back to main page</a></p>
+<p style="padding-top: 25px"><a href="../index.html">Back to main page</a></p>
 
 </div></div>
 

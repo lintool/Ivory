@@ -180,7 +180,7 @@ public class PCP extends PowerTool {
 
 					// compute partial score of similarity for a pair of
 					// documents
-					float weight = mModel.computeScore(e1.getScore(), e2.getScore(),
+					float weight = mModel.computeScore(e1.getTf(), e2.getTf(),
 							mDocLengthTable.getDocLength(e1.getDocno()), mDocLengthTable
 									.getDocLength(e2.getDocno()));
 

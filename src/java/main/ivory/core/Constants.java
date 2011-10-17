@@ -13,6 +13,7 @@ public class Constants {
   public static final String DocnoMappingClass = "Ivory.DocnoMappingClass";
   public static final String DocnoMappingFile = "Ivory.DocnoMappingFile";
   public static final String DocnoOffset = "Ivory.DocnoOffset";
+  public static final String PostingsListsType = "Ivory.PostingsListsType";
   public static final String MaxDf = "Ivory.MaxDf";
   public static final String MinDf = "Ivory.MinDf";
   public static final String TermIndexWindow = "Ivory.TermIndexWindow";
