@@ -1,7 +1,9 @@
 package ivory.core.preprocess;
 
 import ivory.core.RetrievalEnvironment;
+import ivory.core.data.dictionary.DefaultFrequencySortedDictionary;
 import ivory.core.data.document.TermDocVector;
+import ivory.core.data.stat.DfTableArray;
 import ivory.core.data.stat.DocLengthTable;
 import ivory.core.data.stat.DocLengthTable4B;
 import ivory.core.data.stat.PrefixEncodedGlobalStats;
@@ -78,7 +80,7 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
 		int MIN_SIZE = 0;	// minimum document size, to avoid noise in Wikipedia due to stubs/very short articles etc. this is set via Conf object
 		
 		public void configure(JobConf job) {
-			//			LOG.setLevel(Level.DEBUG);
+//			LOG.setLevel(Level.DEBUG);
 			numDocs = job.getInt("Ivory.CollectionDocumentCount", -1);
 			avgDocLen = job.getFloat("Ivory.AvgDocLen", -1);
 			isNormalize = job.getBoolean("Ivory.Normalize", false);
@@ -98,13 +100,15 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
 			} catch (IOException e1) {
 				throw new RuntimeException("Error initializing cache file paths!");
 			}
-
+			for(Path p : localFiles){
+				LOG.info(p);
+			}
 			//load translated df values
 			try {
 				transDfTable = CLIRUtils.readTransDfTable(localFiles[0], localFs);
 			} catch (Exception e) {
 				LOG.info(e.getMessage());
-				throw new RuntimeException("Error initializing DfTable!");
+				throw new RuntimeException("Error initializing DfTable from "+localFiles[0]);
 			}
 
 			//load vocabularies and prob table
@@ -144,7 +148,13 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
 			
 			if(docno.get()%SAMPLING!=0)		return;	//for generating sample document vectors. no sampling if SAMPLING=1
 			
-			if(!language.equals("english")){
+//			/**
+//			 * DEBUG
+//			 * 
+//			 */
+//			if(docno.get()!=101)		return;
+
+			if(!language.equals("english") && !language.equals("en")){
 				docno.set(docno.get() + 1000000000);	//to distinguish between the two collections in the PWSim sliding window algorithm
 			}
 
@@ -195,7 +205,7 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
 	
 		createTranslatedDFFile(transDfFile);
 
-		JobConf conf = new JobConf(getConf(), BuildTranslatedTermDocVectors.class);
+		JobConf conf = new JobConf(BuildTranslatedTermDocVectors.class);
 		conf.setJobName("BuildTranslatedTermDocVectors");
 		FileSystem fs = FileSystem.get(conf);
 
@@ -212,10 +222,6 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
 		LOG.info("CollectionName: " + collectionName);
 		LOG.info("Input path: " + inputPath);
 
-		///////Configuration setup
-
-		conf.set("Ivory.IndexPath", indexPath);
-		conf.set("Ivory.ScoringModel", scoringModel);
 		DocLengthTable mDLTable;
 		try {
 			mDLTable = new DocLengthTable4B(env.getDoclengthsData(), fs);
@@ -225,9 +231,15 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
 		LOG.info(mDLTable.getAvgDocLength()+" is average doc len.");
 		LOG.info(mDLTable.getDocCount()+" is num docs.");
 
+		///////Configuration setup
+		
+		conf.set("Ivory.IndexPath", indexPath);
+		conf.set("Ivory.ScoringModel", scoringModel);
 		conf.setFloat("Ivory.AvgDocLen", mDLTable.getAvgDocLength());
 		conf.setInt("Ivory.CollectionDocumentCount", env.readCollectionDocumentCount());
-		
+		conf.set("Ivory.Lang", getConf().get("Ivory.Lang"));
+		conf.set("Ivory.Normalize", getConf().get("Ivory.Normalize"));
+
 		conf.setNumMapTasks(300);			
 		conf.setNumReduceTasks(0);
 		conf.set("mapred.child.java.opts", "-Xmx2048m");
@@ -312,7 +324,6 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
 			String termsFile = env.getIndexTermsData();
 			String dfByTermFile = env.getDfByTermData();
 
-			sLogger.debug(e2fttableFile+eFile+termsFile);
 			if(!fs2.exists(new Path(fFile)) || !fs2.exists(new Path(eFile)) || !fs2.exists(new Path(e2fttableFile)) || !fs2.exists(new Path(termsFile)) || !fs2.exists(new Path(dfByTermFile))){
 				throw new RuntimeException("Error: Translation files do not exist!");
 			}
@@ -327,11 +338,11 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}	
-			PrefixEncodedGlobalStats globalStatsMap;
-			globalStatsMap = new PrefixEncodedGlobalStats(new Path(termsFile), fs2);
-			globalStatsMap.loadDFStats(new Path(dfByTermFile), fs2);
 
-			HMapIFW transDfTable = CLIRUtils.translateDFTable(eVocab_e2f, fVocab_e2f, en2DeProbs, globalStatsMap);
+			DefaultFrequencySortedDictionary dict = new DefaultFrequencySortedDictionary(new Path(env.getIndexTermsData()), new Path(env.getIndexTermIdsData()), new Path(env.getIndexTermIdMappingData()), fs2);
+			DfTableArray dfTable = new DfTableArray(new Path(dfByTermFile), fs2);
+
+			HMapIFW transDfTable = CLIRUtils.translateDFTable(eVocab_e2f, fVocab_e2f, en2DeProbs, dict, dfTable);
 
 			SequenceFile.Writer writer = SequenceFile.createWriter(fs2, conf, new Path(transDfFile), IntWritable.class, FloatWritable.class);
 			for(MapIF.Entry term : transDfTable.entrySet()){

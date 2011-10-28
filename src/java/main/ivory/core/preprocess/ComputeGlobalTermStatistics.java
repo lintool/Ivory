@@ -145,6 +145,11 @@ public class ComputeGlobalTermStatistics extends PowerTool {
       return 0;
     }
 
+    if (!fs.exists(new Path(termDocVectorsPath))) {
+        LOG.info("term doc vectors path doesn't existing: skipping!");
+        return 0;
+      }
+    
     LOG.info("PowerTool: " + ComputeGlobalTermStatistics.class.getCanonicalName());
     LOG.info(String.format(" - %s: %s", Constants.CollectionName, collectionName));
     LOG.info(String.format(" - %s: %s", Constants.IndexPath, indexPath));

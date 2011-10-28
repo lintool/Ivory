@@ -1,6 +1,9 @@
 package ivory.core.util;
 
+import ivory.core.data.dictionary.DefaultFrequencySortedDictionary;
+import ivory.core.data.dictionary.FrequencySortedDictionary;
 import ivory.core.data.document.TermDocVector;
+import ivory.core.data.stat.DfTableArray;
 import ivory.core.data.stat.PrefixEncodedGlobalStats;
 import ivory.pwsim.score.Bm25;
 import ivory.pwsim.score.ScoringModel;
@@ -28,6 +31,7 @@ import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.SequenceFile;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.mortbay.log.Log;
 
 import edu.umd.cloud9.io.map.HMapIFW;
 import edu.umd.cloud9.io.map.HMapSFW;
@@ -83,7 +87,7 @@ public abstract class CLIRUtils extends Configured {
 
 			while (reader.next(key, value)) {
 				transDfTable.put(key.get(), value.get());
-
+//				logger.info(key.get()+"-->"+value.get());
 				key = (IntWritable) reader.getKeyClass().newInstance();
 				value = (FloatWritable) reader.getValueClass().newInstance();
 			}
@@ -201,7 +205,7 @@ public abstract class CLIRUtils extends Configured {
 	 * @return
 	 * 		mapping from E-terms to their computed df values
 	 */
-	public static HMapIFW translateDFTable(Vocab eVocabSrc, Vocab fVocabTrg, TTable_monolithic_IFAs e2f_probs, PrefixEncodedGlobalStats globalStatsMap){
+	public static HMapIFW translateDFTable(Vocab eVocabSrc, Vocab fVocabTrg, TTable_monolithic_IFAs e2f_probs, FrequencySortedDictionary dict, DfTableArray dfTable){
 		HMapIFW transDfTable = new HMapIFW();
 		for(int e=1;e<eVocabSrc.size();e++){
 			int[] fS = e2f_probs.get(e).getTranslations(0.0f);
@@ -209,9 +213,13 @@ public abstract class CLIRUtils extends Configured {
 			for(int f : fS){
 				float probEF = e2f_probs.get(e, f);
 				String fTerm = fVocabTrg.get(f);
-				float df_f = globalStatsMap.getDF(fTerm);
-
-				df+=(probEF*df_f);
+				int id = dict.getId(fTerm); 
+				if(id != -1){
+					float df_f = dfTable.getDf(id);
+					df+=(probEF*df_f);
+				}else{
+					logger.info(fTerm+" not in dict");
+				}
 			}
 			transDfTable.put(e, df);
 		}
@@ -358,16 +366,18 @@ public abstract class CLIRUtils extends Configured {
 			int tf = reader.getTf();
 			docLen+=tf;
 
+			sLogger.debug("Read "+fTerm+","+tf);
+			
 			int f = fVocabSrc.get(fTerm);
 			if(f <= 0){
-				//				sLogger.warn(f+","+fTerm+": word not in aligner's vocab (source side of f2e)");
+				sLogger.debug("Warning: "+f+","+fTerm+": word not in aligner's vocab (source side of f2e)");
 				continue;
 			}
 			int[] eS = f2eProbs.get(f).getTranslations(0.0f);
 
 			int f2 = fVocabTrg.get(fTerm);		//convert between two F vocabs (different ids)
 			if(f2 <= 0){
-				//				sLogger.warn(fTerm+": word not in aligner's vocab (target side of e2f)");
+				sLogger.debug("Warning: "+fTerm+": word not in aligner's vocab (target side of e2f)");
 				continue;
 			}
 			//tf(e) = sum_f{tf(f)*prob(f|e)}
@@ -376,17 +386,18 @@ public abstract class CLIRUtils extends Configured {
 				String eTerm = eVocabTrg.get(e);
 				int e2 = eVocabSrc.get(eTerm);		//convert between two E vocabs (different ids)
 				if(e2 <= 0){
-					//					sLogger.debug(eTerm+": word not in aligner's final vocab (source side of e2f)");
+					sLogger.warn("Warning: "+eTerm+": word not in aligner's final vocab (source side of e2f)");
 					continue;
 				}
 				probEF = e2fProbs.get(e2, f2);
 				if(probEF > 0){
-					//					sLogger.debug(eVocabSrc.get(e2)+" ==> "+probEF);
+					sLogger.debug(eTerm+" ==> "+probEF);
 					if(tfTable.containsKey(e2)){
 						tfTable.put(e2, tfTable.get(e2)+tf*probEF);
 					}else{
 						tfTable.put(e2, tf*probEF);
 					}
+					sLogger.debug("updated weight to "+tfTable.get(e2));
 				}
 			}
 		}
@@ -498,7 +509,7 @@ public abstract class CLIRUtils extends Configured {
 			// compute score via scoring model
 			float score = ((Bm25) scoringModel).computeDocumentWeight(tf, df, docLen);
 
-			//			sLogger.debug(eTerm+" "+tf+" "+df+" "+score);
+			sLogger.debug(eTerm+" "+tf+" "+df+" "+score);
 			if(score>0){
 				v.put(eTerm, score);
 				if(isNormalize){
@@ -620,7 +631,11 @@ public abstract class CLIRUtils extends Configured {
 	 * For each source language term, top NUM_TRANS entries (with highest translation probability) are kept, unless the top K < NUM_TRANS entries have a cumulatite probability above PROB_THRESHOLD.
 	 * 
 	 * @param inputFile
-	 * 		output of Berkeley Aligner (probability values from source language to target language)
+	 * 		output of Berkeley Aligner (probability values from source language to target language). Format should be: 
+	 * 			[source-word] entropy ... nTrans ... sum 1.000000
+	 * 				[target-word1]: [prob1]
+	 * 				[target-word2]: [prob2]
+	 * 				..
 	 * @param srcVocabFile
 	 * 		path where created source vocabulary (VocabularyWritable) will be written
 	 * @param trgVocabFile
@@ -754,7 +769,10 @@ public abstract class CLIRUtils extends Configured {
 	 * For each source language term, top NUM_TRANS entries (with highest translation probability) are kept, unless the top K < NUM_TRANS entries have a cumulatite probability above PROB_THRESHOLD.
 	 * 
 	 * @param inputFile
-	 * 		output of GIZA (probability values from source language to target language; in GIZA, target word appears before source word each line)
+	 * 		output of GIZA (probability values from source language to target language. In GIZA, format of each line should be: 
+	 * 			[target-word1] [source-word] [prob1]
+	 * 			[target-word2] [source-word] [prob2]
+	 *          ...
 	 * @param srcVocabFile
 	 * 		path where created source vocabulary (VocabularyWritable) will be written
 	 * @param trgVocabFile
@@ -1019,28 +1037,25 @@ public abstract class CLIRUtils extends Configured {
 		dos3.close();
 	}
 
-	public static String[] computeFeaturesF1(HMapSFW eVector, HMapSFW fVector, float eSentLength, float fSentLength,
-			Vocab eVocabSrc, Vocab eVocabTrg, Vocab fVocabSrc, Vocab fVocabTrg, TTable_monolithic_IFAs e2f_Probs, TTable_monolithic_IFAs f2e_Probs) {
+	public static String[] computeFeaturesF1(HMapSFW eVector, HMapSFW fVector, float eSentLength, float fSentLength) {
 		String[] features = new String[1];
 
-		float cosine = CLIRUtils.cosineNormalized(eVector, fVector);
 		if(fSentLength == 0 || eSentLength == 0){
 			return null;
 		}
-
+		float cosine = CLIRUtils.cosineNormalized(eVector, fVector);
 		features[0] = "cosine="+cosine;
 		return features;
 	}
 
-	public static String[] computeFeaturesF2(HMapSFW eVector, HMapSFW fVector, float eSentLength, float fSentLength,
-			Vocab eVocabSrc, Vocab eVocabTrg, Vocab fVocabSrc, Vocab fVocabTrg, TTable_monolithic_IFAs f2e_Probs, TTable_monolithic_IFAs e2f_Probs) {
+	public static String[] computeFeaturesF2(HMapSFW eVector, HMapSFW fVector, float eSentLength, float fSentLength) {
 		String[] features = new String[3];
 
-		float cosine = CLIRUtils.cosineNormalized(eVector, fVector);
 		if(fSentLength == 0 || eSentLength == 0){
 			return null;
 		}
 
+		float cosine = CLIRUtils.cosineNormalized(eVector, fVector);
 		features[0] = "cosine="+cosine;
 		float lengthratio1, lengthratio2;
 		lengthratio1 = eSentLength/fSentLength;
@@ -1051,14 +1066,14 @@ public abstract class CLIRUtils extends Configured {
 	}
 
 	public static String[] computeFeaturesF3(HMapSFW eVector, HMapSFW fVector, float eSentLength, float fSentLength,
-			Vocab eVocabSrc, Vocab eVocabTrg, Vocab fVocabSrc, Vocab fVocabTrg, TTable_monolithic_IFAs f2e_Probs, TTable_monolithic_IFAs e2f_Probs) {
+			Vocab eVocabSrc, Vocab eVocabTrg, Vocab fVocabSrc, Vocab fVocabTrg, TTable_monolithic_IFAs e2f_Probs, TTable_monolithic_IFAs f2e_Probs) {
 		String[] features = new String[5];
 
-		float cosine = CLIRUtils.cosineNormalized(eVector, fVector);
 		if(fSentLength == 0 || eSentLength == 0){
 			return null;
 		}
 
+		float cosine = CLIRUtils.cosineNormalized(eVector, fVector);
 		features[0] = "cosine="+cosine;
 		float lengthratio1, lengthratio2;
 		lengthratio1 = eSentLength/fSentLength;
@@ -1124,20 +1139,41 @@ public abstract class CLIRUtils extends Configured {
 		String lex_f2e = args[0];
 		String lex_e2f = args[1];
 		String type = args[2];
+		Configuration conf = new Configuration();
 		
 		try {
+			FileSystem localFS = FileSystem.getLocal(conf);
 			if(type.equals("giza")){
-//				CLIRUtils.createTTableFromGIZA(lex_f2e, args[3], args[4], args[5], FileSystem.getLocal(new Configuration()));
-				CLIRUtils.createTTableFromGIZA(lex_e2f, args[6], args[7], args[8], FileSystem.getLocal(new Configuration()));
+				CLIRUtils.createTTableFromGIZA(lex_f2e, args[3], args[4], args[5], localFS);
+				CLIRUtils.createTTableFromGIZA(lex_e2f, args[6], args[7], args[8], localFS);
 			}else if(type.equals("berkeley")){
-				CLIRUtils.createTTableFromBerkeleyAligner(lex_f2e, args[3], args[4], args[5], FileSystem.getLocal(new Configuration()));
-				CLIRUtils.createTTableFromBerkeleyAligner(lex_e2f, args[6], args[7], args[8], FileSystem.getLocal(new Configuration()));
+				CLIRUtils.createTTableFromBerkeleyAligner(lex_f2e, args[3], args[4], args[5], localFS);
+				CLIRUtils.createTTableFromBerkeleyAligner(lex_e2f, args[6], args[7], args[8], localFS);
 			}else{
 				printUsage();
 			}
+			
+			//debugging
+			
+//			TTable_monolithic_IFAs de2EnProbs = new TTable_monolithic_IFAs(localFS, new Path(args[5]), true);
+//			TTable_monolithic_IFAs en2DeProbs = new TTable_monolithic_IFAs(localFS, new Path(args[8]), true);
+//			
+//			Vocab enSrc = HadoopAlign.loadVocab(new Path(args[6]), conf);
+//			Vocab zhTrg = HadoopAlign.loadVocab(new Path(args[7]), conf);
+//
+//			int[] fS = en2DeProbs.get(enSrc.get("princess")).getTranslations(0.0f);
+//			System.out.println(fS.length);
+//
+//			for(int f : fS){
+//				String fTerm =  zhTrg.get(f);
+//				System.out.println(fTerm+","+de2EnProbs.get(enSrc.get("princess"), f));		
+//			}
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
+		
 
 	}
 
