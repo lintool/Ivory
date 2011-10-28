@@ -39,6 +39,7 @@ import org.apache.log4j.Logger;
 
 
 import edu.umd.cloud9.io.SequenceFileUtils;
+import edu.umd.cloud9.io.map.HMapSFW;
 import edu.umd.cloud9.io.pair.PairOfFloatInt;
 import edu.umd.cloud9.io.pair.PairOfInts;
 import edu.umd.cloud9.io.pair.PairOfWritables;
@@ -55,8 +56,8 @@ public class BruteForcePwsim extends Configured implements Tool {
 	public static final String[] RequiredParameters = {};
 	private static final Logger sLogger = Logger.getLogger(BruteForcePwsim.class);
 
-	static enum mapoutput{
-		count
+	static enum Pairs{
+		Total, Emitted
 	};
 
 	private static int printUsage() {
@@ -105,6 +106,7 @@ public class BruteForcePwsim extends Configured implements Tool {
 
 				WeightedIntDocVector fromSample = (WeightedIntDocVector)vectors.get(i).getRightElement();
 				float cs = CLIRUtils.cosine(docvector.getWeightedTerms(), fromSample.getWeightedTerms()); 
+				sLogger.info(cs);
 				if(cs >= threshold){
 					output.collect(new IntWritable(sampleDocno.get()), new PairOfFloatInt(cs,docno.get()));
 				}
@@ -113,6 +115,56 @@ public class BruteForcePwsim extends Configured implements Tool {
 		}
 	}
 
+	/**
+	 * For every document in the sample, find all other docs that have cosine similarity higher than some given threshold.
+	 * 
+	 * @author ferhanture
+	 *
+	 */
+	public static class MyMapperTermDocVectors extends MapReduceBase implements
+	Mapper<IntWritable, HMapSFW, IntWritable, PairOfFloatInt> {
+
+		@SuppressWarnings("unchecked")
+		static List<PairOfWritables<WritableComparable, Writable>> vectors;
+		float threshold;
+		
+		public void configure(JobConf job){
+			sLogger.setLevel(Level.INFO);
+			threshold = job.getFloat("Ivory.CosineThreshold", -1);
+			sLogger.info("Threshold = "+threshold);
+		
+			//read doc ids of sample into vectors
+			try {
+				Path[] localFiles = DistributedCache.getLocalCacheFiles(job);
+				vectors = SequenceFileUtils.readFile(localFiles[0], FileSystem.getLocal(job));
+			} catch (Exception e) {
+				throw new RuntimeException("Error reading doc vectors!");
+			}
+			sLogger.info(vectors.size());
+		}
+
+		public void map(IntWritable docno, HMapSFW docvector,
+				OutputCollector<IntWritable, PairOfFloatInt> output,
+				Reporter reporter) throws IOException {
+			Long time = System.currentTimeMillis();
+			for(int i=0;i<vectors.size();i++){
+				reporter.incrCounter(Pairs.Total, 1);
+				IntWritable sampleDocno = (IntWritable)vectors.get(i).getLeftElement();
+				HMapSFW fromSample = (HMapSFW)vectors.get(i).getRightElement();
+				
+				float cs = CLIRUtils.cosine(docvector, fromSample); 
+				if(cs >= threshold){
+					sLogger.debug(sampleDocno + "," + fromSample+"\n"+fromSample.length());
+					sLogger.debug(docno + "," + docvector+"\n"+docvector.length());
+					sLogger.debug(cs);
+					reporter.incrCounter(Pairs.Emitted, 1);
+					output.collect(new IntWritable(sampleDocno.get()), new PairOfFloatInt(cs,docno.get()));
+				}
+			}
+			sLogger.debug("Finished in "+(System.currentTimeMillis()-time));
+		}
+	}
+	
 	/**
 	 * For every document in the sample, find all other docs that are closer than some given hamming distance.
 	 * 
@@ -146,14 +198,15 @@ public class BruteForcePwsim extends Configured implements Tool {
 				Reporter reporter) throws IOException {
 			Long time = System.currentTimeMillis();
 			for(int i=0;i<signatures.size();i++){
+				reporter.incrCounter(Pairs.Total, 1);
 				IntWritable sampleDocno = (IntWritable)signatures.get(i).getLeftElement();
 				Signature fromSample = (Signature)signatures.get(i).getRightElement();
 				int dist = signature.hammingDistance(fromSample, maxDist);
 	
 				if(dist <= maxDist){
 					output.collect(new IntWritable(sampleDocno.get()), new PairOfFloatInt(-dist,docno.get()));
+					reporter.incrCounter(Pairs.Emitted, 1);
 				}
-				reporter.incrCounter(mapoutput.count, 1);
 			}
 			sLogger.info("Finished in "+(System.currentTimeMillis()-time));
 		}
@@ -188,7 +241,7 @@ public class BruteForcePwsim extends Configured implements Tool {
 			while(values.hasNext()){
 				PairOfFloatInt p = values.next();
 				list.add(new PairOfFloatInt(p.getLeftElement(), p.getRightElement()));
-				reporter.incrCounter(mapoutput.count, 1);
+				reporter.incrCounter(Pairs.Total, 1);
 			}
 			int cntr = 0;
 			while(!list.isEmpty() && cntr<numResults){
@@ -217,7 +270,6 @@ public class BruteForcePwsim extends Configured implements Tool {
 		float threshold = -1;
 		threshold = Float.parseFloat(args[4]);
 		int numResults = Integer.parseInt(args[5]);
-		
 		JobConf job = new JobConf(getConf(),BruteForcePwsim.class);
 		
 		FileSystem fs = FileSystem.get(job);
@@ -248,14 +300,21 @@ public class BruteForcePwsim extends Configured implements Tool {
 		job.setMapOutputValueClass(PairOfFloatInt.class);
 		job.setOutputKeyClass(PairOfInts.class);
 		job.setOutputValueClass(FloatWritable.class);
+
+		int numBits = (getConf().getInt("Ivory.NumOfBits",-1)==-1 ? 0 : getConf().getInt("Ivory.NumOfBits", -1));
 		if(args[0].contains("signature")){
-			job.setJobName("BruteForcePwsim_signature_D="+inputPath.toString().substring(inputPath.toString().length()-4)+"_"+threshold+"_"+numResults);
+			job.setJobName("BruteForcePwsim_signature_D="+numBits+"_"+threshold+"_"+(numResults>0 ? numResults : "all"));
 			job.setMapperClass(MyMapperSignature.class);	
 			job.setFloat("Ivory.MaxHammingDistance", threshold);
-		}else{
-			job.setJobName("BruteForcePwsim_docvector_D="+inputPath.toString().substring(inputPath.toString().length()-4)+"_"+threshold+"_"+numResults);
-			job.setMapperClass(MyMapperDocVectors.class);	
+		}else if(args[0].contains("vector")){
+			if(args[0].contains("term")){
+				job.setMapperClass(MyMapperTermDocVectors.class);
+			}else{
+				job.setMapperClass(MyMapperDocVectors.class);
+			}
+			job.setJobName("BruteForcePwsim_docvector_D="+numBits+"_"+threshold+"_"+(numResults>0 ? numResults : "all"));
 			job.setFloat("Ivory.CosineThreshold", threshold);
+			
 		}
 		if(numResults>0){
 			job.setInt("Ivory.NumResults", numResults);
