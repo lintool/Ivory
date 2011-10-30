@@ -382,6 +382,9 @@ public abstract class CLIRUtils extends Configured {
 			}
 			//tf(e) = sum_f{tf(f)*prob(f|e)}
 			for(int e : eS){
+				if(e<=0){		//if eTerm is NULL, that means there were cases where fTerm was unaligned in a sentence pair. Just skip these cases, since the word NULL is not in our target vocab.
+					continue;
+				}
 				float probEF;
 				String eTerm = eVocabTrg.get(e);
 				int e2 = eVocabSrc.get(eTerm);		//convert between two E vocabs (different ids)

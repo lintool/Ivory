@@ -61,7 +61,7 @@ public class BruteForcePwsim extends Configured implements Tool {
 	};
 
 	private static int printUsage() {
-		System.out.println("usage: [type] [input-path] [output-path] [sample-path] [threshold] [num-results]\n[type] is either signature or docvector.\nFor all results, enter -1 for [num-results]");
+		System.out.println("usage: [type = signature|termdocvector|intdocvector] [input-path] [output-path] [sample-path] [threshold] [num-results = -1 for all]");
 		return -1;
 	}
 	
@@ -88,11 +88,12 @@ public class BruteForcePwsim extends Configured implements Tool {
 			sLogger.info("Threshold = "+threshold);
 		
 			//read doc ids of sample into vectors
+			Path[] localFiles = null;
 			try {
-				Path[] localFiles = DistributedCache.getLocalCacheFiles(job);
+				localFiles = DistributedCache.getLocalCacheFiles(job);
 				vectors = SequenceFileUtils.readFile(localFiles[0], FileSystem.getLocal(job));
 			} catch (Exception e) {
-				throw new RuntimeException("Error reading doc vectors!");
+				throw new RuntimeException("Error reading doc vectors from "+(localFiles!=null ? localFiles[0] : "null"));
 			}
 			sLogger.info(vectors.size());
 		}
@@ -100,7 +101,6 @@ public class BruteForcePwsim extends Configured implements Tool {
 		public void map(IntWritable docno, WeightedIntDocVector docvector,
 				OutputCollector<IntWritable, PairOfFloatInt> output,
 				Reporter reporter) throws IOException {
-			Long time = System.currentTimeMillis();
 			for(int i=0;i<vectors.size();i++){
 				IntWritable sampleDocno = (IntWritable)vectors.get(i).getLeftElement();
 
@@ -111,7 +111,6 @@ public class BruteForcePwsim extends Configured implements Tool {
 					output.collect(new IntWritable(sampleDocno.get()), new PairOfFloatInt(cs,docno.get()));
 				}
 			}
-			sLogger.info("Finished in "+(System.currentTimeMillis()-time));
 		}
 	}
 
@@ -134,11 +133,12 @@ public class BruteForcePwsim extends Configured implements Tool {
 			sLogger.info("Threshold = "+threshold);
 		
 			//read doc ids of sample into vectors
+			Path[] localFiles = null;
 			try {
-				Path[] localFiles = DistributedCache.getLocalCacheFiles(job);
+				localFiles = DistributedCache.getLocalCacheFiles(job);
 				vectors = SequenceFileUtils.readFile(localFiles[0], FileSystem.getLocal(job));
 			} catch (Exception e) {
-				throw new RuntimeException("Error reading doc vectors!");
+				throw new RuntimeException("Error reading doc vectors from "+(localFiles!=null ? localFiles[0] : "null"));
 			}
 			sLogger.info(vectors.size());
 		}
@@ -146,12 +146,10 @@ public class BruteForcePwsim extends Configured implements Tool {
 		public void map(IntWritable docno, HMapSFW docvector,
 				OutputCollector<IntWritable, PairOfFloatInt> output,
 				Reporter reporter) throws IOException {
-			Long time = System.currentTimeMillis();
 			for(int i=0;i<vectors.size();i++){
 				reporter.incrCounter(Pairs.Total, 1);
 				IntWritable sampleDocno = (IntWritable)vectors.get(i).getLeftElement();
 				HMapSFW fromSample = (HMapSFW)vectors.get(i).getRightElement();
-				
 				float cs = CLIRUtils.cosine(docvector, fromSample); 
 				if(cs >= threshold){
 					sLogger.debug(sampleDocno + "," + fromSample+"\n"+fromSample.length());
@@ -161,7 +159,6 @@ public class BruteForcePwsim extends Configured implements Tool {
 					output.collect(new IntWritable(sampleDocno.get()), new PairOfFloatInt(cs,docno.get()));
 				}
 			}
-			sLogger.debug("Finished in "+(System.currentTimeMillis()-time));
 		}
 	}
 	

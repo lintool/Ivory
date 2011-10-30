@@ -39,7 +39,6 @@ public class StanfordChineseTokenizer extends Tokenizer {
 			classifier = new CRFClassifier(props);
 			FSDataInputStream in = fs.open(new Path(conf.get("Ivory.TokenizerModel")+"/pku"));
 			FSDataInputStream inDict = fs.open(new Path(conf.get("Ivory.TokenizerModel")+"/dict-chris6.ser"));
-			sLogger.info("STR "+in.available());
 			classifier.loadClassifier(in, props);			//data/pku.gz
 			classifier.flags.setConf(conf);
 			readerWriter = classifier.makeReaderAndWriter(inDict);

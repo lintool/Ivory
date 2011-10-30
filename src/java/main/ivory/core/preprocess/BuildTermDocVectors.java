@@ -355,6 +355,9 @@ public class BuildTermDocVectors extends PowerTool {
     env.writeTokenizerClass(tokenizer);
     env.writeDocnoOffset(docnoOffset);
 
+	conf.set("mapred.child.java.opts", "-Xmx2048m");
+	conf.setInt("mapred.task.timeout", 6000000);
+		
     Job job1 = new Job(conf,
         BuildTermDocVectors.class.getSimpleName() + ":" + collectionName);
     job1.setJarByClass(BuildTermDocVectors.class);
