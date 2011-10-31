@@ -32,6 +32,7 @@ public class OpenNLPTokenizer extends ivory.core.tokenize.Tokenizer {
 	protected static int NUM_PREDS, MIN_LENGTH = 2, MAX_LENGTH = 50;
 	String delims = "`~!@#$%^&*()-_=+]}[{\\|'\";:/?.>,<";
 	private static final int ENGLISH=0, FRENCH=1, GERMAN=2;
+	private static final String[] languages = {"english", "french", "german"};
 	private static final String[] TERRIER_STOP_WORDS = {
 		"a",
 		"abaft",
@@ -821,11 +822,11 @@ public class OpenNLPTokenizer extends ivory.core.tokenize.Tokenizer {
 		Class stemClass;
 		try {
 			stemClass = Class.forName("org.tartarus.snowball.ext." +
-					lang + "Stemmer");
+					languages[lang] + "Stemmer");
 			stemmer = (SnowballStemmer) stemClass.newInstance();
 		} catch (ClassNotFoundException e) {
 			sLogger.warn("Stemmer class not recognized!\n"+"org.tartarus.snowball.ext." +
-					lang + "Stemmer");
+					languages[lang] + "Stemmer");
 			stemmer = null;
 			return;
 		} catch (Exception e) {
