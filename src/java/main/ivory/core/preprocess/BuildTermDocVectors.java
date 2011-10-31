@@ -45,6 +45,7 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.NullOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 import org.apache.hadoop.util.LineReader;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import edu.umd.cloud9.collection.DocnoMapping;
@@ -58,6 +59,7 @@ import edu.umd.cloud9.util.map.MapII;
 
 public class BuildTermDocVectors extends PowerTool {
   private static final Logger LOG = Logger.getLogger(BuildTermDocVectors.class);
+  { LOG.setLevel (Level.INFO); }
 
   protected static enum Docs { Skipped, Total, Empty }
   protected static enum MapTime { Spilling, Parsing }
@@ -333,14 +335,6 @@ public class BuildTermDocVectors extends PowerTool {
     LOG.info(String.format(" - %s: %s", Constants.TermDocVectorSegments, numReducers));
 
     RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fs);
-    Path mappingFile = env.getDocnoMappingData();
-
-    if (!fs.exists(mappingFile)) {
-      LOG.error("Error, docno mapping data file " + mappingFile + "doesn't exist!");
-      return 0;
-    }
-
-    DistributedCache.addCacheFile(mappingFile.toUri(), conf);
 
     Path outputPath = new Path(env.getTermDocVectorsDirectory());
     if (fs.exists(outputPath)) {
@@ -354,6 +348,13 @@ public class BuildTermDocVectors extends PowerTool {
     env.writeDocnoMappingClass(mappingClass);
     env.writeTokenizerClass(tokenizer);
     env.writeDocnoOffset(docnoOffset);
+
+    Path mappingFile = env.getDocnoMappingData();
+    if (!fs.exists(mappingFile)) {
+      LOG.error("Error, docno mapping data file " + mappingFile + " doesn't exist!");
+      return 0;
+    }
+    DistributedCache.addCacheFile(mappingFile.toUri(), conf);
 
     Job job1 = new Job(conf,
         BuildTermDocVectors.class.getSimpleName() + ":" + collectionName);

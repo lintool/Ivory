@@ -60,7 +60,7 @@ public class BuildIPInvertedIndexDocSorted extends PowerTool {
   protected static enum MapTime { Total }
   protected static enum ReduceTime { Total }
 
-  private static class MyMapper 
+  private static class MyMapper
       extends Mapper<IntWritable, IntDocVector, PairOfInts, TermPositions> {
     private static final TermPositions termPositions = new TermPositions();
     private static final PairOfInts pair = new PairOfInts();
@@ -225,7 +225,7 @@ public class BuildIPInvertedIndexDocSorted extends PowerTool {
   }
 
   public static final String[] RequiredParameters = {
-          Constants.NumReduceTasks, Constants.IndexPath };
+          Constants.IndexPath };
 
   public String[] getRequiredParameters() {
     return RequiredParameters;
@@ -244,7 +244,6 @@ public class BuildIPInvertedIndexDocSorted extends PowerTool {
 
     String collectionName = env.readCollectionName();
 
-    int reduceTasks = conf.getInt(Constants.NumReduceTasks, 0);
     int minSplitSize = conf.getInt(Constants.MinSplitSize, 0);
     int collectionDocCnt = env.readCollectionDocumentCount();
 
@@ -259,7 +258,6 @@ public class BuildIPInvertedIndexDocSorted extends PowerTool {
     LOG.info(String.format(" - %s: %s", Constants.CollectionName, collectionName));
     LOG.info(String.format(" - %s: %s", Constants.CollectionDocumentCount, collectionDocCnt));
     LOG.info(String.format(" - %s: %s", Constants.PostingsListsType, postingsClass.getCanonicalName()));
-    LOG.info(String.format(" - %s: %s", Constants.NumReduceTasks, reduceTasks));
     LOG.info(String.format(" - %s: %s", Constants.MinSplitSize, minSplitSize));
 
     if (!fs.exists(new Path(indexPath))) {
@@ -282,8 +280,6 @@ public class BuildIPInvertedIndexDocSorted extends PowerTool {
     Job job = new Job(conf,
         BuildIPInvertedIndexDocSorted.class.getSimpleName() + ":" + collectionName);
     job.setJarByClass(BuildIPInvertedIndexDocSorted.class);
-
-    job.setNumReduceTasks(reduceTasks);
 
     FileInputFormat.setInputPaths(job, inputPath);
     FileOutputFormat.setOutputPath(job, postingsPath);

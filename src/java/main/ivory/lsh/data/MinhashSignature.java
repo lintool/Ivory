@@ -248,4 +248,6 @@ public class MinhashSignature extends Signature{//implements WritableComparable<
 		return sublst;
 	}
 
+	public void and(Signature signature) {}
+	public void or(Signature signature) {}
 }

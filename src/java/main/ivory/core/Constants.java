@@ -19,4 +19,7 @@ public class Constants {
   public static final String TermIndexWindow = "Ivory.TermIndexWindow";
   public static final String MinSplitSize = "Ivory.MinSplitSize";
   public static final String TermDocVectorSegments = "Ivory.TermDocVectorSegments";
+  public static final String BuildWeighted = "Ivory.BuildWeighted";
+  public static final String ScoringModel = "Ivory.ScoringModel";
+  public static final String Normalize = "Ivory.Normalize";
 }

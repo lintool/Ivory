@@ -95,6 +95,13 @@ public class WeightedIntDocVector implements IntDocVector {
 		}
 	}
 
+	public boolean isInfinite() {
+		return weightedTerms.get(0) == Float.POSITIVE_INFINITY;
+	}
+
 }
+	
+
+
 	
 

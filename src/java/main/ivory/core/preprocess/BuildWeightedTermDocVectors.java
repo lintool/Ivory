@@ -63,9 +63,9 @@ import edu.umd.cloud9.util.map.MapKF;
 public class BuildWeightedTermDocVectors extends PowerTool {
 	private static final Logger sLogger = Logger.getLogger(BuildWeightedTermDocVectors.class);
 
-	static{
-		sLogger.setLevel(Level.WARN);
-	}
+	//	static{
+	//		sLogger.setLevel(Level.WARN);
+	//	}
 	protected static enum Docs{
 		Total, ZERO, SHORT
 	}
