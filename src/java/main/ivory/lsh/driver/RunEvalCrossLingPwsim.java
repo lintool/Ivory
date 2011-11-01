@@ -70,7 +70,8 @@ public class RunEvalCrossLingPwsim extends PwsimEnvironment implements Tool {
 		config.set("Ivory.IndexPath", targetLangDir);
 
 		// collection size is the sum of the two collections' sizes
-		int collSize = targetEnv.readCollectionDocumentCount()+srcEnv.readCollectionDocumentCount();
+		int srcCollSize = srcEnv.readCollectionDocumentCount();
+		int collSize = targetEnv.readCollectionDocumentCount()+srcCollSize;
 		config.setInt("Ivory.CollectionDocumentCount", collSize);
 
 		///////Parameters/////////////
@@ -116,7 +117,7 @@ public class RunEvalCrossLingPwsim extends PwsimEnvironment implements Tool {
 
 		// sample from non-English weighted int doc vectors: these are needed by BruteForcePwsim, which finds the ground truth pairs for the sample using dot product of doc vectors
 		if(!hdfs.exists(new Path(sampleWtdIntDocVectorsPath))){
-			int frequency = (collSize/sampleSize);
+			int frequency = (srcCollSize/sampleSize);
 			String[] sampleArgs = {wtdIntDocVectorsPath, sampleWtdIntDocVectorsPath, "100", frequency+""};
 			SampleDocVectors.main(sampleArgs);
 		}

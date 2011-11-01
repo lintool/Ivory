@@ -16,8 +16,10 @@
 
 package ivory.core.preprocess;
 import ivory.core.RetrievalEnvironment;
+import ivory.core.data.dictionary.DefaultFrequencySortedDictionary;
 import ivory.core.data.document.LazyTermDocVector;
 import ivory.core.data.document.TermDocVector;
+import ivory.core.data.stat.DfTableArray;
 import ivory.core.data.stat.DocLengthTable;
 import ivory.core.data.stat.DocLengthTable2B;
 import ivory.core.data.stat.DocLengthTable4B;
@@ -78,9 +80,10 @@ public class BuildWeightedTermDocVectors extends PowerTool {
 		int MIN_SIZE = 0;
 
 		boolean shortDocLengths = false; 
-		PrefixEncodedGlobalStats globalStatsMap;
 		private boolean normalize = false;
-
+		DefaultFrequencySortedDictionary dict;
+		DfTableArray dfTable; 
+		
 		public void configure(JobConf conf){
 			normalize = conf.getBoolean("Ivory.Normalize", false);
 			shortDocLengths = conf.getBoolean("Ivory.ShortDocLengths", false);
@@ -97,11 +100,14 @@ public class BuildWeightedTermDocVectors extends PowerTool {
 					String indexPath = conf.get ("Ivory.IndexPath");
 					//sLogger.info ("indexPath: " + indexPath);
 					RetrievalEnvironment env = new RetrievalEnvironment (indexPath, fs);
-					//					sLogger.info ("env: " + env);
-					localFiles = new Path [3];
+					//sLogger.info ("env: " + env);
+					localFiles = new Path [5];
 					localFiles [0] = new Path (env.getIndexTermsData ());
-					localFiles [1] = new Path (env.getDfByTermData ());
-					localFiles [2] = env.getDoclengthsData ();
+					localFiles [1] = new Path (env.getIndexTermIdsData ());
+					localFiles [2] = new Path (env.getIndexTermIdMappingData ());
+					localFiles [3] = new Path (env.getDfByTermData ());
+					localFiles [4] = env.getDoclengthsData ();
+
 				} else {
 					localFiles = DistributedCache.getLocalCacheFiles (conf);
 				}
@@ -109,30 +115,21 @@ public class BuildWeightedTermDocVectors extends PowerTool {
 				throw new RuntimeException ("Local cache files not read properly.");
 			}
 
-			//for (int i = 0; i < 5; i++)
-			//				sLogger.info ("localFiles [" + i + "]: " + localFiles [i]);
-
 			try{
-				globalStatsMap = new PrefixEncodedGlobalStats(localFiles[0], FileSystem.getLocal(conf));
+				dict = new DefaultFrequencySortedDictionary(localFiles[0], localFiles[1], localFiles[2], FileSystem.getLocal(conf));
+				dfTable = new DfTableArray(localFiles[3], FileSystem.getLocal(conf));
 			} catch (Exception e) {
 				e.printStackTrace();
-				throw new RuntimeException("Error loading Terms File for global stats from "+localFiles[0]);
-			}
-
-			try{
-				globalStatsMap.loadDFStats(localFiles[1]);
-			} catch (Exception e) {
-				e.printStackTrace();
-				throw new RuntimeException("Error loading df file from "+localFiles[1]);
+				throw new RuntimeException("Error loading Terms File for dictionary from "+localFiles[0]);
 			}
 
 			sLogger.info("Global Stats table loaded successfully.");
 
 			try {
 				if(shortDocLengths)
-					mDLTable = new DocLengthTable2B(localFiles[2], FileSystem.getLocal(conf));
+					mDLTable = new DocLengthTable2B(localFiles[4], FileSystem.getLocal(conf));
 				else 
-					mDLTable = new DocLengthTable4B(localFiles[2], FileSystem.getLocal(conf));
+					mDLTable = new DocLengthTable4B(localFiles[4], FileSystem.getLocal(conf));
 			} catch (IOException e1) {
 				throw new RuntimeException("Error loading dl table from "+localFiles[4]);
 			}	
@@ -164,15 +161,18 @@ public class BuildWeightedTermDocVectors extends PowerTool {
 			sum2 = 0;
 			while(r.hasMoreTerms()){
 				term = r.nextTerm();
-				int df = globalStatsMap.getDF(term);
-				if(df>=1){
+				int id = dict.getId(term); 
+				if(id != -1){
+					int df = dfTable.getDf(id);
+//				}
+//				if(df>=1){
 					sLogger.debug(term);
-					mScoreFn.setDF(globalStatsMap.getDF(term));
+					mScoreFn.setDF(df);
 					wt = mScoreFn.computeDocumentWeight(r.getTf(), docLen);
 					weightedVector.put(term, wt);
 					sum2 += wt * wt;
 				}else{
-					sLogger.debug("skipping term "+term+" with df: "+df);
+					sLogger.debug("skipping term "+term+" (not in dictionary)");
 				}
 			}
 			sLogger.debug("===================================END READ DOC");
@@ -213,25 +213,23 @@ public class BuildWeightedTermDocVectors extends PowerTool {
 
 	@SuppressWarnings("deprecation")
 	public int runTool() throws Exception {
-		//		sLogger.setLevel(Level.DEBUG);
-
 		sLogger.info("PowerTool: GetWeightedTermDocVectors");
 
-		// create a new JobConf, inheriting from the configuration of this
-		// PowerTool
-		JobConf conf = new JobConf(getConf(), BuildWeightedTermDocVectors.class);
+		JobConf conf = new JobConf(BuildWeightedTermDocVectors.class);
 		FileSystem fs = FileSystem.get(conf);
 
-		String indexPath = conf.get("Ivory.IndexPath");
+		String indexPath = getConf().get("Ivory.IndexPath");
 		RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fs);
 		String outputPath = env.getWeightedTermDocVectorsDirectory();
-		int mapTasks = conf.getInt("Ivory.NumMapTasks", 0);
-		int minSplitSize = conf.getInt("Ivory.MinSplitSize", 0);
-		String collectionName = conf.get("Ivory.CollectionName");
+		int mapTasks = getConf().getInt("Ivory.NumMapTasks", 0);
+		int minSplitSize = getConf().getInt("Ivory.MinSplitSize", 0);
+		String collectionName = getConf().get("Ivory.CollectionName");
 
 		String termsFilePath = env.getIndexTermsData();
+		String termsIdsFilePath = env.getIndexTermIdsData();
+		String termIdMappingFilePath = env.getIndexTermIdMappingData();
 		String dfByTermFilePath = env.getDfByTermData();
-
+		
 		Path inputPath = new Path(env.getTermDocVectorsDirectory());
 		Path weightedVectorsPath = new Path(outputPath);
 
@@ -242,10 +240,12 @@ public class BuildWeightedTermDocVectors extends PowerTool {
 		}
 
 		/* add terms file to cache */
-		if (!fs.exists(new Path(termsFilePath))) {
-			throw new RuntimeException("Error, terms file " + termsFilePath + "doesn't exist!");
+		if (!fs.exists(new Path(termsFilePath)) || !fs.exists(new Path(termsIdsFilePath)) || !fs.exists(new Path(termIdMappingFilePath))) {
+			throw new RuntimeException("Error, terms file " + termsFilePath + "/" + termsIdsFilePath + "/" + termIdMappingFilePath + "doesn't exist!");
 		}
 		DistributedCache.addCacheFile(new URI(termsFilePath), conf);
+		DistributedCache.addCacheFile(new URI(termsIdsFilePath), conf);
+		DistributedCache.addCacheFile(new URI(termIdMappingFilePath), conf);
 
 		/* add df table to cache */
 		if (!fs.exists(new Path(dfByTermFilePath))) {
@@ -267,6 +267,12 @@ public class BuildWeightedTermDocVectors extends PowerTool {
 		conf.setNumReduceTasks(0);
 		conf.setInt("mapred.min.split.size", minSplitSize);
 		conf.set("mapred.child.java.opts", "-Xmx2048m");
+		conf.setInt("Ivory.MinNumTerms", getConf().getInt("Ivory.MinNumTerms", Integer.MAX_VALUE));		
+		conf.setBoolean("Ivory.Normalize", getConf().getBoolean("Ivory.Normalize", false));
+		if(getConf().get("Ivory.ShortDocLengths")!=null){
+			conf.set("Ivory.ShortDocLengths", getConf().get("Ivory.ShortDocLengths"));
+		}
+		conf.set("Ivory.ScoringModel", getConf().get("Ivory.ScoringModel"));
 
 		FileInputFormat.setInputPaths(conf, inputPath);
 		FileOutputFormat.setOutputPath(conf, weightedVectorsPath);
