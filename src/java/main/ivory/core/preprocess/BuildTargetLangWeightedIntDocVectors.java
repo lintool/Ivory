@@ -140,7 +140,6 @@ public class BuildTargetLangWeightedIntDocVectors extends PowerTool {
 
 	public static final String[] RequiredParameters = { "Ivory.NumMapTasks",
 		"Ivory.IndexPath", 
-		"Ivory.ScoringModel", 
 		"Ivory.Normalize",
 		};
 
@@ -158,17 +157,17 @@ public class BuildTargetLangWeightedIntDocVectors extends PowerTool {
 
 		sLogger.info("PowerTool: GetTargetLangWeightedIntDocVectors");
 
-		JobConf conf = new JobConf(getConf(), BuildWeightedIntDocVectors.class);
+		JobConf conf = new JobConf(BuildTargetLangWeightedIntDocVectors.class);
 		FileSystem fs = FileSystem.get(conf);
 
-		String indexPath = conf.get("Ivory.IndexPath");
+		String indexPath = getConf().get("Ivory.IndexPath");
 		
 		RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fs);
 
 		String outputPath = env.getWeightedIntDocVectorsDirectory();
-		int mapTasks = conf.getInt("Ivory.NumMapTasks", 0);
-		int minSplitSize = conf.getInt("Ivory.MinSplitSize", 0);
-		String collectionName = conf.get("Ivory.CollectionName");
+		int mapTasks = getConf().getInt("Ivory.NumMapTasks", 0);
+		int minSplitSize = getConf().getInt("Ivory.MinSplitSize", 0);
+		String collectionName = getConf().get("Ivory.CollectionName");
 
 
 		sLogger.info("Characteristics of the collection:");
@@ -177,7 +176,7 @@ public class BuildTargetLangWeightedIntDocVectors extends PowerTool {
 		sLogger.info(" - NumMapTasks: " + mapTasks);
 		sLogger.info(" - MinSplitSize: " + minSplitSize);
 		
-		String vocabFile = conf.get("Ivory.FinalVocab");
+		String vocabFile = getConf().get("Ivory.FinalVocab");
 		DistributedCache.addCacheFile(new URI(vocabFile), conf);
 
 		Path inputPath = new Path(PwsimEnvironment.getFileNameWithPars(indexPath, "TermDocs"));
@@ -192,7 +191,7 @@ public class BuildTargetLangWeightedIntDocVectors extends PowerTool {
 		conf.setNumReduceTasks(0);
 		conf.setInt("mapred.min.split.size", minSplitSize);
 		conf.set("mapred.child.java.opts", "-Xmx2048m");
-
+		conf.setBoolean("Ivory.Normalize", getConf().getBoolean("Ivory.Normalize", false));
 		FileInputFormat.setInputPaths(conf, inputPath);
 		FileOutputFormat.setOutputPath(conf, weightedVectorsPath);
 
