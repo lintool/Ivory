@@ -49,6 +49,10 @@ import edu.umd.cloud9.debug.MemoryUsageUtils;
  */
 public class IntDocVectorsForwardIndex {
   private static final Logger LOG = Logger.getLogger(IntDocVectorsForwardIndex.class);
+  {
+    LOG.setLevel(Level.INFO);
+  }
+
   private static final NumberFormat FORMAT = new DecimalFormat("00000");
 
   // This is 10^15 (i.e., an exabyte). We're assuming that each individual file is smaller than
@@ -83,16 +87,15 @@ public class IntDocVectorsForwardIndex {
    */
   public IntDocVectorsForwardIndex(String indexPath, FileSystem fs, boolean weighted)
       throws IOException {
-	  LOG.setLevel(Level.TRACE);
     this.fs = Preconditions.checkNotNull(fs);
     this.conf = fs.getConf();
 
     RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fs);
     path = (weighted ? env.getWeightedIntDocVectorsDirectory() : env.getIntDocVectorsDirectory());
 
-    String forwardIndexPath =(weighted 
-							   ? env.getWeightedIntDocVectorsForwardIndex()
-							   : env.getIntDocVectorsForwardIndex());
+    String forwardIndexPath =(weighted
+                                                           ? env.getWeightedIntDocVectorsForwardIndex()
+                                                           : env.getIntDocVectorsForwardIndex());
     FSDataInputStream posInput = fs.open(new Path(forwardIndexPath));
 
     docnoOffset = posInput.readInt();
@@ -100,8 +103,18 @@ public class IntDocVectorsForwardIndex {
 
     positions = new long[collectionDocumentCount];
     for (int i = 0; i < collectionDocumentCount; i++) {
-      positions[i] = posInput.readLong();
+      if (i > 0 && i % (1000 * 1000) == 0) {
+        LOG.info("Read " + i + " positions of " + collectionDocumentCount);
+      }
+      try {
+        positions[i] = posInput.readLong();
+      } catch (Exception e) {
+        LOG.error("problem reading position: " + i);
+        e.printStackTrace ();
+        break;
+      }
     }
+    LOG.info("Finished reading " + collectionDocumentCount + " positions.");
   }
 
   /**
@@ -140,8 +153,8 @@ public class IntDocVectorsForwardIndex {
     reader.next(key, value);
 
     if (key.get() != docno) {
-      LOG.error("unable to doc vector for docno " + docno + ": found docno " + key
-          + " instead");
+      LOG.error("unable to get doc vector for docno " + docno + ": found docno "
+          + key + " instead");
       return null;
     }
 
