@@ -154,7 +154,7 @@ public class PreprocessAquaint2 extends Configured implements Tool {
     new BuildIntDocVectors(conf).run();
 
     new BuildIntDocVectorsForwardIndex(conf).run();
-    new BuildTermDocVectorsForwardIndex(conf).run();
+    //new BuildTermDocVectorsForwardIndex(conf).run();
 
     new BuildIPInvertedIndexDocSorted(conf).run();
 
