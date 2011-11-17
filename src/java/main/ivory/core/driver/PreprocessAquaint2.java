@@ -37,7 +37,9 @@ import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Logger;
 
+import edu.umd.cloud9.collection.XMLInputFormat;
 import edu.umd.cloud9.collection.aquaint2.Aquaint2DocnoMapping;
+import edu.umd.cloud9.collection.aquaint2.Aquaint2Document;
 import edu.umd.cloud9.collection.aquaint2.Aquaint2DocumentInputFormat2;
 import edu.umd.cloud9.collection.aquaint2.BuildAquaint2ForwardIndex;
 import edu.umd.cloud9.collection.aquaint2.NumberAquaint2Documents2;
@@ -80,6 +82,8 @@ public class PreprocessAquaint2 extends Configured implements Tool {
     }
 
     RetrievalEnvironment env = new RetrievalEnvironment(indexRootPath, fs);
+    conf.set(XMLInputFormat.START_TAG_KEY, Aquaint2Document.getXmlStartTag(fs, collection));
+    conf.set(XMLInputFormat.END_TAG_KEY, Aquaint2Document.getXmlEndTag());
 
     // Look for the docno mapping, which maps from docid (String) to docno
     // (sequentially-number integer). If it doesn't exist create it.
