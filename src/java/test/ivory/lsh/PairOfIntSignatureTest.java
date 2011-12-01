@@ -14,7 +14,6 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.io.Writable;
-import org.apache.hadoop.io.WritableComparable;
 import org.junit.Test;
 
 import edu.umd.cloud9.io.pair.PairOfWritables;
@@ -24,19 +23,19 @@ public class PairOfIntSignatureTest {
 
 	@Test
 	public void testReadWrite() throws IOException{
-		SequenceFile.Writer w = SequenceFile.createWriter(FileSystem.get(new Configuration()), new Configuration(), 
-				new Path("PairOfIntSignatureTest"), IntWritable.class, PairOfIntSignature.class);
+		SequenceFile.Writer w = SequenceFile.createWriter(FileSystem.getLocal(new Configuration()), new Configuration(), 
+				new Path("PairOfIntSignatureTest"), IntWritable.class, PairOfIntNBitSignature.class);
 		
-		PairOfIntSignature p1 = new PairOfIntNBitSignature(1, null);
-		PairOfIntSignature p2 = new PairOfIntNBitSignature(2, new NBitSignature(100));
-		PairOfIntSignature p3 = new PairOfIntNBitSignature(3, null);
+		PairOfIntNBitSignature p1 = new PairOfIntNBitSignature(1, null);
+		PairOfIntNBitSignature p2 = new PairOfIntNBitSignature(2, new NBitSignature(100));
+		PairOfIntNBitSignature p3 = new PairOfIntNBitSignature(3, null);
 
 		w.append(new IntWritable(1), p1);
 		w.append(new IntWritable(2), p2);
 		w.append(new IntWritable(3), p3);
 		w.close();
 		
-		List<PairOfWritables<WritableComparable, Writable>> listOfKeysPairs = SequenceFileUtils.readFile(new Path("PairOfIntSignatureTest"));
+		List<PairOfWritables<Writable, Writable>> listOfKeysPairs = SequenceFileUtils.readFile(new Path("PairOfIntSignatureTest"), FileSystem.getLocal(new Configuration()));
 		FileSystem.get(new Configuration()).delete(new Path("PairOfIntSignatureTest"), true);
 		
 		PairOfIntSignature a1 = (PairOfIntSignature) listOfKeysPairs.get(0).getRightElement();
