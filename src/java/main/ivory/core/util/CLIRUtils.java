@@ -400,11 +400,7 @@ public abstract class CLIRUtils extends Configured {
 				probEF = e2fProbs.get(e2, f2);
 				if(probEF > 0){
 					sLogger.debug(eTerm+" ==> "+probEF);
-//					if(tfTable.containsKey(e2)){
-						tfTable.increment(e2, tf*probEF);
-//					}else{
-//						tfTable.put(e2, tf*probEF);
-//					}
+					tfTable.increment(e2, tf*probEF);
 					sLogger.debug("updated weight to "+tfTable.get(e2));
 				}
 			}
@@ -472,11 +468,7 @@ public abstract class CLIRUtils extends Configured {
 				prob = e2fProbs.get(e2, f2);
 				if(prob > 0){
 					//					sLogger.debug(eVocabSrc.get(e2)+" ==> "+prob);
-//					if(tfTable.containsKey(e2)){
-						tfTable.increment(e2, tf*prob);
-//					}else{
-//						tfTable.put(e2, tf*prob);
-//					}
+					tfTable.increment(e2, tf*prob);
 				}
 			}
 		}
@@ -636,49 +628,7 @@ public abstract class CLIRUtils extends Configured {
 		}
 		return v;
 	}
-	//	/**
-	//	 * Read a Vocab object from file.
-	//	 * 
-	//	 * @param path 
-	//	 * 		path to vocabulary file
-	//	 * @param fileSys
-	//	 * 		FileSystem object
-	//	 * @return 
-	//	 * 		Vocab object
-	//	 * @throws IOException
-	//	 */
-	//	public static Vocab loadVocab(Path path, FileSystem fileSys) throws IOException {
-	//		DataInput in = new DataInputStream(new BufferedInputStream(fileSys.open(path)));
-	//		VocabularyWritable at = new VocabularyWritable();
-	//		at.readFields(in);
-	//
-	//		return at;
-	//	}
-	//	
-	//	
-	//	/**
-	//	 * Read a Vocab object from file.
-	//	 * 
-	//	 * @param path 
-	//	 * 		path to vocabulary file
-	//	 * @param job
-	//	 * 		Configuration/JobConf object
-	//	 * @return 
-	//	 * 		Vocab object
-	//	 * @throws IOException
-	//	 */
-	//	static public Vocab loadVocab(Path path, Configuration job) throws IOException {
-	//		org.apache.hadoop.conf.Configuration conf = new org.apache.hadoop.conf.Configuration(job);
-	//		FileSystem fileSys = FileSystem.get(conf);
-	//
-	//		DataInput in = new DataInputStream(new BufferedInputStream(fileSys.open(path)));
-	//		VocabularyWritable at = new VocabularyWritable();
-	//		at.readFields(in);
-	//
-	//		return at;
-	//	}
-
-
+	
 	/**
 	 * This method converts the output of BerkeleyAligner into a TTable_monolithic_IFAs object. 
 	 * For each source language term, top NUM_TRANS entries (with highest translation probability) are kept, unless the top K < NUM_TRANS entries have a cumulatite probability above PROB_THRESHOLD.
@@ -972,9 +922,6 @@ public abstract class CLIRUtils extends Configured {
 
 			sortedIndices.add(trgIndex);
 			index2ProbMap.put(trgIndex, pr);
-//			if(sumOfProbs > PROB_THRESHOLD){
-//				break;
-//			}
 		}
 
 		// to enable faster access with binary search, we sort entries by vocabulary index.

@@ -106,15 +106,7 @@ public class BruteForcePwsim extends Configured implements Tool {
 
 				WeightedIntDocVector fromSample = (WeightedIntDocVector)vectors.get(i).getRightElement();
 				float cs = CLIRUtils.cosine(docvector.getWeightedTerms(), fromSample.getWeightedTerms());
-				
-//				if((sampleDocno.get()==1000009022 && docno.get()==189034) || (sampleDocno.get()==1000170828 && docno.get()==2898431)){
-//					reporter.incrCounter(Pairs.DEBUG, 1);
-//					sLogger.info(sampleDocno.get()+","+docno.get()+"="+cs);
-//					sLogger.info(fromSample);
-//					sLogger.info(docvector);
-//				}else{
-//					continue;
-//				}
+
 				if(cs >= threshold){
 					output.collect(new IntWritable(sampleDocno.get()), new PairOfFloatInt(cs,docno.get()));
 				}
@@ -154,13 +146,6 @@ public class BruteForcePwsim extends Configured implements Tool {
 		public void map(IntWritable docno, HMapSFW docvector,
 				OutputCollector<IntWritable, PairOfFloatInt> output,
 				Reporter reporter) throws IOException {
-//			if(docno.get()==189034){
-//				reporter.incrCounter(Pairs.DEBUG2, 1);
-//			}else if(docno.get()==2898431){
-//				reporter.incrCounter(Pairs.DEBUG2, 1);
-//			}else{
-//				return;
-//			}
 
 			for(int i=0;i<vectors.size();i++){
 				reporter.incrCounter(Pairs.Total, 1);
@@ -168,15 +153,6 @@ public class BruteForcePwsim extends Configured implements Tool {
 				HMapSFW fromSample = (HMapSFW)vectors.get(i).getRightElement();
 				
 				float cs = CLIRUtils.cosine(docvector, fromSample); 
-//				if((sampleDocno.get()==1000009022 && docno.get()==189034) || (sampleDocno.get()==1000170828 && docno.get()==2898431)){
-//					reporter.incrCounter(Pairs.DEBUG, 1);
-//					sLogger.info(sampleDocno.get()+","+docno.get()+"="+cs);
-//					sLogger.info(fromSample);
-//					sLogger.info(docvector);
-//				}else{
-//					continue;
-//				}
-				
 				if(cs >= threshold){
 //					sLogger.debug(sampleDocno + "," + fromSample+"\n"+fromSample.length());
 //					sLogger.debug(docno + "," + docvector+"\n"+docvector.length());
@@ -219,13 +195,6 @@ public class BruteForcePwsim extends Configured implements Tool {
 		public void map(IntWritable docno, Signature signature,
 				OutputCollector<IntWritable, PairOfFloatInt> output,
 				Reporter reporter) throws IOException {
-//			if(docno.get()==189034){
-//				reporter.incrCounter(Pairs.DEBUG2, 1);
-//			}else if(docno.get()==2898431){
-//				reporter.incrCounter(Pairs.DEBUG2, 1);
-//			}else{
-//				return;
-//			}
 			for(int i=0;i<signatures.size();i++){
 				reporter.incrCounter(Pairs.Total, 1);
 				IntWritable sampleDocno = (IntWritable)signatures.get(i).getLeftElement();

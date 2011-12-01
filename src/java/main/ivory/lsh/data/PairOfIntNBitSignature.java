@@ -1,10 +1,19 @@
 package ivory.lsh.data;
 
+import ivory.core.util.CLIRUtils;
+
 import java.io.DataInput;
 import java.io.IOException;
 
-public class PairOfIntNBitSignature extends PairOfIntSignature {
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
+public class PairOfIntNBitSignature extends PairOfIntSignature {
+	private static final Logger logger = Logger.getLogger(PairOfIntNBitSignature.class);
+	{
+		logger.setLevel(Level.WARN);
+	}
+	
 	public PairOfIntNBitSignature() {
 		super();
 	}
@@ -28,7 +37,8 @@ public class PairOfIntNBitSignature extends PairOfIntSignature {
 		try {
 			signature.readFields(in);
 		} catch (IOException e) {
-			throw new RuntimeException(e);
+			logger.warn("NULL SIGNATURE!");
+			signature = null;
 		}
 	}
 	
