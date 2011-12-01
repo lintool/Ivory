@@ -3,9 +3,9 @@ package ivory.lsh.eval;
 
 import ivory.core.data.document.WeightedIntDocVector;
 import ivory.lsh.eval.SampleSignatures.mapoutput;
-
 import java.io.IOException;
 import java.net.URI;
+import java.util.Iterator;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
@@ -21,6 +21,7 @@ import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.MapReduceBase;
 import org.apache.hadoop.mapred.Mapper;
 import org.apache.hadoop.mapred.OutputCollector;
+import org.apache.hadoop.mapred.Reducer;
 import org.apache.hadoop.mapred.Reporter;
 import org.apache.hadoop.mapred.SequenceFileInputFormat;
 import org.apache.hadoop.mapred.SequenceFileOutputFormat;
@@ -29,8 +30,9 @@ import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-
 import edu.umd.cloud9.io.FSLineReader;
+import edu.umd.cloud9.io.pair.PairOfFloatInt;
+import edu.umd.cloud9.io.pair.PairOfInts;
 import edu.umd.cloud9.util.map.HMapII;
 
 /**
@@ -57,8 +59,8 @@ import edu.umd.cloud9.util.map.HMapII;
  * 
  * <pre>
  * hadoop jar ivory.jar ivory.util.SampleDocVectors 
- * /umd-lin/fture/pwsim/medline/wt-term-doc-vectors 
- * /umd-lin/fture/pwsim/medline/wt-term-doc-vectors-sample 
+ * /umd-lin/fture/pwsim/medline/wt-int-doc-vectors 
+ * /umd-lin/fture/pwsim/medline/wt-int-doc-vectors-sample 
  * 100 
  * </pre>
  * 
@@ -75,18 +77,18 @@ import edu.umd.cloud9.util.map.HMapII;
  *
  */
 @SuppressWarnings("deprecation")
-public class SampleDocVectors  extends Configured implements Tool{
+public class SampleIntDocVectors  extends Configured implements Tool{
 	@SuppressWarnings("unchecked")
 	static Class keyClass = IntWritable.class, valueClass = WeightedIntDocVector.class, inputFormat = SequenceFileInputFormat.class;
 
-	private static final Logger sLogger = Logger.getLogger(SampleDocVectors.class);
+	private static final Logger sLogger = Logger.getLogger(SampleIntDocVectors.class);
 
 	private static int printUsage() {
 		System.out.println("usage: [input] [output-dir] [number-of-mappers] [sample-freq] ([sample-docnos-path])");
 		return -1;
 	}
 	
-	public SampleDocVectors(){
+	public SampleIntDocVectors(){
 
 	}
 
@@ -138,6 +140,17 @@ public class SampleDocVectors  extends Configured implements Tool{
 			}
 		}
 	}
+	
+	public static class MyReducer extends MapReduceBase implements
+	Reducer<IntWritable, WeightedIntDocVector, IntWritable, WeightedIntDocVector> {
+
+		@Override
+		public void reduce(IntWritable key, Iterator<WeightedIntDocVector> values, OutputCollector<IntWritable, WeightedIntDocVector> output,
+				Reporter reporter) throws IOException {
+			output.collect(key, values.next());
+		}
+	}
+
 
 	@SuppressWarnings("unchecked")
 	public int run(String[] args) throws Exception {
@@ -151,7 +164,7 @@ public class SampleDocVectors  extends Configured implements Tool{
 		int N = Integer.parseInt(args[2]);
 		int sampleFreq = Integer.parseInt(args[3]);
 
-		JobConf job = new JobConf(SampleDocVectors.class);
+		JobConf job = new JobConf(SampleIntDocVectors.class);
 		FileSystem fs;
 
 		if(isLocal){
@@ -204,7 +217,7 @@ public class SampleDocVectors  extends Configured implements Tool{
 		job.setOutputKeyClass(keyClass);
 		job.setOutputValueClass(valueClass);
 		job.setMapperClass(MyMapper.class);
-		job.setReducerClass(IdentityReducer.class);
+		job.setReducerClass(MyReducer.class);
 		job.setOutputFormat(SequenceFileOutputFormat.class);
 
 		JobClient.runJob(job); 		
@@ -213,7 +226,7 @@ public class SampleDocVectors  extends Configured implements Tool{
 	}
 
 	public static void main(String[] args) throws Exception{
-		ToolRunner.run(new Configuration(), new SampleDocVectors(), args);
+		ToolRunner.run(new Configuration(), new SampleIntDocVectors(), args);
 		return;
 	}
 }

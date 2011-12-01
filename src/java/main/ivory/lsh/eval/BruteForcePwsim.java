@@ -57,7 +57,7 @@ public class BruteForcePwsim extends Configured implements Tool {
 	private static final Logger sLogger = Logger.getLogger(BruteForcePwsim.class);
 
 	static enum Pairs{
-		Total, Emitted
+		Total, Emitted, DEBUG, DEBUG2, Total2
 	};
 
 	private static int printUsage() {
@@ -105,8 +105,16 @@ public class BruteForcePwsim extends Configured implements Tool {
 				IntWritable sampleDocno = (IntWritable)vectors.get(i).getLeftElement();
 
 				WeightedIntDocVector fromSample = (WeightedIntDocVector)vectors.get(i).getRightElement();
-				float cs = CLIRUtils.cosine(docvector.getWeightedTerms(), fromSample.getWeightedTerms()); 
-				sLogger.info(cs);
+				float cs = CLIRUtils.cosine(docvector.getWeightedTerms(), fromSample.getWeightedTerms());
+				
+//				if((sampleDocno.get()==1000009022 && docno.get()==189034) || (sampleDocno.get()==1000170828 && docno.get()==2898431)){
+//					reporter.incrCounter(Pairs.DEBUG, 1);
+//					sLogger.info(sampleDocno.get()+","+docno.get()+"="+cs);
+//					sLogger.info(fromSample);
+//					sLogger.info(docvector);
+//				}else{
+//					continue;
+//				}
 				if(cs >= threshold){
 					output.collect(new IntWritable(sampleDocno.get()), new PairOfFloatInt(cs,docno.get()));
 				}
@@ -146,15 +154,33 @@ public class BruteForcePwsim extends Configured implements Tool {
 		public void map(IntWritable docno, HMapSFW docvector,
 				OutputCollector<IntWritable, PairOfFloatInt> output,
 				Reporter reporter) throws IOException {
+//			if(docno.get()==189034){
+//				reporter.incrCounter(Pairs.DEBUG2, 1);
+//			}else if(docno.get()==2898431){
+//				reporter.incrCounter(Pairs.DEBUG2, 1);
+//			}else{
+//				return;
+//			}
+
 			for(int i=0;i<vectors.size();i++){
 				reporter.incrCounter(Pairs.Total, 1);
 				IntWritable sampleDocno = (IntWritable)vectors.get(i).getLeftElement();
 				HMapSFW fromSample = (HMapSFW)vectors.get(i).getRightElement();
+				
 				float cs = CLIRUtils.cosine(docvector, fromSample); 
+//				if((sampleDocno.get()==1000009022 && docno.get()==189034) || (sampleDocno.get()==1000170828 && docno.get()==2898431)){
+//					reporter.incrCounter(Pairs.DEBUG, 1);
+//					sLogger.info(sampleDocno.get()+","+docno.get()+"="+cs);
+//					sLogger.info(fromSample);
+//					sLogger.info(docvector);
+//				}else{
+//					continue;
+//				}
+				
 				if(cs >= threshold){
-					sLogger.debug(sampleDocno + "," + fromSample+"\n"+fromSample.length());
-					sLogger.debug(docno + "," + docvector+"\n"+docvector.length());
-					sLogger.debug(cs);
+//					sLogger.debug(sampleDocno + "," + fromSample+"\n"+fromSample.length());
+//					sLogger.debug(docno + "," + docvector+"\n"+docvector.length());
+//					sLogger.debug(cs);
 					reporter.incrCounter(Pairs.Emitted, 1);
 					output.collect(new IntWritable(sampleDocno.get()), new PairOfFloatInt(cs,docno.get()));
 				}
@@ -193,19 +219,32 @@ public class BruteForcePwsim extends Configured implements Tool {
 		public void map(IntWritable docno, Signature signature,
 				OutputCollector<IntWritable, PairOfFloatInt> output,
 				Reporter reporter) throws IOException {
-			Long time = System.currentTimeMillis();
+//			if(docno.get()==189034){
+//				reporter.incrCounter(Pairs.DEBUG2, 1);
+//			}else if(docno.get()==2898431){
+//				reporter.incrCounter(Pairs.DEBUG2, 1);
+//			}else{
+//				return;
+//			}
 			for(int i=0;i<signatures.size();i++){
 				reporter.incrCounter(Pairs.Total, 1);
 				IntWritable sampleDocno = (IntWritable)signatures.get(i).getLeftElement();
 				Signature fromSample = (Signature)signatures.get(i).getRightElement();
 				int dist = signature.hammingDistance(fromSample, maxDist);
-	
+//				if((sampleDocno.get()==1000009022 && docno.get()==189034) || (sampleDocno.get()==1000170828 && docno.get()==2898431)){
+//					reporter.incrCounter(Pairs.DEBUG, 1);
+//					sLogger.info(sampleDocno.get()+","+docno.get()+"="+dist);
+//					sLogger.info(fromSample);
+//					sLogger.info(signature);
+//				}else{
+//					continue;
+//				}
+				
 				if(dist <= maxDist){
 					output.collect(new IntWritable(sampleDocno.get()), new PairOfFloatInt(-dist,docno.get()));
 					reporter.incrCounter(Pairs.Emitted, 1);
 				}
 			}
-			sLogger.info("Finished in "+(System.currentTimeMillis()-time));
 		}
 	}
 	
@@ -224,7 +263,7 @@ public class BruteForcePwsim extends Configured implements Tool {
 		NumberFormat nf;
 		
 		public void configure(JobConf conf){
-//			sLogger.setLevel(Level.DEBUG);
+			sLogger.setLevel(Level.DEBUG);
 			numResults = conf.getInt("Ivory.NumResults", Integer.MAX_VALUE);
 			nf = NumberFormat.getInstance();
 			nf.setMaximumFractionDigits(3);
@@ -237,9 +276,14 @@ public class BruteForcePwsim extends Configured implements Tool {
 			list.clear();
 			while(values.hasNext()){
 				PairOfFloatInt p = values.next();
-				list.add(new PairOfFloatInt(p.getLeftElement(), p.getRightElement()));
+				if(!list.add(new PairOfFloatInt(p.getLeftElement(), p.getRightElement()))){
+					sLogger.debug("Not added: "+p);
+				}else{
+					sLogger.debug("Added: "+p);
+				}
 				reporter.incrCounter(Pairs.Total, 1);
 			}
+			sLogger.debug(list.size());
 			int cntr = 0;
 			while(!list.isEmpty() && cntr<numResults){
 				PairOfFloatInt pair = list.pollLast();

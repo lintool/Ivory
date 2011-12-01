@@ -5,6 +5,7 @@ import ivory.core.data.dictionary.FrequencySortedDictionary;
 import ivory.core.data.document.TermDocVector;
 import ivory.core.data.stat.DfTableArray;
 import ivory.core.data.stat.PrefixEncodedGlobalStats;
+import ivory.core.tokenize.Tokenizer;
 import ivory.pwsim.score.Bm25;
 import ivory.pwsim.score.ScoringModel;
 import java.io.BufferedOutputStream;
@@ -354,7 +355,7 @@ public abstract class CLIRUtils extends Configured {
 	 * @return
 	 * @throws IOException
 	 */
-	public static int translateTFs(TermDocVector doc, HMapIFW tfTable, Vocab eVocabSrc, Vocab eVocabTrg, Vocab fVocabSrc, Vocab fVocabTrg, TTable_monolithic_IFAs e2fProbs, TTable_monolithic_IFAs f2eProbs, Logger sLogger) throws IOException{
+	public static int translateTFs(TermDocVector doc, HMapIFW tfTable, Vocab eVocabSrc, Vocab eVocabTrg, Vocab fVocabSrc, Vocab fVocabTrg, TTable_monolithic_IFAs e2fProbs, TTable_monolithic_IFAs f2eProbs, Tokenizer tokenizer, Logger sLogger) throws IOException{
 		if(sLogger == null){
 			sLogger = logger;
 		}
@@ -387,6 +388,10 @@ public abstract class CLIRUtils extends Configured {
 				}
 				float probEF;
 				String eTerm = eVocabTrg.get(e);
+				if(tokenizer.isStopWord(eTerm)){
+					sLogger.warn("Discarded: "+eTerm+" is a stopword!");
+					continue;
+				}
 				int e2 = eVocabSrc.get(eTerm);		//convert between two E vocabs (different ids)
 				if(e2 <= 0){
 					sLogger.warn("Warning: "+eTerm+": word not in aligner's final vocab (source side of e2f)");
@@ -395,11 +400,11 @@ public abstract class CLIRUtils extends Configured {
 				probEF = e2fProbs.get(e2, f2);
 				if(probEF > 0){
 					sLogger.debug(eTerm+" ==> "+probEF);
-					if(tfTable.containsKey(e2)){
-						tfTable.put(e2, tfTable.get(e2)+tf*probEF);
-					}else{
-						tfTable.put(e2, tf*probEF);
-					}
+//					if(tfTable.containsKey(e2)){
+						tfTable.increment(e2, tf*probEF);
+//					}else{
+//						tfTable.put(e2, tf*probEF);
+//					}
 					sLogger.debug("updated weight to "+tfTable.get(e2));
 				}
 			}
@@ -407,6 +412,7 @@ public abstract class CLIRUtils extends Configured {
 
 		return docLen;
 	}
+
 
 	/**
 	 * Given a document in F, and its tf mapping, compute a tf value for each term in E using the CLIR algorithm: tf(e) = sum_f{tf(f)*prob(f|e)}
@@ -466,11 +472,11 @@ public abstract class CLIRUtils extends Configured {
 				prob = e2fProbs.get(e2, f2);
 				if(prob > 0){
 					//					sLogger.debug(eVocabSrc.get(e2)+" ==> "+prob);
-					if(tfTable.containsKey(e2)){
-						tfTable.put(e2, tfTable.get(e2)+tf*prob);
-					}else{
-						tfTable.put(e2, tf*prob);
-					}
+//					if(tfTable.containsKey(e2)){
+						tfTable.increment(e2, tf*prob);
+//					}else{
+//						tfTable.put(e2, tf*prob);
+//					}
 				}
 			}
 		}
@@ -550,11 +556,10 @@ public abstract class CLIRUtils extends Configured {
 	 * @return
 	 * 		Term doc vector representing the document
 	 */
-	public static HMapSFW createTermDocVector(int docLen, HMapSIW tfTable, Vocab eVocabSrc, ScoringModel scoringModel, PrefixEncodedGlobalStats dfTable, boolean isNormalize, Logger sLogger) {
+	public static HMapSFW createTermDocVector(int docLen, HMapSIW tfTable, Vocab eVocabSrc, ScoringModel scoringModel, FrequencySortedDictionary dict, DfTableArray dfTable, boolean isNormalize, Logger sLogger) {
 		if(sLogger == null){
 			sLogger = logger;
 		}
-		
 
 		HMapSFW v = new HMapSFW();
 		float normalization=0;
@@ -562,12 +567,16 @@ public abstract class CLIRUtils extends Configured {
 			// retrieve term string, tf and df
 			String eTerm = entry.getKey();
 			int tf = entry.getValue();
-			int df = dfTable.getDF(eTerm);
-	
+			int eId = dict.getId(eTerm);
+			if(eId < 1){		//OOV
+				continue;
+			}
+			int df = dfTable.getDf(eId);
 			// compute score via scoring model
 			float score = ((Bm25) scoringModel).computeDocumentWeight(tf, df, docLen);
-			//			sLogger.debug(eTerm+" "+tf+" "+df+" "+score);
-
+			if(df<1){
+				sLogger.warn("Suspicious DF WARNING = "+eTerm+" "+tf+" "+df+" "+score);
+			}
 			if(score>0){
 				v.put(eTerm, score);
 				if(isNormalize){
@@ -586,6 +595,47 @@ public abstract class CLIRUtils extends Configured {
 		return v;
 	}
 
+	/**
+	 * Uses old globalStats code, which is not supported anymore. Only here for backward compatibility
+	 */
+	@Deprecated
+	public static HMapSFW createTermDocVector(int docLen, HMapSIW tfTable, Vocab eVocabSrc, ScoringModel scoringModel, PrefixEncodedGlobalStats globalStats, boolean isNormalize, Logger sLogger) {
+		if(sLogger == null){
+			sLogger = logger;
+		}
+
+		HMapSFW v = new HMapSFW();
+		float normalization=0;
+		for(edu.umd.cloud9.util.map.MapKI.Entry<String> entry : tfTable.entrySet()){
+			// retrieve term string, tf and df
+			String eTerm = entry.getKey();
+			int tf = entry.getValue();
+			
+			int df = globalStats.getDF(eTerm);
+			if(df<1){		//OOV
+				continue;
+			}
+			
+			// compute score via scoring model
+			float score = ((Bm25) scoringModel).computeDocumentWeight(tf, df, docLen);
+
+			if(score>0){
+				v.put(eTerm, score);
+				if(isNormalize){
+					normalization+=Math.pow(score, 2);
+				}		
+			}
+		}
+
+		// length-normalize doc vector
+		if(isNormalize){
+			normalization = (float) Math.sqrt(normalization);
+			for(Entry<String> e : v.entrySet()){
+				v.put(e.getKey(), e.getValue()/normalization);
+			}
+		}
+		return v;
+	}
 	//	/**
 	//	 * Read a Vocab object from file.
 	//	 * 
@@ -806,7 +856,7 @@ public abstract class CLIRUtils extends Configured {
 			TreeSet<PairOfFloatString> topTrans = new TreeSet<PairOfFloatString>();
 			String line = "";
 			boolean earlyTerminate = false, skipTerm = false;
-			float sumOfProbs = 0.0f, prob;
+			float sumOfProbs = 0.0f, prob, sumCumProbs = 0;
 			int cntLongTail = 0, cntShortTail = 0, sumShortTail = 0;		// for statistical purposes only
 
 			while (true) {	
@@ -823,12 +873,13 @@ public abstract class CLIRUtils extends Configured {
 				if(prev==null || !srcTerm.equals(prev)){
 					if(topTrans.size() > 0){
 						//store previous term's top translations to ttable
-						int finalNumTrans = addToTable(curIndex, topTrans, table, trgVocab);
+						int finalNumTrans = addToTable(curIndex, topTrans, sumOfProbs, table, trgVocab);
 						if(finalNumTrans < NUM_TRANS){
 							cntShortTail++;
 							sumShortTail += finalNumTrans;
 						}else{
 							cntLongTail++;
+							sumCumProbs += sumOfProbs;
 						}
 					}
 					logger.debug("Line:"+line);
@@ -867,14 +918,17 @@ public abstract class CLIRUtils extends Configured {
 					logger.debug("Sum of probs > "+PROB_THRESHOLD+", early termination.");
 				}
 			}
+			
+			//last one
 			if(topTrans.size()>0){
 				//store previous term's top translations to ttable
-				int finalNumTrans = addToTable(curIndex, topTrans, table, trgVocab);
+				int finalNumTrans = addToTable(curIndex, topTrans, sumOfProbs, table, trgVocab);
 				if(finalNumTrans < NUM_TRANS){
 					cntShortTail++;
 					sumShortTail += finalNumTrans;
 				}else{
 					cntLongTail++;
+					sumCumProbs += sumOfProbs;
 				}
 			}
 
@@ -885,7 +939,7 @@ public abstract class CLIRUtils extends Configured {
 			logger.info("Vocabulary Target: "+trgVocab.size()+" elements");
 			logger.info("Vocabulary Source: "+srcVocab.size()+" elements");
 			logger.info("# source terms with > "+PROB_THRESHOLD+" probability covered: "+cntShortTail+" and average translations per term: "+(sumShortTail/(cntShortTail+0.0f)));
-			logger.info("# source terms with <= "+PROB_THRESHOLD+" probability covered: "+cntLongTail+" (each has "+ NUM_TRANS +" translations)");
+			logger.info("# source terms with <= "+PROB_THRESHOLD+" probability covered: "+cntLongTail+" (each has "+ NUM_TRANS +" translations). Average coverage is: "+(sumCumProbs/cntLongTail));
 		}catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -904,7 +958,7 @@ public abstract class CLIRUtils extends Configured {
 	}
 
 
-	private static int addToTable(int curIndex, TreeSet<PairOfFloatString> topTrans, TTable_monolithic_IFAs table, Vocab trgVocab) {
+	private static int addToTable(int curIndex, TreeSet<PairOfFloatString> topTrans, float cumProb, TTable_monolithic_IFAs table, Vocab trgVocab) {
 		List<Integer> sortedIndices = new ArrayList<Integer>();
 		HMapIF index2ProbMap = new HMapIF();
 
@@ -912,15 +966,15 @@ public abstract class CLIRUtils extends Configured {
 		while(!topTrans.isEmpty()){
 			PairOfFloatString e = topTrans.pollLast();
 			String term = e.getRightElement();
-			float pr = e.getLeftElement();
+			float pr = e.getLeftElement()/cumProb;
 			int trgIndex = trgVocab.addOrGet(term);
 			sumOfProbs += pr;
 
 			sortedIndices.add(trgIndex);
 			index2ProbMap.put(trgIndex, pr);
-			if(sumOfProbs > PROB_THRESHOLD){
-				break;
-			}
+//			if(sumOfProbs > PROB_THRESHOLD){
+//				break;
+//			}
 		}
 
 		// to enable faster access with binary search, we sort entries by vocabulary index.
@@ -1015,7 +1069,7 @@ public abstract class CLIRUtils extends Configured {
 
 			//store previous term's top translations to ttable
 			if(topTrans.size() > 0){
-				int finalNumTrans = addToTable(curIndex, topTrans, finalTTable, finalTrgVocab);
+				int finalNumTrans = addToTable(curIndex, topTrans, sumOfProbs, finalTTable, finalTrgVocab);
 				if(finalNumTrans < NUM_TRANS){
 					cntShortTail++;
 					sumShortTail += finalNumTrans;

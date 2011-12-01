@@ -1,5 +1,6 @@
 package ivory.core.preprocess;
 
+import ivory.core.Constants;
 import ivory.core.RetrievalEnvironment;
 import ivory.core.data.dictionary.DefaultFrequencySortedDictionary;
 import ivory.core.data.document.TermDocVector;
@@ -7,6 +8,8 @@ import ivory.core.data.stat.DfTableArray;
 import ivory.core.data.stat.DocLengthTable;
 import ivory.core.data.stat.DocLengthTable4B;
 import ivory.core.data.stat.PrefixEncodedGlobalStats;
+import ivory.core.tokenize.OpenNLPTokenizer;
+import ivory.core.tokenize.Tokenizer;
 import ivory.core.util.CLIRUtils;
 import ivory.pwsim.score.ScoringModel;
 import java.io.IOException;
@@ -57,7 +60,7 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
 	protected static enum Docs {
 		ZERO, SHORT, Total
 	};
-	
+
 	protected static enum DF {
 		TransDf, NoDf
 	}
@@ -73,14 +76,15 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
 		// fVocabTrg is the German vocabulary for probability table e2f_Probs.	
 		static Vocab eVocabSrc, fVocabSrc, fVocabTrg, eVocabTrg;
 		static TTable_monolithic_IFAs f2e_Probs, e2f_Probs;
-		static float avgDocLen;
+	    private OpenNLPTokenizer tokenizer;
+	    static float avgDocLen;
 		static int numDocs;
 		static boolean isNormalize;
 		private String language;
 		int MIN_SIZE = 0;	// minimum document size, to avoid noise in Wikipedia due to stubs/very short articles etc. this is set via Conf object
-		
+
 		public void configure(JobConf job) {
-//			LOG.setLevel(Level.DEBUG);
+			//			LOG.setLevel(Level.DEBUG);
 			numDocs = job.getInt("Ivory.CollectionDocumentCount", -1);
 			avgDocLen = job.getFloat("Ivory.AvgDocLen", -1);
 			isNormalize = job.getBoolean("Ivory.Normalize", false);
@@ -134,6 +138,13 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
 			model.setDocCount(numDocs);
 			model.setAvgDocLength(avgDocLen);
 
+			try {
+				tokenizer = new OpenNLPTokenizer();
+			} catch (Exception e) {
+				e.printStackTrace();
+				throw new RuntimeException("Error initializing tokenizer!");
+			}
+
 			if(job.get("debug")!=null){
 				LOG.setLevel(Level.DEBUG);
 			}
@@ -145,14 +156,14 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
 		public void map(IntWritable docno, TermDocVector doc,
 				OutputCollector<IntWritable, HMapSFW> output, Reporter reporter)
 		throws IOException {
-			
+
 			if(docno.get()%SAMPLING!=0)		return;	//for generating sample document vectors. no sampling if SAMPLING=1
-			
-//			/**
-//			 * DEBUG
-//			 * 
-//			 */
-//			if(docno.get()!=101)		return;
+
+			//			/**
+			//			 * DEBUG
+			//			 * 
+			//			 */
+			//			if(docno.get()!=101)		return;
 
 			if(!language.equals("english") && !language.equals("en")){
 				docno.set(docno.get() + 1000000000);	//to distinguish between the two collections in the PWSim sliding window algorithm
@@ -160,10 +171,11 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
 
 			//translate doc vector		
 			HMapIFW tfS = new HMapIFW();
-			
-			int docLen = CLIRUtils.translateTFs(doc, tfS, eVocabSrc, eVocabTrg, fVocabSrc, fVocabTrg, e2f_Probs, f2e_Probs, LOG);
+
+			//we simply use the source-language doc length since the ratio of doc length to average doc length is unlikely to change significantly (not worth complicating the pipeline)
+			int docLen = CLIRUtils.translateTFs(doc, tfS, eVocabSrc, eVocabTrg, fVocabSrc, fVocabTrg, e2f_Probs, f2e_Probs, tokenizer, LOG);
 			HMapSFW v = CLIRUtils.createTermDocVector(docLen, tfS, eVocabSrc, model, transDfTable, isNormalize, LOG);
-			
+
 			// if no translation of any word is in the target vocab, remove document i.e., our model wasn't capable of translating it.
 			if(v.isEmpty() ){
 				reporter.incrCounter(Docs.ZERO, 1);
@@ -202,7 +214,7 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
 		String eVocab_e2f  = getConf().get("Ivory.E_Vocab_E2F");		//en from P(f|e)
 		String fVocab_e2f  = getConf().get("Ivory.F_Vocab_E2F");		//de from P(f|e)
 		String ttable_e2f= getConf().get("Ivory.TTable_E2F");			//P(f|e)
-	
+
 		createTranslatedDFFile(transDfFile);
 
 		JobConf conf = new JobConf(BuildTranslatedTermDocVectors.class);
@@ -232,7 +244,7 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
 		LOG.info(mDLTable.getDocCount()+" is num docs.");
 
 		///////Configuration setup
-		
+
 		conf.set("Ivory.IndexPath", indexPath);
 		conf.set("Ivory.ScoringModel", scoringModel);
 		conf.setFloat("Ivory.AvgDocLen", mDLTable.getAvgDocLength());

@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
 import org.galagosearch.core.parse.Document;
 import org.galagosearch.core.parse.TagTokenizer;
 import org.tartarus.snowball.ext.englishStemmer;
@@ -838,4 +839,8 @@ public class GalagoTokenizer extends Tokenizer {
       System.out.println(t);
     }
   }
+
+@Override
+public void configure(Configuration mJobConf, FileSystem fs) {}
+
 }

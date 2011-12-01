@@ -5,7 +5,7 @@
   <meta http-equiv="Content-Style-Type" content="text/css">
   <title></title>
   <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="1038.35">
+  <meta name="CocoaVersion" content="1138.23">
   <style type="text/css">
     p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 15.0px Helvetica}
     p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
@@ -16,8 +16,9 @@
     span.s1 {text-decoration: underline ; color: #0000ee}
     span.s2 {text-decoration: underline}
     span.s3 {color: #013366}
-    span.s4 {font: 10.0px Helvetica}
+    span.s4 {font: 7.0px Helvetica}
     span.s5 {font: 11.0px Monaco}
+    span.Apple-tab-span {white-space:pre}
   </style>
 </head>
 <body>
@@ -100,7 +101,7 @@
 <p class="p4">(2) If you want to run full pwsim on all document pairs, [mode=all], otherwise [mode=sample]. See Section 4 for more details on this.</p>
 <p class="p4">(3) file that contains sample docnos will be searched based on the [sample-size] parameter. See Section 4 for more details on this.</p>
 <p class="p5"><br></p>
-<p class="p4">hadoop jar ivory.jar ivory.lsh.driver.RunEvalCrossLingPwsim /user/fture/en-wiki /user/fture/de-wiki 1000 random 300 10000 5000 400 1000 all</p>
+<p class="p5"><span class="Apple-converted-space"> <span class="Apple-tab-span">	</span></span></p>
 <p class="p3">======================</p>
 <p class="p2"><br></p>
 <p class="p3"><span class="s2">3.2 Batch pwsim</span> <span class="s2">(</span>experimental<span class="s2">)</span></p>
@@ -172,7 +173,7 @@
 <p class="p2"><br></p>
 <p class="p4">usage: [input] [output-dir] [number-of-mappers] [sample-frequency] ([sample-docnos-path])</p>
 <p class="p4">e.g.,</p>
-<p class="p4">hadoop jar pwsim.jar ivory.lsh.eval.SampleDocVectors /user/fture/de-wiki/wt-int-doc-vectors /user/fture/de-wiki/wt-int-doc-vectors-sample 100 1300</p>
+<p class="p4">hadoop jar pwsim.jar ivory.lsh.eval.SampleIntDocVectors /user/fture/de-wiki/wt-int-doc-vectors /user/fture/de-wiki/wt-int-doc-vectors-sample 100 1300</p>
 <p class="p6"><br></p>
 <p class="p4">usage: [signatures-path] [sample-signatures-path] [signature-type] [sample-frequency] ([sample-docnos-path])</p>
 <p class="p4">Signature type is either random, simhash or minhash.</p>
@@ -181,9 +182,7 @@
 <p class="p2"><br></p>
 <p class="p3">Command-line instructions to run the brute force pwsim algorithm:</p>
 <p class="p2"><br></p>
-<p class="p4">usage: [type] [input-path] [output-path] [sample-path] [threshold] [num-results]</p>
-<p class="p4">[type] is either signature or docvector.</p>
-<p class="p4">For all results, enter -1 for [num-results]</p>
+<p class="p4">usage: [type = signature|termdocvector|intdocvector] [input-path] [output-path] [sample-path] [threshold] [num-results = -1 for all]</p>
 <p class="p2"><br></p>
 <p class="p3">We also provide a Hadoop job to extract language links from two Wikipedia collections:</p>
 <p class="p2"><br></p>

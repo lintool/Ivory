@@ -3,7 +3,7 @@ package ivory.lsh.driver;
 import ivory.core.RetrievalEnvironment;
 import ivory.lsh.eval.BruteForcePwsim;
 import ivory.lsh.eval.FilterResults;
-import ivory.lsh.eval.SampleDocVectors;
+import ivory.lsh.eval.SampleIntDocVectors;
 import ivory.lsh.pwsim.GenerateChunkedPermutedTables;
 import ivory.lsh.pwsim.cl.CLSlidingWindowPwsim;
 
@@ -119,7 +119,7 @@ public class RunEvalCrossLingPwsim extends PwsimEnvironment implements Tool {
 		if(!hdfs.exists(new Path(sampleWtdIntDocVectorsPath))){
 			int frequency = (srcCollSize/sampleSize);
 			String[] sampleArgs = {wtdIntDocVectorsPath, sampleWtdIntDocVectorsPath, "100", frequency+""};
-			SampleDocVectors.main(sampleArgs);
+			SampleIntDocVectors.main(sampleArgs);
 		}
 
 		// extract sample docnos into a separate file: needed for filtering pwsim pairs

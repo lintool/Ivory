@@ -102,7 +102,7 @@ public class PrefixEncodedGlobalStats {
 		if(df == null) 
 			throw new RuntimeException("DF-Stats must be loaded first!");
 		int index = prefixSet.getId(term);
-		LOG.info("index of " + term + ": " + index);
+		//LOG.info("index of " + term + ": " + index);
 		if (index < 0)
 			return -1;
 		return df[index];
