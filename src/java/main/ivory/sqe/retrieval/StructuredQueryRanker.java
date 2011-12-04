@@ -6,6 +6,7 @@ import ivory.smrf.model.GlobalEvidence;
 import ivory.smrf.model.score.BM25ScoringFunction;
 import ivory.smrf.retrieval.Accumulator;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.PriorityQueue;
 import org.apache.hadoop.fs.FileSystem;
 import org.json.JSONException;
@@ -16,8 +17,8 @@ public class StructuredQueryRanker {
   private RetrievalEnvironment env;
   private Accumulator[] accumulators = null;
   private final PriorityQueue<Accumulator> sortedAccumulators = new PriorityQueue<Accumulator>();
-
   private final int numResults;
+  private HashMap<String, Accumulator[]> results;
 
   public StructuredQueryRanker(String indexPath, FileSystem fs, int numResults) throws IOException,
       ConfigurationException {
@@ -25,17 +26,19 @@ public class StructuredQueryRanker {
     env.initialize(true);
 
     this.numResults = numResults;
-
+    results = new HashMap<String, Accumulator[]>();
+    
     // Create single pool of reusable accumulators.
     accumulators = new Accumulator[numResults + 1];
     for (int i = 0; i < numResults + 1; i++) {
       accumulators[i] = new Accumulator(0, 0.0f);
     }
   }
+  
+  
 
-  public Accumulator[] rank(JSONObject query, int queryLength) {
+  public Accumulator[] rank(String qid, JSONObject query, int queryLength) {
     GlobalEvidence globalEvidence = new GlobalEvidence(env.getDocumentCount(), env.getCollectionSize(), queryLength);
-//	  GlobalEvidence globalEvidence = new GlobalEvidence(10, 300, queryLength);
 	  
     PostingsReaderWrapper structureReader;
 	try {
@@ -85,11 +88,9 @@ public class StructuredQueryRanker {
       // Advance to next document
       docno = Integer.MAX_VALUE;
       nextDocno = structureReader.getNextCandidate(docno);
-      System.out.println("0="+docno+","+nextDocno);
       if(nextDocno < docno){
       	docno = nextDocno;
       }
-      System.out.println("1=Advance to docno " + docno);
     }
 
     // Grab the accumulators off the stack, in (reverse) order.
@@ -97,6 +98,8 @@ public class StructuredQueryRanker {
     for (int i = 0; i < results.length; i++) {
       results[results.length - 1 - i] = sortedAccumulators.poll();
     }
+    
+    this.results.put(qid, results);
 
     return results;
   }
@@ -104,6 +107,12 @@ public class StructuredQueryRanker {
   public DocnoMapping getDocnoMapping() throws IOException {
     return env.getDocnoMapping();
   }
+
+
+
+public Accumulator[] getResults(String queryID) {
+	return results.get(queryID);
+}
 
 
 }

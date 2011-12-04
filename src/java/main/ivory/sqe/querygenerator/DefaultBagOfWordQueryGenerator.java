@@ -7,7 +7,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class DefaultBagOfWordQueryGenerator {
+public class DefaultBagOfWordQueryGenerator implements QueryGenerator {
   Tokenizer tokenizer;
   int length;
   
