@@ -216,14 +216,6 @@ public class NBitSignature extends Signature {
     return (float) Math.cos(Math.PI*(dist/size()));
   }
 
-  /*public Signature perm(ArrayListOfIntsWritable permutation) {
-    NBitSignature newSign = new NBitSignature(size());
-    for(int j=0;j<size();j++){
-      newSign.set(j,get(permutation.get(j)));
-    }
-    return newSign;
-  }*/
-
   public Signature perm(ArrayListOfIntsWritable permutation) {
     NBitSignature newSign = new NBitSignature(size());
     int[] perms = permutation.getArray();

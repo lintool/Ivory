@@ -1,26 +1,34 @@
 package ivory.lsh;
 
 import java.io.IOException;
+
+import junit.framework.Assert;
 import junit.framework.TestCase;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.junit.Test;
+
 import edu.umd.hooka.Vocab;
 import edu.umd.hooka.alignment.HadoopAlign;
 import edu.umd.hooka.ttables.TTable_monolithic_IFAs;
 import ivory.core.util.CLIRUtils;
 
 public class CLIRUtilsTest extends TestCase {
+	  private static final String GIZA_DIR = "/Users/ferhanture/edu/research_archive/data/de-en/europarl-v6.de-en/giza";
+	  private static final String HOOKA_DIR = "/Users/ferhanture/edu/research_archive/data/de-en/europarl-v6.de-en/hooka";
+	  private static final String BERKELEY_DIR = "/Users/ferhanture/edu/research_archive/data/de-en/europarl-v6.de-en/berkeleyaligner";
 
+	@Test
 	public void testGIZA(){
-		String srcVocabFile = "/Users/ferhanture/edu/research_archive/data/de-en/europarl-v6.de-en/giza/vocab.de-en.de";
-		String trgVocabFile = "/Users/ferhanture/edu/research_archive/data/de-en/europarl-v6.de-en/giza/vocab.de-en.en";
-		String ttableFile = "/Users/ferhanture/edu/research_archive/data/de-en/europarl-v6.de-en/giza/ttable.de-en";
+		String srcVocabFile = GIZA_DIR+"/vocab.de-en.de";
+		String trgVocabFile = GIZA_DIR+"/vocab.de-en.en";
+		String ttableFile = GIZA_DIR+"/ttable.de-en";
 		
 		Configuration conf =  new Configuration();
 		try {
 			CLIRUtils.createTTableFromGIZA(
-					"/Users/ferhanture/edu/research_archive/data/de-en/europarl-v6.de-en/giza/lex.0-0.f2n", 
+					GIZA_DIR+"/lex.0-0.f2n", 
 					srcVocabFile, 
 					trgVocabFile, 
 					ttableFile, 
@@ -45,18 +53,20 @@ public class CLIRUtilsTest extends TestCase {
 			assertTrue("Giza_case2 --> "+ttable.get(src, trg), ttable.get(src, trg) > 0.3);
 		} catch (IOException e) {
 			e.printStackTrace();
+			Assert.fail();
 		}
 	}
 	
+	@Test
 	public void testGIZA2(){
-		String srcVocabFile = "/Users/ferhanture/edu/research_archive/data/de-en/europarl-v6.de-en/giza/vocab.en-de.en";
-		String trgVocabFile = "/Users/ferhanture/edu/research_archive/data/de-en/europarl-v6.de-en/giza/vocab.en-de.de";
-		String ttableFile = "/Users/ferhanture/edu/research_archive/data/de-en/europarl-v6.de-en/giza/ttable.en-de";
+		String srcVocabFile = GIZA_DIR+"/vocab.en-de.en";
+		String trgVocabFile = GIZA_DIR+"/vocab.en-de.de";
+		String ttableFile = GIZA_DIR+"/ttable.en-de";
 		
 		Configuration conf =  new Configuration();
 		try {
 			CLIRUtils.createTTableFromGIZA(
-					"/Users/ferhanture/edu/research_archive/data/de-en/europarl-v6.de-en/giza/lex.0-0.n2f", 
+					GIZA_DIR+"/lex.0-0.n2f", 
 					srcVocabFile, 
 					trgVocabFile, 
 					ttableFile, 
@@ -81,24 +91,27 @@ public class CLIRUtilsTest extends TestCase {
 			assertTrue("Giza_case2 --> "+ttable.get(src, trg), ttable.get(src, trg) > 0.3);
 		} catch (IOException e) {
 			e.printStackTrace();
+			Assert.fail();
 		}
 	}
 
+	@Test
 	public void testBerkeleyAligner(){
-		String srcVocabFile = "/Users/ferhanture/edu/research_archive/data/de-en/europarl-v6.de-en/berkeleyaligner/vocab.de-en.de";
-		String trgVocabFile = "/Users/ferhanture/edu/research_archive/data/de-en/europarl-v6.de-en/berkeleyaligner/vocab.de-en.en";
-		String ttableFile = "/Users/ferhanture/edu/research_archive/data/de-en/europarl-v6.de-en/berkeleyaligner/ttable.de-en";
+		String srcVocabFile = BERKELEY_DIR+"/vocab.de-en.de";
+		String trgVocabFile = BERKELEY_DIR+"/vocab.de-en.en";
+		String ttableFile = BERKELEY_DIR+"/ttable.de-en";
 
 		Configuration conf =  new Configuration();
 		try {
 			CLIRUtils.createTTableFromBerkeleyAligner(
-					"/Users/ferhanture/edu/research_archive/data/de-en/europarl-v6.de-en/berkeleyaligner/stage2.2.params.txt", 
+					BERKELEY_DIR+"/stage2.2.params.txt", 
 					srcVocabFile, 
 					trgVocabFile, 
 					ttableFile, 
 					FileSystem.getLocal(conf));
 		} catch (IOException e) {
 			e.printStackTrace();
+			Assert.fail();
 		}
 		
 		try {
@@ -117,18 +130,20 @@ public class CLIRUtilsTest extends TestCase {
 			assertTrue("Berk_case2 --> "+ttable.get(src, trg), ttable.get(src, trg) > 0.3);
 		} catch (IOException e) {
 			e.printStackTrace();
+			Assert.fail();
 		}
 	}
 	
+	@Test
 	public void testBerkeleyAligner2(){
-		String srcVocabFile = "/Users/ferhanture/edu/research_archive/data/de-en/europarl-v6.de-en/berkeleyaligner/vocab.en-de.en";
-		String trgVocabFile = "/Users/ferhanture/edu/research_archive/data/de-en/europarl-v6.de-en/berkeleyaligner/vocab.en-de.de";
-		String ttableFile = "/Users/ferhanture/edu/research_archive/data/de-en/europarl-v6.de-en/berkeleyaligner/ttable.en-de";
+		String srcVocabFile = BERKELEY_DIR+"/vocab.en-de.en";
+		String trgVocabFile = BERKELEY_DIR+"/vocab.en-de.de";
+		String ttableFile = BERKELEY_DIR+"/ttable.en-de";
 
 		Configuration conf =  new Configuration();
 		try {
 			CLIRUtils.createTTableFromBerkeleyAligner(
-					"/Users/ferhanture/edu/research_archive/data/de-en/europarl-v6.de-en/berkeleyaligner/stage2.1.params.txt", 
+					BERKELEY_DIR+"/stage2.1.params.txt", 
 					srcVocabFile, 
 					trgVocabFile, 
 					ttableFile, 
@@ -153,16 +168,18 @@ public class CLIRUtilsTest extends TestCase {
 			assertTrue("Berk_case2 --> "+ttable.get(src, trg), ttable.get(src, trg) > 0.3);
 		} catch (IOException e) {
 			e.printStackTrace();
+			Assert.fail();
 		}
 	}
 
+	@Test
 	public void testHooka(){
-		String srcVocabFile = "/Users/ferhanture/edu/research_archive/data/de-en/europarl-v6.de-en/hooka/vocab.de-en.de.raw";
-		String trgVocabFile = "/Users/ferhanture/edu/research_archive/data/de-en/europarl-v6.de-en/hooka/vocab.de-en.en.raw";
-		String ttableFile = "/Users/ferhanture/edu/research_archive/data/de-en/europarl-v6.de-en/hooka/ttable.de-en.raw";
-		String finalSrcVocabFile = "/Users/ferhanture/edu/research_archive/data/de-en/europarl-v6.de-en/hooka/vocab.de-en.de";
-		String finalTrgVocabFile = "/Users/ferhanture/edu/research_archive/data/de-en/europarl-v6.de-en/hooka/vocab.de-en.en";
-		String finalTTableFile = "/Users/ferhanture/edu/research_archive/data/de-en/europarl-v6.de-en/hooka/ttable.de-en";
+		String srcVocabFile = HOOKA_DIR+"/vocab.de-en.de.raw";
+		String trgVocabFile = HOOKA_DIR+"/vocab.de-en.en.raw";
+		String ttableFile = HOOKA_DIR+"/ttable.de-en.raw";
+		String finalSrcVocabFile = HOOKA_DIR+"/vocab.de-en.de";
+		String finalTrgVocabFile = HOOKA_DIR+"/vocab.de-en.en";
+		String finalTTableFile = HOOKA_DIR+"/ttable.de-en";
 		
 		Configuration conf =  new Configuration();
 		try {
@@ -176,6 +193,7 @@ public class CLIRUtilsTest extends TestCase {
 					FileSystem.getLocal(conf));
 		} catch (IOException e) {
 			e.printStackTrace();
+			Assert.fail();
 		}
 		
 		try {
@@ -194,16 +212,18 @@ public class CLIRUtilsTest extends TestCase {
 			assertTrue("Hooka_case2 --> "+ttable.get(src, trg), ttable.get(src, trg) > 0.3);
 		} catch (IOException e) {
 			e.printStackTrace();
+			Assert.fail();
 		}
 	}
 	
+	@Test
 	public void testHooka2(){
-		String srcVocabFile = "/Users/ferhanture/edu/research_archive/data/de-en/europarl-v6.de-en/hooka/vocab.en-de.en.raw";
-		String trgVocabFile = "/Users/ferhanture/edu/research_archive/data/de-en/europarl-v6.de-en/hooka/vocab.en-de.de.raw";
-		String ttableFile = "/Users/ferhanture/edu/research_archive/data/de-en/europarl-v6.de-en/hooka/ttable.en-de.raw";
-		String finalSrcVocabFile = "/Users/ferhanture/edu/research_archive/data/de-en/europarl-v6.de-en/hooka/vocab.en-de.en";
-		String finalTrgVocabFile = "/Users/ferhanture/edu/research_archive/data/de-en/europarl-v6.de-en/hooka/vocab.en-de.de";
-		String finalTTableFile = "/Users/ferhanture/edu/research_archive/data/de-en/europarl-v6.de-en/hooka/ttable.en-de";
+		String srcVocabFile = HOOKA_DIR+"/vocab.en-de.en.raw";
+		String trgVocabFile = HOOKA_DIR+"/vocab.en-de.de.raw";
+		String ttableFile = HOOKA_DIR+"/ttable.en-de.raw";
+		String finalSrcVocabFile = HOOKA_DIR+"/vocab.en-de.en";
+		String finalTrgVocabFile = HOOKA_DIR+"/vocab.en-de.de";
+		String finalTTableFile = HOOKA_DIR+"/ttable.en-de";
 		
 		Configuration conf =  new Configuration();
 		try {
@@ -217,6 +237,7 @@ public class CLIRUtilsTest extends TestCase {
 					FileSystem.getLocal(conf));
 		} catch (IOException e) {
 			e.printStackTrace();
+			Assert.fail();
 		}
 		
 		try {
@@ -235,6 +256,7 @@ public class CLIRUtilsTest extends TestCase {
 			assertTrue("Hooka_case2 --> "+ttable.get(src, trg), ttable.get(src, trg) > 0.3);
 		} catch (IOException e) {
 			e.printStackTrace();
+			Assert.fail();
 		}
 	}
 

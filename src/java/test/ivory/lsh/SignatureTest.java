@@ -121,7 +121,6 @@ public class SignatureTest {
     // System.out.println(read2.toString());
   }
 
-  @Test
   public void testSignatureSizeOnDisk() throws IOException {
     FileSystem fs;
     SequenceFile.Writer w;
@@ -139,7 +138,6 @@ public class SignatureTest {
     fs.delete(new Path(TMP_FILENAME1), true);
   }
 
-  @Test
   public void testWrite() throws IOException {
     NBitSignature s = new NBitSignature(1000);
 
@@ -176,33 +174,6 @@ public class SignatureTest {
     assertTrue(!s.get(0));
   }
 
-  // @Test
-  // public void testAppend() {
-  // Bits b1 = new Bits("0011010101001");
-  // Signature s1 = new NBitSignature(b1);
-  // Bits b2 = new Bits("1111111111111");
-  // Signature s2 = new NBitSignature(b2);
-  //
-  // NBitSignature s = (NBitSignature) ((NBitSignature) s1).append(s2);
-  //
-  // assertTrue(s.bits.toString(), s.bits.toString().equals("00110101010011111111111111"));
-  // }
-  //
-  // @Test
-  // public void testAppend2() {
-  // NBitSignature s1 = new NBitSignature(10);
-  // NBitSignature s2 = new NBitSignature(7);
-  //
-  // for(int i=1;i<10;i=i*3){
-  // s1.set(i, true);
-  // }
-  // for(int i=1;i<7;i=i*2){
-  // s2.set(i, true);
-  // }
-  // NBitSignature s = (NBitSignature) ((NBitSignature) s1).append(s2);
-  // assertTrue(s.toString(), s.toString().equals("01101000101000001"));
-  // }
-
   @Test
   public void testHammingDistance() {
     Bits b1 = new Bits("11100011010111101010");// 11000001011100011110001111100000101001011110111111010111101100101111101100110001110000101000011010001000001001111010111001101001100100011100101010111100000110001101001001010000100001111000000110011110001010101110001001001111010111010111100011001111111000110110000010001100111000001010010000110000000010100101110011001110111011110011010001000110110100111000001001111000111110111111100101011000010110000110100101001101000001110001110110010101000101001001000000000110110101001011111010111010101010001010010000111000001100100101110001111111011100001101011101000011110011111111010001001100001100111110000010111110101010000000101100011110011000010100001011101011001111111011011110010011110101000010001110011100111100101000110111010100011111101000100111010111111100001110110001011010110000000011100000001011101100000001100110010100100000011111001110010101111100100100000110010100010011110111001101110010111010001101110110001010000000000101010010011111010110000110110111100101110010100111");
@@ -212,10 +183,8 @@ public class SignatureTest {
 
     assertTrue(7 == s1.hammingDistance(s2));
     assertTrue(7 == s2.hammingDistance(s1));
-
   }
 
-  @Test
   public void benchmark() {
     int origD = this.D;
     this.D = 1000;
@@ -226,8 +195,7 @@ public class SignatureTest {
     while (i++ < 15000000) {
       s1.hammingDistance(s2, 400);
     }
-    System.out
-        .println("Bit signatures finished in " + (System.currentTimeMillis() - time) / 1000.0);
+    System.out.println("Bit signatures finished in " + (System.currentTimeMillis() - time) / 1000.0);
 
     this.D = 31;
     MinhashSignature m1 = this.getRandomMinhashSignature();

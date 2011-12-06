@@ -27,8 +27,9 @@ public class MinhashSignatureTest {
 
   private MinhashSignature getRandomSignature() {
     MinhashSignature s = new MinhashSignature(D);
-    for (int i = 0; i < s.size(); i++) {
-      s.add((int) (Math.random() * vocabSize));
+    for (int i = 0; i < D; i++) {
+    	int elt = (int) (Math.random() * vocabSize);
+    	s.add(elt);
     }
     return s;
   }
@@ -85,10 +86,8 @@ public class MinhashSignatureTest {
 
     System.out.println(read1.toString());
     System.out.println(read2.toString());
-
   }
 
-  @Test
   public void testSignatureSizeOnDisk() throws IOException {
     FileSystem fs;
     SequenceFile.Writer w;
@@ -108,31 +107,6 @@ public class MinhashSignatureTest {
     }
 
   }
-
-  // @Test
-  // public void testWrite() throws IOException{
-  // MinhashSignature s = new MinhashSignature(1000);
-  //
-  // FileSystem fs;
-  // SequenceFile.Writer w;
-  // Configuration conf = new Configuration();
-  //
-  // try {
-  // fs = FileSystem.get(conf);
-  // w = SequenceFile.createWriter(fs, conf, new Path("test"),
-  // IntWritable.class, MinhashSignature.class);
-  // int i=0;
-  // while(i++<100){
-  // if(i%100000==0)
-  // System.out.println(i+"="+s);
-  // w.append(new IntWritable(i), s);
-  // }
-  // w.close();
-  // } catch (IOException e) {
-  // e.printStackTrace();
-  // }
-  //
-  // }
 
   @Test
   public void testBasic() {
@@ -198,45 +172,8 @@ public class MinhashSignatureTest {
 
   }
 
-  // @Test
-  // public void testGetSlide(){
-  // BitsSignature s = new BitsSignature(10);
-  // BitsSignature s2 = new BitsSignature(10);
-  //
-  // Slide slide = s.getSlide(0, 5);
-  // Slide slide2 = s.getSlide(0, 5);
-  //
-  // System.out.println(slide);
-  // System.out.println(slide.hashCode());
-  // System.out.println(slide2);
-  // System.out.println(slide2.hashCode());
-  //
-  //		
-  // System.out.println(-299566668 % 100);
-  // System.out.println(Integer.MIN_VALUE);
-  //		
-  //		
-  // int i=0, j=0;
-  // float sum=0;
-  // while(i<100000000){
-  // while(j<100000000){
-  // float f1 = (float) Math.random();
-  // float f2 = (float) Math.random();
-  // float f = (f1*f2);
-  // sum = sum + f;
-  // j++;
-  // }
-  // i++;
-  // }
-  //
-  //		
-  // }
-
   @Test
   public void testSubSignature() {
-    PermutationByBit p = new PermutationByBit(D);
-    ArrayListOfIntsWritable a = p.nextPermutation();
-
     for (int i = 0; i < 100; i++) {
 
       MinhashSignature s = getRandomSignature();
@@ -250,20 +187,5 @@ public class MinhashSignatureTest {
       assertTrue(s.toString().equals(slide.toString() + "," + slide2.toString()));
     }
     System.out.println("done");
-
-    // System.out.println(slide);
-    // System.out.println(slide2);
-
   }
-  // @Test
-  // public void testExtract(){
-  // BitsSignature s = new BitsSignature(10);
-  // s.set(2, true);
-  // // s.set(4, true);
-  //
-  // BitsSignature sub = s.getSubSignature(0, 4);
-  // System.out.println(sub);
-  // System.out.println(s);
-  //
-  // }
 }

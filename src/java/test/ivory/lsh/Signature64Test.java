@@ -33,11 +33,6 @@ public class Signature64Test {
 
   @Test
   public void testPermuteNew() throws IOException {
-    PermutationByBit p = new PermutationByBit(64);
-    ArrayListOfIntsWritable a = p.nextPermutation();
-    int[] permBlock = a.getArray();
-    System.out.println(a);
-
     // create some signature of size 64 (=sizeof(long))
     SixtyFourBitSignature s = new SixtyFourBitSignature();
     for (int i = 0; i < s.size(); i++) {
@@ -45,15 +40,14 @@ public class Signature64Test {
     }
     System.out.println(s);
 
-    int loopcnt = 0;
-    ByteArrayInputStream bis = new ByteArrayInputStream(s.getBits());
-    DataInputStream in = new DataInputStream(bis);
-    ByteArrayOutputStream bos = new ByteArrayOutputStream();
-    DataOutputStream dos = new DataOutputStream(bos);
-
+    PermutationByBit p = new PermutationByBit(64);
     SixtyFourBitSignature permutedS = new SixtyFourBitSignature(64);
+    ArrayListOfIntsWritable a;
+    int loopcnt = 0;
     while (loopcnt++ < 1000000) {
-      s.perm(a, permutedS);
+        a = p.nextPermutation();
+        s.perm(a, permutedS);
+        
     }
   }
 
