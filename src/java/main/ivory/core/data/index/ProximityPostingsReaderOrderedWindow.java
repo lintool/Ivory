@@ -114,6 +114,9 @@ public class ProximityPostingsReaderOrderedWindow extends ProximityPostingsReade
           if (curPos - lastMatchedPos > maxGap) {
             maxGap = curPos - lastMatchedPos;
           }
+
+          lastMatchedPos = curPos;
+          lastMatchedID = curID;
         }
 
         // Stop looking if the maximum gap is too large or the terms appear out of order.

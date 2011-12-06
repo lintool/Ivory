@@ -20,11 +20,13 @@ import edu.umd.cloud9.io.pair.PairOfWritables;
 import edu.umd.cloud9.io.SequenceFileUtils;
 
 public class PairOfIntSignatureTest {
+	  private static final String TMP_FILENAME1 = "PairOfIntSignatureTest.out";
 
 	@Test
 	public void testReadWrite() throws IOException{
+		//write
 		SequenceFile.Writer w = SequenceFile.createWriter(FileSystem.getLocal(new Configuration()), new Configuration(), 
-				new Path("PairOfIntSignatureTest"), IntWritable.class, PairOfIntNBitSignature.class);
+				new Path(TMP_FILENAME1), IntWritable.class, PairOfIntNBitSignature.class);
 		
 		PairOfIntNBitSignature p1 = new PairOfIntNBitSignature(1, null);
 		PairOfIntNBitSignature p2 = new PairOfIntNBitSignature(2, new NBitSignature(100));
@@ -35,8 +37,11 @@ public class PairOfIntSignatureTest {
 		w.append(new IntWritable(3), p3);
 		w.close();
 		
-		List<PairOfWritables<Writable, Writable>> listOfKeysPairs = SequenceFileUtils.readFile(new Path("PairOfIntSignatureTest"), FileSystem.getLocal(new Configuration()));
-		FileSystem.get(new Configuration()).delete(new Path("PairOfIntSignatureTest"), true);
+		//read
+		List<PairOfWritables<Writable, Writable>> listOfKeysPairs = SequenceFileUtils.readFile(new Path(TMP_FILENAME1), FileSystem.getLocal(new Configuration()));
+	
+		//delete
+		FileSystem.get(new Configuration()).delete(new Path(TMP_FILENAME1), true);
 		
 		PairOfIntSignature a1 = (PairOfIntSignature) listOfKeysPairs.get(0).getRightElement();
 		PairOfIntSignature a2 = (PairOfIntSignature) listOfKeysPairs.get(1).getRightElement();

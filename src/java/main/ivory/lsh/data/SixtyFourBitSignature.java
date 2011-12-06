@@ -256,41 +256,6 @@ public class SixtyFourBitSignature extends Signature{//implements WritableCompar
 
 		return new SixtyFourBitSignature(permutedBytes);
 	}
-	
-//	@Override
-//	public void perm(ArrayListOfIntsWritable p, BitsSignature permSign, DataInputStream in, ByteArrayOutputStream bos, DataOutputStream dos) throws IOException {
-//		int[] subs = p.getArray();
-//		long b = 0;	//byte array represented as a long
-//		in.reset();
-//		in.read(bits);
-////		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-////		DataOutputStream dos = new DataOutputStream(bos);
-//
-//		try {
-//			b = in.readLong();
-//			long sbytes = 0;
-//			for (int i = 0; i < NUM_BITS; i++) {
-//				int shifts = subs[i];
-//				//using a mask of intialized with one 
-//				long mask = 1; 
-//				mask = (mask << (NUM_BITS - shifts - 1));
-//				long bit = (mask & b);
-//				if (bit != 0) { //if the bit is one
-//					mask = 1;
-//					mask =  (mask << (NUM_BITS - i - 1));
-//					sbytes = (sbytes | mask);
-//				}
-//			}
-//			dos.writeLong(sbytes);
-//			dos.flush();
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-//		byte[] permutedBytes =  bos.toByteArray();
-//		bos.reset();
-//		
-//		((SixtyFourBitSignature) permSign).setBits(permutedBytes);
-//	}
 
 	@Override
 	public void perm(ArrayListOfIntsWritable p, Signature permSign) {
