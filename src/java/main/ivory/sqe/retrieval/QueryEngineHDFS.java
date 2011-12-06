@@ -30,7 +30,7 @@ public class QueryEngineHDFS extends Configured implements Tool  {
 	      QueryEngine qe;
 	      try {
 	        LOG.info("Initializing QueryEngine...");
-	        qe = new QueryEngine(args, fs, conf);
+	        qe = new QueryEngine(args, fs);
 	        LOG.info("Running the queries ...");
 	        long start = System.currentTimeMillis();
 	        qe.runQueries();
@@ -44,8 +44,9 @@ public class QueryEngineHDFS extends Configured implements Tool  {
 	  }
 
 	  public int run(String[] args) throws Exception {
-	    if (args.length != 6) {
-	      System.out.println("usage: [queries-file] [models-file] [vocab-f-file] [vocab-e-file] [ttable-f2e-file] [tokenizer-model-file]");
+	    if (args.length != 2 && args.length != 6) {
+	      System.out.println("usage 1: [queries-file] [models-file] [vocab-f-file] [vocab-e-file] [ttable-f2e-file] [tokenizer-model-file]");
+	      System.out.println("usage 2: [queries-file] [models-file]");
 	      ToolRunner.printGenericCommandUsage(System.out);
 	      return -1;
 	    }
@@ -64,10 +65,13 @@ public class QueryEngineHDFS extends Configured implements Tool  {
 
 	    conf.set("args", argsStr);
 	    conf.set("mapred.child.java.opts", "-Xmx16g");
-	    conf.set("Ivory.F_Vocab_F2E", args[2]);
-	    conf.set("Ivory.E_Vocab_F2E", args[3]);
-	    conf.set("Ivory.TTable_F2E", args[4]);
-	    conf.set("Ivory.TokenizerModel", args[5]);
+	    
+//	    if (args.length == 6) {
+//	    	conf.set("Ivory.F_Vocab_F2E", args[2]);
+//	    	conf.set("Ivory.E_Vocab_F2E", args[3]);
+//	    	conf.set("Ivory.TTable_F2E", args[4]);
+//	    	conf.set("Ivory.TokenizerModel", args[5]);
+//	    }
 	    LOG.info("argsStr: " + argsStr);
 
 	    JobClient client = new JobClient(conf);

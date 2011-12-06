@@ -7,13 +7,17 @@ import ivory.smrf.model.score.BM25ScoringFunction;
 import ivory.smrf.retrieval.Accumulator;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.PriorityQueue;
 import org.apache.hadoop.fs.FileSystem;
+import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
 import edu.umd.cloud9.collection.DocnoMapping;
 
 public class StructuredQueryRanker {
+  private static final Logger LOG = Logger.getLogger(StructuredQueryRanker.class);
+
   private RetrievalEnvironment env;
   private Accumulator[] accumulators = null;
   private final PriorityQueue<Accumulator> sortedAccumulators = new PriorityQueue<Accumulator>();
@@ -69,7 +73,9 @@ public class StructuredQueryRanker {
       score = structureReader.computeScore(docno);
       cnt++;
       if (cnt % 10000 == 0) {
-    	  System.out.println(cnt + " docs processed = "+docno);
+//    	  LOG.info(cnt + " docs processed = "+docno);
+//    	  LOG.info(scoreThreshold);
+//    	  LOG.info(sortedAccumulators);
       }
       // Keep track of numResults best accumulators.
       if (score > scoreThreshold) {
@@ -84,6 +90,12 @@ public class StructuredQueryRanker {
           a = accumulators[sortedAccumulators.size()];
         }
       }
+//      if (cnt % 10000 == 0) {
+//    	  LOG.info(a);
+//    	  LOG.info(scoreThreshold);
+//    	  LOG.info(sortedAccumulators);
+//    	  LOG.info("======================");
+//      }      
 
       // Advance to next document
       docno = Integer.MAX_VALUE;
@@ -94,14 +106,16 @@ public class StructuredQueryRanker {
     }
 
     // Grab the accumulators off the stack, in (reverse) order.
-    Accumulator[] results = new Accumulator[Math.min(numResults, sortedAccumulators.size())];
-    for (int i = 0; i < results.length; i++) {
-      results[results.length - 1 - i] = sortedAccumulators.poll();
+    Accumulator[] accs = new Accumulator[Math.min(numResults, sortedAccumulators.size())];
+	for (int i = 0; i < accs.length; i++) {
+      Accumulator acc = sortedAccumulators.poll();
+//	  LOG.info((results.length - 1 - i)+"="+acc);
+      accs[accs.length - 1 - i] = acc;
     }
     
-    this.results.put(qid, results);
+    this.results.put(qid, accs);
 
-    return results;
+    return accs;
   }
 
   public DocnoMapping getDocnoMapping() throws IOException {
@@ -112,6 +126,12 @@ public class StructuredQueryRanker {
 
 public Accumulator[] getResults(String queryID) {
 	return results.get(queryID);
+}
+
+
+
+public Map<String, Accumulator[]> getResults() {
+	return results;
 }
 
 

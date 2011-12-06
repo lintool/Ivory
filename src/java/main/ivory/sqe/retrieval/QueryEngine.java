@@ -7,8 +7,12 @@ import ivory.smrf.retrieval.Accumulator;
 import ivory.smrf.retrieval.QueryRunner;
 import ivory.sqe.querygenerator.ClQueryGenerator;
 import ivory.sqe.querygenerator.DefaultBagOfWordQueryGenerator;
+import ivory.sqe.querygenerator.QueryGenerator;
+
 import java.io.IOException;
 import java.util.Map;
+import java.util.Set;
+
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.apache.hadoop.conf.Configuration;
@@ -32,14 +36,20 @@ public class QueryEngine {
   private StructuredQueryRanker ranker;
   private Map<String, String> queries;
   private FileSystem fs;
-  private Configuration conf;
+  private QueryGenerator generator;
   
-  public QueryEngine(String[] args, FileSystem fs, Configuration conf) {
+  public QueryEngine(String[] args, FileSystem fs) {
 	  try {
 		this.fs = fs;
-		this.conf = conf;
-		ranker = new StructuredQueryRanker(args[0], fs, 1000);
+		ranker = new StructuredQueryRanker(args[0], fs, 10);
 		queries = parseQueries(args[1], fs);
+	    if (args.length == 6) {
+	    	generator = new ClQueryGenerator();
+	    } else {
+	    	generator = new DefaultBagOfWordQueryGenerator();
+	    }
+	    generator.init(fs, args);
+
 	} catch (IOException e) {
 		e.printStackTrace();
 	} catch (ConfigurationException e) {
@@ -106,54 +116,61 @@ public class QueryEngine {
 	  return queries;
   }
 
-  private void printResults(StructuredQueryRanker ranker, ResultWriter resultWriter) throws IOException {
+  private void printResults(String queryID, StructuredQueryRanker ranker, ResultWriter resultWriter) throws IOException {
 	  DocnoMapping mapping = ranker.getDocnoMapping();
-	  for (String queryID : queries.keySet()) {
+//	  for (String queryID : queries.keySet()) {
 		  // Get the ranked list for this query.
 		  Accumulator[] list = ranker.getResults(queryID);
 		  if (list == null) {
 			  LOG.info("null results for: " + queryID);
-			  continue;
+			  return;
 		  }
 		  for ( int i=0; i<list.length; i++) {
 			  resultWriter.println(queryID + " Q0 " + mapping.getDocid(list[i].docno) + " " + (i + 1) + " "
-					  + list[i].score + " Ivory");
+					  + list[i].score + " sqe-bow-robust04");
 		  }
-	  }
+//	  }
   }
 
   public void runQueries() {
 	  try {
-		  ClQueryGenerator generator = new ClQueryGenerator(fs, conf	);
 
 		  LOG.info("Parsed "+queries.size()+" queries");
+		  ResultWriter resultWriter = new ResultWriter("sqe-bow-trec.txt", false, fs);
 		  
 		  for ( String qid : queries.keySet()) {
 			  String query = queries.get(qid);
 			  LOG.info("Query "+qid+" = "+query);
 
 			  JSONObject structuredQuery = generator.parseQuery(query);
-			  
-			  LOG.info(structuredQuery);
-			  
+			  			  
 			  long start = System.currentTimeMillis();
 			  ranker.rank(qid, structuredQuery, generator.getQueryLength());
 
 			  long end = System.currentTimeMillis();
 			  LOG.info("Ranking " + qid + ": " + ( end - start) + "ms");
+			  printResults(qid, ranker, resultWriter);
 		  }
-		  
-		  // Where should we output these results?
-//	      Node model = models.get(modelID);
-//	      String fileName = XMLTools.getAttributeValue(model, "output", null);
-//	      boolean compress = XMLTools.getAttributeValue(model, "compress", false);
-
-	        ResultWriter resultWriter = new ResultWriter("sqe-bow-trec.txt", false, fs);
-	        printResults(ranker, resultWriter);
-	        resultWriter.flush();
+		  resultWriter.flush();
 	  } catch (IOException e) {
 		  e.printStackTrace();
 	  }
+  }
+
+
+ 
+
+  public Map<String, Accumulator[]> getResults() {
+	  return ranker.getResults();
+  }
+
+  public DocnoMapping getDocnoMapping() {
+	  try {
+		return ranker.getDocnoMapping();
+	} catch (IOException e) {
+		e.printStackTrace();
+		throw new RuntimeException(e);
+	}
   }
 
 }

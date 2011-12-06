@@ -30,12 +30,12 @@ public class PostingsReaderWrapper {
   protected boolean endOfList = true; // Whether or not we're at the end of the postings list.
   protected int lastScoredDocno = 0;
 
-  protected String operator;
+  protected String operator, term;
   protected JSONArray values;
   protected List<PostingsReaderWrapper> children;
-  
-  protected boolean ignore = false;
-  
+  protected GlobalTermEvidence gte;
+  protected GlobalEvidence ge;
+    
   public PostingsReaderWrapper(JSONObject query, RetrievalEnvironment env, ScoringFunction scoringFunction, GlobalEvidence ge) throws JSONException {
 	  this.operator = query.keys().next();
 	  this.values = query.getJSONArray(operator);
@@ -79,12 +79,11 @@ public class PostingsReaderWrapper {
 	  ////LOG.info("leaf node");
 	  
 	  operator = "term";
+	  this.term = term;
 	  
 	  PostingsList pl = env.getPostingsList(term);
-	  if (pl == null) {
-		  ignore = true;
-		  return;
-	  }
+
+	  
 //----------BEGIN LOCAL_USAGE
 
 //	  PostingsListDocSortedNonPositional pl = new PostingsListDocSortedNonPositional();
@@ -112,8 +111,8 @@ public class PostingsReaderWrapper {
 	  
 //---------END LOCAL_USAGE
 	  postingsReader = pl.getPostingsReader();
-	  GlobalTermEvidence gte = new GlobalTermEvidence(pl.getDf(), pl.getCf());
-	  scoringFunction.initialize(gte, ge);
+	  gte = new GlobalTermEvidence(pl.getDf(), pl.getCf());
+	  this.ge = ge;
 
 	  lastScoredDocno = 0;
 	  ////LOG.info("leaf done.");
@@ -121,21 +120,16 @@ public class PostingsReaderWrapper {
 
 
   public float computeScore(int curDocno) {
-	 //shouldn't happen normally, but I'm testing with queries from wt10g and index from trec, so this is possible. i'll just avoid it by returning a score of 0
-	 if (ignore) {
-	   return 0;
-	 }
-	  
-	//System.out.print("Scoring...");
+	//LOG.info("Scoring...");
 	float score = 0;
 
     // If this is not a leaf node, compute scores from children and combine them w.r.t operator
     if (!operator.equals("term")) {
-    	//System.out.println("non-leaf node");
+    	//LOG.info("non-leaf node");
     	float[] scores = new float[children.size()];
     	for (int i = 0; i < children.size(); i++) {
     		scores[i] = children.get(i).computeScore(curDocno);
-    	    //System.out.println("Child "+ i + " score = " + scores[i]);
+    	    //LOG.info("Child "+ i + " score = " + scores[i]);
     	}
     	score = runOperator(scores);
 	    //System.out.println("non-leaf score = " + score);
@@ -154,15 +148,15 @@ public class PostingsReaderWrapper {
 	    if (curDocno == postingsReader.getDocno()) {
 	      tf = postingsReader.getTf();
 	    }
-	    //System.out.println("term " + operator + " : tf,docno = "+tf+","+curDocno);
 	    ((BM25ScoringFunction) scoringFunction).setB(0.3f);
 	    ((BM25ScoringFunction) scoringFunction).setK1(0.5f);
 	
 	    int docLen = env.getDocumentLength(curDocno);
-	    score = scoringFunction.getScore(tf, docLen);
+		this.scoringFunction.initialize(gte, ge);
+		score = scoringFunction.getScore(tf, docLen);
 	    lastScoredDocno = curDocno;
 	    
-	    //System.out.println("leaf score = " + score);
+	    //LOG.info("leaf score = " + score);
     }
     return score;
 }
@@ -187,10 +181,6 @@ public class PostingsReaderWrapper {
    * @return next smallest docno from posting lists of leaf nodes
    */
   public int getNextCandidate(int docno) {
-    //shouldn't happen normally, but I'm testing with queries from wt10g and index from trec, so this is possible. i'll just avoid it by returning a score of 0
-	if (ignore) {
-	  return docno;
-	}
 	if (postingsReader == null) { // not a leaf node
     	for (int i = 0; i < children.size(); i++) {
     		int nextDocno = children.get(i).getNextCandidate(docno);
@@ -230,12 +220,7 @@ public class PostingsReaderWrapper {
     return scoringFunction.getMaxScore();
   }
 
-  public void setNextCandidate(int docno) {
-	    //shouldn't happen normally, but I'm testing with queries from wt10g and index from trec, so this is possible. i'll just avoid it by returning a score of 0
-		if (ignore) {
-		  return;
-		}
-		
+  public void setNextCandidate(int docno) {	
     // Advance postings reader. Invariant: curPosting will always point to
     // the next posting that has not yet been scored.
     while (!endOfList && postingsReader.getDocno() < docno) {

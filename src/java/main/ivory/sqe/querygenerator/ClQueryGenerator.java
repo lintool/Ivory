@@ -22,13 +22,16 @@ public class ClQueryGenerator implements QueryGenerator {
 	private TTable_monolithic_IFAs f2eProbs;
 	private int length;
 	
-	public ClQueryGenerator(FileSystem fs, Configuration conf) throws IOException {
+	public ClQueryGenerator() throws IOException {
 		super();
-		fVocab_f2e = (VocabularyWritable) HadoopAlign.loadVocab(new Path(conf.get("Ivory.F_Vocab_F2E")), fs);
-		eVocab_f2e = (VocabularyWritable) HadoopAlign.loadVocab(new Path(conf.get("Ivory.E_Vocab_F2E")), fs);
+	}
+
+	public void init(FileSystem fs, String[] args) throws IOException {
+		fVocab_f2e = (VocabularyWritable) HadoopAlign.loadVocab(new Path(args[2]), fs);
+		eVocab_f2e = (VocabularyWritable) HadoopAlign.loadVocab(new Path(args[3]), fs);
 		
-		tokenizer = TokenizerFactory.createTokenizer(fs, conf, "en", conf.get("Ivory.TokenizerModel"), fVocab_f2e);
-		f2eProbs = new TTable_monolithic_IFAs(fs, new Path(conf.get("Ivory.TTable_F2E")), true);
+		f2eProbs = new TTable_monolithic_IFAs(fs, new Path(args[4]), true);
+		tokenizer = TokenizerFactory.createTokenizer(fs, "en", args[5], fVocab_f2e);
 	}
 
 	public JSONObject parseQuery(String query) {
