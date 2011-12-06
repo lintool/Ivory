@@ -48,7 +48,6 @@
 	<classpathentry kind="lib" path="lib/log4j-1.2.16.jar"/>
 	<classpathentry kind="lib" path="lib/mail-1.4.1-sources.jar"/>
 	<classpathentry kind="lib" path="lib/mail-1.4.1.jar"/>
-	<classpathentry kind="lib" path="lib/maven.jar"/>
 	<classpathentry kind="lib" path="lib/maxent-3.0.0.jar"/>
 	<classpathentry kind="lib" path="lib/memcached-2.2.jar"/>
 	<classpathentry kind="lib" path="lib/mockito-all-1.8.5.jar"/>
@@ -57,6 +56,7 @@
 	<classpathentry kind="lib" path="lib/servlet-api-2.5-20081211.jar"/>
 	<classpathentry kind="lib" path="lib/servlet-api-2.5.jar"/>
 	<classpathentry kind="lib" path="lib/spy-2.4.jar"/>
+	<classpathentry kind="lib" path="lib/stanford-chinese-segmenter-2011-09-14.jar"/>
 	<classpathentry kind="lib" path="lib/sux4j-2.0.1.jar"/>
 	<classpathentry kind="lib" path="lib/tools-1.5.0-javadoc.jar"/>
 	<classpathentry kind="lib" path="lib/tools-1.5.0-sources.jar"/>

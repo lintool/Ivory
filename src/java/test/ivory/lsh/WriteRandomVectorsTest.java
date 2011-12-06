@@ -14,50 +14,56 @@ import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.io.WritableComparable;
+import org.junit.Test;
 
 import edu.umd.cloud9.io.SequenceFileUtils;
 import edu.umd.cloud9.io.array.ArrayListOfFloatsWritable;
 import edu.umd.cloud9.io.pair.PairOfWritables;
 
 public class WriteRandomVectorsTest {
+  private static final String TMP_FILENAME1 = "tmp1.out";
+  private static final String TMP_FILENAME2 = "tmp2.out";
 
-		public static void main(String[] args) throws IOException{
-			SequenceFile.Writer writer1 = SequenceFile.createWriter(FileSystem.get(new Configuration()), new Configuration(), 
-					new Path("file1"), IntWritable.class, ArrayListOfFloatsWritable.class);
-			SequenceFile.Writer writer2 = SequenceFile.createWriter(FileSystem.get(new Configuration()), new Configuration(), 
-					new Path("file2"), IntWritable.class, FloatAsBytesWritable.class);
+  @Test
+  public void testBasic() throws IOException {
+    Configuration conf = new Configuration();
+    FileSystem fs = FileSystem.get(new Configuration());
+    
+    SequenceFile.Writer writer1 = SequenceFile.createWriter(fs, conf,
+          new Path(TMP_FILENAME1), IntWritable.class, ArrayListOfFloatsWritable.class);
+    SequenceFile.Writer writer2 = SequenceFile.createWriter(fs, conf,
+          new Path(TMP_FILENAME2), IntWritable.class, FloatAsBytesWritable.class);
 
-			ArrayListOfFloatsWritable a1 = WriteRandomVectors.generateUnitRandomVector(100);
-			FloatAsBytesWritable a2 = WriteRandomVectors.generateUnitRandomVectorAsBytes(100);
+    ArrayListOfFloatsWritable a1 = WriteRandomVectors.generateUnitRandomVector(100);
+    FloatAsBytesWritable a2 = WriteRandomVectors.generateUnitRandomVectorAsBytes(100);
 
-			writer1.append(new IntWritable(1), a1);
-			writer1.close();
+    writer1.append(new IntWritable(1), a1);
+    writer1.close();
 
-			writer2.append(new IntWritable(1), a2);
-			writer2.close();
+    writer2.append(new IntWritable(1), a2);
+    writer2.close();
 
-			List<PairOfWritables<WritableComparable, Writable>> listOfKeysPairs2 = SequenceFileUtils
-			.readFile(new Path("file2"));
-			FileSystem.get(new Configuration()).delete(new Path("file2"), true);
-			List<PairOfWritables<WritableComparable, Writable>> listOfKeysPairs1 = SequenceFileUtils
-			.readFile(new Path("file1"));
-			FileSystem.get(new Configuration()).delete(new Path("file1"), true);
+    List<PairOfWritables<WritableComparable, Writable>> listOfKeysPairs1 =
+      SequenceFileUtils.readFile(new Path(TMP_FILENAME1));
+    fs.delete(new Path(TMP_FILENAME1), true);
 
-			FloatAsBytesWritable b2 = (FloatAsBytesWritable) listOfKeysPairs2.get(0).getRightElement();
-			ArrayListOfFloatsWritable b1 = (ArrayListOfFloatsWritable) listOfKeysPairs1.get(0).getRightElement();
+    List<PairOfWritables<WritableComparable, Writable>> listOfKeysPairs2 =
+      SequenceFileUtils.readFile(new Path(TMP_FILENAME2));
+    fs.delete(new Path(TMP_FILENAME2), true);
 
-			for(int i=0;i<100;i++){
-				float f = b1.get(i);
-				float g = a1.get(i);
-				assertTrue(f==g);
-			}
-			for(int i=0;i<100;i++){
-				float f2 = b2.getAsFloat(i);
-				float g2 = a2.getAsFloat(i);
-				assertTrue(f2==g2);
-			}
+    FloatAsBytesWritable b2 = (FloatAsBytesWritable) listOfKeysPairs2.get(0).getRightElement();
+    ArrayListOfFloatsWritable b1 = (ArrayListOfFloatsWritable) listOfKeysPairs1.get(0)
+        .getRightElement();
 
-
-		}
-
-	}
+    for (int i = 0; i < 100; i++) {
+      float f = b1.get(i);
+      float g = a1.get(i);
+      assertTrue(f == g);
+    }
+    for (int i = 0; i < 100; i++) {
+      float f2 = b2.getAsFloat(i);
+      float g2 = a2.getAsFloat(i);
+      assertTrue(f2 == g2);
+    }
+  }
+}
