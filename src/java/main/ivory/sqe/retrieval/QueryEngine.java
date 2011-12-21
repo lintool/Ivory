@@ -37,11 +37,13 @@ public class QueryEngine {
   private Map<String, String> queries;
   private FileSystem fs;
   private QueryGenerator generator;
+  private DocnoMapping mapping;
   
   public QueryEngine(String[] args, FileSystem fs) {
 	  try {
 		this.fs = fs;
-		ranker = new StructuredQueryRanker(args[0], fs, 10);
+		ranker = new StructuredQueryRanker(args[0], fs, 1000);
+		mapping = ranker.getDocnoMapping();
 		queries = parseQueries(args[1], fs);
 	    if (args.length == 6) {
 	    	generator = new ClQueryGenerator();
@@ -117,7 +119,6 @@ public class QueryEngine {
   }
 
   private void printResults(String queryID, StructuredQueryRanker ranker, ResultWriter resultWriter) throws IOException {
-	  DocnoMapping mapping = ranker.getDocnoMapping();
 //	  for (String queryID : queries.keySet()) {
 		  // Get the ranked list for this query.
 		  Accumulator[] list = ranker.getResults(queryID);
@@ -143,7 +144,7 @@ public class QueryEngine {
 			  LOG.info("Query "+qid+" = "+query);
 
 			  JSONObject structuredQuery = generator.parseQuery(query);
-			  			  
+			  LOG.info("Processing "+structuredQuery);			  
 			  long start = System.currentTimeMillis();
 			  ranker.rank(qid, structuredQuery, generator.getQueryLength());
 
@@ -157,20 +158,12 @@ public class QueryEngine {
 	  }
   }
 
-
- 
-
   public Map<String, Accumulator[]> getResults() {
 	  return ranker.getResults();
   }
 
   public DocnoMapping getDocnoMapping() {
-	  try {
-		return ranker.getDocnoMapping();
-	} catch (IOException e) {
-		e.printStackTrace();
-		throw new RuntimeException(e);
-	}
+	  return mapping;
   }
 
 }
