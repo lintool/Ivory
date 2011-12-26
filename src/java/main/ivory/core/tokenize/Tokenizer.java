@@ -17,6 +17,7 @@
 package ivory.core.tokenize;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
 
 public abstract class Tokenizer {
 	public abstract void configure(Configuration conf);
@@ -52,4 +53,10 @@ public abstract class Tokenizer {
 		}
 		return fixedToken.toString();
 	}
+	
+	public boolean isStopWord(String eTerm) {
+		return false;
+	}
+
+	public abstract void configure(Configuration mJobConf, FileSystem fs);
 }

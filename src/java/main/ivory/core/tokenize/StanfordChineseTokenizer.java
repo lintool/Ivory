@@ -46,6 +46,26 @@ public class StanfordChineseTokenizer extends Tokenizer {
 			e.printStackTrace();
 		}
 	}
+	
+	@Override
+	public void configure(Configuration conf, FileSystem fs) {
+		Properties props = new Properties();
+		props.setProperty("sighanCorporaDict", conf.get("Ivory.TokenizerModel"));		//data
+		props.setProperty("serDictionary",conf.get("Ivory.TokenizerModel")+"/dict-chris6.ser");//"data/dict-chris6.ser.gz");
+		props.setProperty("inputEncoding", "UTF-8");
+		props.setProperty("sighanPostProcessing", "true");
+
+		try {
+			classifier = new CRFClassifier(props);
+			FSDataInputStream in = fs.open(new Path(conf.get("Ivory.TokenizerModel")+"/pku"));
+			FSDataInputStream inDict = fs.open(new Path(conf.get("Ivory.TokenizerModel")+"/dict-chris6.ser"));
+			classifier.loadClassifier(in, props);			//data/pku.gz
+			classifier.flags.setConf(conf);
+			readerWriter = classifier.makeReaderAndWriter(inDict);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
 	@Override
 	public String[] processContent(String text) {

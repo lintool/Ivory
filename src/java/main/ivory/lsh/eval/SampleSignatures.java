@@ -7,6 +7,7 @@ import ivory.lsh.data.SixtyFourBitSignature;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.Iterator;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
@@ -22,6 +23,7 @@ import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.MapReduceBase;
 import org.apache.hadoop.mapred.Mapper;
 import org.apache.hadoop.mapred.OutputCollector;
+import org.apache.hadoop.mapred.Reducer;
 import org.apache.hadoop.mapred.Reporter;
 import org.apache.hadoop.mapred.SequenceFileInputFormat;
 import org.apache.hadoop.mapred.SequenceFileOutputFormat;
@@ -34,6 +36,7 @@ import org.apache.log4j.Logger;
 
 import edu.umd.cloud9.io.FSLineReader;
 import edu.umd.cloud9.io.map.HMapIIW;
+import edu.umd.cloud9.io.map.HMapSFW;
 
 
 @SuppressWarnings("deprecation")
@@ -114,7 +117,16 @@ public class SampleSignatures  extends Configured implements Tool{
 		}
 	}
 
+	public static class MyReducer extends MapReduceBase implements
+	Reducer<IntWritable, Signature, IntWritable, Signature> {
 
+		@Override
+		public void reduce(IntWritable key, Iterator<Signature> values, OutputCollector<IntWritable, Signature> output,
+				Reporter reporter) throws IOException {
+			output.collect(key, values.next());
+		}
+	}
+	
 	public String[] getRequiredParameters() {
 		return RequiredParameters;
 	}
@@ -124,64 +136,65 @@ public class SampleSignatures  extends Configured implements Tool{
 			printUsage();
 			return -1;
 		}
-		JobConf job2 = new JobConf(getConf(), SampleSignatures.class);
-		job2.setJobName(this.getClass().getName());
-		FileSystem fs2 = FileSystem.get(job2);
+		JobConf job = new JobConf(getConf(), SampleSignatures.class);
+		job.setJobName(this.getClass().getName());
+		FileSystem fs = FileSystem.get(job);
 
-		String inputPath2 = args[0];//PwsimEnvironment.getFileNameWithPars(dir, "SignaturesRandom");
-		String outputPath2 = args[1];//PwsimEnvironment.getFileNameWithPars(dir, "SignaturesRandom")+"-sample";
+		String inputPath = args[0];//PwsimEnvironment.getFileNameWithPars(dir, "SignaturesRandom");
+		String outputPath = args[1];//PwsimEnvironment.getFileNameWithPars(dir, "SignaturesRandom")+"-sample";
 		int sampleFreq = Integer.parseInt(args[3]);
 
 		int numMappers2 = 100;
 		int numReducers2 = 1;
 
-		if(fs2.exists(new Path(outputPath2))){
+		if(fs.exists(new Path(outputPath))){
 			sLogger.info("Sample signatures output already exists! Quitting...");
 			return 0;
-		}	
-		FileInputFormat.setInputPaths(job2, new Path(inputPath2));
-		FileOutputFormat.setOutputPath(job2, new Path(outputPath2));
-		FileOutputFormat.setCompressOutput(job2, false);
+		}		
+		FileInputFormat.setInputPaths(job, new Path(inputPath));
+		FileOutputFormat.setOutputPath(job, new Path(outputPath));
+		FileOutputFormat.setCompressOutput(job, false);
 
 		// if sample docnos path provided,
 		if(args.length == 5){
 			sampleFreq = -1;	//ignore sample frequency
-			DistributedCache.addCacheFile(new URI(args[4]), job2);	//sample doc vectors in file
+			DistributedCache.addCacheFile(new URI(args[4]), job);	//sample doc vectors in file
 		}
 
-		job2.set("mapred.child.java.opts", "-Xmx2048m");
-		job2.setInt("mapred.map.max.attempts", 10);
-		job2.setInt("mapred.reduce.max.attempts", 10);
-		job2.setInt("mapred.task.timeout", 6000000);
-		job2.setInt("SampleFrequency", sampleFreq);
+		job.set("mapred.child.java.opts", "-Xmx2048m");
+		job.setInt("mapred.map.max.attempts", 10);
+		job.setInt("mapred.reduce.max.attempts", 10);
+		job.setInt("mapred.task.timeout", 6000000);
+		job.setInt("SampleFrequency", sampleFreq);
 
-		sLogger.info("Running job "+job2.getJobName());
-		sLogger.info("Input directory: "+inputPath2);
-		sLogger.info("Output directory: "+outputPath2);
+		sLogger.info("Running job "+job.getJobName());
+		sLogger.info("Input directory: "+inputPath);
+		sLogger.info("Output directory: "+outputPath);
 		sLogger.info("Sample frequency: "+sampleFreq);
 
-		job2.setNumMapTasks(numMappers2);
-		job2.setNumReduceTasks(numReducers2);
-		job2.setInputFormat(SequenceFileInputFormat.class);
-		job2.setMapOutputKeyClass(IntWritable.class);
+		job.setNumMapTasks(numMappers2);
+		job.setNumReduceTasks(numReducers2);
+		job.setInputFormat(SequenceFileInputFormat.class);
+		job.setMapOutputKeyClass(IntWritable.class);
 		if(args[2].equals("simhash")){
-			job2.setMapOutputValueClass(SixtyFourBitSignature.class);
-			job2.setOutputValueClass(SixtyFourBitSignature.class);
+			job.setMapOutputValueClass(SixtyFourBitSignature.class);
+			job.setOutputValueClass(SixtyFourBitSignature.class);
 		}else if(args[2].equals("random")){
-			job2.setMapOutputValueClass(NBitSignature.class);		
-			job2.setOutputValueClass(NBitSignature.class);
+			job.setMapOutputValueClass(NBitSignature.class);		
+			job.setOutputValueClass(NBitSignature.class);
 		}else if(args[2].equals("minhash")){
-			job2.setMapOutputValueClass(MinhashSignature.class);
-			job2.setOutputValueClass(MinhashSignature.class);
+			job.setMapOutputValueClass(MinhashSignature.class);
+			job.setOutputValueClass(MinhashSignature.class);
 		}else{
+			printUsage();
 			throw new RuntimeException("Unknown signature type "+args[2]);
 		}
-		job2.setOutputKeyClass(IntWritable.class);
-		job2.setMapperClass(MyMapper.class);
-		job2.setReducerClass(IdentityReducer.class);
-		job2.setOutputFormat(SequenceFileOutputFormat.class);			
+		job.setOutputKeyClass(IntWritable.class);
+		job.setMapperClass(MyMapper.class);
+		job.setReducerClass(MyReducer.class);
+		job.setOutputFormat(SequenceFileOutputFormat.class);			
 
-		JobClient.runJob(job2);
+		JobClient.runJob(job);
 
 		return 0;
 	}

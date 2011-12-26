@@ -790,7 +790,21 @@ public class OpenNLPTokenizer extends ivory.core.tokenize.Tokenizer {
 		try {
 			vocab = (VocabularyWritable) HadoopAlign.loadVocab(new Path(mJobConf.get("Ivory.CollectionVocab")), fs);
 			setVocab(vocab);
-		} catch (IOException e) {
+		} catch (Exception e) {
+			sLogger.warn("VOCAB IS NULL!");
+			vocab = null;
+		}
+	}
+	
+	@Override
+	public void configure(Configuration mJobConf, FileSystem fs){
+		setTokenizer(fs, new Path(mJobConf.get("Ivory.TokenizerModel")));
+		setLanguageAndStemmer(mJobConf.get("Ivory.Lang"));
+		VocabularyWritable vocab;
+		try {
+			vocab = (VocabularyWritable) HadoopAlign.loadVocab(new Path(mJobConf.get("Ivory.CollectionVocab")), fs);
+			setVocab(vocab);
+		} catch (Exception e) {
 			sLogger.warn("VOCAB IS NULL!");
 			vocab = null;
 		}
@@ -845,8 +859,7 @@ public class OpenNLPTokenizer extends ivory.core.tokenize.Tokenizer {
 		List<String> stemmedTokens = new ArrayList<String>();
 		for(String token : tokens){
 			token = removeNonUnicodeChars(token);
-			if(token.length() < MIN_LENGTH || token.length() > MAX_LENGTH || delims.contains(token) || stopwords.contains(token))	continue;
-			if(lang == ENGLISH && stopwords.contains(token))	continue;
+			if(isDiscard(token))	continue;
 
 			//apply stemming on token
 			String stemmed = token;
@@ -855,7 +868,7 @@ public class OpenNLPTokenizer extends ivory.core.tokenize.Tokenizer {
 				stemmer.stem();
 				stemmed = stemmer.getCurrent().toLowerCase();
 			}
-			
+
 			//skip if out of vocab
 			if(vocab!=null && vocab.get(stemmed)<=0){
 				continue;
@@ -877,6 +890,15 @@ public class OpenNLPTokenizer extends ivory.core.tokenize.Tokenizer {
 		return tokenizer.tokenize(string).length;
 	}
 
+	public boolean isDiscard(String token) {
+		return ((lang==ENGLISH && stopwords.contains(token)) || delims.contains(token) || token.length() < MIN_LENGTH || token.length() > MAX_LENGTH);
+	}
+
+	@Override
+	public boolean isStopWord(String token) {
+		return (stopwords.contains(token) || delims.contains(token));
+	}
+	
 	public static void main(String[] args) throws IOException, ClassNotFoundException, InstantiationException, IllegalAccessException{
 		String s ="965 v. Chr.\n#redirect [[10. Jahrhundert v. Chr.]]";
 		//		OpenNLPTokenizer eTokenizer = new OpenNLPTokenizer();

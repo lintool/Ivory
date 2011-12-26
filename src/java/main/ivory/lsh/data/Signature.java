@@ -29,15 +29,33 @@ public abstract class Signature implements WritableComparable {
   public abstract Signature getSubSignature(int start, int end);
   public abstract Signature getSubSignature(int start, int end, Signature subSign);
 
+  /**
+   * @param signature
+   * @return compute hamming distance between this object and signature.
+   */
   public abstract int hammingDistance(Signature signature);
 
+  /**
+   * @param signature
+   * @param threshold
+   * @return compute hamming distance between this object and signature. early terminate if distance exceeds threshold.
+   */
   public abstract int hammingDistance(Signature signature, int threshold);
 
-  public abstract void perm(ArrayListOfIntsWritable arrayListOfIntsWritable, Signature permSign);
-  public abstract Signature perm(ArrayListOfIntsWritable arrayListOfIntsWritable);
+  /**
+   * @param permutation
+   * permute this object w.r.t permutation object and save permuted signature in permSign
+   */
+  public abstract void perm(ArrayListOfIntsWritable permutation, Signature permSign);
+  
+/**
+ * @param permutation
+ * @return permute this object w.r.t permutation object and return permuted signature
+ */
+public abstract Signature perm(ArrayListOfIntsWritable permutation);
 
   @SuppressWarnings("unchecked")
-  public static Signature createSubSignature(Class subClass, int size){
+  public static Signature createSignature(Class subClass, int size){
     if(subClass.equals(NBitSignature.class) || subClass.equals(SixtyFourBitSignature.class)){
       return new NBitSignature(size);
     }else if(subClass.equals(MinhashSignature.class)){
