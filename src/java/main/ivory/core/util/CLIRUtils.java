@@ -1069,7 +1069,7 @@ public abstract class CLIRUtils extends Configured {
 		return features;
 	}
 
-	public static String[] computeFeaturesF3(HMapSFW eVector, HMapSFW fVector, float eSentLength, float fSentLength,
+	public static String[] computeFeaturesF3(HMapSFW eVector, HMapSIW fSrcTfs, HMapSFW fVector, float eSentLength, float fSentLength,
 			Vocab eVocabSrc, Vocab eVocabTrg, Vocab fVocabSrc, Vocab fVocabTrg, TTable_monolithic_IFAs e2f_Probs, TTable_monolithic_IFAs f2e_Probs) {
 		String[] features = new String[5];
 
@@ -1086,7 +1086,7 @@ public abstract class CLIRUtils extends Configured {
 		features[2] = "lengthratio2="+lengthratio2;				
 		int cntTrans = 0, cntTrans2 = 0;
 		float cnt = 0, transratio = 0.0f, cnt2 = 0, transratio2 = 0.0f;
-		for(String fTerm : fVector.keySet()){
+		for(String fTerm : fSrcTfs.keySet()){
 			int f = fVocabSrc.get(fTerm);
 			if(f < 0){
 				continue;
