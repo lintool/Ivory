@@ -6,7 +6,6 @@
 	<classpathentry kind="src" path="src/java/test"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/activation-1.1.jar"/>
-	<classpathentry kind="lib" path="lib/ant-1.6.5.jar"/>
 	<classpathentry kind="lib" path="lib/cloud9-1.2.5-javadoc.jar"/>
 	<classpathentry kind="lib" path="lib/cloud9-1.2.5-sources.jar"/>
 	<classpathentry kind="lib" path="lib/cloud9-1.2.5.jar"/>
@@ -27,7 +26,6 @@
 	<classpathentry kind="lib" path="lib/dsiutils-1.0.12.jar"/>
 	<classpathentry kind="lib" path="lib/fastutil-6.0.0.jar"/>
 	<classpathentry kind="lib" path="lib/guava-r09.jar"/>
-	<classpathentry kind="lib" path="lib/hadoop-ant-3.0-u1.pom"/>
 	<classpathentry kind="lib" path="lib/hadoop-core-0.20.2-cdh3u1-sources.jar"/>
 	<classpathentry kind="lib" path="lib/hadoop-core-0.20.2-cdh3u1.jar"/>
 	<classpathentry kind="lib" path="lib/hsqldb-1.8.0.7.jar"/>
@@ -58,6 +56,7 @@
 	<classpathentry kind="lib" path="lib/servlet-api-2.5-20081211.jar"/>
 	<classpathentry kind="lib" path="lib/servlet-api-2.5.jar"/>
 	<classpathentry kind="lib" path="lib/spy-2.4.jar"/>
+	<classpathentry kind="lib" path="lib/stanford-chinese-segmenter-2011-09-14.jar"/>
 	<classpathentry kind="lib" path="lib/sux4j-2.0.1.jar"/>
 	<classpathentry kind="lib" path="lib/tools-1.5.0-javadoc.jar"/>
 	<classpathentry kind="lib" path="lib/tools-1.5.0-sources.jar"/>

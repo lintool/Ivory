@@ -26,18 +26,21 @@ import ivory.core.preprocess.BuildTranslatedTermDocVectors;
 import ivory.core.preprocess.BuildWeightedIntDocVectors;
 import ivory.core.preprocess.BuildWeightedTermDocVectors;
 import ivory.core.preprocess.ComputeGlobalTermStatistics;
+import ivory.core.Constants;
 
 import java.io.IOException;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Logger;
 
 import edu.umd.cloud9.collection.wikipedia.BuildWikipediaDocnoMapping;
 import edu.umd.cloud9.collection.wikipedia.RepackWikipedia;
+import edu.umd.cloud9.collection.wikipedia.WikipediaDocnoMapping;
 import edu.umd.hooka.Vocab;
 import edu.umd.hooka.alignment.HadoopAlign;
 
@@ -109,7 +112,6 @@ public class PreprocessWikipedia extends Configured implements Tool {
 				conf.set("Ivory.E_Vocab_E2F", eVocab_e2f);	
 				conf.set("Ivory.F_Vocab_E2F", fVocab_e2f);	
 				conf.set("Ivory.TTable_E2F", ttable_e2f);
-
 				conf.set("Ivory.FinalVocab", eVocab_e2f);
 			}
 		}
@@ -153,8 +155,8 @@ public class PreprocessWikipedia extends Configured implements Tool {
 		Path mappingFile = env.getDocnoMappingData();
 		if (!fs.exists(mappingFile)) {
 			LOG.info(mappingFile + " doesn't exist, creating...");
-			String[] arr = new String[] { rawCollection, indexRootPath + "/wiki-docid-tmp",
-					mappingFile.toString(), new Integer(numMappers).toString() };
+			String[] arr = new String[] { "-input="+rawCollection, "-output_path="+ indexRootPath+"/wiki-docid-tmp", "-output_file="+mappingFile.toString(), "-keep_all=false"};
+
 			BuildWikipediaDocnoMapping tool = new BuildWikipediaDocnoMapping();
 			tool.setConf(conf);
 			tool.run(arr);
@@ -168,44 +170,42 @@ public class PreprocessWikipedia extends Configured implements Tool {
 		p = new Path(seqCollection);
 		if (!fs.exists(p)) {
 			LOG.info(seqCollection + " doesn't exist, creating...");
-			String[] arr = new String[] { rawCollection, seqCollection, mappingFile.toString(), "block"};
+			String[] arr = new String[] { "-input="+rawCollection, "-output="+seqCollection, "-mapping_file="+mappingFile.toString(), "-compression_type=block", "-wiki_language="+collectionLang};
 			RepackWikipedia tool = new RepackWikipedia();
 			tool.setConf(conf);
 			tool.run(arr);
 		}
 
-		conf.set("Ivory.CollectionName", "Wikipedia-"+collectionLang);
-		conf.setInt("Ivory.NumMapTasks", numMappers);
-		conf.setInt("Ivory.NumReduceTasks", numReducers);
-		conf.set("Ivory.CollectionPath", seqCollection);
-		conf.set("Ivory.IndexPath", indexRootPath);
-		conf.set("Ivory.InputFormat", "org.apache.hadoop.mapred.SequenceFileInputFormat");
-		conf.set("Ivory.DocnoMappingClass", "edu.umd.cloud9.collection.wikipedia.WikipediaDocnoMapping");
-		conf.set("Ivory.Tokenizer", tokenizerClass);			//"ivory.tokenize.OpenNLPTokenizer"
-		conf.setInt("Ivory.MinDf", MinDF);
-		conf.setInt("Ivory.MaxDf", Integer.MAX_VALUE);
+		conf.set(Constants.CollectionName, "Wikipedia-"+collectionLang);
+		conf.setInt(Constants.NumMapTasks, numMappers);
+		conf.setInt(Constants.NumReduceTasks, numReducers);
+		conf.set(Constants.CollectionPath, seqCollection);
+		conf.set(Constants.IndexPath, indexRootPath);
+		conf.set(Constants.InputFormat, SequenceFileInputFormat.class.getCanonicalName());
+		conf.set(Constants.DocnoMappingClass, WikipediaDocnoMapping.class.getCanonicalName());
+		conf.set(Constants.Tokenizer, tokenizerClass);			//"ivory.tokenize.OpenNLPTokenizer"
+		conf.setInt(Constants.MinDf, MinDF);
+		conf.setInt(Constants.MaxDf, Integer.MAX_VALUE);
+		conf.setInt(Constants.DocnoOffset, 0); // docnos start at 1
+		conf.setInt(Constants.TermIndexWindow, TermIndexWindow);
 
 		// Builds term doc vectors from document collection, and filters the terms that are not included in Ivory.SrcVocab
 		long startTime = System.currentTimeMillis();	
 		long preprocessStartTime = System.currentTimeMillis();	
 		LOG.info("Building term doc vectors...");
-		BuildTermDocVectors termDocVectorsTool = new BuildTermDocVectors(conf);
-		termDocVectorsTool.run();
+		new BuildTermDocVectors(conf).run();
 		LOG.info("Job finished in "+(System.currentTimeMillis()-startTime)/1000.0+" seconds");
 
 		// Get CF and DF counts
 		startTime = System.currentTimeMillis();
 		LOG.info("Counting terms...");
-		ComputeGlobalTermStatistics termCountWithDfAndCfTool = new ComputeGlobalTermStatistics(conf);
-		termCountWithDfAndCfTool.run();
+		new ComputeGlobalTermStatistics(conf).run();
 		LOG.info("TermCount = "+env.readCollectionTermCount()+"\nJob finished in "+(System.currentTimeMillis()-startTime)/1000.0+" seconds");
 
 		// Build a map from terms to sequentially generated integer term ids
 		startTime = System.currentTimeMillis();
-		conf.setInt("Ivory.TermIndexWindow", TermIndexWindow);
 		LOG.info("Building term-to-integer id mapping...");
-		BuildDictionary termIDsDfCfTool = new BuildDictionary(conf);
-		termIDsDfCfTool.run();
+		new BuildDictionary(conf).run();
 		LOG.info("Job finished in "+(System.currentTimeMillis()-startTime)/1000.0+" seconds");
 
 		// Compute term weights, and output weighted term doc vectors
@@ -216,16 +216,14 @@ public class PreprocessWikipedia extends Configured implements Tool {
 			conf.setInt("Ivory.MinNumTerms",MinNumTermsPerArticle);
 
 			// translate term doc vectors into English. 
-			conf.setBoolean("Ivory.Normalize", false);
-			BuildTranslatedTermDocVectors weightedTermVectorsTool = new BuildTranslatedTermDocVectors(conf);
-			weightedTermVectorsTool.run();
+			conf.setBoolean("Ivory.Normalize", true);
+			new BuildTranslatedTermDocVectors(conf).run();
 		}else{						
 			conf.setInt("Ivory.MinNumTerms",MinNumTermsPerArticle);
 
 			// get weighted term doc vectors
-			conf.setBoolean("Ivory.Normalize", false);
-			BuildWeightedTermDocVectors weightedTermVectorsTool = new BuildWeightedTermDocVectors(conf);
-			weightedTermVectorsTool.run();
+			conf.setBoolean("Ivory.Normalize", true);
+			new BuildWeightedTermDocVectors(conf).run();
 		}
 		LOG.info("Job finished in "+(System.currentTimeMillis()-startTime)/1000.0+" seconds");
 
@@ -256,7 +254,7 @@ public class PreprocessWikipedia extends Configured implements Tool {
 			LOG.info("Changed term count to : "+env.readCollectionTermCount() + " = " + engVocabH.size());
 			env.writeCollectionTermCount(engVocabH.size());
 		}
-		
+
 		LOG.info("Preprocessing job finished in "+(System.currentTimeMillis()-preprocessStartTime)/1000.0+" seconds");
 
 		return 0;

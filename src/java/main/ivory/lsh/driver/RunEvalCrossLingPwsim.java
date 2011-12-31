@@ -3,7 +3,7 @@ package ivory.lsh.driver;
 import ivory.core.RetrievalEnvironment;
 import ivory.lsh.eval.BruteForcePwsim;
 import ivory.lsh.eval.FilterResults;
-import ivory.lsh.eval.SampleDocVectors;
+import ivory.lsh.eval.SampleIntDocVectors;
 import ivory.lsh.pwsim.GenerateChunkedPermutedTables;
 import ivory.lsh.pwsim.cl.CLSlidingWindowPwsim;
 
@@ -70,7 +70,8 @@ public class RunEvalCrossLingPwsim extends PwsimEnvironment implements Tool {
 		config.set("Ivory.IndexPath", targetLangDir);
 
 		// collection size is the sum of the two collections' sizes
-		int collSize = targetEnv.readCollectionDocumentCount()+srcEnv.readCollectionDocumentCount();
+		int srcCollSize = srcEnv.readCollectionDocumentCount();
+		int collSize = targetEnv.readCollectionDocumentCount()+srcCollSize;
 		config.setInt("Ivory.CollectionDocumentCount", collSize);
 
 		///////Parameters/////////////
@@ -116,9 +117,9 @@ public class RunEvalCrossLingPwsim extends PwsimEnvironment implements Tool {
 
 		// sample from non-English weighted int doc vectors: these are needed by BruteForcePwsim, which finds the ground truth pairs for the sample using dot product of doc vectors
 		if(!hdfs.exists(new Path(sampleWtdIntDocVectorsPath))){
-			int frequency = (collSize/sampleSize);
+			int frequency = (srcCollSize/sampleSize);
 			String[] sampleArgs = {wtdIntDocVectorsPath, sampleWtdIntDocVectorsPath, "100", frequency+""};
-			SampleDocVectors.main(sampleArgs);
+			SampleIntDocVectors.main(sampleArgs);
 		}
 
 		// extract sample docnos into a separate file: needed for filtering pwsim pairs

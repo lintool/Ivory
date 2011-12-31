@@ -93,7 +93,7 @@ public class MinhashSignature extends Signature{//implements WritableComparable<
 	 * @see ivory.lsh.data.Signature#size()
 	 */
 	public int size() {
-		return terms.getArray().length;
+		return terms.size();
 	}
 
 	@Override
