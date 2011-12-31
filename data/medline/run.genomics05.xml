@@ -1,13 +1,21 @@
 <parameters>
 
-     <index>/umd-lin/shared/indexes/medline04</index>
+     <index>index-medline04</index>
 
-     <!-- query likelihood -->
-     <model id="genomics05-lm-ql" type="FullIndependence" mu="1000.0" output="/tmp/ranking.genomics05-lm-ql.txt" hits="1000" />
+     <model id="genomics05-dir-base" type="Feature" output="ranking.genomics05-dir-base.txt" hits="1000">
+         <feature id="termWt" weight="1.0" 
+                  cliqueSet="ivory.smrf.model.builder.TermCliqueSet"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.TermExpressionGenerator"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1000.0" />
+     </model>
 
-     <!-- bm25 -->
-     <model id="genomics05-bm25-base" type="Feature" output="/tmp/ranking.genomics05-bm25-base.txt" hits="1000">
-          <feature id="term" weight="1.0" cliqueSet="term" potential="QueryPotential" generator="term" scoreFunction="BM25" k1="0.5" b="0.3" />
+     <model id="genomics05-bm25-base" type="Feature" output="ranking.genomics05-bm25-base.txt" hits="1000">
+         <feature id="term" weight="1.0"
+                  cliqueSet="ivory.smrf.model.builder.TermCliqueSet"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.TermExpressionGenerator" 
+                  scoreFunction="ivory.smrf.model.score.BM25ScoringFunction" k1="0.5" b="0.3" />
      </model>
 
 </parameters>
