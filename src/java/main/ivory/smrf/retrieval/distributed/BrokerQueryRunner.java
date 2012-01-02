@@ -1,11 +1,11 @@
 /*
  * Ivory: A Hadoop toolkit for web-scale information retrieval
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You may
  * obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0 
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -60,7 +60,7 @@ public class BrokerQueryRunner implements QueryRunner {
 
 	private static String join(String[] terms, String sep) {
 		StringBuilder sb = new StringBuilder();
-		
+
 		for ( int i=0; i<terms.length; i++ ) {
 			sb.append(terms[i]);
 			if ( i<terms.length-1)

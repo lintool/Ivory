@@ -3,7 +3,7 @@
      <index>index-medline04</index>
 
      <model id="genomics05-dir-base" type="Feature" output="ranking.genomics05-dir-base.txt" hits="1000">
-         <feature id="termWt" weight="1.0" 
+         <feature id="termWt" weight="1.0"
                   cliqueSet="ivory.smrf.model.builder.TermCliqueSet"
                   potential="ivory.smrf.model.potential.QueryPotential"
                   generator="ivory.smrf.model.builder.TermExpressionGenerator"
@@ -14,7 +14,7 @@
          <feature id="term" weight="1.0"
                   cliqueSet="ivory.smrf.model.builder.TermCliqueSet"
                   potential="ivory.smrf.model.potential.QueryPotential"
-                  generator="ivory.smrf.model.builder.TermExpressionGenerator" 
+                  generator="ivory.smrf.model.builder.TermExpressionGenerator"
                   scoreFunction="ivory.smrf.model.score.BM25ScoringFunction" k1="0.5" b="0.3" />
      </model>
 
