@@ -1,6 +1,6 @@
 <parameters>
 
-     <index>index-medline04</index>
+     <index>/scratch0/indexes/medline04</index>
 
      <model id="genomics05-dir-base" type="Feature" output="ranking.genomics05-dir-base.txt" hits="1000">
          <feature id="termWt" weight="1.0"
