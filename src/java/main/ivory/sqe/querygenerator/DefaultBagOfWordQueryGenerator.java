@@ -19,7 +19,7 @@ public class DefaultBagOfWordQueryGenerator implements QueryGenerator {
 	  super();
   }
 
-  public void init(FileSystem fs, String[] args) throws IOException {
+	public void init(FileSystem fs, Configuration conf) throws IOException {
 	  tokenizer = new GalagoTokenizer();		
   }
 	

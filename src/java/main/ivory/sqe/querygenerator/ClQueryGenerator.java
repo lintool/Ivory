@@ -2,6 +2,8 @@ package ivory.sqe.querygenerator;
 
 import ivory.core.tokenize.Tokenizer;
 import ivory.core.tokenize.TokenizerFactory;
+import ivory.sqe.retrieval.Constants;
+
 import java.io.IOException;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
@@ -27,15 +29,13 @@ public class ClQueryGenerator implements QueryGenerator {
 		super();
 	}
 
-	public void init(FileSystem fs, String[] args) throws IOException {
-		fVocab_f2e = (VocabularyWritable) HadoopAlign.loadVocab(new Path(args[2]), fs);
-		eVocab_f2e = (VocabularyWritable) HadoopAlign.loadVocab(new Path(args[3]), fs);
+	public void init(FileSystem fs, Configuration conf) throws IOException {
+		fVocab_f2e = (VocabularyWritable) HadoopAlign.loadVocab(new Path(conf.get(Constants.fVocabPath)), fs);
+		eVocab_f2e = (VocabularyWritable) HadoopAlign.loadVocab(new Path(conf.get(Constants.eVocabPath)), fs);
 		
-		f2eProbs = new TTable_monolithic_IFAs(fs, new Path(args[4]), true);
-		tokenizer = TokenizerFactory.createTokenizer(fs, "zh", args[5], fVocab_f2e);
-		if(args.length == 7){
-			probThreshold = Float.parseFloat(args[6]);
-		}
+		f2eProbs = new TTable_monolithic_IFAs(fs, new Path(conf.get(Constants.f2eProbsPath)), true);
+		tokenizer = TokenizerFactory.createTokenizer(fs, conf.get(Constants.SourceLanguageCode), conf.get(Constants.TokenizerModelPath), fVocab_f2e);
+		probThreshold = conf.getFloat(Constants.ProbThreshold, 0.0f);
 	}
 
 	public JSONObject parseQuery(String query) {

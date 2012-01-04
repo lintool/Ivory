@@ -155,7 +155,7 @@ public class PreprocessWikipedia extends Configured implements Tool {
 		Path mappingFile = env.getDocnoMappingData();
 		if (!fs.exists(mappingFile)) {
 			LOG.info(mappingFile + " doesn't exist, creating...");
-			String[] arr = new String[] { "-input="+rawCollection, "-output_path="+ indexRootPath+"/wiki-docid-tmp", "-output_file="+mappingFile.toString(), "-keep_all=false"};
+			String[] arr = new String[] { "-input="+rawCollection, "-output_path="+ indexRootPath+"/wiki-docid-tmp", "-output_file="+mappingFile.toString()};
 
 			BuildWikipediaDocnoMapping tool = new BuildWikipediaDocnoMapping();
 			tool.setConf(conf);
@@ -237,9 +237,9 @@ public class PreprocessWikipedia extends Configured implements Tool {
 			LOG.info("Job BuildWeightedIntDocVectors finished in "+(System.currentTimeMillis()-startTime)/1000.0+" seconds");
 		}else{
 			BuildTargetLangWeightedIntDocVectors weightedIntVectorsTool = new BuildTargetLangWeightedIntDocVectors(conf);
-			LOG.info("Job BuildTargetLangWeightedIntDocVectors finished in "+(System.currentTimeMillis()-startTime)/1000.0+" seconds");
 
 			int finalNumDocs = weightedIntVectorsTool.run();
+			LOG.info("Job BuildTargetLangWeightedIntDocVectors finished in "+(System.currentTimeMillis()-startTime)/1000.0+" seconds");
 			if(finalNumDocs > 0){
 				LOG.info("Changed doc count from "+env.readCollectionDocumentCount() + " to = "+finalNumDocs);
 				env.writeCollectionDocumentCount(finalNumDocs);

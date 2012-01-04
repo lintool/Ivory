@@ -5,6 +5,7 @@ import ivory.core.util.ResultWriter;
 import ivory.core.util.XMLTools;
 import ivory.smrf.retrieval.Accumulator;
 import ivory.smrf.retrieval.QueryRunner;
+import ivory.sqe.querygenerator.CLPhraseQueryGenerator;
 import ivory.sqe.querygenerator.ClQueryGenerator;
 import ivory.sqe.querygenerator.DefaultBagOfWordQueryGenerator;
 import ivory.sqe.querygenerator.QueryGenerator;
@@ -39,18 +40,20 @@ public class QueryEngine {
   private QueryGenerator generator;
   private DocnoMapping mapping;
   
-  public QueryEngine(String[] args, FileSystem fs) {
+  public QueryEngine(Configuration conf, FileSystem fs) {
 	  try {
 		this.fs = fs;
-		ranker = new StructuredQueryRanker(args[0], fs, 1000);
+		ranker = new StructuredQueryRanker(conf.get(Constants.IndexPath), fs, 1000);
 		mapping = ranker.getDocnoMapping();
-		queries = parseQueries(args[1], fs);
-	    if (args.length == 6) {
+		queries = parseQueries(conf.get(Constants.QueriesPath), fs);
+	    if (conf.get(Constants.QueryType).equals(Constants.CLIR)) {
 	    	generator = new ClQueryGenerator();
+	    } else if (conf.get(Constants.QueryType).equals(Constants.PhraseCLIR)) {
+	    	generator = new CLPhraseQueryGenerator();
 	    } else {
 	    	generator = new DefaultBagOfWordQueryGenerator();
 	    }
-	    generator.init(fs, args);
+	    generator.init(fs, conf);
 
 	} catch (IOException e) {
 		e.printStackTrace();

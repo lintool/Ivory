@@ -20,72 +20,72 @@ import edu.umd.cloud9.mapred.NullOutputFormat;
 
 public class RunQueryEngineHDFS extends Configured implements Tool  {
 
-	  private static final Logger LOG = Logger.getLogger(RunQueryEngineHDFS.class);
-	  private static enum Time { Query };
+	private static final Logger LOG = Logger.getLogger(RunQueryEngineHDFS.class);
+	private static enum Time { Query };
 
-	  private static class QueryRunner extends NullMapper {
-	    public void run(JobConf conf, Reporter reporter) throws IOException {
-	      String[] args = conf.get("args").split(";");
-	      FileSystem fs = FileSystem.get(conf);
-	      QueryEngine qe;
-	      try {
-	        LOG.info("Initializing QueryEngine...");
-	        qe = new QueryEngine(args, fs);
-	        LOG.info("Running the queries ...");
-	        long start = System.currentTimeMillis();
-	        qe.runQueries();
-	        long end = System.currentTimeMillis();
+	private static class QueryRunner extends NullMapper {
+		public void run(JobConf conf, Reporter reporter) throws IOException {
+			String[] args =     conf.get("args").split(";");
+			FileSystem fs = FileSystem.get(conf);
+			QueryEngine qe;
+			try {
+				LOG.info("Initializing QueryEngine...");
+				qe = new QueryEngine(conf, fs);
+				LOG.info("Running the queries ...");
+				long start = System.currentTimeMillis();
+				qe.runQueries();
+				long end = System.currentTimeMillis();
 
-	        reporter.incrCounter(Time.Query, (end - start));
-	      } catch (Exception e) {
-	        throw new RuntimeException(e);
-	      }
-	    }
-	  }
+				reporter.incrCounter(Time.Query, (end - start));
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		}
+	}
 
-	  public int run(String[] args) throws Exception {
-	    if (args.length != 2 && args.length != 6) {
-	      System.out.println("usage 1: [index-path] [queries-file] [vocab-f-file] [vocab-e-file] [ttable-f2e-file] [tokenizer-model-file]");
-	      System.out.println("usage 2: [index-path] [queries-file]");
-	      ToolRunner.printGenericCommandUsage(System.out);
-	      return -1;
-	    }
+	public int run(String[] args) throws Exception {
+		if (!(args.length == 2 || args.length >= 6)) {
+			System.out.println("usage 1: [index-path] [queries-file] [vocab-f-file] [vocab-e-file] [ttable-f2e-file] [tokenizer-model-file] [src-lang]");
+			System.out.println("usage 2: [index-path] [queries-file] ");
+			ToolRunner.printGenericCommandUsage(System.out);
+			return -1;
+		}
 
-	    String argsStr = Joiner.on(";").join(args);
+		String argsStr = Joiner.on(";").join(args);
 
-	    JobConf conf = new JobConf(RunQueryEngineHDFS.class);
-	    conf.setJobName("RunQueryEngineHDFS");
+		JobConf conf = new JobConf(RunQueryEngineHDFS.class);
+		conf.setJobName("RunQueryEngineHDFS");
 
-	    conf.setNumMapTasks(1);
-	    conf.setNumReduceTasks(0);
+		conf.setNumMapTasks(1);
+		conf.setNumReduceTasks(0);
 
-	    conf.setInputFormat(NullInputFormat.class);
-	    conf.setOutputFormat(NullOutputFormat.class);
-	    conf.setMapperClass(QueryRunner.class);
+		conf.setInputFormat(NullInputFormat.class);
+		conf.setOutputFormat(NullOutputFormat.class);
+		conf.setMapperClass(QueryRunner.class);
 
-	    conf.set("args", argsStr);
-	    conf.set("mapred.child.java.opts", "-Xmx16g");
-	    
-//	    if (args.length == 6) {
-//	    	conf.set("Ivory.F_Vocab_F2E", args[2]);
-//	    	conf.set("Ivory.E_Vocab_F2E", args[3]);
-//	    	conf.set("Ivory.TTable_F2E", args[4]);
-//	    	conf.set("Ivory.TokenizerModel", args[5]);
-//	    }
-	    LOG.info("argsStr: " + argsStr);
+		conf.set("args", argsStr);
+		conf.set("mapred.child.java.opts", "-Xmx16g");
 
-	    JobClient client = new JobClient(conf);
-	    client.submitJob(conf);
+		//	    if (args.length == 6) {
+		//	    	conf.set("Ivory.F_Vocab_F2E", args[2]);
+		//	    	conf.set("Ivory.E_Vocab_F2E", args[3]);
+		//	    	conf.set("Ivory.TTable_F2E", args[4]);
+		//	    	conf.set("Ivory.TokenizerModel", args[5]);
+		//	    }
+		LOG.info("argsStr: " + argsStr);
 
-	    LOG.info("runner started!");
+		JobClient client = new JobClient(conf);
+		client.submitJob(conf);
 
-	    return 0;
-	  }
+		LOG.info("runner started!");
 
-	  public RunQueryEngineHDFS() {}
+		return 0;
+	}
 
-	  public static void main(String[] args) throws Exception {
-	    ToolRunner.run(new RunQueryEngineHDFS(), args);
-	  }
+	public RunQueryEngineHDFS() {}
+
+	public static void main(String[] args) throws Exception {
+		ToolRunner.run(new RunQueryEngineHDFS(), args);
+	}
 
 }

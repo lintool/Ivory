@@ -139,7 +139,7 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
 			model.setAvgDocLength(avgDocLen);
 
 			try {
-				tokenizer = new OpenNLPTokenizer();
+				tokenizer = new OpenNLPTokenizer();		// just for stopword removal in translateTFs
 			} catch (Exception e) {
 				e.printStackTrace();
 				throw new RuntimeException("Error initializing tokenizer!");
@@ -158,12 +158,6 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
 		throws IOException {
 
 			if(docno.get()%SAMPLING!=0)		return;	//for generating sample document vectors. no sampling if SAMPLING=1
-
-			//			/**
-			//			 * DEBUG
-			//			 * 
-			//			 */
-			//			if(docno.get()!=101)		return;
 
 			if(!language.equals("english") && !language.equals("en")){
 				docno.set(docno.get() + 1000000000);	//to distinguish between the two collections in the PWSim sliding window algorithm
@@ -251,6 +245,7 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
 		conf.setInt("Ivory.CollectionDocumentCount", env.readCollectionDocumentCount());
 		conf.set("Ivory.Lang", getConf().get("Ivory.Lang"));
 		conf.set("Ivory.Normalize", getConf().get("Ivory.Normalize"));
+		conf.set("Ivory.MinNumTerms", getConf().get("Ivory.MinNumTerms"));
 
 		conf.setNumMapTasks(300);			
 		conf.setNumReduceTasks(0);

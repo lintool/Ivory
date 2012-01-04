@@ -164,8 +164,6 @@ public class BuildWeightedTermDocVectors extends PowerTool {
 				int id = dict.getId(term); 
 				if(id != -1){
 					int df = dfTable.getDf(id);
-//				}
-//				if(df>=1){
 					sLogger.debug(term);
 					mScoreFn.setDF(df);
 					wt = mScoreFn.computeDocumentWeight(r.getTf(), docLen);
