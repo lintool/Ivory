@@ -139,9 +139,12 @@ public class RetrievalEnvironment {
 		try {
 			String tokenizerClassName = readTokenizerClass();
 			if (tokenizerClassName.startsWith("ivory.util.GalagoTokenizer")) {
-				LOG.warn("Warning: GalagoTokenizer has been refactored to ivory.tokenize.GalagoTokenizer!");
+				LOG.warn("Warning: GalagoTokenizer has been refactored to ivory.core.tokenize.GalagoTokenizer!");
 				tokenizerClassName = "ivory.core.tokenize.GalagoTokenizer";
-			}
+			} else if (tokenizerClassName.startsWith("ivory.tokenize.GalagoTokenizer")) {
+        LOG.warn("Warning: GalagoTokenizer has been refactored to ivory.core.tokenize.GalagoTokenizer!");
+        tokenizerClassName = "ivory.core.tokenize.GalagoTokenizer";
+      }
 
 			LOG.info("Tokenizer: " + tokenizerClassName);
 			tokenizer = (Tokenizer) Class.forName(tokenizerClassName).newInstance();

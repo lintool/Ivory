@@ -75,8 +75,8 @@ public class PreprocessWt10g extends Configured implements Tool {
 
     RetrievalEnvironment env = new RetrievalEnvironment(indexRootPath, fs);
 
-    // Look for the docno mapping, which maps from docid (String) to docno
-    // (sequentially-number integer). If it doesn't exist create it.
+    // Look for the docno mapping, which maps from docid (String) to docno (sequentially-number
+    // integer). If it doesn't exist create it.
     Path mappingFile = env.getDocnoMappingData();
     Path mappingDir = env.getDocnoMappingDirectory();
 
