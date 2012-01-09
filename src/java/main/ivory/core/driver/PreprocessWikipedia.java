@@ -94,7 +94,7 @@ public class PreprocessWikipedia extends Configured implements Tool {
 			tokenizerModel = args[5];
 			collectionVocab = args[6];
 			conf.set("Ivory.Lang", collectionLang);
-			conf.set("Ivory.TokenizerModel", tokenizerModel);
+			conf.set(Constants.TokenizerData, tokenizerModel);
 			conf.set("Ivory.CollectionVocab", collectionVocab);
 			conf.set("Ivory.FinalVocab", collectionVocab);
 

@@ -3,6 +3,7 @@ package ivory.regression.basic.sqe;
 import static ivory.regression.RegressionUtils.loadScoresIntoMap;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import ivory.core.Constants;
 import ivory.core.eval.Qrels;
 import ivory.core.eval.RankedListEvaluator;
 import ivory.smrf.retrieval.Accumulator;
@@ -292,13 +293,13 @@ public class Robust04_Basic {
 
   @Test
   public void runRegression() throws Exception {
-    String[] params = new String[] {
-            "/scratch0/indexes/trec",
-            "data/trec/queries.robust04.xml" };
-
+    Configuration conf = new Configuration();
+    conf.set(ivory.sqe.retrieval.Constants.IndexPath, "/scratch0/indexes/trec");
+    conf.set(ivory.sqe.retrieval.Constants.QueriesPath, "data/trec/queries.robust04.xml");
+    conf.set(ivory.sqe.retrieval.Constants.QueryType, ivory.sqe.retrieval.Constants.BagOfWords);
     FileSystem fs = FileSystem.getLocal(new Configuration());
 
-    QueryEngine qe = new QueryEngine(params, fs);
+    QueryEngine qe = new QueryEngine(conf, fs);
     long start = System.currentTimeMillis();
     qe.runQueries();
     long end = System.currentTimeMillis();
