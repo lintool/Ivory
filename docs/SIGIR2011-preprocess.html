@@ -14,11 +14,12 @@
     p.p5 {margin: 0.0px 0.0px 0.0px 0.0px; font: 11.0px Monaco}
     p.p6 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; color: #3b3df5; min-height: 14.0px}
     p.p7 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times}
-    p.p8 {margin: 0.0px 0.0px 0.0px 0.0px; font: 10.0px 'Trebuchet MS'}
-    p.p9 {margin: 0.0px 0.0px 0.0px 0.0px; font: 10.0px Helvetica}
-    p.p10 {margin: 0.0px 0.0px 0.0px 0.0px; font: 11.0px Helvetica}
-    span.s1 {text-decoration: underline}
-    span.s2 {font: 11.0px Monaco}
+    p.p8 {margin: 0.0px 0.0px 0.0px 0.0px; font: 7.0px 'Trebuchet MS'}
+    p.p9 {margin: 0.0px 0.0px 0.0px 0.0px; font: 10.0px 'Trebuchet MS'}
+    p.p10 {margin: 0.0px 0.0px 0.0px 0.0px; font: 7.0px Helvetica}
+    p.p11 {margin: 0.0px 0.0px 0.0px 0.0px; font: 11.0px Helvetica}
+    span.s1 {font: 11.0px Monaco}
+    span.s2 {text-decoration: underline}
     span.s3 {font: 13.0px Helvetica}
     span.s4 {text-decoration: underline ; color: #0000ee}
     span.s5 {font: 12.0px Helvetica; text-decoration: underline}
@@ -26,9 +27,11 @@
     span.s7 {color: #3b3df5}
     span.s8 {font: 12.0px Times}
     span.s9 {font: 12.0px Helvetica}
-    span.s10 {font: 9.0px Helvetica}
-    span.s11 {font: 11.0px 'Trebuchet MS'}
-    span.s12 {font: 11.0px Monaco; color: #0326cc}
+    span.s10 {font: 10.0px 'Trebuchet MS'}
+    span.s11 {font: 7.0px 'Trebuchet MS'}
+    span.s12 {font: 6.0px Helvetica}
+    span.s13 {font: 11.0px 'Trebuchet MS'}
+    span.s14 {font: 11.0px Monaco; color: #0326cc}
     span.Apple-tab-span {white-space:pre}
     table.t1 {border-collapse: collapse}
     td.td1 {width: 274.0px; border-style: solid; border-width: 1.0px 1.0px 1.0px 1.0px; border-color: #000000 #000000 #000000 #000000; padding: 0.0px 5.0px 0.0px 5.0px}
@@ -51,87 +54,87 @@
 <p class="p2"><br></p>
 <p class="p3">There are 12 program arguments, some of which are optional depending on user needs and requirements.<span class="Apple-converted-space"> </span></p>
 <p class="p2"><br></p>
-<p class="p3">* means the argument is not needed if you're not running cross-lingual collections. It's needed if you're running English or non-English side of cross-lingual collection (e.g. English Wikipedia)</p>
-<p class="p3">** means the argument is only needed if you're running non-English side of cross-lingual collection (e.g., German Wikipedia).</p>
+<p class="p3">* <span class="Apple-converted-space">    </span>means the argument is required only if the tokenizer class requires a model file (e.g., OpenNLPTokenizer, <span class="s1">StanfordChineseTokenizer</span>).<span class="Apple-converted-space"> </span></p>
+<p class="p3">** <span class="Apple-converted-space">  </span>means the argument is required only if you're running English or non-English side of cross-lingual collection (e.g. English Wikipedia)</p>
+<p class="p3">*** means the argument is required only if you're running non-English side of cross-lingual collection (e.g., German Wikipedia).</p>
 <p class="p2"><br></p>
-<p class="p3"><b>1</b><span class="s1">) Working directory to write output</span><span class="Apple-converted-space"> </span></p>
+<p class="p3"><b>1</b><span class="s2">) Working directory to write output</span><span class="Apple-converted-space"> </span></p>
 <p class="p3">Will be created if it doesn't exist in the HDFS.</p>
 <p class="p2"><br></p>
-<p class="p3"><b>2</b><span class="s1">) Path to raw collection</span></p>
+<p class="p3"><b>2</b><span class="s2">) Path to raw collection</span></p>
 <p class="p3">This is not needed if compressed version (see next bullet) and docno mapping already exists (i.e., if you already repacked Wikipedia as described in http://www.umiacs.umd.edu/~jimmylin/Cloud9/docs/content/wikipedia.html). Just enter X in that case.</p>
 <p class="p2"><br></p>
-<p class="p3"><b>3</b><span class="s1">) Path to compressed sequential blocks</span></p>
+<p class="p3"><b>3</b><span class="s2">) Path to compressed sequential blocks</span></p>
 <p class="p3">This will be created from raw collection if it doesn't already exist. System will check for the path in HDFS.</p>
 <p class="p2"><span class="Apple-converted-space"> </span></p>
-<p class="p3"><b>4</b><span class="s1">) Tokenizer class</span></p>
-<p class="p3">Needs to be a class that implements <span class="s2">ivory.core.tokenize.Tokenizer</span>. See <span class="s2">ivory.core.tokenize</span> for implementations.</p>
-<p class="p3">The <span class="s2">OpenNLPTokenizer</span> class was based on the OpenNLP package to be used in cross-lingual applications. It has been tested with English, German and French OpenNLP models.</p>
-<p class="p3">Similarly, the <span class="s2">StanfordChineseTokenizer</span> class was based on the Stanford Chinese segmentation package. It has been tested with Chinese tokenization models from their website.</p>
+<p class="p3"><b>4</b><span class="s2">) Tokenizer class</span></p>
+<p class="p3">Needs to be a class that implements <span class="s1">ivory.core.tokenize.Tokenizer</span>. See <span class="s1">ivory.core.tokenize</span> for implementations.</p>
+<p class="p3">The <span class="s1">OpenNLPTokenizer</span> class was based on the OpenNLP package to be used in cross-lingual applications. It has been tested with English, German and French OpenNLP models.</p>
+<p class="p3">Similarly, the <span class="s1">StanfordChineseTokenizer</span> class was based on the Stanford Chinese segmentation package. It has been tested with Chinese tokenization models from their website.</p>
 <p class="p2"><br></p>
-<p class="p3"><span class="s1">*</span><b>5</b><span class="s1">) Language collection is written in</span></p>
+<p class="p3"><span class="s2">*</span><b>5</b><span class="s2">) Language collection is written in</span></p>
 <p class="p3">Used to determine the correct stemmer class. Current stemmer classes (org.tartarus.snowball.ext) require full, lowercase names: english, german, ...</p>
 <p class="p3">Also used in a hack to separate docnos from English and non-English languages. Current system assumes one of the languages to be English.</p>
 <p class="p2"><br></p>
-<p class="p3"><span class="s1">*</span><b>6</b><span class="s1">) Tokenizer model</span></p>
-<p class="p3">When using <span class="s2">OpenNLPTokenizer</span> or <span class="s2">StanfordChineseTokenizer</span>, a model file is needed for each language. Model files can be downloaded from their website.</p>
-<p class="p3">If you're not running cross-lingual collections (see bullet 4), this is irrelevant, just enter X.</p>
+<p class="p3"><span class="s2">*</span><b>6</b><span class="s2">) Tokenizer model</span></p>
+<p class="p3">When using <span class="s1">OpenNLPTokenizer</span> or <span class="s1">StanfordChineseTokenizer</span>, a model file is needed for each language. Model files can be downloaded from their website.</p>
 <p class="p2"><br></p>
-<p class="p3">Vocabulary files are required so that the system can synchronize the vocabularies of the two collections.<span class="Apple-converted-space"> </span></p>
+<p class="p3"><span class="s2">**</span><b>7</b><span class="s2">) Path to collection vocabulary</span></p>
+<p class="p3">When running cross-lingual collections, a set of vocabulary files are required so that the system can synchronize the vocabularies of the two collections.<span class="Apple-converted-space"> </span></p>
 <p class="p2"><br></p>
-<p class="p3"><span class="s1">*</span><b>7</b><span class="s1">) Path to collection vocabulary</span></p>
 <p class="p3">If you're running English side of cross-lingual collection, this should be the source vocabulary of the probability table P(f|e).</p>
 <p class="p3">If you're running non-English side of cross-lingual collection, this should be the source vocabulary of the probability table P(e|f).</p>
-<p class="p3">If you're not running cross-lingual collections (see bullet 4), this is irrelevant, just enter X.</p>
 <p class="p2"><br></p>
-<p class="p3">In order to translate document vectors from Language F into Language E, two tables containing lexical translation probabilities (i.e., P(f|e) and P(e|f)) and four vocabularies (source and target vocabulary of each translation table) are needed. Our system requires the translation table to be an instance of the type <span class="s2">edu.umd.clip.mt.ttables.TTable_monolithic_IFAs</span><span class="s3">,</span> a product of running alignment with <span class="s2">Hooka</span>. In the case that translation probabilities are already available, or a different aligner has been used (e.g. Giza++, BerkeleyAligner), the files should be converted into this format. See <span class="s2">Hooka</span> documentation in our Cloud9 release for more details.</p>
+<p class="p3">In order to translate document vectors from Language F into Language E, two tables containing lexical translation probabilities (i.e., P(f|e) and P(e|f)) and four vocabularies (source and target vocabulary of each translation table) are needed. Our system requires the translation table to be an instance of the type <span class="s1">edu.umd.clip.mt.ttables.TTable_monolithic_IFAs</span><span class="s3">,</span> a product of running alignment with <span class="s1">Hooka</span>. In the case that translation probabilities are already available, or a different aligner has been used (e.g. Giza++, BerkeleyAligner), the files should be converted into this format. See <span class="s1">Hooka</span> documentation in our Cloud9 release for more details.</p>
 <p class="p2"><br></p>
-<p class="p3"><span class="s1">**</span><b>8</b><span class="s1">) Path to target vocabulary of the probability table P(e|f)</span></p>
+<p class="p3"><span class="s2">***</span><b>8</b><span class="s2">) Path to target vocabulary of the probability table P(e|f)</span></p>
 <p class="p2"><br></p>
-<p class="p3"><span class="s1">**</span><b>9</b><span class="s1">) Probability table P(e|f)</span></p>
+<p class="p3"><span class="s2">***</span><b>9</b><span class="s2">) Probability table P(e|f)</span></p>
 <p class="p2"><br></p>
-<p class="p3"><span class="s1">**</span><b>10</b><span class="s1">) Path to source vocabulary of P(f|e)</span></p>
+<p class="p3"><span class="s2">***</span><b>10</b><span class="s2">) Path to source vocabulary of P(f|e)</span></p>
 <p class="p2"><br></p>
-<p class="p3"><span class="s1">**</span><b>11</b><span class="s1">) Path to target vocabulary of P(f|e)</span></p>
+<p class="p3"><span class="s2">***</span><b>11</b><span class="s2">) Path to target vocabulary of P(f|e)</span></p>
 <p class="p2"><br></p>
-<p class="p3"><span class="s1">**</span><b>12</b><span class="s1">) Probability table P(f|e)</span></p>
+<p class="p3"><span class="s2">***</span><b>12</b><span class="s2">) Probability table P(f|e)</span></p>
 <p class="p2"><br></p>
 <p class="p3">As a result, this program can be run in three different "modes":</p>
 <p class="p2"><br></p>
 <p class="p3"><b>Mode 1: Monolingual (MONO)</b></p>
 <p class="p2"><br></p>
-<p class="p3"><span class="s1">Input</span>: Wikipedia collection in language X</p>
-<p class="p3"><span class="s1">Output</span>: Weighted document vectors in language X</p>
+<p class="p3"><span class="s2">Input</span>: Wikipedia collection in language E</p>
+<p class="p3"><span class="s2">Output</span>: Weighted document vectors in language E</p>
 <p class="p2"><br></p>
-<p class="p3"><span class="s1">usage</span>: [work-dir] [raw-path] [compressed-path] [tokenizer-class]</p>
-<p class="p3">(only first four program arguments)</p>
+<p class="p3"><span class="s2">usage</span>: [work-dir] [raw-path] [compressed-path] [tokenizer-class] ([collection-lang]) ([tokenizer-model])</p>
+<p class="p3">(Only first four program arguments are required. remaining two are optional, enter only if needed by the specified [tokenizer-class].)</p>
 <p class="p2"><br></p>
-<p class="p3"><span class="s1">example command:</span></p>
+<p class="p3"><span class="s2">example command:</span></p>
 <p class="p2"><br></p>
-<p class="p3">hadoop jar ivory.jar ivory.driver.PreprocessWikipedia /user/fture/en-wiki X /user/fture/en-wiki/compressed.block ivory.tokenize.GalagoTokenizer</p>
+<p class="p5">hadoop jar ivory.jar ivory.driver.PreprocessWikipedia /user/fture/en-wiki /user/fture/enwiki-20110115-pages-articles.xml /user/fture/enwiki-20110115.compressed ivory.core.tokenize.GalagoTokenizer</p>
+<p class="p5">hadoop jar ivory.jar ivory.driver.PreprocessWikipedia /user/fture/en-wiki X /user/fture/enwiki-20110115.compressed ivory.core.tokenize.OpenNLPTokenizer en /user/fture/vocab/en-token.bin</p>
 <p class="p2"><br></p>
 <p class="p3"><b>Mode 2: Cross-lingual, English side (CROSS-ENG)</b></p>
 <p class="p2"><br></p>
-<p class="p3"><span class="s1">Input</span>: English side of cross-lingual Wikipedia collection</p>
-<p class="p3"><span class="s1">Output</span>: English weighted document vectors (comparable with the document vectors generated from non-English side)</p>
+<p class="p3"><span class="s2">Input</span>: English side of cross-lingual Wikipedia collection</p>
+<p class="p3"><span class="s2">Output</span>: English weighted document vectors (comparable with the document vectors generated from non-English side)</p>
 <p class="p2"><br></p>
-<p class="p3"><span class="s1">usage</span>: [work-dir] [raw-path] [compressed-path] [tokenizer-class] [collection-lang] [tokenizer-model] [collection-vocab]</p>
-<p class="p3">(only first seven program arguments)</p>
+<p class="p3"><span class="s2">usage</span>: [work-dir] [raw-path] [compressed-path] [tokenizer-class] [collection-lang] [tokenizer-model] [collection-vocab]</p>
+<p class="p3">(Only first seven program arguments are required.)</p>
 <p class="p2"><br></p>
-<p class="p3"><span class="s1">example command:</span></p>
+<p class="p3"><span class="s2">example command:</span></p>
 <p class="p2"><br></p>
-<p class="p3">hadoop jar ivory.jar ivory.core.driver.PreprocessWikipedia /user/fture/enwiki_de-en /shared/collections/wikipedia/raw/enwiki-20110115-pages-articles.xml /user/fture/collections/enwiki-20110115.compressed ivory.core.tokenize.OpenNLPTokenizer en<span class="Apple-converted-space">  </span>/user/fture/vocab/en-token.bin<span class="Apple-converted-space">  </span>/user/fture/vocab/vocab.en-de.en</p>
+<p class="p5">hadoop jar ivory.jar ivory.core.driver.PreprocessWikipedia /user/fture/enwiki_de-en /user/fture/enwiki-20110115-pages-articles.xml /user/fture/enwiki-20110115.compressed ivory.core.tokenize.OpenNLPTokenizer en /user/fture/vocab/en-token.bin /user/fture/vocab/vocab.en-de.en</p>
 <p class="p2"><br></p>
 <p class="p3"><b>Mode 3: Cross-lingual, Non-English side (CROSS-NON-ENG)</b></p>
 <p class="p2"><br></p>
-<p class="p3"><span class="s1">Input</span>: Non-English side of cross-lingual Wikipedia collection</p>
-<p class="p3"><span class="s1">Output</span>: English weighted document vectors (comparable with the document vectors generated from English side)</p>
+<p class="p3"><span class="s2">Input</span>: Non-English side of cross-lingual Wikipedia collection</p>
+<p class="p3"><span class="s2">Output</span>: English weighted document vectors (comparable with the document vectors generated from English side)</p>
 <p class="p2"><br></p>
-<p class="p3"><span class="s1">usage</span>: [work-dir] [raw-path] [compressed-path] [tokenizer-class] [collection-lang] [tokenizer-model] [src-vocab_f] [trg-vocab_e] [prob-table_f--&gt;e] [src-vocab_e] [trg-vocab_f] [prob-table_e--&gt;f])</p>
-<p class="p3">(all program arguments)</p>
+<p class="p3"><span class="s2">usage</span>: [work-dir] [raw-path] [compressed-path] [tokenizer-class] [collection-lang] [tokenizer-model] [src-vocab_f] [trg-vocab_e] [prob-table_f--&gt;e] [src-vocab_e] [trg-vocab_f] [prob-table_e--&gt;f])</p>
+<p class="p3">(All program arguments are required.)</p>
 <p class="p2"><br></p>
-<p class="p3"><span class="s1">example command:</span></p>
+<p class="p3"><span class="s2">example command:</span></p>
 <p class="p2"><br></p>
-<p class="p3">hadoop jar ivory.jar ivory.core.driver.PreprocessWikipedia /user/fture/dewiki_de-en /shared/collections/wikipedia/raw/dewiki-20110131-pages-articles.xml /user/fture/collections/enwiki-20110115.compressed ivory.core.tokenize.OpenNLPTokenizer de /user/fture/vocab/de-token.bin /user/fture/vocab/vocab.de-en.de /user/fture/vocab/vocab.de-en.en /user/fture/vocab/ttable.de-en /user/fture/vocab/vocab.en-de.en /user/fture/vocab/vocab.en-de.de /user/fture/vocab/ttable.en-de</p>
+<p class="p5">hadoop jar ivory.jar ivory.core.driver.PreprocessWikipedia /user/fture/dewiki_de-en /user/fture/dewiki-20110131-pages-articles.xml /user/fture/dewiki-20110131.compressed ivory.core.tokenize.OpenNLPTokenizer de /user/fture/vocab/de-token.bin /user/fture/vocab/vocab.de-en.de /user/fture/vocab/vocab.de-en.en /user/fture/vocab/ttable.de-en /user/fture/vocab/vocab.en-de.en /user/fture/vocab/vocab.en-de.de /user/fture/vocab/ttable.en-de</p>
 <p class="p2"><br></p>
 <p class="p3">=====================</p>
 <p class="p2"><br></p>
@@ -141,11 +144,11 @@
 <p class="p2"><br></p>
 <p class="p3">The first three steps of the program are MapReduce tasks that are common to the preprocessing of any collection in Ivory. The only customization is through configuration parameters, and any such configuration is explained below. <span class="Apple-converted-space"> </span></p>
 <p class="p2"><br></p>
-<p class="p5"><span class="s5">1. </span><span class="s1">ivory.core.preprocess.BuildTermDocVectors</span></p>
+<p class="p5"><span class="s5">1. </span><span class="s2">ivory.core.preprocess.BuildTermDocVectors</span></p>
 <p class="p2"><br></p>
 <p class="p3">The first step of the program is to create term doc vectors --<span class="Apple-converted-space">  </span>each document is converted into a vector that contains unique terms and their frequency in the document. The text of each document is tokenized by the specified tokenizer. <span class="Apple-converted-space"> </span></p>
 <p class="p2"><br></p>
-<p class="p3">The <span class="s2">OpenNLPTokenizer</span> class reads the collection vocabulary from configuration parameter "<span class="s6">Ivory.CollectionVocab</span>", and filters out all terms that do no appear in the vocabulary. If this is not set, the filtering is not done, but the tokenizer will still work. Other configuration parameters used by this class are "<span class="s6">Ivory.Lang</span>", "<span class="s6">Ivory.IsWiki</span>" and "<span class="s6">Ivory.TokenizerModel"</span><span class="s2">,</span>indicating the collection language, whether to parse and clean Wikipedia page or not, and the tokenizer model.<span class="s7"><span class="Apple-converted-space"> </span></span></p>
+<p class="p3">The <span class="s1">OpenNLPTokenizer</span> class reads the collection vocabulary from configuration parameter "<span class="s6">Ivory.CollectionVocab</span>", and filters out all terms that do no appear in the vocabulary. If this is not set, the filtering is not done, but the tokenizer will still work. Other configuration parameters used by this class are "<span class="s6">Ivory.Lang</span>", "<span class="s6">Ivory.IsWiki</span>" and "<span class="s6">Ivory.TokenizerModel"</span><span class="s1">,</span>indicating the collection language, whether to parse and clean Wikipedia page or not, and the tokenizer model.<span class="s7"><span class="Apple-converted-space"> </span></span></p>
 <p class="p6"><br></p>
 <p class="p3">This job also keeps track of document lengths and saves them on HDFS ($workdir/doclengths.dat), which is loaded in step 4 to compute term weights.</p>
 <p class="p2"><br></p>
@@ -184,7 +187,7 @@
 <p class="p2"><br></p>
 <p class="p3">At this point, the working directory should have a subdirectory named term-doc-vectors.</p>
 <p class="p2"><br></p>
-<p class="p5"><span class="s5">2. </span><span class="s1">ivory.core.preprocess.ComputeGlobalTermStatistics</span></p>
+<p class="p5"><span class="s5">2. </span><span class="s2">ivory.core.preprocess.ComputeGlobalTermStatistics</span></p>
 <p class="p2"><br></p>
 <p class="p3">This job finds the DF (document frequency = number of documents a term has occurred) and CF (collection frequency = number of times a term has occurred throughout the collection) values of all terms in the collection. We don't need the CF values, but they're computed as part of the Ivory preprocessing pipeline anyway.</p>
 <p class="p2"><br></p>
@@ -227,7 +230,7 @@
   </tbody>
 </table>
 <p class="p2"><br></p>
-<p class="p5"><span class="s5">3. </span><span class="s1">ivory.core.preprocess.BuildDictionary</span></p>
+<p class="p5"><span class="s5">3. </span><span class="s2">ivory.core.preprocess.BuildDictionary</span></p>
 <p class="p2"><br></p>
 <p class="p3">This jobs builds an index of terms, and creates a mapping from terms to integer ids for efficient storage. If a collection vocabulary has been provided, this mapping will not be used.</p>
 <p class="p2"><br></p>
@@ -269,7 +272,7 @@
 </table>
 <p class="p2"><br></p>
 <p class="p2"><br></p>
-<p class="p5"><span class="s5">4. </span><span class="s1">Building weighted term doc vectors</span></p>
+<p class="p5"><span class="s5">4. </span><span class="s2">Building weighted term doc vectors</span></p>
 <p class="p2"><br></p>
 <p class="p3">In this step, every term in each document is weighted according to its document frequency (DF), term frequency (TF), the document length (doclen) and average document length. Although there are several ways to compute this weight, it is hardcoded in our program as the BM25 function (<span class="s6">ivory.pwsim.score.Bm25)</span>. TF values are read from the input (term doc vectors created in step 1), whereas the DF, document length and average document length values are read from the files written to HDFS in steps 1-3.<span class="Apple-converted-space"> </span></p>
 <p class="p2"><br></p>
@@ -280,28 +283,28 @@
     <tr>
       <td valign="top" class="td7">
         <p class="p8"><sup>CLIR-TRANSLATE (non-English docvector </sup><i><sup>v</sup></i><sup>)</sup></p>
-        <p class="p8"><sup>for_all(non-English term </sup><i><sup>f</sup></i><sup> in </sup><i><sup>v</sup></i><sup>)</sup><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-converted-space">                  </span><sup>// f \in source vocabulary of P(e|f)</sup></p>
-        <p class="p8"><sup>   for_all(English translation </sup><i><sup>e</sup></i><sup> of </sup><i><sup>f </sup></i><sup>)    </sup> <span class="Apple-tab-span">	</span><span class="Apple-converted-space">                  </span><sup>// e \in target vocabulary of P(e|f)</sup></p>
-        <p class="p8"><sup>         TF(e) = TF(e) + Pr(f | e) x TF(f)    </sup><span class="Apple-converted-space">                  </span><sup>// we use P(f|e) instead of P(e|f) for mathematical correctness.1</sup></p>
-        <p class="p8"><sup>         DF(e) = DF(e) + Pr(f | e) x DF(f)</sup><span class="Apple-converted-space">                      </span><sup>// notice that e \in source vocabulary of P(f|e)</sup></p>
-        <p class="p8"><span class="Apple-converted-space">   </span><sup>end</sup></p>
+        <p class="p8"><sup>for_all(non-English term </sup><i><sup>f</sup></i><sup> in </sup><i><sup>v</sup></i><sup>)</sup><span class="s10"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-converted-space">                  </span></span><sup>// f \in source vocabulary of P(e|f)</sup></p>
+        <p class="p8"><sup>   for_all(English translation </sup><i><sup>e</sup></i><sup> of </sup><i><sup>f </sup></i><sup>)    </sup><span class="s10"> <span class="Apple-tab-span">	</span><span class="Apple-converted-space">                  </span></span><sup>// e \in target vocabulary of P(e|f)</sup></p>
+        <p class="p8"><sup>         TF(e) = TF(e) + Pr(f | e) x TF(f)    </sup><span class="s10"><span class="Apple-converted-space">                  </span></span><sup>// we use P(f|e) instead of P(e|f) for mathematical correctness.1</sup></p>
+        <p class="p8"><sup>         DF(e) = DF(e) + Pr(f | e) x DF(f)</sup><span class="s10"><span class="Apple-converted-space">                      </span></span><sup>// notice that e \in source vocabulary of P(f|e)</sup></p>
+        <p class="p9"><span class="Apple-converted-space">   </span><span class="s11"><sup>end</sup></span></p>
         <p class="p8"><sup>end</sup></p>
         <p class="p8"><sup>for_all(</sup><i><sup>e</sup></i><sup> in table P(f|e))</sup></p>
-        <p class="p8"><span class="Apple-tab-span">	</span><sup>weight(e) = BM25(TF(</sup><i><sup>e</sup></i><sup>), DF(</sup><i><sup>e</sup></i><sup>), DocLength(</sup><i><sup>v</sup></i><sup>), AverageDocLength)</sup></p>
-        <p class="p9"><sup>end</sup></p>
+        <p class="p8"><span class="s10"><span class="Apple-tab-span">	</span></span><sup>weight(e) = BM25(TF(</sup><i><sup>e</sup></i><sup>), DF(</sup><i><sup>e</sup></i><sup>), DocLength(</sup><i><sup>v</sup></i><sup>), AverageDocLength)</sup></p>
+        <p class="p10"><sup>end</sup></p>
         <p class="p3">// return doc vector with computed weights</p>
         <p class="p2"><br></p>
         <p class="p3">Note: Since df values do not depend on the document vector, our implementation translates df values of the entire vocabulary offline and saves them, so they can be simply looked up while translating tf values.</p>
         <p class="p2"><br></p>
-        <p class="p10"><span class="s10"><sup>1</sup></span><span class="s11">See paper </span><i>Combining Bidirectional Translation and Synonymy for Cross-Language Information Retrieval, Wang&amp;Oard</i></p>
+        <p class="p11"><span class="s12"><sup>1</sup></span><span class="s13">See paper </span><i>Combining Bidirectional Translation and Synonymy for Cross-Language Information Retrieval, Wang&amp;Oard</i></p>
       </td>
     </tr>
   </tbody>
 </table>
 <p class="p2"><br></p>
-<p class="p3">To reflect this difference, we implemented a separate class to handle this translation idea. The class <span class="s2">ivory.core.preprocess.BuildWeightedTermDocVectors</span> is the regular Ivory implementation used when there is no translation involved (modes MONO and CROSS-ENG), whereas <span class="s2">ivory.core.preprocess.BuildTargetLangWeightedIntDocVectors</span> implements the above CLIR idea (mode CROSS-NON-ENG). Both output weighted term doc vectors are of type <span class="s2">HMapSFW</span> and are normalized.</p>
+<p class="p3">To reflect this difference, we implemented a separate class to handle this translation idea. The class <span class="s1">ivory.core.preprocess.BuildWeightedTermDocVectors</span> is the regular Ivory implementation used when there is no translation involved (modes MONO and CROSS-ENG), whereas <span class="s1">ivory.core.preprocess.BuildTranslatedTermDocVectors</span> implements the above CLIR idea (mode CROSS-NON-ENG). Both output weighted term doc vectors are of type <span class="s1">HMapSFW</span> and are normalized.</p>
 <p class="p2"><br></p>
-<p class="p3">In Wikipedia, there are many irrelevant, possibly noisy articles that can be removed based on shortness. We heuristically remove all doc vectors containing less than 5 terms. This can be set via the configuration parameter "<span class="s12">Ivory.MinNumTermsPerArticle</span>" in the main class <span class="s2">ivory.core.driver.PreprocessWikipedia</span>.</p>
+<p class="p3">In Wikipedia, there are many irrelevant, possibly noisy articles that can be removed based on shortness. We heuristically remove all doc vectors containing less than 5 terms. This can be set via the configuration parameter "<span class="s14">Ivory.MinNumTermsPerArticle</span>" in the main class <span class="s1">ivory.core.driver.PreprocessWikipedia</span>.</p>
 <p class="p2"><br></p>
 <p class="p3">Counters</p>
 <p class="p3">English Wikipedia<span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>German Wikipedia</p>
@@ -326,9 +329,9 @@
   </tbody>
 </table>
 <p class="p2"><br></p>
-<p class="p5"><span class="s5">5. </span><span class="s1">Building weighted integer doc vectors</span></p>
+<p class="p5"><span class="s5">5. </span><span class="s2">Building weighted integer doc vectors</span></p>
 <p class="p2"><br></p>
-<p class="p3">In this step, weighted term doc vectors are converted into weighted integer doc vectors for efficient storage. In Ivory, this conversion is normally done via the term-id mapping, created in step 3, which is a mapping from string terms to unique integer ids. However, when we preprocess cross-lingual Wikipedia and use source and target vocabularies of the probability table, those vocabularies already provide such a mapping. Therefore the term-id mapping is not used in this step. For that reason, in modes CROSS-ENG and CROSS-NON-ENG, we use the class <span class="s2">ivory.core.preprocess.BuildTargetLangWeightedIntDocVectors</span>, as opposed to running <span class="s2">BuildIntDocVectors</span> and then <span class="s2">ivory.core.preprocess.BuildWeightedIntDocVectors</span> in mode MONO.</p>
+<p class="p3">In this step, weighted term doc vectors are converted into weighted integer doc vectors for efficient storage. In Ivory, this conversion is normally done via the term-id mapping, created in step 3, which is a mapping from string terms to unique integer ids. However, when we preprocess cross-lingual Wikipedia and use source and target vocabularies of the probability table, those vocabularies already provide such a mapping. Therefore the term-id mapping is not used in this step. For that reason, in modes CROSS-ENG and CROSS-NON-ENG, we use the class <span class="s1">ivory.core.preprocess.BuildTargetLangWeightedIntDocVectors</span>, as opposed to running <span class="s1">BuildIntDocVectors</span> and then <span class="s1">ivory.core.preprocess.BuildWeightedIntDocVectors</span> in mode MONO.</p>
 <p class="p2"><br></p>
 </body>
 </html>

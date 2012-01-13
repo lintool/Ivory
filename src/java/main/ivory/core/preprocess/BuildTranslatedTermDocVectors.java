@@ -329,9 +329,9 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
 
 			String e2fttableFile = conf.get("Ivory.TTable_E2F");
 			String termsFile = env.getIndexTermsData();
-			String dfByTermFile = env.getDfByTermData();
+			String dfByIntFile = env.getDfByIntData();
 
-			if(!fs2.exists(new Path(fFile)) || !fs2.exists(new Path(eFile)) || !fs2.exists(new Path(e2fttableFile)) || !fs2.exists(new Path(termsFile)) || !fs2.exists(new Path(dfByTermFile))){
+			if(!fs2.exists(new Path(fFile)) || !fs2.exists(new Path(eFile)) || !fs2.exists(new Path(e2fttableFile)) || !fs2.exists(new Path(termsFile)) || !fs2.exists(new Path(dfByIntFile))){
 				throw new RuntimeException("Error: Translation files do not exist!");
 			}
 
@@ -347,7 +347,7 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
 			}	
 
 			DefaultFrequencySortedDictionary dict = new DefaultFrequencySortedDictionary(new Path(env.getIndexTermsData()), new Path(env.getIndexTermIdsData()), new Path(env.getIndexTermIdMappingData()), fs2);
-			DfTableArray dfTable = new DfTableArray(new Path(dfByTermFile), fs2);
+			DfTableArray dfTable = new DfTableArray(new Path(dfByIntFile), fs2);
 
 			HMapIFW transDfTable = CLIRUtils.translateDFTable(eVocab_e2f, fVocab_e2f, en2DeProbs, dict, dfTable);
 

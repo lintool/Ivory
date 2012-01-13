@@ -23,21 +23,14 @@ import ivory.core.data.stat.DfTableArray;
 import ivory.core.data.stat.DocLengthTable;
 import ivory.core.data.stat.DocLengthTable2B;
 import ivory.core.data.stat.DocLengthTable4B;
-import ivory.core.data.stat.PrefixEncodedGlobalStats;
-import ivory.core.data.stat.PrefixEncodedGlobalStatsWithIndex;
-import ivory.core.util.CLIRUtils;
 import ivory.pwsim.score.ScoringModel;
-
 import java.io.IOException;
 import java.net.URI;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.filecache.DistributedCache;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.FloatWritable;
 import org.apache.hadoop.io.IntWritable;
-import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.mapred.FileInputFormat;
 import org.apache.hadoop.mapred.FileOutputFormat;
 import org.apache.hadoop.mapred.JobClient;
@@ -51,22 +44,15 @@ import org.apache.hadoop.mapred.SequenceFileInputFormat;
 import org.apache.hadoop.mapred.SequenceFileOutputFormat;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-
-
-import edu.umd.hooka.Vocab;
-import edu.umd.hooka.ttables.TTable_monolithic_IFAs;
 import edu.umd.cloud9.io.map.HMapSFW;
-import edu.umd.cloud9.mapred.NullInputFormat;
-import edu.umd.cloud9.mapred.NullMapper;
-import edu.umd.cloud9.mapred.NullOutputFormat;
 import edu.umd.cloud9.util.PowerTool;
 import edu.umd.cloud9.util.map.MapKF;
 
 public class BuildWeightedTermDocVectors extends PowerTool {
-	private static final Logger sLogger = Logger.getLogger(BuildWeightedTermDocVectors.class);
+	private static final Logger LOG = Logger.getLogger(BuildWeightedTermDocVectors.class);
 
 	static{
-		sLogger.setLevel(Level.WARN);
+		LOG.setLevel(Level.WARN);
 	}
 	protected static enum Docs{
 		Total, ZERO, SHORT
@@ -83,8 +69,9 @@ public class BuildWeightedTermDocVectors extends PowerTool {
 		private boolean normalize = false;
 		DefaultFrequencySortedDictionary dict;
 		DfTableArray dfTable; 
-		
+
 		public void configure(JobConf conf){
+			LOG.setLevel(Level.INFO);
 			normalize = conf.getBoolean("Ivory.Normalize", false);
 			shortDocLengths = conf.getBoolean("Ivory.ShortDocLengths", false);
 			MIN_SIZE = conf.getInt("Ivory.MinNumTerms", 0);
@@ -96,16 +83,16 @@ public class BuildWeightedTermDocVectors extends PowerTool {
 				// standalone mode...
 				if (conf.get ("mapred.job.tracker").equals ("local")) {
 					FileSystem fs = FileSystem.get (conf);
-					//sLogger.info ("fs: " + fs);
+					//LOG.info ("fs: " + fs);
 					String indexPath = conf.get ("Ivory.IndexPath");
-					//sLogger.info ("indexPath: " + indexPath);
+					//LOG.info ("indexPath: " + indexPath);
 					RetrievalEnvironment env = new RetrievalEnvironment (indexPath, fs);
-					//sLogger.info ("env: " + env);
+					//LOG.info ("env: " + env);
 					localFiles = new Path [5];
 					localFiles [0] = new Path (env.getIndexTermsData ());
 					localFiles [1] = new Path (env.getIndexTermIdsData ());
 					localFiles [2] = new Path (env.getIndexTermIdMappingData ());
-					localFiles [3] = new Path (env.getDfByTermData ());
+					localFiles [3] = new Path (env.getDfByIntData ());
 					localFiles [4] = env.getDoclengthsData ();
 
 				} else {
@@ -116,6 +103,11 @@ public class BuildWeightedTermDocVectors extends PowerTool {
 			}
 
 			try{
+				LOG.info("Index-terms = "+localFiles[0].toString());
+				LOG.info("Index-termids = "+localFiles[1].toString());
+				LOG.info("Index-termidmap = "+localFiles[2].toString());
+				LOG.info("dftable = "+localFiles[3].toString());
+				
 				dict = new DefaultFrequencySortedDictionary(localFiles[0], localFiles[1], localFiles[2], FileSystem.getLocal(conf));
 				dfTable = new DfTableArray(localFiles[3], FileSystem.getLocal(conf));
 			} catch (Exception e) {
@@ -123,7 +115,7 @@ public class BuildWeightedTermDocVectors extends PowerTool {
 				throw new RuntimeException("Error loading Terms File for dictionary from "+localFiles[0]);
 			}
 
-			sLogger.info("Global Stats table loaded successfully.");
+			LOG.info("Global Stats table loaded successfully.");
 
 			try {
 				if(shortDocLengths)
@@ -155,25 +147,25 @@ public class BuildWeightedTermDocVectors extends PowerTool {
 			int docLen = mDLTable.getDocLength(mDocno.get());
 
 			weightedVector.clear();
-			TermDocVector.Reader r = doc.getReader();
-
-			sLogger.debug("===================================BEGIN READ DOC");
+			TermDocVector.Reader r = doc.getReader();			
+			
+			LOG.debug("===================================BEGIN READ DOC");
 			sum2 = 0;
 			while(r.hasMoreTerms()){
 				term = r.nextTerm();
 				int id = dict.getId(term); 
 				if(id != -1){
 					int df = dfTable.getDf(id);
-					sLogger.debug(term);
 					mScoreFn.setDF(df);
 					wt = mScoreFn.computeDocumentWeight(r.getTf(), docLen);
+					LOG.debug(term+","+id+"==>"+r.getTf()+","+df+","+docLen+"="+wt);
 					weightedVector.put(term, wt);
 					sum2 += wt * wt;
 				}else{
-					sLogger.debug("skipping term "+term+" (not in dictionary)");
+					LOG.debug("skipping term "+term+" (not in dictionary)");
 				}
 			}
-			sLogger.debug("===================================END READ DOC");
+			LOG.debug("===================================END READ DOC");
 			if(normalize){
 				/*length-normalize doc vectors*/
 				sum2 = (float) Math.sqrt(sum2);
@@ -182,6 +174,7 @@ public class BuildWeightedTermDocVectors extends PowerTool {
 					weightedVector.put(e.getKey(), score/sum2);
 				}
 			}
+			LOG.debug("docvector size="+weightedVector.size());
 			if(weightedVector.size()==0){
 				reporter.incrCounter(Docs.ZERO, 1);
 			}else if(weightedVector.size()<MIN_SIZE){
@@ -196,7 +189,6 @@ public class BuildWeightedTermDocVectors extends PowerTool {
 
 	public static final String[] RequiredParameters = { "Ivory.NumMapTasks",
 		"Ivory.IndexPath", 
-		//"Ivory.OutputPath",
 		"Ivory.ScoringModel",
 		"Ivory.Normalize",
 	};
@@ -211,7 +203,7 @@ public class BuildWeightedTermDocVectors extends PowerTool {
 
 	@SuppressWarnings("deprecation")
 	public int runTool() throws Exception {
-		sLogger.info("PowerTool: GetWeightedTermDocVectors");
+		LOG.info("PowerTool: GetWeightedTermDocVectors");
 
 		JobConf conf = new JobConf(BuildWeightedTermDocVectors.class);
 		FileSystem fs = FileSystem.get(conf);
@@ -226,14 +218,13 @@ public class BuildWeightedTermDocVectors extends PowerTool {
 		String termsFilePath = env.getIndexTermsData();
 		String termsIdsFilePath = env.getIndexTermIdsData();
 		String termIdMappingFilePath = env.getIndexTermIdMappingData();
-		String dfByTermFilePath = env.getDfByTermData();
+		String dfByIntFilePath = env.getDfByIntData();
 		
 		Path inputPath = new Path(env.getTermDocVectorsDirectory());
 		Path weightedVectorsPath = new Path(outputPath);
 
 		if (fs.exists(weightedVectorsPath)) {
-			//fs.delete(weightedVectorsPath, true);
-			sLogger.info("Output path already exists!");
+			LOG.info("Output path already exists!");
 			return 0;
 		}
 
@@ -246,10 +237,10 @@ public class BuildWeightedTermDocVectors extends PowerTool {
 		DistributedCache.addCacheFile(new URI(termIdMappingFilePath), conf);
 
 		/* add df table to cache */
-		if (!fs.exists(new Path(dfByTermFilePath))) {
-			throw new RuntimeException("Error, df data file " + dfByTermFilePath + "doesn't exist!");
+		if (!fs.exists(new Path(dfByIntFilePath))) {
+			throw new RuntimeException("Error, df data file " + dfByIntFilePath + "doesn't exist!");
 		}
-		DistributedCache.addCacheFile(new URI(dfByTermFilePath), conf);
+		DistributedCache.addCacheFile(new URI(dfByIntFilePath), conf);
 
 		/* add dl table to cache */
 		Path docLengthFile = env.getDoclengthsData();
@@ -281,11 +272,11 @@ public class BuildWeightedTermDocVectors extends PowerTool {
 		conf.setOutputKeyClass(IntWritable.class);
 		conf.setOutputValueClass(HMapSFW.class);
 
-		sLogger.info("Running job: "+conf.getJobName());
+		LOG.info("Running job: "+conf.getJobName());
 		
 		long startTime = System.currentTimeMillis();
 		RunningJob job = JobClient.runJob(conf);
-		sLogger.info("Job Finished in " + (System.currentTimeMillis() - startTime) / 1000.0
+		LOG.info("Job Finished in " + (System.currentTimeMillis() - startTime) / 1000.0
 				+ " seconds");
 
 		return 0;

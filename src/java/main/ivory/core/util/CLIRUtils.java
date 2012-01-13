@@ -63,10 +63,8 @@ import edu.umd.hooka.ttables.TTable_monolithic_IFAs;
  * @author ferhanture
  *
  */
-public abstract class CLIRUtils extends Configured {
+public class CLIRUtils extends Configured {
 	private static final Logger logger = Logger.getLogger(CLIRUtils.class);
-	private static final int NUM_TRANS = 15;
-	private static final float PROB_THRESHOLD = 0.9f;
 
 	/**
 	 * Read df mapping from file.
@@ -216,8 +214,8 @@ public abstract class CLIRUtils extends Configured {
 				String fTerm = fVocabTrg.get(f);
 				int id = dict.getId(fTerm); 
 				if(id != -1){
-					float df_f = dfTable.getDf(id);
-					df+=(probEF*df_f);
+					float df_f = dfTable.getDf(id);				
+					df += (probEF*df_f);
 				}else{
 					logger.info(fTerm+" not in dict");
 				}
@@ -631,7 +629,7 @@ public abstract class CLIRUtils extends Configured {
 	
 	/**
 	 * This method converts the output of BerkeleyAligner into a TTable_monolithic_IFAs object. 
-	 * For each source language term, top NUM_TRANS entries (with highest translation probability) are kept, unless the top K < NUM_TRANS entries have a cumulatite probability above PROB_THRESHOLD.
+	 * For each source language term, top numTrans entries (with highest translation probability) are kept, unless the top K < numTrans entries have a cumulatite probability above PROB_THRESHOLD.
 	 * 
 	 * @param inputFile
 	 * 		output of Berkeley Aligner (probability values from source language to target language). Format should be: 
@@ -649,7 +647,7 @@ public abstract class CLIRUtils extends Configured {
 	 * 		FileSystem object
 	 * @throws IOException
 	 */
-	public static void createTTableFromBerkeleyAligner(String inputFile, String srcVocabFile, String trgVocabFile, String probsFile, FileSystem fs) throws IOException{
+	public static void createTTableFromBerkeleyAligner(String inputFile, String srcVocabFile, String trgVocabFile, String probsFile, float probThreshold, int numTrans, FileSystem fs) throws IOException{
 		logger.setLevel(Level.INFO);
 
 		TTable_monolithic_IFAs table = new TTable_monolithic_IFAs();
@@ -688,7 +686,7 @@ public abstract class CLIRUtils extends Configured {
 
 					List<PairOfIntFloat> indexProbPairs = new ArrayList<PairOfIntFloat>();
 					float sumprob = 0.0f;
-					for(int i=0;i<NUM_TRANS;i++){
+					for(int i=0;i<numTrans;i++){
 						if((line=bis.readLine())!=null){
 							Pattern p2 = Pattern.compile("\\s*(\\S+): (.+)");
 							Matcher m2 = p2.matcher(line);
@@ -697,7 +695,7 @@ public abstract class CLIRUtils extends Configured {
 								if(m.find()){
 									logger.debug("Early terminate");
 									earlyTerminate = true;
-									i = NUM_TRANS;
+									i = numTrans;
 									break;
 								}
 								//								logger.debug("FFFF"+line);
@@ -710,13 +708,13 @@ public abstract class CLIRUtils extends Configured {
 								sumprob+=prob;
 							}
 						}
-						if(sumprob > PROB_THRESHOLD){
+						if(sumprob > probThreshold){
 							cntShortTail++;		// for statistical purposes only
 							sumShortTail += (i+1);	// for statistical purposes only
 							break;
 						}
 					}
-					if(sumprob <= PROB_THRESHOLD){
+					if(sumprob <= probThreshold){
 						cntLongTail++;		// for statistical purposes only
 						if(sumprob < 0.1){
 							logger.info(sumprob);
@@ -748,8 +746,8 @@ public abstract class CLIRUtils extends Configured {
 		}
 		logger.info("Vocabulary Target: "+trgVocab.size()+" elements");
 		logger.info("Vocabulary Source: "+srcVocab.size()+" elements");
-		logger.info("# source terms with > "+PROB_THRESHOLD+" probability covered: "+cntShortTail+" and average translations per term: "+(sumShortTail/(cntShortTail+0.0f)));
-		logger.info("# source terms with <= "+PROB_THRESHOLD+" probability covered: "+cntLongTail+" (each has "+ NUM_TRANS +" translations)");
+		logger.info("# source terms with > "+probThreshold+" probability covered: "+cntShortTail+" and average translations per term: "+(sumShortTail/(cntShortTail+0.0f)));
+		logger.info("# source terms with <= "+probThreshold+" probability covered: "+cntLongTail+" (each has "+ numTrans +" translations)");
 
 
 		DataOutputStream dos = new DataOutputStream(new BufferedOutputStream
@@ -769,7 +767,7 @@ public abstract class CLIRUtils extends Configured {
 
 	/**
 	 * This method converts the output of GIZA into a TTable_monolithic_IFAs object. 
-	 * For each source language term, top NUM_TRANS entries (with highest translation probability) are kept, unless the top K < NUM_TRANS entries have a cumulatite probability above PROB_THRESHOLD.
+	 * For each source language term, top numTrans entries (with highest translation probability) are kept, unless the top K < numTrans entries have a cumulatite probability above probThreshold.
 	 * 
 	 * @param inputFile
 	 * 		output of GIZA (probability values from source language to target language. In GIZA, format of each line should be: 
@@ -786,7 +784,7 @@ public abstract class CLIRUtils extends Configured {
 	 * 		FileSystem object
 	 * @throws IOException
 	 */
-	public static void createTTableFromGIZA(String filename, String srcVocabFile, String trgVocabFile, String probsFile, FileSystem fs) throws IOException{
+	public static void createTTableFromGIZA(String filename, String srcVocabFile, String trgVocabFile, String probsFile, float probThreshold, int numTrans, FileSystem fs) throws IOException{
 		logger.setLevel(Level.INFO);
 
 		TTable_monolithic_IFAs table = new TTable_monolithic_IFAs();
@@ -796,7 +794,7 @@ public abstract class CLIRUtils extends Configured {
 		BufferedReader bis = null;
 		int cnt = 0;
 
-		//In GIZA output, dictionary entries are in random order (w.r.t. prob value), so you need to keep a sorted list of top NUM_TRANS or less entries w/o exceeding MaxProb threshold
+		//In GIZA output, dictionary entries are in random order (w.r.t. prob value), so you need to keep a sorted list of top numTrans or less entries w/o exceeding MaxProb threshold
 		try {
 			fis = new FileInputStream(file);
 			bis = new BufferedReader(new InputStreamReader(fis,"UTF-8"));
@@ -824,7 +822,7 @@ public abstract class CLIRUtils extends Configured {
 					if(topTrans.size() > 0){
 						//store previous term's top translations to ttable
 						int finalNumTrans = addToTable(curIndex, topTrans, sumOfProbs, table, trgVocab);
-						if(finalNumTrans < NUM_TRANS){
+						if(finalNumTrans < numTrans){
 							cntShortTail++;
 							sumShortTail += finalNumTrans;
 						}else{
@@ -854,8 +852,8 @@ public abstract class CLIRUtils extends Configured {
 				}else if(!earlyTerminate && !skipTerm){	//continue adding translation term,prob pairs (except if early termination is ON)
 					topTrans.add(new PairOfFloatString(prob, trgTerm));
 
-					// keep top NUM_TRANS translations
-					if(topTrans.size()>NUM_TRANS){
+					// keep top numTrans translations
+					if(topTrans.size()>numTrans){
 						float removedProb = topTrans.pollFirst().getLeftElement();
 						sumOfProbs -= removedProb;
 					}
@@ -863,9 +861,9 @@ public abstract class CLIRUtils extends Configured {
 				}else{
 					logger.debug("Skipped");
 				}
-				if(sumOfProbs > PROB_THRESHOLD){
+				if(sumOfProbs > probThreshold){
 					earlyTerminate = true;
-					logger.debug("Sum of probs > "+PROB_THRESHOLD+", early termination.");
+					logger.debug("Sum of probs > "+probThreshold+", early termination.");
 				}
 			}
 			
@@ -873,7 +871,7 @@ public abstract class CLIRUtils extends Configured {
 			if(topTrans.size()>0){
 				//store previous term's top translations to ttable
 				int finalNumTrans = addToTable(curIndex, topTrans, sumOfProbs, table, trgVocab);
-				if(finalNumTrans < NUM_TRANS){
+				if(finalNumTrans < numTrans){
 					cntShortTail++;
 					sumShortTail += finalNumTrans;
 				}else{
@@ -888,8 +886,8 @@ public abstract class CLIRUtils extends Configured {
 			logger.info("File "+filename+": read "+cnt+" lines");
 			logger.info("Vocabulary Target: "+trgVocab.size()+" elements");
 			logger.info("Vocabulary Source: "+srcVocab.size()+" elements");
-			logger.info("# source terms with > "+PROB_THRESHOLD+" probability covered: "+cntShortTail+" and average translations per term: "+(sumShortTail/(cntShortTail+0.0f)));
-			logger.info("# source terms with <= "+PROB_THRESHOLD+" probability covered: "+cntLongTail+" (each has "+ NUM_TRANS +" translations). Average coverage is: "+(sumCumProbs/cntLongTail));
+			logger.info("# source terms with > "+probThreshold+" probability covered: "+cntShortTail+" and average translations per term: "+(sumShortTail/(cntShortTail+0.0f)));
+			logger.info("# source terms with <= "+probThreshold+" probability covered: "+cntLongTail+" (each has "+ numTrans +" translations). Average coverage is: "+(sumCumProbs/cntLongTail));
 		}catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -907,12 +905,11 @@ public abstract class CLIRUtils extends Configured {
 		dos3.close();
 	}
 
-
 	private static int addToTable(int curIndex, TreeSet<PairOfFloatString> topTrans, float cumProb, TTable_monolithic_IFAs table, Vocab trgVocab) {
 		List<Integer> sortedIndices = new ArrayList<Integer>();
 		HMapIF index2ProbMap = new HMapIF();
 
-		float sumOfProbs = 0.0f;		//only extract the top K<15 if the mass prob. exceeds MAX_PROB_THRESHOLD
+		float sumOfProbs = 0.0f;		//only extract the top K<15 if the mass prob. exceeds MAX_probThreshold
 		while(!topTrans.isEmpty()){
 			PairOfFloatString e = topTrans.pollLast();
 			String term = e.getRightElement();
@@ -944,7 +941,7 @@ public abstract class CLIRUtils extends Configured {
 
 	/**
 	 * This method modifies the TTable_monolithic_IFAs object output by Hooka, to meet following criteria: 
-	 * For each source language term, top NUM_TRANS entries (with highest translation probability) are kept, unless the top K < NUM_TRANS entries have a cumulatite probability above PROB_THRESHOLD.
+	 * For each source language term, top numTrans entries (with highest translation probability) are kept, unless the top K < numTrans entries have a cumulatite probability above probThreshold.
 	 * 
 	 * @param srcVocabFile
 	 * 		path to source vocabulary file output by Hooka
@@ -962,7 +959,7 @@ public abstract class CLIRUtils extends Configured {
 	 * 		FileSystem object
 	 * @throws IOException
 	 */
-	public static void createTTableFromHooka(String srcVocabFile, String trgVocabFile, String tableFile, String finalSrcVocabFile, String finalTrgVocabFile, String finalTableFile, FileSystem fs) throws IOException{
+	public static void createTTableFromHooka(String srcVocabFile, String trgVocabFile, String tableFile, String finalSrcVocabFile, String finalTrgVocabFile, String finalTableFile, float probThreshold, int numTrans, FileSystem fs) throws IOException{
 		logger.setLevel(Level.INFO);
 
 		Vocab srcVocab = HadoopAlign.loadVocab(new Path(srcVocabFile), fs);
@@ -979,7 +976,7 @@ public abstract class CLIRUtils extends Configured {
 		float sumOfProbs = 0.0f, prob;
 		int cntLongTail = 0, cntShortTail = 0, sumShortTail = 0;		// for statistical purposes only
 
-		//modify current ttable wrt foll. criteria: top NUM_TRANS translations per source term, unless cumulative prob. distr. exceeds PROB_THRESHOLD before that.
+		//modify current ttable wrt foll. criteria: top numTrans translations per source term, unless cumulative prob. distr. exceeds probThreshold before that.
 		for(int srcIndex=1; srcIndex<srcVocab.size(); srcIndex++){
 			int[] translations;
 			try {
@@ -1001,15 +998,15 @@ public abstract class CLIRUtils extends Configured {
 				prob = ttable.get(srcIndex, trgIndex);
 
 				topTrans.add(new PairOfFloatString(prob, trgTerm));
-				// keep top NUM_TRANS translations
-				if(topTrans.size() > NUM_TRANS){
+				// keep top numTrans translations
+				if(topTrans.size() > numTrans){
 					float removedProb = topTrans.pollFirst().getLeftElement();
 					sumOfProbs -= removedProb;
 				}
 				sumOfProbs += prob;
 
-				if(sumOfProbs > PROB_THRESHOLD){
-					logger.debug("Sum of probs > "+PROB_THRESHOLD+", early termination.");
+				if(sumOfProbs > probThreshold){
+					logger.debug("Sum of probs > "+probThreshold+", early termination.");
 					break;
 				}	
 			}
@@ -1017,7 +1014,7 @@ public abstract class CLIRUtils extends Configured {
 			//store previous term's top translations to ttable
 			if(topTrans.size() > 0){
 				int finalNumTrans = addToTable(curIndex, topTrans, sumOfProbs, finalTTable, finalTrgVocab);
-				if(finalNumTrans < NUM_TRANS){
+				if(finalNumTrans < numTrans){
 					cntShortTail++;
 					sumShortTail += finalNumTrans;
 				}else{
@@ -1027,8 +1024,8 @@ public abstract class CLIRUtils extends Configured {
 		}
 		logger.info("Vocabulary Target: "+finalTrgVocab.size()+" elements");
 		logger.info("Vocabulary Source: "+finalSrcVocab.size()+" elements");
-		logger.info("# source terms with > "+PROB_THRESHOLD+" probability covered: "+cntShortTail+" and average translations per term: "+(sumShortTail/(cntShortTail+0.0f)));
-		logger.info("# source terms with <= "+PROB_THRESHOLD+" probability covered: "+cntLongTail+" (each has "+ NUM_TRANS +" translations)");
+		logger.info("# source terms with > "+probThreshold+" probability covered: "+cntShortTail+" and average translations per term: "+(sumShortTail/(cntShortTail+0.0f)));
+		logger.info("# source terms with <= "+probThreshold+" probability covered: "+cntLongTail+" (each has "+ numTrans +" translations)");
 
 		DataOutputStream dos = new DataOutputStream(new BufferedOutputStream(fs.create(new Path(finalTrgVocabFile))));
 		((VocabularyWritable) finalTrgVocab).write(dos);
@@ -1130,7 +1127,7 @@ public abstract class CLIRUtils extends Configured {
 
 
 	private static int printUsage() {
-		System.out.println("usage: [input-lexicalprob-file_f2e] [input-lexicalprob-file_e2f] [type=giza|berkeley] [src-vocab_f] [trg-vocab_e] [prob-table_f-->e] [src-vocab_e] [trg-vocab_f] [prob-table_e-->f])");
+		System.out.println("usage: [input-lexicalprob-file_f2e] [input-lexicalprob-file_e2f] [type=giza|berkeley] [src-vocab_f] [trg-vocab_e] [prob-table_f-->e] [src-vocab_e] [trg-vocab_f] [prob-table_e-->f] ([cumulative-prob-threshold]) ([num-max-entries-per-word])");
 
 		return -1;
 	}
@@ -1140,6 +1137,25 @@ public abstract class CLIRUtils extends Configured {
 		if(args.length < 9){
 			printUsage();
 		}
+		
+		// Read parameters
+		float probThreshold = 0.9f;
+		int numTrans = 15;
+		if(args.length >= 10){
+			try {
+				probThreshold = Float.parseFloat(args[9]);
+			} catch (NumberFormatException e) {
+				e.printStackTrace();
+			}
+		}
+		if(args.length >= 11){
+			try {
+				numTrans = Integer.parseInt(args[10]);
+			} catch (NumberFormatException e) {
+				e.printStackTrace();
+			}
+		}
+		
 		String lex_f2e = args[0];
 		String lex_e2f = args[1];
 		String type = args[2];
@@ -1148,11 +1164,11 @@ public abstract class CLIRUtils extends Configured {
 		try {
 			FileSystem localFS = FileSystem.getLocal(conf);
 			if(type.equals("giza")){
-				CLIRUtils.createTTableFromGIZA(lex_f2e, args[3], args[4], args[5], localFS);
-				CLIRUtils.createTTableFromGIZA(lex_e2f, args[6], args[7], args[8], localFS);
+				CLIRUtils.createTTableFromGIZA(lex_f2e, args[3], args[4], args[5], probThreshold, numTrans, localFS);
+				CLIRUtils.createTTableFromGIZA(lex_e2f, args[6], args[7], args[8], probThreshold, numTrans, localFS);
 			}else if(type.equals("berkeley")){
-				CLIRUtils.createTTableFromBerkeleyAligner(lex_f2e, args[3], args[4], args[5], localFS);
-				CLIRUtils.createTTableFromBerkeleyAligner(lex_e2f, args[6], args[7], args[8], localFS);
+				CLIRUtils.createTTableFromBerkeleyAligner(lex_f2e, args[3], args[4], args[5], probThreshold, numTrans, localFS);
+				CLIRUtils.createTTableFromBerkeleyAligner(lex_e2f, args[6], args[7], args[8], probThreshold, numTrans, localFS);
 			}else{
 				printUsage();
 			}

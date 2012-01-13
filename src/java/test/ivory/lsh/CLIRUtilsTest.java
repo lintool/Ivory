@@ -32,7 +32,7 @@ public class CLIRUtilsTest extends TestCase {
 					srcVocabFile, 
 					trgVocabFile, 
 					ttableFile, 
-					FileSystem.getLocal(conf));
+					0.9f, 15, FileSystem.getLocal(conf));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -70,7 +70,7 @@ public class CLIRUtilsTest extends TestCase {
 					srcVocabFile, 
 					trgVocabFile, 
 					ttableFile, 
-					FileSystem.getLocal(conf));
+					0.9f, 15, FileSystem.getLocal(conf));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -108,7 +108,7 @@ public class CLIRUtilsTest extends TestCase {
 					srcVocabFile, 
 					trgVocabFile, 
 					ttableFile, 
-					FileSystem.getLocal(conf));
+					0.9f, 15, FileSystem.getLocal(conf));
 		} catch (IOException e) {
 			e.printStackTrace();
 			Assert.fail();
@@ -147,7 +147,7 @@ public class CLIRUtilsTest extends TestCase {
 					srcVocabFile, 
 					trgVocabFile, 
 					ttableFile, 
-					FileSystem.getLocal(conf));
+					0.9f, 15, FileSystem.getLocal(conf));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -190,7 +190,7 @@ public class CLIRUtilsTest extends TestCase {
 					finalSrcVocabFile, 
 					finalTrgVocabFile, 
 					finalTTableFile, 
-					FileSystem.getLocal(conf));
+					0.9f, 15, FileSystem.getLocal(conf));
 		} catch (IOException e) {
 			e.printStackTrace();
 			Assert.fail();
@@ -234,7 +234,7 @@ public class CLIRUtilsTest extends TestCase {
 					finalSrcVocabFile, 
 					finalTrgVocabFile, 
 					finalTTableFile, 
-					FileSystem.getLocal(conf));
+					0.9f, 15, FileSystem.getLocal(conf));
 		} catch (IOException e) {
 			e.printStackTrace();
 			Assert.fail();

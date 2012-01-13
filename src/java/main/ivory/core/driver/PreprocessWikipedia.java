@@ -58,8 +58,9 @@ public class PreprocessWikipedia extends Configured implements Tool {
 	 */
 	static final int MinDF = 2, MinNumTermsPerArticle = 5, TermIndexWindow = 8;
 	static final boolean IsNormalized = true;
-	static final  int MONO_LINGUAL = 4, CROSS_LINGUAL_E = 7, CROSS_LINGUAL_F =12;
-
+	static final int NUM_MONO = 4, NUM_CROSS_E = 7, NUM_CROSS_F = 12;
+	static int MONO_LINGUAL = 0, CROSS_LINGUAL_E = 1, CROSS_LINGUAL_F = 2;
+	
 	private static int printUsage() {
 		System.out.println("\nThis program can be run in three different \"modes\":\n=====================\nInput: English Wikipedia collection\nOutput: English weighted document vectors" +
 				"\nusage: [index-path] [raw-path] [compressed-path] [tokenizer-class]" +
@@ -74,22 +75,39 @@ public class PreprocessWikipedia extends Configured implements Tool {
 	 * Runs this tool.
 	 */
 	public int run(String[] args) throws Exception {
-		int mode = args.length;
-		if (mode != MONO_LINGUAL && mode != CROSS_LINGUAL_E && mode != CROSS_LINGUAL_F){
+		int numArgs = args.length;
+		int mode;
+		if (numArgs >= NUM_MONO && numArgs < NUM_CROSS_E) {
+			mode = MONO_LINGUAL;
+			LOG.info("Mode: monolingual");
+		}else if (numArgs == NUM_CROSS_E) {
+			mode = CROSS_LINGUAL_E;
+			LOG.info("Mode: crosslingual - English side");
+		}else if (numArgs == NUM_CROSS_F) {
+			mode = CROSS_LINGUAL_F;
+			LOG.info("Mode: crosslingual - nonEnglish side");
+		}else{
 			printUsage();
 			return -1;
 		}
+		Configuration conf = new Configuration();
 
+		String collectionLang = null, tokenizerModel = null, collectionVocab = null,
+				fVocab_f2e = null, eVocab_f2e = null, fVocab_e2f, eVocab_e2f = null, ttable_f2e = null, ttable_e2f = null;
 		String indexRootPath = args[0];
 		String rawCollection = args[1]; 	//"/shared/Wikipedia/raw/dewiki-20100117-pages-articles.xml";
 		String seqCollection = args[2]; 	//"/umd-lin/fture/pwsim/de-wikipedia/compressed.block/de-20100117";
 		String tokenizerClass = args[3];	
-
-		Configuration conf = new Configuration();
-
-		String collectionLang = null, tokenizerModel = null, collectionVocab = null;
-		String fVocab_f2e = null, eVocab_f2e = null, fVocab_e2f, eVocab_e2f = null, ttable_f2e = null, ttable_e2f = null;
-		if(mode == CROSS_LINGUAL_E || mode == CROSS_LINGUAL_F){		// CROSS-LINGUAL CASE
+		if (args.length > 4) {
+			collectionLang = args[4];
+			conf.set("Ivory.Lang", collectionLang);
+			if (args.length > 5) {
+				tokenizerModel = args[5];
+				conf.set(Constants.TokenizerData, tokenizerModel);
+			}
+		}
+		
+		if (mode == CROSS_LINGUAL_E || mode == CROSS_LINGUAL_F) {		// CROSS-LINGUAL CASE
 			collectionLang = args[4];
 			tokenizerModel = args[5];
 			collectionVocab = args[6];
@@ -98,8 +116,8 @@ public class PreprocessWikipedia extends Configured implements Tool {
 			conf.set("Ivory.CollectionVocab", collectionVocab);
 			conf.set("Ivory.FinalVocab", collectionVocab);
 
-			if(mode == CROSS_LINGUAL_F){			// non-English side, needs to be translated
-				fVocab_f2e = args[6];		//  same as collection vocab
+			if (mode == CROSS_LINGUAL_F) {			// non-English side, needs to be translated
+				fVocab_f2e = args[6];		//  this is the collection vocab
 				eVocab_f2e = args[7];
 				ttable_f2e = args[8];
 				eVocab_e2f = args[9];
@@ -126,12 +144,12 @@ public class PreprocessWikipedia extends Configured implements Tool {
 		LOG.info(" - Tokenizer class: " + tokenizerClass);
 		LOG.info(" - Minimum # terms per article : " + MinNumTermsPerArticle);
 
-		if(mode == CROSS_LINGUAL_E || mode == CROSS_LINGUAL_F){
+		if (mode == CROSS_LINGUAL_E || mode == CROSS_LINGUAL_F) {
 			LOG.info("Cross-lingual collection : Preprocessing "+collectionLang+" side.");
 			LOG.info(" - Collection vocab file: " + collectionVocab);
 			LOG.info(" - Tokenizer model: " + tokenizerModel);
 
-			if(mode == CROSS_LINGUAL_F){
+			if (mode == CROSS_LINGUAL_F) {
 				LOG.info(" - TTable file "+collectionLang+" --> English : " + ttable_f2e);
 				LOG.info(" - Source vocab file: " + fVocab_f2e);
 				LOG.info(" - Target vocab file: " + eVocab_f2e);
@@ -162,7 +180,7 @@ public class PreprocessWikipedia extends Configured implements Tool {
 			tool.run(arr);
 
 			fs.delete(new Path(indexRootPath + "/wiki-docid-tmp"), true);
-		}else{
+		}else {
 			LOG.info(p+" exists");
 		}
 
@@ -209,20 +227,18 @@ public class PreprocessWikipedia extends Configured implements Tool {
 		LOG.info("Job finished in "+(System.currentTimeMillis()-startTime)/1000.0+" seconds");
 
 		// Compute term weights, and output weighted term doc vectors
-		startTime = System.currentTimeMillis();
 		LOG.info("Building weighted term doc vectors...");
+		startTime = System.currentTimeMillis();
+		
 		conf.set("Ivory.ScoringModel", "ivory.pwsim.score.Bm25");
-		if(mode == CROSS_LINGUAL_F){
-			conf.setInt("Ivory.MinNumTerms",MinNumTermsPerArticle);
-
+		conf.setBoolean("Ivory.Normalize", IsNormalized);
+		conf.setInt("Ivory.MinNumTerms",MinNumTermsPerArticle);
+		
+		if (mode == CROSS_LINGUAL_F) {
 			// translate term doc vectors into English. 
-			conf.setBoolean("Ivory.Normalize", true);
 			new BuildTranslatedTermDocVectors(conf).run();
-		}else{						
-			conf.setInt("Ivory.MinNumTerms",MinNumTermsPerArticle);
-
+		}else {						
 			// get weighted term doc vectors
-			conf.setBoolean("Ivory.Normalize", true);
 			new BuildWeightedTermDocVectors(conf).run();
 		}
 		LOG.info("Job finished in "+(System.currentTimeMillis()-startTime)/1000.0+" seconds");
@@ -231,16 +247,16 @@ public class PreprocessWikipedia extends Configured implements Tool {
 		startTime = System.currentTimeMillis();
 		LOG.info("Building weighted integer doc vectors...");
 		conf.setBoolean("Ivory.Normalize", IsNormalized);
-		if(mode == MONO_LINGUAL){
+		if (mode == MONO_LINGUAL) {
 			new BuildIntDocVectors(conf).run();
 			new BuildWeightedIntDocVectors(conf).run();
 			LOG.info("Job BuildWeightedIntDocVectors finished in "+(System.currentTimeMillis()-startTime)/1000.0+" seconds");
-		}else{
+		}else {
 			BuildTargetLangWeightedIntDocVectors weightedIntVectorsTool = new BuildTargetLangWeightedIntDocVectors(conf);
 
 			int finalNumDocs = weightedIntVectorsTool.run();
 			LOG.info("Job BuildTargetLangWeightedIntDocVectors finished in "+(System.currentTimeMillis()-startTime)/1000.0+" seconds");
-			if(finalNumDocs > 0){
+			if (finalNumDocs > 0) {
 				LOG.info("Changed doc count from "+env.readCollectionDocumentCount() + " to = "+finalNumDocs);
 				env.writeCollectionDocumentCount(finalNumDocs);
 			}

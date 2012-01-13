@@ -73,6 +73,7 @@ public class StanfordChineseTokenizer extends Tokenizer {
 	public String[] processContent(String text) {
 		String[] tokens = null;
 		try {
+			text = text.toLowerCase();
 			tokens = classifier.classifyStringAndReturnAnswers(text, readerWriter);
 		} catch (IOException e) {
 			sLogger.info("Problem in tokenizing Chinese");
