@@ -43,7 +43,7 @@ public class PreprocessTREC9Chinese extends Configured implements Tool {
   private static final Logger LOG = Logger.getLogger(PreprocessTREC9Chinese.class);
 
   private static int printUsage() {
-    System.out.println("usage: [input-path] [index-path]");
+    System.out.println("usage: [input-path] [index-path] [stanford-segmenter-model-path]");
     ToolRunner.printGenericCommandUsage(System.out);
     return -1;
   }
@@ -52,7 +52,7 @@ public class PreprocessTREC9Chinese extends Configured implements Tool {
    * Runs this tool.
    */
   public int run(String[] args) throws Exception {
-    if (args.length != 2) {
+    if (args.length != 3) {
       printUsage();
       return -1;
     }
@@ -73,7 +73,7 @@ public class PreprocessTREC9Chinese extends Configured implements Tool {
     if (!fs.exists(p)) {
       LOG.info("index directory doesn't exist, creating...");
       fs.mkdirs(p);
-    }
+    }	
 
     RetrievalEnvironment env = new RetrievalEnvironment(indexRootPath, fs);
 
