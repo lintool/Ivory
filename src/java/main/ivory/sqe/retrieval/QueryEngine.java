@@ -4,36 +4,29 @@ import ivory.core.exception.ConfigurationException;
 import ivory.core.util.ResultWriter;
 import ivory.core.util.XMLTools;
 import ivory.smrf.retrieval.Accumulator;
-import ivory.smrf.retrieval.QueryRunner;
 import ivory.sqe.querygenerator.CLPhraseQueryGenerator;
-import ivory.sqe.querygenerator.ClQueryGenerator;
+import ivory.sqe.querygenerator.CLWordAndPhraseQueryGenerator;
+import ivory.sqe.querygenerator.CLWordQueryGenerator;
 import ivory.sqe.querygenerator.DefaultBagOfWordQueryGenerator;
 import ivory.sqe.querygenerator.QueryGenerator;
-
 import java.io.IOException;
 import java.util.Map;
-import java.util.Set;
-
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import com.google.common.collect.Maps;
-
 import edu.umd.cloud9.collection.DocnoMapping;
 
 public class QueryEngine {
   private static final Logger LOG = Logger.getLogger(QueryEngine.class);
-  private static JSONObject x = new JSONObject();
   private StructuredQueryRanker ranker;
   private Map<String, String> queries;
   private FileSystem fs;
@@ -43,16 +36,21 @@ public class QueryEngine {
   public QueryEngine(Configuration conf, FileSystem fs) {
 	  try {
 		this.fs = fs;
+		LOG.info(conf.get(Constants.Language));
+		LOG.info(conf.get(Constants.IndexPath));
 		ranker = new StructuredQueryRanker(conf.get(Constants.IndexPath), fs, 1000);
 		mapping = ranker.getDocnoMapping();
 		queries = parseQueries(conf.get(Constants.QueriesPath), fs);
 	    if (conf.get(Constants.QueryType).equals(Constants.CLIR)) {
-	    	generator = new ClQueryGenerator();
+	    	generator = new CLWordQueryGenerator();
 	    } else if (conf.get(Constants.QueryType).equals(Constants.PhraseCLIR)) {
 	    	generator = new CLPhraseQueryGenerator();
+	    } else if (conf.get(Constants.QueryType).equals(Constants.PhraseCLIRv2)) {
+	    	generator = new CLWordAndPhraseQueryGenerator();	    	
 	    } else {
 	    	generator = new DefaultBagOfWordQueryGenerator();
 	    }
+
 	    generator.init(fs, conf);
 
 	} catch (IOException e) {
@@ -83,7 +81,7 @@ public class QueryEngine {
 //	  JSONObject x2 = new JSONObject();
 //	  JSONObject x11 = new JSONObject();
 	  
-	  
+	  LOG.info("Parsing "+queryNodes.getLength()+" nodes...");
 	  for (int i = 0; i < queryNodes.getLength(); i++) {
 		  // Get query XML node.
 		  Node node = queryNodes.item(i);
@@ -136,23 +134,27 @@ public class QueryEngine {
 //	  }
   }
 
-  public void runQueries() {
+  public void runQueries(Configuration conf) {
 	  try {
 
 		  LOG.info("Parsed "+queries.size()+" queries");
-		  ResultWriter resultWriter = new ResultWriter("sqe-bow-trec.txt", false, fs);
+		  ResultWriter resultWriter = new ResultWriter("sqe-"+conf.get(Constants.QueryType)+"-trec.txt", false, fs);
 		  
 		  for ( String qid : queries.keySet()) {
 			  String query = queries.get(qid);
 			  LOG.info("Query "+qid+" = "+query);
 
-			  JSONObject structuredQuery = generator.parseQuery(query);
-			  LOG.info("Processing "+structuredQuery);			  
 			  long start = System.currentTimeMillis();
-			  ranker.rank(qid, structuredQuery, generator.getQueryLength());
-
+			  JSONObject structuredQuery = generator.parseQuery(query);
 			  long end = System.currentTimeMillis();
+			  LOG.info("Generating " + qid + ": " + ( end - start) + "ms");
+			  LOG.info("Processing "+structuredQuery);			  
+			  
+			  start = System.currentTimeMillis();
+			  ranker.rank(qid, structuredQuery, generator.getQueryLength());
+			  end = System.currentTimeMillis();
 			  LOG.info("Ranking " + qid + ": " + ( end - start) + "ms");
+			  
 			  printResults(qid, ranker, resultWriter);
 		  }
 		  resultWriter.flush();
