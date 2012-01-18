@@ -19,32 +19,34 @@ public class StructuredQueryRanker {
   private static final Logger LOG = Logger.getLogger(StructuredQueryRanker.class);
 
   private RetrievalEnvironment env;
-//  private Accumulator[] accumulators = null;
+  // private Accumulator[] accumulators = null;
   private final PriorityQueue<Accumulator> sortedAccumulators = new PriorityQueue<Accumulator>();
   private final int numResults;
   private HashMap<String, Accumulator[]> results;
 
   public StructuredQueryRanker(String indexPath, FileSystem fs, int numResults) throws IOException,
       ConfigurationException {
-	this.env = new RetrievalEnvironment(indexPath, fs);
+    this.env = new RetrievalEnvironment(indexPath, fs);
     env.initialize(true);
 
     this.numResults = numResults;
     results = new HashMap<String, Accumulator[]>();
   }
-  
+
   public Accumulator[] rank(String qid, JSONObject query, int queryLength) {
-    GlobalEvidence globalEvidence = new GlobalEvidence(env.getDocumentCount(), env.getCollectionSize(), queryLength);
+    GlobalEvidence globalEvidence = new GlobalEvidence(env.getDocumentCount(), env
+        .getCollectionSize(), queryLength);
 
     PostingsReaderWrapper structureReader;
-	try {
-		structureReader = new PostingsReaderWrapper(query, env, new BM25ScoringFunction(), globalEvidence);
-	} catch (JSONException e) {
-		e.printStackTrace();
-		throw new RuntimeException(e);
-	}
-	////System.out.println("Ranker created.");
-	
+    try {
+      structureReader = new PostingsReaderWrapper(query, env, new BM25ScoringFunction(),
+          globalEvidence);
+    } catch (JSONException e) {
+      e.printStackTrace();
+      throw new RuntimeException(e);
+    }
+    // //System.out.println("Ranker created.");
+
     sortedAccumulators.clear();
     Accumulator a = new Accumulator(0, 0.0f);
 
@@ -53,19 +55,19 @@ public class StructuredQueryRanker {
 
     int docno = Integer.MAX_VALUE;
     int nextDocno = structureReader.getNextCandidate(docno);
-    if(nextDocno < docno){
-    	docno = nextDocno;
+    if (nextDocno < docno) {
+      docno = nextDocno;
     }
     int cnt = 0;
     while (docno < Integer.MAX_VALUE) {
       float score = 0.0f;
 
       // Document-at-a-time scoring.
-//      try {
-//		LOG.info("Advance to docno " + docno+" => "+getDocnoMapping().getDocid(docno));
-//      } catch (IOException e) {
-//		e.printStackTrace();
-//      }
+      // try {
+      // LOG.info("Advance to docno " + docno+" => "+getDocnoMapping().getDocid(docno));
+      // } catch (IOException e) {
+      // e.printStackTrace();
+      // }
       score = structureReader.computeScore(docno);
 
       cnt++;
@@ -81,27 +83,27 @@ public class StructuredQueryRanker {
         } else {
           a = new Accumulator(0, 0.0f);
         }
-      }     
+      }
 
       // Advance to next document
       docno = Integer.MAX_VALUE;
       nextDocno = structureReader.getNextCandidate(docno);
-      if(nextDocno < docno){
-      	docno = nextDocno;
+      if (nextDocno < docno) {
+        docno = nextDocno;
       }
     }
 
     // Grab the accumulators off the stack, in (reverse) order.
     LOG.info("Results...");
     Accumulator[] accs = new Accumulator[Math.min(numResults, sortedAccumulators.size())];
-	for (int i = 0; i < accs.length; i++) {
+    for (int i = 0; i < accs.length; i++) {
       Accumulator acc = sortedAccumulators.poll();
-//	  LOG.info((accs.length - 1 - i)+"="+acc.docno+","+acc.score);
+      // LOG.info((accs.length - 1 - i)+"="+acc.docno+","+acc.score);
       accs[accs.length - 1 - i] = acc;
     }
- 
-	LOG.info("Scored "+cnt+" documents to process query "+qid);
-	
+
+    LOG.info("Scored " + cnt + " documents to process query " + qid);
+
     this.results.put(qid, accs);
 
     return accs;
@@ -112,12 +114,11 @@ public class StructuredQueryRanker {
   }
 
   public Accumulator[] getResults(String queryID) {
-	  return results.get(queryID);
+    return results.get(queryID);
   }
 
   public Map<String, Accumulator[]> getResults() {
-	  return results;
+    return results;
   }
-
 
 }

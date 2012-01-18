@@ -33,174 +33,173 @@ import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
-
 import edu.umd.cloud9.io.FSLineReader;
 import edu.umd.cloud9.io.map.HMapIIW;
 import edu.umd.cloud9.io.map.HMapSFW;
 
-
 @SuppressWarnings("deprecation")
-public class SampleSignatures  extends Configured implements Tool{
-	public static final String[] RequiredParameters = {};
-	private static final Logger sLogger = Logger.getLogger(SampleSignatures.class);
+public class SampleSignatures extends Configured implements Tool {
+  public static final String[] RequiredParameters = {};
+  private static final Logger sLogger = Logger.getLogger(SampleSignatures.class);
 
-	static enum mapoutput{
-		count
-	};
+  static enum mapoutput {
+    count
+  };
 
-	private static int printUsage() {
-		System.out.println("usage: [signatures-path] [sample-signatures-path] [signature-type] [sample-frequency] ([sample-docnos-path])\nSignature type is either random, simhash or minhash.");
-		return -1;
-	}
+  private static int printUsage() {
+    System.out
+        .println("usage: [signatures-path] [sample-signatures-path] [signature-type] [sample-frequency] ([sample-docnos-path])\nSignature type is either random, simhash or minhash.");
+    return -1;
+  }
 
-	public SampleSignatures() {
-		super();
-	}
+  public SampleSignatures() {
+    super();
+  }
 
-	/**
-	 * 	Filter signatures that are not from sample.
-	 *  
-	 * @author ferhanture
-	 *
-	 */
-	public static class MyMapper extends MapReduceBase implements
-	Mapper<IntWritable, Signature, IntWritable, Signature> {
+  /**
+   * Filter signatures that are not from sample.
+   * 
+   * @author ferhanture
+   * 
+   */
+  public static class MyMapper extends MapReduceBase implements
+      Mapper<IntWritable, Signature, IntWritable, Signature> {
 
-		static Path[] localFiles;
-		HMapIIW samplesMap = null;
-		static int sampleFreq;
+    static Path[] localFiles;
+    HMapIIW samplesMap = null;
+    static int sampleFreq;
 
-		public void configure(JobConf job){
-			sLogger.setLevel(Level.INFO);
-			
-			sampleFreq = job.getInt("SampleFrequency", -1);
+    public void configure(JobConf job) {
+      sLogger.setLevel(Level.INFO);
 
-			//read doc ids of sample into vectors
-			try {
-				localFiles = DistributedCache.getLocalCacheFiles(job);
-			} catch (Exception e) {
-				throw new RuntimeException("Error reading doc vectors!");
-			}
+      sampleFreq = job.getInt("SampleFrequency", -1);
 
-			if(localFiles!=null && localFiles.length > 0){
-				samplesMap = new HMapIIW();
-				try {
-					FSLineReader reader = new FSLineReader(localFiles[0], FileSystem.getLocal(job));
-					Text t = new Text();
-					while(reader.readLine(t)!=0){
-						int docno = Integer.parseInt(t.toString());
-						samplesMap.put(docno, 1);
-					}
-					reader.close();
-				} catch (IOException e1) {
-				}
-				sLogger.info(samplesMap);
-			}
-		}
+      // read doc ids of sample into vectors
+      try {
+        localFiles = DistributedCache.getLocalCacheFiles(job);
+      } catch (Exception e) {
+        throw new RuntimeException("Error reading doc vectors!");
+      }
 
-		public void map(IntWritable key, Signature value,
-				OutputCollector<IntWritable, Signature> output,
-				Reporter reporter) throws IOException {
-			sLogger.debug(key);
-			if(samplesMap != null){
-				if(samplesMap.containsKey(key.get())){
-					reporter.incrCounter(mapoutput.count, 1);
-					output.collect(key, value);
-				}
-			}else{
-				int randInt = (int) (Math.random()*sampleFreq); 	//integer in [0,sampleFrq)
-				if(randInt==0){	
-					reporter.incrCounter(mapoutput.count, 1);
-					output.collect(key, value);
-				}
-			}
-		}
-	}
+      if (localFiles != null && localFiles.length > 0) {
+        samplesMap = new HMapIIW();
+        try {
+          FSLineReader reader = new FSLineReader(localFiles[0], FileSystem.getLocal(job));
+          Text t = new Text();
+          while (reader.readLine(t) != 0) {
+            int docno = Integer.parseInt(t.toString());
+            samplesMap.put(docno, 1);
+          }
+          reader.close();
+        } catch (IOException e1) {
+        }
+        sLogger.info(samplesMap);
+      }
+    }
 
-	public static class MyReducer extends MapReduceBase implements
-	Reducer<IntWritable, Signature, IntWritable, Signature> {
+    public void map(IntWritable key, Signature value,
+        OutputCollector<IntWritable, Signature> output, Reporter reporter) throws IOException {
+      sLogger.debug(key);
+      if (samplesMap != null) {
+        if (samplesMap.containsKey(key.get())) {
+          reporter.incrCounter(mapoutput.count, 1);
+          output.collect(key, value);
+        }
+      } else {
+        int randInt = (int) (Math.random() * sampleFreq); // integer in [0,sampleFrq)
+        if (randInt == 0) {
+          reporter.incrCounter(mapoutput.count, 1);
+          output.collect(key, value);
+        }
+      }
+    }
+  }
 
-		@Override
-		public void reduce(IntWritable key, Iterator<Signature> values, OutputCollector<IntWritable, Signature> output,
-				Reporter reporter) throws IOException {
-			output.collect(key, values.next());
-		}
-	}
-	
-	public String[] getRequiredParameters() {
-		return RequiredParameters;
-	}
+  public static class MyReducer extends MapReduceBase implements
+      Reducer<IntWritable, Signature, IntWritable, Signature> {
 
-	public int run(String[] args) throws Exception {
-		if (args.length != 4 && args.length != 5) {
-			printUsage();
-			return -1;
-		}
-		JobConf job = new JobConf(getConf(), SampleSignatures.class);
-		job.setJobName(this.getClass().getName());
-		FileSystem fs = FileSystem.get(job);
+    @Override
+    public void reduce(IntWritable key, Iterator<Signature> values,
+        OutputCollector<IntWritable, Signature> output, Reporter reporter) throws IOException {
+      output.collect(key, values.next());
+    }
+  }
 
-		String inputPath = args[0];//PwsimEnvironment.getFileNameWithPars(dir, "SignaturesRandom");
-		String outputPath = args[1];//PwsimEnvironment.getFileNameWithPars(dir, "SignaturesRandom")+"-sample";
-		int sampleFreq = Integer.parseInt(args[3]);
+  public String[] getRequiredParameters() {
+    return RequiredParameters;
+  }
 
-		int numMappers2 = 100;
-		int numReducers2 = 1;
+  public int run(String[] args) throws Exception {
+    if (args.length != 4 && args.length != 5) {
+      printUsage();
+      return -1;
+    }
+    JobConf job = new JobConf(getConf(), SampleSignatures.class);
+    job.setJobName(this.getClass().getName());
+    FileSystem fs = FileSystem.get(job);
 
-		if(fs.exists(new Path(outputPath))){
-			sLogger.info("Sample signatures output already exists! Quitting...");
-			return 0;
-		}		
-		FileInputFormat.setInputPaths(job, new Path(inputPath));
-		FileOutputFormat.setOutputPath(job, new Path(outputPath));
-		FileOutputFormat.setCompressOutput(job, false);
+    String inputPath = args[0];// PwsimEnvironment.getFileNameWithPars(dir, "SignaturesRandom");
+    String outputPath = args[1];// PwsimEnvironment.getFileNameWithPars(dir,
+                                // "SignaturesRandom")+"-sample";
+    int sampleFreq = Integer.parseInt(args[3]);
 
-		// if sample docnos path provided,
-		if(args.length == 5){
-			sampleFreq = -1;	//ignore sample frequency
-			DistributedCache.addCacheFile(new URI(args[4]), job);	//sample doc vectors in file
-		}
+    int numMappers2 = 100;
+    int numReducers2 = 1;
 
-		job.set("mapred.child.java.opts", "-Xmx2048m");
-		job.setInt("mapred.map.max.attempts", 10);
-		job.setInt("mapred.reduce.max.attempts", 10);
-		job.setInt("mapred.task.timeout", 6000000);
-		job.setInt("SampleFrequency", sampleFreq);
+    if (fs.exists(new Path(outputPath))) {
+      sLogger.info("Sample signatures output already exists! Quitting...");
+      return 0;
+    }
+    FileInputFormat.setInputPaths(job, new Path(inputPath));
+    FileOutputFormat.setOutputPath(job, new Path(outputPath));
+    FileOutputFormat.setCompressOutput(job, false);
 
-		sLogger.info("Running job "+job.getJobName());
-		sLogger.info("Input directory: "+inputPath);
-		sLogger.info("Output directory: "+outputPath);
-		sLogger.info("Sample frequency: "+sampleFreq);
+    // if sample docnos path provided,
+    if (args.length == 5) {
+      sampleFreq = -1; // ignore sample frequency
+      DistributedCache.addCacheFile(new URI(args[4]), job); // sample doc vectors in file
+    }
 
-		job.setNumMapTasks(numMappers2);
-		job.setNumReduceTasks(numReducers2);
-		job.setInputFormat(SequenceFileInputFormat.class);
-		job.setMapOutputKeyClass(IntWritable.class);
-		if(args[2].equals("simhash")){
-			job.setMapOutputValueClass(SixtyFourBitSignature.class);
-			job.setOutputValueClass(SixtyFourBitSignature.class);
-		}else if(args[2].equals("random")){
-			job.setMapOutputValueClass(NBitSignature.class);		
-			job.setOutputValueClass(NBitSignature.class);
-		}else if(args[2].equals("minhash")){
-			job.setMapOutputValueClass(MinhashSignature.class);
-			job.setOutputValueClass(MinhashSignature.class);
-		}else{
-			printUsage();
-			throw new RuntimeException("Unknown signature type "+args[2]);
-		}
-		job.setOutputKeyClass(IntWritable.class);
-		job.setMapperClass(MyMapper.class);
-		job.setReducerClass(MyReducer.class);
-		job.setOutputFormat(SequenceFileOutputFormat.class);			
+    job.set("mapred.child.java.opts", "-Xmx2048m");
+    job.setInt("mapred.map.max.attempts", 10);
+    job.setInt("mapred.reduce.max.attempts", 10);
+    job.setInt("mapred.task.timeout", 6000000);
+    job.setInt("SampleFrequency", sampleFreq);
 
-		JobClient.runJob(job);
+    sLogger.info("Running job " + job.getJobName());
+    sLogger.info("Input directory: " + inputPath);
+    sLogger.info("Output directory: " + outputPath);
+    sLogger.info("Sample frequency: " + sampleFreq);
 
-		return 0;
-	}
+    job.setNumMapTasks(numMappers2);
+    job.setNumReduceTasks(numReducers2);
+    job.setInputFormat(SequenceFileInputFormat.class);
+    job.setMapOutputKeyClass(IntWritable.class);
+    if (args[2].equals("simhash")) {
+      job.setMapOutputValueClass(SixtyFourBitSignature.class);
+      job.setOutputValueClass(SixtyFourBitSignature.class);
+    } else if (args[2].equals("random")) {
+      job.setMapOutputValueClass(NBitSignature.class);
+      job.setOutputValueClass(NBitSignature.class);
+    } else if (args[2].equals("minhash")) {
+      job.setMapOutputValueClass(MinhashSignature.class);
+      job.setOutputValueClass(MinhashSignature.class);
+    } else {
+      printUsage();
+      throw new RuntimeException("Unknown signature type " + args[2]);
+    }
+    job.setOutputKeyClass(IntWritable.class);
+    job.setMapperClass(MyMapper.class);
+    job.setReducerClass(MyReducer.class);
+    job.setOutputFormat(SequenceFileOutputFormat.class);
 
-	public static void main(String[] args) throws Exception{
-		ToolRunner.run(new Configuration(), new SampleSignatures(), args);
-		return;
-	}
+    JobClient.runJob(job);
+
+    return 0;
+  }
+
+  public static void main(String[] args) throws Exception {
+    ToolRunner.run(new Configuration(), new SampleSignatures(), args);
+    return;
+  }
 }

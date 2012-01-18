@@ -30,44 +30,44 @@ import org.apache.hadoop.fs.Path;
  * @author Don Metzler
  */
 public class ResultWriter {
-	// System-dependent newline character.
-	protected static final String NEWLINE = System.getProperty("line.separator");
+  // System-dependent newline character.
+  protected static final String NEWLINE = System.getProperty("line.separator");
   protected static final int OUTPUT_BUFFER_SIZE = 1 * 1024 * 1024;
 
-	protected Writer writer = null;
-	protected GZIPOutputStream gzipStream = null;
+  protected Writer writer = null;
+  protected GZIPOutputStream gzipStream = null;
 
-	/**
-	 * @param file
-	 * @param compress
-	 * @throws IOException
-	 */
-	public ResultWriter(String file, boolean compress, FileSystem fs) throws IOException {
-		FSDataOutputStream out = fs.create(new Path(file), true);
+  /**
+   * @param file
+   * @param compress
+   * @throws IOException
+   */
+  public ResultWriter(String file, boolean compress, FileSystem fs) throws IOException {
+    FSDataOutputStream out = fs.create(new Path(file), true);
 
-		if (compress) {
-			gzipStream = new GZIPOutputStream(out);
-			writer = new OutputStreamWriter(gzipStream);
-		} else {
-			writer = new BufferedWriter(new OutputStreamWriter(out), OUTPUT_BUFFER_SIZE);
-		}
-	}
+    if (compress) {
+      gzipStream = new GZIPOutputStream(out);
+      writer = new OutputStreamWriter(gzipStream);
+    } else {
+      writer = new BufferedWriter(new OutputStreamWriter(out), OUTPUT_BUFFER_SIZE);
+    }
+  }
 
-	/**
-	 * @param string
-	 */
-	public void println(String string) throws IOException {
-		writer.write(string + NEWLINE);
-	}
+  /**
+   * @param string
+   */
+  public void println(String string) throws IOException {
+    writer.write(string + NEWLINE);
+  }
 
-	/**
-	 * @throws IOException
-	 */
-	public void flush() throws IOException {
-		writer.flush();
-		if (gzipStream != null) {
-			gzipStream.finish();
-		}
-		writer.close();
-	}
+  /**
+   * @throws IOException
+   */
+  public void flush() throws IOException {
+    writer.flush();
+    if (gzipStream != null) {
+      gzipStream.finish();
+    }
+    writer.close();
+  }
 }

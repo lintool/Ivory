@@ -15,6 +15,7 @@
  */
 
 package ivory.core.preprocess;
+
 import ivory.core.RetrievalEnvironment;
 import ivory.core.data.document.WeightedIntDocVector;
 import ivory.core.util.CLIRUtils;
@@ -51,167 +52,169 @@ import edu.umd.cloud9.util.map.MapIF;
 import edu.umd.cloud9.util.map.MapKF;
 
 /**
- * Map term doc vectors into int doc vectors using the term-to-id mapping. 
- * This task is the same in either cross-lingual or mono-lingual case. That is, this task works for the case where doc vectors are translated into English and the case where doc vectors are originally in English.
+ * Map term doc vectors into int doc vectors using the term-to-id mapping. This task is the same in
+ * either cross-lingual or mono-lingual case. That is, this task works for the case where doc
+ * vectors are translated into English and the case where doc vectors are originally in English.
  * Also, weights in doc vector are normalized.
  * 
  * @author ferhanture
- *
+ * 
  */
 @SuppressWarnings("deprecation")
 public class BuildTargetLangWeightedIntDocVectors extends PowerTool {
-	private static final Logger sLogger = Logger.getLogger(BuildWeightedIntDocVectors.class);
+  private static final Logger sLogger = Logger.getLogger(BuildWeightedIntDocVectors.class);
 
-	static{
-		sLogger.setLevel(Level.INFO);
-	}
-	protected static enum Docs{
-		Total
-	}
-	protected static enum Terms{
-		OOV, NEG
-	}
-	private static class MyMapper extends MapReduceBase implements
-	Mapper<IntWritable, HMapSFW, IntWritable, WeightedIntDocVector> {
+  static {
+    sLogger.setLevel(Level.INFO);
+  }
 
-		static IntWritable mDocno = new IntWritable();
-		private boolean normalize = false;
-		private Vocab engVocabH;
-		
-		public void configure(JobConf conf){
-//			sLogger.setLevel(Level.DEBUG);
+  protected static enum Docs {
+    Total
+  }
 
-			normalize = conf.getBoolean("Ivory.Normalize", false);
-			
-			Path[] localFiles;
-			try {
-				localFiles = DistributedCache.getLocalCacheFiles(conf);
-			} catch (IOException e2) {
-				throw new RuntimeException("Local cache files not read properly.");
-			}
-			
-			try{
-				engVocabH = HadoopAlign.loadVocab(localFiles[0], FileSystem.getLocal(conf));
-			} catch (Exception e) {
-				e.printStackTrace();
-				throw new RuntimeException("Error initializing Term to Id map!");
-			}
-		}
+  protected static enum Terms {
+    OOV, NEG
+  }
 
-		WeightedIntDocVector weightedVectorOut = new WeightedIntDocVector();
-		HMapIFW weightedVector = new HMapIFW();
+  private static class MyMapper extends MapReduceBase implements
+      Mapper<IntWritable, HMapSFW, IntWritable, WeightedIntDocVector> {
 
-		float sum2;
-		public void map(IntWritable docno, HMapSFW doc,
-				OutputCollector<IntWritable, WeightedIntDocVector> output, Reporter reporter)
-		throws IOException {	
-			mDocno.set(docno.get());
-			weightedVector.clear();
+    static IntWritable mDocno = new IntWritable();
+    private boolean normalize = false;
+    private Vocab engVocabH;
 
-			sLogger.debug("===================================BEGIN READ DOC");
-			sum2 = 0;
+    public void configure(JobConf conf) {
+      // sLogger.setLevel(Level.DEBUG);
 
-			for (MapKF.Entry<String> entry : doc.entrySet()) {
-				String eTerm = entry.getKey();
-				int e = engVocabH.get(eTerm);
-				if (e < 0) {
-					sLogger.debug(eTerm+ " term in doc not found in aligner vocab");
-					continue;
-				}
-				float score = entry.getValue(); 
-				if (normalize) {
-					sum2+=score*score;
-				}
-				weightedVector.put(e, score);
-			}
-			sLogger.debug("===================================END READ DOC");
-			
-			weightedVectorOut.setWeightedTerms(weightedVector);
-			if (normalize) {
-				/*length-normalize doc vectors*/
-				sum2 = (float) Math.sqrt(sum2);
-				weightedVectorOut.normalizeWith(sum2);
-			}
-			output.collect(mDocno, weightedVectorOut);
-			reporter.incrCounter(Docs.Total, 1);
-		}
-	}
+      normalize = conf.getBoolean("Ivory.Normalize", false);
 
-	public static final String[] RequiredParameters = { "Ivory.NumMapTasks",
-		"Ivory.IndexPath", 
-		"Ivory.Normalize",
-		};
+      Path[] localFiles;
+      try {
+        localFiles = DistributedCache.getLocalCacheFiles(conf);
+      } catch (IOException e2) {
+        throw new RuntimeException("Local cache files not read properly.");
+      }
 
-	public String[] getRequiredParameters() {
-		return RequiredParameters;
-	}
+      try {
+        engVocabH = HadoopAlign.loadVocab(localFiles[0], FileSystem.getLocal(conf));
+      } catch (Exception e) {
+        e.printStackTrace();
+        throw new RuntimeException("Error initializing Term to Id map!");
+      }
+    }
 
-	public BuildTargetLangWeightedIntDocVectors(Configuration conf) {
-		super(conf);
-	}
+    WeightedIntDocVector weightedVectorOut = new WeightedIntDocVector();
+    HMapIFW weightedVector = new HMapIFW();
 
-	@SuppressWarnings("deprecation")
-	public int runTool() throws Exception {
-		//		sLogger.setLevel(Level.DEBUG);
+    float sum2;
 
-		sLogger.info("PowerTool: GetTargetLangWeightedIntDocVectors");
+    public void map(IntWritable docno, HMapSFW doc,
+        OutputCollector<IntWritable, WeightedIntDocVector> output, Reporter reporter)
+        throws IOException {
+      mDocno.set(docno.get());
+      weightedVector.clear();
 
-		JobConf conf = new JobConf(BuildTargetLangWeightedIntDocVectors.class);
-		FileSystem fs = FileSystem.get(conf);
+      sLogger.debug("===================================BEGIN READ DOC");
+      sum2 = 0;
 
-		String indexPath = getConf().get("Ivory.IndexPath");
-		
-		RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fs);
+      for (MapKF.Entry<String> entry : doc.entrySet()) {
+        String eTerm = entry.getKey();
+        int e = engVocabH.get(eTerm);
+        if (e < 0) {
+          sLogger.debug(eTerm + " term in doc not found in aligner vocab");
+          continue;
+        }
+        float score = entry.getValue();
+        if (normalize) {
+          sum2 += score * score;
+        }
+        weightedVector.put(e, score);
+      }
+      sLogger.debug("===================================END READ DOC");
 
-		String outputPath = env.getWeightedIntDocVectorsDirectory();
-		int mapTasks = getConf().getInt("Ivory.NumMapTasks", 0);
-		int minSplitSize = getConf().getInt("Ivory.MinSplitSize", 0);
-		String collectionName = getConf().get("Ivory.CollectionName");
+      weightedVectorOut.setWeightedTerms(weightedVector);
+      if (normalize) {
+        /* length-normalize doc vectors */
+        sum2 = (float) Math.sqrt(sum2);
+        weightedVectorOut.normalizeWith(sum2);
+      }
+      output.collect(mDocno, weightedVectorOut);
+      reporter.incrCounter(Docs.Total, 1);
+    }
+  }
 
+  public static final String[] RequiredParameters = { "Ivory.NumMapTasks", "Ivory.IndexPath",
+      "Ivory.Normalize", };
 
-		sLogger.info("Characteristics of the collection:");
-		sLogger.info(" - CollectionName: " + collectionName);
-		sLogger.info("Characteristics of the job:");
-		sLogger.info(" - NumMapTasks: " + mapTasks);
-		sLogger.info(" - MinSplitSize: " + minSplitSize);
-		
-		String vocabFile = getConf().get("Ivory.FinalVocab");
-		DistributedCache.addCacheFile(new URI(vocabFile), conf);
+  public String[] getRequiredParameters() {
+    return RequiredParameters;
+  }
 
-		Path inputPath = new Path(PwsimEnvironment.getFileNameWithPars(indexPath, "TermDocs"));
-		Path weightedVectorsPath = new Path(outputPath);
+  public BuildTargetLangWeightedIntDocVectors(Configuration conf) {
+    super(conf);
+  }
 
-		if (fs.exists(weightedVectorsPath)) {
-			sLogger.info("Output path already exists!");
-			return -1;
-		}
-		conf.setJobName("GetWeightedIntDocVectors:" + collectionName);
-		conf.setNumMapTasks(mapTasks);
-		conf.setNumReduceTasks(0);
-		conf.setInt("mapred.min.split.size", minSplitSize);
-		conf.set("mapred.child.java.opts", "-Xmx2048m");
-		conf.setBoolean("Ivory.Normalize", getConf().getBoolean("Ivory.Normalize", true));
-		FileInputFormat.setInputPaths(conf, inputPath);
-		FileOutputFormat.setOutputPath(conf, weightedVectorsPath);
+  @SuppressWarnings("deprecation")
+  public int runTool() throws Exception {
+    // sLogger.setLevel(Level.DEBUG);
 
-		conf.setInputFormat(SequenceFileInputFormat.class);
-		conf.setMapOutputKeyClass(IntWritable.class);
-		conf.setMapOutputValueClass(WeightedIntDocVector.class);
-		conf.setOutputFormat(SequenceFileOutputFormat.class);
-		conf.setOutputKeyClass(IntWritable.class);
-		conf.setOutputValueClass(WeightedIntDocVector.class);
+    sLogger.info("PowerTool: GetTargetLangWeightedIntDocVectors");
 
-		conf.setMapperClass(MyMapper.class);
+    JobConf conf = new JobConf(BuildTargetLangWeightedIntDocVectors.class);
+    FileSystem fs = FileSystem.get(conf);
 
-		long startTime = System.currentTimeMillis();
+    String indexPath = getConf().get("Ivory.IndexPath");
 
-		RunningJob rj = JobClient.runJob(conf);
-		sLogger.info("Job Finished in " + (System.currentTimeMillis() - startTime) / 1000.0
-				+ " seconds");
-		Counters counters = rj.getCounters();
+    RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fs);
 
-		long numOfDocs= (long) counters.findCounter(Docs.Total).getCounter();
+    String outputPath = env.getWeightedIntDocVectorsDirectory();
+    int mapTasks = getConf().getInt("Ivory.NumMapTasks", 0);
+    int minSplitSize = getConf().getInt("Ivory.MinSplitSize", 0);
+    String collectionName = getConf().get("Ivory.CollectionName");
 
-		return (int) numOfDocs;
-	}
+    sLogger.info("Characteristics of the collection:");
+    sLogger.info(" - CollectionName: " + collectionName);
+    sLogger.info("Characteristics of the job:");
+    sLogger.info(" - NumMapTasks: " + mapTasks);
+    sLogger.info(" - MinSplitSize: " + minSplitSize);
+
+    String vocabFile = getConf().get("Ivory.FinalVocab");
+    DistributedCache.addCacheFile(new URI(vocabFile), conf);
+
+    Path inputPath = new Path(PwsimEnvironment.getFileNameWithPars(indexPath, "TermDocs"));
+    Path weightedVectorsPath = new Path(outputPath);
+
+    if (fs.exists(weightedVectorsPath)) {
+      sLogger.info("Output path already exists!");
+      return -1;
+    }
+    conf.setJobName("GetWeightedIntDocVectors:" + collectionName);
+    conf.setNumMapTasks(mapTasks);
+    conf.setNumReduceTasks(0);
+    conf.setInt("mapred.min.split.size", minSplitSize);
+    conf.set("mapred.child.java.opts", "-Xmx2048m");
+    conf.setBoolean("Ivory.Normalize", getConf().getBoolean("Ivory.Normalize", true));
+    FileInputFormat.setInputPaths(conf, inputPath);
+    FileOutputFormat.setOutputPath(conf, weightedVectorsPath);
+
+    conf.setInputFormat(SequenceFileInputFormat.class);
+    conf.setMapOutputKeyClass(IntWritable.class);
+    conf.setMapOutputValueClass(WeightedIntDocVector.class);
+    conf.setOutputFormat(SequenceFileOutputFormat.class);
+    conf.setOutputKeyClass(IntWritable.class);
+    conf.setOutputValueClass(WeightedIntDocVector.class);
+
+    conf.setMapperClass(MyMapper.class);
+
+    long startTime = System.currentTimeMillis();
+
+    RunningJob rj = JobClient.runJob(conf);
+    sLogger.info("Job Finished in " + (System.currentTimeMillis() - startTime) / 1000.0
+        + " seconds");
+    Counters counters = rj.getCounters();
+
+    long numOfDocs = (long) counters.findCounter(Docs.Total).getCounter();
+
+    return (int) numOfDocs;
+  }
 }

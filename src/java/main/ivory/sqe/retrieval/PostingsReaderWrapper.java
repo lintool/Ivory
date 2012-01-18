@@ -20,291 +20,285 @@ import org.json.JSONObject;
 import com.google.common.base.Preconditions;
 
 public class PostingsReaderWrapper {
-	// Default score for potentials with no postings.
-	protected static final float DEFAULT_SCORE = 0.0f;
-	private static final Logger LOG = Logger
-			.getLogger(PostingsReaderWrapper.class);
+  // Default score for potentials with no postings.
+  protected static final float DEFAULT_SCORE = 0.0f;
+  private static final Logger LOG = Logger.getLogger(PostingsReaderWrapper.class);
 
-	protected final Posting curPosting = new Posting();
-	protected RetrievalEnvironment env;
-	protected ScoringFunction scoringFunction;
-	protected PostingsReader postingsReader = null;
-	protected GlobalTermEvidence gte;
-	protected GlobalEvidence ge;
+  protected final Posting curPosting = new Posting();
+  protected RetrievalEnvironment env;
+  protected ScoringFunction scoringFunction;
+  protected PostingsReader postingsReader = null;
+  protected GlobalTermEvidence gte;
+  protected GlobalEvidence ge;
 
-	protected boolean endOfList = true; // Whether or not we're at the end of
-										// the postings list.
-	protected int lastScoredDocno = 0, iterStart = 0, iterStep = 1;
+  protected boolean endOfList = true; // Whether or not we're at the end of
+  // the postings list.
+  protected int lastScoredDocno = 0, iterStart = 0, iterStep = 1;
 
-	protected String operator, terms[];
-	protected JSONArray values;
-	protected List<PostingsReaderWrapper> children;
+  protected String operator, terms[];
+  protected JSONArray values;
+  protected List<PostingsReaderWrapper> children;
 
-	protected boolean isOOV = false;
-	protected float weights[];// , normalizationFactor;
+  protected boolean isOOV = false;
+  protected float weights[];// , normalizationFactor;
 
-	public PostingsReaderWrapper(JSONObject query, RetrievalEnvironment env,
-			ScoringFunction scoringFunction, GlobalEvidence ge)
-			throws JSONException {
-		this.operator = query.keys().next();
-		this.values = query.getJSONArray(operator);
+  public PostingsReaderWrapper(JSONObject query, RetrievalEnvironment env,
+      ScoringFunction scoringFunction, GlobalEvidence ge) throws JSONException {
+    this.operator = query.keys().next();
+    this.values = query.getJSONArray(operator);
 
-		// LOG.info("operator= "+operator);
-		// LOG.info("values= "+values.toString());
+    // LOG.info("operator= "+operator);
+    // LOG.info("values= "+values.toString());
 
-		if (operator.equals("#weight") || operator.equals("#pweight")) {
-			iterStart = 1;
-			iterStep = 2;
-			weights = new float[values.length() / 2];
-			
-			// in #weight or #pweight structure, even-numbered indices corr. to
-			// weights, odd-numbered indices corr. to terms/phrases
-			// handle weight normalization here
-			// normalizationFactor = 0.0f;
-			for (int i = 0; i < values.length(); i = i + iterStep) {
-				weights[i / 2] = (float) values.getDouble(i);
-				// normalizationFactor += weights[i/2];
-			}
-		}
+    if (operator.equals("#weight") || operator.equals("#pweight")) {
+      iterStart = 1;
+      iterStep = 2;
+      weights = new float[values.length() / 2];
 
-		this.env = Preconditions.checkNotNull(env);
-		this.scoringFunction = Preconditions.checkNotNull(scoringFunction);
+      // in #weight or #pweight structure, even-numbered indices corr. to
+      // weights, odd-numbered indices corr. to terms/phrases
+      // handle weight normalization here
+      // normalizationFactor = 0.0f;
+      for (int i = 0; i < values.length(); i = i + iterStep) {
+        weights[i / 2] = (float) values.getDouble(i);
+        // normalizationFactor += weights[i/2];
+      }
+    }
 
-		// Read first posting.
-		endOfList = false;
+    this.env = Preconditions.checkNotNull(env);
+    this.scoringFunction = Preconditions.checkNotNull(scoringFunction);
 
-		// If this is not a leaf node, create children
-		children = new ArrayList<PostingsReaderWrapper>();
-		// LOG.info("non-leaf node with "+values.length()+" children");
-		for (int i = iterStart; i < values.length(); i = i + iterStep) {
-			// LOG.info("child "+i+":");
-			JSONObject child = values.optJSONObject(i);
-			// //LOG.info(child);
-			if (child != null) {
-				// If child is an object (non-leaf), call nonleaf-constructor
-				children.add(new PostingsReaderWrapper(values.getJSONObject(i),
-						env, scoringFunction, ge));
-			} else {
-				// If child is leaf, call leaf-constructor
-				children.add(new PostingsReaderWrapper(values.getString(i),
-						env, scoringFunction, ge));
-			}
-		}
+    // Read first posting.
+    endOfList = false;
 
-		lastScoredDocno = 0;
-		// LOG.info("non-leaf done.");
-	}
+    // If this is not a leaf node, create children
+    children = new ArrayList<PostingsReaderWrapper>();
+    // LOG.info("non-leaf node with "+values.length()+" children");
+    for (int i = iterStart; i < values.length(); i = i + iterStep) {
+      // LOG.info("child "+i+":");
+      JSONObject child = values.optJSONObject(i);
+      // //LOG.info(child);
+      if (child != null) {
+        // If child is an object (non-leaf), call nonleaf-constructor
+        children.add(new PostingsReaderWrapper(values.getJSONObject(i), env, scoringFunction, ge));
+      } else {
+        // If child is leaf, call leaf-constructor
+        children.add(new PostingsReaderWrapper(values.getString(i), env, scoringFunction, ge));
+      }
+    }
 
-	public PostingsReaderWrapper(String termOrPhrase, RetrievalEnvironment env,
-			ScoringFunction scoringFunction, GlobalEvidence ge)
-			throws JSONException {
-		this.env = Preconditions.checkNotNull(env);
-		this.scoringFunction = Preconditions.checkNotNull(scoringFunction);
+    lastScoredDocno = 0;
+    // LOG.info("non-leaf done.");
+  }
 
-		// Read first posting.
-		endOfList = false;
+  public PostingsReaderWrapper(String termOrPhrase, RetrievalEnvironment env,
+      ScoringFunction scoringFunction, GlobalEvidence ge) throws JSONException {
+    this.env = Preconditions.checkNotNull(env);
+    this.scoringFunction = Preconditions.checkNotNull(scoringFunction);
 
-		// If this is a leaf node (i.e., single term), create postings list
-		// LOG.info("leaf node");
-		terms = termOrPhrase.split("\\s+");
-		if (terms.length > 1) {
-			operator = "phrase";
-			PostingsReader[] prs = new PostingsReader[terms.length];
-			int i = 0;
-			for (String term : terms) {
-				PostingsList pl = env.getPostingsList(term);
-				// if any of the tokens is OOV, then the phrase is considerd OOV
-				if (pl == null) {
-					isOOV = true;
-					endOfList = true;
-					return;
-				}
-				prs[i++] = pl.getPostingsReader();
-			}
-			postingsReader = new ProximityPostingsReaderOrderedWindow(prs, 2);
-			gte = new GlobalTermEvidence(env.getDefaultDf(), env.getDefaultCf());
-			this.ge = ge;
-			lastScoredDocno = 0;
-		} else {
-			operator = "term";
-			PostingsList pl = env.getPostingsList(termOrPhrase);
-			if (pl == null) {
-				isOOV = true;
-				endOfList = true;
-			} else {
-				postingsReader = pl.getPostingsReader();
-				gte = new GlobalTermEvidence(pl.getDf(), pl.getCf());
-				this.ge = ge;
-				lastScoredDocno = 0;
-			}
-		}
-		// LOG.info("leaf done.");
-	}
+    // Read first posting.
+    endOfList = false;
 
-	public float computeScore(int curDocno) {
-		// LOG.info("Scoring... docno="+curDocno+" node="+this.toString());
-		float score = 0;
-		if (isOOV) {
+    // If this is a leaf node (i.e., single term), create postings list
+    // LOG.info("leaf node");
+    terms = termOrPhrase.split("\\s+");
+    if (terms.length > 1) {
+      operator = "phrase";
+      PostingsReader[] prs = new PostingsReader[terms.length];
+      int i = 0;
+      for (String term : terms) {
+        PostingsList pl = env.getPostingsList(term);
+        // if any of the tokens is OOV, then the phrase is considerd OOV
+        if (pl == null) {
+          isOOV = true;
+          endOfList = true;
+          return;
+        }
+        prs[i++] = pl.getPostingsReader();
+      }
+      postingsReader = new ProximityPostingsReaderOrderedWindow(prs, 2);
+      gte = new GlobalTermEvidence(env.getDefaultDf(), env.getDefaultCf());
+      this.ge = ge;
+      lastScoredDocno = 0;
+    } else {
+      operator = "term";
+      PostingsList pl = env.getPostingsList(termOrPhrase);
+      if (pl == null) {
+        isOOV = true;
+        endOfList = true;
+      } else {
+        postingsReader = pl.getPostingsReader();
+        gte = new GlobalTermEvidence(pl.getDf(), pl.getCf());
+        this.ge = ge;
+        lastScoredDocno = 0;
+      }
+    }
+    // LOG.info("leaf done.");
+  }
 
-		} else if (!isLeaf()) {
-			// If this is not a leaf node, compute scores from children and
-			// combine them w.r.t operator
-			float[] scores = new float[children.size()];
-			// LOG.info(children.size()+" children");
-			for (int i = 0; i < children.size(); i++) {
-				// LOG.info("Scoring child "+ children.get(i).toString() +
-				// "...");
-				scores[i] = children.get(i).computeScore(curDocno);
-				// LOG.info("Child score: "+ scores[i]);
-			}
-			score = runOperator(scores);
-			lastScoredDocno = curDocno;
-		} else { // leaf node
-			// System.out.println("leaf node");
-			// Advance postings reader. Invariant: curPosting will always point
-			// to
-			// the next posting that has not yet been scored.
-			while (!endOfList && postingsReader.getDocno() < curDocno) {
-				if (!postingsReader.nextPosting(curPosting)) {
-					endOfList = true;
-				}
-			}
+  public float computeScore(int curDocno) {
+    // LOG.info("Scoring... docno="+curDocno+" node="+this.toString());
+    float score = 0;
+    if (isOOV) {
 
-			// Compute term frequency if postings list contains this docno,
-			// otherwise tf=0
-			int tf = 0;
-			if (curDocno == postingsReader.getDocno()) {
-				tf = postingsReader.getTf();
-			}
-			((BM25ScoringFunction) scoringFunction).setB(0.3f);
-			((BM25ScoringFunction) scoringFunction).setK1(0.5f);
+    } else if (!isLeaf()) {
+      // If this is not a leaf node, compute scores from children and
+      // combine them w.r.t operator
+      float[] scores = new float[children.size()];
+      // LOG.info(children.size()+" children");
+      for (int i = 0; i < children.size(); i++) {
+        // LOG.info("Scoring child "+ children.get(i).toString() +
+        // "...");
+        scores[i] = children.get(i).computeScore(curDocno);
+        // LOG.info("Child score: "+ scores[i]);
+      }
+      score = runOperator(scores);
+      lastScoredDocno = curDocno;
+    } else { // leaf node
+      // System.out.println("leaf node");
+      // Advance postings reader. Invariant: curPosting will always point
+      // to
+      // the next posting that has not yet been scored.
+      while (!endOfList && postingsReader.getDocno() < curDocno) {
+        if (!postingsReader.nextPosting(curPosting)) {
+          endOfList = true;
+        }
+      }
 
-			int docLen = env.getDocumentLength(curDocno);
-			this.scoringFunction.initialize(gte, ge);
-			score = scoringFunction.getScore(tf, docLen);
-			// LOG.info(tf + "," + gte.getDf()+ "," + ge.queryLength+"," +
-			// ge.numDocs+"," + ge.collectionLength+"," + docLen);
+      // Compute term frequency if postings list contains this docno,
+      // otherwise tf=0
+      int tf = 0;
+      if (curDocno == postingsReader.getDocno()) {
+        tf = postingsReader.getTf();
+      }
+      ((BM25ScoringFunction) scoringFunction).setB(0.3f);
+      ((BM25ScoringFunction) scoringFunction).setK1(0.5f);
 
-			lastScoredDocno = curDocno;
-		}
-		return score;
-	}
+      int docLen = env.getDocumentLength(curDocno);
+      this.scoringFunction.initialize(gte, ge);
+      score = scoringFunction.getScore(tf, docLen);
+      // LOG.info(tf + "," + gte.getDf()+ "," + ge.queryLength+"," +
+      // ge.numDocs+"," + ge.collectionLength+"," + docLen);
 
-	private float runOperator(float[] scores) {
-		if (operator.equals("#combine")) {
-			float finalScore = 0;
-			for (int i = 0; i < scores.length; i++) {
-				finalScore += scores[i];
-			}
-			return finalScore;
-		} else if (operator.equals("#or")) {
-			return 0;
-		} else if (operator.equals("#weight")) {
-			float finalScore = 0;
-			for (int i = 0; i < scores.length; i++) {
-				// LOG.info("normalized weight = " +
-				// (weights[i]/normalizationFactor));
-				finalScore += scores[i] * (weights[i]);// /normalizationFactor);
-			}
-			return finalScore;
-		} else if (operator.equals("#pweight")) {
-			float finalScore = 0;
-			for (int i = 0; i < scores.length; i++) {
-				// LOG.info("normalized weight = " +
-				// (weights[i]/normalizationFactor));
-				finalScore += scores[i] * (weights[i]);// /normalizationFactor);
-			}
-			return finalScore;
-		} else {
-			return 0;
-		}
-	}
+      lastScoredDocno = curDocno;
+    }
+    return score;
+  }
 
-	/**
-	 * @param curDocno
-	 * @return next smallest docno from posting lists of leaf nodes
-	 */
-	public int getNextCandidate(int docno) {
-		// LOG.info("Looking for candidates... at node="+this.toString());
-		if (isOOV) {
-			return docno;
-		} else if (!isLeaf()) { // not a leaf node
-			for (int i = 0; i < children.size(); i++) {
-				int nextDocno = children.get(i).getNextCandidate(docno);
-				if (nextDocno != lastScoredDocno && nextDocno < docno) {
-					docno = nextDocno;
-				}
-			}
-			return docno;
-		} else { // leaf node
-			if (endOfList) {
-				return Integer.MAX_VALUE;
-			}
-			int nextDocno = findNextDocnoWithPositiveTF(operator);
-			if (nextDocno == Integer.MAX_VALUE) {
-				// LOG.info("End of list");
-				endOfList = true;
-			} else {
-				// LOG.info("Found "+nextDocno);
-			}
-			return nextDocno;
-		}
-	}
+  private float runOperator(float[] scores) {
+    if (operator.equals("#combine")) {
+      float finalScore = 0;
+      for (int i = 0; i < scores.length; i++) {
+        finalScore += scores[i];
+      }
+      return finalScore;
+    } else if (operator.equals("#or")) {
+      return 0;
+    } else if (operator.equals("#weight")) {
+      float finalScore = 0;
+      for (int i = 0; i < scores.length; i++) {
+        // LOG.info("normalized weight = " +
+        // (weights[i]/normalizationFactor));
+        finalScore += scores[i] * (weights[i]);// /normalizationFactor);
+      }
+      return finalScore;
+    } else if (operator.equals("#pweight")) {
+      float finalScore = 0;
+      for (int i = 0; i < scores.length; i++) {
+        // LOG.info("normalized weight = " +
+        // (weights[i]/normalizationFactor));
+        finalScore += scores[i] * (weights[i]);// /normalizationFactor);
+      }
+      return finalScore;
+    } else {
+      return 0;
+    }
+  }
 
-	private int findNextDocnoWithPositiveTF(String operator) {
-		boolean t = true;
-		if (operator.equals("phrase")) {
-			t = postingsReader.nextPosting(curPosting);
-		}
-		while (t
-				&& (postingsReader.getTf() == 0 || postingsReader.getDocno() == lastScoredDocno)) {
-			t = postingsReader.nextPosting(curPosting);
-		}
-		if (t) {
-			return postingsReader.getDocno();
-		} else {
-			return Integer.MAX_VALUE;
-		}
-	}
+  /**
+   * @param curDocno
+   * @return next smallest docno from posting lists of leaf nodes
+   */
+  public int getNextCandidate(int docno) {
+    // LOG.info("Looking for candidates... at node="+this.toString());
+    if (isOOV) {
+      return docno;
+    } else if (!isLeaf()) { // not a leaf node
+      for (int i = 0; i < children.size(); i++) {
+        int nextDocno = children.get(i).getNextCandidate(docno);
+        if (nextDocno != lastScoredDocno && nextDocno < docno) {
+          docno = nextDocno;
+        }
+      }
+      return docno;
+    } else { // leaf node
+      if (endOfList) {
+        return Integer.MAX_VALUE;
+      }
+      int nextDocno = findNextDocnoWithPositiveTF(operator);
+      if (nextDocno == Integer.MAX_VALUE) {
+        // LOG.info("End of list");
+        endOfList = true;
+      } else {
+        // LOG.info("Found "+nextDocno);
+      }
+      return nextDocno;
+    }
+  }
 
-	public void reset() {
-		endOfList = false;
-		lastScoredDocno = -1;
-	}
+  private int findNextDocnoWithPositiveTF(String operator) {
+    boolean t = true;
+    if (operator.equals("phrase")) {
+      t = postingsReader.nextPosting(curPosting);
+    }
+    while (t && (postingsReader.getTf() == 0 || postingsReader.getDocno() == lastScoredDocno)) {
+      t = postingsReader.nextPosting(curPosting);
+    }
+    if (t) {
+      return postingsReader.getDocno();
+    } else {
+      return Integer.MAX_VALUE;
+    }
+  }
 
-	public float getMinScore() {
-		return scoringFunction.getMinScore();
-	}
+  public void reset() {
+    endOfList = false;
+    lastScoredDocno = -1;
+  }
 
-	public float getMaxScore() {
-		return scoringFunction.getMaxScore();
-	}
+  public float getMinScore() {
+    return scoringFunction.getMinScore();
+  }
 
-	public void setNextCandidate(int docno) {
-		// Advance postings reader. Invariant: curPosting will always point to
-		// the next posting that has not yet been scored.
-		while (!endOfList && postingsReader.getDocno() < docno) {
-			if (!postingsReader.nextPosting(curPosting)) {
-				endOfList = true;
-			}
-		}
-	}
+  public float getMaxScore() {
+    return scoringFunction.getMaxScore();
+  }
 
-	public ScoringFunction getScoringFunction() {
-		return this.scoringFunction;
-	}
+  public void setNextCandidate(int docno) {
+    // Advance postings reader. Invariant: curPosting will always point to
+    // the next posting that has not yet been scored.
+    while (!endOfList && postingsReader.getDocno() < docno) {
+      if (!postingsReader.nextPosting(curPosting)) {
+        endOfList = true;
+      }
+    }
+  }
 
-	public String toString() {
-		if (isOOV) {
-			return "OOV";
-		} else if (!isLeaf()) { // not a leaf node
-			return operator + "::" + values.toString();
-		} else {
-			return operator + "::" + Arrays.asList(terms).toString();
-		}
-	}
+  public ScoringFunction getScoringFunction() {
+    return this.scoringFunction;
+  }
 
-	private boolean isLeaf() {
-		return postingsReader != null;
-	}
+  public String toString() {
+    if (isOOV) {
+      return "OOV";
+    } else if (!isLeaf()) { // not a leaf node
+      return operator + "::" + values.toString();
+    } else {
+      return operator + "::" + Arrays.asList(terms).toString();
+    }
+  }
+
+  private boolean isLeaf() {
+    return postingsReader != null;
+  }
 }

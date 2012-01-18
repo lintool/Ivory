@@ -102,9 +102,8 @@ public class DocumentProcessingUtils {
       if (positionsList.size() >= TF_CUT) {
         // There are a few ways to handle this... If we're getting such a high tf, then it most
         // likely means that this is a junk doc.
-        LOG.warn("Error: tf of " + e.getValue()
-            + " will overflow max short value. docno=" + doc.getDocid() + ", term="
-            + e.getKey());
+        LOG.warn("Error: tf of " + e.getValue() + " will overflow max short value. docno="
+            + doc.getDocid() + ", term=" + e.getKey());
         it.remove();
       } else {
         positionsList.trimToSize();
@@ -112,7 +111,7 @@ public class DocumentProcessingUtils {
       }
     }
 
-    if ( positions.size() == 0 ) {
+    if (positions.size() == 0) {
       return positions;
     }
 

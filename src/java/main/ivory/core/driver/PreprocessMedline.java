@@ -82,7 +82,7 @@ public class PreprocessMedline extends Configured implements Tool {
 
     if (!fs.exists(mappingFile)) {
       LOG.info(mappingFile + " doesn't exist, creating...");
-      String[] arr = new String[] { collection, mappingDir.toString(), mappingFile.toString()};
+      String[] arr = new String[] { collection, mappingDir.toString(), mappingFile.toString() };
       NumberMedlineCitations2 tool = new NumberMedlineCitations2();
       tool.setConf(conf);
       tool.run(arr);

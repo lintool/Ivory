@@ -25,91 +25,87 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapred.JobConf;
 
-
 /**
- * A reader for processing delimited data files.  Typical usage pattern:
+ * A reader for processing delimited data files. Typical usage pattern:
  * 
  * <pre>
- * DelimitedValuesFileReader iter = new DelimitedValuesFileReader("foo.txt");
- *     
+ * DelimitedValuesFileReader iter = new DelimitedValuesFileReader(&quot;foo.txt&quot;);
+ * 
  * String[] arr;
  * while ((arr = iter.nextValues()) != null) {
- *    String val1 = arr[0];
- *    String val2 = arr[1];
- *    // do something here
- * } 
+ *   String val1 = arr[0];
+ *   String val2 = arr[1];
+ *   // do something here
+ * }
  * </pre>
  */
 public class DelimitedValuesFileReader {
-	public static final String DEFAULT_DELIMITER = "\t";
-	
-	//private FileInputStream mStream;
+  public static final String DEFAULT_DELIMITER = "\t";
 
-	//private BufferedReader mReader;
+  // private FileInputStream mStream;
 
-	private FSDataInputStream in;
+  // private BufferedReader mReader;
 
-	private String mDelimiter;
+  private FSDataInputStream in;
 
-	/**
-	 * Constructs a <code>TabbedSeparatedValuesFileReader</code> with the
-	 * contents of a file.
-	 * 
-	 * @param filename
-	 *            name of file to read
-	 */
-	public DelimitedValuesFileReader(String filename) {
-		this(filename, DEFAULT_DELIMITER);
-	}
+  private String mDelimiter;
 
-	public DelimitedValuesFileReader(String filename, String delimiter) {
-		mDelimiter = delimiter;
+  /**
+   * Constructs a <code>TabbedSeparatedValuesFileReader</code> with the contents of a file.
+   * 
+   * @param filename name of file to read
+   */
+  public DelimitedValuesFileReader(String filename) {
+    this(filename, DEFAULT_DELIMITER);
+  }
 
-		JobConf conf = new JobConf(DelimitedValuesFileReader.class);
+  public DelimitedValuesFileReader(String filename, String delimiter) {
+    mDelimiter = delimiter;
 
-		try {
-			in = FileSystem.get(conf).open(new Path(filename));
+    JobConf conf = new JobConf(DelimitedValuesFileReader.class);
 
-			//mStream = new FileInputStream(new File(filename));
-			//mReader = new BufferedReader(new InputStreamReader(mStream));
-		} catch (Exception e) {
-			throw new RuntimeException("Error: '" + filename + "' not found");
-		}
-	}
+    try {
+      in = FileSystem.get(conf).open(new Path(filename));
 
-	/**
-	 * Reads the next line.
-	 * 
-	 * @return an array with values from the next line, or <code>null</code>
-	 *         if no more lines
-	 */
-	public String[] nextValues() {
-		String line = null;
+      // mStream = new FileInputStream(new File(filename));
+      // mReader = new BufferedReader(new InputStreamReader(mStream));
+    } catch (Exception e) {
+      throw new RuntimeException("Error: '" + filename + "' not found");
+    }
+  }
 
-		try {
-			//line = mReader.readLine();
+  /**
+   * Reads the next line.
+   * 
+   * @return an array with values from the next line, or <code>null</code> if no more lines
+   */
+  public String[] nextValues() {
+    String line = null;
 
-			line = in.readLine();
+    try {
+      // line = mReader.readLine();
 
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+      line = in.readLine();
 
-		if (line == null || line.trim().equals(""))
-			return null;
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
 
-		return line.split(mDelimiter);
-	}
+    if (line == null || line.trim().equals(""))
+      return null;
 
-	/**
-	 * Closes file handles.
-	 */
-	public void destruct() {
-		try {
-			//mReader.close();
-			//mStream.close();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+    return line.split(mDelimiter);
+  }
+
+  /**
+   * Closes file handles.
+   */
+  public void destruct() {
+    try {
+      // mReader.close();
+      // mStream.close();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
 }

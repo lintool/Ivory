@@ -16,7 +16,6 @@
 
 package ivory.core.util;
 
-
 import ivory.core.exception.ConfigurationException;
 
 import java.io.IOException;
@@ -39,67 +38,66 @@ import org.w3c.dom.ls.LSSerializer;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-
 /**
  * @author Don Metzler
  * 
  */
 public class XMLTools {
 
-	/**
-	 * @param node
-	 * @param name
-	 * @param defaultValue
-	 */
-	public static boolean getAttributeValue(Node node, String name, boolean defaultValue) {
-		String value = getAttributeValue(node, name, null);
-		if (value == null) {
-			setAttributeValue(node, name, defaultValue + "");
-			return defaultValue;
-		}
-		return Boolean.parseBoolean(value);
-	}
+  /**
+   * @param node
+   * @param name
+   * @param defaultValue
+   */
+  public static boolean getAttributeValue(Node node, String name, boolean defaultValue) {
+    String value = getAttributeValue(node, name, null);
+    if (value == null) {
+      setAttributeValue(node, name, defaultValue + "");
+      return defaultValue;
+    }
+    return Boolean.parseBoolean(value);
+  }
 
-	/**
-	 * @param node
-	 * @param name
-	 * @param defaultValue
-	 */
-	public static float getAttributeValue(Node node, String name, float defaultValue) {
-		String value = getAttributeValue(node, name, null);
-		if (value == null) {
-			setAttributeValue(node, name, defaultValue + "");
-			return defaultValue;
-		}
-		return Float.parseFloat(value);
-	}
-	
-	/**
-	 * @param node
-	 * @param name
-	 * @param defaultValue
-	 */
-	public static int getAttributeValue(Node node, String name, int defaultValue) {
-		String value = getAttributeValue(node, name, null);
-		if (value == null) {
-			setAttributeValue(node, name, defaultValue + "");
-			return defaultValue;
-		}
-		return Integer.parseInt(value);
-	}
+  /**
+   * @param node
+   * @param name
+   * @param defaultValue
+   */
+  public static float getAttributeValue(Node node, String name, float defaultValue) {
+    String value = getAttributeValue(node, name, null);
+    if (value == null) {
+      setAttributeValue(node, name, defaultValue + "");
+      return defaultValue;
+    }
+    return Float.parseFloat(value);
+  }
 
-	public static String getAttributeValue(Node node, String name) {
-		if (node == null || !node.hasAttributes()) {
-			return null;
-		}
+  /**
+   * @param node
+   * @param name
+   * @param defaultValue
+   */
+  public static int getAttributeValue(Node node, String name, int defaultValue) {
+    String value = getAttributeValue(node, name, null);
+    if (value == null) {
+      setAttributeValue(node, name, defaultValue + "");
+      return defaultValue;
+    }
+    return Integer.parseInt(value);
+  }
 
-		NamedNodeMap attributes = node.getAttributes();
-		if (attributes.getNamedItem(name) == null) {
-			return null;
-		}
+  public static String getAttributeValue(Node node, String name) {
+    if (node == null || !node.hasAttributes()) {
+      return null;
+    }
 
-		return attributes.getNamedItem(name).getNodeValue();
-	}
+    NamedNodeMap attributes = node.getAttributes();
+    if (attributes.getNamedItem(name) == null) {
+      return null;
+    }
+
+    return attributes.getNamedItem(name).getNodeValue();
+  }
 
   /**
    * Returns the value of an attribute, and if the attribute is not found, throws an
@@ -119,86 +117,86 @@ public class XMLTools {
     return attributes.getNamedItem(name).getNodeValue();
   }
 
-	/**
-	 * @param node
-	 * @param name
-	 * @param defaultValue
-	 */
-	public static String getAttributeValue(Node node, String name, String defaultValue) {
-		if (node == null || !node.hasAttributes()) {
-			return defaultValue;
-		}
+  /**
+   * @param node
+   * @param name
+   * @param defaultValue
+   */
+  public static String getAttributeValue(Node node, String name, String defaultValue) {
+    if (node == null || !node.hasAttributes()) {
+      return defaultValue;
+    }
 
-		NamedNodeMap attributes = node.getAttributes();
-		if (attributes.getNamedItem(name) == null) {
-			setAttributeValue(node, name, defaultValue);
-			return defaultValue;
-		}
+    NamedNodeMap attributes = node.getAttributes();
+    if (attributes.getNamedItem(name) == null) {
+      setAttributeValue(node, name, defaultValue);
+      return defaultValue;
+    }
 
-		return attributes.getNamedItem(name).getNodeValue();
-	}
+    return attributes.getNamedItem(name).getNodeValue();
+  }
 
-	public static String getStringAttributeValue(Node node, String name) {
-		return getAttributeValue(node, name, null);	}
-	
-	/**
-	 * @param node
-	 * @param name
-	 * @param value
-	 */
-	public static synchronized void setAttributeValue(Node node, String name, String value) {
-		NamedNodeMap attributes = node.getAttributes();
-		Attr a = node.getOwnerDocument().createAttribute(name);
-		a.setValue(value);
-		attributes.setNamedItem(a);
-	}
+  public static String getStringAttributeValue(Node node, String name) {
+    return getAttributeValue(node, name, null);
+  }
 
-	// Pretty-prints a DOM document to XML using DOM Load and Save's
-	// LSSerializer. Note that the "format-pretty-print" DOM configuration
-	// parameter can only be set in JDK 1.6+.
-	public static String format(String xml) {
-		return format(parseXMLString(xml));
-	}
-	
-	public static String format(Document doc) {
-		DOMImplementation domImplementation = doc.getImplementation();
+  /**
+   * @param node
+   * @param name
+   * @param value
+   */
+  public static synchronized void setAttributeValue(Node node, String name, String value) {
+    NamedNodeMap attributes = node.getAttributes();
+    Attr a = node.getOwnerDocument().createAttribute(name);
+    a.setValue(value);
+    attributes.setNamedItem(a);
+  }
 
-		if (domImplementation.hasFeature("LS", "3.0")
-				&& domImplementation.hasFeature("Core", "2.0")) {
-			DOMImplementationLS domImplementationLS = (DOMImplementationLS) domImplementation
-					.getFeature("LS", "3.0");
-			LSSerializer lsSerializer = domImplementationLS.createLSSerializer();
-			DOMConfiguration domConfiguration = lsSerializer.getDomConfig();
-			if (domConfiguration.canSetParameter("format-pretty-print", Boolean.TRUE)) {
-				lsSerializer.getDomConfig().setParameter("format-pretty-print", Boolean.TRUE);
-				LSOutput lsOutput = domImplementationLS.createLSOutput();
-				lsOutput.setEncoding("UTF-8");
-				StringWriter stringWriter = new StringWriter();
-				lsOutput.setCharacterStream(stringWriter);
-				lsSerializer.write(doc, lsOutput);
-				return stringWriter.toString();
-			} else {
-				throw new RuntimeException(
-						"DOMConfiguration 'format-pretty-print' parameter isn't settable.");
-			}
-		} else {
-			throw new RuntimeException("DOM 3.0 LS and/or DOM 2.0 Core not supported.");
-		}
-	}
+  // Pretty-prints a DOM document to XML using DOM Load and Save's
+  // LSSerializer. Note that the "format-pretty-print" DOM configuration
+  // parameter can only be set in JDK 1.6+.
+  public static String format(String xml) {
+    return format(parseXMLString(xml));
+  }
 
-	private static Document parseXMLString(String in) {
-		try {
-			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-			DocumentBuilder db = dbf.newDocumentBuilder();
-			InputSource is = new InputSource(new StringReader(in));
-			return db.parse(is);
-		} catch (ParserConfigurationException e) {
-			throw new RuntimeException(e);
-		} catch (SAXException e) {
-			throw new RuntimeException(e);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-	}
+  public static String format(Document doc) {
+    DOMImplementation domImplementation = doc.getImplementation();
+
+    if (domImplementation.hasFeature("LS", "3.0") && domImplementation.hasFeature("Core", "2.0")) {
+      DOMImplementationLS domImplementationLS = (DOMImplementationLS) domImplementation.getFeature(
+          "LS", "3.0");
+      LSSerializer lsSerializer = domImplementationLS.createLSSerializer();
+      DOMConfiguration domConfiguration = lsSerializer.getDomConfig();
+      if (domConfiguration.canSetParameter("format-pretty-print", Boolean.TRUE)) {
+        lsSerializer.getDomConfig().setParameter("format-pretty-print", Boolean.TRUE);
+        LSOutput lsOutput = domImplementationLS.createLSOutput();
+        lsOutput.setEncoding("UTF-8");
+        StringWriter stringWriter = new StringWriter();
+        lsOutput.setCharacterStream(stringWriter);
+        lsSerializer.write(doc, lsOutput);
+        return stringWriter.toString();
+      } else {
+        throw new RuntimeException(
+            "DOMConfiguration 'format-pretty-print' parameter isn't settable.");
+      }
+    } else {
+      throw new RuntimeException("DOM 3.0 LS and/or DOM 2.0 Core not supported.");
+    }
+  }
+
+  private static Document parseXMLString(String in) {
+    try {
+      DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+      DocumentBuilder db = dbf.newDocumentBuilder();
+      InputSource is = new InputSource(new StringReader(in));
+      return db.parse(is);
+    } catch (ParserConfigurationException e) {
+      throw new RuntimeException(e);
+    } catch (SAXException e) {
+      throw new RuntimeException(e);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
 
 }

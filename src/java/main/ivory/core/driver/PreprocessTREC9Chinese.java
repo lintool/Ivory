@@ -73,7 +73,7 @@ public class PreprocessTREC9Chinese extends Configured implements Tool {
     if (!fs.exists(p)) {
       LOG.info("index directory doesn't exist, creating...");
       fs.mkdirs(p);
-    }	
+    }
 
     RetrievalEnvironment env = new RetrievalEnvironment(indexRootPath, fs);
 

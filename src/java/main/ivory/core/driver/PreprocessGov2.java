@@ -82,8 +82,8 @@ public class PreprocessGov2 extends Configured implements Tool {
 
     if (!fs.exists(mappingFile)) {
       LOG.info("docno-mapping.dat doesn't exist, creating...");
-      String[] arr = new String[] { collection, mappingDir.toString(),
-          mappingFile.toString(), "100" };
+      String[] arr = new String[] { collection, mappingDir.toString(), mappingFile.toString(),
+          "100" };
       NumberTrecWebDocuments tool = new NumberTrecWebDocuments();
       tool.setConf(conf);
       tool.run(arr);

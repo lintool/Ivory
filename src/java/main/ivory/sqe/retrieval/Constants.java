@@ -3,18 +3,18 @@ package ivory.sqe.retrieval;
 public class Constants {
 
   public static final String IndexPath = "Ivory.IndexPath";
-  
+
   public static final String TokenizerData = "Ivory.TokenizerModel";
   public static final String fVocabPath = "Ivory.fVocab";
   public static final String eVocabPath = "Ivory.eVocab";
   public static final String f2eProbsPath = "Ivory.f2eProbs";
   public static final String LexicalProbThreshold = "Ivory.LexProbThreshold";
   public static final String CumulativeProbThreshold = "Ivory.CumProbThreshold";
-  
+
   public static final String QueriesPath = "Ivory.Queries";
   public static final String QrelsPath = "Ivory.Qrels";
   public static final String SCFGPath = "Ivory.SCFG";
-  
+
   public static final String Language = "Ivory.Language";
   public static final String English = "en";
   public static final String Chinese = "zh";

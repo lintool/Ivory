@@ -52,8 +52,8 @@ public class ComputeGlobalTermStatistics extends PowerTool {
     private static final PairOfIntLong pair = new PairOfIntLong();
 
     @Override
-    public void map(IntWritable key, TermDocVector doc, Context context)
-        throws IOException, InterruptedException {
+    public void map(IntWritable key, TermDocVector doc, Context context) throws IOException,
+        InterruptedException {
       TermDocVector.Reader r = doc.getReader();
       int dl = 0, tf = 0;
       while (r.hasMoreTerms()) {
@@ -115,8 +115,8 @@ public class ComputeGlobalTermStatistics extends PowerTool {
     }
   }
 
-  public static final String[] RequiredParameters = {
-          Constants.CollectionName, Constants.IndexPath, Constants.MinDf, Constants.MaxDf };
+  public static final String[] RequiredParameters = { Constants.CollectionName,
+      Constants.IndexPath, Constants.MinDf, Constants.MaxDf };
 
   public String[] getRequiredParameters() {
     return RequiredParameters;
@@ -146,10 +146,10 @@ public class ComputeGlobalTermStatistics extends PowerTool {
     }
 
     if (!fs.exists(new Path(termDocVectorsPath))) {
-        LOG.info("term doc vectors path doesn't existing: skipping!");
-        return 0;
-      }
-    
+      LOG.info("term doc vectors path doesn't existing: skipping!");
+      return 0;
+    }
+
     LOG.info("PowerTool: " + ComputeGlobalTermStatistics.class.getCanonicalName());
     LOG.info(String.format(" - %s: %s", Constants.CollectionName, collectionName));
     LOG.info(String.format(" - %s: %s", Constants.IndexPath, indexPath));
