@@ -38,8 +38,8 @@ import org.apache.log4j.Logger;
 import edu.umd.cloud9.collection.clue.ClueWarcDocnoMapping;
 
 public class PreprocessClueWebEnglishMultipleSegments extends Configured implements Tool {
-  private static final Logger LOG = Logger
-      .getLogger(PreprocessClueWebEnglishMultipleSegments.class);
+  private static final Logger LOG =
+    Logger.getLogger(PreprocessClueWebEnglishMultipleSegments.class);
 
   public int run(String[] args) throws Exception {
     if (args.length < 4) {

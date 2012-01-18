@@ -37,8 +37,8 @@ public class PositionalSequenceFileRecordReader<K, V> extends RecordReader<K, V>
   protected Configuration conf;
 
   @Override
-  public void initialize(InputSplit split, TaskAttemptContext context) throws IOException,
-      InterruptedException {
+  public void initialize(InputSplit split, TaskAttemptContext context)
+      throws IOException, InterruptedException {
     FileSplit fileSplit = (FileSplit) split;
     conf = context.getConfiguration();
     Path path = fileSplit.getPath();

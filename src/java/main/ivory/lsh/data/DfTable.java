@@ -18,9 +18,10 @@ package ivory.lsh.data;
 
 /**
  * <p>
- * Interface to object that keeps track of the document frequency of each term in the collection.
- * Concrete classes may vary in terms of implementation, e.g., hashes (faster lookup, but less
- * memory efficient) or arrays (slower binary search lookup, but more memory efficient).
+ * Interface to object that keeps track of the document frequency of each term
+ * in the collection. Concrete classes may vary in terms of implementation,
+ * e.g., hashes (faster lookup, but less memory efficient) or arrays (slower
+ * binary search lookup, but more memory efficient).
  * </p>
  * 
  * @author Jimmy Lin
@@ -28,33 +29,34 @@ package ivory.lsh.data;
  */
 public interface DfTable {
 
-  /**
-   * Returns the document frequency of a term.
-   */
-  public int getDf(String term);
+	/**
+	 * Returns the document frequency of a term.
+	 */
+	public int getDf(String term);
 
-  /**
-   * Returns the number of documents in the collection.
-   */
-  public int getDocumentCount();
+	/**
+	 * Returns the number of documents in the collection.
+	 */
+	public int getDocumentCount();
 
-  /**
-   * Returns the number of unique terms in the collection.
-   */
-  public int getVocabularySize();
+	/**
+	 * Returns the number of unique terms in the collection.
+	 */
+	public int getVocabularySize();
 
-  /**
-   * Returns the document frequency of the term with the highest document frequency.
-   */
-  public int getMaxDf();
+	/**
+	 * Returns the document frequency of the term with the highest document
+	 * frequency.
+	 */
+	public int getMaxDf();
 
-  /**
-   * Returns the term with the highest document frequency.
-   */
-  public String getMaxDfTerm();
+	/**
+	 * Returns the term with the highest document frequency.
+	 */
+	public String getMaxDfTerm();
 
-  /**
-   * Returns the number of terms that only appear in one document.
-   */
-  public int getCountOfTermWithDfOne();
+	/**
+	 * Returns the number of terms that only appear in one document.
+	 */
+	public int getCountOfTermWithDfOne();
 }

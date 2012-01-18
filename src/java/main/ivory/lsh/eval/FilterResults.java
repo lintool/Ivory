@@ -34,287 +34,289 @@ import edu.umd.cloud9.io.pair.PairOfInts;
 
 @SuppressWarnings("deprecation")
 public class FilterResults extends Configured implements Tool {
-  public static final String[] RequiredParameters = {};
-  private static final Logger sLogger = Logger.getLogger(FilterResults.class);
+	public static final String[] RequiredParameters = {};
+	private static final Logger sLogger = Logger.getLogger(FilterResults.class);
 
-  static enum mapoutput {
-    count
-  };
+	static enum mapoutput{
+		count
+	};
+	
+	private static int printUsage() {
+		System.out.println("usage: [input-path] [output-path] [sample-docnos] [threshold] [num-results]");
+		return -1;
+	}
+	
+	public FilterResults() {
+		super();
+	}
 
-  private static int printUsage() {
-    System.out
-        .println("usage: [input-path] [output-path] [sample-docnos] [threshold] [num-results]");
-    return -1;
-  }
+	/**
+	 * 	Filter results that are not from sample and/or have distance more than specified in option Ivory.MaxHammingDistance. 
+	 *  Reducer selects closest N pairs for each sample foreign-language document.
+	 *  
+	 * @author ferhanture
+	 *
+	 */
+	public static class MyMapperTopN extends MapReduceBase implements
+	Mapper<PairOfInts, IntWritable, IntWritable, PairOfInts> {
 
-  public FilterResults() {
-    super();
-  }
+		static Path[] localFiles;
+		HMapIIW samplesMap = null;
+		int maxDist;
 
-  /**
-   * Filter results that are not from sample and/or have distance more than specified in option
-   * Ivory.MaxHammingDistance. Reducer selects closest N pairs for each sample foreign-language
-   * document.
-   * 
-   * @author ferhanture
-   * 
-   */
-  public static class MyMapperTopN extends MapReduceBase implements
-      Mapper<PairOfInts, IntWritable, IntWritable, PairOfInts> {
+		public void configure(JobConf job){
+			sLogger.setLevel(Level.INFO);
+			maxDist = job.getInt("Ivory.MaxHammingDistance", -1);
 
-    static Path[] localFiles;
-    HMapIIW samplesMap = null;
-    int maxDist;
+			//read doc ids of sample into vectors
+			try {
+				localFiles = DistributedCache.getLocalCacheFiles(job);
+			} catch (Exception e) {
+				throw new RuntimeException("Error reading doc vectors!");
+			}
 
-    public void configure(JobConf job) {
-      sLogger.setLevel(Level.INFO);
-      maxDist = job.getInt("Ivory.MaxHammingDistance", -1);
+			if(localFiles != null && localFiles.length > 0){
+				samplesMap = new HMapIIW();
+				try {
+					FSLineReader reader = new FSLineReader(localFiles[0], FileSystem.getLocal(job));
+					Text t = new Text();
+					while(reader.readLine(t)!=0){
+						int docno = Integer.parseInt(t.toString());
+						sLogger.info(docno + " --> sample");
+						samplesMap.put(docno, 1);
+					}
+					reader.close();
+				} catch (IOException e1) {
+				}
+				sLogger.info(samplesMap.size()+" sampled");
+			}else{
+				sLogger.info("samples file not specified in local cache");
+			}
+		}
 
-      // read doc ids of sample into vectors
-      try {
-        localFiles = DistributedCache.getLocalCacheFiles(job);
-      } catch (Exception e) {
-        throw new RuntimeException("Error reading doc vectors!");
-      }
+		public void map(PairOfInts key, IntWritable value,
+				OutputCollector<IntWritable, PairOfInts> output,
+				Reporter reporter) throws IOException {
 
-      if (localFiles != null && localFiles.length > 0) {
-        samplesMap = new HMapIIW();
-        try {
-          FSLineReader reader = new FSLineReader(localFiles[0], FileSystem.getLocal(job));
-          Text t = new Text();
-          while (reader.readLine(t) != 0) {
-            int docno = Integer.parseInt(t.toString());
-            sLogger.info(docno + " --> sample");
-            samplesMap.put(docno, 1);
-          }
-          reader.close();
-        } catch (IOException e1) {
-        }
-        sLogger.info(samplesMap.size() + " sampled");
-      } else {
-        sLogger.info("samples file not specified in local cache");
-      }
-    }
+			int leftKey = key.getLeftElement();			//english docno
+			int rightKey = key.getRightElement();		//german docno
 
-    public void map(PairOfInts key, IntWritable value,
-        OutputCollector<IntWritable, PairOfInts> output, Reporter reporter) throws IOException {
+			sLogger.debug(rightKey);
+			if(samplesMap==null || samplesMap.containsKey(rightKey)){
+				if(maxDist==-1 || value.get()<=maxDist){
+					output.collect(new IntWritable(rightKey), new PairOfInts(value.get(),leftKey));
+					
+					//symmetric implementation. change when not desired.
+//					output.collect(new IntWritable(leftKey), new PairOfInts(value.get(),rightKey));
+				}
+			}
 
-      int leftKey = key.getLeftElement(); // english docno
-      int rightKey = key.getRightElement(); // german docno
+		}
+	}
 
-      sLogger.debug(rightKey);
-      if (samplesMap == null || samplesMap.containsKey(rightKey)) {
-        if (maxDist == -1 || value.get() <= maxDist) {
-          output.collect(new IntWritable(rightKey), new PairOfInts(value.get(), leftKey));
+	public static class MyReducerTopN extends MapReduceBase implements
+	Reducer<IntWritable, PairOfInts, IntWritable, PairOfInts> {
+		int numResults;
+		TreeSet<PairOfInts> list = new TreeSet<PairOfInts>();
 
-          // symmetric implementation. change when not desired.
-          // output.collect(new IntWritable(leftKey), new PairOfInts(value.get(),rightKey));
-        }
-      }
+		public void configure(JobConf conf){
+			numResults = conf.getInt("Ivory.NumResults", -1);
+			sLogger.info("numResults");
+		}
 
-    }
-  }
+		public void reduce(IntWritable key, Iterator<PairOfInts> values,
+				OutputCollector<IntWritable, PairOfInts> output, Reporter reporter)
+		throws IOException {
+			list.clear();
+			while(values.hasNext()){
+				PairOfInts p = values.next();
+				list.add(new PairOfInts(p.getLeftElement(),p.getRightElement()));
+				reporter.incrCounter(mapoutput.count, 1);
+			}
+			int cntr = 0;
+			while(!list.isEmpty() && cntr<numResults){
+				output.collect(key, list.pollFirst());
+				cntr++;
+			}
+		}
 
-  public static class MyReducerTopN extends MapReduceBase implements
-      Reducer<IntWritable, PairOfInts, IntWritable, PairOfInts> {
-    int numResults;
-    TreeSet<PairOfInts> list = new TreeSet<PairOfInts>();
+	}
 
-    public void configure(JobConf conf) {
-      numResults = conf.getInt("Ivory.NumResults", -1);
-      sLogger.info("numResults");
-    }
+	
+	public static class MyMapper extends MapReduceBase implements
+	Mapper<PairOfInts, IntWritable, PairOfInts, IntWritable> {
 
-    public void reduce(IntWritable key, Iterator<PairOfInts> values,
-        OutputCollector<IntWritable, PairOfInts> output, Reporter reporter) throws IOException {
-      list.clear();
-      while (values.hasNext()) {
-        PairOfInts p = values.next();
-        list.add(new PairOfInts(p.getLeftElement(), p.getRightElement()));
-        reporter.incrCounter(mapoutput.count, 1);
-      }
-      int cntr = 0;
-      while (!list.isEmpty() && cntr < numResults) {
-        output.collect(key, list.pollFirst());
-        cntr++;
-      }
-    }
+		static Path[] localFiles;
+		HMapIIW samplesMap = null;
+		int maxDist;
+		IntWritable outValue = new IntWritable();
+		PairOfInts outKey = new PairOfInts();
+		
+		public void configure(JobConf job){
+			sLogger.setLevel(Level.INFO);
+			maxDist = job.getInt("Ivory.MaxHammingDistance", -1);
 
-  }
+			//read doc ids of sample into vectors
+			try {
+				localFiles = DistributedCache.getLocalCacheFiles(job);
+			} catch (Exception e) {
+				throw new RuntimeException("Error reading doc vectors!");
+			}
 
-  public static class MyMapper extends MapReduceBase implements
-      Mapper<PairOfInts, IntWritable, PairOfInts, IntWritable> {
+			if(localFiles != null && localFiles.length > 0){
+				samplesMap = new HMapIIW();
+				try {
+					FSLineReader reader = new FSLineReader(localFiles[0], FileSystem.getLocal(job));
+					Text t = new Text();
+					while(reader.readLine(t)!=0){
+						int docno = Integer.parseInt(t.toString());
+						sLogger.info(docno + " --> sample");
+						samplesMap.put(docno, 1);
+					}
+					reader.close();
+				} catch (IOException e1) {
+				}
+				sLogger.info(samplesMap.size()+" sampled");
+			}else{
+				sLogger.info("samples file not specified in option SampleDocnosFile");
+			}
+		}
 
-    static Path[] localFiles;
-    HMapIIW samplesMap = null;
-    int maxDist;
-    IntWritable outValue = new IntWritable();
-    PairOfInts outKey = new PairOfInts();
+		public void map(PairOfInts key, IntWritable value,
+				OutputCollector<PairOfInts, IntWritable> output,
+				Reporter reporter) throws IOException {
 
-    public void configure(JobConf job) {
-      sLogger.setLevel(Level.INFO);
-      maxDist = job.getInt("Ivory.MaxHammingDistance", -1);
+			int leftKey = key.getLeftElement();			//english docno
+			int rightKey = key.getRightElement();		//german docno
 
-      // read doc ids of sample into vectors
-      try {
-        localFiles = DistributedCache.getLocalCacheFiles(job);
-      } catch (Exception e) {
-        throw new RuntimeException("Error reading doc vectors!");
-      }
+			sLogger.debug(rightKey);
+			if(samplesMap==null || samplesMap.containsKey(rightKey)){
+				if(maxDist==-1 || value.get()<=maxDist){
+					outKey.set(leftKey, rightKey);
+					outValue.set(value.get());
+					output.collect(outKey, outValue);
+				}
+			}
+		}
+	}
+	
+	// @author: ferhanture
+	// I wrote this to be used on a text dataset. needs some fixing.
+//	public static class MyReducerAltOutput extends MapReduceBase implements
+//	Reducer<IntWritable, PairOfInts, Text, Text> {
+//		int numResults;
+//		TreeSet<PairOfInts> list = new TreeSet<PairOfInts>();
+//		private DocnoMapping mDocMapping;
+//
+//		public void configure(JobConf conf){
+//			numResults = conf.getInt("Ivory.NumResults", -1);
+//			sLogger.info("numResults");
+//			mDocMapping = new TextDocnoMapping();
+//			try {
+//				mDocMapping.loadMapping(new Path("/user/fture/doug/docno-mapping.dat"), FileSystem.get(conf));
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			}
+//		}
+//
+//		public void reduce(IntWritable key, Iterator<PairOfInts> values,
+//				OutputCollector<Text, Text> output, Reporter reporter)
+//		throws IOException {
+//			list.clear();
+//			while(values.hasNext()){
+//				PairOfInts p = values.next();
+//				list.add(new PairOfInts(p.getLeftElement(),p.getRightElement()));
+//				reporter.incrCounter(mapoutput.count, 1);
+//			}
+//			int cntr = 0;
+//			while(!list.isEmpty() && cntr<numResults){
+//				PairOfInts nextClosest = list.pollFirst();
+//				String keyDocid = mDocMapping.getDocid(key.get());
+//				String valueDocid = mDocMapping.getDocid(nextClosest.getRightElement());
+//				int dist= nextClosest.getLeftElement();
+//				output.collect(new Text(keyDocid), new Text(valueDocid+"\t"+dist));
+//				cntr++;
+//			}
+//		}
+//
+//	}
 
-      if (localFiles != null && localFiles.length > 0) {
-        samplesMap = new HMapIIW();
-        try {
-          FSLineReader reader = new FSLineReader(localFiles[0], FileSystem.getLocal(job));
-          Text t = new Text();
-          while (reader.readLine(t) != 0) {
-            int docno = Integer.parseInt(t.toString());
-            sLogger.info(docno + " --> sample");
-            samplesMap.put(docno, 1);
-          }
-          reader.close();
-        } catch (IOException e1) {
-        }
-        sLogger.info(samplesMap.size() + " sampled");
-      } else {
-        sLogger.info("samples file not specified in option SampleDocnosFile");
-      }
-    }
+	public String[] getRequiredParameters() {
+		return RequiredParameters;
+	}
 
-    public void map(PairOfInts key, IntWritable value,
-        OutputCollector<PairOfInts, IntWritable> output, Reporter reporter) throws IOException {
+	public int run(String[] args) throws Exception {
+		if (args.length != 5) {
+			printUsage();
+			return -1;
+		}
+		JobConf job = new JobConf(getConf(), FilterResults.class);
+		
+		String samplesFile = args[2]; 
+		int maxHammingDistance = Integer.parseInt(args[3]);
+		job.setInt("Ivory.MaxHammingDistance",maxHammingDistance);
+		int numResults = Integer.parseInt(args[4]);
+		job.setInt("Ivory.NumResults",numResults);
 
-      int leftKey = key.getLeftElement(); // english docno
-      int rightKey = key.getRightElement(); // german docno
+		job.setJobName("FilterResults_"+maxHammingDistance+"_"+numResults);
+		FileSystem fs2 = FileSystem.get(job);
 
-      sLogger.debug(rightKey);
-      if (samplesMap == null || samplesMap.containsKey(rightKey)) {
-        if (maxDist == -1 || value.get() <= maxDist) {
-          outKey.set(leftKey, rightKey);
-          outValue.set(value.get());
-          output.collect(outKey, outValue);
-        }
-      }
-    }
-  }
+		String inputPath2 = args[0];//job2.get("Ivory.PWSimOutputPath");
+		String outputPath2 = args[1];//job2.get("FilteredPWSimFile");
 
-  // @author: ferhanture
-  // I wrote this to be used on a text dataset. needs some fixing.
-  // public static class MyReducerAltOutput extends MapReduceBase implements
-  // Reducer<IntWritable, PairOfInts, Text, Text> {
-  // int numResults;
-  // TreeSet<PairOfInts> list = new TreeSet<PairOfInts>();
-  // private DocnoMapping mDocMapping;
-  //
-  // public void configure(JobConf conf){
-  // numResults = conf.getInt("Ivory.NumResults", -1);
-  // sLogger.info("numResults");
-  // mDocMapping = new TextDocnoMapping();
-  // try {
-  // mDocMapping.loadMapping(new Path("/user/fture/doug/docno-mapping.dat"), FileSystem.get(conf));
-  // } catch (IOException e) {
-  // e.printStackTrace();
-  // }
-  // }
-  //
-  // public void reduce(IntWritable key, Iterator<PairOfInts> values,
-  // OutputCollector<Text, Text> output, Reporter reporter)
-  // throws IOException {
-  // list.clear();
-  // while(values.hasNext()){
-  // PairOfInts p = values.next();
-  // list.add(new PairOfInts(p.getLeftElement(),p.getRightElement()));
-  // reporter.incrCounter(mapoutput.count, 1);
-  // }
-  // int cntr = 0;
-  // while(!list.isEmpty() && cntr<numResults){
-  // PairOfInts nextClosest = list.pollFirst();
-  // String keyDocid = mDocMapping.getDocid(key.get());
-  // String valueDocid = mDocMapping.getDocid(nextClosest.getRightElement());
-  // int dist= nextClosest.getLeftElement();
-  // output.collect(new Text(keyDocid), new Text(valueDocid+"\t"+dist));
-  // cntr++;
-  // }
-  // }
-  //
-  // }
+		int numMappers2 = 300;
+		int numReducers2 = 1;
 
-  public String[] getRequiredParameters() {
-    return RequiredParameters;
-  }
+		if(fs2.exists(new Path(outputPath2))){
+			sLogger.info("FilteredPwsim output already exists! Quitting...");
+			return 0;
+		}	
+		FileInputFormat.setInputPaths(job, new Path(inputPath2));
+		FileOutputFormat.setOutputPath(job, new Path(outputPath2));
+		FileOutputFormat.setCompressOutput(job, false);
 
-  public int run(String[] args) throws Exception {
-    if (args.length != 5) {
-      printUsage();
-      return -1;
-    }
-    JobConf job = new JobConf(getConf(), FilterResults.class);
+		job.set("mapred.child.java.opts", "-Xmx2048m");
+		job.setInt("mapred.map.max.attempts", 10);
+		job.setInt("mapred.reduce.max.attempts", 10);
+		job.setInt("mapred.task.timeout", 6000000);
 
-    String samplesFile = args[2];
-    int maxHammingDistance = Integer.parseInt(args[3]);
-    job.setInt("Ivory.MaxHammingDistance", maxHammingDistance);
-    int numResults = Integer.parseInt(args[4]);
-    job.setInt("Ivory.NumResults", numResults);
+		sLogger.info("Running job "+job.getJobName());
+		sLogger.info("Input directory: "+inputPath2);
+		sLogger.info("Output directory: "+outputPath2);
 
-    job.setJobName("FilterResults_" + maxHammingDistance + "_" + numResults);
-    FileSystem fs2 = FileSystem.get(job);
+		sLogger.info("Samples file: "+samplesFile);
 
-    String inputPath2 = args[0];// job2.get("Ivory.PWSimOutputPath");
-    String outputPath2 = args[1];// job2.get("FilteredPWSimFile");
+		if(!samplesFile.equals("none")){
+			DistributedCache.addCacheFile(new URI(samplesFile), job);	//sample doc vectors in file
+		}
 
-    int numMappers2 = 300;
-    int numReducers2 = 1;
+		if(numResults > 0){
+			sLogger.info("Number of results = "+numResults);
+			job.setMapperClass(MyMapperTopN.class);
+			job.setReducerClass(MyReducerTopN.class);
+			job.setMapOutputKeyClass(IntWritable.class);
+			job.setMapOutputValueClass(PairOfInts.class);
+		}else{
+			sLogger.info("Number of results = all");
+			job.setMapperClass(MyMapper.class);
+			job.setReducerClass(IdentityReducer.class);
+			job.setMapOutputKeyClass(PairOfInts.class);
+			job.setMapOutputValueClass(IntWritable.class);
+		}
+		
+		job.setNumMapTasks(numMappers2);
+		job.setNumReduceTasks(numReducers2);
+		job.setInputFormat(SequenceFileInputFormat.class);
+		//		job2.setOutputFormat(SequenceFileOutputFormat.class);			
 
-    if (fs2.exists(new Path(outputPath2))) {
-      sLogger.info("FilteredPwsim output already exists! Quitting...");
-      return 0;
-    }
-    FileInputFormat.setInputPaths(job, new Path(inputPath2));
-    FileOutputFormat.setOutputPath(job, new Path(outputPath2));
-    FileOutputFormat.setCompressOutput(job, false);
+		JobClient.runJob(job);
 
-    job.set("mapred.child.java.opts", "-Xmx2048m");
-    job.setInt("mapred.map.max.attempts", 10);
-    job.setInt("mapred.reduce.max.attempts", 10);
-    job.setInt("mapred.task.timeout", 6000000);
+		return 0;
+	}
 
-    sLogger.info("Running job " + job.getJobName());
-    sLogger.info("Input directory: " + inputPath2);
-    sLogger.info("Output directory: " + outputPath2);
-
-    sLogger.info("Samples file: " + samplesFile);
-
-    if (!samplesFile.equals("none")) {
-      DistributedCache.addCacheFile(new URI(samplesFile), job); // sample doc vectors in file
-    }
-
-    if (numResults > 0) {
-      sLogger.info("Number of results = " + numResults);
-      job.setMapperClass(MyMapperTopN.class);
-      job.setReducerClass(MyReducerTopN.class);
-      job.setMapOutputKeyClass(IntWritable.class);
-      job.setMapOutputValueClass(PairOfInts.class);
-    } else {
-      sLogger.info("Number of results = all");
-      job.setMapperClass(MyMapper.class);
-      job.setReducerClass(IdentityReducer.class);
-      job.setMapOutputKeyClass(PairOfInts.class);
-      job.setMapOutputValueClass(IntWritable.class);
-    }
-
-    job.setNumMapTasks(numMappers2);
-    job.setNumReduceTasks(numReducers2);
-    job.setInputFormat(SequenceFileInputFormat.class);
-    // job2.setOutputFormat(SequenceFileOutputFormat.class);
-
-    JobClient.runJob(job);
-
-    return 0;
-  }
-
-  public static void main(String[] args) throws Exception {
-    ToolRunner.run(new Configuration(), new FilterResults(), args);
-    return;
-  }
+	public static void main(String[] args) throws Exception{
+		ToolRunner.run(new Configuration(), new FilterResults(), args);
+		return;
+	}
 
 }

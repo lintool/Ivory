@@ -44,13 +44,10 @@ import edu.umd.cloud9.util.PowerTool;
 
 public class BuildIntDocVectorsForwardIndex extends PowerTool {
   private static final Logger LOG = Logger.getLogger(BuildIntDocVectorsForwardIndex.class);
+  protected static enum DocVectors { Count };
 
-  protected static enum DocVectors {
-    Count
-  };
-
-  private static class MyMapper extends
-      Mapper<IntWritable, IntDocVector, IntWritable, LongWritable> {
+  private static class MyMapper
+      extends Mapper<IntWritable, IntDocVector, IntWritable, LongWritable> {
     private static final LongWritable output = new LongWritable();
 
     @Override
@@ -58,7 +55,8 @@ public class BuildIntDocVectorsForwardIndex extends PowerTool {
       String file = ((FileSplit) context.getInputSplit()).getPath().getName();
       LOG.info("Input file: " + file);
 
-      PositionalSequenceFileRecordReader<IntWritable, IntDocVector> reader = new PositionalSequenceFileRecordReader<IntWritable, IntDocVector>();
+      PositionalSequenceFileRecordReader<IntWritable, IntDocVector> reader =
+          new PositionalSequenceFileRecordReader<IntWritable, IntDocVector>();
       reader.initialize(context.getInputSplit(), context);
 
       int fileNo = Integer.parseInt(file.substring(file.lastIndexOf("-") + 1));
@@ -75,14 +73,15 @@ public class BuildIntDocVectorsForwardIndex extends PowerTool {
     }
   }
 
-  private static class MyReducer extends
-      Reducer<IntWritable, LongWritable, NullWritable, NullWritable> {
+  private static class MyReducer
+      extends Reducer<IntWritable, LongWritable, NullWritable, NullWritable> {
     private FSDataOutputStream out;
     private int collectionDocumentCount;
     private int curDoc = 0;
 
     @Override
-    public void setup(Reducer<IntWritable, LongWritable, NullWritable, NullWritable>.Context context) {
+    public void setup(
+        Reducer<IntWritable, LongWritable, NullWritable, NullWritable>.Context context) {
       Configuration conf = context.getConfiguration();
       FileSystem fs;
       try {
@@ -172,8 +171,8 @@ public class BuildIntDocVectorsForwardIndex extends PowerTool {
       return 0;
     }
 
-    Job job = new Job(conf, BuildIntDocVectorsForwardIndex.class.getSimpleName() + ":"
-        + collectionName);
+    Job job = new Job(conf,
+        BuildIntDocVectorsForwardIndex.class.getSimpleName()  + ":" + collectionName);
     job.setJarByClass(BuildIntDocVectorsForwardIndex.class);
 
     FileInputFormat.setInputPaths(job, new Path(intDocVectorsPath));

@@ -30,7 +30,8 @@ import edu.umd.cloud9.debug.MemoryUsageUtils;
 
 /**
  * <p>
- * Array-based implementation of <code>DfTable</code>. Binary search is used for lookup.
+ * Array-based implementation of <code>DfTable</code>. Binary search is used
+ * for lookup.
  * </p>
  * 
  * @see ExtractDfFromPostings
@@ -38,128 +39,131 @@ import edu.umd.cloud9.debug.MemoryUsageUtils;
  * 
  */
 public class DfTableArray implements DfTable {
-  private int mNumDocs;
-  private int mNumTerms;
+	private int mNumDocs;
+	private int mNumTerms;
 
-  private int mMaxDf = 0;
-  private String mMaxDfTerm;
+	private int mMaxDf = 0;
+	private String mMaxDfTerm;
 
-  private int mDfOne = 0;
+	private int mDfOne = 0;
 
-  private String[] mTerms;
-  private int[] mDfs;
+	private String[] mTerms;
+	private int[] mDfs;
 
-  /**
-   * Creates a <code>DfTableArray</code> object.
-   * 
-   * @param file collection frequency data file
-   * @throws IOException
-   */
-  public DfTableArray(String file) throws IOException {
-    this(file, FileSystem.get(new Configuration()));
-    // for(int i=0;i<20;i++){
-    // int j= 100*i+1000;
-    // while(mDfs[j]==1){
-    // j++;
-    // }
-    // System.out.println(mTerms[j]+" "+mDfs[j]);
-    //
-    // }
-  }
+	/**
+	 * Creates a <code>DfTableArray</code> object.
+	 * 
+	 * @param file
+	 *            collection frequency data file
+	 * @throws IOException
+	 */
+	public DfTableArray(String file) throws IOException {
+		this(file, FileSystem.get(new Configuration()));
+//		for(int i=0;i<20;i++){
+//			int j= 100*i+1000;
+//			while(mDfs[j]==1){
+//				j++;
+//			}
+//			System.out.println(mTerms[j]+" "+mDfs[j]);
+//
+//		}
+	}
 
-  /**
-   * Creates a <code>DfTableArray</code> object.
-   * 
-   * @param file collection frequency data file
-   * @param fs FileSystem to read from
-   * @throws IOException
-   */
-  public DfTableArray(String file, FileSystem fs) throws IOException {
-    FSDataInputStream in = fs.open(new Path(file));
+	/**
+	 * Creates a <code>DfTableArray</code> object.
+	 * 
+	 * @param file
+	 *            collection frequency data file
+	 * @param fs
+	 *            FileSystem to read from
+	 * @throws IOException
+	 */
+	public DfTableArray(String file, FileSystem fs) throws IOException {
+		FSDataInputStream in = fs.open(new Path(file));
 
-    this.mNumDocs = in.readInt();
-    this.mNumTerms = in.readInt();
+		this.mNumDocs = in.readInt();
+		this.mNumTerms = in.readInt();
 
-    mTerms = new String[mNumTerms];
-    mDfs = new int[mNumTerms];
+		mTerms = new String[mNumTerms];
+		mDfs = new int[mNumTerms];
 
-    for (int i = 0; i < mNumTerms; i++) {
-      String term = in.readUTF();
+		for (int i = 0; i < mNumTerms; i++) {
+			String term = in.readUTF();
+			
+			//changed by Ferhan Ture : df table isn't read properly with commented line
+			//int df = WritableUtils.readVInt(in);
+			int df = in.readInt();
+			
+			mTerms[i] = term;
+			mDfs[i] = df;
 
-      // changed by Ferhan Ture : df table isn't read properly with commented line
-      // int df = WritableUtils.readVInt(in);
-      int df = in.readInt();
+			if (df > mMaxDf) {
+				mMaxDf = df;
+				mMaxDfTerm = term;
+			}
 
-      mTerms[i] = term;
-      mDfs[i] = df;
+			if (df == 1) {
+				mDfOne++;
+			}
+		}
 
-      if (df > mMaxDf) {
-        mMaxDf = df;
-        mMaxDfTerm = term;
-      }
+		in.close();
+	}
 
-      if (df == 1) {
-        mDfOne++;
-      }
-    }
+	public int getDf(String term) {
+		int index = Arrays.binarySearch(mTerms, term);
 
-    in.close();
-  }
+		if (index < 0)
+			return -1;
 
-  public int getDf(String term) {
-    int index = Arrays.binarySearch(mTerms, term);
+		return mDfs[index];
+	}
 
-    if (index < 0)
-      return -1;
+	public int getDocumentCount() {
+		return mNumDocs;
+	}
 
-    return mDfs[index];
-  }
+	public int getVocabularySize() {
+		return mNumTerms;
+	}
 
-  public int getDocumentCount() {
-    return mNumDocs;
-  }
+	public int getMaxDf() {
+		return mMaxDf;
+	}
 
-  public int getVocabularySize() {
-    return mNumTerms;
-  }
+	public String getMaxDfTerm() {
+		return mMaxDfTerm;
+	}
 
-  public int getMaxDf() {
-    return mMaxDf;
-  }
+	public int getCountOfTermWithDfOne() {
+		return mDfOne;
+	}
 
-  public String getMaxDfTerm() {
-    return mMaxDfTerm;
-  }
+	public static void main(String[] args) throws Exception {
+		if (args.length != 1) {
+			System.out.println("usage: [df-file]");
+			System.exit(-1);
+		}
 
-  public int getCountOfTermWithDfOne() {
-    return mDfOne;
-  }
+		long startingMemoryUse = MemoryUsageUtils.getUsedMemory();
 
-  public static void main(String[] args) throws Exception {
-    if (args.length != 1) {
-      System.out.println("usage: [df-file]");
-      System.exit(-1);
-    }
+		DfTableArray dfs = new DfTableArray(args[0]);
 
-    long startingMemoryUse = MemoryUsageUtils.getUsedMemory();
+		System.out.println("Number of documents: " + dfs.getDocumentCount());
+		System.out.println("Vocab size: " + dfs.getVocabularySize());
+		System.out.println("term with max df is " + dfs.getMaxDfTerm() + ", df=" + dfs.getMaxDf());
+		System.out.println(dfs.getCountOfTermWithDfOne() + " terms have df=1");
 
-    DfTableArray dfs = new DfTableArray(args[0]);
+		long endingMemoryUse = MemoryUsageUtils.getUsedMemory();
 
-    System.out.println("Number of documents: " + dfs.getDocumentCount());
-    System.out.println("Vocab size: " + dfs.getVocabularySize());
-    System.out.println("term with max df is " + dfs.getMaxDfTerm() + ", df=" + dfs.getMaxDf());
-    System.out.println(dfs.getCountOfTermWithDfOne() + " terms have df=1");
+		System.out.println("Memory usage: " + (endingMemoryUse - startingMemoryUse) + " bytes\n");
 
-    long endingMemoryUse = MemoryUsageUtils.getUsedMemory();
-
-    System.out.println("Memory usage: " + (endingMemoryUse - startingMemoryUse) + " bytes\n");
-
-    String term = null;
-    BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
-    System.out.print("Look up df of stemmed term> ");
-    while ((term = stdin.readLine()) != null) {
-      System.out.println(term + ", df=" + dfs.getDf(term));
-      System.out.print("Look up df of stemmed term > ");
-    }
-  }
+		String term = null;
+		BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
+		System.out.print("Look up df of stemmed term> ");
+		while ((term = stdin.readLine()) != null) {
+			System.out.println(term + ", df=" + dfs.getDf(term));
+			System.out.print("Look up df of stemmed term > ");
+		}
+	}
 }

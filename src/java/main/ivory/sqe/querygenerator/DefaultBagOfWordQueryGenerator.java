@@ -16,39 +16,37 @@ import org.json.JSONObject;
 public class DefaultBagOfWordQueryGenerator implements QueryGenerator {
   Tokenizer tokenizer;
   int length;
-
+  
   public DefaultBagOfWordQueryGenerator() {
-    super();
+	  super();
   }
 
-  public void init(FileSystem fs, Configuration conf) throws IOException {
-    if (conf.get(Constants.Language).equals(Constants.English)) {
-      tokenizer = new GalagoTokenizer();
-    } else if (conf.get(Constants.Language).equals(Constants.German)) {
-      tokenizer = TokenizerFactory.createTokenizer(conf.get(Constants.Language), conf
-          .get(Constants.TokenizerData), null);
-    } else if (conf.get(Constants.Language).equals(Constants.Chinese)) {
-      tokenizer = TokenizerFactory.createTokenizer(conf.get(Constants.Language), conf
-          .get(Constants.TokenizerData), null);
-    } else {
-      throw new RuntimeException("Language code " + conf.get(Constants.Language) + " not known");
-    }
-  }
+	public void init(FileSystem fs, Configuration conf) throws IOException {
+		if(conf.get(Constants.Language).equals(Constants.English)){
+			tokenizer = new GalagoTokenizer();		
+		}else if(conf.get(Constants.Language).equals(Constants.German)){
+			tokenizer = TokenizerFactory.createTokenizer(conf.get(Constants.Language), conf.get(Constants.TokenizerData), null);
+		}else if(conf.get(Constants.Language).equals(Constants.Chinese)){
+			tokenizer = TokenizerFactory.createTokenizer(conf.get(Constants.Language), conf.get(Constants.TokenizerData), null);
+		}else{
+			throw new RuntimeException("Language code "+conf.get(Constants.Language)+ " not known");
+		}
+	}
+	
+  public JSONObject parseQuery(String query){
+	  String[] tokens = tokenizer.processContent(query);
+	  length = tokens.length;
 
-  public JSONObject parseQuery(String query) {
-    String[] tokens = tokenizer.processContent(query);
-    length = tokens.length;
-
-    JSONObject queryJson = new JSONObject();
-    try {
-      queryJson.put("#combine", new JSONArray(tokens));
-    } catch (JSONException e) {
-      e.printStackTrace();
-    }
-    return queryJson;
-  }
-
-  public int getQueryLength() {
-    return length;
+	  JSONObject queryJson = new JSONObject();
+	  try {
+		  queryJson.put("#combine", new JSONArray(tokens));
+	  } catch (JSONException e) {
+		  e.printStackTrace();
+	  }
+	  return queryJson;
+ }
+  
+  public int getQueryLength(){
+	return length;  
   }
 }

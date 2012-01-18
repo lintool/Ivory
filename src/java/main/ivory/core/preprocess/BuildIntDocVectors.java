@@ -50,21 +50,17 @@ import edu.umd.cloud9.util.PowerTool;
 public class BuildIntDocVectors extends PowerTool {
   private static final Logger LOG = Logger.getLogger(BuildIntDocVectors.class);
 
-  protected static enum Docs {
-    Skipped, Total
-  }
+  protected static enum Docs { Skipped, Total }
+  protected static enum MapTime { DecodingAndIdMapping, EncodingAndSpilling }
 
-  protected static enum MapTime {
-    DecodingAndIdMapping, EncodingAndSpilling
-  }
-
-  private static class MyMapper extends
-      Mapper<IntWritable, TermDocVector, IntWritable, IntDocVector> {
+  private static class MyMapper
+      extends Mapper<IntWritable, TermDocVector, IntWritable, IntDocVector> {
     private DefaultFrequencySortedDictionary dictionary = null;
     private static final LazyIntDocVector docVector = new LazyIntDocVector();
 
     @Override
-    public void setup(Mapper<IntWritable, TermDocVector, IntWritable, IntDocVector>.Context context) {
+    public void setup(
+        Mapper<IntWritable, TermDocVector, IntWritable, IntDocVector>.Context context) {
       try {
         Configuration conf = context.getConfiguration();
         FileSystem fs = FileSystem.get(conf);
@@ -77,8 +73,8 @@ public class BuildIntDocVectors extends PowerTool {
 
         // Take a different code path if we're in standalone mode.
         if (conf.get("mapred.job.tracker").equals("local")) {
-          dictionary = new DefaultFrequencySortedDictionary(new Path(termsFile), new Path(
-              termidsFile), new Path(idToTermFile), FileSystem.getLocal(conf));
+          dictionary = new DefaultFrequencySortedDictionary(new Path(termsFile),
+              new Path(termidsFile), new Path(idToTermFile), FileSystem.getLocal(conf));
         } else {
           // We need to figure out which file in the DistributeCache is which...
           Map<String, Path> pathMapping = Maps.newHashMap();
@@ -98,9 +94,9 @@ public class BuildIntDocVectors extends PowerTool {
           LOG.info(" - id: " + pathMapping.get(termidsFile));
           LOG.info(" - idToTerms: " + pathMapping.get(idToTermFile));
 
-          dictionary = new DefaultFrequencySortedDictionary(pathMapping.get(termsFile), pathMapping
-              .get(termidsFile), pathMapping.get(idToTermFile), FileSystem.getLocal(context
-              .getConfiguration()));
+          dictionary = new DefaultFrequencySortedDictionary(pathMapping.get(termsFile),
+              pathMapping.get(termidsFile), pathMapping.get(idToTermFile),
+              FileSystem.getLocal(context.getConfiguration()));
         }
       } catch (Exception e) {
         e.printStackTrace();
@@ -109,19 +105,19 @@ public class BuildIntDocVectors extends PowerTool {
     }
 
     @Override
-    public void map(IntWritable key, TermDocVector doc, Context context) throws IOException,
-        InterruptedException {
+    public void map(IntWritable key, TermDocVector doc, Context context)
+        throws IOException, InterruptedException {
       long startTime = System.currentTimeMillis();
-      SortedMap<Integer, int[]> positions = DocumentProcessingUtils.integerizeTermDocVector(doc,
-          dictionary);
-      context.getCounter(MapTime.DecodingAndIdMapping).increment(
-          System.currentTimeMillis() - startTime);
+      SortedMap<Integer, int[]> positions =
+          DocumentProcessingUtils.integerizeTermDocVector(doc, dictionary);
+      context.getCounter(MapTime.DecodingAndIdMapping)
+          .increment(System.currentTimeMillis() - startTime);
 
       startTime = System.currentTimeMillis();
       docVector.setTermPositionsMap(positions);
       context.write(key, docVector);
-      context.getCounter(MapTime.EncodingAndSpilling).increment(
-          System.currentTimeMillis() - startTime);
+      context.getCounter(MapTime.EncodingAndSpilling)
+          .increment(System.currentTimeMillis() - startTime);
       context.getCounter(Docs.Total).increment(1);
     }
   }

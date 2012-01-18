@@ -54,13 +54,12 @@ import edu.umd.cloud9.util.PowerTool;
 public class BuildDictionary extends PowerTool {
   private static final Logger LOG = Logger.getLogger(BuildDictionary.class);
 
-  protected static enum Terms {
-    Total
-  }
+  protected static enum Terms { Total }
 
-  private static class MyReducer extends Reducer<Text, PairOfIntLong, NullWritable, NullWritable> {
-    private FSDataOutputStream termsOut, idsOut, idsToTermOut, dfByTermOut, cfByTermOut,
-        dfByIntOut, cfByIntOut;
+  private static class MyReducer
+      extends Reducer<Text, PairOfIntLong, NullWritable, NullWritable> {
+    private FSDataOutputStream termsOut, idsOut, idsToTermOut,
+        dfByTermOut, cfByTermOut, dfByIntOut, cfByIntOut;
     private int numTerms;
     private int[] seqNums = null;
     private int[] dfs = null;
@@ -85,7 +84,7 @@ public class BuildDictionary extends PowerTool {
       cfs = new long[numTerms];
 
       termsOut = fs.create(new Path(env.getIndexTermsData()), true);
-      // termsOut.writeInt(numTerms);
+      //termsOut.writeInt(numTerms);
 
       idsOut = fs.create(new Path(env.getIndexTermIdsData()), true);
       idsOut.writeInt(numTerms);
@@ -122,7 +121,7 @@ public class BuildDictionary extends PowerTool {
         throw new RuntimeException("More than one record for term: " + term);
       }
 
-      // termsOut.writeUTF(term);
+      //termsOut.writeUTF(term);
 
       terms[curKeyIndex] = term;
       seqNums[curKeyIndex] = curKeyIndex;
@@ -134,12 +133,13 @@ public class BuildDictionary extends PowerTool {
     }
 
     @Override
-    public void cleanup(Reducer<Text, PairOfIntLong, NullWritable, NullWritable>.Context context)
+    public void cleanup(
+        Reducer<Text, PairOfIntLong, NullWritable, NullWritable>.Context context)
         throws IOException {
       LOG.info("Starting cleanup.");
       if (curKeyIndex != numTerms) {
-        throw new RuntimeException("Total expected Terms: " + numTerms + ", Total observed terms: "
-            + curKeyIndex + "!");
+        throw new RuntimeException("Total expected Terms: " + numTerms +
+            ", Total observed terms: " + curKeyIndex + "!");
       }
       // Sort based on df and change seqNums accordingly.
       QuickSort.quicksortWithSecondary(seqNums, dfs, cfs, 0, numTerms - 1);
@@ -207,7 +207,8 @@ public class BuildDictionary extends PowerTool {
     }
   }
 
-  public static final String[] RequiredParameters = { Constants.CollectionName, Constants.IndexPath };
+  public static final String[] RequiredParameters = {
+      Constants.CollectionName, Constants.IndexPath };
 
   public String[] getRequiredParameters() {
     return RequiredParameters;
@@ -234,11 +235,13 @@ public class BuildDictionary extends PowerTool {
       return 0;
     }
 
-    if (fs.exists(new Path(env.getIndexTermsData()))
-        && fs.exists(new Path(env.getIndexTermIdsData()))
-        && fs.exists(new Path(env.getIndexTermIdMappingData()))
-        && fs.exists(new Path(env.getDfByTermData())) && fs.exists(new Path(env.getCfByTermData()))
-        && fs.exists(new Path(env.getDfByIntData())) && fs.exists(new Path(env.getCfByIntData()))) {
+    if (fs.exists(new Path(env.getIndexTermsData())) &&
+        fs.exists(new Path(env.getIndexTermIdsData())) &&
+        fs.exists(new Path(env.getIndexTermIdMappingData())) &&
+        fs.exists(new Path(env.getDfByTermData())) &&
+        fs.exists(new Path(env.getCfByTermData())) &&
+        fs.exists(new Path(env.getDfByIntData())) &&
+        fs.exists(new Path(env.getCfByIntData()))) {
       LOG.info("term and term id data exist: skipping!");
       return 0;
     }
@@ -249,7 +252,8 @@ public class BuildDictionary extends PowerTool {
     Path tmpPath = new Path(env.getTempDirectory());
     fs.delete(tmpPath, true);
 
-    Job job = new Job(conf, BuildDictionary.class.getSimpleName() + ":" + collectionName);
+    Job job = new Job(conf,
+        BuildDictionary.class.getSimpleName() + ":" + collectionName);
 
     job.setJarByClass(BuildDictionary.class);
     job.setNumReduceTasks(1);

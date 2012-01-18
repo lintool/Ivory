@@ -7,9 +7,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.json.JSONObject;
 
 public interface QueryGenerator {
-  public JSONObject parseQuery(String query);
-
-  public void init(FileSystem fs, Configuration conf) throws IOException;
-
-  public int getQueryLength();
+	  public JSONObject parseQuery(String query);
+	  public void init(FileSystem fs, Configuration conf) throws IOException;
+	  public int getQueryLength();
 }

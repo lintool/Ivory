@@ -1,14 +1,13 @@
 package ivory.lsh.data;
-
 import org.apache.hadoop.io.WritableComparable;
 
 import edu.umd.cloud9.io.array.ArrayListOfIntsWritable;
 
+
 /**
- * Abstract class for signatures.
- * 
+ *  Abstract class for signatures.
  * @author ferhanture
- * 
+ *
  */
 @SuppressWarnings("unchecked")
 public abstract class Signature implements WritableComparable {
@@ -28,7 +27,6 @@ public abstract class Signature implements WritableComparable {
   public abstract String toString();
 
   public abstract Signature getSubSignature(int start, int end);
-
   public abstract Signature getSubSignature(int start, int end, Signature subSign);
 
   /**
@@ -40,30 +38,29 @@ public abstract class Signature implements WritableComparable {
   /**
    * @param signature
    * @param threshold
-   * @return compute hamming distance between this object and signature. early terminate if distance
-   *         exceeds threshold.
+   * @return compute hamming distance between this object and signature. early terminate if distance exceeds threshold.
    */
   public abstract int hammingDistance(Signature signature, int threshold);
 
   /**
-   * @param permutation permute this object w.r.t permutation object and save permuted signature in
-   *        permSign
+   * @param permutation
+   * permute this object w.r.t permutation object and save permuted signature in permSign
    */
   public abstract void perm(ArrayListOfIntsWritable permutation, Signature permSign);
-
-  /**
-   * @param permutation
-   * @return permute this object w.r.t permutation object and return permuted signature
-   */
-  public abstract Signature perm(ArrayListOfIntsWritable permutation);
+  
+/**
+ * @param permutation
+ * @return permute this object w.r.t permutation object and return permuted signature
+ */
+public abstract Signature perm(ArrayListOfIntsWritable permutation);
 
   @SuppressWarnings("unchecked")
-  public static Signature createSignature(Class subClass, int size) {
-    if (subClass.equals(NBitSignature.class) || subClass.equals(SixtyFourBitSignature.class)) {
+  public static Signature createSignature(Class subClass, int size){
+    if(subClass.equals(NBitSignature.class) || subClass.equals(SixtyFourBitSignature.class)){
       return new NBitSignature(size);
-    } else if (subClass.equals(MinhashSignature.class)) {
+    }else if(subClass.equals(MinhashSignature.class)){
       return new MinhashSignature(size);
-    } else {
+    }else{
       throw new RuntimeException("Unidentified class");
     }
   }
@@ -73,3 +70,4 @@ public abstract class Signature implements WritableComparable {
   }
 
 }
+

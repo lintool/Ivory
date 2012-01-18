@@ -22,82 +22,82 @@ import edu.umd.cloud9.io.pair.PairOfInts;
  * Read in sequence file format and output as text format.
  * 
  * @author ferhanture
- * 
+ *
  */
 @SuppressWarnings("deprecation")
 public class OutputResultsAsText extends Configured implements Tool {
-  public static final String[] RequiredParameters = {};
-  private static final Logger sLogger = Logger.getLogger(OutputResultsAsText.class);
+	public static final String[] RequiredParameters = {};
+	private static final Logger sLogger = Logger.getLogger(OutputResultsAsText.class);
 
-  static enum mapoutput {
-    count
-  };
+	static enum mapoutput{
+		count
+	};
 
-  private static int printUsage() {
-    System.out.println("usage: [input-path] [output-path]");
-    return -1;
-  }
+	private static int printUsage() {
+		System.out.println("usage: [input-path] [output-path]");
+		return -1;
+	}
 
-  public OutputResultsAsText() {
-    super();
-  }
+	public OutputResultsAsText() {
+		super();
+	}
 
-  public String[] getRequiredParameters() {
-    return RequiredParameters;
-  }
+	public String[] getRequiredParameters() {
+		return RequiredParameters;
+	}
 
-  public int run(String[] args) throws Exception {
-    if (args.length != 2) {
-      printUsage();
-      return -1;
-    }
-    JobConf job = new JobConf(getConf(), OutputResultsAsText.class);
+	public int run(String[] args) throws Exception {
+		if (args.length != 2) {
+			printUsage();
+			return -1;
+		}
+		JobConf job = new JobConf(getConf(), OutputResultsAsText.class);
 
-    job.setJobName("OutputAsText");
-    FileSystem fs = FileSystem.get(job);
+		job.setJobName("OutputAsText");
+		FileSystem fs = FileSystem.get(job);
 
-    String inputPath = args[0];
-    String outputPath = args[1];
+		String inputPath = args[0];
+		String outputPath = args[1];
 
-    int numMappers = 300;
-    int numReducers = 1;
+		int numMappers = 300;
+		int numReducers = 1;
 
-    if (fs.exists(new Path(outputPath))) {
-      sLogger.info("Output already exists! Quitting...");
-      return 0;
-    }
-    FileInputFormat.setInputPaths(job, new Path(inputPath));
-    FileOutputFormat.setOutputPath(job, new Path(outputPath));
-    FileOutputFormat.setCompressOutput(job, false);
+		if(fs.exists(new Path(outputPath))){
+			sLogger.info("Output already exists! Quitting...");
+			return 0;
+		}	
+		FileInputFormat.setInputPaths(job, new Path(inputPath));
+		FileOutputFormat.setOutputPath(job, new Path(outputPath));
+		FileOutputFormat.setCompressOutput(job, false);
 
-    job.set("mapred.child.java.opts", "-Xmx2048m");
-    job.setInt("mapred.map.max.attempts", 10);
-    job.setInt("mapred.reduce.max.attempts", 10);
-    job.setInt("mapred.task.timeout", 6000000);
+		job.set("mapred.child.java.opts", "-Xmx2048m");
+		job.setInt("mapred.map.max.attempts", 10);
+		job.setInt("mapred.reduce.max.attempts", 10);
+		job.setInt("mapred.task.timeout", 6000000);
 
-    sLogger.info("Running job " + job.getJobName());
-    sLogger.info("Input directory: " + inputPath);
-    sLogger.info("Output directory: " + outputPath);
+		sLogger.info("Running job "+job.getJobName());
+		sLogger.info("Input directory: "+inputPath);
+		sLogger.info("Output directory: "+outputPath);
 
-    job.setMapperClass(IdentityMapper.class);
-    job.setReducerClass(IdentityReducer.class);
+		job.setMapperClass(IdentityMapper.class);
+		job.setReducerClass(IdentityReducer.class);
 
-    job.setMapOutputKeyClass(PairOfInts.class);
-    job.setMapOutputValueClass(IntWritable.class);
-    job.setOutputKeyClass(PairOfInts.class);
-    job.setOutputValueClass(IntWritable.class);
-    job.setNumMapTasks(numMappers);
-    job.setNumReduceTasks(numReducers);
-    job.setInputFormat(SequenceFileInputFormat.class);
+		job.setMapOutputKeyClass(PairOfInts.class);
+		job.setMapOutputValueClass(IntWritable.class);
+		job.setOutputKeyClass(PairOfInts.class);
+		job.setOutputValueClass(IntWritable.class);
+		job.setNumMapTasks(numMappers);
+		job.setNumReduceTasks(numReducers);
+		job.setInputFormat(SequenceFileInputFormat.class);
 
-    JobClient.runJob(job);
+		JobClient.runJob(job);
 
-    return 0;
-  }
+		return 0;
+	}
 
-  public static void main(String[] args) throws Exception {
-    ToolRunner.run(new Configuration(), new OutputResultsAsText(), args);
-    return;
-  }
+	public static void main(String[] args) throws Exception{
+		ToolRunner.run(new Configuration(), new OutputResultsAsText(), args);
+		return;
+	}
 
 }

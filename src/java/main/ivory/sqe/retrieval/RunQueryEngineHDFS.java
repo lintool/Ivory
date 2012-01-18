@@ -23,63 +23,60 @@ import edu.umd.cloud9.mapred.NullInputFormat;
 import edu.umd.cloud9.mapred.NullMapper;
 import edu.umd.cloud9.mapred.NullOutputFormat;
 
-@SuppressWarnings( { "deprecation" })
-public class RunQueryEngineHDFS extends Configured implements Tool {
 
-  private static final Logger LOG = Logger.getLogger(RunQueryEngineHDFS.class);
+@SuppressWarnings({ "deprecation" })
+public class RunQueryEngineHDFS extends Configured implements Tool  {
 
-  private static enum Time {
-    Query
-  };
+	private static final Logger LOG = Logger.getLogger(RunQueryEngineHDFS.class);
+	private static enum Time { Query };
 
-  private static class QueryRunner extends NullMapper {
-    public void run(JobConf conf, Reporter reporter) throws IOException {
-      FileSystem fs = FileSystem.get(conf);
-      QueryEngine qe;
-      try {
-        LOG.info("Initializing QueryEngine...");
-        qe = new QueryEngine(conf, fs);
-        LOG.info("Running the queries ...");
-        long start = System.currentTimeMillis();
-        qe.runQueries(conf);
-        long end = System.currentTimeMillis();
+	private static class QueryRunner extends NullMapper {
+		public void run(JobConf conf, Reporter reporter) throws IOException {
+			FileSystem fs = FileSystem.get(conf);
+			QueryEngine qe;
+			try {
+				LOG.info("Initializing QueryEngine...");
+				qe = new QueryEngine(conf, fs);
+				LOG.info("Running the queries ...");
+				long start = System.currentTimeMillis();
+				qe.runQueries(conf);
+				long end = System.currentTimeMillis();
 
-        reporter.incrCounter(Time.Query, (end - start));
-      } catch (Exception e) {
-        throw new RuntimeException(e);
-      }
+				reporter.incrCounter(Time.Query, (end - start));
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+			
+			RunQueryEngine.eval(qe, conf);
+		}
+	}
+	
+	public int run(String[] args) throws Exception {
+		Configuration conf = RunQueryEngine.parseArgs(args);
+		
+		JobConf job = new JobConf(conf, RunQueryEngineHDFS.class);
+		job.setJobName(getClass().getSimpleName());
 
-      RunQueryEngine.eval(qe, conf);
-    }
-  }
+		job.setNumMapTasks(1);
+		job.setNumReduceTasks(0);
 
-  public int run(String[] args) throws Exception {
-    Configuration conf = RunQueryEngine.parseArgs(args);
+		job.setInputFormat(NullInputFormat.class);
+		job.setOutputFormat(NullOutputFormat.class);
+		job.setMapperClass(QueryRunner.class);
 
-    JobConf job = new JobConf(conf, RunQueryEngineHDFS.class);
-    job.setJobName(getClass().getSimpleName());
+		job.set("mapred.child.java.opts", "-Xmx16g");
 
-    job.setNumMapTasks(1);
-    job.setNumReduceTasks(0);
+		JobClient client = new JobClient(job);
+		client.submitJob(job);
 
-    job.setInputFormat(NullInputFormat.class);
-    job.setOutputFormat(NullOutputFormat.class);
-    job.setMapperClass(QueryRunner.class);
+		LOG.info("runner started!");
+		return 0;
+	}
 
-    job.set("mapred.child.java.opts", "-Xmx16g");
+	public RunQueryEngineHDFS() {}
 
-    JobClient client = new JobClient(job);
-    client.submitJob(job);
-
-    LOG.info("runner started!");
-    return 0;
-  }
-
-  public RunQueryEngineHDFS() {
-  }
-
-  public static void main(String[] args) throws Exception {
-    ToolRunner.run(new RunQueryEngineHDFS(), args);
-  }
+	public static void main(String[] args) throws Exception {
+		ToolRunner.run(new RunQueryEngineHDFS(), args);
+	}
 
 }

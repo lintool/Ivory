@@ -44,12 +44,10 @@ import edu.umd.cloud9.util.PowerTool;
 
 public class BuildTermDocVectorsForwardIndex extends PowerTool {
   private static final Logger LOG = Logger.getLogger(BuildTermDocVectorsForwardIndex.class);
+  protected static enum Dictionary { Size };
 
-  protected static enum Dictionary {
-    Size
-  };
-
-  private static class MyMapper extends Mapper<IntWritable, IntDocVector, IntWritable, Text> {
+  private static class MyMapper
+      extends Mapper<IntWritable, IntDocVector, IntWritable, Text> {
     private static final Text output = new Text();
 
     @Override
@@ -57,7 +55,8 @@ public class BuildTermDocVectorsForwardIndex extends PowerTool {
       String file = ((FileSplit) context.getInputSplit()).getPath().getName();
       LOG.info("Input file: " + file);
 
-      PositionalSequenceFileRecordReader<IntWritable, IntDocVector> reader = new PositionalSequenceFileRecordReader<IntWritable, IntDocVector>();
+      PositionalSequenceFileRecordReader<IntWritable, IntDocVector> reader =
+          new PositionalSequenceFileRecordReader<IntWritable, IntDocVector>();
       reader.initialize(context.getInputSplit(), context);
 
       int fileNo = Integer.parseInt(file.substring(file.lastIndexOf("-") + 1));
@@ -75,14 +74,16 @@ public class BuildTermDocVectorsForwardIndex extends PowerTool {
     }
   }
 
-  private static class MyReducer extends Reducer<IntWritable, Text, NullWritable, NullWritable> {
+  private static class MyReducer
+      extends Reducer<IntWritable, Text, NullWritable, NullWritable> {
     FSDataOutputStream out;
 
     int collectionDocumentCount;
     int curDoc = 0;
 
     @Override
-    public void setup(Reducer<IntWritable, Text, NullWritable, NullWritable>.Context context) {
+    public void setup(
+        Reducer<IntWritable, Text, NullWritable, NullWritable>.Context context) {
       Configuration conf = context.getConfiguration();
       FileSystem fs;
       try {
@@ -110,8 +111,8 @@ public class BuildTermDocVectorsForwardIndex extends PowerTool {
     }
 
     @Override
-    public void reduce(IntWritable key, Iterable<Text> values, Context context) throws IOException,
-        InterruptedException {
+    public void reduce(IntWritable key, Iterable<Text> values, Context context)
+        throws IOException, InterruptedException {
       Iterator<Text> iter = values.iterator();
       String[] s = iter.next().toString().split("\\s+");
 
@@ -134,8 +135,8 @@ public class BuildTermDocVectorsForwardIndex extends PowerTool {
       out.close();
 
       if (curDoc != collectionDocumentCount) {
-        throw new IOException("Expected " + collectionDocumentCount + " docs, actually got "
-            + curDoc + " terms!");
+        throw new IOException("Expected " + collectionDocumentCount
+            + " docs, actually got " + curDoc + " terms!");
       }
     }
   }
@@ -172,8 +173,8 @@ public class BuildTermDocVectorsForwardIndex extends PowerTool {
       return 0;
     }
 
-    Job job = new Job(conf, BuildTermDocVectorsForwardIndex.class.getSimpleName() + ":"
-        + collectionName);
+    Job job = new Job(conf,
+        BuildTermDocVectorsForwardIndex.class.getSimpleName() + ":" + collectionName);
     job.setJarByClass(BuildTermDocVectorsForwardIndex.class);
 
     FileInputFormat.setInputPaths(job, new Path(env.getTermDocVectorsDirectory()));
