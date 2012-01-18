@@ -111,16 +111,15 @@ public class BuildTargetLangWeightedIntDocVectors extends PowerTool {
 			sLogger.debug("===================================BEGIN READ DOC");
 			sum2 = 0;
 
-			for (MapKF.Entry<String> entry : doc.entrySet()){
+			for (MapKF.Entry<String> entry : doc.entrySet()) {
 				String eTerm = entry.getKey();
 				int e = engVocabH.get(eTerm);
-				if(e<0){
+				if (e < 0) {
 					sLogger.debug(eTerm+ " term in doc not found in aligner vocab");
 					continue;
 				}
 				float score = entry.getValue(); 
-				if(normalize)
-				{
+				if (normalize) {
 					sum2+=score*score;
 				}
 				weightedVector.put(e, score);
@@ -128,7 +127,7 @@ public class BuildTargetLangWeightedIntDocVectors extends PowerTool {
 			sLogger.debug("===================================END READ DOC");
 			
 			weightedVectorOut.setWeightedTerms(weightedVector);
-			if(normalize){
+			if (normalize) {
 				/*length-normalize doc vectors*/
 				sum2 = (float) Math.sqrt(sum2);
 				weightedVectorOut.normalizeWith(sum2);
@@ -191,7 +190,7 @@ public class BuildTargetLangWeightedIntDocVectors extends PowerTool {
 		conf.setNumReduceTasks(0);
 		conf.setInt("mapred.min.split.size", minSplitSize);
 		conf.set("mapred.child.java.opts", "-Xmx2048m");
-		conf.setBoolean("Ivory.Normalize", getConf().getBoolean("Ivory.Normalize", false));
+		conf.setBoolean("Ivory.Normalize", getConf().getBoolean("Ivory.Normalize", true));
 		FileInputFormat.setInputPaths(conf, inputPath);
 		FileOutputFormat.setOutputPath(conf, weightedVectorsPath);
 

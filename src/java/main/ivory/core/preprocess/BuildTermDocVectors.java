@@ -356,6 +356,7 @@ public class BuildTermDocVectors extends PowerTool {
     env.writeDocnoOffset(docnoOffset);
 
     conf.set("mapred.child.java.opts", "-Xmx2048m");
+    conf.set("mapred.task.timeout", "6000000");			// needed for stragglers (e.g., very long documents in Wikipedia)
 
     Job job1 = new Job(conf,
         BuildTermDocVectors.class.getSimpleName() + ":" + collectionName);

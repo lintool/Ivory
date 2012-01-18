@@ -2,6 +2,7 @@ package ivory.core.tokenize;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
+import org.mortbay.log.Log;
 
 import edu.umd.hooka.VocabularyWritable;
 
@@ -56,6 +57,7 @@ public class TokenizerFactory {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+			Log.info("Language code:"+lang);
 			throw new RuntimeException(e);
 		}
 	}

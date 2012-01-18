@@ -770,6 +770,7 @@ public class OpenNLPTokenizer extends ivory.core.tokenize.Tokenizer {
 	};
 	private final Set<String> stopwords = Sets.newHashSet(TERRIER_STOP_WORDS);
 	VocabularyWritable vocab;
+	private boolean isStopwordRemoval = true;
 
 	public OpenNLPTokenizer(){
 		super();
@@ -786,12 +787,13 @@ public class OpenNLPTokenizer extends ivory.core.tokenize.Tokenizer {
 		} 
 		setTokenizer(fs, new Path(mJobConf.get("Ivory.TokenizerModel")));
 		setLanguageAndStemmer(mJobConf.get("Ivory.Lang"));
+		
 		VocabularyWritable vocab;
 		try {
 			vocab = (VocabularyWritable) HadoopAlign.loadVocab(new Path(mJobConf.get("Ivory.CollectionVocab")), fs);
 			setVocab(vocab);
 		} catch (Exception e) {
-			sLogger.warn("VOCAB IS NULL!");
+			sLogger.warn("No vocabulary provided to tokenizer.");
 			vocab = null;
 		}
 	}
@@ -805,7 +807,7 @@ public class OpenNLPTokenizer extends ivory.core.tokenize.Tokenizer {
 			vocab = (VocabularyWritable) HadoopAlign.loadVocab(new Path(mJobConf.get("Ivory.CollectionVocab")), fs);
 			setVocab(vocab);
 		} catch (Exception e) {
-			sLogger.warn("VOCAB IS NULL!");
+			sLogger.warn("No vocabulary provided to tokenizer.");
 			vocab = null;
 		}
 	}
@@ -859,7 +861,10 @@ public class OpenNLPTokenizer extends ivory.core.tokenize.Tokenizer {
 		List<String> stemmedTokens = new ArrayList<String>();
 		for(String token : tokens){
 			token = removeNonUnicodeChars(token);
-			if(isDiscard(token))	continue;
+			if(isDiscard(token)){
+				sLogger.warn("Discarded stopword "+token);
+				continue;
+			}
 
 			//apply stemming on token
 			String stemmed = token;
@@ -891,7 +896,8 @@ public class OpenNLPTokenizer extends ivory.core.tokenize.Tokenizer {
 	}
 
 	public boolean isDiscard(String token) {
-		return ((lang==ENGLISH && stopwords.contains(token)) || delims.contains(token) || token.length() < MIN_LENGTH || token.length() > MAX_LENGTH);
+		return ((lang==ENGLISH && isStopwordRemoval && stopwords.contains(token)) || delims.contains(token) || token.length() < MIN_LENGTH || token.length() > MAX_LENGTH);
+//		return (delims.contains(token) || token.length() < MIN_LENGTH || token.length() > MAX_LENGTH);
 	}
 
 	@Override

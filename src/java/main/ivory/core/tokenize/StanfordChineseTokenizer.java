@@ -1,5 +1,7 @@
 package ivory.core.tokenize;
 
+import ivory.core.Constants;
+
 import java.io.IOException;
 import java.util.Properties;
 import org.apache.hadoop.conf.Configuration;
@@ -29,16 +31,16 @@ public class StanfordChineseTokenizer extends Tokenizer {
 	@Override
 	public void configure(Configuration conf) {
 		Properties props = new Properties();
-		props.setProperty("sighanCorporaDict", conf.get("Ivory.TokenizerModel"));		//data
-		props.setProperty("serDictionary",conf.get("Ivory.TokenizerModel")+"/dict-chris6.ser");//"data/dict-chris6.ser.gz");
+		props.setProperty("sighanCorporaDict", conf.get(Constants.TokenizerData));		//data
+		props.setProperty("serDictionary",conf.get(Constants.TokenizerData)+"/dict-chris6.ser");//"data/dict-chris6.ser.gz");
 		props.setProperty("inputEncoding", "UTF-8");
 		props.setProperty("sighanPostProcessing", "true");
 
 		try {
 			FileSystem fs = FileSystem.get(conf);		
 			classifier = new CRFClassifier(props);
-			FSDataInputStream in = fs.open(new Path(conf.get("Ivory.TokenizerModel")+"/pku"));
-			FSDataInputStream inDict = fs.open(new Path(conf.get("Ivory.TokenizerModel")+"/dict-chris6.ser"));
+			FSDataInputStream in = fs.open(new Path(conf.get(Constants.TokenizerData)+"/pku"));
+			FSDataInputStream inDict = fs.open(new Path(conf.get(Constants.TokenizerData)+"/dict-chris6.ser"));
 			classifier.loadClassifier(in, props);			//data/pku.gz
 			classifier.flags.setConf(conf);
 			readerWriter = classifier.makeReaderAndWriter(inDict);
@@ -50,15 +52,15 @@ public class StanfordChineseTokenizer extends Tokenizer {
 	@Override
 	public void configure(Configuration conf, FileSystem fs) {
 		Properties props = new Properties();
-		props.setProperty("sighanCorporaDict", conf.get("Ivory.TokenizerModel"));		//data
-		props.setProperty("serDictionary",conf.get("Ivory.TokenizerModel")+"/dict-chris6.ser");//"data/dict-chris6.ser.gz");
+		props.setProperty("sighanCorporaDict", conf.get(Constants.TokenizerData));		//data
+		props.setProperty("serDictionary",conf.get(Constants.TokenizerData)+"/dict-chris6.ser");//"data/dict-chris6.ser.gz");
 		props.setProperty("inputEncoding", "UTF-8");
 		props.setProperty("sighanPostProcessing", "true");
 
 		try {
 			classifier = new CRFClassifier(props);
-			FSDataInputStream in = fs.open(new Path(conf.get("Ivory.TokenizerModel")+"/pku"));
-			FSDataInputStream inDict = fs.open(new Path(conf.get("Ivory.TokenizerModel")+"/dict-chris6.ser"));
+			FSDataInputStream in = fs.open(new Path(conf.get(Constants.TokenizerData)+"/pku"));
+			FSDataInputStream inDict = fs.open(new Path(conf.get(Constants.TokenizerData)+"/dict-chris6.ser"));
 			classifier.loadClassifier(in, props);			//data/pku.gz
 			classifier.flags.setConf(conf);
 			readerWriter = classifier.makeReaderAndWriter(inDict);
@@ -71,6 +73,7 @@ public class StanfordChineseTokenizer extends Tokenizer {
 	public String[] processContent(String text) {
 		String[] tokens = null;
 		try {
+			text = text.toLowerCase();
 			tokens = classifier.classifyStringAndReturnAnswers(text, readerWriter);
 		} catch (IOException e) {
 			sLogger.info("Problem in tokenizing Chinese");

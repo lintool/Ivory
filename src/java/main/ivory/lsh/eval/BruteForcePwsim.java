@@ -60,6 +60,10 @@ public class BruteForcePwsim extends Configured implements Tool {
 		Total, Emitted, DEBUG, DEBUG2, Total2
 	};
 
+	static enum Sample{
+		Size
+	};
+	
 	private static int printUsage() {
 		System.out.println("usage: [type = signature|termdocvector|intdocvector] [input-path] [output-path] [sample-path] [threshold] [num-results = -1 for all]");
 		return -1;
@@ -95,7 +99,6 @@ public class BruteForcePwsim extends Configured implements Tool {
 			} catch (Exception e) {
 				throw new RuntimeException("Error reading doc vectors from "+(localFiles!=null ? localFiles[0] : "null"));
 			}
-			sLogger.info(vectors.size());
 		}
 
 		public void map(IntWritable docno, WeightedIntDocVector docvector,
@@ -154,9 +157,9 @@ public class BruteForcePwsim extends Configured implements Tool {
 				
 				float cs = CLIRUtils.cosine(docvector, fromSample); 
 				if(cs >= threshold){
-//					sLogger.debug(sampleDocno + "," + fromSample+"\n"+fromSample.length());
-//					sLogger.debug(docno + "," + docvector+"\n"+docvector.length());
-//					sLogger.debug(cs);
+					sLogger.debug(sampleDocno + "," + fromSample+"\n"+fromSample.length());
+					sLogger.debug(docno + "," + docvector+"\n"+docvector.length());
+					sLogger.debug(cs);
 					reporter.incrCounter(Pairs.Emitted, 1);
 					output.collect(new IntWritable(sampleDocno.get()), new PairOfFloatInt(cs,docno.get()));
 				}
@@ -232,7 +235,7 @@ public class BruteForcePwsim extends Configured implements Tool {
 		NumberFormat nf;
 		
 		public void configure(JobConf conf){
-			sLogger.setLevel(Level.DEBUG);
+			sLogger.setLevel(Level.INFO);
 			numResults = conf.getInt("Ivory.NumResults", Integer.MAX_VALUE);
 			nf = NumberFormat.getInstance();
 			nf.setMaximumFractionDigits(3);
@@ -319,10 +322,11 @@ public class BruteForcePwsim extends Configured implements Tool {
 		}else if(args[0].contains("vector")){
 			if(args[0].contains("term")){
 				job.setMapperClass(MyMapperTermDocVectors.class);
+				job.setJobName("BruteForcePwsim_termdocvector_D="+numBits+"_"+threshold+"_"+(numResults>0 ? numResults : "all"));
 			}else{
 				job.setMapperClass(MyMapperDocVectors.class);
+				job.setJobName("BruteForcePwsim_intdocvector_D="+numBits+"_"+threshold+"_"+(numResults>0 ? numResults : "all"));
 			}
-			job.setJobName("BruteForcePwsim_docvector_D="+numBits+"_"+threshold+"_"+(numResults>0 ? numResults : "all"));
 			job.setFloat("Ivory.CosineThreshold", threshold);
 			
 		}

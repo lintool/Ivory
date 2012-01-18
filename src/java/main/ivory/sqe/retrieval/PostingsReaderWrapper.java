@@ -28,7 +28,7 @@ public class PostingsReaderWrapper {
   protected PostingsReader postingsReader = null;
 
   protected boolean endOfList = true; // Whether or not we're at the end of the postings list.
-  protected int lastScoredDocno = 0;
+  protected int lastScoredDocno = 0, iterStart = 0, iterStep = 1;
 
   protected String operator, term;
   protected JSONArray values;
@@ -36,14 +36,26 @@ public class PostingsReaderWrapper {
   protected GlobalTermEvidence gte;
   protected GlobalEvidence ge;
     
+  protected boolean isOOV = false;
+  protected float[] weights;
+  
   public PostingsReaderWrapper(JSONObject query, RetrievalEnvironment env, ScoringFunction scoringFunction, GlobalEvidence ge) throws JSONException {
 	  this.operator = query.keys().next();
 	  this.values = query.getJSONArray(operator);
 
-	  //LOG.info("operator= "+operator);
-	  //LOG.info("values= "+values.toString());
+	  LOG.info("operator= "+operator);
+	  LOG.info("values= "+values.toString());
 
+	  if(operator.equals("#weight")){
+		  iterStart = 1;
+		  iterStep = 2;
+		  weights = new float[values.length()/2];
+		  for (int i = 0; i < values.length(); i = i + iterStep) {
+			  weights[i/2] = (float) values.getDouble(i);
+		  }
 
+	  }
+	  
 	  this.env = Preconditions.checkNotNull(env);
 	  this.scoringFunction = Preconditions.checkNotNull(scoringFunction);
 
@@ -52,20 +64,22 @@ public class PostingsReaderWrapper {
 
 	  // If this is not a leaf node, create children
 	  children = new ArrayList<PostingsReaderWrapper>();
-	  //LOG.info("non-leaf node with "+values.length()+" children");
-	  for(int i=0; i<values.length(); i++){
-		  //LOG.info("child "+i+":");
+	  LOG.info("non-leaf node with "+values.length()+" children");
+	  for (int i = iterStart; i < values.length(); i = i + iterStep) {
+		  LOG.info("child "+i+":");
 		  JSONObject child = values.optJSONObject(i);
 		  //LOG.info(child);
 		  if(child != null){
+			  // If child is an object (non-leaf), call nonleaf-constructor
 			  children.add(new PostingsReaderWrapper(values.getJSONObject(i), env, scoringFunction, ge));
 		  }else{
+			  // If child is leaf, call leaf-constructor
 			  children.add(new PostingsReaderWrapper(values.getString(i), env, scoringFunction, ge));
 		  }
 	  }
 
 	  lastScoredDocno = 0;
-	  //LOG.info("non-leaf done.");
+	  LOG.info("non-leaf done.");
   }
   
   public PostingsReaderWrapper(String term, RetrievalEnvironment env, ScoringFunction scoringFunction, GlobalEvidence ge) throws JSONException {
@@ -76,64 +90,41 @@ public class PostingsReaderWrapper {
 	  endOfList = false;
 
 	  // If this is a leaf node (i.e., single term), create postings list
-	  ////LOG.info("leaf node");
+	  LOG.info("leaf node");
 	  
 	  operator = "term";
 	  this.term = term;
 	  
 	  PostingsList pl = env.getPostingsList(term);
-
-	  
-//----------BEGIN LOCAL_USAGE
-
-//	  PostingsListDocSortedNonPositional pl = new PostingsListDocSortedNonPositional();
-//	  int docno = 0;
-//	  int df = ((int) (Math.random()*19))+1;
-//	  int docnos[] = new int[df];
-//	  short tfs[] = new short[df];
-//	  int cf = 0;
-//	  for(int i=0;i<df;i++){
-//		  if(docno == 20){
-//			  df = i;
-//			  break;
-//		  }
-//		  docno = ((int) (Math.random()*(19-docno-1)))+docno+1;  //prevdocno+1....20
-//		  docnos[i] = docno;
-//		  tfs[i] = (short) (Math.random()*5+1);		//1...6
-//		  cf += tfs[i];
-//	  }
-//	  pl.setDf(df);
-//	  pl.setCf(cf);
-//	  pl.setCollectionDocumentCount(20);
-//	  for(int i=0;i<df;i++){
-//		  pl.add(docnos[i], tfs[i]);
-//	  }
-	  
-//---------END LOCAL_USAGE
-	  postingsReader = pl.getPostingsReader();
-	  gte = new GlobalTermEvidence(pl.getDf(), pl.getCf());
-	  this.ge = ge;
-
-	  lastScoredDocno = 0;
-	  ////LOG.info("leaf done.");
+	  if (pl == null) {
+		  isOOV = true;
+		  endOfList = true;
+	  } else{
+		  postingsReader = pl.getPostingsReader();
+		  gte = new GlobalTermEvidence(pl.getDf(), pl.getCf());
+		  this.ge = ge;
+		  lastScoredDocno = 0;
+	  }
+	  LOG.info("leaf done.");
   }
 
 
   public float computeScore(int curDocno) {
-	//LOG.info("Scoring...");
+	LOG.info("Scoring... docno="+curDocno+" node="+this.toString());
 	float score = 0;
-
-    // If this is not a leaf node, compute scores from children and combine them w.r.t operator
-    if (!operator.equals("term")) {
-    	//LOG.info("non-leaf node");
+	if (isOOV) {
+		
+	}else if (!operator.equals("term")) {
+		// If this is not a leaf node, compute scores from children and combine them w.r.t operator
     	float[] scores = new float[children.size()];
+    	LOG.info(children.size()+" children");
     	for (int i = 0; i < children.size(); i++) {
+//    	    LOG.info("Scoring child "+ children.get(i).toString() + "...");
     		scores[i] = children.get(i).computeScore(curDocno);
-    	    //LOG.info("Child "+ i + " score = " + scores[i]);
+//    	    LOG.info("Child score: "+ scores[i]);
     	}
     	score = runOperator(scores);
-	    //System.out.println("non-leaf score = " + score);
-    }else{
+    }else {
     	//System.out.println("leaf node");
 	    // Advance postings reader. Invariant: curPosting will always point to
 	    // the next posting that has not yet been scored.
@@ -154,22 +145,28 @@ public class PostingsReaderWrapper {
 	    int docLen = env.getDocumentLength(curDocno);
 		this.scoringFunction.initialize(gte, ge);
 		score = scoringFunction.getScore(tf, docLen);
-	    lastScoredDocno = curDocno;
-	    
-	    //LOG.info("leaf score = " + score);
+
+	    lastScoredDocno = curDocno;    
     }
+	LOG.info("Final score of " + this.toString() +" = "+score+ "\n===============");
     return score;
 }
 
   private float runOperator(float[] scores) {
 	if (this.operator.equals("#combine")) {
 		float finalScore = 0;
-		for (int i = 0; i < scores.length; i++){
+		for (int i = 0; i < scores.length; i++) {
 			finalScore += scores[i];
 		}
 		return finalScore;
 	}else if (this.operator.equals("#or")) {
 		return 0;
+	}else if (this.operator.equals("#weight")) {
+		float finalScore = 0;
+		for (int i = 0; i < scores.length; i++) {
+			finalScore += scores[i]*weights[i];
+		}
+		return finalScore;
 	}else{
 		return 0;		
 	}
@@ -181,7 +178,9 @@ public class PostingsReaderWrapper {
    * @return next smallest docno from posting lists of leaf nodes
    */
   public int getNextCandidate(int docno) {
-	if (postingsReader == null) { // not a leaf node
+	 if (isOOV) {
+		 return docno;
+	 }else if (postingsReader == null) { // not a leaf node
     	for (int i = 0; i < children.size(); i++) {
     		int nextDocno = children.get(i).getNextCandidate(docno);
     		if (nextDocno < docno) {
@@ -189,7 +188,7 @@ public class PostingsReaderWrapper {
     		}
     	}
     	return docno;
-    }else{	// leaf node
+    }else {	// leaf node
     	if (endOfList) {
             return Integer.MAX_VALUE;
     	}
@@ -232,5 +231,15 @@ public class PostingsReaderWrapper {
 
   public ScoringFunction getScoringFunction() {
     return this.scoringFunction;
+  }
+  
+  public String toString() {
+		 if (isOOV) {
+			 return "OOV";
+		 }else if (postingsReader == null) { // not a leaf node
+			 return "operator="+operator+" "+values.toString();
+		 }else {
+			 return "term="+term;
+		 }
   }
 }

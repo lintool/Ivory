@@ -5,6 +5,7 @@ import ivory.core.util.ResultWriter;
 import ivory.core.util.XMLTools;
 import ivory.smrf.retrieval.Accumulator;
 import ivory.smrf.retrieval.QueryRunner;
+import ivory.sqe.querygenerator.CLPhraseQueryGenerator;
 import ivory.sqe.querygenerator.ClQueryGenerator;
 import ivory.sqe.querygenerator.DefaultBagOfWordQueryGenerator;
 import ivory.sqe.querygenerator.QueryGenerator;
@@ -37,18 +38,22 @@ public class QueryEngine {
   private Map<String, String> queries;
   private FileSystem fs;
   private QueryGenerator generator;
+  private DocnoMapping mapping;
   
-  public QueryEngine(String[] args, FileSystem fs) {
+  public QueryEngine(Configuration conf, FileSystem fs) {
 	  try {
 		this.fs = fs;
-		ranker = new StructuredQueryRanker(args[0], fs, 10);
-		queries = parseQueries(args[1], fs);
-	    if (args.length == 6) {
+		ranker = new StructuredQueryRanker(conf.get(Constants.IndexPath), fs, 1000);
+		mapping = ranker.getDocnoMapping();
+		queries = parseQueries(conf.get(Constants.QueriesPath), fs);
+	    if (conf.get(Constants.QueryType).equals(Constants.CLIR)) {
 	    	generator = new ClQueryGenerator();
+	    } else if (conf.get(Constants.QueryType).equals(Constants.PhraseCLIR)) {
+	    	generator = new CLPhraseQueryGenerator();
 	    } else {
 	    	generator = new DefaultBagOfWordQueryGenerator();
 	    }
-	    generator.init(fs, args);
+	    generator.init(fs, conf);
 
 	} catch (IOException e) {
 		e.printStackTrace();
@@ -117,7 +122,6 @@ public class QueryEngine {
   }
 
   private void printResults(String queryID, StructuredQueryRanker ranker, ResultWriter resultWriter) throws IOException {
-	  DocnoMapping mapping = ranker.getDocnoMapping();
 //	  for (String queryID : queries.keySet()) {
 		  // Get the ranked list for this query.
 		  Accumulator[] list = ranker.getResults(queryID);
@@ -143,7 +147,7 @@ public class QueryEngine {
 			  LOG.info("Query "+qid+" = "+query);
 
 			  JSONObject structuredQuery = generator.parseQuery(query);
-			  			  
+			  LOG.info("Processing "+structuredQuery);			  
 			  long start = System.currentTimeMillis();
 			  ranker.rank(qid, structuredQuery, generator.getQueryLength());
 
@@ -157,20 +161,12 @@ public class QueryEngine {
 	  }
   }
 
-
- 
-
   public Map<String, Accumulator[]> getResults() {
 	  return ranker.getResults();
   }
 
   public DocnoMapping getDocnoMapping() {
-	  try {
-		return ranker.getDocnoMapping();
-	} catch (IOException e) {
-		e.printStackTrace();
-		throw new RuntimeException(e);
-	}
+	  return mapping;
   }
 
 }

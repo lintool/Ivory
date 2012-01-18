@@ -1,7 +1,6 @@
 package ivory.lsh.eval;
 
 
-import ivory.core.data.document.WeightedIntDocVector;
 import ivory.lsh.eval.SampleSignatures.mapoutput;
 import java.io.IOException;
 import java.net.URI;

@@ -139,7 +139,7 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
 			model.setAvgDocLength(avgDocLen);
 
 			try {
-				tokenizer = new OpenNLPTokenizer();
+				tokenizer = new OpenNLPTokenizer();		// just for stopword removal in translateTFs
 			} catch (Exception e) {
 				e.printStackTrace();
 				throw new RuntimeException("Error initializing tokenizer!");
@@ -158,12 +158,6 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
 		throws IOException {
 
 			if(docno.get()%SAMPLING!=0)		return;	//for generating sample document vectors. no sampling if SAMPLING=1
-
-			//			/**
-			//			 * DEBUG
-			//			 * 
-			//			 */
-			//			if(docno.get()!=101)		return;
 
 			if(!language.equals("english") && !language.equals("en")){
 				docno.set(docno.get() + 1000000000);	//to distinguish between the two collections in the PWSim sliding window algorithm
@@ -251,6 +245,7 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
 		conf.setInt("Ivory.CollectionDocumentCount", env.readCollectionDocumentCount());
 		conf.set("Ivory.Lang", getConf().get("Ivory.Lang"));
 		conf.set("Ivory.Normalize", getConf().get("Ivory.Normalize"));
+		conf.set("Ivory.MinNumTerms", getConf().get("Ivory.MinNumTerms"));
 
 		conf.setNumMapTasks(300);			
 		conf.setNumReduceTasks(0);
@@ -334,9 +329,9 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
 
 			String e2fttableFile = conf.get("Ivory.TTable_E2F");
 			String termsFile = env.getIndexTermsData();
-			String dfByTermFile = env.getDfByTermData();
+			String dfByIntFile = env.getDfByIntData();
 
-			if(!fs2.exists(new Path(fFile)) || !fs2.exists(new Path(eFile)) || !fs2.exists(new Path(e2fttableFile)) || !fs2.exists(new Path(termsFile)) || !fs2.exists(new Path(dfByTermFile))){
+			if(!fs2.exists(new Path(fFile)) || !fs2.exists(new Path(eFile)) || !fs2.exists(new Path(e2fttableFile)) || !fs2.exists(new Path(termsFile)) || !fs2.exists(new Path(dfByIntFile))){
 				throw new RuntimeException("Error: Translation files do not exist!");
 			}
 
@@ -352,7 +347,7 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
 			}	
 
 			DefaultFrequencySortedDictionary dict = new DefaultFrequencySortedDictionary(new Path(env.getIndexTermsData()), new Path(env.getIndexTermIdsData()), new Path(env.getIndexTermIdMappingData()), fs2);
-			DfTableArray dfTable = new DfTableArray(new Path(dfByTermFile), fs2);
+			DfTableArray dfTable = new DfTableArray(new Path(dfByIntFile), fs2);
 
 			HMapIFW transDfTable = CLIRUtils.translateDFTable(eVocab_e2f, fVocab_e2f, en2DeProbs, dict, dfTable);
 

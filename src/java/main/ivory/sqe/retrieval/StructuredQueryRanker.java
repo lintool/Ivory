@@ -19,7 +19,7 @@ public class StructuredQueryRanker {
   private static final Logger LOG = Logger.getLogger(StructuredQueryRanker.class);
 
   private RetrievalEnvironment env;
-  private Accumulator[] accumulators = null;
+//  private Accumulator[] accumulators = null;
   private final PriorityQueue<Accumulator> sortedAccumulators = new PriorityQueue<Accumulator>();
   private final int numResults;
   private HashMap<String, Accumulator[]> results;
@@ -31,19 +31,13 @@ public class StructuredQueryRanker {
 
     this.numResults = numResults;
     results = new HashMap<String, Accumulator[]>();
-    
-    // Create single pool of reusable accumulators.
-    accumulators = new Accumulator[numResults + 1];
-    for (int i = 0; i < numResults + 1; i++) {
-      accumulators[i] = new Accumulator(0, 0.0f);
-    }
   }
   
   
 
   public Accumulator[] rank(String qid, JSONObject query, int queryLength) {
     GlobalEvidence globalEvidence = new GlobalEvidence(env.getDocumentCount(), env.getCollectionSize(), queryLength);
-	  
+
     PostingsReaderWrapper structureReader;
 	try {
 		structureReader = new PostingsReaderWrapper(query, env, new BM25ScoringFunction(), globalEvidence);
@@ -52,9 +46,9 @@ public class StructuredQueryRanker {
 		throw new RuntimeException(e);
 	}
 	////System.out.println("Ranker created.");
-    
+	
     sortedAccumulators.clear();
-    Accumulator a = accumulators[0];
+    Accumulator a = new Accumulator(0, 0.0f);
 
     // Score that must be achieved to enter result set.
     double scoreThreshold = Double.NEGATIVE_INFINITY;
@@ -71,12 +65,8 @@ public class StructuredQueryRanker {
 
       // Document-at-a-time scoring.
       score = structureReader.computeScore(docno);
+
       cnt++;
-      if (cnt % 10000 == 0) {
-//    	  LOG.info(cnt + " docs processed = "+docno);
-//    	  LOG.info(scoreThreshold);
-//    	  LOG.info(sortedAccumulators);
-      }
       // Keep track of numResults best accumulators.
       if (score > scoreThreshold) {
         a.docno = docno;
@@ -87,15 +77,9 @@ public class StructuredQueryRanker {
           a = sortedAccumulators.poll();
           scoreThreshold = sortedAccumulators.peek().score;
         } else {
-          a = accumulators[sortedAccumulators.size()];
+          a = new Accumulator(0, 0.0f);
         }
-      }
-//      if (cnt % 10000 == 0) {
-//    	  LOG.info(a);
-//    	  LOG.info(scoreThreshold);
-//    	  LOG.info(sortedAccumulators);
-//    	  LOG.info("======================");
-//      }      
+      }     
 
       // Advance to next document
       docno = Integer.MAX_VALUE;
@@ -106,13 +90,14 @@ public class StructuredQueryRanker {
     }
 
     // Grab the accumulators off the stack, in (reverse) order.
+//    LOG.info("Results...");
     Accumulator[] accs = new Accumulator[Math.min(numResults, sortedAccumulators.size())];
 	for (int i = 0; i < accs.length; i++) {
       Accumulator acc = sortedAccumulators.poll();
-//	  LOG.info((results.length - 1 - i)+"="+acc);
+//	  LOG.info((accs.length - 1 - i)+"="+acc.docno+","+acc.score);
       accs[accs.length - 1 - i] = acc;
     }
-    
+ 
     this.results.put(qid, accs);
 
     return accs;
@@ -122,17 +107,13 @@ public class StructuredQueryRanker {
     return env.getDocnoMapping();
   }
 
+  public Accumulator[] getResults(String queryID) {
+	  return results.get(queryID);
+  }
 
-
-public Accumulator[] getResults(String queryID) {
-	return results.get(queryID);
-}
-
-
-
-public Map<String, Accumulator[]> getResults() {
-	return results;
-}
+  public Map<String, Accumulator[]> getResults() {
+	  return results;
+  }
 
 
 }

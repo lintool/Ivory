@@ -68,10 +68,6 @@ public class ComputeSignaturesSimhash extends PowerTool {
 		static SixtyFourBitSignature s = new SixtyFourBitSignature();
 
 		public void configure(JobConf job){
-//			if(job.get("debug")!=null){
-				//sLogger.setLevel(Level.INFO);
-//			}
-//			sLogger.setLevel(Level.DEBUG);
 			hashLib = new GeneralHashFunctionLibrary();
 		}
 
@@ -84,12 +80,8 @@ public class ComputeSignaturesSimhash extends PowerTool {
 				float weight = entry.getValue();
 				
 				long hashL = hashLib.APHash(term);
-				
-//				sLogger.debug(term+","+weight+" --> "+hashL);
-//				String debugg="";
 				for(int i=0;i<64;i++){
 					int bit =  (int) ((hashL >>> i)&1);
-//					debugg+=bit+"";
 					if(bit==1){
 						V[i]+=weight;
 					}else{
@@ -97,9 +89,6 @@ public class ComputeSignaturesSimhash extends PowerTool {
 					}
 					
 				}
-				
-//				sLogger.debug(debugg);
-//				sLogger.debug("V="+Arrays.asList(V).toString());
 			}
 			int i=0;
 			for(float f: V){
