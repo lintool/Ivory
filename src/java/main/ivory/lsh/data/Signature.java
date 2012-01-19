@@ -47,12 +47,12 @@ public abstract class Signature implements WritableComparable {
    * permute this object w.r.t permutation object and save permuted signature in permSign
    */
   public abstract void perm(ArrayListOfIntsWritable permutation, Signature permSign);
-  
-/**
- * @param permutation
- * @return permute this object w.r.t permutation object and return permuted signature
- */
-public abstract Signature perm(ArrayListOfIntsWritable permutation);
+
+  /**
+   * @param permutation
+   * @return permute this object w.r.t permutation object and return permuted signature
+   */
+  public abstract Signature perm(ArrayListOfIntsWritable permutation);
 
   @SuppressWarnings("unchecked")
   public static Signature createSignature(Class subClass, int size){

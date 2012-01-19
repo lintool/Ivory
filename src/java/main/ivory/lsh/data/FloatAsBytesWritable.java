@@ -18,56 +18,56 @@ import org.apache.hadoop.io.Writable;
  *
  */
 public class FloatAsBytesWritable implements Writable{
-	byte[] bytes;
-	float maxNorm, minNorm;
-	
-	public FloatAsBytesWritable() {
-		super();
-	}
+  byte[] bytes;
+  float maxNorm, minNorm;
 
-	public FloatAsBytesWritable(byte[] bytearray, float max, float min) {
-		super();
-		bytes = new byte[bytearray.length];
-		for(int i=0;i<bytearray.length;i++){
-			bytes[i]=bytearray[i];
-		}
-		maxNorm = max;
-		minNorm = min;
-	}
+  public FloatAsBytesWritable() {
+    super();
+  }
 
-	public void readFields(DataInput in) throws IOException {
-		maxNorm = in.readFloat();
-		minNorm = in.readFloat();
-		bytes = new byte[in.readInt()];
-		for(int i=0;i<bytes.length;i++){
-			bytes[i] = in.readByte();
-		}
-	}
+  public FloatAsBytesWritable(byte[] bytearray, float max, float min) {
+    super();
+    bytes = new byte[bytearray.length];
+    for(int i=0;i<bytearray.length;i++){
+      bytes[i]=bytearray[i];
+    }
+    maxNorm = max;
+    minNorm = min;
+  }
 
-	public void write(DataOutput out) throws IOException {
-		out.writeFloat(maxNorm);
-		out.writeFloat(minNorm);
-		out.writeInt(bytes.length);
-		for(int i=0;i<bytes.length;i++){
-			out.writeByte(bytes[i]);
-		}
-	}
-	
-	public byte get(int index){
-		return bytes[index];
-	}
-	
-	public float getAsFloat(int index){
-		byte f1 = get(index);
-		if(f1>0){
-			return ((float)f1*maxNorm/128f);
-		}else{			
-			return ((float)-f1*minNorm/128f);
-		}
-	}
-	
-	public int size() {
-		return bytes.length;
-	}
+  public void readFields(DataInput in) throws IOException {
+    maxNorm = in.readFloat();
+    minNorm = in.readFloat();
+    bytes = new byte[in.readInt()];
+    for(int i=0;i<bytes.length;i++){
+      bytes[i] = in.readByte();
+    }
+  }
+
+  public void write(DataOutput out) throws IOException {
+    out.writeFloat(maxNorm);
+    out.writeFloat(minNorm);
+    out.writeInt(bytes.length);
+    for(int i=0;i<bytes.length;i++){
+      out.writeByte(bytes[i]);
+    }
+  }
+
+  public byte get(int index){
+    return bytes[index];
+  }
+
+  public float getAsFloat(int index){
+    byte f1 = get(index);
+    if(f1>0){
+      return ((float)f1*maxNorm/128f);
+    }else{			
+      return ((float)-f1*minNorm/128f);
+    }
+  }
+
+  public int size() {
+    return bytes.length;
+  }
 
 }

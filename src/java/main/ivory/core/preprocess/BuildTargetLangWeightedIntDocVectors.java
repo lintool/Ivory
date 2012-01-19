@@ -60,158 +60,158 @@ import edu.umd.cloud9.util.map.MapKF;
  */
 @SuppressWarnings("deprecation")
 public class BuildTargetLangWeightedIntDocVectors extends PowerTool {
-	private static final Logger sLogger = Logger.getLogger(BuildWeightedIntDocVectors.class);
+  private static final Logger sLogger = Logger.getLogger(BuildWeightedIntDocVectors.class);
 
-	static{
-		sLogger.setLevel(Level.INFO);
-	}
-	protected static enum Docs{
-		Total
-	}
-	protected static enum Terms{
-		OOV, NEG
-	}
-	private static class MyMapper extends MapReduceBase implements
-	Mapper<IntWritable, HMapSFW, IntWritable, WeightedIntDocVector> {
+  static{
+    sLogger.setLevel(Level.INFO);
+  }
+  protected static enum Docs{
+    Total
+  }
+  protected static enum Terms{
+    OOV, NEG
+  }
+  private static class MyMapper extends MapReduceBase implements
+  Mapper<IntWritable, HMapSFW, IntWritable, WeightedIntDocVector> {
 
-		static IntWritable mDocno = new IntWritable();
-		private boolean normalize = false;
-		private Vocab engVocabH;
-		
-		public void configure(JobConf conf){
-//			sLogger.setLevel(Level.DEBUG);
+    static IntWritable mDocno = new IntWritable();
+    private boolean normalize = false;
+    private Vocab engVocabH;
 
-			normalize = conf.getBoolean("Ivory.Normalize", false);
-			
-			Path[] localFiles;
-			try {
-				localFiles = DistributedCache.getLocalCacheFiles(conf);
-			} catch (IOException e2) {
-				throw new RuntimeException("Local cache files not read properly.");
-			}
-			
-			try{
-				engVocabH = HadoopAlign.loadVocab(localFiles[0], FileSystem.getLocal(conf));
-			} catch (Exception e) {
-				e.printStackTrace();
-				throw new RuntimeException("Error initializing Term to Id map!");
-			}
-		}
+    public void configure(JobConf conf){
+      //			sLogger.setLevel(Level.DEBUG);
 
-		WeightedIntDocVector weightedVectorOut = new WeightedIntDocVector();
-		HMapIFW weightedVector = new HMapIFW();
+      normalize = conf.getBoolean("Ivory.Normalize", false);
 
-		float sum2;
-		public void map(IntWritable docno, HMapSFW doc,
-				OutputCollector<IntWritable, WeightedIntDocVector> output, Reporter reporter)
-		throws IOException {	
-			mDocno.set(docno.get());
-			weightedVector.clear();
+      Path[] localFiles;
+      try {
+        localFiles = DistributedCache.getLocalCacheFiles(conf);
+      } catch (IOException e2) {
+        throw new RuntimeException("Local cache files not read properly.");
+      }
 
-			sLogger.debug("===================================BEGIN READ DOC");
-			sum2 = 0;
+      try{
+        engVocabH = HadoopAlign.loadVocab(localFiles[0], FileSystem.getLocal(conf));
+      } catch (Exception e) {
+        e.printStackTrace();
+        throw new RuntimeException("Error initializing Term to Id map!");
+      }
+    }
 
-			for (MapKF.Entry<String> entry : doc.entrySet()) {
-				String eTerm = entry.getKey();
-				int e = engVocabH.get(eTerm);
-				if (e < 0) {
-					sLogger.debug(eTerm+ " term in doc not found in aligner vocab");
-					continue;
-				}
-				float score = entry.getValue(); 
-				if (normalize) {
-					sum2+=score*score;
-				}
-				weightedVector.put(e, score);
-			}
-			sLogger.debug("===================================END READ DOC");
-			
-			weightedVectorOut.setWeightedTerms(weightedVector);
-			if (normalize) {
-				/*length-normalize doc vectors*/
-				sum2 = (float) Math.sqrt(sum2);
-				weightedVectorOut.normalizeWith(sum2);
-			}
-			output.collect(mDocno, weightedVectorOut);
-			reporter.incrCounter(Docs.Total, 1);
-		}
-	}
+    WeightedIntDocVector weightedVectorOut = new WeightedIntDocVector();
+    HMapIFW weightedVector = new HMapIFW();
 
-	public static final String[] RequiredParameters = { "Ivory.NumMapTasks",
-		"Ivory.IndexPath", 
-		"Ivory.Normalize",
-		};
+    float sum2;
+    public void map(IntWritable docno, HMapSFW doc,
+        OutputCollector<IntWritable, WeightedIntDocVector> output, Reporter reporter)
+    throws IOException {	
+      mDocno.set(docno.get());
+      weightedVector.clear();
 
-	public String[] getRequiredParameters() {
-		return RequiredParameters;
-	}
+      sLogger.debug("===================================BEGIN READ DOC");
+      sum2 = 0;
 
-	public BuildTargetLangWeightedIntDocVectors(Configuration conf) {
-		super(conf);
-	}
+      for (MapKF.Entry<String> entry : doc.entrySet()) {
+        String eTerm = entry.getKey();
+        int e = engVocabH.get(eTerm);
+        if (e < 0) {
+          sLogger.debug(eTerm+ " term in doc not found in aligner vocab");
+          continue;
+        }
+        float score = entry.getValue(); 
+        if (normalize) {
+          sum2+=score*score;
+        }
+        weightedVector.put(e, score);
+      }
+      sLogger.debug("===================================END READ DOC");
 
-	@SuppressWarnings("deprecation")
-	public int runTool() throws Exception {
-		//		sLogger.setLevel(Level.DEBUG);
+      weightedVectorOut.setWeightedTerms(weightedVector);
+      if (normalize) {
+        /*length-normalize doc vectors*/
+        sum2 = (float) Math.sqrt(sum2);
+        weightedVectorOut.normalizeWith(sum2);
+      }
+      output.collect(mDocno, weightedVectorOut);
+      reporter.incrCounter(Docs.Total, 1);
+    }
+  }
 
-		sLogger.info("PowerTool: GetTargetLangWeightedIntDocVectors");
+  public static final String[] RequiredParameters = { "Ivory.NumMapTasks",
+    "Ivory.IndexPath", 
+    "Ivory.Normalize",
+  };
 
-		JobConf conf = new JobConf(BuildTargetLangWeightedIntDocVectors.class);
-		FileSystem fs = FileSystem.get(conf);
+  public String[] getRequiredParameters() {
+    return RequiredParameters;
+  }
 
-		String indexPath = getConf().get("Ivory.IndexPath");
-		
-		RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fs);
+  public BuildTargetLangWeightedIntDocVectors(Configuration conf) {
+    super(conf);
+  }
 
-		String outputPath = env.getWeightedIntDocVectorsDirectory();
-		int mapTasks = getConf().getInt("Ivory.NumMapTasks", 0);
-		int minSplitSize = getConf().getInt("Ivory.MinSplitSize", 0);
-		String collectionName = getConf().get("Ivory.CollectionName");
+  @SuppressWarnings("deprecation")
+  public int runTool() throws Exception {
+    //		sLogger.setLevel(Level.DEBUG);
+
+    sLogger.info("PowerTool: GetTargetLangWeightedIntDocVectors");
+
+    JobConf conf = new JobConf(BuildTargetLangWeightedIntDocVectors.class);
+    FileSystem fs = FileSystem.get(conf);
+
+    String indexPath = getConf().get("Ivory.IndexPath");
+
+    RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fs);
+
+    String outputPath = env.getWeightedIntDocVectorsDirectory();
+    int mapTasks = getConf().getInt("Ivory.NumMapTasks", 0);
+    int minSplitSize = getConf().getInt("Ivory.MinSplitSize", 0);
+    String collectionName = getConf().get("Ivory.CollectionName");
 
 
-		sLogger.info("Characteristics of the collection:");
-		sLogger.info(" - CollectionName: " + collectionName);
-		sLogger.info("Characteristics of the job:");
-		sLogger.info(" - NumMapTasks: " + mapTasks);
-		sLogger.info(" - MinSplitSize: " + minSplitSize);
-		
-		String vocabFile = getConf().get("Ivory.FinalVocab");
-		DistributedCache.addCacheFile(new URI(vocabFile), conf);
+    sLogger.info("Characteristics of the collection:");
+    sLogger.info(" - CollectionName: " + collectionName);
+    sLogger.info("Characteristics of the job:");
+    sLogger.info(" - NumMapTasks: " + mapTasks);
+    sLogger.info(" - MinSplitSize: " + minSplitSize);
 
-		Path inputPath = new Path(PwsimEnvironment.getFileNameWithPars(indexPath, "TermDocs"));
-		Path weightedVectorsPath = new Path(outputPath);
+    String vocabFile = getConf().get("Ivory.FinalVocab");
+    DistributedCache.addCacheFile(new URI(vocabFile), conf);
 
-		if (fs.exists(weightedVectorsPath)) {
-			sLogger.info("Output path already exists!");
-			return -1;
-		}
-		conf.setJobName("GetWeightedIntDocVectors:" + collectionName);
-		conf.setNumMapTasks(mapTasks);
-		conf.setNumReduceTasks(0);
-		conf.setInt("mapred.min.split.size", minSplitSize);
-		conf.set("mapred.child.java.opts", "-Xmx2048m");
-		conf.setBoolean("Ivory.Normalize", getConf().getBoolean("Ivory.Normalize", true));
-		FileInputFormat.setInputPaths(conf, inputPath);
-		FileOutputFormat.setOutputPath(conf, weightedVectorsPath);
+    Path inputPath = new Path(PwsimEnvironment.getFileNameWithPars(indexPath, "TermDocs"));
+    Path weightedVectorsPath = new Path(outputPath);
 
-		conf.setInputFormat(SequenceFileInputFormat.class);
-		conf.setMapOutputKeyClass(IntWritable.class);
-		conf.setMapOutputValueClass(WeightedIntDocVector.class);
-		conf.setOutputFormat(SequenceFileOutputFormat.class);
-		conf.setOutputKeyClass(IntWritable.class);
-		conf.setOutputValueClass(WeightedIntDocVector.class);
+    if (fs.exists(weightedVectorsPath)) {
+      sLogger.info("Output path already exists!");
+      return -1;
+    }
+    conf.setJobName("GetWeightedIntDocVectors:" + collectionName);
+    conf.setNumMapTasks(mapTasks);
+    conf.setNumReduceTasks(0);
+    conf.setInt("mapred.min.split.size", minSplitSize);
+    conf.set("mapred.child.java.opts", "-Xmx2048m");
+    conf.setBoolean("Ivory.Normalize", getConf().getBoolean("Ivory.Normalize", true));
+    FileInputFormat.setInputPaths(conf, inputPath);
+    FileOutputFormat.setOutputPath(conf, weightedVectorsPath);
 
-		conf.setMapperClass(MyMapper.class);
+    conf.setInputFormat(SequenceFileInputFormat.class);
+    conf.setMapOutputKeyClass(IntWritable.class);
+    conf.setMapOutputValueClass(WeightedIntDocVector.class);
+    conf.setOutputFormat(SequenceFileOutputFormat.class);
+    conf.setOutputKeyClass(IntWritable.class);
+    conf.setOutputValueClass(WeightedIntDocVector.class);
 
-		long startTime = System.currentTimeMillis();
+    conf.setMapperClass(MyMapper.class);
 
-		RunningJob rj = JobClient.runJob(conf);
-		sLogger.info("Job Finished in " + (System.currentTimeMillis() - startTime) / 1000.0
-				+ " seconds");
-		Counters counters = rj.getCounters();
+    long startTime = System.currentTimeMillis();
 
-		long numOfDocs= (long) counters.findCounter(Docs.Total).getCounter();
+    RunningJob rj = JobClient.runJob(conf);
+    sLogger.info("Job Finished in " + (System.currentTimeMillis() - startTime) / 1000.0
+        + " seconds");
+    Counters counters = rj.getCounters();
 
-		return (int) numOfDocs;
-	}
+    long numOfDocs= (long) counters.findCounter(Docs.Total).getCounter();
+
+    return (int) numOfDocs;
+  }
 }

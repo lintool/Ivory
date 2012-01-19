@@ -66,9 +66,9 @@ public class NBitSignature extends Signature {
     Bits subBits = bits.extract(end, start);
     sub.bits = subBits;
 
-//    for(int i=0;i<(end-start+1);i++){
-//      sub.set(i, subBits.getBit(i)==1);
-//    }
+    //    for(int i=0;i<(end-start+1);i++){
+    //      sub.set(i, subBits.getBit(i)==1);
+    //    }
     return sub;
   }
 
@@ -291,36 +291,36 @@ public class NBitSignature extends Signature {
     return cnt;
   }
 
-//  public BitsSignature permute(int[] permutation){
-//    Bits permBits = new Bits(0,size());
-//    int b=0;
-//    while(b<size()-1){
-//      Bits bits = this.bits;
-//      int seq = bits.getBits(b, b+31);
-//      int permSeq = perm(seq, permutation, 32);
-//      permBits.setBits(b, b+31, permSeq);
-//      b+=32;
-//    }
-//    return new BitsSignature(permBits);
-//  }
+  //  public BitsSignature permute(int[] permutation){
+  //    Bits permBits = new Bits(0,size());
+  //    int b=0;
+  //    while(b<size()-1){
+  //      Bits bits = this.bits;
+  //      int seq = bits.getBits(b, b+31);
+  //      int permSeq = perm(seq, permutation, 32);
+  //      permBits.setBits(b, b+31, permSeq);
+  //      b+=32;
+  //    }
+  //    return new BitsSignature(permBits);
+  //  }
 
-//  public static long perm(long b, final int subs[], int blockSize) {
-//    long sbytes = 0;
-//    for (int i = 0; i < subs.length; i++) {
-//      int shifts = subs[i];
-//      //using a mask of intialized with one
-//      long mask = 1;
-//
-//      mask = (mask << (blockSize - shifts));
-//      long bit = (mask & b);
-//      if (bit != 0) { //if the bit is one
-//        mask = 1;
-//        mask =  (mask << (blockSize - i - 1));
-//        sbytes = (sbytes | mask);
-//      }
-//    }
-//
-//    return sbytes;
-//  }
+  //  public static long perm(long b, final int subs[], int blockSize) {
+  //    long sbytes = 0;
+  //    for (int i = 0; i < subs.length; i++) {
+  //      int shifts = subs[i];
+  //      //using a mask of intialized with one
+  //      long mask = 1;
+  //
+  //      mask = (mask << (blockSize - shifts));
+  //      long bit = (mask & b);
+  //      if (bit != 0) { //if the bit is one
+  //        mask = 1;
+  //        mask =  (mask << (blockSize - i - 1));
+  //        sbytes = (sbytes | mask);
+  //      }
+  //    }
+  //
+  //    return sbytes;
+  //  }
 
 }
