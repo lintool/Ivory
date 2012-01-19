@@ -47,7 +47,7 @@ public class TokenizerFactory {
 				conf.set("Ivory.Lang", lang);
 				conf.set("Ivory.TokenizerModel", modelPath);
 				fTok.configure(conf, fs);
-				if(vocab!=null){
+				if (vocab != null) {
 					fTok.setVocab(vocab);	
 				}
 				

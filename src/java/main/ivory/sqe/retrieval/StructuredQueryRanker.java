@@ -26,15 +26,13 @@ public class StructuredQueryRanker {
 
   public StructuredQueryRanker(String indexPath, FileSystem fs, int numResults) throws IOException,
       ConfigurationException {
-    this.env = new RetrievalEnvironment(indexPath, fs);
+	this.env = new RetrievalEnvironment(indexPath, fs);
     env.initialize(true);
 
     this.numResults = numResults;
     results = new HashMap<String, Accumulator[]>();
   }
   
-  
-
   public Accumulator[] rank(String qid, JSONObject query, int queryLength) {
     GlobalEvidence globalEvidence = new GlobalEvidence(env.getDocumentCount(), env.getCollectionSize(), queryLength);
 
@@ -58,12 +56,16 @@ public class StructuredQueryRanker {
     if(nextDocno < docno){
     	docno = nextDocno;
     }
-    ////System.out.println("Advance to docno " + docno);
     int cnt = 0;
     while (docno < Integer.MAX_VALUE) {
       float score = 0.0f;
 
       // Document-at-a-time scoring.
+//      try {
+//		LOG.info("Advance to docno " + docno+" => "+getDocnoMapping().getDocid(docno));
+//      } catch (IOException e) {
+//		e.printStackTrace();
+//      }
       score = structureReader.computeScore(docno);
 
       cnt++;
@@ -90,7 +92,7 @@ public class StructuredQueryRanker {
     }
 
     // Grab the accumulators off the stack, in (reverse) order.
-//    LOG.info("Results...");
+    LOG.info("Results...");
     Accumulator[] accs = new Accumulator[Math.min(numResults, sortedAccumulators.size())];
 	for (int i = 0; i < accs.length; i++) {
       Accumulator acc = sortedAccumulators.poll();
@@ -98,6 +100,8 @@ public class StructuredQueryRanker {
       accs[accs.length - 1 - i] = acc;
     }
  
+	LOG.info("Scored "+cnt+" documents to process query "+qid);
+	
     this.results.put(qid, accs);
 
     return accs;

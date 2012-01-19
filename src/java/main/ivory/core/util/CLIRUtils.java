@@ -1,6 +1,5 @@
 package ivory.core.util;
 
-import ivory.core.data.dictionary.DefaultFrequencySortedDictionary;
 import ivory.core.data.dictionary.FrequencySortedDictionary;
 import ivory.core.data.document.TermDocVector;
 import ivory.core.data.stat.DfTableArray;
@@ -8,6 +7,7 @@ import ivory.core.data.stat.PrefixEncodedGlobalStats;
 import ivory.core.tokenize.Tokenizer;
 import ivory.pwsim.score.Bm25;
 import ivory.pwsim.score.ScoringModel;
+
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -32,7 +32,6 @@ import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.SequenceFile;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.mortbay.log.Log;
 
 import edu.umd.cloud9.io.map.HMapIFW;
 import edu.umd.cloud9.io.map.HMapSFW;
@@ -655,7 +654,8 @@ public class CLIRUtils extends Configured {
 		File file = new File(inputFile);
 		FileInputStream fis = null;
 		BufferedReader bis = null;
-		int cntLongTail = 0, cntShortTail = 0, sumShortTail = 0;		// for statistical purposes only
+		int cntLongTail = 0, cntShortTail = 0, sumShortTail = 0, cnt = 0;		// for statistical purposes only
+		float sumCumProbs = 0f;											// for statistical purposes only
 
 		//In BerkeleyAligner output, dictionary entries of each source term are already sorted by prob. value. 
 		try {
@@ -665,12 +665,12 @@ public class CLIRUtils extends Configured {
 			String cur = null;
 			boolean earlyTerminate = false;
 			String line = "";
-
 			while (true) {
 				if(!earlyTerminate){
 					line = bis.readLine();
 					if(line ==null)
 						break;
+					cnt++;
 				}
 				earlyTerminate = false;
 				logger.debug("Line:"+line);
@@ -685,9 +685,10 @@ public class CLIRUtils extends Configured {
 
 
 					List<PairOfIntFloat> indexProbPairs = new ArrayList<PairOfIntFloat>();
-					float sumprob = 0.0f;
+					float sumOfProbs = 0.0f;
 					for(int i=0;i<numTrans;i++){
 						if((line=bis.readLine())!=null){
+							cnt++;
 							Pattern p2 = Pattern.compile("\\s*(\\S+): (.+)");
 							Matcher m2 = p2.matcher(line);
 							if(!m2.find()){
@@ -705,20 +706,19 @@ public class CLIRUtils extends Configured {
 								int engIndex = trgVocab.addOrGet(term);
 								logger.debug("Added: "+term+" with index: "+engIndex+" and prob:"+prob);
 								indexProbPairs.add(new PairOfIntFloat(engIndex, prob));
-								sumprob+=prob;
+								sumOfProbs+=prob;
 							}
 						}
-						if(sumprob > probThreshold){
+						if(sumOfProbs > probThreshold){
 							cntShortTail++;		// for statistical purposes only
 							sumShortTail += (i+1);	// for statistical purposes only
 							break;
 						}
 					}
-					if(sumprob <= probThreshold){
+					if(sumOfProbs <= probThreshold){
+						// early termination
 						cntLongTail++;		// for statistical purposes only
-						if(sumprob < 0.1){
-							logger.info(sumprob);
-						}
+						sumCumProbs += sumOfProbs;
 					}
 
 					// to enable faster access with binary search, we sort entries by vocabulary index.
@@ -729,7 +729,7 @@ public class CLIRUtils extends Configured {
 					float[] probs = new float[numEntries];
 					for(PairOfIntFloat pair : indexProbPairs){
 						indices[i] = pair.getLeftElement();
-						probs[i++] = pair.getRightElement()/sumprob;
+						probs[i++] = pair.getRightElement()/sumOfProbs;
 					}
 					table.set(gerIndex, new IndexedFloatArray(indices, probs, true));
 				}
@@ -744,10 +744,12 @@ public class CLIRUtils extends Configured {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		logger.info("File "+inputFile+": read "+cnt+" lines");
 		logger.info("Vocabulary Target: "+trgVocab.size()+" elements");
 		logger.info("Vocabulary Source: "+srcVocab.size()+" elements");
 		logger.info("# source terms with > "+probThreshold+" probability covered: "+cntShortTail+" and average translations per term: "+(sumShortTail/(cntShortTail+0.0f)));
-		logger.info("# source terms with <= "+probThreshold+" probability covered: "+cntLongTail+" (each has "+ numTrans +" translations)");
+		logger.info("# source terms with <= "+probThreshold+" probability covered: "+cntLongTail+" (each have "+ numTrans +" translations). Average coverage is: "+(sumCumProbs/cntLongTail));
+		logger.info("Size (total number of dictionary entries) = "+(sumShortTail + cntLongTail*numTrans));
 
 
 		DataOutputStream dos = new DataOutputStream(new BufferedOutputStream
@@ -794,7 +796,7 @@ public class CLIRUtils extends Configured {
 		BufferedReader bis = null;
 		int cnt = 0;
 
-		//In GIZA output, dictionary entries are in random order (w.r.t. prob value), so you need to keep a sorted list of top numTrans or less entries w/o exceeding MaxProb threshold
+		//In GIZA output, dictionary entries are in random order (w.r.t. prob value), so you need to keep a sorted list of top numTrans or less entries w/o exceeding <probThreshold> probability
 		try {
 			fis = new FileInputStream(file);
 			bis = new BufferedReader(new InputStreamReader(fis,"UTF-8"));
@@ -853,7 +855,7 @@ public class CLIRUtils extends Configured {
 					topTrans.add(new PairOfFloatString(prob, trgTerm));
 
 					// keep top numTrans translations
-					if(topTrans.size()>numTrans){
+					if(topTrans.size() > numTrans){
 						float removedProb = topTrans.pollFirst().getLeftElement();
 						sumOfProbs -= removedProb;
 					}
@@ -875,6 +877,7 @@ public class CLIRUtils extends Configured {
 					cntShortTail++;
 					sumShortTail += finalNumTrans;
 				}else{
+					// early termination: <numTrans> elements did not cover <probThreshold> probability
 					cntLongTail++;
 					sumCumProbs += sumOfProbs;
 				}
@@ -887,7 +890,8 @@ public class CLIRUtils extends Configured {
 			logger.info("Vocabulary Target: "+trgVocab.size()+" elements");
 			logger.info("Vocabulary Source: "+srcVocab.size()+" elements");
 			logger.info("# source terms with > "+probThreshold+" probability covered: "+cntShortTail+" and average translations per term: "+(sumShortTail/(cntShortTail+0.0f)));
-			logger.info("# source terms with <= "+probThreshold+" probability covered: "+cntLongTail+" (each has "+ numTrans +" translations). Average coverage is: "+(sumCumProbs/cntLongTail));
+			logger.info("# source terms with <= "+probThreshold+" probability covered: "+cntLongTail+" (each have "+ numTrans +" translations). Average coverage is: "+(sumCumProbs/cntLongTail));
+			logger.info("Size (total number of dictionary entries) = "+(sumShortTail + cntLongTail*numTrans));
 		}catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -973,7 +977,7 @@ public class CLIRUtils extends Configured {
 		String srcTerm = null, trgTerm = null;
 		int curIndex = -1;
 		TreeSet<PairOfFloatString> topTrans = new TreeSet<PairOfFloatString>();
-		float sumOfProbs = 0.0f, prob;
+		float sumOfProbs = 0.0f, prob, sumCumProbs = 0f;
 		int cntLongTail = 0, cntShortTail = 0, sumShortTail = 0;		// for statistical purposes only
 
 		//modify current ttable wrt foll. criteria: top numTrans translations per source term, unless cumulative prob. distr. exceeds probThreshold before that.
@@ -1018,14 +1022,17 @@ public class CLIRUtils extends Configured {
 					cntShortTail++;
 					sumShortTail += finalNumTrans;
 				}else{
+					// early termination: <numTrans> elements did not cover <probThreshold> probability
 					cntLongTail++;
+					sumCumProbs += sumOfProbs;
 				}
 			}
 		}
 		logger.info("Vocabulary Target: "+finalTrgVocab.size()+" elements");
 		logger.info("Vocabulary Source: "+finalSrcVocab.size()+" elements");
 		logger.info("# source terms with > "+probThreshold+" probability covered: "+cntShortTail+" and average translations per term: "+(sumShortTail/(cntShortTail+0.0f)));
-		logger.info("# source terms with <= "+probThreshold+" probability covered: "+cntLongTail+" (each has "+ numTrans +" translations)");
+		logger.info("# source terms with <= "+probThreshold+" probability covered: "+cntLongTail+" (each have "+ numTrans +" translations). Average coverage is: "+(sumCumProbs/cntLongTail));
+		logger.info("Size (total number of dictionary entries) = "+(sumShortTail + cntLongTail*numTrans));
 
 		DataOutputStream dos = new DataOutputStream(new BufferedOutputStream(fs.create(new Path(finalTrgVocabFile))));
 		((VocabularyWritable) finalTrgVocab).write(dos);
@@ -1160,7 +1167,7 @@ public class CLIRUtils extends Configured {
 		String lex_e2f = args[1];
 		String type = args[2];
 		Configuration conf = new Configuration();
-		
+		logger.info("Type of input:" + type);
 		try {
 			FileSystem localFS = FileSystem.getLocal(conf);
 			if(type.equals("giza")){
