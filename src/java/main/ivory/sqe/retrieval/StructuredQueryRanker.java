@@ -24,6 +24,8 @@ public class StructuredQueryRanker {
   private final int numResults;
   private HashMap<String, Accumulator[]> results;
 
+  private DocnoMapping docnoMapping;
+
   public StructuredQueryRanker(String indexPath, FileSystem fs, int numResults) throws IOException,
       ConfigurationException {
 	this.env = new RetrievalEnvironment(indexPath, fs);
@@ -31,6 +33,7 @@ public class StructuredQueryRanker {
 
     this.numResults = numResults;
     results = new HashMap<String, Accumulator[]>();
+    docnoMapping = getDocnoMapping();
   }
   
   public Accumulator[] rank(String qid, JSONObject query, int queryLength) {
@@ -67,7 +70,8 @@ public class StructuredQueryRanker {
 //		e.printStackTrace();
 //      }
       score = structureReader.computeScore(docno);
-
+//      LOG.info("Docno " + docno + ","+docnoMapping.getDocid(docno)+" scored: "+score);
+      
       cnt++;
       // Keep track of numResults best accumulators.
       if (score > scoreThreshold) {

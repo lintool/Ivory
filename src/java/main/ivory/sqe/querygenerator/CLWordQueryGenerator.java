@@ -51,7 +51,7 @@ public class CLWordQueryGenerator implements QueryGenerator {
 	public JSONObject parseQuery(String query) {
 		JSONObject queryJson = new JSONObject();
 		try {
-			String[] tokens = tokenizer.processContent(query);
+			String[] tokens = tokenizer.processContent(query.trim());
 			length = tokens.length;
 			JSONArray tokenTranslations = new JSONArray();
 			for (String token : tokens) {

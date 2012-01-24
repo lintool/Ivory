@@ -22,11 +22,12 @@ public class DefaultBagOfWordQueryGenerator implements QueryGenerator {
   }
 
 	public void init(FileSystem fs, Configuration conf) throws IOException {
-		if(conf.get(Constants.Language).equals(Constants.English)){
+		String lang = conf.get(Constants.Language);
+	  if(lang == null || lang.equals(Constants.English)){
 			tokenizer = new GalagoTokenizer();		
-		}else if(conf.get(Constants.Language).equals(Constants.German)){
+		}else if(lang.equals(Constants.German)){
 			tokenizer = TokenizerFactory.createTokenizer(conf.get(Constants.Language), conf.get(Constants.TokenizerData), null);
-		}else if(conf.get(Constants.Language).equals(Constants.Chinese)){
+		}else if(lang.equals(Constants.Chinese)){
 			tokenizer = TokenizerFactory.createTokenizer(conf.get(Constants.Language), conf.get(Constants.TokenizerData), null);
 		}else{
 			throw new RuntimeException("Language code "+conf.get(Constants.Language)+ " not known");
@@ -34,7 +35,7 @@ public class DefaultBagOfWordQueryGenerator implements QueryGenerator {
 	}
 	
   public JSONObject parseQuery(String query){
-	  String[] tokens = tokenizer.processContent(query);
+	  String[] tokens = tokenizer.processContent(query.trim());
 	  length = tokens.length;
 
 	  JSONObject queryJson = new JSONObject();
