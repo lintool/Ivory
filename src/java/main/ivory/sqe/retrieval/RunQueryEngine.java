@@ -53,20 +53,19 @@ public class RunQueryEngine {
       conf.set(Constants.IndexPath, args[1]);
       conf.set(Constants.QueriesPath, args[2]);
       conf.set(Constants.QrelsPath, args[3]);
+      conf.set(Constants.Language, args[4]);
+      conf.set(Constants.TokenizerData, args[5]);
 
       if(mode.equals(Constants.MTOutput)){
-        conf.setInt(Constants.KBest, Integer.parseInt(args[4]));
-        conf.set(Constants.Heuristic5, args[5]);
-        if (args.length == 9) {
-          conf.set(Constants.fVocabPath, args[6]);
-          conf.set(Constants.eVocabPath, args[7]);
-          conf.set(Constants.f2eProbsPath, args[8]);
+        conf.setInt(Constants.KBest, Integer.parseInt(args[6]));
+        conf.set(Constants.Heuristic5, args[7]);
+        if (args.length == 11) {
+          conf.set(Constants.fVocabPath, args[8]);
+          conf.set(Constants.eVocabPath, args[9]);
+          conf.set(Constants.f2eProbsPath, args[10]);
         }
         return conf;
       }  
-      
-      conf.set(Constants.Language, args[4]);
-      conf.set(Constants.TokenizerData, args[5]);
 
       if(mode.equals(Constants.CLIR)){
         conf.set(Constants.fVocabPath, args[6]);
@@ -77,6 +76,12 @@ public class RunQueryEngine {
         }
         if (args.length >= 11) {
           conf.setFloat(Constants.CumulativeProbThreshold, Float.parseFloat(args[10]));
+        }
+        if (args.length >= 12) {
+          conf.set(Constants.Heuristic6, args[11]);
+        }   
+        if (args.length >= 13) {
+          conf.set(Constants.SCFGPath, args[12]);
         }
       }else if(mode.equals(Constants.PhraseCLIR)){
         conf.set(Constants.SCFGPath, args[6]);
@@ -108,20 +113,23 @@ public class RunQueryEngine {
           conf.set(Constants.Heuristic4, args[13]);
         }   
         if (args.length >= 15) {
-          conf.setFloat(Constants.LexicalProbThreshold, Float.parseFloat(args[14]));
-        }
+          conf.set(Constants.Heuristic6, args[14]);
+        }   
         if (args.length >= 16) {
-          conf.setFloat(Constants.CumulativeProbThreshold, Float.parseFloat(args[15]));
+          conf.setFloat(Constants.LexicalProbThreshold, Float.parseFloat(args[15]));
+        }
+        if (args.length >= 17) {
+          conf.setFloat(Constants.CumulativeProbThreshold, Float.parseFloat(args[16]));
         }
       }
       LOG.info("Running job in mode = "+mode);
     } catch (Exception e) {
       e.printStackTrace();
-      System.out.println("usage: ivory.sqe.retrieval.RunQueryEngine bow [index-path] [queries-file] [qrels] [src-lang] [tokenizer-model-file]");
-      System.out.println("usage: ivory.sqe.retrieval.RunQueryEngine clir [index-path] [queries-file] [qrels] [src-lang] [tokenizer-model-file] [vocab-f-file] [vocab-e-file] [ttable-f2e-file] (lex-prob-threshold) (cum-prob-threshold)");
-      System.out.println("usage: ivory.sqe.retrieval.RunQueryEngine phrase [index-path] [queries-file] [qrels] [src-lang] [tokenizer-model-file] [grammar-file] (H1=yes|no) (H2=yes|no) (H3=sum|max|avg)");
-      System.out.println("usage: ivory.sqe.retrieval.RunQueryEngine phrase2 [index-path] [queries-file] [qrels] [src-lang] [tokenizer-model-file] [vocab-f-file] [vocab-e-file] [ttable-f2e-file] [grammar-file] (H1=yes|no) (H2=yes|no) (H3=sum|max|avg) (H4=token|combine) (lex-prob-threshold) (cum-prob-threshold)");
-      System.out.println("usage: ivory.sqe.retrieval.RunQueryEngine mt-output [index-path] [queries-file] [qrels] [kBest] (H5=none|add|replace) [vocab-f-file] [vocab-e-file] [ttable-f2e-file]");
+      System.out.println("usage: ivory.sqe.retrieval.RunQueryEngine bow [index-path] [queries-file] [qrels] [query-lang] [tokenizer-model-file]");
+      System.out.println("usage: ivory.sqe.retrieval.RunQueryEngine clir [index-path] [queries-file] [qrels] [query-lang] [tokenizer-model-file] [vocab-f-file] [vocab-e-file] [ttable-f2e-file] (lex-prob-threshold) (cum-prob-threshold) (H6=yes|no) (grammar-file for H6)");
+      System.out.println("usage: ivory.sqe.retrieval.RunQueryEngine phrase [index-path] [queries-file] [qrels] [query-lang] [tokenizer-model-file] [grammar-file] (H1=yes|no) (H2=yes|no) (H3=sum|max|avg)");
+      System.out.println("usage: ivory.sqe.retrieval.RunQueryEngine phrase2 [index-path] [queries-file] [qrels] [query-lang] [tokenizer-model-file] [vocab-f-file] [vocab-e-file] [ttable-f2e-file] [grammar-file] (H1=yes|no) (H2=yes|no) (H3=sum|max|avg) (H4=token|combine) (H6=yes|no) (lex-prob-threshold) (cum-prob-threshold)");
+      System.out.println("usage: ivory.sqe.retrieval.RunQueryEngine mt-output [index-path] [queries-file] [qrels] [query-lang] [tokenizer-model-file] [kBest] (H5=none|add|replace) ([vocab-f-file] [vocab-e-file] [ttable-f2e-file])");
       ToolRunner.printGenericCommandUsage(System.out);
       System.exit(-1);	
     }

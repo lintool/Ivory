@@ -34,5 +34,6 @@ public class Constants {
   public static final String Heuristic3 = "Ivory.H3";
   public static final String Heuristic4 = "Ivory.H4";
   public static final String Heuristic5 = "Ivory.H5";
+  public static final String Heuristic6 = "Ivory.H6";
 
 }

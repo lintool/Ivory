@@ -4,16 +4,12 @@ import ivory.core.tokenize.Tokenizer;
 import ivory.core.tokenize.TokenizerFactory;
 import ivory.sqe.retrieval.Constants;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.mortbay.log.Log;
 
 
 public class CLWordAndPhraseQueryGenerator implements QueryGenerator {
@@ -26,7 +22,7 @@ public class CLWordAndPhraseQueryGenerator implements QueryGenerator {
   //  private int H4;
   private static final int OFF = 0, ON = 1;
   private static final int COMBINE = 0, PERTOKEN = 1, COVER = 2;
-  private int H1, H4;
+  private int H1, H4, H6;
 
   public CLWordAndPhraseQueryGenerator() throws IOException {
     super();
@@ -38,6 +34,7 @@ public class CLWordAndPhraseQueryGenerator implements QueryGenerator {
     LOG.info(conf.get(Constants.Heuristic1));
     LOG.info(conf.get(Constants.Heuristic3));
     LOG.info(conf.get(Constants.Heuristic4));
+    LOG.info(conf.get(Constants.Heuristic6));
 
     String h4 = conf.get(Constants.Heuristic4); 
     if (h4.equals("combine")) {
@@ -62,8 +59,8 @@ public class CLWordAndPhraseQueryGenerator implements QueryGenerator {
 
     tokenizer = TokenizerFactory.createTokenizer(fs, conf.get(Constants.Language), conf.get(Constants.TokenizerData), null);
     clGenerator = new CLWordQueryGenerator();
-    phraseGenerator = new CLPhraseQueryGenerator();
     clGenerator.init(fs, conf);
+    phraseGenerator = new CLPhraseQueryGenerator();
     phraseGenerator.init(fs, conf);
   }
 
@@ -82,22 +79,6 @@ public class CLWordAndPhraseQueryGenerator implements QueryGenerator {
       // iterate over tokens and phrases, and create weighted representation for each. 
       // save representations into resp. arrays
 
-      // word
-      JSONObject[] weightObjects = new JSONObject[length];
-      for (int start = 0; start < length; start++) {
-        // create a #weight JSonObject
-        String token = tokens[start];
-        JSONArray weights = clGenerator.getTranslations(token);
-        if (weights != null) {				
-          JSONObject wordTrans = new JSONObject();
-          wordTrans.put("#weight", weights);
-          weightObjects[start] = wordTrans;
-        }else {
-          // token doesn't appear in vocab
-          //LOG.info("Skipped "+token);
-        }
-      }	
-
       // phrase
       int numWindowSizes = maxWindow-minWindow+1;
       boolean isCovered[][] = new boolean[numWindowSizes][length];
@@ -106,7 +87,7 @@ public class CLWordAndPhraseQueryGenerator implements QueryGenerator {
         int wIndex = windowSize - minWindow;
 
         // extract phrases
-        String[] phrases = extractPhrases(tokens, windowSize);
+        String[] phrases = Utils.extractPhrases(tokens, windowSize);
         pweightObjects[wIndex] = new JSONObject[phrases.length];
 
         // find translations for each phrase.
@@ -127,7 +108,10 @@ public class CLWordAndPhraseQueryGenerator implements QueryGenerator {
                 ignore = true;
 //                LOG.info("already covered "+wIndex+","+cur); 
               }
-              isCovered[wIndex][cur] = true;
+              if (windowSize > 0) {     // if phrase has single term, no need to mark as covered
+                LOG.info("covered "+wIndex+","+cur); 
+                isCovered[wIndex][cur] = true;
+              }
             }
           }
           if (!ignore) {
@@ -136,8 +120,30 @@ public class CLWordAndPhraseQueryGenerator implements QueryGenerator {
             pweightObjects[wIndex][start] = phraseTrans;
           }
         }
-
       }
+      
+      // word
+      JSONObject[] weightObjects = new JSONObject[length];
+      for (int start = 0; start < length; start++) {
+//        // we want to check coverage from phrases with length > 0 (not single term)
+//        if(minWindow == 0){
+//          if (isCovered[1][start])  continue;          
+//        }else {
+//          if (isCovered[0][start])  continue;          
+//        }
+        // create a #weight JSonObject
+        String token = tokens[start];
+//        LOG.info("Token "+token+" at "+start+" not covered by pweight");
+        JSONArray weights = clGenerator.getTranslations(token);
+        if (weights != null) {        
+          JSONObject wordTrans = new JSONObject();
+          wordTrans.put("#weight", weights);
+          weightObjects[start] = wordTrans;
+        }else {
+          // token doesn't appear in vocab
+          //LOG.info("Skipped "+token);
+        }
+      } 
 
       // represent each token with an array of #pweight and #weight objects = tokenArr
       // represent query by #combine of token representations = queryArr
@@ -193,21 +199,6 @@ public class CLWordAndPhraseQueryGenerator implements QueryGenerator {
       e.printStackTrace();
     }
     return queryJson;
-  }
-
-  private String[] extractPhrases(String[] tokens, int windowSize) {
-    int numWindows = length - windowSize;
-    String[] phrases = new String[numWindows];
-    for (int start = 0; start < numWindows; start++) {
-      String phrase = "";
-      for (int k = 0; k <= windowSize; k++) {
-        int cur = start + k;
-        phrase = phrase + tokens[cur]+" ";
-      }
-      phrase = phrase.trim();
-      phrases[start] = phrase;
-    }
-    return phrases;
   }
 
   public int getQueryLength(){

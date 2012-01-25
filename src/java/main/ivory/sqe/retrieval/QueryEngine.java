@@ -150,7 +150,7 @@ public class QueryEngine {
       String c = conf.get(Constants.CumulativeProbThreshold);
 
       ResultWriter resultWriter = new ResultWriter("sqe-"+conf.get(Constants.QueryType)+"-"+h1+"-"+h2+"-"+h3+"-"+h4+"-"+p+"-"+c+"-trec.txt", false, fs);
-
+      float rankTime = 0, generateTime = 0;
       for ( String qid : queries.keySet()) {
         String query = queries.get(qid);
         LOG.info("Query "+qid+" = "+query);
@@ -159,20 +159,23 @@ public class QueryEngine {
         JSONObject structuredQuery = generator.parseQuery(query);
         long end = System.currentTimeMillis();
         LOG.info("Generating " + qid + ": " + ( end - start) + "ms");
-        try {
-          LOG.info("Processing "+structuredQuery.toString(0));
-        } catch (JSONException e) {
-          e.printStackTrace();
-        }			  
+        generateTime += ( end - start ) ;
+//        try {
+////          LOG.info("Processing "+structuredQuery.toString(1));
+//        } catch (JSONException e) {
+//          e.printStackTrace();
+//        }			  
+        LOG.info("Processing "+qid + ": " + structuredQuery);
 
         start = System.currentTimeMillis();
         ranker.rank(qid, structuredQuery, generator.getQueryLength());
         end = System.currentTimeMillis();
         LOG.info("Ranking " + qid + ": " + ( end - start) + "ms");
-
+        rankTime += ( end - start ) ;
         printResults(qid, ranker, resultWriter);
       }
       resultWriter.flush();
+      LOG.info("Total generation time : " + generateTime + "ms\nTotal rank time : " + rankTime + "ms");
     } catch (IOException e) {
       e.printStackTrace();
     }
