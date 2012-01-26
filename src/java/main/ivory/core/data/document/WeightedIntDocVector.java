@@ -95,6 +95,10 @@ public class WeightedIntDocVector implements IntDocVector {
 		}
 	}
 
+	@Override
+	public String toString() {
+	  return weightedTerms.toString();
+	}
 }
 	
 

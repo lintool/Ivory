@@ -90,7 +90,7 @@ public class PreprocessWikipedia extends Configured implements Tool {
       printUsage();
       return -1;
     }
-    Configuration conf = new Configuration();
+    Configuration conf = getConf();
 
     String collectionLang = null, tokenizerModel = null, collectionVocab = null,
     fVocab_f2e = null, eVocab_f2e = null, fVocab_e2f, eVocab_e2f = null, ttable_f2e = null, ttable_e2f = null;
@@ -141,6 +141,7 @@ public class PreprocessWikipedia extends Configured implements Tool {
     LOG.info(" - Index path: " + indexRootPath);
     LOG.info(" - Raw collection path: " + rawCollection);
     LOG.info(" - Compressed collection path: " + seqCollection);
+    LOG.info(" - Collection language: " + collectionLang);
     LOG.info(" - Tokenizer class: " + tokenizerClass);
     LOG.info(" - Minimum # terms per article : " + MinNumTermsPerArticle);
 
@@ -173,7 +174,9 @@ public class PreprocessWikipedia extends Configured implements Tool {
     Path mappingFile = env.getDocnoMappingData();
     if (!fs.exists(mappingFile)) {
       LOG.info(mappingFile + " doesn't exist, creating...");
-      String[] arr = new String[] { "-input="+rawCollection, "-output_path="+ indexRootPath+"/wiki-docid-tmp", "-output_file="+mappingFile.toString()};
+      String[] arr = new String[] { "-input="+rawCollection,
+          "-output_path="+ indexRootPath+"/wiki-docid-tmp",
+          "-output_file="+mappingFile.toString()};
 
       BuildWikipediaDocnoMapping tool = new BuildWikipediaDocnoMapping();
       tool.setConf(conf);
@@ -188,7 +191,8 @@ public class PreprocessWikipedia extends Configured implements Tool {
     p = new Path(seqCollection);
     if (!fs.exists(p)) {
       LOG.info(seqCollection + " doesn't exist, creating...");
-      String[] arr = new String[] { "-input="+rawCollection, "-output="+seqCollection, "-mapping_file="+mappingFile.toString(), "-compression_type=block", "-wiki_language="+collectionLang};
+      String[] arr = new String[] { "-input="+rawCollection, "-output="+seqCollection, "-mapping_file="+mappingFile.toString(), "-compression_type=block",
+          "-wiki_language="+collectionLang};
       RepackWikipedia tool = new RepackWikipedia();
       tool.setConf(conf);
       tool.run(arr);
@@ -218,7 +222,8 @@ public class PreprocessWikipedia extends Configured implements Tool {
     startTime = System.currentTimeMillis();
     LOG.info("Counting terms...");
     new ComputeGlobalTermStatistics(conf).run();
-    LOG.info("TermCount = "+env.readCollectionTermCount()+"\nJob finished in "+(System.currentTimeMillis()-startTime)/1000.0+" seconds");
+    LOG.info("TermCount = "+env.readCollectionTermCount());
+    LOG.info("Job finished in "+(System.currentTimeMillis()-startTime)/1000.0+" seconds");
 
     // Build a map from terms to sequentially generated integer term ids
     startTime = System.currentTimeMillis();
