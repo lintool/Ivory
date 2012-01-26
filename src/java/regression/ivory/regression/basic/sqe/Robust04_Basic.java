@@ -294,14 +294,14 @@ public class Robust04_Basic {
   @Test
   public void runRegression() throws Exception {
     Configuration conf = new Configuration();
-    conf.set(ivory.sqe.retrieval.Constants.IndexPath, "/scratch0/indexes/trec");
+    conf.set(ivory.sqe.retrieval.Constants.IndexPath, "/fs/clip-scratch/fture/indexes/trec");
     conf.set(ivory.sqe.retrieval.Constants.QueriesPath, "data/trec/queries.robust04.xml");
     conf.set(ivory.sqe.retrieval.Constants.QueryType, ivory.sqe.retrieval.Constants.BagOfWords);
     FileSystem fs = FileSystem.getLocal(new Configuration());
 
     QueryEngine qe = new QueryEngine(conf, fs);
     long start = System.currentTimeMillis();
-    qe.runQueries();
+    qe.runQueries(conf);
     long end = System.currentTimeMillis();
     LOG.info("Total query time: " + (end - start) + "ms");
 
