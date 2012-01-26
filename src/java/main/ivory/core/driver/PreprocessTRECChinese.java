@@ -39,11 +39,11 @@ import edu.umd.cloud9.collection.trec.NumberTrecDocuments2;
 import edu.umd.cloud9.collection.trec.TrecDocnoMapping;
 import edu.umd.cloud9.collection.trec.TrecDocumentInputFormat2;
 
-public class PreprocessTREC9Chinese extends Configured implements Tool {
-  private static final Logger LOG = Logger.getLogger(PreprocessTREC9Chinese.class);
+public class PreprocessTRECChinese extends Configured implements Tool {
+  private static final Logger LOG = Logger.getLogger(PreprocessTRECChinese.class);
 
   private static int printUsage() {
-    System.out.println("usage: [input-path] [index-path] [stanford-segmenter-model-path]");
+    System.out.println("usage: [input-path] [index-path] [tokenizer-class] [stanford-segmenter-model-path]");
     ToolRunner.printGenericCommandUsage(System.out);
     return -1;
   }
@@ -52,17 +52,22 @@ public class PreprocessTREC9Chinese extends Configured implements Tool {
    * Runs this tool.
    */
   public int run(String[] args) throws Exception {
-    if (args.length != 3) {
+    if (args.length < 3) {
       printUsage();
       return -1;
     }
 
     String collection = args[0];
     String indexRootPath = args[1];
-    String tokenizerPath = args[2];
-    LOG.info("Tool name: " + PreprocessTREC9Chinese.class.getCanonicalName());
+    String tokenizerClass = args[2];
+    String tokenizerPath = null;
+    if (args.length == 4) {
+      tokenizerPath = args[3];
+    }
+    LOG.info("Tool name: " + PreprocessTRECChinese.class.getCanonicalName());
     LOG.info(" - Collection path: " + collection);
     LOG.info(" - Index path: " + indexRootPath);
+    LOG.info(" - Tokenizer class: " + tokenizerClass);
     LOG.info(" - Tokenizer path: " + tokenizerPath);
 
     Configuration conf = getConf();
@@ -96,8 +101,10 @@ public class PreprocessTREC9Chinese extends Configured implements Tool {
     conf.set(Constants.CollectionPath, collection);
     conf.set(Constants.IndexPath, indexRootPath);
     conf.set(Constants.InputFormat, TrecDocumentInputFormat2.class.getCanonicalName());
-    conf.set(Constants.Tokenizer, StanfordChineseTokenizer.class.getCanonicalName());
-    conf.set(Constants.TokenizerData, tokenizerPath);
+    conf.set(Constants.Tokenizer, tokenizerClass);
+    if (tokenizerPath != null) {
+      conf.set(Constants.TokenizerData, tokenizerPath);
+    }
     conf.set(Constants.DocnoMappingClass, TrecDocnoMapping.class.getCanonicalName());
     conf.set(Constants.DocnoMappingFile, env.getDocnoMappingData().toString());
 
@@ -121,6 +128,6 @@ public class PreprocessTREC9Chinese extends Configured implements Tool {
    * Dispatches command-line arguments to the tool via the {@code ToolRunner}.
    */
   public static void main(String[] args) throws Exception {
-    ToolRunner.run(new Configuration(), new PreprocessTREC9Chinese(), args);
+    ToolRunner.run(new Configuration(), new PreprocessTRECChinese(), args);
   }
 }
