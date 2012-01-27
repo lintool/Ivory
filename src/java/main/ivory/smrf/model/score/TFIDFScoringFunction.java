@@ -1,0 +1,66 @@
+/*
+ * Ivory: A Hadoop toolkit for web-scale information retrieval
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you
+ * may not use this file except in compliance with the License. You may
+ * obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+ * implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
+
+package ivory.smrf.model.score;
+
+import ivory.core.util.XMLTools;
+import ivory.smrf.model.GlobalEvidence;
+import ivory.smrf.model.GlobalTermEvidence;
+
+import org.w3c.dom.Node;
+
+/**
+ * Computes score based on IDF.
+ *
+ * @author Nima Asadi
+ */
+public class TFIDFScoringFunction extends ScoringFunction {
+  private String idfType = "okapi";
+  protected float idf;
+
+  @Override
+  public void configure(Node domNode) {
+    idfType = XMLTools.getAttributeValue(domNode, "idf", "okapi");
+  }
+
+  @Override
+  public float getScore(int tf, int docLen) {
+    return tf * idf;
+  }
+
+  @Override
+  public String toString() {
+    return "<scoringfunction>TFIDF</scoringfunction>\n";
+  }
+
+  @Override
+  public void initialize(GlobalTermEvidence termEvidence, GlobalEvidence globalEvidence) {
+    super.initialize(termEvidence, globalEvidence);
+
+    if ("none".equals(idfType)) {
+      idf = 1;
+    } else if ("classic".equals(idfType)) {
+      idf = (float) Math.log((float) globalEvidence.numDocs / (float) termEvidence.getDf());
+    } else if ("okapi-positive".equals(idfType)) {
+      idf = (float) Math.log(((float) globalEvidence.numDocs + 0.5f)
+          / ((float) termEvidence.getDf() + 0.5f));
+    } else {
+      // Defaults to "Okapi" idf.
+      idf = (float) Math.log(((float) globalEvidence.numDocs - (float) termEvidence.getDf() + 0.5f)
+          / ((float) termEvidence.getDf() + 0.5f));
+    }
+  }
+}
