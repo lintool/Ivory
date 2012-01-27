@@ -1,11 +1,11 @@
 /*
- * Ivory: A Hadoop toolkit for Web-scale information retrieval
- * 
+ * Ivory: A Hadoop toolkit for web-scale information retrieval
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You may
  * obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0 
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,19 +16,20 @@
 
 package ivory.core.driver;
 
-
+import ivory.core.Constants;
 import ivory.core.RetrievalEnvironment;
+import ivory.core.preprocess.BuildDictionary;
 import ivory.core.preprocess.BuildIntDocVectors;
 import ivory.core.preprocess.BuildTargetLangWeightedIntDocVectors;
 import ivory.core.preprocess.BuildTermDocVectors;
-import ivory.core.preprocess.BuildDictionary;
 import ivory.core.preprocess.BuildTranslatedTermDocVectors;
 import ivory.core.preprocess.BuildWeightedIntDocVectors;
 import ivory.core.preprocess.BuildWeightedTermDocVectors;
 import ivory.core.preprocess.ComputeGlobalTermStatistics;
-import ivory.core.Constants;
 
 import java.io.IOException;
+import java.util.Arrays;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
@@ -80,13 +81,13 @@ public class PreprocessWikipedia extends Configured implements Tool {
     if (numArgs >= NUM_MONO && numArgs < NUM_CROSS_E) {
       mode = MONO_LINGUAL;
       LOG.info("Mode: monolingual");
-    }else if (numArgs == NUM_CROSS_E) {
+    } else if (numArgs == NUM_CROSS_E) {
       mode = CROSS_LINGUAL_E;
       LOG.info("Mode: crosslingual - English side");
-    }else if (numArgs == NUM_CROSS_F) {
+    } else if (numArgs == NUM_CROSS_F) {
       mode = CROSS_LINGUAL_F;
       LOG.info("Mode: crosslingual - nonEnglish side");
-    }else{
+    } else {
       printUsage();
       return -1;
     }
@@ -159,7 +160,6 @@ public class PreprocessWikipedia extends Configured implements Tool {
         LOG.info(" - Target vocab file: " + eVocab_f2e);
       }
     }
-    LOG.info("Launching with " + numMappers + " mappers, " + numReducers + " reducers...");
 
     FileSystem fs = FileSystem.get(conf);
 
@@ -174,25 +174,30 @@ public class PreprocessWikipedia extends Configured implements Tool {
     Path mappingFile = env.getDocnoMappingData();
     if (!fs.exists(mappingFile)) {
       LOG.info(mappingFile + " doesn't exist, creating...");
-      String[] arr = new String[] { "-input="+rawCollection,
-          "-output_path="+ indexRootPath+"/wiki-docid-tmp",
-          "-output_file="+mappingFile.toString()};
+      String[] arr = new String[] {
+          "-input=" + rawCollection,
+          "-output_path=" + indexRootPath + "/wiki-docid-tmp",
+          "-output_file=" + mappingFile.toString() };
+      LOG.info("Running BuildWikipediaDocnoMapping with args " + Arrays.toString(arr));
 
       BuildWikipediaDocnoMapping tool = new BuildWikipediaDocnoMapping();
       tool.setConf(conf);
       tool.run(arr);
 
       fs.delete(new Path(indexRootPath + "/wiki-docid-tmp"), true);
-    }else {
-      LOG.info(p+" exists");
     }
 
     // Repack Wikipedia into sequential compressed block
     p = new Path(seqCollection);
     if (!fs.exists(p)) {
       LOG.info(seqCollection + " doesn't exist, creating...");
-      String[] arr = new String[] { "-input="+rawCollection, "-output="+seqCollection, "-mapping_file="+mappingFile.toString(), "-compression_type=block",
-          "-wiki_language="+collectionLang};
+      String[] arr = new String[] { "-input=" + rawCollection,
+          "-output=" + seqCollection,
+          "-mapping_file=" + mappingFile.toString(),
+          "-compression_type=block",
+          "-wiki_language=" + collectionLang };
+      LOG.info("Running RepackWikipedia with args " + Arrays.toString(arr));
+
       RepackWikipedia tool = new RepackWikipedia();
       tool.setConf(conf);
       tool.run(arr);
@@ -282,11 +287,9 @@ public class PreprocessWikipedia extends Configured implements Tool {
   }
 
   /**
-   * Dispatches command-line arguments to the tool via the
-   * <code>ToolRunner</code>.
+   * Dispatches command-line arguments to the tool via the {@code ToolRunner}.
    */
   public static void main(String[] args) throws Exception {
-    int res = ToolRunner.run(new Configuration(), new PreprocessWikipedia(), args);
-    System.exit(res);
+    ToolRunner.run(new Configuration(), new PreprocessWikipedia(), args);
   }
 }

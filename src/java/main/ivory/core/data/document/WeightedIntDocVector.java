@@ -99,6 +99,14 @@ public class WeightedIntDocVector implements IntDocVector {
 	public String toString() {
 	  return weightedTerms.toString();
 	}
+
+	public boolean containsTerm(int termid) {
+	  return weightedTerms.containsKey(termid);
+	}
+
+	public float getWeight(int termid) {
+	  return weightedTerms.get(termid);
+	}
 }
 	
 
