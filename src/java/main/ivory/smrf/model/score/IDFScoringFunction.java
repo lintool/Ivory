@@ -63,10 +63,4 @@ public class IDFScoringFunction extends ScoringFunction {
           / ((float) termEvidence.getDf() + 0.5f));
     }
   }
-
-  @Override
-  public float getMinScore() {
-    // TODO: make this bound tighter
-    return Float.NEGATIVE_INFINITY;
-  }
 }

@@ -63,4 +63,8 @@ public class TFIDFScoringFunction extends ScoringFunction {
           / ((float) termEvidence.getDf() + 0.5f));
     }
   }
+
+  @Override public float getMinScore() {
+    return 0.0f;
+  }
 }
