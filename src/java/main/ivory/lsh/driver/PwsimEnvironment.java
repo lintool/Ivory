@@ -67,7 +67,11 @@ public abstract class PwsimEnvironment extends Configured {
   }
 
   public static String getFileNameWithPars(String dir, String fileName) throws Exception{
-    RetrievalEnvironment env = new RetrievalEnvironment(dir, FileSystem.get(new Configuration()));
+    return getFileNameWithPars(dir, fileName, FileSystem.get(new Configuration()));
+  }
+
+  public static String getFileNameWithPars(String dir, String fileName, FileSystem fs) throws Exception{
+    RetrievalEnvironment env = new RetrievalEnvironment(dir, fs);
     if(fileName.equals("TermDocs")){
       return env.getWeightedTermDocVectorsDirectory();
     }else if(fileName.equals("IntDocs")){

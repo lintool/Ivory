@@ -56,16 +56,11 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
   private static final Logger LOG = Logger.getLogger(BuildTranslatedTermDocVectors.class);
   private static int SAMPLING = 1;
 
-  protected static enum Docs {
-    ZERO, SHORT, Total
-  };
-
-  protected static enum DF {
-    TransDf, NoDf
-  }
+  protected static enum Docs { ZERO, SHORT, Total };
+  protected static enum DF { TransDf, NoDf }
 
   private static class MyMapperTrans extends MapReduceBase implements
-  Mapper<IntWritable, TermDocVector, IntWritable, HMapSFW> {
+      Mapper<IntWritable, TermDocVector, IntWritable, HMapSFW> {
 
     private ScoringModel model;
     private HMapIFW transDfTable;
@@ -201,12 +196,12 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
 
     String outputPath = env.getWeightedTermDocVectorsDirectory();
     String transDfFile = indexPath+"/transDf.dat";
-    String fVocab_f2e= getConf().get("Ivory.F_Vocab_F2E");				//de from P(e|f)
-    String eVocab_f2e = getConf().get("Ivory.E_Vocab_F2E");				//en from P(e|f)
-    String ttable_f2e = getConf().get("Ivory.TTable_F2E");				//P(e|f)
-    String eVocab_e2f  = getConf().get("Ivory.E_Vocab_E2F");		//en from P(f|e)
-    String fVocab_e2f  = getConf().get("Ivory.F_Vocab_E2F");		//de from P(f|e)
-    String ttable_e2f= getConf().get("Ivory.TTable_E2F");			//P(f|e)
+    String fVocab_f2e= getConf().get("Ivory.F_Vocab_F2E");   // de from P(e|f)
+    String eVocab_f2e = getConf().get("Ivory.E_Vocab_F2E");  // en from P(e|f)
+    String ttable_f2e = getConf().get("Ivory.TTable_F2E");   // P(e|f)
+    String eVocab_e2f = getConf().get("Ivory.E_Vocab_E2F");  // en from P(f|e)
+    String fVocab_e2f = getConf().get("Ivory.F_Vocab_E2F");  // de from P(f|e)
+    String ttable_e2f = getConf().get("Ivory.TTable_E2F");   // P(f|e)
 
     createTranslatedDFFile(transDfFile);
 
@@ -214,8 +209,9 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
     conf.setJobName("BuildTranslatedTermDocVectors");
     FileSystem fs = FileSystem.get(conf);
 
-    if(fs.exists(new Path(outputPath))){
-      LOG.info(outputPath+": Translated term doc vectors already exist! Nothing to do for this job...");
+    if (fs.exists(new Path(outputPath))) {
+      LOG.info(outputPath
+          + ": Translated term doc vectors already exist! Nothing to do for this job...");
       return 0;
     }
 
@@ -277,7 +273,7 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
 
     long startTime = System.currentTimeMillis();
     JobClient.runJob(conf);
-    LOG.info("Job finished in "+(System.currentTimeMillis()-startTime)/1000.0+" seconds");
+    LOG.info("Job finished in " + (System.currentTimeMillis() - startTime) / 1000.0 + " seconds");
 
     return 0;
   }

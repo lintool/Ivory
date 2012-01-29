@@ -223,7 +223,7 @@ public class BuildWeightedTermDocVectors extends PowerTool {
   }
 
   public int runTool() throws Exception {
-    LOG.info("PowerTool: BuildWeightedTermDocVectors");
+    LOG.info("PowerTool: " + BuildWeightedTermDocVectors.class.getName());
 
     JobConf conf = new JobConf(getConf(), BuildWeightedTermDocVectors.class);
     FileSystem fs = FileSystem.get(conf);
@@ -269,11 +269,12 @@ public class BuildWeightedTermDocVectors extends PowerTool {
     }
     DistributedCache.addCacheFile(docLengthFile.toUri(), conf);
 
+    conf.setJobName(BuildWeightedTermDocVectors.class.getSimpleName() + ":" + collectionName);
     conf.setMapperClass(MyMapper.class);
-    //conf.setInt("mapred.task.timeout",3600000);
-    conf.setJobName("GetWeightedTermDocVectors:" + collectionName);
+
     conf.setNumMapTasks(mapTasks);
     conf.setNumReduceTasks(0);
+
     conf.setInt("mapred.min.split.size", minSplitSize);
     conf.set("mapred.child.java.opts", "-Xmx2048m");
     conf.setInt("Ivory.MinNumTerms", getConf().getInt("Ivory.MinNumTerms", Integer.MAX_VALUE));		

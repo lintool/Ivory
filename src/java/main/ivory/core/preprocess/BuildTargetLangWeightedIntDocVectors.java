@@ -1,11 +1,11 @@
 /*
- * Ivory: A Hadoop toolkit for Web-scale information retrieval
- * 
+ * Ivory: A Hadoop toolkit for web-scale information retrieval
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You may
  * obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0 
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,13 +15,14 @@
  */
 
 package ivory.core.preprocess;
+
 import ivory.core.RetrievalEnvironment;
 import ivory.core.data.document.WeightedIntDocVector;
-import ivory.core.util.CLIRUtils;
 import ivory.lsh.driver.PwsimEnvironment;
 
 import java.io.IOException;
 import java.net.URI;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.filecache.DistributedCache;
 import org.apache.hadoop.fs.FileSystem;
@@ -42,13 +43,12 @@ import org.apache.hadoop.mapred.SequenceFileOutputFormat;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
-import edu.umd.hooka.Vocab;
-import edu.umd.hooka.alignment.HadoopAlign;
 import edu.umd.cloud9.io.map.HMapIFW;
 import edu.umd.cloud9.io.map.HMapSFW;
 import edu.umd.cloud9.util.PowerTool;
-import edu.umd.cloud9.util.map.MapIF;
 import edu.umd.cloud9.util.map.MapKF;
+import edu.umd.hooka.Vocab;
+import edu.umd.hooka.alignment.HadoopAlign;
 
 /**
  * Map term doc vectors into int doc vectors using the term-to-id mapping. 
@@ -58,7 +58,6 @@ import edu.umd.cloud9.util.map.MapKF;
  * @author ferhanture
  *
  */
-@SuppressWarnings("deprecation")
 public class BuildTargetLangWeightedIntDocVectors extends PowerTool {
   private static final Logger sLogger = Logger.getLogger(BuildWeightedIntDocVectors.class);
 
@@ -71,30 +70,29 @@ public class BuildTargetLangWeightedIntDocVectors extends PowerTool {
   protected static enum Terms{
     OOV, NEG
   }
+
   private static class MyMapper extends MapReduceBase implements
-  Mapper<IntWritable, HMapSFW, IntWritable, WeightedIntDocVector> {
+      Mapper<IntWritable, HMapSFW, IntWritable, WeightedIntDocVector> {
 
     static IntWritable mDocno = new IntWritable();
     private boolean normalize = false;
     private Vocab engVocabH;
 
     public void configure(JobConf conf){
-      //			sLogger.setLevel(Level.DEBUG);
-
       normalize = conf.getBoolean("Ivory.Normalize", false);
 
-      Path[] localFiles;
       try {
-        localFiles = DistributedCache.getLocalCacheFiles(conf);
-      } catch (IOException e2) {
-        throw new RuntimeException("Local cache files not read properly.");
-      }
+        Path[] localFiles = DistributedCache.getLocalCacheFiles(conf);
 
-      try{
-        engVocabH = HadoopAlign.loadVocab(localFiles[0], FileSystem.getLocal(conf));
+        String vocabFile = conf.get("Ivory.FinalVocab");
+        for (Path p : localFiles) {
+          if (p.toString().contains(vocabFile)) {
+            engVocabH = HadoopAlign.loadVocab(p, FileSystem.getLocal(conf));
+          }
+        }
       } catch (Exception e) {
         e.printStackTrace();
-        throw new RuntimeException("Error initializing Term to Id map!");
+        throw new RuntimeException("Error initializing vocab data!");
       }
     }
 
@@ -150,13 +148,10 @@ public class BuildTargetLangWeightedIntDocVectors extends PowerTool {
     super(conf);
   }
 
-  @SuppressWarnings("deprecation")
   public int runTool() throws Exception {
-    //		sLogger.setLevel(Level.DEBUG);
+    sLogger.info("PowerTool: " + BuildTargetLangWeightedIntDocVectors.class.getName());
 
-    sLogger.info("PowerTool: GetTargetLangWeightedIntDocVectors");
-
-    JobConf conf = new JobConf(BuildTargetLangWeightedIntDocVectors.class);
+    JobConf conf = new JobConf(getConf(), BuildTargetLangWeightedIntDocVectors.class);
     FileSystem fs = FileSystem.get(conf);
 
     String indexPath = getConf().get("Ivory.IndexPath");
@@ -168,7 +163,6 @@ public class BuildTargetLangWeightedIntDocVectors extends PowerTool {
     int minSplitSize = getConf().getInt("Ivory.MinSplitSize", 0);
     String collectionName = getConf().get("Ivory.CollectionName");
 
-
     sLogger.info("Characteristics of the collection:");
     sLogger.info(" - CollectionName: " + collectionName);
     sLogger.info("Characteristics of the job:");
@@ -178,14 +172,14 @@ public class BuildTargetLangWeightedIntDocVectors extends PowerTool {
     String vocabFile = getConf().get("Ivory.FinalVocab");
     DistributedCache.addCacheFile(new URI(vocabFile), conf);
 
-    Path inputPath = new Path(PwsimEnvironment.getFileNameWithPars(indexPath, "TermDocs"));
+    Path inputPath = new Path(PwsimEnvironment.getFileNameWithPars(indexPath, "TermDocs", fs));
     Path weightedVectorsPath = new Path(outputPath);
 
     if (fs.exists(weightedVectorsPath)) {
       sLogger.info("Output path already exists!");
       return -1;
     }
-    conf.setJobName("GetWeightedIntDocVectors:" + collectionName);
+    conf.setJobName(BuildTargetLangWeightedIntDocVectors.class.getSimpleName() + ":" + collectionName);
     conf.setNumMapTasks(mapTasks);
     conf.setNumReduceTasks(0);
     conf.setInt("mapred.min.split.size", minSplitSize);

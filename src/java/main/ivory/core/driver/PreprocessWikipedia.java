@@ -245,10 +245,10 @@ public class PreprocessWikipedia extends Configured implements Tool {
     conf.setInt("Ivory.MinNumTerms",MinNumTermsPerArticle);
 
     if (mode == CROSS_LINGUAL_F) {
-      // translate term doc vectors into English. 
+      // Translate term doc vectors into English.
       new BuildTranslatedTermDocVectors(conf).run();
-    }else {						
-      // get weighted term doc vectors
+    } else {
+      // Build weighted term doc vectors.
       new BuildWeightedTermDocVectors(conf).run();
     }
     LOG.info("Job finished in "+(System.currentTimeMillis()-startTime)/1000.0+" seconds");
@@ -260,14 +260,19 @@ public class PreprocessWikipedia extends Configured implements Tool {
     if (mode == MONO_LINGUAL) {
       new BuildIntDocVectors(conf).run();
       new BuildWeightedIntDocVectors(conf).run();
-      LOG.info("Job BuildWeightedIntDocVectors finished in "+(System.currentTimeMillis()-startTime)/1000.0+" seconds");
-    }else {
-      BuildTargetLangWeightedIntDocVectors weightedIntVectorsTool = new BuildTargetLangWeightedIntDocVectors(conf);
+      LOG.info("Job BuildWeightedIntDocVectors finished in " +
+          (System.currentTimeMillis() - startTime) / 1000.0 + " seconds");
+    } else {
+      BuildTargetLangWeightedIntDocVectors weightedIntVectorsTool =
+        new BuildTargetLangWeightedIntDocVectors(conf);
 
       int finalNumDocs = weightedIntVectorsTool.run();
-      LOG.info("Job BuildTargetLangWeightedIntDocVectors finished in "+(System.currentTimeMillis()-startTime)/1000.0+" seconds");
+
+      LOG.info("Job BuildTargetLangWeightedIntDocVectors finished in " +
+          (System.currentTimeMillis() - startTime) / 1000.0 + " seconds");
       if (finalNumDocs > 0) {
-        LOG.info("Changed doc count from "+env.readCollectionDocumentCount() + " to = "+finalNumDocs);
+        LOG.info("Changed doc count from " + env.readCollectionDocumentCount() +
+            " to = " + finalNumDocs);
         env.writeCollectionDocumentCount(finalNumDocs);
       }
       // set Property.CollectionTermCount to the size of the target vocab. since all docs are translated into that vocab. This property is read by WriteRandomVectors via RunComputeSignatures.
@@ -281,7 +286,8 @@ public class PreprocessWikipedia extends Configured implements Tool {
       env.writeCollectionTermCount(engVocabH.size());
     }
 
-    LOG.info("Preprocessing job finished in "+(System.currentTimeMillis()-preprocessStartTime)/1000.0+" seconds");
+    LOG.info("Preprocessing job finished in " +
+        (System.currentTimeMillis() - preprocessStartTime) / 1000.0 + " seconds");
 
     return 0;
   }
