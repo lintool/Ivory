@@ -216,27 +216,28 @@ public class PreprocessWikipedia extends Configured implements Tool {
     conf.setInt(Constants.DocnoOffset, 0); // docnos start at 1
     conf.setInt(Constants.TermIndexWindow, TermIndexWindow);
 
-    // Builds term doc vectors from document collection, and filters the terms that are not included in Ivory.SrcVocab
-    long startTime = System.currentTimeMillis();	
-    long preprocessStartTime = System.currentTimeMillis();	
+    // Builds term doc vectors from document collection, and filters the terms that are not included
+    // in Ivory.SrcVocab.
+    long startTime = System.currentTimeMillis();
+    long preprocessStartTime = System.currentTimeMillis();
     LOG.info("Building term doc vectors...");
     new BuildTermDocVectors(conf).run();
-    LOG.info("Job finished in "+(System.currentTimeMillis()-startTime)/1000.0+" seconds");
+    LOG.info("Job finished in " + (System.currentTimeMillis() - startTime) / 1000.0 + " seconds");
 
-    // Get CF and DF counts
+    // Get CF and DF counts.
     startTime = System.currentTimeMillis();
     LOG.info("Counting terms...");
     new ComputeGlobalTermStatistics(conf).run();
-    LOG.info("TermCount = "+env.readCollectionTermCount());
-    LOG.info("Job finished in "+(System.currentTimeMillis()-startTime)/1000.0+" seconds");
+    LOG.info("TermCount = " + env.readCollectionTermCount());
+    LOG.info("Job finished in " + (System.currentTimeMillis() - startTime) / 1000.0 + " seconds");
 
-    // Build a map from terms to sequentially generated integer term ids
+    // Build a map from terms to sequentially generated integer term ids.
     startTime = System.currentTimeMillis();
     LOG.info("Building term-to-integer id mapping...");
     new BuildDictionary(conf).run();
-    LOG.info("Job finished in "+(System.currentTimeMillis()-startTime)/1000.0+" seconds");
+    LOG.info("Job finished in " + (System.currentTimeMillis() - startTime) / 1000.0 + " seconds");
 
-    // Compute term weights, and output weighted term doc vectors
+    // Compute term weights, and output weighted term doc vectors.
     LOG.info("Building weighted term doc vectors...");
     startTime = System.currentTimeMillis();
 
@@ -251,7 +252,7 @@ public class PreprocessWikipedia extends Configured implements Tool {
       // Build weighted term doc vectors.
       new BuildWeightedTermDocVectors(conf).run();
     }
-    LOG.info("Job finished in "+(System.currentTimeMillis()-startTime)/1000.0+" seconds");
+    LOG.info("Job finished in " + (System.currentTimeMillis() - startTime) / 1000.0 + " seconds");
 
     // normalize (optional) and convert weighted term doc vectors into int doc vectors for efficiency
     startTime = System.currentTimeMillis();
