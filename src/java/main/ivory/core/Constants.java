@@ -10,6 +10,7 @@ public class Constants {
   public static final String IndexPath = "Ivory.IndexPath";
   public static final String InputFormat = "Ivory.InputFormat";
   public static final String Tokenizer = "Ivory.Tokenizer";
+  public static final String TokenizerData = "Ivory.TokenizerModel";
   public static final String DocnoMappingClass = "Ivory.DocnoMappingClass";
   public static final String DocnoMappingFile = "Ivory.DocnoMappingFile";
   public static final String DocnoOffset = "Ivory.DocnoOffset";

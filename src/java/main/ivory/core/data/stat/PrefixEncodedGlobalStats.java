@@ -120,7 +120,7 @@ public class PrefixEncodedGlobalStats {
 
 	public PairOfIntLong getStats(String term) {
 		int index = prefixSet.getId(term);
-		LOG.info("index of " + term + ": " + index);
+//		LOG.info("index of " + term + ": " + index);
 		if (index < 0)
 			return null;
 		PairOfIntLong p = new PairOfIntLong();
