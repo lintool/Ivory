@@ -44,6 +44,8 @@ import java.util.Map.Entry;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import com.google.common.collect.Maps;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.w3c.dom.Node;
@@ -52,9 +54,14 @@ import org.xml.sax.SAXException;
 
 import edu.umd.cloud9.collection.DocnoMapping;
 
+import ivory.ltr.operator.Operator;
+import ivory.ltr.operator.OperatorUtil;
+import ivory.ltr.operator.Sum;
+
 /**
  * @author Don Metzler
  *
+ * Modified by Nima Asadi
  */
 public class ExtractFeatures {
 
@@ -69,11 +76,23 @@ public class ExtractFeatures {
   private Map<String, String> queries = null; // query id -> query text mapping
   private DocnoMapping docnoMapping = null;   // docno mapping
 
+  private Map<String, Operator> operators = null;
+
   public ExtractFeatures(String [] args, FileSystem fs) throws SAXException, IOException, ParserConfigurationException, NotBoundException, Exception {
     loadQueryRunner(args, fs);
     env = runner.getRetrievalEnvironment();
     queries = runner.getQueries();
     docnoMapping = env.getDocnoMapping();
+
+    operators = Maps.newHashMap();
+    for(String configPath: args) {
+      Map<String, Operator> ops = OperatorUtil.parseOperators(configPath);
+      if(ops.size() > 0) {
+        for(String key: ops.keySet()) {
+          operators.put(key, ops.get(key));
+        }
+      }
+    }
 
     Map<String, String> finalQueries = new HashMap<String, String>();
     for(Entry<String, String> queryEntry : queries.entrySet()) {
@@ -169,7 +188,7 @@ public class ExtractFeatures {
    // extract features query-by-query
    for(Entry<String, String> queryEntry : queries.entrySet()) {
      // feature map (docname -> feature name -> feature value)
-     SortedMap<String,SortedMap<String,Double>> featureValues = new TreeMap<String,SortedMap<String,Double>>();
+     SortedMap<String,SortedMap<String,Operator>> featureValues = new TreeMap<String,SortedMap<String,Operator>>();
 
      // query id and text
      String qid = queryEntry.getKey();
@@ -231,9 +250,9 @@ public class ExtractFeatures {
          String docName = docIdToNameMap.get(docid);
 
          // get feature map for this docname
-         SortedMap<String,Double> docFeatures = featureValues.get(docName);
+         SortedMap<String,Operator> docFeatures = featureValues.get(docName);
          if(docFeatures == null) {
-           docFeatures = new TreeMap<String,Double>();
+           docFeatures = new TreeMap<String,Operator>();
            featureValues.put(docName, docFeatures);
          }
 
@@ -241,7 +260,8 @@ public class ExtractFeatures {
          double judgment = judgmentEntry.getValue();
 
          // set judgment feature
-         docFeatures.put(JUDGMENT_FEATURE_NAME, judgment);
+         docFeatures.put(JUDGMENT_FEATURE_NAME, new Sum());
+         docFeatures.get(JUDGMENT_FEATURE_NAME).addScore(judgment);
 
          // initialize doc nodes
          for(DocumentNode node : docNodes) {
@@ -266,13 +286,10 @@ public class ExtractFeatures {
                  double score = model.computeFeatureValue(c.getConcept(), metaFeat) * c.getPotential();
 
                  // update feature values
-                 Double curVal = docFeatures.get(featId);
-                 if(curVal == null) {
-                   docFeatures.put(featId, score);
+                 if(!docFeatures.containsKey(featId)) {
+                   docFeatures.put(featId, operators.get(modelName + "-" + paramId).newInstance());
                  }
-                 else {
-                   docFeatures.put(featId, curVal + score);
-                 }
+                 docFeatures.get(featId).addScore(score);
                }
              }
            }
@@ -284,27 +301,24 @@ public class ExtractFeatures {
            double score = c.getPotential();
 
            // update feature values
-           Double curVal = docFeatures.get(featId);
-           if(curVal == null) {
-             docFeatures.put(featId, score);
+           if(!docFeatures.containsKey(featId)) {
+             docFeatures.put(featId, operators.get(featId).newInstance());
            }
-           else {
-             docFeatures.put(featId, curVal + score);
-           }
-
+           docFeatures.get(featId).addScore(score);
          }
        }
      }
 
      // print feature values for current query
-     for(Entry<String, SortedMap<String, Double>> featureEntry : featureValues.entrySet()) {
+     for(Entry<String, SortedMap<String, Operator>> featureEntry : featureValues.entrySet()) {
        String docName = featureEntry.getKey();
        System.out.print(qid + "\t" + docName);
-       Map<String,Double> docFeatures = featureEntry.getValue();
+       Map<String,Operator> docFeatures = featureEntry.getValue();
        for(String featureName : featureNames) {
-         Double featVal = docFeatures.get(featureName);
-         if(featVal == null) {
-           featVal = DEFAULT_FEATURE_VALUE;
+         Operator op = docFeatures.get(featureName);
+         double featVal = DEFAULT_FEATURE_VALUE;
+         if(op != null) {
+           featVal = op.getFinalScore();
          }
          System.out.print("\t" + featVal);
        }
