@@ -1,11 +1,11 @@
 /*
- * Ivory: A Hadoop toolkit for Web-scale information retrieval
- * 
+ * Ivory: A Hadoop toolkit for web-scale information retrieval
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You may
  * obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0 
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,19 +16,20 @@
 
 package ivory.core.driver;
 
-
+import ivory.core.Constants;
 import ivory.core.RetrievalEnvironment;
+import ivory.core.preprocess.BuildDictionary;
 import ivory.core.preprocess.BuildIntDocVectors;
 import ivory.core.preprocess.BuildTargetLangWeightedIntDocVectors;
 import ivory.core.preprocess.BuildTermDocVectors;
-import ivory.core.preprocess.BuildDictionary;
 import ivory.core.preprocess.BuildTranslatedTermDocVectors;
 import ivory.core.preprocess.BuildWeightedIntDocVectors;
 import ivory.core.preprocess.BuildWeightedTermDocVectors;
 import ivory.core.preprocess.ComputeGlobalTermStatistics;
-import ivory.core.Constants;
 
 import java.io.IOException;
+import java.util.Arrays;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
@@ -80,23 +81,23 @@ public class PreprocessWikipedia extends Configured implements Tool {
     if (numArgs >= NUM_MONO && numArgs < NUM_CROSS_E) {
       mode = MONO_LINGUAL;
       LOG.info("Mode: monolingual");
-    }else if (numArgs == NUM_CROSS_E) {
+    } else if (numArgs == NUM_CROSS_E) {
       mode = CROSS_LINGUAL_E;
       LOG.info("Mode: crosslingual - English side");
-    }else if (numArgs == NUM_CROSS_F) {
+    } else if (numArgs == NUM_CROSS_F) {
       mode = CROSS_LINGUAL_F;
       LOG.info("Mode: crosslingual - nonEnglish side");
-    }else{
+    } else {
       printUsage();
       return -1;
     }
-    Configuration conf = new Configuration();
+    Configuration conf = getConf();
 
     String collectionLang = null, tokenizerModel = null, collectionVocab = null,
     fVocab_f2e = null, eVocab_f2e = null, fVocab_e2f, eVocab_e2f = null, ttable_f2e = null, ttable_e2f = null;
     String indexRootPath = args[0];
-    String rawCollection = args[1]; 	//"/shared/Wikipedia/raw/dewiki-20100117-pages-articles.xml";
-    String seqCollection = args[2]; 	//"/umd-lin/fture/pwsim/de-wikipedia/compressed.block/de-20100117";
+    String rawCollection = args[1];
+    String seqCollection = args[2];
     String tokenizerClass = args[3];	
     if (args.length > 4) {
       collectionLang = args[4];
@@ -141,7 +142,9 @@ public class PreprocessWikipedia extends Configured implements Tool {
     LOG.info(" - Index path: " + indexRootPath);
     LOG.info(" - Raw collection path: " + rawCollection);
     LOG.info(" - Compressed collection path: " + seqCollection);
+    LOG.info(" - Collection language: " + collectionLang);
     LOG.info(" - Tokenizer class: " + tokenizerClass);
+    LOG.info(" - Tokenizer model: " + tokenizerModel);
     LOG.info(" - Minimum # terms per article : " + MinNumTermsPerArticle);
 
     if (mode == CROSS_LINGUAL_E || mode == CROSS_LINGUAL_F) {
@@ -158,7 +161,6 @@ public class PreprocessWikipedia extends Configured implements Tool {
         LOG.info(" - Target vocab file: " + eVocab_f2e);
       }
     }
-    LOG.info("Launching with " + numMappers + " mappers, " + numReducers + " reducers...");
 
     FileSystem fs = FileSystem.get(conf);
 
@@ -173,22 +175,30 @@ public class PreprocessWikipedia extends Configured implements Tool {
     Path mappingFile = env.getDocnoMappingData();
     if (!fs.exists(mappingFile)) {
       LOG.info(mappingFile + " doesn't exist, creating...");
-      String[] arr = new String[] { "-input="+rawCollection, "-output_path="+ indexRootPath+"/wiki-docid-tmp", "-output_file="+mappingFile.toString()};
+      String[] arr = new String[] {
+          "-input=" + rawCollection,
+          "-output_path=" + indexRootPath + "/wiki-docid-tmp",
+          "-output_file=" + mappingFile.toString() };
+      LOG.info("Running BuildWikipediaDocnoMapping with args " + Arrays.toString(arr));
 
       BuildWikipediaDocnoMapping tool = new BuildWikipediaDocnoMapping();
       tool.setConf(conf);
       tool.run(arr);
 
       fs.delete(new Path(indexRootPath + "/wiki-docid-tmp"), true);
-    }else {
-      LOG.info(p+" exists");
     }
 
     // Repack Wikipedia into sequential compressed block
     p = new Path(seqCollection);
     if (!fs.exists(p)) {
       LOG.info(seqCollection + " doesn't exist, creating...");
-      String[] arr = new String[] { "-input="+rawCollection, "-output="+seqCollection, "-mapping_file="+mappingFile.toString(), "-compression_type=block", "-wiki_language="+collectionLang};
+      String[] arr = new String[] { "-input=" + rawCollection,
+          "-output=" + seqCollection,
+          "-mapping_file=" + mappingFile.toString(),
+          "-compression_type=block",
+          "-wiki_language=" + collectionLang };
+      LOG.info("Running RepackWikipedia with args " + Arrays.toString(arr));
+
       RepackWikipedia tool = new RepackWikipedia();
       tool.setConf(conf);
       tool.run(arr);
@@ -207,26 +217,28 @@ public class PreprocessWikipedia extends Configured implements Tool {
     conf.setInt(Constants.DocnoOffset, 0); // docnos start at 1
     conf.setInt(Constants.TermIndexWindow, TermIndexWindow);
 
-    // Builds term doc vectors from document collection, and filters the terms that are not included in Ivory.SrcVocab
-    long startTime = System.currentTimeMillis();	
-    long preprocessStartTime = System.currentTimeMillis();	
+    // Builds term doc vectors from document collection, and filters the terms that are not included
+    // in Ivory.SrcVocab.
+    long startTime = System.currentTimeMillis();
+    long preprocessStartTime = System.currentTimeMillis();
     LOG.info("Building term doc vectors...");
     new BuildTermDocVectors(conf).run();
-    LOG.info("Job finished in "+(System.currentTimeMillis()-startTime)/1000.0+" seconds");
+    LOG.info("Job finished in " + (System.currentTimeMillis() - startTime) / 1000.0 + " seconds");
 
-    // Get CF and DF counts
+    // Get CF and DF counts.
     startTime = System.currentTimeMillis();
     LOG.info("Counting terms...");
     new ComputeGlobalTermStatistics(conf).run();
-    LOG.info("TermCount = "+env.readCollectionTermCount()+"\nJob finished in "+(System.currentTimeMillis()-startTime)/1000.0+" seconds");
+    LOG.info("TermCount = " + env.readCollectionTermCount());
+    LOG.info("Job finished in " + (System.currentTimeMillis() - startTime) / 1000.0 + " seconds");
 
-    // Build a map from terms to sequentially generated integer term ids
+    // Build a map from terms to sequentially generated integer term ids.
     startTime = System.currentTimeMillis();
     LOG.info("Building term-to-integer id mapping...");
     new BuildDictionary(conf).run();
-    LOG.info("Job finished in "+(System.currentTimeMillis()-startTime)/1000.0+" seconds");
+    LOG.info("Job finished in " + (System.currentTimeMillis() - startTime) / 1000.0 + " seconds");
 
-    // Compute term weights, and output weighted term doc vectors
+    // Compute term weights, and output weighted term doc vectors.
     LOG.info("Building weighted term doc vectors...");
     startTime = System.currentTimeMillis();
 
@@ -235,13 +247,13 @@ public class PreprocessWikipedia extends Configured implements Tool {
     conf.setInt("Ivory.MinNumTerms",MinNumTermsPerArticle);
 
     if (mode == CROSS_LINGUAL_F) {
-      // translate term doc vectors into English. 
+      // Translate term doc vectors into English.
       new BuildTranslatedTermDocVectors(conf).run();
-    }else {						
-      // get weighted term doc vectors
+    } else {
+      // Build weighted term doc vectors.
       new BuildWeightedTermDocVectors(conf).run();
     }
-    LOG.info("Job finished in "+(System.currentTimeMillis()-startTime)/1000.0+" seconds");
+    LOG.info("Job finished in " + (System.currentTimeMillis() - startTime) / 1000.0 + " seconds");
 
     // normalize (optional) and convert weighted term doc vectors into int doc vectors for efficiency
     startTime = System.currentTimeMillis();
@@ -250,14 +262,19 @@ public class PreprocessWikipedia extends Configured implements Tool {
     if (mode == MONO_LINGUAL) {
       new BuildIntDocVectors(conf).run();
       new BuildWeightedIntDocVectors(conf).run();
-      LOG.info("Job BuildWeightedIntDocVectors finished in "+(System.currentTimeMillis()-startTime)/1000.0+" seconds");
-    }else {
-      BuildTargetLangWeightedIntDocVectors weightedIntVectorsTool = new BuildTargetLangWeightedIntDocVectors(conf);
+      LOG.info("Job BuildWeightedIntDocVectors finished in " +
+          (System.currentTimeMillis() - startTime) / 1000.0 + " seconds");
+    } else {
+      BuildTargetLangWeightedIntDocVectors weightedIntVectorsTool =
+        new BuildTargetLangWeightedIntDocVectors(conf);
 
       int finalNumDocs = weightedIntVectorsTool.run();
-      LOG.info("Job BuildTargetLangWeightedIntDocVectors finished in "+(System.currentTimeMillis()-startTime)/1000.0+" seconds");
+
+      LOG.info("Job BuildTargetLangWeightedIntDocVectors finished in " +
+          (System.currentTimeMillis() - startTime) / 1000.0 + " seconds");
       if (finalNumDocs > 0) {
-        LOG.info("Changed doc count from "+env.readCollectionDocumentCount() + " to = "+finalNumDocs);
+        LOG.info("Changed doc count from " + env.readCollectionDocumentCount() +
+            " to = " + finalNumDocs);
         env.writeCollectionDocumentCount(finalNumDocs);
       }
       // set Property.CollectionTermCount to the size of the target vocab. since all docs are translated into that vocab. This property is read by WriteRandomVectors via RunComputeSignatures.
@@ -271,17 +288,16 @@ public class PreprocessWikipedia extends Configured implements Tool {
       env.writeCollectionTermCount(engVocabH.size());
     }
 
-    LOG.info("Preprocessing job finished in "+(System.currentTimeMillis()-preprocessStartTime)/1000.0+" seconds");
+    LOG.info("Preprocessing job finished in " +
+        (System.currentTimeMillis() - preprocessStartTime) / 1000.0 + " seconds");
 
     return 0;
   }
 
   /**
-   * Dispatches command-line arguments to the tool via the
-   * <code>ToolRunner</code>.
+   * Dispatches command-line arguments to the tool via the {@code ToolRunner}.
    */
   public static void main(String[] args) throws Exception {
-    int res = ToolRunner.run(new Configuration(), new PreprocessWikipedia(), args);
-    System.exit(res);
+    ToolRunner.run(new Configuration(), new PreprocessWikipedia(), args);
   }
 }

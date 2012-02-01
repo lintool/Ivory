@@ -10,11 +10,10 @@
         <exclude name="ant"/>
         <exclude name="hadoop-ant"/>
     </dependency>
-    <dependency org="edu.umd" name="cloud9" rev="1.2.9">
+    <dependency org="edu.umd" name="cloud9" rev="1.2.11">
         <exclude name="ant"/>
         <exclude org="org.apache.hadoop"/>
         <exclude org="com.cloudera.hadoop"/>
-        <exclude org="info.bliki.wiki"/>
         <exclude org="fastutil"/>
     </dependency>
 
