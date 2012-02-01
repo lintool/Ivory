@@ -83,7 +83,7 @@ public class AnchorTextInvertedIndex extends PowerTool {
         throw new RuntimeException("Local cache files not read properly.");
       }
       
-      String[] params = new String[localFiles.length];
+      String[] params = new String[job.get("Ivory.WeightingSchemeParameters").split(PARAMETER_SEPARATER).length];
       for (int i = 0; i < params.length; i++) {
       	params[i] = localFiles[i].toString();
     	}
