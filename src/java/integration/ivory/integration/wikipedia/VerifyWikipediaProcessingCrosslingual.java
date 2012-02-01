@@ -8,6 +8,7 @@ import ivory.integration.IntegrationUtils;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import junit.framework.JUnit4TestAdapter;
 
@@ -25,11 +26,14 @@ import com.google.common.collect.Lists;
 import edu.umd.cloud9.io.map.HMapSFW;
 
 public class VerifyWikipediaProcessingCrosslingual {
-  private static final String vocabPath = "vocab";
+  private static final Random rand = new Random();
+  private static final String tmp = "tmp-" + VerifyWikipediaProcessingCrosslingual.class.getSimpleName() + rand.nextInt(10000);
+
+  private static final String vocabPath = tmp + "/vocab";
   private static final String enwikiPath = 
     "/shared/collections/wikipedia/raw/enwiki-20110115-pages-articles.xml";
-  private static final String enwikiRepacked = "enwiki-20110115.repacked";
-  private static final String enwikiEn = "enwiki.en";
+  private static final String enwikiRepacked = tmp + "/enwiki-20110115.repacked";
+  private static final String enwikiEn = tmp + "/enwiki.en";
 
   // en side: part 00000, key = 92101
   private ImmutableMap<String, Float> enTermDocVector1 = ImmutableMap.of(
@@ -49,8 +53,8 @@ public class VerifyWikipediaProcessingCrosslingual {
 
   private static final String dewikiPath = 
     "/shared/collections/wikipedia/raw/dewiki-20110131-pages-articles.xml";
-  private static final String dewikiRepacked = "dewiki-20110131.repacked";
-  private static final String dewikiEn = "dewiki.en";
+  private static final String dewikiRepacked = tmp + "/dewiki-20110131.repacked";
+  private static final String dewikiEn = tmp + "/dewiki.en";
 
   // de side: part 00000, key = 1001242228
   private ImmutableMap<String, Float> deTermDocVector1 = ImmutableMap.of(
@@ -77,6 +81,7 @@ public class VerifyWikipediaProcessingCrosslingual {
 
     fs.delete(new Path(enwikiEn), true);
     fs.delete(new Path(enwikiRepacked), true);
+    fs.delete(new Path(vocabPath), true);
 
     fs.copyFromLocalFile(false, true, new Path("data/vocab"), new Path(vocabPath));
 
@@ -100,7 +105,7 @@ public class VerifyWikipediaProcessingCrosslingual {
         IntegrationUtils.D_JT, IntegrationUtils.D_NN,
         enwikiEn, enwikiPath, enwikiRepacked,
         ivory.core.tokenize.OpenNLPTokenizer.class.getCanonicalName(), "en",
-        "vocab/en-token.bin", "vocab/vocab.en-de.en"});
+        vocabPath + "/en-token.bin", vocabPath + "/vocab.en-de.en"});
   }
 
   @Test
@@ -152,6 +157,7 @@ public class VerifyWikipediaProcessingCrosslingual {
 
     fs.delete(new Path(dewikiEn), true);
     fs.delete(new Path(dewikiRepacked), true);
+    fs.delete(new Path(vocabPath), true);
 
     fs.copyFromLocalFile(false, true, new Path("data/vocab"), new Path(vocabPath));
 
@@ -175,8 +181,9 @@ public class VerifyWikipediaProcessingCrosslingual {
         IntegrationUtils.D_JT, IntegrationUtils.D_NN,
         dewikiEn, dewikiPath, dewikiRepacked,
         ivory.core.tokenize.OpenNLPTokenizer.class.getCanonicalName(), "de",
-        "vocab/de-token.bin", "vocab/vocab.de-en.de", "vocab/vocab.de-en.en", "vocab/ttable.de-en",
-        "vocab/vocab.en-de.en", "vocab/vocab.en-de.de", "vocab/ttable.en-de"});
+        vocabPath + "/de-token.bin",
+        vocabPath + "/vocab.de-en.de", vocabPath + "/vocab.de-en.en", vocabPath + "/ttable.de-en",
+        vocabPath + "/vocab.en-de.en", vocabPath + "/vocab.en-de.de", vocabPath + "/ttable.en-de"});
   }
 
   @Test

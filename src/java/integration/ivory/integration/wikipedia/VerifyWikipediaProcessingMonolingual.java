@@ -8,6 +8,7 @@ import ivory.integration.IntegrationUtils;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import junit.framework.JUnit4TestAdapter;
 
@@ -25,10 +26,13 @@ import com.google.common.collect.Lists;
 import edu.umd.cloud9.io.map.HMapSFW;
 
 public class VerifyWikipediaProcessingMonolingual {
+  private static final Random rand = new Random();
+  private static final String tmp = "tmp-" + VerifyWikipediaProcessingMonolingual.class.getSimpleName() + rand.nextInt(10000);
+
   private static final String collectionPath = 
     "/shared/collections/wikipedia/raw/enwiki-20110115-pages-articles.xml";
-  private static final String collectionRepacked = "enwiki-20110115.repacked";
-  private static final String galagoIndex = "enwiki.galago";
+  private static final String collectionRepacked = tmp + "/enwiki-20110115.repacked";
+  private static final String galagoIndex = tmp + "/enwiki.galago";
 
   // Galago: part 00000, key = 92101
   private ImmutableMap<String, Float> galagoTermDocVector1 = ImmutableMap.of(
@@ -46,8 +50,8 @@ public class VerifyWikipediaProcessingMonolingual {
   private ImmutableMap<Integer, Float> galagoIntDocVector2 =
     ImmutableMap.of(2, 0.003051088f, 156, 0.03952723f, 2726, 0.08285294f, 402710, 0.20997283f);
 
-  private static final String opennlpIndex = "enwiki.opennlp";
-  private static final String vocabPath = "vocab";
+  private static final String opennlpIndex = tmp + "/enwiki.opennlp";
+  private static final String vocabPath = tmp + "/vocab";
 
   // Opennlp: part 00000, key = 92101
   private ImmutableMap<String, Float> opennlpTermDocVector1 = ImmutableMap.of(
@@ -146,6 +150,7 @@ public class VerifyWikipediaProcessingMonolingual {
 
     fs.delete(new Path(opennlpIndex), true);
     fs.delete(new Path(collectionRepacked), true);
+    fs.delete(new Path(vocabPath), true);
 
     fs.copyFromLocalFile(false, true, new Path("data/vocab"), new Path(vocabPath));
 
