@@ -1,10 +1,7 @@
 package ivory.core.tokenize;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.DataInput;
-import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -13,13 +10,11 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-
 import opennlp.tools.tokenize.Tokenizer;
 import opennlp.tools.tokenize.TokenizerME;
 import opennlp.tools.tokenize.TokenizerModel;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
-import org.apache.hadoop.fs.FSInputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Level;
@@ -843,7 +838,7 @@ public class OpenNLPTokenizer extends ivory.core.tokenize.Tokenizer {
     }else if(l.equals("german") || l.startsWith("de")){
       lang = GERMAN;//"german";
     }else{
-      sLogger.warn("Language not recognized!");
+      sLogger.warn("Language not recognized, setting to English!");
     }
     Class stemClass;
     try {
@@ -867,7 +862,7 @@ public class OpenNLPTokenizer extends ivory.core.tokenize.Tokenizer {
 
   @Override
   public String[] processContent(String text) {
-    String[] tokens = tokenizer.tokenize(text);
+    String[] tokens = tokenizer.tokenize(text.toLowerCase());
     List<String> stemmedTokens = new ArrayList<String>();
     for(String token : tokens){
       token = removeNonUnicodeChars(token);
@@ -881,7 +876,7 @@ public class OpenNLPTokenizer extends ivory.core.tokenize.Tokenizer {
       if(stemmer!=null){
         stemmer.setCurrent(token);
         stemmer.stem();
-        stemmed = stemmer.getCurrent().toLowerCase();
+        stemmed = stemmer.getCurrent();
       }
 
       //skip if out of vocab
@@ -900,20 +895,41 @@ public class OpenNLPTokenizer extends ivory.core.tokenize.Tokenizer {
 
   }
 
+  public String getLanguage() {
+    return languages[lang];
+  }
+  
   @Override
   public int getNumberTokens(String string){
     return tokenizer.tokenize(string).length;
   }
 
-  public boolean isDiscard(String token) {
+  private boolean isDiscard(String token) {
     return ((lang==ENGLISH && isStopwordRemoval && stopwords.contains(token)) || delims.contains(token) || token.length() < MIN_LENGTH || token.length() > MAX_LENGTH);
-    //		return (delims.contains(token) || token.length() < MIN_LENGTH || token.length() > MAX_LENGTH);
   }
 
+  /* 
+   * For external use. returns true if token is a Galago stopword or a delimiter: `~!@#$%^&*()-_=+]}[{\\|'\";:/?.>,<
+   */
   @Override
   public boolean isStopWord(String token) {
     return (stopwords.contains(token) || delims.contains(token));
   }
+  
+//  /**
+//   * @param token
+//   * @return
+//   *    if stemmer is available, returns stemmed string. otherwise, throws RuntimeException
+//   */
+//  public String stem(String token) {
+//    if(stemmer!=null){
+//      stemmer.setCurrent(token);
+//      stemmer.stem();
+//      return stemmer.getCurrent().toLowerCase();
+//    }else {
+//      throw new RuntimeException("Stemmer is not initialized for language " + getLanguage() +". Use method setLanguageandStemmer(String lang_code)");
+//    }
+//  }
 
   public static void main(String[] args) throws IOException, ClassNotFoundException, InstantiationException, IllegalAccessException{
     if(args.length < 4){
