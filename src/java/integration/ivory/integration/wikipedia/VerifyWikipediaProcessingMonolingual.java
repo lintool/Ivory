@@ -55,7 +55,7 @@ public class VerifyWikipediaProcessingMonolingual {
   private ImmutableMap<String, Float> opennlpTermDocVector1 = ImmutableMap.of(
     "extern", 0.002431489f, "zero", 0.054258674f, "theorem", 0.06642f, "prime", 0.04304153f);
 
-  // Opennlp: part 00010, key = 14178
+  // Opennlp: part 00010, key = 34222
   private ImmutableMap<String, Float> opennlpTermDocVector2 = ImmutableMap.of(
      "direct", 0.07711119f, "titl", 0.08201428f, "congress", 0.1344831f, "soundtrack", 0.15833028f);
 
