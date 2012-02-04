@@ -776,6 +776,7 @@ public class GalagoTokenizer extends Tokenizer {
     return stopwords.contains(word);
   }
 
+  @Override
   public String[] processContent(String text) {
     TagTokenizer tokenizer = new TagTokenizer();
     Document doc = null;

@@ -24,7 +24,7 @@ import ivory.core.preprocess.BuildIntDocVectorsForwardIndex;
 import ivory.core.preprocess.BuildTermDocVectors;
 import ivory.core.preprocess.BuildTermDocVectorsForwardIndex;
 import ivory.core.preprocess.ComputeGlobalTermStatistics;
-import ivory.core.tokenize.GalagoTokenizer;
+import ivory.core.tokenize.TikaGalagoTokenizer;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
@@ -89,7 +89,7 @@ public class PreprocessClueWebEnglish extends Configured implements Tool {
     conf.set(Constants.CollectionPath, collection);
     conf.set(Constants.IndexPath, indexPath);
     conf.set(Constants.InputFormat, SequenceFileInputFormat.class.getCanonicalName());
-    conf.set(Constants.Tokenizer, GalagoTokenizer.class.getCanonicalName());
+    conf.set(Constants.Tokenizer, TikaGalagoTokenizer.class.getCanonicalName());
     conf.set(Constants.DocnoMappingClass, ClueWarcDocnoMapping.class.getCanonicalName());
     conf.set(Constants.DocnoMappingFile, env.getDocnoMappingData().toString());
 

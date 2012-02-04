@@ -16,6 +16,7 @@
         <exclude org="com.cloudera.hadoop"/>
         <exclude org="fastutil"/>
     </dependency>
+    <dependency org="org.apache.tika" name="tika-parsers" rev="1.0"/>
 
     <dependency org="" name="dsiutils" rev="1.0.12" />
     <dependency org="" name="sux4j" rev="2.0.1" />
@@ -24,9 +25,9 @@
     <dependency org="commons-collections" name="commons-collections" rev="3.2.1" />
     <dependency org="" name="stanford-chinese-segmenter" rev="2011-09-14" />    
 
-    <dependency org="xerces" name="xercesImpl" rev="2.9.1" />
-    <dependency org="javax.mail" name="mail" rev="1.4.1"/>    
-        <dependency org="opennlp" name="tools" rev="1.5.0"/>    
-        <dependency org="opennlp" name="maxent" rev="3.0.0"/>    
+    <dependency org="xerces" name="xercesImpl" rev="2.9.1"/>
+    <dependency org="javax.mail" name="mail" rev="1.4.1"/>
+    <dependency org="opennlp" name="tools" rev="1.5.0"/>
+    <dependency org="opennlp" name="maxent" rev="3.0.0"/>
   </dependencies>
 </ivy-module>
