@@ -34,9 +34,9 @@ import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Logger;
 
-import edu.umd.cloud9.collection.medline.MedlineCitationInputFormat2;
+import edu.umd.cloud9.collection.medline.MedlineCitationInputFormat;
 import edu.umd.cloud9.collection.medline.MedlineDocnoMapping;
-import edu.umd.cloud9.collection.medline.NumberMedlineCitations2;
+import edu.umd.cloud9.collection.medline.MedlineDocnoMappingBuilder;
 
 public class PreprocessMedline extends Configured implements Tool {
   private static final Logger LOG = Logger.getLogger(PreprocessMedline.class);
@@ -71,6 +71,9 @@ public class PreprocessMedline extends Configured implements Tool {
     if (!fs.exists(p)) {
       LOG.info("index path doesn't exist, creating...");
       fs.mkdirs(p);
+    } else {
+      LOG.info("Index directory " + p + " already exists!");
+      return -1;
     }
 
     RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fs);
@@ -83,7 +86,7 @@ public class PreprocessMedline extends Configured implements Tool {
     if (!fs.exists(mappingFile)) {
       LOG.info(mappingFile + " doesn't exist, creating...");
       String[] arr = new String[] { collection, mappingDir.toString(), mappingFile.toString()};
-      NumberMedlineCitations2 tool = new NumberMedlineCitations2();
+      MedlineDocnoMappingBuilder tool = new MedlineDocnoMappingBuilder();
       tool.setConf(conf);
       tool.run(arr);
 
@@ -93,7 +96,7 @@ public class PreprocessMedline extends Configured implements Tool {
     conf.set(Constants.CollectionName, "Medline");
     conf.set(Constants.CollectionPath, collection);
     conf.set(Constants.IndexPath, indexPath);
-    conf.set(Constants.InputFormat, MedlineCitationInputFormat2.class.getCanonicalName());
+    conf.set(Constants.InputFormat, MedlineCitationInputFormat.class.getCanonicalName());
     conf.set(Constants.Tokenizer, GalagoTokenizer.class.getCanonicalName());
     conf.set(Constants.DocnoMappingClass, MedlineDocnoMapping.class.getCanonicalName());
     conf.set(Constants.DocnoMappingFile, env.getDocnoMappingData().toString());

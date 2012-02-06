@@ -2,6 +2,7 @@ package ivory.lsh.eval;
 
 import ivory.core.data.document.WeightedIntDocVector;
 import ivory.lsh.eval.SampleSignatures.mapoutput;
+
 import java.io.IOException;
 import java.net.URI;
 import java.util.Iterator;
@@ -24,14 +25,12 @@ import org.apache.hadoop.mapred.Reducer;
 import org.apache.hadoop.mapred.Reporter;
 import org.apache.hadoop.mapred.SequenceFileInputFormat;
 import org.apache.hadoop.mapred.SequenceFileOutputFormat;
-import org.apache.hadoop.mapred.lib.IdentityReducer;
+import org.apache.hadoop.util.LineReader;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import edu.umd.cloud9.io.FSLineReader;
-import edu.umd.cloud9.io.pair.PairOfFloatInt;
-import edu.umd.cloud9.io.pair.PairOfInts;
+
 import edu.umd.cloud9.util.map.HMapII;
 
 /**
@@ -117,7 +116,7 @@ public class SampleIntDocVectors extends Configured implements Tool {
         sLogger.setLevel(Level.INFO);
         samplesMap = new HMapII();
         try {
-          FSLineReader reader = new FSLineReader(localFiles[0], FileSystem.getLocal(conf));
+          LineReader reader = new LineReader(FileSystem.getLocal(conf).open(localFiles[0]));
           Text t = new Text();
           while (reader.readLine(t) != 0) {
             int docno = Integer.parseInt(t.toString());

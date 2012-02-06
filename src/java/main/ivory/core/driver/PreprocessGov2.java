@@ -36,7 +36,7 @@ import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Logger;
 
 import edu.umd.cloud9.collection.trecweb.Gov2DocnoMapping;
-import edu.umd.cloud9.collection.trecweb.NumberTrecWebDocuments;
+import edu.umd.cloud9.collection.trecweb.TrecWebDocnoMappingBuilder;
 
 public class PreprocessGov2 extends Configured implements Tool {
   private static final Logger LOG = Logger.getLogger(PreprocessGov2.class);
@@ -71,25 +71,14 @@ public class PreprocessGov2 extends Configured implements Tool {
     if (!fs.exists(p)) {
       LOG.info("index directory doesn't exist, creating...");
       fs.mkdirs(p);
+    } else {
+      LOG.info("Index directory " + p + " already exists!");
+      return -1;
     }
 
     RetrievalEnvironment env = new RetrievalEnvironment(indexRootPath, fs);
-
-    // Look for the docno mapping, which maps from docid (String) to docno
-    // (sequentially-number integer). If it doesn't exist create it.
     Path mappingFile = env.getDocnoMappingData();
-    Path mappingDir = env.getDocnoMappingDirectory();
-
-    if (!fs.exists(mappingFile)) {
-      LOG.info("docno-mapping.dat doesn't exist, creating...");
-      String[] arr = new String[] { collection, mappingDir.toString(),
-          mappingFile.toString(), "100" };
-      NumberTrecWebDocuments tool = new NumberTrecWebDocuments();
-      tool.setConf(conf);
-      tool.run(arr);
-
-      fs.delete(mappingDir, true);
-    }
+    new TrecWebDocnoMappingBuilder().build(new Path(collection), mappingFile, conf);
 
     conf.set(Constants.CollectionName, "Gov2");
     conf.set(Constants.CollectionPath, collection);

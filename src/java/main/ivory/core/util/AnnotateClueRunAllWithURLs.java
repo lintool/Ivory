@@ -11,6 +11,7 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.JobClient;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.Reporter;
+import org.apache.hadoop.util.LineReader;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Level;
@@ -18,7 +19,6 @@ import org.apache.log4j.Logger;
 
 import edu.umd.cloud9.collection.clue.ClueWarcForwardIndex;
 import edu.umd.cloud9.collection.clue.ClueWarcRecord;
-import edu.umd.cloud9.io.FSLineReader;
 import edu.umd.cloud9.mapred.NullInputFormat;
 import edu.umd.cloud9.mapred.NullMapper;
 import edu.umd.cloud9.mapred.NullOutputFormat;
@@ -87,7 +87,7 @@ public class AnnotateClueRunAllWithURLs extends Configured implements Tool {
 
 			sLogger.info("reading " + inputFile);
 
-			FSLineReader reader = new FSLineReader(new Path(inputFile), fs);
+			LineReader reader = new LineReader(fs.open(new Path(inputFile)));
 			FSDataOutputStream writer = fs.create(new Path(outputFile), true);
 
 			Text line = new Text();

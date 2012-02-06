@@ -23,12 +23,12 @@ import org.apache.hadoop.mapred.Reducer;
 import org.apache.hadoop.mapred.Reporter;
 import org.apache.hadoop.mapred.SequenceFileInputFormat;
 import org.apache.hadoop.mapred.lib.IdentityReducer;
+import org.apache.hadoop.util.LineReader;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
-import edu.umd.cloud9.io.FSLineReader;
 import edu.umd.cloud9.io.map.HMapIIW;
 import edu.umd.cloud9.io.pair.PairOfInts;
 
@@ -80,7 +80,7 @@ public class FilterResults extends Configured implements Tool {
       if (localFiles != null && localFiles.length > 0) {
         samplesMap = new HMapIIW();
         try {
-          FSLineReader reader = new FSLineReader(localFiles[0], FileSystem.getLocal(job));
+          LineReader reader = new LineReader(FileSystem.getLocal(job).open(localFiles[0]));
           Text t = new Text();
           while (reader.readLine(t) != 0) {
             int docno = Integer.parseInt(t.toString());
@@ -165,7 +165,7 @@ public class FilterResults extends Configured implements Tool {
       if (localFiles != null && localFiles.length > 0) {
         samplesMap = new HMapIIW();
         try {
-          FSLineReader reader = new FSLineReader(localFiles[0], FileSystem.getLocal(job));
+          LineReader reader = new LineReader(FileSystem.getLocal(job).open(localFiles[0]));
           Text t = new Text();
           while (reader.readLine(t) != 0) {
             int docno = Integer.parseInt(t.toString());
