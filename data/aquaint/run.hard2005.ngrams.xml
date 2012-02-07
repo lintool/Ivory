@@ -1,0 +1,25 @@
+<parameters>
+
+     <index>/scratch0/jimmylin/index-aquaint-ngram</index>
+
+     <model id="ql-base" type="Feature" output="ranking.hard2005.ngrams.dir-base.txt" hits="1000">
+         <feature id="termWt" weight="1.0"
+                  cliqueSet="ivory.smrf.model.builder.TermCliqueSet"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.TermExpressionGenerator"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1000.0" />
+     </model>
+
+     <model id="dir-rm3-f" type="Feature" output="ranking.hard2005.ngrams.dir-rm3-f.txt" hits="1000">
+         <feature id="termWt" weight="0.15"
+                  cliqueSet="ivory.smrf.model.builder.TermCliqueSet"
+                  potential="ivory.smrf.model.potential.QueryPotential"
+                  generator="ivory.smrf.model.builder.TermExpressionGenerator"
+                  scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1000.0" />
+	 <expander type="UnigramLatentConcept" fbDocs="10" fbTerms="25">
+	   <conceptscore id="expansionTermWt" weight="0.85"
+			 scoreFunction="ivory.smrf.model.score.DirichletScoringFunction" mu="1.0" />
+	 </expander>
+     </model>
+
+</parameters>
