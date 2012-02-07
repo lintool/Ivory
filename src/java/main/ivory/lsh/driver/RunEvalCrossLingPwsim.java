@@ -117,9 +117,14 @@ public class RunEvalCrossLingPwsim extends PwsimEnvironment implements Tool {
 
     // sample from non-English weighted int doc vectors: these are needed by BruteForcePwsim, which finds the ground truth pairs for the sample using dot product of doc vectors
     if(!hdfs.exists(new Path(sampleWtdIntDocVectorsPath))){
-      int frequency = (srcCollSize/sampleSize);
-      String[] sampleArgs = {wtdIntDocVectorsPath, sampleWtdIntDocVectorsPath, "100", frequency+""};
-      SampleIntDocVectors.main(sampleArgs);
+      if (hdfs.exists(sampleDocnosPath)) {
+        String[] sampleArgs = {wtdIntDocVectorsPath, sampleWtdIntDocVectorsPath, "100", "-1", sampleDocnosPath.toString()};
+        SampleIntDocVectors.main(sampleArgs);
+      }else {
+        int frequency = (srcCollSize/sampleSize);
+        String[] sampleArgs = {wtdIntDocVectorsPath, sampleWtdIntDocVectorsPath, "100", frequency+""};
+        SampleIntDocVectors.main(sampleArgs);
+      }
     }
 
     // extract sample docnos into a separate file: needed for filtering pwsim pairs
