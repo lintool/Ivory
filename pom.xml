@@ -12,7 +12,7 @@
   <artifactId>ivory</artifactId>
   <packaging>jar</packaging>
   <name>Ivory</name>
-  <version>0.5.0</version>
+  <version>0.6.0</version>
   <description>A Hadoop toolkit for web-scale information retrieval</description>
   <url>http://ivory.cc</url>
   <licenses>
@@ -44,7 +44,19 @@
     <dependency>
       <groupId>edu.umd</groupId>
       <artifactId>cloud9</artifactId>
-      <version>1.2.4</version>
+      <version>1.2.5</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>com.martiansoftware</groupId>
+      <artifactId>jsap</artifactId>
+      <version>2.1</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>commons-collections</groupId>
+      <artifactId>commons-collections</artifactId>
+      <version>3.2.1</version>
       <optional>true</optional>
     </dependency>
     <dependency>

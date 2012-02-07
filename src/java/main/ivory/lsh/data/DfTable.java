@@ -29,34 +29,34 @@ package ivory.lsh.data;
  */
 public interface DfTable {
 
-	/**
-	 * Returns the document frequency of a term.
-	 */
-	public int getDf(String term);
+  /**
+   * Returns the document frequency of a term.
+   */
+  public int getDf(String term);
 
-	/**
-	 * Returns the number of documents in the collection.
-	 */
-	public int getDocumentCount();
+  /**
+   * Returns the number of documents in the collection.
+   */
+  public int getDocumentCount();
 
-	/**
-	 * Returns the number of unique terms in the collection.
-	 */
-	public int getVocabularySize();
+  /**
+   * Returns the number of unique terms in the collection.
+   */
+  public int getVocabularySize();
 
-	/**
-	 * Returns the document frequency of the term with the highest document
-	 * frequency.
-	 */
-	public int getMaxDf();
+  /**
+   * Returns the document frequency of the term with the highest document
+   * frequency.
+   */
+  public int getMaxDf();
 
-	/**
-	 * Returns the term with the highest document frequency.
-	 */
-	public String getMaxDfTerm();
+  /**
+   * Returns the term with the highest document frequency.
+   */
+  public String getMaxDfTerm();
 
-	/**
-	 * Returns the number of terms that only appear in one document.
-	 */
-	public int getCountOfTermWithDfOne();
+  /**
+   * Returns the number of terms that only appear in one document.
+   */
+  public int getCountOfTermWithDfOne();
 }

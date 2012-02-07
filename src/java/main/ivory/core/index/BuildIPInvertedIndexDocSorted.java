@@ -21,7 +21,6 @@ import ivory.core.RetrievalEnvironment;
 import ivory.core.data.document.IntDocVector;
 import ivory.core.data.document.IntDocVector.Reader;
 import ivory.core.data.index.PostingsList;
-import ivory.core.data.index.PostingsListDocSortedPositional;
 import ivory.core.data.index.TermPositions;
 
 import java.io.IOException;
@@ -122,7 +121,7 @@ public class BuildIPInvertedIndexDocSorted extends PowerTool {
   private static class MyReducer
       extends Reducer<PairOfInts, TermPositions, IntWritable, PostingsList> {
     private static final IntWritable term = new IntWritable();
-    private static final PostingsList postings = new PostingsListDocSortedPositional();
+    private static PostingsList postings;
 
     private int prevTerm = -1;
     private int numPostings = 0;
@@ -133,6 +132,14 @@ public class BuildIPInvertedIndexDocSorted extends PowerTool {
       int cnt = context.getConfiguration().getInt(Constants.CollectionDocumentCount, 0);
       if (cnt == 0) {
         throw new RuntimeException("Error: size of collection cannot be zero!");
+      }
+
+      String postingsType = context.getConfiguration().get(Constants.PostingsListsType,
+          ivory.core.data.index.PostingsListDocSortedPositional.class.getCanonicalName());
+      try {
+        postings = (PostingsList) Class.forName(postingsType).newInstance();
+      } catch (Exception e) {
+        throw new RuntimeException(e);
       }
       postings.setCollectionDocumentCount(cnt);
     }
@@ -241,10 +248,17 @@ public class BuildIPInvertedIndexDocSorted extends PowerTool {
     int minSplitSize = conf.getInt(Constants.MinSplitSize, 0);
     int collectionDocCnt = env.readCollectionDocumentCount();
 
+    String postingsType = conf.get(Constants.PostingsListsType,
+        ivory.core.data.index.PostingsListDocSortedPositional.class.getCanonicalName());
+    @SuppressWarnings("unchecked")
+    Class<? extends PostingsList> postingsClass =
+        (Class<? extends PostingsList>) Class.forName(postingsType);
+
     LOG.info("PowerTool: " + BuildIPInvertedIndexDocSorted.class.getCanonicalName());
     LOG.info(String.format(" - %s: %s", Constants.IndexPath, indexPath));
     LOG.info(String.format(" - %s: %s", Constants.CollectionName, collectionName));
     LOG.info(String.format(" - %s: %s", Constants.CollectionDocumentCount, collectionDocCnt));
+    LOG.info(String.format(" - %s: %s", Constants.PostingsListsType, postingsClass.getCanonicalName()));
     LOG.info(String.format(" - %s: %s", Constants.NumReduceTasks, reduceTasks));
     LOG.info(String.format(" - %s: %s", Constants.MinSplitSize, minSplitSize));
 
@@ -280,7 +294,7 @@ public class BuildIPInvertedIndexDocSorted extends PowerTool {
     job.setMapOutputKeyClass(PairOfInts.class);
     job.setMapOutputValueClass(TermPositions.class);
     job.setOutputKeyClass(IntWritable.class);
-    job.setOutputValueClass(PostingsListDocSortedPositional.class);
+    job.setOutputValueClass(postingsClass);
 
     job.setMapperClass(MyMapper.class);
     job.setReducerClass(MyReducer.class);
@@ -290,7 +304,7 @@ public class BuildIPInvertedIndexDocSorted extends PowerTool {
     job.waitForCompletion(true);
     LOG.info("Job Finished in " + (System.currentTimeMillis() - startTime) / 1000.0 + " seconds");
 
-    env.writePostingsType(PostingsListDocSortedPositional.class.getCanonicalName());
+    env.writePostingsType(postingsClass.getCanonicalName());
 
     return 0;
   }

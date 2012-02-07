@@ -70,7 +70,11 @@ public class BM25ScoringFunction extends ScoringFunction {
           / ((float) termEvidence.getDf() + 0.5f));
     }
 
-    maxScore = (k1 + 1.0f) * idf;
+    if(idf > 0.0) {
+      maxScore = (k1 + 1.0f) * idf;
+    } else { // this can happen for the "Okapi" idf when df > N/2
+      maxScore = 0;
+    }
   }
 
   @Override

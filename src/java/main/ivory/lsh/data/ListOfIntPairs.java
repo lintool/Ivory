@@ -11,61 +11,61 @@ import edu.umd.cloud9.util.array.ArrayListOfInts;
 
 public class ListOfIntPairs implements Writable {
 
-	List<PairOfInts> lst; 
+  List<PairOfInts> lst; 
 
-	public ListOfIntPairs() {
-		super();
-		lst = new ArrayList<PairOfInts>();
-	}
+  public ListOfIntPairs() {
+    super();
+    lst = new ArrayList<PairOfInts>();
+  }
 
-	public void readFields(DataInput in) throws IOException{
-		int size = in.readInt();
-		for(int i=0; i<size; i++){
-			PairOfInts elt = new PairOfInts();
-			elt.readFields(in);
-			lst.add(elt);
-		}
-	}
+  public void readFields(DataInput in) throws IOException{
+    int size = in.readInt();
+    for(int i=0; i<size; i++){
+      PairOfInts elt = new PairOfInts();
+      elt.readFields(in);
+      lst.add(elt);
+    }
+  }
 
-	public void write(DataOutput out) throws IOException {
-		out.writeInt(lst.size());
-		for(PairOfInts pair : lst){
-			pair.write(out);
-		}
-	}
-	
-	public boolean equals(Object other){
-		ListOfIntPairs p = (ListOfIntPairs) other;
+  public void write(DataOutput out) throws IOException {
+    out.writeInt(lst.size());
+    for(PairOfInts pair : lst){
+      pair.write(out);
+    }
+  }
 
-		return lst.equals(p);
-	}
-	
-	public void addPair(int i1, int i2){
-		lst.add(new PairOfInts(i1, i2));
-	}
-	
-	public String toString(){
-		return lst.toString();
-	}
+  public boolean equals(Object other){
+    ListOfIntPairs p = (ListOfIntPairs) other;
 
-	public void clear() {
-		lst.clear();
-	}
+    return lst.equals(p);
+  }
 
-	public boolean isEmpty() {
-		return lst.isEmpty();
-	}
+  public void addPair(int i1, int i2){
+    lst.add(new PairOfInts(i1, i2));
+  }
 
-	public void setEIds(ArrayListOfInts l) {
-		for(PairOfInts p : lst){
-			l.add(p.getLeftElement());
-		}
-	}
-	
-	public void setFIds(ArrayListOfInts l) {
-		for(PairOfInts p : lst){
-			l.add(p.getRightElement());
-		}
-	}
+  public String toString(){
+    return lst.toString();
+  }
+
+  public void clear() {
+    lst.clear();
+  }
+
+  public boolean isEmpty() {
+    return lst.isEmpty();
+  }
+
+  public void setEIds(ArrayListOfInts l) {
+    for(PairOfInts p : lst){
+      l.add(p.getLeftElement());
+    }
+  }
+
+  public void setFIds(ArrayListOfInts l) {
+    for(PairOfInts p : lst){
+      l.add(p.getRightElement());
+    }
+  }
 
 }

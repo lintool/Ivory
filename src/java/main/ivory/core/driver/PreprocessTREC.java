@@ -75,15 +75,14 @@ public class PreprocessTREC extends Configured implements Tool {
 
     RetrievalEnvironment env = new RetrievalEnvironment(indexRootPath, fs);
 
-    // Look for the docno mapping, which maps from docid (String) to docno
-    // (sequentially-number integer). If it doesn't exist create it.
+    // Look for the docno mapping, which maps from docid (String) to docno (sequentially-number
+    // integer). If it doesn't exist create it.
     Path mappingFile = env.getDocnoMappingData();
     Path mappingDir = env.getDocnoMappingDirectory();
 
     if (!fs.exists(mappingFile)) {
       LOG.info("docno-mapping.dat doesn't exist, creating...");
-      String[] arr = new String[] { collection, mappingDir.toString(),
-              mappingFile.toString() };
+      String[] arr = new String[] { collection, mappingDir.toString(), mappingFile.toString() };
       NumberTrecDocuments2 tool = new NumberTrecDocuments2();
       tool.setConf(conf);
       tool.run(arr);

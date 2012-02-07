@@ -1,5 +1,5 @@
 /*
- * Ivory: A Hadoop toolkit for Web-scale information retrieval
+ * Ivory: A Hadoop toolkit for web-scale information retrieval
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You may
@@ -23,16 +23,13 @@ import java.io.IOException;
 import org.apache.hadoop.io.Writable;
 
 /**
- * Object representing a posting. A posting contains two elements: a docno and a
- * score. In most cases, the score is the term frequency of a term within the
- * document, but in the case of impact-based indexes, the score is the impact
- * score.
- * 
+ * A posting, consisting of a docno and a term frequency.
+ *
  * @author Jimmy Lin
  */
 public class Posting implements Writable {
   private int docno;
-  private short score;
+  private short tf;
 
   /**
    * Creates a new empty posting.
@@ -42,12 +39,12 @@ public class Posting implements Writable {
   }
 
   /**
-   * Creates a new posting with a specific docno and score.
+   * Creates a new posting with a specific docno and term frequency.
    */
-  public Posting(int docno, short score) {
+  public Posting(int docno, short tf) {
     super();
     this.docno = docno;
-    this.score = score;
+    this.tf = tf;
   }
 
   /**
@@ -65,21 +62,17 @@ public class Posting implements Writable {
   }
 
   /**
-   * Returns the score of this posting. Most typically, this is the term
-   * frequency, but can also be the impact score in the case of impact-based
-   * indexes.
+   * Returns the term frequency of this posting.
    */
-  public short getScore() {
-    return score;
+  public short getTf() {
+    return tf;
   }
 
   /**
-   * Sets the score of this posting. Most typically, this is the term
-   * frequency, but can also be the impact score in the case of impact-based
-   * indexes.
+   * Sets the term frequency of this posting.
    */
-  public void setScore(short score) {
-    this.score = score;
+  public void setTf(short score) {
+    this.tf = score;
   }
 
   /**
@@ -88,7 +81,7 @@ public class Posting implements Writable {
   @Override
   public void readFields(DataInput in) throws IOException {
     docno = in.readInt();
-    score = in.readShort();
+    tf = in.readShort();
   }
 
   /**
@@ -97,7 +90,7 @@ public class Posting implements Writable {
   @Override
   public void write(DataOutput out) throws IOException {
     out.writeInt(docno);
-    out.writeShort(score);
+    out.writeShort(tf);
   }
 
   /**
@@ -105,7 +98,7 @@ public class Posting implements Writable {
    */
   @Override
   public Posting clone() {
-    return new Posting(this.getDocno(), this.getScore());
+    return new Posting(this.getDocno(), this.getTf());
   }
 
   /**
@@ -113,6 +106,6 @@ public class Posting implements Writable {
    */
   @Override
   public String toString() {
-    return "(" + docno + ", " + score + ")";
+    return "(" + docno + ", " + tf + ")";
   }
 }

@@ -12,7 +12,7 @@
   <property name="regression.quick.dir" location="${test.dir}/regression.quick" />
   <property name="integration.dir" location="${test.dir}/integration" />
 
-  <property name="version" value="0.5.0"/>
+  <property name="version" value="0.6.0"/>
 
   <!-- paths used for compilation and run  -->
   <path id="lib.path.id">

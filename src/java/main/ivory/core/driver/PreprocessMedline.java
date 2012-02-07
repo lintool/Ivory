@@ -1,11 +1,11 @@
 /*
- * Ivory: A Hadoop toolkit for Web-scale information retrieval
- * 
+ * Ivory: A Hadoop toolkit for web-scale information retrieval
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You may
  * obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0 
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,14 +16,15 @@
 
 package ivory.core.driver;
 
-
+import ivory.core.Constants;
 import ivory.core.RetrievalEnvironment;
+import ivory.core.preprocess.BuildDictionary;
 import ivory.core.preprocess.BuildIntDocVectors;
 import ivory.core.preprocess.BuildIntDocVectorsForwardIndex;
 import ivory.core.preprocess.BuildTermDocVectors;
 import ivory.core.preprocess.BuildTermDocVectorsForwardIndex;
-import ivory.core.preprocess.BuildDictionary;
 import ivory.core.preprocess.ComputeGlobalTermStatistics;
+import ivory.core.tokenize.GalagoTokenizer;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
@@ -33,96 +34,89 @@ import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Logger;
 
-
-import edu.umd.cloud9.collection.medline.NumberMedlineCitations;
+import edu.umd.cloud9.collection.medline.MedlineCitationInputFormat2;
+import edu.umd.cloud9.collection.medline.MedlineDocnoMapping;
+import edu.umd.cloud9.collection.medline.NumberMedlineCitations2;
 
 public class PreprocessMedline extends Configured implements Tool {
-	private static final Logger sLogger = Logger.getLogger(PreprocessMedline.class);
+  private static final Logger LOG = Logger.getLogger(PreprocessMedline.class);
 
-	private static int printUsage() {
-		System.out.println("usage: [input-path] [index-path] [num-of-mappers] [num-of-reducers]");
-		ToolRunner.printGenericCommandUsage(System.out);
-		return -1;
-	}
+  private static int printUsage() {
+    System.out.println("usage: [input-path] [index-path]");
+    ToolRunner.printGenericCommandUsage(System.out);
+    return -1;
+  }
 
-	/**
-	 * Runs this tool.
-	 */
-	public int run(String[] args) throws Exception {
-		if (args.length != 4) {
-			printUsage();
-			return -1;
-		}
+  /**
+   * Runs this tool.
+   */
+  public int run(String[] args) throws Exception {
+    if (args.length != 2) {
+      printUsage();
+      return -1;
+    }
 
-		String collection = args[0];
-		String indexPath = args[1];
-		int numMappers = Integer.parseInt(args[2]);
-		int numReducers = Integer.parseInt(args[3]);
+    String collection = args[0];
+    String indexPath = args[1];
 
-		sLogger.info("Tool name: ProcessMedline");
-		sLogger.info(" - Collection path: " + collection);
-		sLogger.info(" - Index path: " + indexPath);
+    LOG.info("Tool name: ProcessMedline");
+    LOG.info(" - Collection path: " + collection);
+    LOG.info(" - Index path: " + indexPath);
 
-		Configuration conf = new Configuration();
-		FileSystem fs = FileSystem.get(conf);
+    Configuration conf = getConf();
+    FileSystem fs = FileSystem.get(conf);
 
-		// Create the index directory if it doesn't already exist.
-		Path p = new Path(indexPath);
-		if (!fs.exists(p)) {
-			sLogger.info("index path doesn't exist, creating...");
-			fs.mkdirs(p);
-		}
+    // Create the index directory if it doesn't already exist.
+    Path p = new Path(indexPath);
+    if (!fs.exists(p)) {
+      LOG.info("index path doesn't exist, creating...");
+      fs.mkdirs(p);
+    }
 
-		RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fs);
+    RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fs);
 
-		// Look for the docno mapping, which maps from docid (String) to docno
-		// (sequentially-number integer). If it doesn't exist create it.
-		Path mappingFile = env.getDocnoMappingData();
-		if (!fs.exists(mappingFile)) {
-			sLogger.info(mappingFile + " doesn't exist, creating...");
-			String[] arr = new String[] { collection, indexPath + "/medline-docid-tmp",	mappingFile.toString(), new Integer(numMappers).toString() };
-			NumberMedlineCitations tool = new NumberMedlineCitations();
-			tool.setConf(conf);
-			tool.run(arr);
+    // Look for the docno mapping, which maps from docid (String) to docno (sequentially-number
+    // integer). If it doesn't exist create it.
+    Path mappingFile = env.getDocnoMappingData();
+    Path mappingDir = env.getDocnoMappingDirectory();
 
-			fs.delete(new Path(indexPath + "/medline-docid-tmp"), true);
-		}
+    if (!fs.exists(mappingFile)) {
+      LOG.info(mappingFile + " doesn't exist, creating...");
+      String[] arr = new String[] { collection, mappingDir.toString(), mappingFile.toString()};
+      NumberMedlineCitations2 tool = new NumberMedlineCitations2();
+      tool.setConf(conf);
+      tool.run(arr);
 
-		// Now we're ready to start the preprocessing pipeline... set
-		// appropriate properties.
-		conf.setInt("Ivory.NumMapTasks", numMappers);
-		conf.setInt("Ivory.NumReduceTasks", numReducers);
+      fs.delete(mappingDir, true);
+    }
 
-		conf.set("Ivory.CollectionName", "Medline");
-		conf.set("Ivory.CollectionPath", collection);
-		conf.set("Ivory.IndexPath", indexPath);
-		conf.set("Ivory.Tokenizer", "ivory.tokenize.GalagoTokenizer");
-		conf.set("Ivory.InputFormat", "edu.umd.cloud9.collection.medline.MedlineCitationInputFormat");
-		conf.set("Ivory.DocnoMappingFile", indexPath + "docno.mapping");
-		conf.set("Ivory.DocnoMappingClass",	"edu.umd.cloud9.collection.medline.MedlineDocnoMapping");
+    conf.set(Constants.CollectionName, "Medline");
+    conf.set(Constants.CollectionPath, collection);
+    conf.set(Constants.IndexPath, indexPath);
+    conf.set(Constants.InputFormat, MedlineCitationInputFormat2.class.getCanonicalName());
+    conf.set(Constants.Tokenizer, GalagoTokenizer.class.getCanonicalName());
+    conf.set(Constants.DocnoMappingClass, MedlineDocnoMapping.class.getCanonicalName());
+    conf.set(Constants.DocnoMappingFile, env.getDocnoMappingData().toString());
 
-		conf.setInt("Ivory.DocnoOffset", 0); // docnos start at 1
-		conf.setInt("Ivory.MinDf", 2); // toss away singleton terms
-		conf.setInt("Ivory.MaxDf", Integer.MAX_VALUE);
-		conf.setInt("Ivory.TermIndexWindow", 8);
+    conf.setInt(Constants.DocnoOffset, 0); // docnos start at 1
+    conf.setInt(Constants.MinDf, 2); // toss away singleton terms
+    conf.setInt(Constants.MaxDf, Integer.MAX_VALUE);
 
-		new BuildTermDocVectors(conf).run();
-		new ComputeGlobalTermStatistics(conf).run();
-		new BuildDictionary(conf).run();
-		new BuildIntDocVectors(conf).run();
+    new BuildTermDocVectors(conf).run();
+    new ComputeGlobalTermStatistics(conf).run();
+    new BuildDictionary(conf).run();
+    new BuildIntDocVectors(conf).run();
 
-		new BuildIntDocVectorsForwardIndex(conf).run();
-		new BuildTermDocVectorsForwardIndex(conf).run();
+    new BuildIntDocVectorsForwardIndex(conf).run();
+    new BuildTermDocVectorsForwardIndex(conf).run();
 
-		return 0;
-	}
+    return 0;
+  }
 
-	/**
-	 * Dispatches command-line arguments to the tool via the
-	 * <code>ToolRunner</code>.
-	 */
-	public static void main(String[] args) throws Exception {
-		int res = ToolRunner.run(new Configuration(), new PreprocessMedline(), args);
-		System.exit(res);
-	}
+  /**
+   * Dispatches command-line arguments to the tool via the {@code ToolRunner}.
+   */
+  public static void main(String[] args) throws Exception {
+    ToolRunner.run(new Configuration(), new PreprocessMedline(), args);
+  }
 }

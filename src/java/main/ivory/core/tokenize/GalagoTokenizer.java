@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
 import org.galagosearch.core.parse.Document;
 import org.galagosearch.core.parse.TagTokenizer;
 import org.tartarus.snowball.ext.englishStemmer;
@@ -30,7 +31,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-public class GalagoTokenizer implements Tokenizer {
+public class GalagoTokenizer extends Tokenizer {
   private static final String[] TERRIER_STOP_WORDS = {
     "a",
     "abaft",
@@ -838,4 +839,8 @@ public class GalagoTokenizer implements Tokenizer {
       System.out.println(t);
     }
   }
+
+@Override
+public void configure(Configuration mJobConf, FileSystem fs) {}
+
 }
