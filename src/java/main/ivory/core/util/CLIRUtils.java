@@ -176,12 +176,12 @@ public class CLIRUtils extends Configured {
    ************
    */
   public static float cosineNormalized2(HMapSFW vectorA, HMapSFW vectorB) {
-    logger.setLevel(Level.DEBUG);
+//    logger.setLevel(Level.DEBUG);
     float sum = 0;
     for(edu.umd.cloud9.util.map.MapKF.Entry<String> e : vectorA.entrySet()){
       float value = e.getValue();
       if(vectorB.containsKey(e.getKey())){
-        logger.debug("Matched "+ e.getKey()+"="+value+" x "+vectorB.get(e.getKey()));
+//        logger.debug("Matched "+ e.getKey()+"="+value+" x "+vectorB.get(e.getKey()));
         sum+= value*vectorB.get(e.getKey());
       }
     }
@@ -364,7 +364,7 @@ public class CLIRUtils extends Configured {
       int tf = reader.getTf();
       docLen+=tf;
 
-      sLogger.debug("Read "+fTerm+","+tf);
+//      sLogger.debug("Read "+fTerm+","+tf);
 
       int f = fVocabSrc.get(fTerm);
       if(f <= 0){
@@ -396,9 +396,9 @@ public class CLIRUtils extends Configured {
         }
         probEF = e2fProbs.get(e2, f2);
         if(probEF > 0){
-          sLogger.debug(eTerm+" ==> "+probEF);
+//          sLogger.debug(eTerm+" ==> "+probEF);
           tfTable.increment(e2, tf*probEF);
-          sLogger.debug("updated weight to "+tfTable.get(e2));
+//          sLogger.debug("updated weight to "+tfTable.get(e2));
         }
       }
     }
@@ -507,7 +507,7 @@ public class CLIRUtils extends Configured {
       // compute score via scoring model
       float score = ((Bm25) scoringModel).computeDocumentWeight(tf, df, docLen);
 
-      sLogger.debug(eTerm+" "+tf+" "+df+" "+score);
+//      sLogger.debug(eTerm+" "+tf+" "+df+" "+score);
       if(score>0){
         v.put(eTerm, score);
         if(isNormalize){
