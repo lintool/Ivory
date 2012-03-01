@@ -8,9 +8,8 @@ import ivory.integration.IntegrationUtils;
 
 import java.util.List;
 import java.util.Map;
-
+import java.util.Random;
 import junit.framework.JUnit4TestAdapter;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -25,10 +24,13 @@ import com.google.common.collect.Lists;
 import edu.umd.cloud9.io.map.HMapSFW;
 
 public class VerifyWikipediaProcessingMonolingual {
+  private static final Random rand = new Random();
+  private static final String tmp = "tmp-" + VerifyWikipediaProcessingMonolingual.class.getSimpleName() + rand.nextInt(10000);
+
   private static final String collectionPath = 
     "/shared/collections/wikipedia/raw/enwiki-20110115-pages-articles.xml";
-  private static final String collectionRepacked = "enwiki-20110115.repacked";
-  private static final String galagoIndex = "enwiki.galago";
+  private static final String collectionRepacked = tmp + "/enwiki-20110115.repacked";
+  private static final String galagoIndex = tmp + "/enwiki.galago";
 
   // Galago: part 00000, key = 92101
   private ImmutableMap<String, Float> galagoTermDocVector1 = ImmutableMap.of(
@@ -46,24 +48,24 @@ public class VerifyWikipediaProcessingMonolingual {
   private ImmutableMap<Integer, Float> galagoIntDocVector2 =
     ImmutableMap.of(2, 0.003051088f, 156, 0.03952723f, 2726, 0.08285294f, 402710, 0.20997283f);
 
-  private static final String opennlpIndex = "enwiki.opennlp";
-  private static final String vocabPath = "vocab";
+  private static final String opennlpIndex = tmp + "/enwiki.opennlp";
+  private static final String vocabPath = tmp + "/vocab";
 
   // Opennlp: part 00000, key = 92101
   private ImmutableMap<String, Float> opennlpTermDocVector1 = ImmutableMap.of(
-    "external", 0.0026067079f, "zero", 0.05407416f, "theorem", 0.066354945f, "prime", 0.04295602f);
+    "extern", 0.002431489f, "zero", 0.054258674f, "theorem", 0.06642f, "prime", 0.04304153f);
 
-  // Opennlp: part 00010, key = 14178
+  // Opennlp: part 00010, key = 34222
   private ImmutableMap<String, Float> opennlpTermDocVector2 = ImmutableMap.of(
-     "gyroscop", 0.039886165f, "hors", 0.011038983f, "m551", 0.030033048f, "plastic", 0.013833861f);
+     "direct", 0.07711119f, "titl", 0.08201428f, "congress", 0.1344831f, "soundtrack", 0.15833028f);
 
   // Opennlp: part 00002, key = 100984
   private ImmutableMap<Integer, Float> opennlpIntDocVector1 =
-    ImmutableMap.of(2193, 0.07499186f, 12, 0.018467898f, 3290, 0.08417095f, 15, 0.025152508f);
+    ImmutableMap.of(2101, 0.07527498f, 12, 0.023745911f, 3156, 0.0844875f, 15, 0.030846044f);
 
-  // Opennlp: part 00011, key = 34222
+  // Opennlp: part 00011, key = 34222, (terms: conjunto, histori, film, cultur)
   private ImmutableMap<Integer, Float> opennlpIntDocVector2 =
-    ImmutableMap.of(15, 0.04056658f, 24, 0.05205808f, 31, 0.06348826f, 30, 0.057549093f);
+    ImmutableMap.of(50365, 0.31359836f, 284, 0.0925163f, 201, 0.0978275f, 419, 0.10097963f);
 
   @Test
   public void runBuildIndexGalago() throws Exception {
@@ -146,6 +148,7 @@ public class VerifyWikipediaProcessingMonolingual {
 
     fs.delete(new Path(opennlpIndex), true);
     fs.delete(new Path(collectionRepacked), true);
+    fs.delete(new Path(vocabPath), true);
 
     fs.copyFromLocalFile(false, true, new Path("data/vocab"), new Path(vocabPath));
 
@@ -185,7 +188,7 @@ public class VerifyWikipediaProcessingMonolingual {
         new Path(opennlpIndex + "/wt-term-doc-vectors/part-00000"), fs.getConf());
     reader.next(key, value);
     verifyTermDocVector(opennlpTermDocVector1, value);
-
+    
     reader = new SequenceFile.Reader(fs,
         new Path(opennlpIndex + "/wt-term-doc-vectors/part-00010"), fs.getConf());
     reader.next(key, value);

@@ -96,8 +96,8 @@ public class PreprocessWikipedia extends Configured implements Tool {
     String collectionLang = null, tokenizerModel = null, collectionVocab = null,
     fVocab_f2e = null, eVocab_f2e = null, fVocab_e2f, eVocab_e2f = null, ttable_f2e = null, ttable_e2f = null;
     String indexRootPath = args[0];
-    String rawCollection = args[1]; 	//"/shared/Wikipedia/raw/dewiki-20100117-pages-articles.xml";
-    String seqCollection = args[2]; 	//"/umd-lin/fture/pwsim/de-wikipedia/compressed.block/de-20100117";
+    String rawCollection = args[1];
+    String seqCollection = args[2];
     String tokenizerClass = args[3];	
     if (args.length > 4) {
       collectionLang = args[4];
@@ -144,6 +144,7 @@ public class PreprocessWikipedia extends Configured implements Tool {
     LOG.info(" - Compressed collection path: " + seqCollection);
     LOG.info(" - Collection language: " + collectionLang);
     LOG.info(" - Tokenizer class: " + tokenizerClass);
+    LOG.info(" - Tokenizer model: " + tokenizerModel);
     LOG.info(" - Minimum # terms per article : " + MinNumTermsPerArticle);
 
     if (mode == CROSS_LINGUAL_E || mode == CROSS_LINGUAL_F) {
