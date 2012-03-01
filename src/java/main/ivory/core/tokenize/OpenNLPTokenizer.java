@@ -867,7 +867,7 @@ public class OpenNLPTokenizer extends ivory.core.tokenize.Tokenizer {
     for(String token : tokens){
       token = removeNonUnicodeChars(token);
       if(isDiscard(token)){
-      //  sLogger.warn("Discarded stopword "+token);
+        sLogger.warn("Discarded stopword "+token);
         continue;
       }
 
@@ -881,6 +881,7 @@ public class OpenNLPTokenizer extends ivory.core.tokenize.Tokenizer {
 
       //skip if out of vocab
       if(vocab!=null && vocab.get(stemmed)<=0){
+        sLogger.warn("Discarded OOV "+token);
         continue;
       }
       stemmedTokens.add(stemmed);
