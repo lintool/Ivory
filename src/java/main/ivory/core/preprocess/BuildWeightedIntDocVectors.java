@@ -201,10 +201,6 @@ public class BuildWeightedIntDocVectors extends PowerTool {
     int minSplitSize = conf.getInt("Ivory.MinSplitSize", 0);
     String collectionName = conf.get("Ivory.CollectionName");
 
-    sLogger.info("PowerTool: " + BuildWeightedIntDocVectors.class.getCanonicalName());
-    sLogger.info(String.format(" - %s: %s", Constants.CollectionName, collectionName));
-    sLogger.info(String.format(" - %s: %s", Constants.IndexPath, indexPath));
-
 
     Path inputPath = new Path(env.getIntDocVectorsDirectory());
     Path vectorWeightsPath = new Path(outputPath);
@@ -235,6 +231,13 @@ public class BuildWeightedIntDocVectors extends PowerTool {
     conf.setNumReduceTasks(0);
     conf.setInt("mapred.min.split.size", minSplitSize);
     conf.set("mapred.child.java.opts", "-Xmx2048m");
+
+
+    sLogger.info("PowerTool: " + BuildWeightedIntDocVectors.class.getCanonicalName());
+    sLogger.info(String.format(" - %s: %s", Constants.CollectionName, collectionName));
+    sLogger.info(String.format(" - %s: %s", Constants.IndexPath, indexPath));
+    sLogger.info(String.format(" - %s: %s", "Input Path", inputPath));
+    sLogger.info(String.format(" - %s: %s", "Output Path", vectorWeightsPath));
 
     FileInputFormat.setInputPaths(conf, inputPath);
     FileOutputFormat.setOutputPath(conf, vectorWeightsPath);

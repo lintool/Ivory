@@ -168,13 +168,13 @@ public class PreprocessAquaint2 extends Configured implements Tool {
     new BuildIntPostingsForwardIndex(conf).run();
 
 
-    //boolean buildingVectors = true;
-    boolean buildingVectors = false;
+    boolean buildingVectors = true;
+    //boolean buildingVectors = false;
     if (buildingVectors) {
-      new BuildWeightedIntDocVectors(conf).run();
+      //new BuildWeightedIntDocVectors(conf).run();
 
-      conf.setBoolean(Constants.BuildWeighted, true);
-      new BuildIntDocVectorsForwardIndex(conf).run();
+      //conf.setBoolean(Constants.BuildWeighted, true);
+      //new BuildIntDocVectorsForwardIndex(conf).run();
 
       String findexDirPath = indexRootPath + "/findex";
       String findexFilePath = indexRootPath + "/findex.dat";

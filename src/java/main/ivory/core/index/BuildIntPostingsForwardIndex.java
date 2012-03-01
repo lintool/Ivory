@@ -189,10 +189,6 @@ public class BuildIntPostingsForwardIndex extends PowerTool {
     RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fs);
     String collectionName = env.readCollectionName();
 
-    LOG.info("Tool: " + BuildIntPostingsForwardIndex.class.getCanonicalName());
-    LOG.info(String.format(" - %s: %s", Constants.IndexPath, indexPath));
-    LOG.info(String.format(" - %s: %s", Constants.CollectionName, collectionName));
-
     Job job = new Job(getConf(),
         BuildIntPostingsForwardIndex.class.getSimpleName() + ":" + collectionName);
     job.setJarByClass(BuildIntPostingsForwardIndex.class);
@@ -207,6 +203,12 @@ public class BuildIntPostingsForwardIndex extends PowerTool {
       return 0;
     }
     job.setNumReduceTasks(1);
+
+    LOG.info("Tool: " + BuildIntPostingsForwardIndex.class.getCanonicalName());
+    LOG.info(String.format(" - %s: %s", Constants.IndexPath, indexPath));
+    LOG.info(String.format(" - %s: %s", Constants.CollectionName, collectionName));
+    LOG.info(String.format(" - %s: %s", "Input Path", inputPath));
+    LOG.info(String.format(" - %s: %s", "Output Postings Forward Index Path", postingsIndexPath));
 
     conf.setInt("mapred.min.split.size", minSplitSize);
     conf.set("mapred.child.java.opts", "-Xmx2048m");
