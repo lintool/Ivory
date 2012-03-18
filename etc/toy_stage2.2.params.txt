@@ -1,0 +1,1101 @@
+# Name: HMM:reversed
+# Reverse: true
+# Distortion probabilities
+0: <= -5	0.0
+0: = -4	0.0
+0: = -3	0.0
+0: = -2	0.0
+0: = -1	0.0
+0: = 0	0.0
+0: = 1	712423.7606577115
+0: = 2	88680.52869553366
+0: = 3	79327.26023086114
+0: = 4	44716.96115993227
+0: >= 5	128892.1252520533
+1: <= -5	1875064.0031619011
+1: = -4	475870.69944851403
+1: = -3	710902.5487405249
+1: = -2	1011766.5631666086
+1: = -1	1268777.6769116411
+1: = 0	1772519.307495007
+1: = 1	1.1722194986217856E7
+1: = 2	2650273.822323171
+1: = 3	1609987.300451667
+1: = 4	961485.560738277
+1: >= 5	2578341.668614459
+2: <= -5	0.0
+2: = -4	0.0
+2: = -3	0.0
+2: = -2	0.0
+2: = -1	0.0
+2: = 0	0.0
+2: = 1	1.5429002480812052E10
+2: = 2	3.8336493179114747E9
+2: = 3	4.256863633984132E9
+2: = 4	1.5743692587996507E8
+2: >= 5	4.508041671223312E9
+3: <= -5	0.0
+3: = -4	0.0
+3: = -3	0.0
+3: = -2	0.0
+3: = -1	0.0
+3: = 0	0.0
+3: = 1	0.0
+3: = 2	0.0
+3: = 3	0.0
+3: = 4	0.0
+3: >= 5	0.0
+# Translation probabilities
+sechsmonatsfrist	entropy 0.698	nTrans 50	sum 1.000000
+  six-month: 0.501461
+  six: 0.497950
+  period: 0.000588
+  month: 0.000001
+nichteinhalt	entropy 2.015	nTrans 1506	sum 1.000000
+  non-compli: 0.395908
+  compli: 0.174158
+  failur: 0.151624
+  respect: 0.071878
+  lack: 0.030417
+  breach: 0.029680
+  disregard: 0.026086
+  observ: 0.017102
+  complianc: 0.016711
+  fail: 0.016575
+  non-respect: 0.010478
+  non-implement: 0.010460
+  if: 0.007668
+  resort: 0.005523
+  non-conform: 0.005240
+  nonobserv: 0.005240
+  unfulfil: 0.005137
+  cuba’: 0.004960
+  commun: 0.004764
+  violat: 0.004649
+  tantamount: 0.003681
+  compil: 0.000772
+  multin: 0.000758
+  met: 0.000313
+  fine: 0.000123
+  occup: 0.000087
+  abid: 0.000008
+  side: 0.000001
+  neglect: 0.000000
+  adher: 0.000000
+'nato	entropy 1.19e-06	nTrans 28	sum 1.000000
+  anti-terrorist: 1.000000
+  u: 0.000000
+eurostaat	entropy 0.693	nTrans 51	sum 1.000000
+  eurost: 0.515616
+  inordin: 0.484384
+volkergrupp	entropy 0	nTrans 28	sum 1.000000
+  maya: 1.000000
+bestimmungskontroll	entropy 0	nTrans 37	sum 1.000000
+  95/409/eec: 1.000000
+cossutta	entropy 0	nTrans 99	sum 1.000000
+  cossutta: 1.000000
+zivilgesellschaftsaktivist	entropy 5.94e-29	nTrans 21	sum 1.000000
+  activist: 1.000000
+polizeiwach	entropy 0.157	nTrans 108	sum 1.000000
+  station: 0.963309
+  routin: 0.036665
+  polic: 0.000025
+  rife: 0.000000
+longo	entropy 0.007	nTrans 139	sum 1.000000
+  longo: 0.999077
+  agag: 0.000923
+a5-0392/2000	entropy 0	nTrans 45	sum 1.000000
+  a5-0392/2000: 1.000000
+"anzeig	entropy 2.28e-25	nTrans 16	sum 1.000000
+  unlock: 1.000000
+nistelrooijs	entropy 0	nTrans 37	sum 1.000000
+  nistelrooij: 1.000000
+gats-text	entropy 0	nTrans 20	sum 1.000000
+  gats: 1.000000
+mediatisier	entropy 0	nTrans 16	sum 1.000000
+  coverag: 1.000000
+chirac	entropy 0.114	nTrans 1703	sum 1.000000
+  chirac: 0.982165
+  chirac’: 0.006315
+  chirac.: 0.004050
+  chiral: 0.004049
+  french: 0.003421
+verweigerungshalt	entropy 1.162	nTrans 51	sum 1.000000
+  reluct: 0.378840
+  ecj: 0.309674
+  taken: 0.297105
+  some: 0.007622
+  step: 0.006727
+  them: 0.000032
+  accept: 0.000000
+sozialdienstleistungsrichtlini	entropy 0	nTrans 21	sum 1.000000
+  necess: 1.000000
+imagewerb	entropy 0	nTrans 7	sum 1.000000
+  image-orient: 1.000000
+uppermiddl	entropy 2.17e-39	nTrans 45	sum 1.000000
+  annuiti: 1.000000
+soziolog	entropy 0.992	nTrans 647	sum 1.000000
+  sociolog: 0.525311
+  sociologist: 0.375350
+  social: 0.074438
+  analyst: 0.024871
+  unus: 0.000030
+einrennt	entropy 0.001	nTrans 67	sum 1.000000
+  door: 0.999902
+  push: 0.000092
+  break: 0.000006
+standardbehandl	entropy 2.65e-13	nTrans 26	sum 1.000000
+  ms: 1.000000
+webauftritt	entropy 1.84e-26	nTrans 21	sum 1.000000
+  web: 1.000000
+verebbt	entropy 0.693	nTrans 36	sum 1.000000
+  eb: 0.501103
+  wane: 0.498897
+umstrukturierungsvorschlag	entropy 0	nTrans 12	sum 1.000000
+  restructur: 1.000000
+hofft	entropy 0.300	nTrans 1847	sum 1.000000
+  hope: 0.949189
+  forward: 0.018158
+  expect: 0.010602
+  see: 0.004797
+  dubious: 0.002764
+  foreseen: 0.002709
+  wait: 0.002665
+  count: 0.002658
+  look: 0.002392
+  await: 0.002168
+  luxembourg: 0.001899
+kulturwissenschaft	entropy 0	nTrans 34	sum 1.000000
+  reproduc.: 1.000000
+eu-forstwirtschaftssektor	entropy 0	nTrans 20	sum 1.000000
+  social-econom: 1.000000
+standardinstrument	entropy 0.895	nTrans 70	sum 1.000000
+  default: 0.485946
+  handler: 0.463309
+  standard: 0.028806
+  toolbox: 0.021579
+  precautionari: 0.000361
+aufzuruf	entropy 1.062	nTrans 773	sum 1.000000
+  call: 0.743238
+  appeal: 0.104836
+  urg: 0.036033
+  unnecessari: 0.020285
+  invit: 0.018590
+  knuckl: 0.017911
+  encourag: 0.016742
+  leverag: 0.015975
+  hostil: 0.012885
+  recal: 0.007515
+  desist: 0.005486
+  clock: 0.000503
+  wider: 0.000000
+renault-diktat	entropy 0	nTrans 15	sum 1.000000
+  renault: 1.000000
+a4-0435/98	entropy 0	nTrans 40	sum 1.000000
+  a4-0435/98: 1.000000
+falschdarstell	entropy 0	nTrans 38	sum 1.000000
+  misrepresent: 1.000000
+demotivi	entropy 0.693	nTrans 61	sum 1.000000
+  discourag: 0.501076
+  motiv: 0.498924
+minervois	entropy 0	nTrans 47	sum 1.000000
+  minervoi: 1.000000
+h-0392/03	entropy 0	nTrans 9	sum 1.000000
+  (h-0392/03: 1.000000
+m-30	entropy 0	nTrans 74	sum 1.000000
+  m-30: 1.000000
+gegenuberzutret	entropy 0.905	nTrans 157	sum 1.000000
+  face: 0.637551
+  leverag: 0.276746
+  fold: 0.060034
+  combat: 0.025669
+asset-management-industri	entropy 0	nTrans 47	sum 1.000000
+  asset: 1.000000
+europa-mittelmeer-dimension	entropy 1.77e-09	nTrans 49	sum 1.000000
+  euro-mediterranean: 1.000000
+kooperationsfor	entropy 0	nTrans 25	sum 1.000000
+  helcom: 1.000000
+hauptstadtstatus	entropy 3.00e-10	nTrans 36	sum 1.000000
+  citi: 1.000000
+letzlich	entropy 1.158	nTrans 76	sum 1.000000
+  eventu: 0.337665
+  ultimat: 0.337394
+  reestablish: 0.312497
+  bound: 0.010361
+  recent: 0.001859
+  after: 0.000213
+  requir: 0.000011
+machos	entropy 0	nTrans 58	sum 1.000000
+  macho: 1.000000
+oli	entropy 6.42e-14	nTrans 26	sum 1.000000
+  oli: 1.000000
+tv2	entropy 0	nTrans 21	sum 1.000000
+  tv2: 1.000000
+grundsatznorm	entropy 1.01e-18	nTrans 9	sum 1.000000
+  eros: 1.000000
+a5-0051/2003	entropy 0	nTrans 37	sum 1.000000
+  a5-0051/2003: 1.000000
+ergreif	entropy 1.193	nTrans 5696	sum 1.000000
+  take: 0.720926
+  adopt: 0.092291
+  taken: 0.061670
+  speak: 0.029345
+  seiz: 0.027891
+  measur: 0.010221
+  act: 0.008665
+  rise: 0.008303
+  do: 0.007818
+  undertak: 0.007084
+  introduc: 0.006733
+  interven: 0.003560
+  launch: 0.002405
+  grasp: 0.002113
+  someth: 0.001933
+  anyth: 0.001252
+  grab: 0.000998
+  opportun: 0.000971
+  action: 0.000947
+  intend: 0.000547
+  devis: 0.000383
+  initi: 0.000373
+  motion: 0.000369
+  duli: 0.000357
+  roll: 0.000341
+  meagr: 0.000338
+  instanc.: 0.000337
+  actionnow: 0.000332
+  proactiv: 0.000316
+  contempl: 0.000253
+  what: 0.000208
+  lead: 0.000188
+  side: 0.000184
+  anyon: 0.000131
+  invit: 0.000121
+  wish: 0.000044
+  champion: 0.000033
+  plead: 0.000013
+  pt)mr: 0.000005
+  step: 0.000001
+  implement: 0.000000
+  appropri: 0.000000
+  acut: 0.000000
+  submit: 0.000000
+  undertaken: 0.000000
+  ball: 0.000000
+isst	entropy 0.602	nTrans 315	sum 1.000000
+  eat: 0.844675
+  eaten: 0.057433
+  ate: 0.048928
+  dine: 0.048924
+  pralin: 0.000040
+euro-schein	entropy 0.648	nTrans 94	sum 1.000000
+  note: 0.649375
+  coin: 0.350625
+  high-level: 0.000000
+  circul: 0.000000
+tropfchenweis	entropy 1.567	nTrans 95	sum 1.000000
+  dropper: 0.282453
+  trickl: 0.282089
+  drib: 0.156746
+  small: 0.150574
+  drab: 0.125674
+  step: 0.001824
+  pittanc: 0.000641
+kernfamili	entropy 0.305	nTrans 84	sum 1.000000
+  famili: 0.925394
+  nuclear: 0.057827
+  core: 0.016755
+  split: 0.000023
+vermogensschad	entropy 1.046	nTrans 83	sum 1.000000
+  properti: 0.555291
+  heritag: 0.300993
+  gbp: 0.109614
+  damag: 0.034101
+  valuabl: 0.000000
+lariv.	entropy 0	nTrans 7	sum 1.000000
+  lariv.: 1.000000
+wachzuhalt	entropy 0	nTrans 19	sum 1.000000
+  moï: 1.000000
+renteneintrittsalt	entropy 0.365	nTrans 343	sum 1.000000
+  retir: 0.880856
+  age: 0.119144
+fallen	entropy 6.31e-04	nTrans 67	sum 1.000000
+  ‘concret: 0.999941
+  fall: 0.000059
+zeitknapp	entropy 0.748	nTrans 36	sum 1.000000
+  short: 0.510766
+  dwell: 0.477925
+  constraint: 0.011122
+  avail: 0.000188
+strafnorm	entropy 0.803	nTrans 37	sum 1.000000
+  penalti: 0.523464
+  lay: 0.448886
+  down: 0.026455
+  crimin: 0.001195
+  deserv: 0.000000
+aprikos	entropy 0	nTrans 33	sum 1.000000
+  apricot: 1.000000
+"entnomadisi	entropy 0	nTrans 33	sum 1.000000
+  denomadis: 1.000000
+erkennungszeich	entropy 0	nTrans 39	sum 1.000000
+  post-soviet: 1.000000
+gesetzgebungsmodell	entropy 4.38e-04	nTrans 17	sum 1.000000
+  model: 0.999961
+  oppos: 0.000039
+gasliefer	entropy 0.089	nTrans 721	sum 1.000000
+  gas: 0.984019
+  suppli: 0.013555
+  deliveri: 0.002426
+willy-betz-konstrukt	entropy 2.98e-09	nTrans 17	sum 1.000000
+  betz: 1.000000
+  willi: 0.000000
+innovation-produktivitat-wachstum-beschaft	entropy 0	nTrans 36	sum 1.000000
+  innovation-productivity-growth-employ: 1.000000
+konigs	entropy 2.99e-30	nTrans 52	sum 1.000000
+  ‘our: 1.000000
+'von	entropy 0.693	nTrans 143	sum 1.000000
+  obsolesc: 0.500296
+  bottom-up: 0.499704
+frohlockt	entropy 0.878	nTrans 41	sum 1.000000
+  miracl: 0.497724
+  hussein: 0.441567
+  sink: 0.060709
+  cairn: 0.000000
+nebenakzent	entropy 2.78e-27	nTrans 19	sum 1.000000
+  secondari: 1.000000
+pflanzenrichtlini	entropy 2.32e-21	nTrans 18	sum 1.000000
+  plant: 1.000000
+zuschlagskriteri	entropy 0.332	nTrans 225	sum 1.000000
+  award: 0.896922
+  criteria: 0.103078
+entsorgungsbeitrag	entropy 1.39e-05	nTrans 29	sum 1.000000
+  fee: 0.999999
+  dispos: 0.000001
+iao-anforder	entropy 0	nTrans 19	sum 1.000000
+  ilo’s: 1.000000
+jahr	entropy 0.203	nTrans 19104	sum 1.000000
+  year: 0.973090
+  month: 0.005501
+  period: 0.003506
+  age: 0.002215
+  annual: 0.001949
+  date: 0.001627
+  back: 0.001451
+  was: 0.001398
+  time: 0.001142
+  last: 0.000946
+  dure: 0.000777
+  decad: 0.000669
+  2001: 0.000558
+  anniversari: 0.000395
+  next: 0.000385
+  until: 0.000369
+  one-year: 0.000336
+  1997: 0.000303
+  2003: 0.000302
+  2002: 0.000295
+  after: 0.000280
+  2000: 0.000242
+  sinc: 0.000203
+  mark: 0.000169
+  1999: 0.000155
+  had: 0.000140
+  old: 0.000139
+  were: 0.000132
+  2004: 0.000122
+  saw: 0.000096
+  2005: 0.000093
+  1996: 0.000092
+  everi: 0.000083
+  onward: 0.000079
+  around: 0.000071
+  past: 0.000058
+  come: 0.000057
+  jahr: 0.000054
+  earli: 0.000049
+  2006: 0.000045
+  began: 0.000045
+  half: 0.000045
+  occur: 0.000044
+  becam: 0.000043
+  end: 0.000038
+  2010: 0.000034
+  2008: 0.000026
+  year-on-year: 0.000025
+  four: 0.000024
+  been: 0.000021
+  launch: 0.000019
+  ago: 0.000018
+  took: 0.000014
+  came: 0.000014
+  celebr: 0.000011
+  over: 0.000003
+  held: 0.000003
+  near: 0.000003
+  late: 0.000000
+  few: 0.000000
+  two-year: 0.000000
+  ahead: 0.000000
+  1990s: 0.000000
+  2007: 0.000000
+  set: 0.000000
+regierungssitz	entropy 0.006	nTrans 67	sum 1.000000
+  seat: 0.999270
+  dispatch: 0.000707
+  rife: 0.000023
+jara	entropy 1.07e-37	nTrans 31	sum 1.000000
+  jara: 1.000000
+einwanderungsthem	entropy 5.68e-22	nTrans 48	sum 1.000000
+  immigr: 1.000000
+hineindirigi	entropy 7.82e-07	nTrans 42	sum 1.000000
+  bargain: 1.000000
+  interfer: 0.000000
+andras	entropy 0.562	nTrans 54	sum 1.000000
+  fel: 0.752167
+  lära: 0.247507
+  eftersom: 0.000326
+  int: 0.000000
+a4-0087/97	entropy 0	nTrans 30	sum 1.000000
+  a4-0087/97: 1.000000
+alkoholprobl	entropy 1.099	nTrans 61	sum 1.000000
+  alcohol-rel: 0.334893
+  underr: 0.334731
+  people&#x02bc: 0.330376
+  ;s: 0.000000
+electrabel	entropy 0	nTrans 30	sum 1.000000
+  electrabel: 1.000000
+co2-auswirk	entropy 0	nTrans 46	sum 1.000000
+  co2: 1.000000
+vontabakerzeugnis	entropy 0.637	nTrans 8	sum 1.000000
+  tobaccoproduct: 0.666665
+  tobaccoadvertis: 0.333335
+gestoppt	entropy 1.443	nTrans 1544	sum 1.000000
+  stop: 0.611775
+  halt: 0.214065
+  end: 0.035804
+  shelv.: 0.010076
+  break: 0.010070
+  suspend: 0.010051
+  arrest: 0.010019
+  led: 0.009810
+  cut: 0.009472
+  allow: 0.008325
+  continu: 0.005359
+  discontinu: 0.005053
+  frozen: 0.005052
+  moratorium: 0.005033
+  lost: 0.005031
+  freez: 0.005023
+  vacanc: 0.005015
+  blockad: 0.004968
+  termin: 0.004966
+  hit: 0.004907
+  stamp: 0.004775
+  cash: 0.004533
+  project: 0.004306
+  spiral: 0.003891
+  abandon: 0.002088
+  paralys: 0.000361
+  slow: 0.000092
+  impetus: 0.000038
+  lock: 0.000037
+  improv: 0.000004
+  happier: 0.000000
+  block: 0.000000
+innenkommissar	entropy 0	nTrans 20	sum 1.000000
+  nomine: 1.000000
+gesundheitskontroll	entropy 1.077	nTrans 86	sum 1.000000
+  screen: 0.513483
+  check: 0.248158
+  spread: 0.226552
+  health: 0.011807
+warentonn	entropy 1.58e-39	nTrans 34	sum 1.000000
+  tonn: 1.000000
+ungut	entropy 1.917	nTrans 195	sum 1.000000
+  uneasi: 0.258049
+  qualm: 0.129384
+  unwelcom: 0.129383
+  unpleas: 0.129376
+  bad: 0.129184
+  uncomfort: 0.129096
+  confess: 0.090287
+  uneas: 0.005242
+turkischzypr	entropy 5.36e-37	nTrans 35	sum 1.000000
+  turkish: 1.000000
+patrie-bericht	entropy 0	nTrans 31	sum 1.000000
+  patri: 1.000000
+ajatollah	entropy 0	nTrans 171	sum 1.000000
+  ayatollah: 1.000000
+2000/43	entropy 0	nTrans 91	sum 1.000000
+  2000/43: 1.000000
+personlichkeitsrecht	entropy 1.395	nTrans 587	sum 1.000000
+  person: 0.491081
+  individu: 0.265156
+  right: 0.093423
+  privaci: 0.071262
+  intrus: 0.039188
+  throttl: 0.021907
+  sodomi: 0.017754
+  re-learn: 0.000228
+  prey: 0.000000
+ausweisinhab	entropy 1.54e-30	nTrans 21	sum 1.000000
+  person-on: 1.000000
+forschungsgrundlag	entropy 0.792	nTrans 12	sum 1.000000
+  solid: 0.609089
+  research: 0.353614
+  base: 0.037297
+luxembourg	entropy 0.405	nTrans 54	sum 1.000000
+  lit-up: 0.859933
+  downgrad: 0.140067
+halbeuropa	entropy 0	nTrans 16	sum 1.000000
+  semi-european: 1.000000
+rechtsmassnahm	entropy 0.095	nTrans 45	sum 1.000000
+  unsatisfactori: 0.980759
+  raft: 0.019241
+datenlawin	entropy 0.111	nTrans 18	sum 1.000000
+  avalanch: 0.976518
+  worst-cas: 0.023482
+geschichtsauffass	entropy 0.005	nTrans 22	sum 1.000000
+  teach: 0.999434
+  scholarship: 0.000566
+vorhangs	entropy 0	nTrans 44	sum 1.000000
+  curtain: 1.000000
+fernsehubertragungsdien	entropy 0.666	nTrans 19	sum 1.000000
+  broadcast: 0.615651
+  televis: 0.384349
+2003/0057(	entropy 2.38e-35	nTrans 50	sum 1.000000
+  2003/0057(: 1.000000
+einsatz	entropy 1.941	nTrans 5986	sum 1.000000
+  use: 0.587498
+  commit: 0.067172
+  deploy: 0.061435
+  oper: 0.045061
+  effort: 0.044246
+  work: 0.021236
+  action: 0.013559
+  dedic: 0.011898
+  implement: 0.011893
+  intervent: 0.011668
+  applic: 0.011258
+  involv: 0.010328
+  mission: 0.010154
+  recours: 0.007489
+  appli: 0.007397
+  input: 0.006207
+  engag: 0.005210
+  stake: 0.004838
+  risk: 0.004085
+  introduct: 0.003979
+  contribut: 0.003519
+  invest: 0.003220
+  activ: 0.003198
+  fight: 0.003086
+  interven: 0.002263
+  hard: 0.002150
+  utilis: 0.002097
+  act: 0.002064
+  presenc: 0.001918
+  using: 0.001832
+  campaign: 0.001583
+  promot: 0.001572
+  ambit: 0.001528
+  forc: 0.001483
+  defenc: 0.001359
+  put: 0.001083
+  instal: 0.001069
+  resort: 0.000923
+  effect: 0.000870
+  aspir: 0.000793
+  emphasi: 0.000782
+  encourag: 0.000781
+  over-us: 0.000739
+  assign: 0.000724
+  fund: 0.000643
+  perform: 0.000557
+  unus: 0.000540
+  target: 0.000519
+  product: 0.000518
+  pull: 0.000450
+  drive: 0.000426
+  demand: 0.000424
+  method: 0.000412
+  effici: 0.000410
+  medium: 0.000400
+  determin: 0.000399
+  technolog: 0.000399
+  advocaci: 0.000390
+  sentenc.: 0.000390
+  engage: 0.000389
+  leadership: 0.000388
+  involvement: 0.000388
+  complianc: 0.000387
+  bet: 0.000387
+  anyhow: 0.000386
+  absolut: 0.000380
+  side: 0.000366
+  circumst: 0.000363
+  spray: 0.000361
+  inject: 0.000337
+  mechan: 0.000301
+  connect: 0.000284
+  substanc: 0.000282
+  voyag: 0.000233
+  drop: 0.000228
+  obtain: 0.000149
+  design: 0.000145
+  region-wid: 0.000086
+  meant: 0.000022
+  antibiot: 0.000012
+  through: 0.000003
+  underway: 0.000000
+  toward: 0.000000
+rahmenrezeptur	entropy 3.14e-28	nTrans 26	sum 1.000000
+  formul: 1.000000
+zollorganisation	entropy 0	nTrans 37	sum 1.000000
+  fast-mov: 1.000000
+fayad	entropy 1.215	nTrans 139	sum 1.000000
+  fayad: 0.494940
+  fayyad: 0.257590
+  fallad: 0.123735
+  faya: 0.123735
+krankenhaus	entropy 0.174	nTrans 2224	sum 1.000000
+  hospit: 0.968556
+  clinic: 0.016724
+  hospitalis: 0.009952
+  healthcar: 0.002398
+  offic: 0.002370
+jastimm	entropy 1.157	nTrans 113	sum 1.000000
+  85: 0.421282
+  noteworthi: 0.287663
+  favour: 0.270112
+  through: 0.020942
+  es: 0.000000
+bewasserungszweck	entropy 3.14e-27	nTrans 27	sum 1.000000
+  irrig: 1.000000
+finanzamt	entropy 1.207	nTrans 198	sum 1.000000
+  tax: 0.429395
+  treasuri: 0.352207
+  taxman: 0.136514
+  depart: 0.081884
+  offic: 0.000000
+sozialversicherungszahl	entropy 0.424	nTrans 22	sum 1.000000
+  liabl: 0.849354
+  payment: 0.150646
+book	entropy 1.94e-12	nTrans 196	sum 1.000000
+  book: 1.000000
+mikrofinanzierungsprogramm	entropy 0.869	nTrans 124	sum 1.000000
+  microfin: 0.665332
+  micro-fin: 0.167342
+  micro-financ: 0.167327
+birg	entropy 1.039	nTrans 123	sum 1.000000
+  birgen: 0.500737
+  birgenair: 0.250177
+  undiscov: 0.249086
+co2-intensiv	entropy 0.636	nTrans 70	sum 1.000000
+  co2-intens: 0.666914
+  leapfrog: 0.333086
+kraftprogramm	entropy 0	nTrans 28	sum 1.000000
+  oversubscrib: 1.000000
+:kinderbetreu	entropy 0	nTrans 5	sum 1.000000
+  childcare: 1.000000
+wurz	entropy 2.015	nTrans 195	sum 1.000000
+  spice: 0.241817
+  piquanc: 0.120542
+  potenc: 0.120541
+  salti: 0.120523
+  essenc: 0.120500
+  inject: 0.120072
+  polem: 0.083274
+  breviti: 0.072731
+bildungsexplosion	entropy 6.95e-21	nTrans 51	sum 1.000000
+  explos: 1.000000
+nachstellt	entropy 1.90e-20	nTrans 25	sum 1.000000
+  persecut: 1.000000
+klimawandel-phanom	entropy 0	nTrans 34	sum 1.000000
+  phenomena: 1.000000
+bis129	entropy 2.58e-39	nTrans 11	sum 1.000000
+  129: 1.000000
+asthmapatient	entropy 0	nTrans 20	sum 1.000000
+  asthma: 1.000000
+burd	entropy 0.708	nTrans 795	sum 1.000000
+  burden: 0.857769
+  tape: 0.034249
+  onus: 0.017491
+  millston: 0.017485
+  charg: 0.017477
+  imposit: 0.015496
+  shoulder: 0.012708
+  behalv: 0.012143
+  bear: 0.010269
+  weight: 0.004398
+  burden-shar: 0.000360
+  red: 0.000106
+  thrust: 0.000050
+abhangigkeitszustand	entropy 1.23e-05	nTrans 10	sum 1.000000
+  born: 0.999999
+  depend: 0.000001
+katyn	entropy 0.233	nTrans 269	sum 1.000000
+  katyn: 0.937643
+  katyń: 0.062357
+buch	entropy 0.492	nTrans 2739	sum 1.000000
+  book: 0.910541
+  account: 0.029793
+  paper: 0.021282
+  buch: 0.007908
+  keep: 0.004085
+  literatur: 0.003978
+  volum: 0.003966
+  buy: 0.002520
+  cost: 0.002495
+  record: 0.002487
+  side: 0.001989
+  publish: 0.001983
+  domain: 0.001963
+  bag: 0.001842
+  suspect: 0.001371
+  holiday: 0.000849
+  burden: 0.000722
+  win-win: 0.000173
+  purpos: 0.000046
+  asset: 0.000005
+  set: 0.000001
+  schwere: 0.000000
+ruckversicherungsunternehm	entropy 0.689	nTrans 186	sum 1.000000
+  reinsur: 0.546899
+  re-insur: 0.453101
+kohlebergbaus	entropy 0.056	nTrans 18	sum 1.000000
+  coal: 0.989919
+  and/or: 0.010081
+  rehabilit: 0.000000
+buchstab	entropy 1.611	nTrans 2554	sum 1.000000
+  letter: 0.501023
+  liter: 0.240001
+  (: 0.109219
+  ): 0.028818
+  1(: 0.028574
+  2(: 0.015947
+  genuin: 0.015226
+  virtual: 0.007627
+  alphabet: 0.005088
+  )a: 0.005087
+  written: 0.004910
+  paragraph: 0.004257
+  page: 0.004169
+  5(: 0.003843
+  4(: 0.002735
+  27a: 0.002543
+  shelv.: 0.002522
+  1d: 0.002485
+  lifeless: 0.002482
+  3(: 0.002408
+  11(: 0.002403
+  30(: 0.002128
+  simpli: 0.001608
+  practic: 0.001570
+  26(: 0.001081
+  print: 0.000895
+  goe: 0.000830
+  4.6.b: 0.000320
+  14a: 0.000197
+  adher: 0.000002
+  two-prong: 0.000000
+  8(: 0.000000
+oder100	entropy 0.139	nTrans 27	sum 1.000000
+  100: 0.968643
+  97: 0.031357
+2000/0127(	entropy 2.60e-35	nTrans 61	sum 1.000000
+  2000/0127(: 1.000000
+tack	entropy 2.18e-10	nTrans 34	sum 1.000000
+  grazi: 1.000000
+-zieg	entropy 0.435	nTrans 44	sum 1.000000
+  she-goat: 0.842990
+  milking-sheep: 0.157010
+ozonloch	entropy 1.066	nTrans 199	sum 1.000000
+  ozon: 0.405909
+  hole: 0.376285
+  layer: 0.217806
+leitungsverantwort	entropy 0	nTrans 35	sum 1.000000
+  senior: 1.000000
+mineralwassermark	entropy 0	nTrans 26	sum 1.000000
+  10mg/kg: 1.000000
+dinn	entropy 0	nTrans 103	sum 1.000000
+  dinner: 1.000000
+pasok-partei	entropy 0	nTrans 47	sum 1.000000
+  pasok: 1.000000
+­beobachtungsmission	entropy 0	nTrans 27	sum 1.000000
+  chalk: 1.000000
+324.8	entropy 0	nTrans 44	sum 1.000000
+  324.8: 1.000000
+versorgungsregel	entropy 0.805	nTrans 175	sum 1.000000
+  suppli: 0.670929
+  arrang: 0.258648
+  ssa: 0.070407
+  politically-correct: 0.000015
+  regim: 0.000000
+meilenschritt	entropy 0	nTrans 34	sum 1.000000
+  commissioner: 1.000000
+uno-programm	entropy 0.100	nTrans 92	sum 1.000000
+  washington-inspir: 0.979552
+  bypass: 0.020448
+nahrungsmittelhilfeprogramm	entropy 0.138	nTrans 199	sum 1.000000
+  food: 0.969654
+  aid: 0.030014
+  facil: 0.000308
+  programm: 0.000024
+4-gipfel	entropy 1.75e-10	nTrans 67	sum 1.000000
+  asem: 1.000000
+auszuheck	entropy 0.693	nTrans 50	sum 1.000000
+  hatch: 0.500432
+  concoct: 0.499568
+1.1.1993	entropy 0.511	nTrans 32	sum 1.000000
+  disappear: 0.821157
+  suppos: 0.169921
+  1993: 0.005762
+  ought: 0.003161
+derabstimmung	entropy 0.119	nTrans 9	sum 1.000000
+  thevote: 0.974563
+  vote: 0.025437
+milchbeihilf	entropy 0.072	nTrans 18	sum 1.000000
+  milk: 0.988248
+  transcend: 0.007369
+  subsidi: 0.004383
+eu-reiseverbot	entropy 0.045	nTrans 27	sum 1.000000
+  travel: 0.992379
+  ban: 0.007621
+'c-span'-modell	entropy 0	nTrans 32	sum 1.000000
+  c-span: 1.000000
+tauschprojekt	entropy 1.04e-23	nTrans 43	sum 1.000000
+  exchang: 1.000000
+schaffen"	entropy 0	nTrans 30	sum 1.000000
+  tempt: 1.000000
+neafc-regel	entropy 0	nTrans 37	sum 1.000000
+  neafc: 1.000000
+groning	entropy 0	nTrans 149	sum 1.000000
+  groningen: 1.000000
+tenet	entropy 2.30e-36	nTrans 26	sum 1.000000
+  tenet: 1.000000
+entwurf	entropy 1.031	nTrans 5443	sum 1.000000
+  draft: 0.726293
+  propos: 0.133817
+  text: 0.070632
+  project: 0.017618
+  version: 0.008765
+  design: 0.007753
+  motion: 0.007447
+  bill: 0.007243
+  outlin: 0.006055
+  draw: 0.004902
+  plan: 0.004388
+  paper: 0.000686
+  recommend: 0.000683
+  relev: 0.000615
+  formul: 0.000606
+  raft: 0.000593
+  legisl: 0.000367
+  initi: 0.000336
+  draftsman’: 0.000330
+  earlier: 0.000276
+  abstain: 0.000228
+  convent: 0.000215
+  resolut: 0.000118
+  compil: 0.000033
+  provis: 0.000002
+  korean: 0.000000
+  satisfactorili: 0.000000
+  draftspeopl: 0.000000
+lakhdar	entropy 0	nTrans 36	sum 1.000000
+  brahimi: 1.000000
+aussenministerrat	entropy 0.864	nTrans 155	sum 1.000000
+  foreign: 0.729568
+  though: 0.124893
+  edific: 0.114752
+  minist: 0.025118
+  split: 0.003534
+  council: 0.002133
+  affair: 0.000002
+vereingt	entropy 0	nTrans 28	sum 1.000000
+  well-b: 1.000000
+orientteppich	entropy 0.493	nTrans 79	sum 1.000000
+  carpet: 0.805506
+  azo-color: 0.194494
+  orient: 0.000000
+suchterkrank	entropy 8.80e-11	nTrans 107	sum 1.000000
+  addict: 1.000000
+weltsozialprodukt	entropy 0.475	nTrans 45	sum 1.000000
+  gross: 0.871087
+  encompass: 0.075113
+  unregul: 0.053237
+  twelv: 0.000563
+begnad	entropy 0.685	nTrans 381	sum 1.000000
+  pardon: 0.801945
+  clemenc: 0.119802
+  life: 0.039519
+  spare: 0.038734
+teilvorschlag	entropy 1.07e-30	nTrans 92	sum 1.000000
+  partial: 1.000000
+restrukturierungsplan	entropy 5.77e-13	nTrans 58	sum 1.000000
+  restructur: 1.000000
+unternehmensgrundungskost	entropy 0.043	nTrans 53	sum 1.000000
+  hardwork: 0.992855
+  dig: 0.006997
+  start-up: 0.000147
+dubski	entropy 2.67e-29	nTrans 42	sum 1.000000
+  dubski: 1.000000
+a4-0196/98	entropy 0	nTrans 37	sum 1.000000
+  a4-0196/98: 1.000000
+„eurisch	entropy 0	nTrans 33	sum 1.000000
+  ‘euro-ese’: 1.000000
+heutzutag	entropy 1.591	nTrans 2560	sum 1.000000
+  today: 0.458295
+  nowaday: 0.202471
+  now: 0.120263
+  day: 0.118498
+  present: 0.041045
+  current: 0.028298
+  moment: 0.010281
+  age: 0.004720
+  modern: 0.003908
+  longer: 0.003504
+  constant: 0.001841
+  drive: 0.001757
+  glibli: 0.001735
+  at: 0.001459
+  fashion: 0.001158
+  against: 0.000753
+  less: 0.000013
+  recogn: 0.000000
+schnurgerad	entropy 5.57e-14	nTrans 18	sum 1.000000
+  straight: 1.000000
+wasserwehr	entropy 0	nTrans 28	sum 1.000000
+  water-storag: 1.000000
+therapiebedarf	entropy 0	nTrans 38	sum 1.000000
+  drug-rel: 1.000000
+forderwurdigkeitskriteri	entropy 0.286	nTrans 41	sum 1.000000
+  map: 0.917120
+  coincid: 0.082880
+c5-0205/1999	entropy 3.23e-35	nTrans 52	sum 1.000000
+  c5-0205/1999: 1.000000
+sonderorgan	entropy 0.656	nTrans 118	sum 1.000000
+  specialis: 0.635707
+  vein: 0.364293
+  agenc: 0.000000
+brotgetreid	entropy 0	nTrans 23	sum 1.000000
+  bread: 1.000000
+bekaa-tal	entropy 5.07e-36	nTrans 59	sum 1.000000
+  bekaa: 1.000000
+sean	entropy 0	nTrans 154	sum 1.000000
+  sean: 1.000000
+korperfett	entropy 0	nTrans 19	sum 1.000000
+  17ß-oestradiol: 1.000000
+autoritativ	entropy 0	nTrans 86	sum 1.000000
+  authorit: 1.000000
+hilfsmodell	entropy 0	nTrans 40	sum 1.000000
+  dirigist: 1.000000
+us-gesetzgeb.	entropy 0	nTrans 27	sum 1.000000
+  vaunt: 1.000000
+amir	entropy 0	nTrans 52	sum 1.000000
+  amir: 1.000000
+futtermittelproduktionskett	entropy 6.78e-04	nTrans 38	sum 1.000000
+  chain: 0.999937
+  anim: 0.000063
+  feed: 0.000000
+marpol-übereinkomm	entropy 0.298	nTrans 308	sum 1.000000
+  marpol: 0.912059
+  annexvi: 0.087941
+weinherstellungsverfahr	entropy 0	nTrans 65	sum 1.000000
+  wine-mak: 1.000000
+„gut	entropy 1.558	nTrans 225	sum 1.000000
+  good: 0.382030
+  ‘good: 0.305073
+  ‘well: 0.076268
+  ‘fine: 0.076267
+  fine: 0.076152
+  caricaturis: 0.076021
+  theεu: 0.006694
+  ': 0.001335
+  foster: 0.000160
+geschleust	entropy 1.081	nTrans 198	sum 1.000000
+  shepherd: 0.378870
+  passag: 0.372865
+  $: 0.248266
+  overboard: 0.000000
+überwachungsmassnahm	entropy 1.661	nTrans 665	sum 1.000000
+  monitor: 0.381961
+  surveil: 0.171201
+  control: 0.152928
+  measur: 0.124505
+  supervis: 0.114911
+  vigil: 0.035675
+  intercept: 0.018158
+  safeguard: 0.000661
+soja-produkt	entropy 3.06e-13	nTrans 15	sum 1.000000
+  soya: 1.000000
+statutsbestimm	entropy 0.689	nTrans 71	sum 1.000000
+  marit: 0.553410
+  philosoph: 0.446421
+  race: 0.000101
+  official: 0.000069
+tarifberechn	entropy 0	nTrans 34	sum 1.000000
+  calcul: 1.000000
+freisetz	entropy 0.807	nTrans 1311	sum 1.000000
+  releas: 0.839734
+  free: 0.037143
+  liber: 0.027139
+  unlock: 0.019970
+  dispers: 0.016071
+  unleash: 0.015143
+  spillag: 0.005949
+  contributor: 0.005848
+  summon: 0.005822
+  rein: 0.005810
+  entail: 0.005780
+  leverag: 0.005677
+  impact: 0.005124
+  emiss: 0.004761
+  through: 0.000018
+  theenviron: 0.000009
+  potenti: 0.000000
+kennzeichnungspflicht	entropy 0.695	nTrans 470	sum 1.000000
+  label: 0.826849
+  oblig: 0.054775
+  requir: 0.049787
+  compulsori: 0.046553
+  content: 0.021591
+  mandatori: 0.000442
+  declar: 0.000004
+  per: 0.000000
+unesco-empfehlung	entropy 0.666	nTrans 55	sum 1.000000
+  unesco: 0.615694
+  parthenon: 0.384306
+tranquiliz	entropy 0.693	nTrans 41	sum 1.000000
+  placat: 0.502549
+  tranquil: 0.497431
+  bribe: 0.000020
+  betablock: 0.000000
+akp-waiv	entropy 6.02e-08	nTrans 35	sum 1.000000
+  waiver: 1.000000
+  acp: 0.000000
+altprasident	entropy 1.58e-05	nTrans 17	sum 1.000000
+  gil-robl: 0.999999
+  former: 0.000001
+privatkompromiss	entropy 0	nTrans 44	sum 1.000000
+  privat: 1.000000
+ausserminist	entropy 0	nTrans 31	sum 1.000000
+  senior: 1.000000
+bundesregier	entropy 1.100	nTrans 1158	sum 1.000000
+  feder: 0.567422
+  german: 0.205177
+  govern: 0.198456
+  coalit: 0.013881
+  germani: 0.007764
+  note: 0.007300
+trennungsmog	entropy 1.91e-27	nTrans 54	sum 1.000000
+  separ: 1.000000
+kommunalpolit	entropy 1.055	nTrans 347	sum 1.000000
+  local: 0.659626
+  councillor: 0.193145
+  local-govern: 0.048617
+  behav.: 0.048177
+  politician: 0.044085
+  undergon: 0.006352
+  fire-brigad: 0.000000

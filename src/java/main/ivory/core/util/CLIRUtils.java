@@ -176,12 +176,12 @@ public class CLIRUtils extends Configured {
    ************
    */
   public static float cosineNormalized2(HMapSFW vectorA, HMapSFW vectorB) {
-    logger.setLevel(Level.DEBUG);
+//    logger.setLevel(Level.DEBUG);
     float sum = 0;
     for(edu.umd.cloud9.util.map.MapKF.Entry<String> e : vectorA.entrySet()){
       float value = e.getValue();
       if(vectorB.containsKey(e.getKey())){
-        logger.debug("Matched "+ e.getKey()+"="+value+" x "+vectorB.get(e.getKey()));
+//        logger.debug("Matched "+ e.getKey()+"="+value+" x "+vectorB.get(e.getKey()));
         sum+= value*vectorB.get(e.getKey());
       }
     }
@@ -364,7 +364,7 @@ public class CLIRUtils extends Configured {
       int tf = reader.getTf();
       docLen+=tf;
 
-      sLogger.debug("Read "+fTerm+","+tf);
+//      sLogger.debug("Read "+fTerm+","+tf);
 
       int f = fVocabSrc.get(fTerm);
       if(f <= 0){
@@ -396,9 +396,9 @@ public class CLIRUtils extends Configured {
         }
         probEF = e2fProbs.get(e2, f2);
         if(probEF > 0){
-          sLogger.debug(eTerm+" ==> "+probEF);
+//          sLogger.debug(eTerm+" ==> "+probEF);
           tfTable.increment(e2, tf*probEF);
-          sLogger.debug("updated weight to "+tfTable.get(e2));
+//          sLogger.debug("updated weight to "+tfTable.get(e2));
         }
       }
     }
@@ -507,7 +507,7 @@ public class CLIRUtils extends Configured {
       // compute score via scoring model
       float score = ((Bm25) scoringModel).computeDocumentWeight(tf, df, docLen);
 
-      sLogger.debug(eTerm+" "+tf+" "+df+" "+score);
+//      sLogger.debug(eTerm+" "+tf+" "+df+" "+score);
       if(score>0){
         v.put(eTerm, score);
         if(isNormalize){
@@ -626,6 +626,14 @@ public class CLIRUtils extends Configured {
     return v;
   }
 
+  
+  /***
+   * 
+   * Hooka helper functions
+   * 
+   */
+  
+  
   /**
    * This method converts the output of BerkeleyAligner into a TTable_monolithic_IFAs object. 
    * For each source language term, top numTrans entries (with highest translation probability) are kept, unless the top K < numTrans entries have a cumulatite probability above PROB_THRESHOLD.
@@ -909,40 +917,6 @@ public class CLIRUtils extends Configured {
     dos3.close();
   }
 
-  private static int addToTable(int curIndex, TreeSet<PairOfFloatString> topTrans, float cumProb, TTable_monolithic_IFAs table, Vocab trgVocab) {
-    List<Integer> sortedIndices = new ArrayList<Integer>();
-    HMapIF index2ProbMap = new HMapIF();
-
-    float sumOfProbs = 0.0f;		//only extract the top K<15 if the mass prob. exceeds MAX_probThreshold
-    while(!topTrans.isEmpty()){
-      PairOfFloatString e = topTrans.pollLast();
-      String term = e.getRightElement();
-      float pr = e.getLeftElement()/cumProb;
-      int trgIndex = trgVocab.addOrGet(term);
-      sumOfProbs += pr;
-
-      sortedIndices.add(trgIndex);
-      index2ProbMap.put(trgIndex, pr);
-    }
-
-    // to enable faster access with binary search, we sort entries by vocabulary index.
-    Collections.sort(sortedIndices);
-    int numEntries = sortedIndices.size();
-    int[] indices = new int[numEntries];
-    float[] probs = new float[numEntries];
-    int i=0;
-    for(int sortedIndex : sortedIndices){
-      indices[i]=sortedIndex;
-      probs[i]=index2ProbMap.get(sortedIndex);
-      logger.debug("Added: "+indices[i]+" with prob: "+probs[i]);
-      i++;
-    }
-    table.set(curIndex, new IndexedFloatArray(indices, probs, true));
-    logger.debug(table.get(curIndex));
-
-    return indices.length;
-  }
-
   /**
    * This method modifies the TTable_monolithic_IFAs object output by Hooka, to meet following criteria: 
    * For each source language term, top numTrans entries (with highest translation probability) are kept, unless the top K < numTrans entries have a cumulatite probability above probThreshold.
@@ -1018,11 +992,13 @@ public class CLIRUtils extends Configured {
       //store previous term's top translations to ttable
       if(topTrans.size() > 0){
         int finalNumTrans = addToTable(curIndex, topTrans, sumOfProbs, finalTTable, finalTrgVocab);
+      
         if(finalNumTrans < numTrans){
+          // <numTrans> elements covered more than <probThreshold> probability, so we terminated early
           cntShortTail++;
           sumShortTail += finalNumTrans;
         }else{
-          // early termination: <numTrans> elements did not cover <probThreshold> probability
+          // <numTrans> elements did not cover <probThreshold> probability, do not add any more as an efficiency heuristic
           cntLongTail++;
           sumCumProbs += sumOfProbs;
         }
@@ -1044,6 +1020,49 @@ public class CLIRUtils extends Configured {
     finalTTable.write(dos3);
     dos3.close();
   }
+  
+ 
+  public static int addToTable(int curIndex, TreeSet<PairOfFloatString> topTrans, float cumProb, TTable_monolithic_IFAs table, Vocab trgVocab) {
+    List<Integer> sortedIndices = new ArrayList<Integer>();
+    HMapIF index2ProbMap = new HMapIF();
+
+    float sumOfProbs = 0.0f;    //only extract the top K<15 if the mass prob. exceeds MAX_probThreshold
+    while(!topTrans.isEmpty()){
+      PairOfFloatString e = topTrans.pollLast();
+      String term = e.getRightElement();
+      float pr = e.getLeftElement()/cumProb;
+      int trgIndex = trgVocab.addOrGet(term);
+      sumOfProbs += pr;
+
+      sortedIndices.add(trgIndex);
+      index2ProbMap.put(trgIndex, pr);
+    }
+
+    // to enable faster access with binary search, we sort entries by vocabulary index.
+    Collections.sort(sortedIndices);
+    int numEntries = sortedIndices.size();
+    int[] indices = new int[numEntries];
+    float[] probs = new float[numEntries];
+    int i=0;
+    for(int sortedIndex : sortedIndices){
+      indices[i]=sortedIndex;
+      probs[i]=index2ProbMap.get(sortedIndex);
+      logger.debug("Added: "+indices[i]+" with prob: "+probs[i]);
+      i++;
+    }
+    table.set(curIndex, new IndexedFloatArray(indices, probs, true));
+    logger.debug(table.get(curIndex));
+
+    return indices.length;
+  }
+  
+  
+  /***
+   * 
+   * Bitext extraction helper functions
+   * 
+   */
+   
 
   public static String[] computeFeaturesF1(HMapSFW eVector, HMapSFW fVector, float eSentLength, float fSentLength) {
     String[] features = new String[1];
