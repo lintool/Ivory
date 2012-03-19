@@ -1,8 +1,8 @@
 package ivory.integration;
 
 import static org.junit.Assert.assertTrue;
-import ivory.core.driver.BuildPositionalIndexIP;
-import ivory.core.driver.PreprocessGov2;
+import ivory.app.BuildPositionalIndexIP;
+import ivory.app.PreprocessGov2;
 import ivory.core.eval.Qrels;
 import ivory.regression.basic.Gov2_Basic;
 import ivory.smrf.retrieval.BatchQueryRunner;
@@ -51,13 +51,8 @@ public class VerifyGov2PositionalIndexIP {
         collectionPath.toString(), index });
     BuildPositionalIndexIP.main(new String[] { libjars, IntegrationUtils.D_JT, IntegrationUtils.D_NN,
         index, "100" });
-  }
 
-  @Test
-  public void verifyResults() throws Exception {
-    Configuration conf = IntegrationUtils.getBespinConfiguration();
-    FileSystem fs = FileSystem.get(conf);
-
+    // Done with indexing, now do retrieval run.
     fs.copyFromLocalFile(false, true, new Path("data/gov2/run.gov2.basic.xml"),
         new Path(index + "/" + "run.gov2.basic.xml"));
     fs.copyFromLocalFile(false, true, new Path("data/gov2/gov2.title.701-775"),

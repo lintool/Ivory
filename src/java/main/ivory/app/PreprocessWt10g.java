@@ -1,11 +1,11 @@
 /*
  * Ivory: A Hadoop toolkit for web-scale information retrieval
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You may
  * obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0 
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,7 +14,7 @@
  * permissions and limitations under the License.
  */
 
-package ivory.core.driver;
+package ivory.app;
 
 import ivory.core.Constants;
 import ivory.core.RetrievalEnvironment;
@@ -35,19 +35,14 @@ import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Logger;
 
-import edu.umd.cloud9.collection.clue.ClueWarcDocnoMapping;
+import edu.umd.cloud9.collection.trecweb.TrecWebDocnoMappingBuilder;
+import edu.umd.cloud9.collection.trecweb.Wt10gDocnoMapping;
 
-public class PreprocessClueWebEnglish extends Configured implements Tool {
-  private static final Logger LOG = Logger.getLogger(PreprocessClueWebEnglish.class);
-
-  public static int[] SegmentDocCounts = new int[] { 3382356, 50220423, 51577077, 50547493,
-      52311060, 50756858, 50559093, 52472358, 49545346, 50738874, 45175228 };
-
-  public static int[] DocnoOffsets = new int[] { 0, 0, 50220423, 101797500, 152344993, 204656053,
-      255412911, 305972004, 358444362, 407989708, 458728582 };
+public class PreprocessWt10g extends Configured implements Tool {
+  private static final Logger LOG = Logger.getLogger(PreprocessWt10g.class);
 
   private static int printUsage() {
-    System.out.println("usage: [input-path] [index-path] [segment-num]");
+    System.out.println("usage: [input-path] [index-path]");
     ToolRunner.printGenericCommandUsage(System.out);
     return -1;
   }
@@ -56,47 +51,46 @@ public class PreprocessClueWebEnglish extends Configured implements Tool {
    * Runs this tool.
    */
   public int run(String[] args) throws Exception {
-    if (args.length != 3) {
+    if (args.length != 2) {
       printUsage();
       return -1;
     }
 
     String collection = args[0];
-    String indexPath = args[1];
-    int segment = Integer.parseInt(args[2]);
+    String indexRootPath = args[1];
 
-    LOG.info("Tool name: " + PreprocessClueWebEnglish.class.getCanonicalName());
+    LOG.info("Tool name: " + PreprocessWt10g.class.getCanonicalName());
     LOG.info(" - Collection path: " + collection);
-    LOG.info(" - Index path: " + indexPath);
-    LOG.info(" - segement number: " + segment);
+    LOG.info(" - Index path: " + indexRootPath);
 
     Configuration conf = getConf();
     FileSystem fs = FileSystem.get(conf);
-    RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fs);
 
-    Path p = new Path(indexPath);
+    // Create the index directory if it doesn't already exist.
+    Path p = new Path(indexRootPath);
     if (!fs.exists(p)) {
-      LOG.error("Error: index path doesn't exist!");
-      return 0;
+      LOG.info("index directory doesn't exist, creating...");
+      fs.mkdirs(p);
+    } else {
+      LOG.info("Index directory " + p + " already exists!");
+      return -1;
     }
 
-    if (!fs.exists(env.getDocnoMappingData())) {
-      LOG.error("Error: docno mapping data doesn't exist!");
-      return 0;
-    }
+    RetrievalEnvironment env = new RetrievalEnvironment(indexRootPath, fs);
+    Path mappingFile = env.getDocnoMappingData();
+    new TrecWebDocnoMappingBuilder().build(new Path(collection), mappingFile, conf);
 
-    conf.set(Constants.CollectionName, "ClueWeb:English:Segment" + segment);
+    conf.set(Constants.CollectionName, "Wt10g");
     conf.set(Constants.CollectionPath, collection);
-    conf.set(Constants.IndexPath, indexPath);
+    conf.set(Constants.IndexPath, indexRootPath);
     conf.set(Constants.InputFormat, SequenceFileInputFormat.class.getCanonicalName());
     conf.set(Constants.Tokenizer, GalagoTokenizer.class.getCanonicalName());
-    conf.set(Constants.DocnoMappingClass, ClueWarcDocnoMapping.class.getCanonicalName());
-    conf.set(Constants.DocnoMappingFile, env.getDocnoMappingData().toString());
+    conf.set(Constants.DocnoMappingClass, Wt10gDocnoMapping.class.getCanonicalName());
+    conf.set(Constants.DocnoMappingFile, mappingFile.toString());
 
-    conf.setInt(Constants.DocnoOffset, DocnoOffsets[segment]);
+    conf.setInt(Constants.DocnoOffset, 0); // docnos start at 1
     conf.setInt(Constants.MinDf, 10);
     conf.setInt(Constants.MaxDf, Integer.MAX_VALUE);
-    conf.setInt(Constants.TermIndexWindow, 8);
 
     new BuildTermDocVectors(conf).run();
     new ComputeGlobalTermStatistics(conf).run();
@@ -113,6 +107,6 @@ public class PreprocessClueWebEnglish extends Configured implements Tool {
    * Dispatches command-line arguments to the tool via the {@code ToolRunner}.
    */
   public static void main(String[] args) throws Exception {
-    ToolRunner.run(new PreprocessClueWebEnglish(), args);
+    ToolRunner.run(new Configuration(), new PreprocessWt10g(), args);
   }
 }

@@ -1,8 +1,8 @@
 package ivory.integration;
 
 import static org.junit.Assert.assertTrue;
-import ivory.core.driver.BuildPositionalIndexIP;
-import ivory.core.driver.PreprocessClueWebEnglish;
+import ivory.app.BuildPositionalIndexIP;
+import ivory.app.PreprocessClueWebEnglish;
 import ivory.core.eval.Qrels;
 import ivory.regression.basic.Web09catB_All;
 import ivory.smrf.retrieval.BatchQueryRunner;
@@ -55,13 +55,8 @@ public class VerifyCluePositionalIndexIP {
         IntegrationUtils.D_JT, IntegrationUtils.D_NN, collectionPath.toString(), index, "1" });
     BuildPositionalIndexIP.main(new String[] { libjars,
         IntegrationUtils.D_JT, IntegrationUtils.D_NN, index, "200" });
-  }
 
-  @Test
-  public void verifyResults() throws Exception {
-    Configuration conf = IntegrationUtils.getBespinConfiguration();
-    FileSystem fs = FileSystem.get(conf);
-
+    // Done with indexing, now do retrieval run.
     fs.copyFromLocalFile(false, true, new Path("data/clue/run.web09catB.all.xml"),
         new Path(index + "/" + "run.web09catB.all.xml"));
     fs.copyFromLocalFile(false, true, new Path("data/clue/queries.web09.xml"),

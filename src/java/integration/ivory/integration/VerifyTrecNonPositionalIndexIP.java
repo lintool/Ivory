@@ -1,8 +1,8 @@
 package ivory.integration;
 
 import static org.junit.Assert.assertTrue;
-import ivory.core.driver.BuildNonPositionalIndexIP;
-import ivory.core.driver.PreprocessTREC;
+import ivory.app.BuildNonPositionalIndexIP;
+import ivory.app.PreprocessTrec45;
 import ivory.core.eval.Qrels;
 import ivory.regression.basic.Robust04_Basic;
 import ivory.smrf.retrieval.BatchQueryRunner;
@@ -47,17 +47,12 @@ public class VerifyTrecNonPositionalIndexIP {
 
     String libjars = String.format("-libjars=%s", Joiner.on(",").join(jars));
 
-    PreprocessTREC.main(new String[] { libjars, IntegrationUtils.D_JT, IntegrationUtils.D_NN,
+    PreprocessTrec45.main(new String[] { libjars, IntegrationUtils.D_JT, IntegrationUtils.D_NN,
         collectionPath.toString(), index });
     BuildNonPositionalIndexIP.main(new String[] { libjars,
         IntegrationUtils.D_JT, IntegrationUtils.D_NN, index, "10" });
-  }
 
-  @Test
-  public void verifyResults() throws Exception {
-    Configuration conf = IntegrationUtils.getBespinConfiguration();
-    FileSystem fs = FileSystem.get(conf);
-
+    // Done with indexing, now do retrieval run.
     fs.copyFromLocalFile(false, true,
         new Path("data/trec/run.robust04.nonpositional.baselines.xml"),
         new Path(index + "/run.robust04.nonpositional.baselines.xml"));

@@ -1,8 +1,8 @@
 package ivory.integration;
 
 import static org.junit.Assert.assertTrue;
-import ivory.core.driver.BuildNonPositionalIndexIP;
-import ivory.core.driver.PreprocessClueWebEnglish;
+import ivory.app.BuildNonPositionalIndexIP;
+import ivory.app.PreprocessClueWebEnglish;
 import ivory.core.eval.Qrels;
 import ivory.regression.basic.Web09catB_All;
 import ivory.smrf.retrieval.BatchQueryRunner;
@@ -55,13 +55,8 @@ public class VerifyClueNonPositionalIndexIP {
         IntegrationUtils.D_JT, IntegrationUtils.D_NN, collectionPath.toString(), index, "1" });
     BuildNonPositionalIndexIP.main(new String[] { libjars,
         IntegrationUtils.D_JT, IntegrationUtils.D_NN, index, "200" });
-  }
 
-  @Test
-  public void verifyResults() throws Exception {
-    Configuration conf = IntegrationUtils.getBespinConfiguration();
-    FileSystem fs = FileSystem.get(conf);
-
+    // Done with indexing, now do retrieval run.
     fs.copyFromLocalFile(false, true,
         new Path("data/clue/run.web09catB.nonpositional.baselines.xml"),
         new Path(index + "/run.web09catB.nonpositional.baselines.xml"));

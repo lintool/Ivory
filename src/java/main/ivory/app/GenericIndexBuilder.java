@@ -37,8 +37,8 @@ import edu.umd.cloud9.collection.trecweb.Gov2DocnoMapping;
 import edu.umd.cloud9.collection.trecweb.Wt10gDocnoMapping;
 
 @SuppressWarnings("unchecked")
-public class IndexBuilder extends Configured implements Tool {
-  private static final Logger LOG = Logger.getLogger(IndexBuilder.class);
+public class GenericIndexBuilder extends Configured implements Tool {
+  private static final Logger LOG = Logger.getLogger(GenericIndexBuilder.class);
 
   private static final String INPUT_OPTION = "collection";
   private static final String NAME_OPTION = "collectionName";
@@ -92,7 +92,7 @@ public class IndexBuilder extends Configured implements Tool {
     String collectionName = cmdline.getOptionValue(NAME_OPTION);
     String indexPath = cmdline.getOptionValue(INDEX_OPTION);
 
-    int indexPartitions = cmdline.hasOption(MAPPING_OPTION) ?
+    int indexPartitions = cmdline.hasOption(INDEX_PARTITIONS_OPTION) ?
         Integer.parseInt(cmdline.getOptionValue(INDEX_PARTITIONS_OPTION)) : 64;
 
     Class<? extends DocnoMapping> docnoMappingClass = null;
@@ -125,7 +125,7 @@ public class IndexBuilder extends Configured implements Tool {
 
     int minDf = 2;
 
-    LOG.info("Tool name: " + IndexBuilder.class.getCanonicalName());
+    LOG.info("Tool name: " + GenericIndexBuilder.class.getCanonicalName());
     LOG.info(String.format(" -%s: %s", INPUT_OPTION, collection));
     LOG.info(String.format(" -%s: %s", NAME_OPTION, collectionName));
     LOG.info(String.format(" -%s: %s", INDEX_OPTION, indexPath));
@@ -205,6 +205,6 @@ public class IndexBuilder extends Configured implements Tool {
    * Dispatches command-line arguments to the tool via the {@code ToolRunner}.
    */
   public static void main(String[] args) throws Exception {
-    ToolRunner.run(new Configuration(), new IndexBuilder(), args);
+    ToolRunner.run(new Configuration(), new GenericIndexBuilder(), args);
   }
 }

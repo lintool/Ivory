@@ -14,7 +14,7 @@
  * permissions and limitations under the License.
  */
 
-package ivory.core.driver;
+package ivory.app;
 
 import ivory.core.Constants;
 import ivory.core.RetrievalEnvironment;
@@ -38,8 +38,8 @@ import edu.umd.cloud9.collection.trec.TrecDocnoMapping;
 import edu.umd.cloud9.collection.trec.TrecDocnoMappingBuilder;
 import edu.umd.cloud9.collection.trec.TrecDocumentInputFormat;
 
-public class PreprocessTREC extends Configured implements Tool {
-  private static final Logger LOG = Logger.getLogger(PreprocessTREC.class);
+public class PreprocessTrec45 extends Configured implements Tool {
+  private static final Logger LOG = Logger.getLogger(PreprocessTrec45.class);
 
   private static int printUsage() {
     System.out.println("usage: [input-path] [index-path]");
@@ -59,7 +59,7 @@ public class PreprocessTREC extends Configured implements Tool {
     String collection = args[0];
     String indexRootPath = args[1];
 
-    LOG.info("Tool name: " + PreprocessTREC.class.getCanonicalName());
+    LOG.info("Tool name: " + PreprocessTrec45.class.getCanonicalName());
     LOG.info(" - Collection path: " + collection);
     LOG.info(" - Index path: " + indexRootPath);
 
@@ -91,7 +91,6 @@ public class PreprocessTREC extends Configured implements Tool {
     conf.setInt(Constants.DocnoOffset, 0); // docnos start at 1
     conf.setInt(Constants.MinDf, 2); // toss away singleton terms
     conf.setInt(Constants.MaxDf, Integer.MAX_VALUE);
-    conf.setInt(Constants.TermIndexWindow, 8);
 
     new BuildTermDocVectors(conf).run();
     new ComputeGlobalTermStatistics(conf).run();
@@ -108,6 +107,6 @@ public class PreprocessTREC extends Configured implements Tool {
    * Dispatches command-line arguments to the tool via the {@code ToolRunner}.
    */
   public static void main(String[] args) throws Exception {
-    ToolRunner.run(new Configuration(), new PreprocessTREC(), args);
+    ToolRunner.run(new Configuration(), new PreprocessTrec45(), args);
   }
 }
