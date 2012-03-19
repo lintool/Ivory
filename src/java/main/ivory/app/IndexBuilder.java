@@ -33,6 +33,8 @@ import org.apache.log4j.Logger;
 
 import edu.umd.cloud9.collection.DocnoMapping;
 import edu.umd.cloud9.collection.trec.TrecDocnoMapping;
+import edu.umd.cloud9.collection.trecweb.Gov2DocnoMapping;
+import edu.umd.cloud9.collection.trecweb.Wt10gDocnoMapping;
 
 @SuppressWarnings("unchecked")
 public class IndexBuilder extends Configured implements Tool {
@@ -44,6 +46,7 @@ public class IndexBuilder extends Configured implements Tool {
   private static final String FORMAT_OPTION = "inputFormat";
   private static final String TOKENIZER_OPTION = "tokenizer";
   private static final String MAPPING_OPTION = "docnoMapping";
+  private static final String INDEX_PARTITIONS_OPTION = "indexPartitions";
 
   @SuppressWarnings({"static-access"}) @Override
   public int run(String[] args) throws Exception {
@@ -58,9 +61,14 @@ public class IndexBuilder extends Configured implements Tool {
         .withDescription("(required) fully-qualified DocnoMapping").create(MAPPING_OPTION));
 
     options.addOption(OptionBuilder.withArgName("class").hasArg()
-        .withDescription("(optional) fully-qualified Hadoop InputFormat: SequenceFileInputFormat default").create(FORMAT_OPTION));
+        .withDescription("(optional) fully-qualified Hadoop InputFormat: SequenceFileInputFormat default")
+        .create(FORMAT_OPTION));
     options.addOption(OptionBuilder.withArgName("class").hasArg()
-        .withDescription("(optional) fully-qualified Tokenizer: GalagoTokenizer default").create(TOKENIZER_OPTION));
+        .withDescription("(optional) fully-qualified Tokenizer: GalagoTokenizer default")
+        .create(TOKENIZER_OPTION));
+    options.addOption(OptionBuilder.withArgName("num").hasArg()
+        .withDescription("(optional) number of index partitions: 100 default")
+        .create(INDEX_PARTITIONS_OPTION));
 
     CommandLine cmdline;
     CommandLineParser parser = new GnuParser();
@@ -83,6 +91,9 @@ public class IndexBuilder extends Configured implements Tool {
     String collection = cmdline.getOptionValue(INPUT_OPTION);
     String collectionName = cmdline.getOptionValue(NAME_OPTION);
     String indexPath = cmdline.getOptionValue(INDEX_OPTION);
+
+    int indexPartitions = cmdline.hasOption(MAPPING_OPTION) ?
+        Integer.parseInt(cmdline.getOptionValue(INDEX_PARTITIONS_OPTION)) : 64;
 
     Class<? extends DocnoMapping> docnoMappingClass = null;
     try {
@@ -112,19 +123,36 @@ public class IndexBuilder extends Configured implements Tool {
       }
     }
 
-    LOG.info("Tool name: " + IndexBuilder.class.getCanonicalName());
-    LOG.info(" - Collection path: " + collection);
-    LOG.info(" - Collection name: " + collectionName);
-    LOG.info(" - Index path: " + indexPath);
-    LOG.info(" - DocnoMapping: " + docnoMappingClass.getCanonicalName());
-    LOG.info(" - InputFormat: " + inputFormatClass.getCanonicalName());
-    LOG.info(" - Tokenizer: " + tokenizerClass.getCanonicalName());
+    int minDf = 2;
 
-    int indexPartitions = 100;
-    if ( docnoMappingClass.equals(TrecDocnoMapping.class)) {
+    LOG.info("Tool name: " + IndexBuilder.class.getCanonicalName());
+    LOG.info(String.format(" -%s: %s", INPUT_OPTION, collection));
+    LOG.info(String.format(" -%s: %s", NAME_OPTION, collectionName));
+    LOG.info(String.format(" -%s: %s", INDEX_OPTION, indexPath));
+    LOG.info(String.format(" -%s: %s", MAPPING_OPTION, docnoMappingClass.getCanonicalName()));
+    LOG.info(String.format(" -%s: %s", FORMAT_OPTION, inputFormatClass.getCanonicalName()));
+    LOG.info(String.format(" -%s: %s", TOKENIZER_OPTION, tokenizerClass.getCanonicalName()));
+    LOG.info(String.format(" -%s: %d", INDEX_PARTITIONS_OPTION, indexPartitions));
+
+    if (docnoMappingClass.equals(TrecDocnoMapping.class)) {
       indexPartitions = 10;
-      LOG.info("Recognized TREC collection: Setting indexPartitions = " + indexPartitions);
-    }
+      minDf = 2;
+      LOG.info("Recognized TREC collection: setting special defaults...");
+      LOG.info(String.format(" -%s: %d", INDEX_PARTITIONS_OPTION, indexPartitions));
+      LOG.info(String.format(" -minDf: %d", minDf));
+    } else if (docnoMappingClass.equals(Wt10gDocnoMapping.class)) {
+      indexPartitions = 10;
+      minDf = 10;
+      LOG.info("Recognized Wt10g collection: setting special defaults...");
+      LOG.info(String.format(" -%s: %d", INDEX_PARTITIONS_OPTION, indexPartitions));
+      LOG.info(String.format(" -minDf: %d", minDf));
+    } else if (docnoMappingClass.equals(Gov2DocnoMapping.class)) {
+      indexPartitions = 100;
+      minDf = 10;
+      LOG.info("Recognized Gov2 collection: setting special defaults...");
+      LOG.info(String.format(" -%s: %d", INDEX_PARTITIONS_OPTION, indexPartitions));
+      LOG.info(String.format(" -minDf: %d", minDf));
+    } 
 
     Configuration conf = getConf();
     FileSystem fs = FileSystem.get(conf);
@@ -150,9 +178,8 @@ public class IndexBuilder extends Configured implements Tool {
     conf.set(Constants.DocnoMappingFile, env.getDocnoMappingData().toString());
 
     conf.setInt(Constants.DocnoOffset, 0); // docnos start at 1
-    conf.setInt(Constants.MinDf, 2); // toss away singleton terms
+    conf.setInt(Constants.MinDf, minDf); // toss away singleton terms
     conf.setInt(Constants.MaxDf, Integer.MAX_VALUE);
-    conf.setInt(Constants.TermIndexWindow, 8);
 
     Path mappingFile = env.getDocnoMappingData();
     docnoMappingClass.newInstance().getBuilder().build(new Path(collection), mappingFile, conf);
