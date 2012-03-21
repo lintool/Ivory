@@ -36,6 +36,7 @@ import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Logger;
 
 import edu.umd.cloud9.collection.clue.ClueWarcDocnoMapping;
+import edu.umd.cloud9.collection.clue.ClueWarcDocnoMappingBuilder;
 
 public class PreprocessClueWebEnglish extends Configured implements Tool {
   private static final Logger LOG = Logger.getLogger(PreprocessClueWebEnglish.class);
@@ -72,18 +73,20 @@ public class PreprocessClueWebEnglish extends Configured implements Tool {
 
     Configuration conf = getConf();
     FileSystem fs = FileSystem.get(conf);
-    RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fs);
 
+    // Create the index directory if it doesn't already exist.
     Path p = new Path(indexPath);
     if (!fs.exists(p)) {
-      LOG.error("Error: index path doesn't exist!");
-      return 0;
+      LOG.info("index path doesn't exist, creating...");
+      fs.mkdirs(p);
+    } else {
+      LOG.info("Index directory " + p + " already exists!");
+      return -1;
     }
 
-    if (!fs.exists(env.getDocnoMappingData())) {
-      LOG.error("Error: docno mapping data doesn't exist!");
-      return 0;
-    }
+    RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fs);
+    Path mappingFile = env.getDocnoMappingData();
+    new ClueWarcDocnoMappingBuilder().build(new Path(collection), mappingFile, conf);
 
     conf.set(Constants.CollectionName, "ClueWeb:English:Segment" + segment);
     conf.set(Constants.CollectionPath, collection);

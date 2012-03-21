@@ -48,9 +48,6 @@ public class VerifyCluePositionalIndexIP {
 
     String libjars = String.format("-libjars=%s", Joiner.on(",").join(jars));
 
-    fs.copyFromLocalFile(false, true, new Path("data/clue/docno-mapping.dat"),
-        new Path(index + "/" + "docno-mapping.dat"));
-
     PreprocessClueWebEnglish.main(new String[] { libjars,
         IntegrationUtils.D_JT, IntegrationUtils.D_NN, collectionPath.toString(), index, "1" });
     BuildPositionalIndexIP.main(new String[] { libjars,

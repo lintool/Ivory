@@ -77,21 +77,8 @@ public class PreprocessMedline extends Configured implements Tool {
     }
 
     RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fs);
-
-    // Look for the docno mapping, which maps from docid (String) to docno (sequentially-number
-    // integer). If it doesn't exist create it.
     Path mappingFile = env.getDocnoMappingData();
-    Path mappingDir = env.getDocnoMappingDirectory();
-
-    if (!fs.exists(mappingFile)) {
-      LOG.info(mappingFile + " doesn't exist, creating...");
-      String[] arr = new String[] { collection, mappingDir.toString(), mappingFile.toString()};
-      MedlineDocnoMappingBuilder tool = new MedlineDocnoMappingBuilder();
-      tool.setConf(conf);
-      tool.run(arr);
-
-      fs.delete(mappingDir, true);
-    }
+    new MedlineDocnoMappingBuilder().build(new Path(collection), mappingFile, conf);
 
     conf.set(Constants.CollectionName, "Medline");
     conf.set(Constants.CollectionPath, collection);
