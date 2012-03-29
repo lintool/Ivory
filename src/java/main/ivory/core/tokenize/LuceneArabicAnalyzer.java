@@ -19,27 +19,27 @@ import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.util.Version;
 
 public class LuceneArabicAnalyzer extends Tokenizer {
-  ArabicAnalyzer a;
-  TokenStream ts;
+  private ArabicAnalyzer analyzer;
+  private TokenStream tokenStream;
   
   @Override
   public void configure(Configuration conf) {
-    a = new ArabicAnalyzer(Version.LUCENE_40);
+    analyzer = new ArabicAnalyzer(Version.LUCENE_40);
   }
 
   @Override
   public void configure(Configuration mJobConf, FileSystem fs) {
-    a = new ArabicAnalyzer(Version.LUCENE_40);
+    analyzer = new ArabicAnalyzer(Version.LUCENE_40);
   }
 
   @Override
   public String[] processContent(String text) {
     List<String> tokens = new ArrayList<String>();
     try {
-      ts = a.tokenStream("dummy", new StringReader(text));
-      CharTermAttribute termAtt = ts.getAttribute(CharTermAttribute.class);
-      ts.clearAttributes();
-      while (ts.incrementToken()) {
+      tokenStream = analyzer.tokenStream("dummy", new StringReader(text));
+      CharTermAttribute termAtt = tokenStream.getAttribute(CharTermAttribute.class);
+      tokenStream.clearAttributes();
+      while (tokenStream.incrementToken()) {
         tokens.add(termAtt.toString());
       }
     } catch (IOException e) {
@@ -50,14 +50,14 @@ public class LuceneArabicAnalyzer extends Tokenizer {
   }
   
   public static void main(String[] args) throws IOException, ClassNotFoundException, InstantiationException, IllegalAccessException{
-    if(args.length < 3){
-      System.err.println("usage: [input] [language] [output-file]");
+    if(args.length < 2){
+      System.err.println("usage: [input] [output-file]");
       System.exit(-1);
     }
 //    ivory.core.tokenize.Tokenizer tokenizer = TokenizerFactory.createTokenizer(args[1], args[2], null);
     ivory.core.tokenize.Tokenizer tokenizer = new LuceneArabicAnalyzer();
     tokenizer.configure(null);
-    BufferedWriter out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(args[2]), "UTF8"));
+    BufferedWriter out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(args[1]), "UTF8"));
     BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(args[0]), "UTF8"));
 
     //    DataInput in = new DataInputStream(new BufferedInputStream(FileSystem.getLocal(new Configuration()).open(new Path(args[0]))));
