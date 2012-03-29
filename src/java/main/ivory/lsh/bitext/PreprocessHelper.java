@@ -44,10 +44,10 @@ public class PreprocessHelper {
   private HMapIFW transDfTable;
   private MaxentModel classifier;
 //  private PrefixEncodedGlobalStats globalStatsMap;  // for backward compatibility
-  DfTableArray dfTable;
-  DefaultFrequencySortedDictionary dict;
+  private DfTableArray dfTable;
+  private DefaultFrequencySortedDictionary dict;
   private final Logger sLogger = Logger.getLogger(PreprocessHelper.class);
-  ArrayListWritable<Text> tempSentences;
+  private ArrayListWritable<Text> tempSentences;
   
   public PreprocessHelper(int minVectorTerms, int minSentenceLength, JobConf job) throws Exception {
     super();
@@ -208,7 +208,7 @@ public class PreprocessHelper {
 
   public HMapSFW createFDocVector(HMapSIW termTf, int length) {
     if(termTf.size() < MinVectorTerms){
-      sLogger.warn("Vector has too few terms = "+termTf);
+//      sLogger.warn("Vector has too few terms = "+termTf);
       return null;
     }
     

@@ -87,11 +87,11 @@ public class FindParallelSentencePairs extends Configured implements Tool {
 	private static class MyMapper extends MapReduceBase implements
 	Mapper<Writable, Indexable, PairOfInts, WikiDocInfo> {
 
-		HMapIV<ArrayListOfIntsWritable> pwsimMapping;		// mapping for pwsim pairs
-		PairOfInts keyOut;
-		JobConf mJob;
-		WikiDocInfo valOut;
-		PreprocessHelper helper;							// for modularity, helper provides methods to preprocess data
+		private HMapIV<ArrayListOfIntsWritable> pwsimMapping;		// mapping for pwsim pairs
+		private PairOfInts keyOut;
+		private JobConf mJob;
+		private WikiDocInfo valOut;
+		private PreprocessHelper helper;							// for modularity, helper provides methods to preprocess data
 
 		public void configure(JobConf job) {
 			sLogger.setLevel(Level.INFO);
@@ -235,13 +235,13 @@ public class FindParallelSentencePairs extends Configured implements Tool {
 	 */
 	private static class MyReducer extends MapReduceBase implements
 	Reducer<PairOfInts, WikiDocInfo, Text, Text>{
-		int fDocno, eDocno;
-		int classifierPositiveId;
-		ArrayListWritable<HMapSFW> fVectors, eVectors;
-		ArrayListWritable<Text> fSentences, eSentences;
-		PreprocessHelper helper;						// for modularity, helper provides methods to preprocess data
-		float classifierThreshold;
-		Text emptyValue = new Text();
+	  private int fDocno, eDocno;
+	  private int classifierPositiveId;
+	  private ArrayListWritable<HMapSFW> fVectors, eVectors;
+	  private ArrayListWritable<Text> fSentences, eSentences;
+	  private PreprocessHelper helper;						// for modularity, helper provides methods to preprocess data
+	  private float classifierThreshold;
+	  private Text emptyValue = new Text();
 
 		public void configure(JobConf job) {
 			sLogger.setLevel(Level.INFO);

@@ -66,14 +66,14 @@ public class FilterSentencePairs extends Configured implements Tool {
 	private static class MyMapper extends MapReduceBase implements
 	Mapper<LongWritable, Text, Text, Text> {
 
-		PreprocessHelper helper;
-		String eSent, fSent;
-		int eLen, fLen;
-		HMapSFW eVector, fVector;
-		Tokenizer eTok, fTok;
-		Text outSent1, outSent2;
-		float classifierThreshold;
-		int classifierPositiveId;
+		private PreprocessHelper helper;
+		private String eSent, fSent;
+		private int eLen, fLen;
+		private HMapSFW eVector, fVector;
+		private Tokenizer eTok, fTok;
+		private Text outSent1, outSent2;
+		private float classifierThreshold;
+		private int classifierPositiveId;
 		
 		public void configure(JobConf job) {
 			sLogger.setLevel(Level.INFO);
