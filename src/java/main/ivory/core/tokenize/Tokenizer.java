@@ -45,9 +45,9 @@ public abstract class Tokenizer {
    */
   public String removeNonUnicodeChars(String token) {
     StringBuffer fixedToken = new StringBuffer();
-    for(int i=0; i<token.length(); i++){
+    for (int i = 0; i < token.length(); i++) {
       char c = token.charAt(i);
-      if(Character.getNumericValue(c)>=0){
+      if (Character.getNumericValue(c) >= -1) {
         fixedToken.append(c);
       }
     }
