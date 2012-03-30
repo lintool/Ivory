@@ -92,6 +92,7 @@ public class StanfordChineseTokenizer extends Tokenizer {
   public static void main(String[] args) throws IOException, ClassNotFoundException, InstantiationException, IllegalAccessException{
     if(args.length < 4){
       System.err.println("usage: [input] [language] [tokenizer-model-path] [output-file]");
+      System.exit(-1);
     }
     ivory.core.tokenize.Tokenizer tokenizer = TokenizerFactory.createTokenizer(args[1], args[2], null);
     BufferedWriter out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(args[3]), "UTF8"));
