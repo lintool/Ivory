@@ -1,13 +1,16 @@
 package ivory.core.util;
 
-import ivory.core.util.CLIRUtils;
+import java.io.File;
 import java.io.IOException;
+
 import junit.framework.Assert;
 import junit.framework.TestCase;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.junit.Test;
+
 import edu.umd.hooka.Vocab;
 import edu.umd.hooka.alignment.HadoopAlign;
 import edu.umd.hooka.ttables.TTable_monolithic_IFAs;
@@ -15,14 +18,14 @@ import edu.umd.hooka.ttables.TTable_monolithic_IFAs;
 public class CLIRUtilsTest extends TestCase {
   @Test
   public void testGIZA(){
-    String srcVocabFile = "Ivory/etc/toy_vocab.de-en.de";
-    String trgVocabFile = "Ivory/etc/toy_vocab.de-en.en";
-    String ttableFile = "Ivory/etc/toy_ttable.de-en";
+    String srcVocabFile = "etc/toy_vocab.de-en.de";
+    String trgVocabFile = "etc/toy_vocab.de-en.en";
+    String ttableFile = "etc/toy_ttable.de-en";
 
     Configuration conf =  new Configuration();
     try {
       CLIRUtils.createTTableFromGIZA(
-          "Ivory/etc/toy_lex.0-0.f2n", 
+          "etc/toy_lex.0-0.f2n", 
           srcVocabFile, 
           trgVocabFile, 
           ttableFile, 
@@ -53,14 +56,14 @@ public class CLIRUtilsTest extends TestCase {
 
   @Test
   public void testGIZA2(){
-    String srcVocabFile = "Ivory/etc/vocab.en-de.en";
-    String trgVocabFile = "Ivory/etc/vocab.en-de.de";
-    String ttableFile = "Ivory/etc/ttable.en-de";
+    String srcVocabFile = "etc/vocab.en-de.en";
+    String trgVocabFile = "etc/vocab.en-de.de";
+    String ttableFile = "etc/ttable.en-de";
 
     Configuration conf =  new Configuration();
     try {
       CLIRUtils.createTTableFromGIZA(
-          "Ivory/etc/toy_lex.0-0.n2f", 
+          "etc/toy_lex.0-0.n2f", 
           srcVocabFile, 
           trgVocabFile, 
           ttableFile, 
@@ -87,18 +90,22 @@ public class CLIRUtilsTest extends TestCase {
       e.printStackTrace();
       Assert.fail();
     }
+
+    new File(srcVocabFile).delete();
+    new File(trgVocabFile).delete();
+    new File(ttableFile).delete();
   }
 
   @Test
   public void testBerkeleyAligner(){
-    String srcVocabFile = "Ivory/etc/vocab.de-en.de";
-    String trgVocabFile = "Ivory/etc/vocab.de-en.en";
-    String ttableFile = "Ivory/etc/ttable.de-en";
+    String srcVocabFile = "etc/vocab.de-en.de";
+    String trgVocabFile = "etc/vocab.de-en.en";
+    String ttableFile = "etc/ttable.de-en";
 
     Configuration conf =  new Configuration();
     try {
       CLIRUtils.createTTableFromBerkeleyAligner(
-          "Ivory/etc/toy_stage2.2.params.txt", 
+          "etc/toy_stage2.2.params.txt", 
           srcVocabFile, 
           trgVocabFile, 
           ttableFile, 
@@ -126,18 +133,22 @@ public class CLIRUtilsTest extends TestCase {
       e.printStackTrace();
       Assert.fail();
     }
+
+    new File(srcVocabFile).delete();
+    new File(trgVocabFile).delete();
+    new File(ttableFile).delete();
   }
 
   @Test
   public void testBerkeleyAligner2(){
-    String srcVocabFile = "Ivory/etc/vocab.en-de.en";
-    String trgVocabFile = "Ivory/etc/vocab.en-de.de";
-    String ttableFile = "Ivory/etc/ttable.en-de";
+    String srcVocabFile = "etc/vocab.en-de.en";
+    String trgVocabFile = "etc/vocab.en-de.de";
+    String ttableFile = "etc/ttable.en-de";
 
     Configuration conf =  new Configuration();
     try {
       CLIRUtils.createTTableFromBerkeleyAligner(
-          "Ivory/etc/toy_stage2.1.params.txt", 
+          "etc/toy_stage2.1.params.txt", 
           srcVocabFile, 
           trgVocabFile, 
           ttableFile, 
@@ -164,20 +175,24 @@ public class CLIRUtilsTest extends TestCase {
       e.printStackTrace();
       Assert.fail();
     }
+
+    new File(srcVocabFile).delete();
+    new File(trgVocabFile).delete();
+    new File(ttableFile).delete();
   }
 
   @Test
   public void testHooka(){
-    String finalSrcVocabFile = "Ivory/etc/toy_vocab.de-en.de";
-    String finalTrgVocabFile = "Ivory/etc/toy_vocab.de-en.en";
-    String finalTTableFile = "Ivory/etc/toy_ttable.de-en";
+    String finalSrcVocabFile = "etc/toy_vocab.de-en.de";
+    String finalTrgVocabFile = "etc/toy_vocab.de-en.en";
+    String finalTTableFile = "etc/toy_ttable.de-en";
 
     Configuration conf =  new Configuration();
     try {
       CLIRUtils.createTTableFromHooka(
-          "Ivory/etc/toy_vocab.de-en.de.raw", 
-          "Ivory/etc/toy_vocab.de-en.en.raw", 
-          "Ivory/etc/toy_ttable.de-en.raw", 
+          "etc/toy_vocab.de-en.de.raw", 
+          "etc/toy_vocab.de-en.en.raw", 
+          "etc/toy_ttable.de-en.raw", 
           finalSrcVocabFile, 
           finalTrgVocabFile, 
           finalTTableFile, 
@@ -210,16 +225,16 @@ public class CLIRUtilsTest extends TestCase {
 
   @Test
   public void testHooka2(){
-    String finalSrcVocabFile = "Ivory/etc/toy_vocab.en-de.en";
-    String finalTrgVocabFile = "Ivory/etc/toy_vocab.en-de.de";
-    String finalTTableFile = "Ivory/etc/toy_ttable.en-de";
+    String finalSrcVocabFile = "etc/toy_vocab.en-de.en";
+    String finalTrgVocabFile = "etc/toy_vocab.en-de.de";
+    String finalTTableFile = "etc/toy_ttable.en-de";
 
     Configuration conf =  new Configuration();
     try {
       CLIRUtils.createTTableFromHooka(
-          "Ivory/etc/toy_vocab.en-de.en.raw", 
-          "Ivory/etc/toy_vocab.en-de.de.raw", 
-          "Ivory/etc/toy_ttable.en-de.raw", 
+          "etc/toy_vocab.en-de.en.raw", 
+          "etc/toy_vocab.en-de.de.raw", 
+          "etc/toy_ttable.en-de.raw", 
           finalSrcVocabFile, 
           finalTrgVocabFile, 
           finalTTableFile, 
