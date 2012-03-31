@@ -26,7 +26,10 @@
 
     <dependency org="xerces" name="xercesImpl" rev="2.9.1" />
     <dependency org="javax.mail" name="mail" rev="1.4.1"/>    
-        <dependency org="opennlp" name="tools" rev="1.5.0"/>    
+     	<dependency org="opennlp" name="tools" rev="1.5.0"/>    
         <dependency org="opennlp" name="maxent" rev="3.0.0"/>    
+	<dependency org="org.apache.lucene" name="lucene-core" rev="3.5.0"/>
+	<dependency org="org.apache.lucene" name="lucene-analyzers" rev="3.5.0"/>
+
   </dependencies>
 </ivy-module>
