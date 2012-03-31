@@ -31,12 +31,12 @@ import org.apache.hadoop.mapred.RunningJob;
 import org.apache.hadoop.mapred.SequenceFileInputFormat;
 import org.apache.hadoop.mapred.SequenceFileOutputFormat;
 import org.apache.hadoop.mapred.TextOutputFormat;
+import org.apache.hadoop.util.LineReader;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
-import edu.umd.cloud9.io.FSLineReader;
 import edu.umd.cloud9.io.map.HMapIIW;
 import edu.umd.cloud9.io.pair.PairOfInts;
 
@@ -101,7 +101,7 @@ public class CLSlidingWindowPwsim extends Configured implements Tool {
       if (localFiles != null && localFiles.length > 0) {
         samplesMap = new HMapIIW();
         try {
-          FSLineReader reader = new FSLineReader(conf.get("Ivory.SampleFile"), FileSystem.get(conf));
+          LineReader reader = new LineReader(FileSystem.get(conf).open(new Path(conf.get("Ivory.SampleFile"))));
           Text t = new Text();
           while (reader.readLine(t) != 0) {
             int docno = Integer.parseInt(t.toString());

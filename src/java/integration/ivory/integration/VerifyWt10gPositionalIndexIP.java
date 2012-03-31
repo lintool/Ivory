@@ -1,8 +1,8 @@
 package ivory.integration;
 
 import static org.junit.Assert.assertTrue;
-import ivory.core.driver.BuildPositionalIndexIP;
-import ivory.core.driver.PreprocessWt10g;
+import ivory.app.BuildPositionalIndexIP;
+import ivory.app.PreprocessWt10g;
 import ivory.core.eval.Qrels;
 import ivory.regression.basic.Wt10g_Basic;
 import ivory.smrf.retrieval.BatchQueryRunner;
@@ -51,13 +51,8 @@ public class VerifyWt10gPositionalIndexIP {
         collectionPath.toString(), index });
     BuildPositionalIndexIP.main(new String[] { libjars, IntegrationUtils.D_JT, IntegrationUtils.D_NN,
         index, "10" });
-  }
 
-  @Test
-  public void verifyResults() throws Exception {
-    Configuration conf = IntegrationUtils.getBespinConfiguration();
-    FileSystem fs = FileSystem.get(conf);
-
+    // Done with indexing, now do retrieval run.
     fs.copyFromLocalFile(false, true, new Path("data/wt10g/run.wt10g.basic.xml"),
         new Path(index + "/" + "run.wt10g.basic.xml"));
     fs.copyFromLocalFile(false, true, new Path("data/wt10g/queries.wt10g.451-500.xml"),

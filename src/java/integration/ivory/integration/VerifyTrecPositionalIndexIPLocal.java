@@ -1,8 +1,8 @@
 package ivory.integration;
 
 import static org.junit.Assert.assertTrue;
-import ivory.core.driver.BuildPositionalIndexIP;
-import ivory.core.driver.PreprocessTREC;
+import ivory.app.BuildPositionalIndexIP;
+import ivory.app.PreprocessTrec45;
 import ivory.core.eval.Qrels;
 import ivory.regression.basic.Robust04_Basic;
 import ivory.smrf.retrieval.BatchQueryRunner;
@@ -47,17 +47,12 @@ public class VerifyTrecPositionalIndexIPLocal {
 
     String libjars = String.format("-libjars=%s", Joiner.on(",").join(jars));
 
-    PreprocessTREC.main(new String[] { libjars, IntegrationUtils.D_JT_LOCAL,
+    PreprocessTrec45.main(new String[] { libjars, IntegrationUtils.D_JT_LOCAL,
         IntegrationUtils.D_NN_LOCAL, collectionPath.toString(), index });
     BuildPositionalIndexIP.main(new String[] { libjars, IntegrationUtils.D_JT_LOCAL,
         IntegrationUtils.D_NN_LOCAL, index, "10" });
-  }
 
-  @Test
-  public void verifyResults() throws Exception {
-    Configuration conf = new Configuration();
-    FileSystem fs = FileSystem.getLocal(conf);
-
+    // Done with indexing, now do retrieval run.
     String[] params = new String[] {
         "data/trec/run.robust04.basic.xml",
         "data/trec/queries.robust04.xml" };

@@ -28,6 +28,7 @@ import org.apache.hadoop.mapred.Reporter;
 import org.apache.hadoop.mapred.SequenceFileInputFormat;
 import org.apache.hadoop.mapred.SequenceFileOutputFormat;
 import org.apache.hadoop.mapred.lib.IdentityReducer;
+import org.apache.hadoop.util.LineReader;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Level;
@@ -36,7 +37,6 @@ import org.apache.log4j.Logger;
 import edu.umd.cloud9.collection.DocnoMapping;
 import edu.umd.cloud9.collection.wikipedia.WikipediaDocnoMapping;
 import edu.umd.cloud9.collection.wikipedia.WikipediaPage;
-import edu.umd.cloud9.io.FSLineReader;
 import edu.umd.cloud9.io.SequenceFileUtils;
 import edu.umd.cloud9.io.map.HMapIIW;
 
@@ -85,7 +85,7 @@ public class ExtractWikipedia extends Configured implements Tool {
       if (sampleDocnosFile != null) {
         samplesMap = new HMapIIW();
         try {
-          FSLineReader reader = new FSLineReader(sampleDocnosFile);
+          LineReader reader = new LineReader(FileSystem.get(job).open(new Path(sampleDocnosFile)));
           Text t = new Text();
           while (reader.readLine(t) != 0) {
             int docno = Integer.parseInt(t.toString());
@@ -160,7 +160,7 @@ public class ExtractWikipedia extends Configured implements Tool {
       if (sampleDocnosFile != null) {
         samplesMap = new HMapIIW();
         try {
-          FSLineReader reader = new FSLineReader(sampleDocnosFile);
+          LineReader reader = new LineReader(FileSystem.get(job).open(new Path(sampleDocnosFile)));
           Text t = new Text();
           while (reader.readLine(t) != 0) {
             int docno = Integer.parseInt(t.toString());
@@ -246,7 +246,7 @@ public class ExtractWikipedia extends Configured implements Tool {
       if (sampleDocnosFile != null) {
         samplesMap = new HMapIIW();
         try {
-          FSLineReader reader = new FSLineReader(sampleDocnosFile);
+          LineReader reader = new LineReader(FileSystem.get(job).open(new Path(sampleDocnosFile)));
           Text t = new Text();
           while (reader.readLine(t) != 0) {
             String[] docnos = t.toString().split("\t");

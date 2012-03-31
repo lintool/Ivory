@@ -14,7 +14,7 @@
  * permissions and limitations under the License.
  */
 
-package ivory.core.driver;
+package ivory.app;
 
 import ivory.core.Constants;
 import ivory.core.RetrievalEnvironment;
@@ -30,16 +30,16 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Logger;
 
-import edu.umd.cloud9.collection.trecweb.Gov2DocnoMapping;
-import edu.umd.cloud9.collection.trecweb.NumberTrecWebDocuments;
+import edu.umd.cloud9.collection.medline.MedlineCitationInputFormat;
+import edu.umd.cloud9.collection.medline.MedlineDocnoMapping;
+import edu.umd.cloud9.collection.medline.MedlineDocnoMappingBuilder;
 
-public class PreprocessGov2 extends Configured implements Tool {
-  private static final Logger LOG = Logger.getLogger(PreprocessGov2.class);
+public class PreprocessMedline extends Configured implements Tool {
+  private static final Logger LOG = Logger.getLogger(PreprocessMedline.class);
 
   private static int printUsage() {
     System.out.println("usage: [input-path] [index-path]");
@@ -57,52 +57,40 @@ public class PreprocessGov2 extends Configured implements Tool {
     }
 
     String collection = args[0];
-    String indexRootPath = args[1];
+    String indexPath = args[1];
 
-    LOG.info("Tool name: " + PreprocessGov2.class.getCanonicalName());
+    LOG.info("Tool name: ProcessMedline");
     LOG.info(" - Collection path: " + collection);
-    LOG.info(" - Index path: " + indexRootPath);
+    LOG.info(" - Index path: " + indexPath);
 
     Configuration conf = getConf();
     FileSystem fs = FileSystem.get(conf);
 
     // Create the index directory if it doesn't already exist.
-    Path p = new Path(indexRootPath);
+    Path p = new Path(indexPath);
     if (!fs.exists(p)) {
-      LOG.info("index directory doesn't exist, creating...");
+      LOG.info("index path doesn't exist, creating...");
       fs.mkdirs(p);
+    } else {
+      LOG.info("Index directory " + p + " already exists!");
+      return -1;
     }
 
-    RetrievalEnvironment env = new RetrievalEnvironment(indexRootPath, fs);
-
-    // Look for the docno mapping, which maps from docid (String) to docno
-    // (sequentially-number integer). If it doesn't exist create it.
+    RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fs);
     Path mappingFile = env.getDocnoMappingData();
-    Path mappingDir = env.getDocnoMappingDirectory();
+    new MedlineDocnoMappingBuilder().build(new Path(collection), mappingFile, conf);
 
-    if (!fs.exists(mappingFile)) {
-      LOG.info("docno-mapping.dat doesn't exist, creating...");
-      String[] arr = new String[] { collection, mappingDir.toString(),
-          mappingFile.toString(), "100" };
-      NumberTrecWebDocuments tool = new NumberTrecWebDocuments();
-      tool.setConf(conf);
-      tool.run(arr);
-
-      fs.delete(mappingDir, true);
-    }
-
-    conf.set(Constants.CollectionName, "Gov2");
+    conf.set(Constants.CollectionName, "Medline");
     conf.set(Constants.CollectionPath, collection);
-    conf.set(Constants.IndexPath, indexRootPath);
-    conf.set(Constants.InputFormat, SequenceFileInputFormat.class.getCanonicalName());
+    conf.set(Constants.IndexPath, indexPath);
+    conf.set(Constants.InputFormat, MedlineCitationInputFormat.class.getCanonicalName());
     conf.set(Constants.Tokenizer, GalagoTokenizer.class.getCanonicalName());
-    conf.set(Constants.DocnoMappingClass, Gov2DocnoMapping.class.getCanonicalName());
-    conf.set(Constants.DocnoMappingFile, mappingFile.toString());
+    conf.set(Constants.DocnoMappingClass, MedlineDocnoMapping.class.getCanonicalName());
+    conf.set(Constants.DocnoMappingFile, env.getDocnoMappingData().toString());
 
     conf.setInt(Constants.DocnoOffset, 0); // docnos start at 1
-    conf.setInt(Constants.MinDf, 10);
+    conf.setInt(Constants.MinDf, 2); // toss away singleton terms
     conf.setInt(Constants.MaxDf, Integer.MAX_VALUE);
-    conf.setInt(Constants.TermIndexWindow, 8);
 
     new BuildTermDocVectors(conf).run();
     new ComputeGlobalTermStatistics(conf).run();
@@ -119,6 +107,6 @@ public class PreprocessGov2 extends Configured implements Tool {
    * Dispatches command-line arguments to the tool via the {@code ToolRunner}.
    */
   public static void main(String[] args) throws Exception {
-    ToolRunner.run(new Configuration(), new PreprocessGov2(), args);
+    ToolRunner.run(new Configuration(), new PreprocessMedline(), args);
   }
 }
