@@ -46,7 +46,7 @@ public class LuceneArabicAnalyzerTest {
     tokenizer.configure(null);
 
     String sentence = "القوات الإثيوبية تسيطر على مدينة مَحَاس وسط الصومال بعد يوم من سيطرتها على مدينة عيل";
-    String[] expectedTokens = new String[] { "قر", "اثيوب",  "تسيطر", "مدين", "محاس", "وسط", "صومال", "يوم", "سيطرت", "مدين", "عيل"};
+    String[] expectedTokens = new String[] { "قو","اثيوب",  "تسيطر", "مدين", "محاس", "وسط", "صومال", "يوم", "سيطرت", "مدين", "عيل"};
 
     String[] tokens = tokenizer.processContent(sentence);
     int tokenCnt = 0;

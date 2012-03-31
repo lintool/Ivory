@@ -10,7 +10,6 @@ import java.io.OutputStreamWriter;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.lucene.analysis.TokenStream;
@@ -24,12 +23,12 @@ public class LuceneArabicAnalyzer extends Tokenizer {
   
   @Override
   public void configure(Configuration conf) {
-    analyzer = new ArabicAnalyzer(Version.LUCENE_40);
+    analyzer = new ArabicAnalyzer(Version.LUCENE_35);
   }
 
   @Override
   public void configure(Configuration mJobConf, FileSystem fs) {
-    analyzer = new ArabicAnalyzer(Version.LUCENE_40);
+    analyzer = new ArabicAnalyzer(Version.LUCENE_35);
   }
 
   @Override
