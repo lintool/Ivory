@@ -867,7 +867,7 @@ public class OpenNLPTokenizer extends ivory.core.tokenize.Tokenizer {
     for(String token : tokens){
       token = removeNonUnicodeChars(token);
       if(isDiscard(token)){
-        sLogger.warn("Discarded stopword "+token);
+//        sLogger.warn("Discarded stopword "+token);
         continue;
       }
 
@@ -881,7 +881,7 @@ public class OpenNLPTokenizer extends ivory.core.tokenize.Tokenizer {
 
       //skip if out of vocab
       if(vocab!=null && vocab.get(stemmed)<=0){
-        sLogger.warn("Discarded OOV "+token);
+//        sLogger.warn("Discarded OOV "+token);
         continue;
       }
       stemmedTokens.add(stemmed);
@@ -935,6 +935,7 @@ public class OpenNLPTokenizer extends ivory.core.tokenize.Tokenizer {
   public static void main(String[] args) throws IOException, ClassNotFoundException, InstantiationException, IllegalAccessException{
     if(args.length < 4){
       System.err.println("usage: [input] [language] [tokenizer-model-path] [output-file]");
+      System.exit(-1);
     }
     ivory.core.tokenize.Tokenizer tokenizer = TokenizerFactory.createTokenizer(args[1], args[2], null);
     BufferedWriter out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(args[3]), "UTF8"));

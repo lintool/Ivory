@@ -14,7 +14,7 @@
  * permissions and limitations under the License.
  */
 
-package ivory.core.driver;
+package ivory.app;
 
 import ivory.core.Constants;
 import ivory.core.RetrievalEnvironment;

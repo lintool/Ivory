@@ -24,8 +24,6 @@ import ivory.core.preprocess.BuildIntDocVectorsForwardIndex;
 import ivory.core.preprocess.BuildTermDocVectors;
 import ivory.core.preprocess.BuildTermDocVectorsForwardIndex;
 import ivory.core.preprocess.ComputeGlobalTermStatistics;
-import ivory.core.tokenize.GalagoTokenizer;
-import ivory.core.tokenize.StanfordChineseTokenizer;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
@@ -35,9 +33,9 @@ import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Logger;
 
-import edu.umd.cloud9.collection.trec.NumberTrecDocuments2;
 import edu.umd.cloud9.collection.trec.TrecDocnoMapping;
-import edu.umd.cloud9.collection.trec.TrecDocumentInputFormat2;
+import edu.umd.cloud9.collection.trec.TrecDocnoMappingBuilder;
+import edu.umd.cloud9.collection.trec.TrecDocumentInputFormat;
 
 public class PreprocessTRECChinese extends Configured implements Tool {
   private static final Logger LOG = Logger.getLogger(PreprocessTRECChinese.class);
@@ -78,7 +76,10 @@ public class PreprocessTRECChinese extends Configured implements Tool {
     if (!fs.exists(p)) {
       LOG.info("index directory doesn't exist, creating...");
       fs.mkdirs(p);
-    }	
+    }	 else {
+      LOG.info("Index directory " + p + " already exists!");
+      return -1;
+    }
 
     RetrievalEnvironment env = new RetrievalEnvironment(indexRootPath, fs);
 
@@ -90,7 +91,7 @@ public class PreprocessTRECChinese extends Configured implements Tool {
     if (!fs.exists(mappingFile)) {
       LOG.info("docno-mapping.dat doesn't exist, creating...");
       String[] arr = new String[] { collection, mappingDir.toString(), mappingFile.toString() };
-      NumberTrecDocuments2 tool = new NumberTrecDocuments2();
+      TrecDocnoMappingBuilder tool = new TrecDocnoMappingBuilder();
       tool.setConf(conf);
       tool.run(arr);
 
@@ -100,7 +101,7 @@ public class PreprocessTRECChinese extends Configured implements Tool {
     conf.set(Constants.CollectionName, "TREC_vol9_Chinese");
     conf.set(Constants.CollectionPath, collection);
     conf.set(Constants.IndexPath, indexRootPath);
-    conf.set(Constants.InputFormat, TrecDocumentInputFormat2.class.getCanonicalName());
+    conf.set(Constants.InputFormat, TrecDocumentInputFormat.class.getCanonicalName());
     conf.set(Constants.Tokenizer, tokenizerClass);
     if (tokenizerPath != null) {
       conf.set(Constants.TokenizerData, tokenizerPath);

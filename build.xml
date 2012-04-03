@@ -256,6 +256,8 @@
 			<report format="noframes" styledir="etc/" todir="${integration.dir}" />
 		</junitreport>
 
+                <mail messageMimeType="text/html" messageFile="${integration.dir}/junit-noframes.html" tolist="umd-ivory@googlegroups.com" subject="Ivory integration test results" mailhost="smtp.umiacs.umd.edu" from="jimmylin@umd.edu" />
+
 	</target>
 
 	<target name="javadoc">

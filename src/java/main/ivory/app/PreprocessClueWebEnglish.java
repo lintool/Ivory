@@ -1,11 +1,11 @@
 /*
  * Ivory: A Hadoop toolkit for web-scale information retrieval
- *
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You may
  * obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0 
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,7 +14,7 @@
  * permissions and limitations under the License.
  */
 
-package ivory.core.driver;
+package ivory.app;
 
 import ivory.core.Constants;
 import ivory.core.RetrievalEnvironment;
@@ -30,19 +30,25 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Logger;
 
-import edu.umd.cloud9.collection.medline.MedlineCitationInputFormat2;
-import edu.umd.cloud9.collection.medline.MedlineDocnoMapping;
-import edu.umd.cloud9.collection.medline.NumberMedlineCitations2;
+import edu.umd.cloud9.collection.clue.ClueWarcDocnoMapping;
+import edu.umd.cloud9.collection.clue.ClueWarcDocnoMappingBuilder;
 
-public class PreprocessMedline extends Configured implements Tool {
-  private static final Logger LOG = Logger.getLogger(PreprocessMedline.class);
+public class PreprocessClueWebEnglish extends Configured implements Tool {
+  private static final Logger LOG = Logger.getLogger(PreprocessClueWebEnglish.class);
+
+  public static int[] SegmentDocCounts = new int[] { 3382356, 50220423, 51577077, 50547493,
+      52311060, 50756858, 50559093, 52472358, 49545346, 50738874, 45175228 };
+
+  public static int[] DocnoOffsets = new int[] { 0, 0, 50220423, 101797500, 152344993, 204656053,
+      255412911, 305972004, 358444362, 407989708, 458728582 };
 
   private static int printUsage() {
-    System.out.println("usage: [input-path] [index-path]");
+    System.out.println("usage: [input-path] [index-path] [segment-num]");
     ToolRunner.printGenericCommandUsage(System.out);
     return -1;
   }
@@ -51,17 +57,19 @@ public class PreprocessMedline extends Configured implements Tool {
    * Runs this tool.
    */
   public int run(String[] args) throws Exception {
-    if (args.length != 2) {
+    if (args.length != 3) {
       printUsage();
       return -1;
     }
 
     String collection = args[0];
     String indexPath = args[1];
+    int segment = Integer.parseInt(args[2]);
 
-    LOG.info("Tool name: ProcessMedline");
+    LOG.info("Tool name: " + PreprocessClueWebEnglish.class.getCanonicalName());
     LOG.info(" - Collection path: " + collection);
     LOG.info(" - Index path: " + indexPath);
+    LOG.info(" - segement number: " + segment);
 
     Configuration conf = getConf();
     FileSystem fs = FileSystem.get(conf);
@@ -71,35 +79,25 @@ public class PreprocessMedline extends Configured implements Tool {
     if (!fs.exists(p)) {
       LOG.info("index path doesn't exist, creating...");
       fs.mkdirs(p);
+    } else {
+      LOG.info("Index directory " + p + " already exists!");
+      return -1;
     }
 
     RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fs);
-
-    // Look for the docno mapping, which maps from docid (String) to docno (sequentially-number
-    // integer). If it doesn't exist create it.
     Path mappingFile = env.getDocnoMappingData();
-    Path mappingDir = env.getDocnoMappingDirectory();
+    new ClueWarcDocnoMappingBuilder().build(new Path(collection), mappingFile, conf);
 
-    if (!fs.exists(mappingFile)) {
-      LOG.info(mappingFile + " doesn't exist, creating...");
-      String[] arr = new String[] { collection, mappingDir.toString(), mappingFile.toString()};
-      NumberMedlineCitations2 tool = new NumberMedlineCitations2();
-      tool.setConf(conf);
-      tool.run(arr);
-
-      fs.delete(mappingDir, true);
-    }
-
-    conf.set(Constants.CollectionName, "Medline");
+    conf.set(Constants.CollectionName, "ClueWeb:English:Segment" + segment);
     conf.set(Constants.CollectionPath, collection);
     conf.set(Constants.IndexPath, indexPath);
-    conf.set(Constants.InputFormat, MedlineCitationInputFormat2.class.getCanonicalName());
+    conf.set(Constants.InputFormat, SequenceFileInputFormat.class.getCanonicalName());
     conf.set(Constants.Tokenizer, GalagoTokenizer.class.getCanonicalName());
-    conf.set(Constants.DocnoMappingClass, MedlineDocnoMapping.class.getCanonicalName());
+    conf.set(Constants.DocnoMappingClass, ClueWarcDocnoMapping.class.getCanonicalName());
     conf.set(Constants.DocnoMappingFile, env.getDocnoMappingData().toString());
 
-    conf.setInt(Constants.DocnoOffset, 0); // docnos start at 1
-    conf.setInt(Constants.MinDf, 2); // toss away singleton terms
+    conf.setInt(Constants.DocnoOffset, DocnoOffsets[segment]);
+    conf.setInt(Constants.MinDf, 10);
     conf.setInt(Constants.MaxDf, Integer.MAX_VALUE);
 
     new BuildTermDocVectors(conf).run();
@@ -117,6 +115,6 @@ public class PreprocessMedline extends Configured implements Tool {
    * Dispatches command-line arguments to the tool via the {@code ToolRunner}.
    */
   public static void main(String[] args) throws Exception {
-    ToolRunner.run(new Configuration(), new PreprocessMedline(), args);
+    ToolRunner.run(new PreprocessClueWebEnglish(), args);
   }
 }

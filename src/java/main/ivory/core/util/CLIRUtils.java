@@ -172,16 +172,11 @@ public class CLIRUtils extends Configured {
     return sum;
   }
 
-  /**
-   ************
-   */
   public static float cosineNormalized2(HMapSFW vectorA, HMapSFW vectorB) {
-//    logger.setLevel(Level.DEBUG);
     float sum = 0;
     for(edu.umd.cloud9.util.map.MapKF.Entry<String> e : vectorA.entrySet()){
       float value = e.getValue();
       if(vectorB.containsKey(e.getKey())){
-//        logger.debug("Matched "+ e.getKey()+"="+value+" x "+vectorB.get(e.getKey()));
         sum+= value*vectorB.get(e.getKey());
       }
     }

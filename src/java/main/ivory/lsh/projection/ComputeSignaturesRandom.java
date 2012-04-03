@@ -28,15 +28,15 @@ import org.apache.hadoop.mapred.Reporter;
 import org.apache.hadoop.mapred.SequenceFileInputFormat;
 import org.apache.hadoop.mapred.SequenceFileOutputFormat;
 import org.apache.hadoop.mapred.lib.IdentityReducer;
+import org.apache.hadoop.util.LineReader;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
+import edu.umd.cloud9.io.SequenceFileUtils;
 import edu.umd.cloud9.io.array.ArrayListOfFloatsWritable;
 import edu.umd.cloud9.io.map.HMapIFW;
-import edu.umd.cloud9.io.FSLineReader;
-import edu.umd.cloud9.io.SequenceFileUtils;
-import edu.umd.cloud9.util.map.MapIF;
 import edu.umd.cloud9.util.PowerTool;
+import edu.umd.cloud9.util.map.MapIF;
 
 /**
  * A Hadoop task to compute signatures from document vectors.
@@ -109,7 +109,7 @@ public class ComputeSignaturesRandom extends PowerTool {
         dotProductThresholds = new float[D];
         int i = 0;
         try {
-          FSLineReader reader = new FSLineReader(localFiles[1], FileSystem.getLocal(job));
+          LineReader reader = new LineReader(FileSystem.getLocal(job).open(localFiles[1]));
           Text t = new Text();
           while (reader.readLine(t) != 0) {
             float val = Float.parseFloat(t.toString());
