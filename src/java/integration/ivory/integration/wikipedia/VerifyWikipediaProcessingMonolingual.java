@@ -34,7 +34,7 @@ public class VerifyWikipediaProcessingMonolingual {
 
   // Galago: part 00000, key = 92101
   private ImmutableMap<String, Float> galagoTermDocVector1 = ImmutableMap.of(
-    "total", 0.036282938f, "posit", 0.047018476f, "valid", 0.07093949f, "formula", 0.06923077f);
+    "total", 0.036282938f, "posit", 0.047018472f, "valid", 0.07093948f, "formula", 0.069230765f);
 
   // Galago: part 00010, key = 34222
   private ImmutableMap<String, Float> galagoTermDocVector2 = ImmutableMap.of(
@@ -53,19 +53,19 @@ public class VerifyWikipediaProcessingMonolingual {
 
   // Opennlp: part 00000, key = 92101
   private ImmutableMap<String, Float> opennlpTermDocVector1 = ImmutableMap.of(
-    "extern", 0.002431489f, "zero", 0.054258674f, "theorem", 0.06642f, "prime", 0.04304153f);
+    "extern", 0.0021218103f, "zero", 0.047699325f, "theorem", 0.057848703f, "prime", 0.037537705f);
 
   // Opennlp: part 00010, key = 34222
   private ImmutableMap<String, Float> opennlpTermDocVector2 = ImmutableMap.of(
-     "direct", 0.07711119f, "titl", 0.08201428f, "congress", 0.1344831f, "soundtrack", 0.15833028f);
+     "direct", 0.07568382f, "titl", 0.080587946f, "congress", 0.131854f, "soundtrack", 0.15528105f);
 
   // Opennlp: part 00002, key = 100984
   private ImmutableMap<Integer, Float> opennlpIntDocVector1 =
-    ImmutableMap.of(2101, 0.07527498f, 12, 0.023745911f, 3156, 0.0844875f, 15, 0.030846044f);
+    ImmutableMap.of(1, -0.012728759f, 12, 0.024670692f, 3266, 0.084026895f, 5, 0.01582835f);
 
   // Opennlp: part 00011, key = 34222, (terms: conjunto, histori, film, cultur)
   private ImmutableMap<Integer, Float> opennlpIntDocVector2 =
-    ImmutableMap.of(50365, 0.31359836f, 284, 0.0925163f, 201, 0.0978275f, 419, 0.10097963f);
+    ImmutableMap.of(37730, 0.31801265f, 92316, 0.3315111f, 294, 0.09105158f, 2336, 0.15528107f);
 
   @Test
   public void runBuildIndexGalago() throws Exception {

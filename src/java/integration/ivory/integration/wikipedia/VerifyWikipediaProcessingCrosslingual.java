@@ -37,19 +37,19 @@ public class VerifyWikipediaProcessingCrosslingual {
 
   // en side: part 00000, key = 92101
   private ImmutableMap<String, Float> enTermDocVector1 = ImmutableMap.of(
-      "total", 0.048103902f, "external", 0.004541542f, "time", 0.033348884f, "refer", -0.011754768f);
+      "total", 0.0521711f, "extern", 0.0045928364f, "side", 0.052283954f, "refer", -0.012635737f);
 
   // en side: part 00010, key = 138960
   private ImmutableMap<String, Float> enTermDocVector2 = ImmutableMap.of(
-      "external", 0.004776824f, "cofound", 0.09919491f, "he", 0.023234092f, "devianc", 0.18071339f);
+      "extern", 0.004580953f, "perspect", 0.097292185f, "deal", 0.07025129f, "devianc", 0.18621536f);
 
   // en side: part 00002, key = 150251
   private ImmutableMap<Integer, Float> enIntDocVector1 =
-    ImmutableMap.of(35202, 0.034152746f, 34129, 0.054591186f, 27261, 0.039973103f, 34140, 0.08634214f);
+    ImmutableMap.of(35202, 0.033555865f, 34129, 0.053415705f, 27261, 0.039032873f, 34140, 0.08449726f);
 
   // en side: part 00011, key = 184192
   private ImmutableMap<Integer, Float> enIntDocVector2 =
-    ImmutableMap.of(8777, 0.10271761f, 73827, 0.077015184f, 75933, -0.016551014f, 44992, 0.11264816f);
+    ImmutableMap.of(8777, 0.103838794f, 73827, 0.07746056f, 9147, -0.016266173f, 44992, 0.11387909f);
 
   private static final String dewikiPath = 
     "/shared/collections/wikipedia/raw/dewiki-20110131-pages-articles.xml";
@@ -58,19 +58,19 @@ public class VerifyWikipediaProcessingCrosslingual {
 
   // de side: part 00000, key = 1001242228
   private ImmutableMap<String, Float> deTermDocVector1 = ImmutableMap.of(
-      "auction", 0.00926886f, "total", 0.011755229f, "hors", 0.06490202f, "store", 0.003023784f);
+      "foundat", 0.0034755506f, "external", 0.024032094f, "programm", 0.08090772f, "htv", 0.26859477f);
 
   // de side: part 00010, key = 1000034130
   private ImmutableMap<String, Float> deTermDocVector2 = ImmutableMap.of(
-      "portray", 0.02833135f, "profession", 0.007643698f, "asund", 0.025962f, "suitabl", 0.02116417f);
+      "ombudswomen", 0.18138693f, "profession", 0.039470334f, "ascrib", 0.016959665f, "great", 0.0019023749f);
 
   // de side: part 00002, key = 1000943946
   private ImmutableMap<Integer, Float> deIntDocVector1 =
-    ImmutableMap.of(27255, 0.034241054f, 59321, 0.19270006f, 39099, 0.08531962f, 37992, 0.006224899f);
+    ImmutableMap.of(34132, 0.004382227f, 26285, 0.009954007f, 33034, 0.028362243f, 66084, 0.07469488f);
 
   // de side: part 00011, key = 1000347854
   private ImmutableMap<Integer, Float> deIntDocVector2 =
-    ImmutableMap.of(2110, 0.02419825f, 14287, 0.27120075f, 75805, 0.15010615f, 49109, 0.20328416f);
+    ImmutableMap.of(51505, 0.33379892f, 16336, 0.21256998f, 80281, 0.7150921f, 78262, 0.37479895f);
 
   @Test
   public void runBuildIndexEnSide() throws Exception {
@@ -219,7 +219,7 @@ public class VerifyWikipediaProcessingCrosslingual {
         new Path(dewikiEn + "/wt-int-doc-vectors/part-00002"), fs.getConf());
     reader.next(key, value);
     verifyIntDocVector(deIntDocVector1, value);
-
+    
     reader = new SequenceFile.Reader(fs,
         new Path(dewikiEn + "/wt-int-doc-vectors/part-00011"), fs.getConf());
     reader.next(key, value);
