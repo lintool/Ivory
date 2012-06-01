@@ -30,6 +30,7 @@
     <dependency org="opennlp" name="maxent" rev="3.0.0"/>    
     <dependency org="org.apache.lucene" name="lucene-core" rev="3.5.0"/>
     <dependency org="org.apache.lucene" name="lucene-analyzers" rev="3.5.0"/>
+    <dependency org="com.sna-projects.kamikaze" name="kamikaze" rev="3.0.3" />
 
   </dependencies>
 </ivy-module>
