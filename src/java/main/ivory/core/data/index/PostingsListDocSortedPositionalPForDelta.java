@@ -790,7 +790,7 @@ public class PostingsListDocSortedPositionalPForDelta implements PostingsList {
         while(positionsRaw.size() > BLOCK_SIZE ||
               (elements == nbPostings && positionsRaw.size() > 0)) {
           int blockSize = BLOCK_SIZE;
-          if(elements == nbPostings) {
+          if(elements == nbPostings && positionsRaw.size() > BLOCK_SIZE) {
             blockSize = positionsRaw.size();
             positionsLastBlockSize = blockSize;
           }
@@ -841,73 +841,18 @@ public class PostingsListDocSortedPositionalPForDelta implements PostingsList {
     }
 
     private static int[] compressOneBlock(int[] data, int blockSize, boolean computeGaps) {
-      // Compress all blocks except for the last block which might
-      // contain fewer elements.
       if(!computeGaps) {
         return PForDelta.compressOneBlockOpt(data, blockSize);
-      } else {
-        int[] temp = new int[blockSize];
-        temp[0] = data[0];
-        int pre = temp[0];
-        for(int j = 1; j < temp.length; j++) {
-          temp[j] = data[j] - pre;
-          pre = data[j];
-        }
-        return PForDelta.compressOneBlockOpt(temp, blockSize);
       }
-    }
-
-    /**
-     * Compresses a list of integers
-     *
-     * @param data Array of integers
-     * @param blockSize PForDelta block size
-     * @param computeGaps Whether to compute gaps before compression
-     * @return Compressed arrays
-     */
-    private static int[][] compressData(int[] data, int blockSize, boolean computeGaps) {
-      // Data is stored in blocks of equal size..
-      int nbBlocks = (int) Math.ceil(((double) data.length) / ((double) blockSize));
-      int[][] compressedBlocks = new int[nbBlocks][];
 
       int[] temp = new int[blockSize];
-
-      // Compress all blocks except for the last block which might
-      // contain fewer elements.
-      for(int i = 0; i < nbBlocks - 1; i++) {
-        if(!computeGaps) {
-          for(int j = 0; j < temp.length; j++) {
-            temp[j] = data[i * blockSize + j];
-          }
-        } else {
-          temp[0] = data[i * blockSize];
-          int pre = temp[0];
-          for(int j = 1; j < temp.length; j++) {
-            temp[j] = data[i * blockSize + j] - pre;
-            pre = data[i * blockSize + j];
-          }
-        }
-        compressedBlocks[i] = PForDelta.compressOneBlockOpt(temp, blockSize);
+      temp[0] = data[0];
+      int pre = temp[0];
+      for(int j = 1; j < temp.length; j++) {
+        temp[j] = data[j] - pre;
+        pre = data[j];
       }
-
-      // Compress the last block
-      int remaining = computeLastBlockSize(data.length, nbBlocks, blockSize);
-      temp = new int[remaining];
-      if(!computeGaps) {
-        for(int j = 0; j < temp.length; j++) {
-          temp[j] = data[(nbBlocks - 1) * blockSize + j];
-        }
-      } else {
-        temp[0] = data[(nbBlocks - 1) * blockSize];
-        int pre = temp[0];
-        for(int j = 1; j < temp.length; j++) {
-          temp[j] = data[(nbBlocks - 1) * blockSize + j] - pre;
-          pre = data[(nbBlocks - 1) * blockSize + j];
-        }
-      }
-      compressedBlocks[nbBlocks - 1] = PForDelta.compressOneBlockOpt(temp, remaining);
-
-      return compressedBlocks;
+      return PForDelta.compressOneBlockOpt(temp, blockSize);
     }
 
     private static int computeLastBlockSize(int dataLength, int nbBlocks, int blockSize) {
