@@ -781,29 +781,27 @@ public class PostingsListDocSortedPositionalPForDelta implements PostingsList {
         }
       }
 
-      if(posArray.length > 0) {
-        positionsRaw.add(posArray[0]);
-        for(int j = 1; j < posArray.length; j++) {
-          positionsRaw.add(posArray[j] - posArray[j - 1]);
+      positionsRaw.add(posArray[0]);
+      for(int j = 1; j < posArray.length; j++) {
+        positionsRaw.add(posArray[j] - posArray[j - 1]);
+      }
+
+      while(positionsRaw.size() > BLOCK_SIZE ||
+            (elements == nbPostings && positionsRaw.size() > 0)) {
+        int blockSize = BLOCK_SIZE;
+        if(elements == nbPostings && positionsRaw.size() <= BLOCK_SIZE) {
+          blockSize = positionsRaw.size();
+          positionsLastBlockSize = blockSize;
         }
 
-        while(positionsRaw.size() > BLOCK_SIZE ||
-              (elements == nbPostings && positionsRaw.size() > 0)) {
-          int blockSize = BLOCK_SIZE;
-          if(elements == nbPostings && positionsRaw.size() > BLOCK_SIZE) {
-            blockSize = positionsRaw.size();
-            positionsLastBlockSize = blockSize;
-          }
-
-          int[] temp = new int[blockSize];
-          for(int i = 0; i < temp.length; i++) {
-            temp[i] = positionsRaw.get(i);
-          }
-          for(int i = 0; i < temp.length; i++) {
+        int[] temp = new int[blockSize];
+        for(int i = 0; i < temp.length; i++) {
+          temp[i] = positionsRaw.get(i);
+        }
+        for(int i = 0; i < temp.length; i++) {
             positionsRaw.remove(0);
-          }
-          positions.add(compressOneBlock(temp, temp.length, false));
         }
+        positions.add(compressOneBlock(temp, temp.length, false));
       }
 
       if(elements == nbPostings) {
