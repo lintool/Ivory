@@ -178,11 +178,21 @@ public class PostingsListDocSortedPositionalPForDelta implements PostingsList {
     offsetCompressed = new int[docidCompressed.length][];
     for(int i = 0; i < docidCompressed.length; i++) {
       docidCompressed[i] = new int[in.readInt()];
-      tfCompressed[i] = new int[in.readInt()];
-      offsetCompressed[i] = new int[in.readInt()];
       for(int j = 0; j < docidCompressed[i].length; j++) {
         docidCompressed[i][j] = in.readInt();
+      }
+    }
+
+    for(int i = 0; i < tfCompressed.length; i++) {
+      tfCompressed[i] = new int[in.readInt()];
+      for(int j = 0; j < tfCompressed[i].length; j++) {
         tfCompressed[i][j] = in.readInt();
+      }
+    }
+
+    for(int i = 0; i < offsetCompressed.length; i++) {
+      offsetCompressed[i] = new int[in.readInt()];
+      for(int j = 0; j < offsetCompressed[i].length; j++) {
         offsetCompressed[i][j] = in.readInt();
       }
     }
@@ -207,11 +217,21 @@ public class PostingsListDocSortedPositionalPForDelta implements PostingsList {
     out.writeInt(docidCompressed.length);
     for(int i = 0; i < docidCompressed.length; i++) {
       out.writeInt(docidCompressed[i].length);
-      out.writeInt(tfCompressed[i].length);
-      out.writeInt(offsetCompressed[i].length);
       for(int j = 0; j < docidCompressed[i].length; j++) {
         out.writeInt(docidCompressed[i][j]);
+      }
+    }
+
+    for(int i = 0; i < tfCompressed.length; i++) {
+      out.writeInt(tfCompressed[i].length);
+      for(int j = 0; j < tfCompressed[i].length; j++) {
         out.writeInt(tfCompressed[i][j]);
+      }
+    }
+
+    for(int i = 0; i < offsetCompressed.length; i++) {
+      out.writeInt(offsetCompressed[i].length);
+      for(int j = 0; j < offsetCompressed[i].length; j++) {
         out.writeInt(offsetCompressed[i][j]);
       }
     }
@@ -692,18 +712,38 @@ public class PostingsListDocSortedPositionalPForDelta implements PostingsList {
     private int[][] positionsCompressed;
     private int positionsLastBlockSize;
 
+    private int nbPostings;
     private int[] docids = null;
     private int[] tfs = null;
     private int[] offsets = null;
-    private List<Integer> positions;
+    private List<Integer> positionsRaw;
+    private List<int[]> positions;
     private int index;
+    private int positionIndex;
+    private int blockIndex;
 
     public PForDeltaUtility(int nbPostings) {
-      docids = new int[nbPostings];
-      tfs = new int[nbPostings];
-      offsets = new int[nbPostings];
+      this.nbPostings = nbPostings;
+      int nbBlocks = (int) Math.ceil(((double) nbPostings) / ((double) BLOCK_SIZE));
+
+      docidCompressed = new int[nbBlocks][];
+      offsetCompressed = new int[nbBlocks][];
+      tfCompressed = new int[nbBlocks][];
+      lastBlockSize = computeLastBlockSize(nbPostings, nbBlocks, BLOCK_SIZE);
+
+      if(nbBlocks > 1) {
+        docids = new int[BLOCK_SIZE];
+        tfs = new int[BLOCK_SIZE];
+        offsets = new int[BLOCK_SIZE];
+      } else {
+        docids = new int[lastBlockSize];
+        tfs = new int[lastBlockSize];
+        offsets = new int[lastBlockSize];
+      }
+      positionsRaw = Lists.newArrayList();
       positions = Lists.newArrayList();
       index = 0;
+      positionIndex = 0;
     }
 
     /**
@@ -717,40 +757,63 @@ public class PostingsListDocSortedPositionalPForDelta implements PostingsList {
     public boolean add(int docid, int tf, TermPositions pos) {
       Preconditions.checkNotNull(pos);
 
-      if(index < docids.length) {
-        this.docids[index] = docid;
-        this.tfs[index] = tf;
+      int elements = blockIndex * BLOCK_SIZE + index + 1;
 
-        int[] posArray = pos.getPositions();
-        this.offsets[index] = positions.size();
-        if(posArray.length > 0) {
-          positions.add(posArray[0]);
-          for(int j = 1; j < posArray.length; j++) {
-            positions.add(posArray[j] - posArray[j - 1]);
-          }
+      this.docids[index] = docid;
+      this.tfs[index] = tf;
+      int[] posArray = pos.getPositions();
+      this.offsets[index] = positionIndex;
+      positionIndex += posArray.length;
+      index++;
+
+      if(index == this.docids.length) {
+        docidCompressed[blockIndex] = compressOneBlock(this.docids, this.docids.length, true);
+        tfCompressed[blockIndex] = compressOneBlock(this.tfs, this.tfs.length, false);
+        offsetCompressed[blockIndex] = compressOneBlock(this.offsets, this.offsets.length, true);
+
+        blockIndex++;
+        index = 0;
+
+        if(blockIndex == docidCompressed.length - 1) {
+          this.docids = new int[lastBlockSize];
+          this.tfs = new int[lastBlockSize];
+          this.offsets = new int[lastBlockSize];
         }
-        index++;
       }
 
-      if(index >= docids.length) {
-        performCompression();
+      if(posArray.length > 0) {
+        positionsRaw.add(posArray[0]);
+        for(int j = 1; j < posArray.length; j++) {
+          positionsRaw.add(posArray[j] - posArray[j - 1]);
+        }
+
+        while(positionsRaw.size() > BLOCK_SIZE ||
+              (elements == nbPostings && positionsRaw.size() > 0)) {
+          int blockSize = BLOCK_SIZE;
+          if(elements == nbPostings) {
+            blockSize = positionsRaw.size();
+            positionsLastBlockSize = blockSize;
+          }
+
+          int[] temp = new int[blockSize];
+          for(int i = 0; i < temp.length; i++) {
+            temp[i] = positionsRaw.get(i);
+          }
+          for(int i = 0; i < temp.length; i++) {
+            positionsRaw.remove(0);
+          }
+          positions.add(compressOneBlock(temp, temp.length, false));
+        }
+      }
+
+      if(elements == nbPostings) {
+        positionsCompressed = new int[positions.size()][];
+        for(int i = 0; i < positionsCompressed.length; i++) {
+          positionsCompressed[i] = positions.get(i);
+        }
         return true;
       }
       return false;
-    }
-
-    private void performCompression() {
-      docidCompressed = compressData(docids, BLOCK_SIZE, true);
-      offsetCompressed = compressData(offsets, BLOCK_SIZE, true);
-      tfCompressed = compressData(tfs, BLOCK_SIZE, false);
-      lastBlockSize = computeLastBlockSize(docids.length, docidCompressed.length, BLOCK_SIZE);
-
-      int[] posArray  = new int[positions.size()];
-      for(int i = 0; i < positions.size(); i++) {
-        posArray[i] = positions.get(i);
-      }
-      positionsCompressed = compressData(posArray, BLOCK_SIZE, false);
-      positionsLastBlockSize = computeLastBlockSize(posArray.length, positionsCompressed.length, BLOCK_SIZE);
     }
 
     public int[][] getCompressedDocids() {
@@ -775,6 +838,23 @@ public class PostingsListDocSortedPositionalPForDelta implements PostingsList {
 
     public int getPositionsLastBlockSize() {
       return positionsLastBlockSize;
+    }
+
+    private static int[] compressOneBlock(int[] data, int blockSize, boolean computeGaps) {
+      // Compress all blocks except for the last block which might
+      // contain fewer elements.
+      if(!computeGaps) {
+        return PForDelta.compressOneBlockOpt(data, blockSize);
+      } else {
+        int[] temp = new int[blockSize];
+        temp[0] = data[0];
+        int pre = temp[0];
+        for(int j = 1; j < temp.length; j++) {
+          temp[j] = data[j] - pre;
+          pre = data[j];
+        }
+        return PForDelta.compressOneBlockOpt(temp, blockSize);
+      }
     }
 
     /**
