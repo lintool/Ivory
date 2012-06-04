@@ -845,10 +845,8 @@ public class PostingsListDocSortedPositionalPForDelta implements PostingsList {
 
       int[] temp = new int[blockSize];
       temp[0] = data[0];
-      int pre = temp[0];
       for(int j = 1; j < temp.length; j++) {
-        temp[j] = data[j] - pre;
-        pre = data[j];
+        temp[j] = data[j] - data[j - 1];
       }
       return PForDelta.compressOneBlockOpt(temp, blockSize);
     }
