@@ -112,7 +112,7 @@ public class PostingsListDocSortedPositionalPForDelta implements PostingsList {
     Preconditions.checkArgument(collectionDocumentCount > 0);
     Preconditions.checkArgument(postingsAdded > 0);
 
-    return new PostingsReader(postingsAdded, collectionDocumentCount, this);
+    return new PostingsReader(postingsAdded, this);
   }
 
   @Override
@@ -286,14 +286,12 @@ public class PostingsListDocSortedPositionalPForDelta implements PostingsList {
     private short innerPrevTf;
     private int innerPrevDocno;
     private int innerNumPostings;
-    private int innerCollectionSize;
     private PostingsListDocSortedPositionalPForDelta postingsList;
 
-    protected PostingsReader(int numPostings, int collectionSize,
+    protected PostingsReader(int numPostings,
         PostingsListDocSortedPositionalPForDelta list) {
       Preconditions.checkNotNull(list);
       Preconditions.checkArgument(numPostings > 0);
-      Preconditions.checkArgument(collectionSize > 0);
 
       docidBlock = new int[PForDeltaUtility.BLOCK_SIZE];
       tfBlock = new int[PForDeltaUtility.BLOCK_SIZE];
@@ -301,7 +299,6 @@ public class PostingsListDocSortedPositionalPForDelta implements PostingsList {
       positionBlock = new int[PForDeltaUtility.BLOCK_SIZE];
 
       innerNumPostings = numPostings;
-      innerCollectionSize = collectionSize;
       postingsList = list;
     }
 
@@ -404,6 +401,14 @@ public class PostingsListDocSortedPositionalPForDelta implements PostingsList {
         for(int i = beginOffset + 1; i < positionBlock.length; i++) {
           pos[posIndex] = positionBlock[i] + pos[posIndex - 1];
           posIndex++;
+        }
+
+        for(int i = beginBlock + 1; i < endBlock; i++) {
+          PForDelta.decompressOneBlock(positionBlock, postingsList.positionsCompressed[i], positionBlock.length);
+          for(int j = 0; j < positionBlock.length; j++) {
+            pos[posIndex] = positionBlock[j] + pos[posIndex - 1];
+            posIndex++;
+          }
         }
 
         if(endBlock == postingsList.positionsCompressed.length - 1) {
@@ -744,6 +749,7 @@ public class PostingsListDocSortedPositionalPForDelta implements PostingsList {
       positions = Lists.newArrayList();
       index = 0;
       positionIndex = 0;
+      blockIndex = 0;
     }
 
     /**
@@ -787,7 +793,7 @@ public class PostingsListDocSortedPositionalPForDelta implements PostingsList {
       }
 
       while(positionsRaw.size() > BLOCK_SIZE ||
-            (elements == nbPostings && positionsRaw.size() > 0)) {
+            (elements == nbPostings && !positionsRaw.isEmpty())) {
         int blockSize = BLOCK_SIZE;
         if(elements == nbPostings && positionsRaw.size() <= BLOCK_SIZE) {
           blockSize = positionsRaw.size();
@@ -799,7 +805,7 @@ public class PostingsListDocSortedPositionalPForDelta implements PostingsList {
           temp[i] = positionsRaw.get(i);
         }
         for(int i = 0; i < temp.length; i++) {
-            positionsRaw.remove(0);
+          positionsRaw.remove(0);
         }
         positions.add(compressOneBlock(temp, temp.length, false));
       }
