@@ -41,11 +41,11 @@ import com.google.common.collect.Lists;
  * @author Nima Asadi
  */
 public class PostingsListDocSortedPositionalPForDelta implements PostingsList {
-  private int[][] docidCompressed;
-  private int[][] offsetCompressed;
-  private int[][] tfCompressed;
+  private int[][] docidCompressed; //Docid blocks
+  private int[][] offsetCompressed; //Offset blocks
+  private int[][] tfCompressed; //Term frequency blocks
   private int lastBlockSize;
-  private int[][] positionsCompressed;
+  private int[][] positionsCompressed; //Term positions
   private int positionsLastBlockSize;
 
   private transient PForDeltaUtility util;
@@ -328,6 +328,8 @@ public class PostingsListDocSortedPositionalPForDelta implements PostingsList {
       int blockNumber = (int) ((double) cnt / (double) PForDeltaUtility.BLOCK_SIZE);
       int inBlockIndex = cnt % PForDeltaUtility.BLOCK_SIZE;
 
+      // If this is the last block, use lastBlockSize instead of the default
+      // block size
       if(blockNumber == postingsList.docidCompressed.length - 1 &&
          currentBlock != blockNumber) {
         docidBlock = new int[postingsList.lastBlockSize];
@@ -335,6 +337,7 @@ public class PostingsListDocSortedPositionalPForDelta implements PostingsList {
       }
 
       if(currentBlock != blockNumber) {
+        //Docids are gap-compressed
         PForDelta.decompressOneBlock(docidBlock, postingsList.docidCompressed[blockNumber], docidBlock.length);
         for(int i = 1; i < docidBlock.length; i++) {
           docidBlock[i] += docidBlock[i - 1];
@@ -360,16 +363,20 @@ public class PostingsListDocSortedPositionalPForDelta implements PostingsList {
         return curPositions;
       }
 
+      // Grab the offset value for the current posting
       int cnt = this.cnt - 1;
       int blockNumber = (int) ((double) cnt / (double) PForDeltaUtility.BLOCK_SIZE);
       int inBlockIndex = cnt % PForDeltaUtility.BLOCK_SIZE;
 
+      // If this is the last block, use lastBlockSize instead of the default
+      // block size
       if(blockNumber == postingsList.offsetCompressed.length - 1 &&
          currentOffsetBlock != blockNumber) {
         offsetBlock = new int[postingsList.lastBlockSize];
       }
 
       if(currentOffsetBlock != blockNumber) {
+        // Offset values are gap-compressed
         PForDelta.decompressOneBlock(offsetBlock, postingsList.offsetCompressed[blockNumber], offsetBlock.length);
         for(int i = 1; i < offsetBlock.length; i++) {
           offsetBlock[i] += offsetBlock[i - 1];
@@ -378,6 +385,10 @@ public class PostingsListDocSortedPositionalPForDelta implements PostingsList {
 
       int[] pos = new int[getTf()];
 
+      // Term positions of a posting can span multiple blocks.
+      // Therefore, we have to compute the position (i.e.,
+      // block number and offset within the block) where term positions
+      // begin and the position where the list ends.
       int beginOffset = offsetBlock[inBlockIndex];
       int endOffset = beginOffset + pos.length - 1;
       int beginBlock = (int) ((double) beginOffset/(double) PForDeltaUtility.BLOCK_SIZE);
@@ -387,6 +398,8 @@ public class PostingsListDocSortedPositionalPForDelta implements PostingsList {
         positionBlock = new int[postingsList.positionsLastBlockSize];
       }
 
+      // If the block we are going to probe is different from
+      // the current block that has been decompressed
       if(beginBlock != currentPositionBlock) {
         PForDelta.decompressOneBlock(positionBlock, postingsList.positionsCompressed[beginBlock], positionBlock.length);
       }
@@ -396,6 +409,7 @@ public class PostingsListDocSortedPositionalPForDelta implements PostingsList {
       int endBlock = (int) ((double) endOffset / (double) PForDeltaUtility.BLOCK_SIZE);
       endOffset %= PForDeltaUtility.BLOCK_SIZE;
 
+      // If the list of term positions span across mutliple blocks
       if(endBlock != beginBlock) {
         pos[posIndex++] = positionBlock[beginOffset];
         for(int i = beginOffset + 1; i < positionBlock.length; i++) {
@@ -763,6 +777,7 @@ public class PostingsListDocSortedPositionalPForDelta implements PostingsList {
     public boolean add(int docid, int tf, TermPositions pos) {
       Preconditions.checkNotNull(pos);
 
+      // Total number of elements added to this postings list
       int elements = blockIndex * BLOCK_SIZE + index + 1;
 
       this.docids[index] = docid;
@@ -772,6 +787,8 @@ public class PostingsListDocSortedPositionalPForDelta implements PostingsList {
       positionIndex += posArray.length;
       index++;
 
+      // If number of postings accumulated so far is equal to the block size,
+      // then compress the current block and store it in the compressed array
       if(index == this.docids.length) {
         docidCompressed[blockIndex] = compressOneBlock(this.docids, this.docids.length, true);
         tfCompressed[blockIndex] = compressOneBlock(this.tfs, this.tfs.length, false);
@@ -787,11 +804,15 @@ public class PostingsListDocSortedPositionalPForDelta implements PostingsList {
         }
       }
 
+      // Add position gaps to the list of accumulated term positions
       positionsRaw.add(posArray[0]);
       for(int j = 1; j < posArray.length; j++) {
         positionsRaw.add(posArray[j] - posArray[j - 1]);
       }
 
+      // If number of accumulated term positions is larger than the block size,
+      // compress blocks of term positions until the number of remaining elements
+      // is less than the block size
       while(positionsRaw.size() > BLOCK_SIZE ||
             (elements == nbPostings && !positionsRaw.isEmpty())) {
         int blockSize = BLOCK_SIZE;
@@ -810,6 +831,8 @@ public class PostingsListDocSortedPositionalPForDelta implements PostingsList {
         positions.add(compressOneBlock(temp, temp.length, false));
       }
 
+      // When all postings have been inserted, reformat the compressed
+      // term positions
       if(elements == nbPostings) {
         positionsCompressed = new int[positions.size()][];
         for(int i = 0; i < positionsCompressed.length; i++) {
