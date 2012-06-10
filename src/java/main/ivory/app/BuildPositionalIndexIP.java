@@ -65,7 +65,7 @@ public class BuildPositionalIndexIP extends Configured implements Tool {
     conf.set(Constants.IndexPath, indexPath);
     conf.setInt(Constants.NumReduceTasks, numReducers);
     conf.set(Constants.PostingsListsType,
-        ivory.core.data.index.PostingsListDocSortedPositional.class.getCanonicalName());
+        ivory.core.data.index.PostingsListDocSortedPositionalPForDelta.class.getCanonicalName());
 
     new BuildIPInvertedIndexDocSorted(conf).run();
     new BuildIntPostingsForwardIndex(conf).run();
