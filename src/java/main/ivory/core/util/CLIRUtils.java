@@ -359,7 +359,7 @@ public class CLIRUtils extends Configured {
       int tf = reader.getTf();
       docLen+=tf;
 
-//      sLogger.debug("Read "+fTerm+","+tf);
+      //      sLogger.debug("Read "+fTerm+","+tf);
 
       int f = fVocabSrc.get(fTerm);
       if(f <= 0){
@@ -391,9 +391,9 @@ public class CLIRUtils extends Configured {
         }
         probEF = e2fProbs.get(e2, f2);
         if(probEF > 0){
-//          sLogger.debug(eTerm+" ==> "+probEF);
+          //          sLogger.debug(eTerm+" ==> "+probEF);
           tfTable.increment(e2, tf*probEF);
-//          sLogger.debug("updated weight to "+tfTable.get(e2));
+          //          sLogger.debug("updated weight to "+tfTable.get(e2));
         }
       }
     }
@@ -445,7 +445,7 @@ public class CLIRUtils extends Configured {
 
       int f2 = fVocabTrg.get(fTerm);		//convert between two F vocabs (different ids)
       if(f2 <= 0){
-        //				sLogger.warn(fTerm+": word not in aligner's vocab (target side of e2f)");
+        sLogger.info(fTerm+": word not in aligner's vocab (target side of e2f)");
         continue;
       }
       //tf(e) = sum_f{tf(f)*prob(f|e)}
@@ -454,12 +454,12 @@ public class CLIRUtils extends Configured {
         String eTerm = eVocabTrg.get(e);
         int e2 = eVocabSrc.get(eTerm);		//convert between two E vocabs (different ids)
         if(e2 <= 0){
-          //					sLogger.debug(eTerm+": word not in aligner's final vocab (source side of e2f)");
+          sLogger.info(eTerm+": word not in aligner's final vocab (source side of e2f)");
           continue;
         }
         prob = e2fProbs.get(e2, f2);
         if(prob > 0){
-          //					sLogger.debug(eVocabSrc.get(e2)+" ==> "+prob);
+          sLogger.info("Pr("+eTerm+"|"+fTerm+") = "+prob);
           tfTable.increment(e2, tf*prob);
         }
       }
@@ -502,7 +502,7 @@ public class CLIRUtils extends Configured {
       // compute score via scoring model
       float score = ((Bm25) scoringModel).computeDocumentWeight(tf, df, docLen);
 
-//      sLogger.debug(eTerm+" "+tf+" "+df+" "+score);
+      //      sLogger.debug(eTerm+" "+tf+" "+df+" "+score);
       if(score>0){
         v.put(eTerm, score);
         if(isNormalize){
@@ -621,14 +621,14 @@ public class CLIRUtils extends Configured {
     return v;
   }
 
-  
+
   /***
    * 
    * Hooka helper functions
    * 
    */
-  
-  
+
+
   /**
    * This method converts the output of BerkeleyAligner into a TTable_monolithic_IFAs object. 
    * For each source language term, top numTrans entries (with highest translation probability) are kept, unless the top K < numTrans entries have a cumulatite probability above PROB_THRESHOLD.
@@ -705,11 +705,13 @@ public class CLIRUtils extends Configured {
                 //								logger.debug("FFFF"+line);
               }else{
                 String term = m2.group(1);
-                float prob = Float.parseFloat(m2.group(2));
-                int engIndex = trgVocab.addOrGet(term);
-                logger.debug("Added: "+term+" with index: "+engIndex+" and prob:"+prob);
-                indexProbPairs.add(new PairOfIntFloat(engIndex, prob));
-                sumOfProbs+=prob;
+                if (!term.equals("NULL")) {
+                  float prob = Float.parseFloat(m2.group(2));
+                  int engIndex = trgVocab.addOrGet(term);
+                  logger.debug("Added: "+term+" with index: "+engIndex+" and prob:"+prob);
+                  indexProbPairs.add(new PairOfIntFloat(engIndex, prob));
+                  sumOfProbs+=prob;
+                }
               }
             }
             if(sumOfProbs > probThreshold){
@@ -751,9 +753,10 @@ public class CLIRUtils extends Configured {
     logger.info("Vocabulary Target: "+trgVocab.size()+" elements");
     logger.info("Vocabulary Source: "+srcVocab.size()+" elements");
     logger.info("# source terms with > "+probThreshold+" probability covered: "+cntShortTail+" and average translations per term: "+(sumShortTail/(cntShortTail+0.0f)));
-    logger.info("# source terms with <= "+probThreshold+" probability covered: "+cntLongTail+" (each have "+ numTrans +" translations). Average coverage is: "+(sumCumProbs/cntLongTail));
-    logger.info("Size (total number of dictionary entries) = "+(sumShortTail + cntLongTail*numTrans));
-
+    float averageCoverageLongTail = sumCumProbs/cntLongTail;
+    logger.info("# source terms with <= "+probThreshold+" probability covered: "+cntLongTail+" (each have "+ numTrans +" translations). Average coverage is: "+averageCoverageLongTail);
+    float averageCoverageOverall = (cntShortTail*probThreshold+cntLongTail*averageCoverageLongTail)/(cntShortTail+cntLongTail);
+    logger.info("Size (total number of dictionary entries) = "+(sumShortTail + cntLongTail*numTrans)+". Average coverage per term (overall) >= "+averageCoverageOverall);
 
     DataOutputStream dos = new DataOutputStream(new BufferedOutputStream
         (fs.create(new Path(trgVocabFile))));
@@ -823,6 +826,11 @@ public class CLIRUtils extends Configured {
         trgTerm = parts[0];
         srcTerm = parts[1];
         prob = Float.parseFloat(parts[2]);
+
+        if (trgTerm.equals("NULL")) {
+          continue;   // skip alignments to imaginary NULL word
+        }
+
         if(prev==null || !srcTerm.equals(prev)){
           if(topTrans.size() > 0){
             //store previous term's top translations to ttable
@@ -893,8 +901,10 @@ public class CLIRUtils extends Configured {
       logger.info("Vocabulary Target: "+trgVocab.size()+" elements");
       logger.info("Vocabulary Source: "+srcVocab.size()+" elements");
       logger.info("# source terms with > "+probThreshold+" probability covered: "+cntShortTail+" and average translations per term: "+(sumShortTail/(cntShortTail+0.0f)));
-      logger.info("# source terms with <= "+probThreshold+" probability covered: "+cntLongTail+" (each have "+ numTrans +" translations). Average coverage is: "+(sumCumProbs/cntLongTail));
-      logger.info("Size (total number of dictionary entries) = "+(sumShortTail + cntLongTail*numTrans));
+      float averageCoverageLongTail = sumCumProbs/cntLongTail;
+      logger.info("# source terms with <= "+probThreshold+" probability covered: "+cntLongTail+" (each have "+ numTrans +" translations). Average coverage is: "+averageCoverageLongTail);
+      float averageCoverageOverall = (cntShortTail*probThreshold+cntLongTail*averageCoverageLongTail)/(cntShortTail+cntLongTail);
+      logger.info("Size (total number of dictionary entries) = "+(sumShortTail + cntLongTail*numTrans)+" TTable average coverage >= "+averageCoverageOverall);
     }catch (FileNotFoundException e) {
       e.printStackTrace();
     } catch (IOException e) {
@@ -987,7 +997,7 @@ public class CLIRUtils extends Configured {
       //store previous term's top translations to ttable
       if(topTrans.size() > 0){
         int finalNumTrans = addToTable(curIndex, topTrans, sumOfProbs, finalTTable, finalTrgVocab);
-      
+
         if(finalNumTrans < numTrans){
           // <numTrans> elements covered more than <probThreshold> probability, so we terminated early
           cntShortTail++;
@@ -1002,8 +1012,10 @@ public class CLIRUtils extends Configured {
     logger.info("Vocabulary Target: "+finalTrgVocab.size()+" elements");
     logger.info("Vocabulary Source: "+finalSrcVocab.size()+" elements");
     logger.info("# source terms with > "+probThreshold+" probability covered: "+cntShortTail+" and average translations per term: "+(sumShortTail/(cntShortTail+0.0f)));
-    logger.info("# source terms with <= "+probThreshold+" probability covered: "+cntLongTail+" (each have "+ numTrans +" translations). Average coverage is: "+(sumCumProbs/cntLongTail));
-    logger.info("Size (total number of dictionary entries) = "+(sumShortTail + cntLongTail*numTrans));
+    float averageCoverageLongTail = sumCumProbs/cntLongTail;
+    logger.info("# source terms with <= "+probThreshold+" probability covered: "+cntLongTail+" (each have "+ numTrans +" translations). Average coverage is: "+averageCoverageLongTail);
+    float averageCoverageOverall = (cntShortTail*probThreshold+cntLongTail*averageCoverageLongTail)/(cntShortTail+cntLongTail);
+    logger.info("Size (total number of dictionary entries) = "+(sumShortTail + cntLongTail*numTrans)+" TTable average coverage >= "+averageCoverageOverall);
 
     DataOutputStream dos = new DataOutputStream(new BufferedOutputStream(fs.create(new Path(finalTrgVocabFile))));
     ((VocabularyWritable) finalTrgVocab).write(dos);
@@ -1015,8 +1027,8 @@ public class CLIRUtils extends Configured {
     finalTTable.write(dos3);
     dos3.close();
   }
-  
- 
+
+
   public static int addToTable(int curIndex, TreeSet<PairOfFloatString> topTrans, float cumProb, TTable_monolithic_IFAs table, Vocab trgVocab) {
     List<Integer> sortedIndices = new ArrayList<Integer>();
     HMapIF index2ProbMap = new HMapIF();
@@ -1025,7 +1037,7 @@ public class CLIRUtils extends Configured {
     while(!topTrans.isEmpty()){
       PairOfFloatString e = topTrans.pollLast();
       String term = e.getRightElement();
-      float pr = e.getLeftElement()/cumProb;
+      float pr = e.getLeftElement()/cumProb;    // normalize
       int trgIndex = trgVocab.addOrGet(term);
       sumOfProbs += pr;
 
@@ -1046,18 +1058,17 @@ public class CLIRUtils extends Configured {
       i++;
     }
     table.set(curIndex, new IndexedFloatArray(indices, probs, true));
-    logger.debug(table.get(curIndex));
 
     return indices.length;
   }
-  
-  
+
+
   /***
    * 
    * Bitext extraction helper functions
    * 
    */
-   
+
 
   public static String[] computeFeaturesF1(HMapSFW eVector, HMapSFW fVector, float eSentLength, float fSentLength) {
     String[] features = new String[1];
@@ -1148,7 +1159,8 @@ public class CLIRUtils extends Configured {
 
 
   private static int printUsage() {
-    System.out.println("usage: [input-lexicalprob-file_f2e] [input-lexicalprob-file_e2f] [type=giza|berkeley] [src-vocab_f] [trg-vocab_e] [prob-table_f-->e] [src-vocab_e] [trg-vocab_f] [prob-table_e-->f] ([cumulative-prob-threshold]) ([num-max-entries-per-word])");
+    System.out.println("usage: [input-lexicalprob-file_f2e] [input-lexicalprob-file_e2f] [type=giza|berkeley] [src-vocab_f] [trg-vocab_e] [prob-table_f-->e] [src-vocab_e] [trg-vocab_f] [prob-table_e-->f] ([cumulative-prob-threshold]) ([num-max-entries-per-word])" +
+    "\nFor each lexicalprob file, the format should be 'target/TAB/source/TAB/prob', sorted by source token.\n");
 
     return -1;
   }

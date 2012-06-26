@@ -101,7 +101,7 @@ public class PreprocessWikipedia extends Configured implements Tool {
     String tokenizerClass = args[3];	
     if (args.length > 4) {
       collectionLang = args[4];
-      conf.set("Ivory.Lang", collectionLang);
+      conf.set(Constants.Language, collectionLang);
       if (args.length > 5) {
         tokenizerModel = args[5];
         conf.set(Constants.TokenizerData, tokenizerModel);
@@ -112,7 +112,7 @@ public class PreprocessWikipedia extends Configured implements Tool {
       collectionLang = args[4];
       tokenizerModel = args[5];
       collectionVocab = args[6];
-      conf.set("Ivory.Lang", collectionLang);
+      conf.set(Constants.Language, collectionLang);
       conf.set(Constants.TokenizerData, tokenizerModel);
       conf.set("Ivory.CollectionVocab", collectionVocab);
       conf.set("Ivory.FinalVocab", collectionVocab);

@@ -24,7 +24,6 @@ import ivory.core.preprocess.BuildIntDocVectorsForwardIndex;
 import ivory.core.preprocess.BuildTermDocVectors;
 import ivory.core.preprocess.BuildTermDocVectorsForwardIndex;
 import ivory.core.preprocess.ComputeGlobalTermStatistics;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
@@ -32,16 +31,15 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Logger;
-
 import edu.umd.cloud9.collection.trec.TrecDocnoMapping;
 import edu.umd.cloud9.collection.trec.TrecDocnoMappingBuilder;
 import edu.umd.cloud9.collection.trec.TrecDocumentInputFormat;
 
-public class PreprocessTRECChinese extends Configured implements Tool {
-  private static final Logger LOG = Logger.getLogger(PreprocessTRECChinese.class);
+public class PreprocessTREC extends Configured implements Tool {
+  private static final Logger LOG = Logger.getLogger(PreprocessTREC.class);
 
   private static int printUsage() {
-    System.out.println("usage: [input-path] [index-path] [tokenizer-class] [stanford-segmenter-model-path]");
+    System.out.println("usage: [input-path] [index-path] [collection-name] [language] [tokenizer-class] [tokenizer-model-path]");
     ToolRunner.printGenericCommandUsage(System.out);
     return -1;
   }
@@ -50,21 +48,25 @@ public class PreprocessTRECChinese extends Configured implements Tool {
    * Runs this tool.
    */
   public int run(String[] args) throws Exception {
-    if (args.length < 3) {
+    if (args.length < 6) {
       printUsage();
       return -1;
     }
 
     String collection = args[0];
     String indexRootPath = args[1];
-    String tokenizerClass = args[2];
+    String collectionName = args[2];
+    String language = args[3];
+    String tokenizerClass = args[4];
+    
     String tokenizerPath = null;
-    if (args.length == 4) {
-      tokenizerPath = args[3];
+    if (args.length == 6) {
+      tokenizerPath = args[5];
     }
-    LOG.info("Tool name: " + PreprocessTRECChinese.class.getCanonicalName());
+    LOG.info("Tool name: " + PreprocessTREC.class.getCanonicalName());
     LOG.info(" - Collection path: " + collection);
     LOG.info(" - Index path: " + indexRootPath);
+    LOG.info(" - Language: " + language);
     LOG.info(" - Tokenizer class: " + tokenizerClass);
     LOG.info(" - Tokenizer path: " + tokenizerPath);
 
@@ -76,29 +78,13 @@ public class PreprocessTRECChinese extends Configured implements Tool {
     if (!fs.exists(p)) {
       LOG.info("index directory doesn't exist, creating...");
       fs.mkdirs(p);
-    }	 else {
-      LOG.info("Index directory " + p + " already exists!");
-      return -1;
-    }
+    }	
 
     RetrievalEnvironment env = new RetrievalEnvironment(indexRootPath, fs);
-
-    // Look for the docno mapping, which maps from docid (String) to docno (sequentially-number
-    // integer). If it doesn't exist create it.
     Path mappingFile = env.getDocnoMappingData();
-    Path mappingDir = env.getDocnoMappingDirectory();
+    new TrecDocnoMappingBuilder().build(new Path(collection), mappingFile, conf);
 
-    if (!fs.exists(mappingFile)) {
-      LOG.info("docno-mapping.dat doesn't exist, creating...");
-      String[] arr = new String[] { collection, mappingDir.toString(), mappingFile.toString() };
-      TrecDocnoMappingBuilder tool = new TrecDocnoMappingBuilder();
-      tool.setConf(conf);
-      tool.run(arr);
-
-      fs.delete(mappingDir, true);
-    }
-
-    conf.set(Constants.CollectionName, "TREC_vol9_Chinese");
+    conf.set(Constants.CollectionName, collectionName);
     conf.set(Constants.CollectionPath, collection);
     conf.set(Constants.IndexPath, indexRootPath);
     conf.set(Constants.InputFormat, TrecDocumentInputFormat.class.getCanonicalName());
@@ -108,12 +94,13 @@ public class PreprocessTRECChinese extends Configured implements Tool {
     }
     conf.set(Constants.DocnoMappingClass, TrecDocnoMapping.class.getCanonicalName());
     conf.set(Constants.DocnoMappingFile, env.getDocnoMappingData().toString());
-
+    
     conf.setInt(Constants.DocnoOffset, 0); // docnos start at 1
     conf.setInt(Constants.MinDf, 2); // toss away singleton terms
     conf.setInt(Constants.MaxDf, Integer.MAX_VALUE);
     conf.setInt(Constants.TermIndexWindow, 8);
-
+    conf.set(Constants.Language, language);
+    
     new BuildTermDocVectors(conf).run();
     new ComputeGlobalTermStatistics(conf).run();
     new BuildDictionary(conf).run();
@@ -129,6 +116,6 @@ public class PreprocessTRECChinese extends Configured implements Tool {
    * Dispatches command-line arguments to the tool via the {@code ToolRunner}.
    */
   public static void main(String[] args) throws Exception {
-    ToolRunner.run(new Configuration(), new PreprocessTRECChinese(), args);
+    ToolRunner.run(new Configuration(), new PreprocessTREC(), args);
   }
 }
