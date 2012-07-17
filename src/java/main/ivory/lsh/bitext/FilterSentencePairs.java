@@ -31,7 +31,8 @@ import edu.umd.cloud9.io.map.HMapSFW;
 import edu.umd.cloud9.io.map.HMapSIW;
 
 /**
-
+  Step 2 of the bitext extraction algorithm.
+    
  * @author ferhanture
  * 
  */
@@ -39,30 +40,24 @@ import edu.umd.cloud9.io.map.HMapSIW;
 public class FilterSentencePairs extends Configured implements Tool {
 
 	private static final Logger sLogger = Logger.getLogger(FilterSentencePairs.class);
-	private static final int MinVectorTerms = 3, MinSentenceLength = 5;
-	private static final String separator = "<GERMAN2ENGLISH>";
 
-	enum Docs{
-		en, de, pairs, pairsIncompleteF, pairsIncompleteE
-	}
-	
 	enum Sentences{
-		en, de, pairsProcessed, pairsCandidate, pairsFilteredByVectorSize, pairsFilteredBySentRatio, parallel, ignored
+	  parallel, ignored
 	}
 
 	public FilterSentencePairs() {
 	}
 
 	private static int printUsage() {
-		sLogger.info("usage: [bitext-input-path] [filtered-output-path] [e-dir] [f-dir] [vocab-dir] [e-lang] [f-lang] [classifier] [classifier-threshold] [classifier-idOfPositiveClass]");
+		sLogger.info("usage: [bitext-input-path] [filtered-output-path] [e-dir] [f-dir] [vocab-dir] [e-lang] [f-lang] [bitext-name] [classifier-threshold] [classifier-idOfPositiveClass]");
 		ToolRunner.printGenericCommandUsage(System.out);
 		return -1;
 	}
 
 	//	Map: (eSent, fSent) --> (eSent, fSent)
-	//	Ê Ê Ê(vect1, vect2) = convert sentences into tf-idf vectors
-	//	Ê Ê Êcompute features for vector pair
-	//		 emit pair if confidence met
+	//	     (vect1, vect2) = convert sentences into tf-idf vectors
+	//	     compute features for vector pair
+	//		   emit pair if complex classifier confidence met
 	private static class MyMapper extends MapReduceBase implements
 	Mapper<LongWritable, Text, Text, Text> {
 
@@ -79,7 +74,7 @@ public class FilterSentencePairs extends Configured implements Tool {
 			sLogger.setLevel(Level.INFO);
 
 			try {
-				helper = new PreprocessHelper(MinVectorTerms, MinSentenceLength, job);
+				helper = new PreprocessHelper(CLIRUtils.MinVectorTerms, CLIRUtils.MinSentenceLength, job);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -96,7 +91,7 @@ public class FilterSentencePairs extends Configured implements Tool {
 		}
 
 		public void map(LongWritable key, Text sentencePair, OutputCollector<Text, Text> output, Reporter reporter) throws IOException {
-			String sentences[] = sentencePair.toString().split(separator);
+			String sentences[] = sentencePair.toString().split(CLIRUtils.BitextSeparator);
 			eSent = sentences[1];
 			fSent = sentences[0];
 						
@@ -105,16 +100,11 @@ public class FilterSentencePairs extends Configured implements Tool {
 
 			eVector = helper.createEDocVector(eSent);
 			
-			// for foreign language, we compute tfs here, so that we can pass the tf map as an argument to F3 classifier.
-			HMapSIW fTfs = new HMapSIW();
-			String[] terms = fTok.processContent(fSent);
-			for(String term : terms){
-				fTfs.increment(term);
-			}
-			
-			fVector = helper.createFDocVector(fTfs, fLen);
+			// for foreign language, we create tf map here, so that we can pass it as an argument to F3 classifier.
+			HMapSIW fTfs = new HMapSIW();		
+			fVector = helper.createFDocVector(fSent, fTfs);
 
-			if (eVector==null || fVector==null) 	{
+			if (eVector == null || fVector == null) {
 				reporter.incrCounter(Sentences.ignored, 1);	
 				return;
 			}
@@ -136,9 +126,9 @@ public class FilterSentencePairs extends Configured implements Tool {
 			// we pass this information as a program argument
 			double confidence = probs[classifierPositiveId];
 
-			if(confidence>classifierThreshold){
+			if (confidence > classifierThreshold) {
 				reporter.incrCounter(Sentences.parallel, 1);
-				outSent1.set(fSent+separator+eSent);
+				outSent1.set(fSent + CLIRUtils.BitextSeparator + eSent);
 				output.collect(outSent1, outSent2);
 			}
 		}
@@ -165,27 +155,29 @@ public class FilterSentencePairs extends Configured implements Tool {
 
 		RetrievalEnvironment eEnv = new RetrievalEnvironment(eDir, FileSystem.get(conf));
 
-		String vocabDir = args[4];
+		String dataDir = args[4];
 		String eLang = args[5];
 		String fLang = args[6];
-		String classifierFile = args[7];
+    String bitextName = args[7];
 		float classifierThreshold = Float.parseFloat(args[8]);
 		int classifierId = Integer.parseInt(args[9]);
 
-		String eSentDetect = vocabDir+"/"+eLang+"-sent.bin";
-		String eTokenizer = vocabDir+"/"+eLang+"-token.bin";
-		String eVocabSrc = vocabDir+"/vocab."+eLang+"-"+fLang+"."+eLang;
-		String eVocabTrg = vocabDir+"/vocab."+fLang+"-"+eLang+"."+eLang;
+    String eSentDetect = dataDir+"/sent/"+eLang+"-sent.bin";
+    String eTokenizer = dataDir+"/token/"+eLang+"-token.bin";
+    String eVocabSrc = dataDir+"/"+bitextName+"/vocab."+eLang+"-"+fLang+"."+eLang;
+    String eVocabTrg = dataDir+"/"+bitextName+"/vocab."+fLang+"-"+eLang+"."+eLang;
 
-		String fSentDetect = vocabDir+"/"+fLang+"-sent.bin";
-		String fTokenizer = vocabDir+"/"+fLang+"-token.bin";
-		String fVocabSrc = vocabDir+"/vocab."+fLang+"-"+eLang+"."+fLang;
-		String fVocabTrg = vocabDir+"/vocab."+eLang+"-"+fLang+"."+fLang;
+    String fSentDetect = dataDir+"/sent/"+fLang+"-sent.bin";
+    String fTokenizer = dataDir+"/token/"+fLang+"-token.bin";
+    String fVocabSrc = dataDir+"/"+bitextName+"/vocab."+fLang+"-"+eLang+"."+fLang;
+    String fVocabTrg = dataDir+"/"+bitextName+"/vocab."+eLang+"-"+fLang+"."+fLang;
 
-		String f2e_ttableFile = vocabDir+"/ttable."+fLang+"-"+eLang;
-		String e2f_ttableFile = vocabDir+"/ttable."+eLang+"-"+fLang;
+    String f2e_ttableFile = dataDir+"/"+bitextName+"/ttable."+fLang+"-"+eLang;
+    String e2f_ttableFile = dataDir+"/"+bitextName+"/ttable."+eLang+"-"+fLang;
 
-		conf.setJobName("FilterSentencePairs_F3="+classifierThreshold+"["+classifierId+"]");
+    String classifierFile = dataDir+"/"+bitextName+"/classifier-complex."+fLang+"-"+eLang;
+    
+		conf.setJobName("FilterSentencePairs_" + fLang +"-" + eLang +"_F3="+classifierThreshold+"["+classifierId+"]");
 	
 		conf.set("eDir", eDir);
 		conf.set("fDir", fDir);

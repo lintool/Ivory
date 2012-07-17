@@ -47,78 +47,32 @@ public class PreprocessHelper {
   private DfTableArray dfTable;
   private DefaultFrequencySortedDictionary dict;
   private final Logger sLogger = Logger.getLogger(PreprocessHelper.class);
-  private ArrayListWritable<Text> tempSentences;
+  private static final HMapSIW lang2AvgSentLen = new HMapSIW();
+  static {
+    lang2AvgSentLen.put("en",29);       // took average # of tokens per sentence in de-en.wmt12 train data
+    lang2AvgSentLen.put("de",27);       // took average # of tokens per sentence in de-en.wmt12 train data
+    lang2AvgSentLen.put("zh",25);       // took average # of tokens per sentence in zh-en.fbis train data
+    lang2AvgSentLen.put("fr",32);       // took average # of tokens per sentence in fr-en.wmt12 train data
+    lang2AvgSentLen.put("tr",17);       // took average # of tokens per sentence in tr-en.oflazer train data
+    lang2AvgSentLen.put("ar",21);       // took average # of tokens per sentence in ar-en.galep5oct train data
+  };
   
   public PreprocessHelper(int minVectorTerms, int minSentenceLength, JobConf job) throws Exception {
     super();
-    sLogger.setLevel(Level.DEBUG);
+    sLogger.setLevel(Level.INFO);
     MinVectorTerms = minVectorTerms;
     MinSentenceLength = minSentenceLength;
     loadModels(job);
   }
 
   public void loadModels(JobConf job) throws Exception{
-    if(job.get("fLang").equals("de")){
-      loadDeModels(job);
-    }else if(job.get("fLang").equals("zh")){
-      loadZhModels(job);
-    }else{
-      throw new RuntimeException("Unknown foreign language code: "+job.get("fLang"));
-    }
-    loadEnModels(job);
+    loadFModels(job);
+    loadEModels(job);
   }
 
-  private void loadZhModels(JobConf job) throws Exception {
-    sLogger.info("Loading models...");
-
-    FileSystem fs = FileSystem.get(job);
-    FileSystem localFs = FileSystem.getLocal(job);
-    Path[] localFiles = null;
-    localFiles = DistributedCache.getLocalCacheFiles(job);
-
-    String dir = job.get("fDir");
-    String sentDetectorFile = localFiles[6].toString();
-    String tokenizerFile = "/user/fture/vocab/zh-token.bin";
-    String eVocabSrcFile = localFiles[3].toString();
-    String eVocabTrgFile = localFiles[4].toString();
-    String fVocabSrcFile = localFiles[8].toString();
-    String fVocabTrgFile = localFiles[9].toString();
-    String f2e_ttableFile = localFiles[10].toString();
-    String e2f_ttableFile = localFiles[11].toString();
-    String dfTableFile = localFiles[5].toString();
-
-    RetrievalEnvironment env = new RetrievalEnvironment(dir, fs);
-    sLogger.info("Environment created successfully.");
-
-    InputStream modelIn = localFs.open(new Path(sentDetectorFile));
-
-    SentenceModel model = new SentenceModel(modelIn);
-    fModel = new SentenceDetectorME(model);
-
-    sLogger.info("Sentence model created successfully.");
-
-    fTok = TokenizerFactory.createTokenizer(fs, job, "zh", tokenizerFile, null);
-    
-    eVocabSrc = (VocabularyWritable) HadoopAlign.loadVocab(new Path(eVocabSrcFile), localFs);
-    eVocabTrg = (VocabularyWritable) HadoopAlign.loadVocab(new Path(eVocabTrgFile), localFs);
-    fVocabSrc = (VocabularyWritable) HadoopAlign.loadVocab(new Path(fVocabSrcFile), localFs);
-    fVocabTrg = (VocabularyWritable) HadoopAlign.loadVocab(new Path(fVocabTrgFile), localFs);         
-    f2e_Probs = new TTable_monolithic_IFAs(localFs, new Path(f2e_ttableFile), true);
-    e2f_Probs = new TTable_monolithic_IFAs(localFs, new Path(e2f_ttableFile), true);
-
-    sLogger.info("Tokenizer and vocabs created successfully.");
-
-    fScoreFn = (ScoringModel) new Bm25();
-    fScoreFn.setAvgDocLength(11.0f);      //average sentence length = just a heuristic
-    fScoreFn.setDocCount(env.readCollectionDocumentCount());
-    transDfTable = CLIRUtils.readTransDfTable(new Path(dfTableFile), localFs);
-
-    String modelFileName = localFiles[13].toString();
-    classifier = new MoreGenericModelReader(modelFileName, FileSystem.getLocal(job)).constructModel();
-  }
-  
-  private void loadDeModels(JobConf job) throws Exception {
-    sLogger.info("Loading models...");
+  private void loadFModels(JobConf job) throws Exception {
+    String fLang = job.get("fLang");
+    sLogger.info("Loading models for " + fLang + " ...");
 
     FileSystem fs = FileSystem.get(job);
     FileSystem localFs = FileSystem.getLocal(job);
@@ -146,6 +100,8 @@ public class PreprocessHelper {
 
     sLogger.info("Sentence model created successfully.");
 
+    fTok = TokenizerFactory.createTokenizer(localFs, fLang, tokenizerFile, null);
+    
     eVocabSrc = (VocabularyWritable) HadoopAlign.loadVocab(new Path(eVocabSrcFile), localFs);
     eVocabTrg = (VocabularyWritable) HadoopAlign.loadVocab(new Path(eVocabTrgFile), localFs);
     fVocabSrc = (VocabularyWritable) HadoopAlign.loadVocab(new Path(fVocabSrcFile), localFs);
@@ -153,20 +109,18 @@ public class PreprocessHelper {
     f2e_Probs = new TTable_monolithic_IFAs(localFs, new Path(f2e_ttableFile), true);
     e2f_Probs = new TTable_monolithic_IFAs(localFs, new Path(e2f_ttableFile), true);
 
-    fTok = TokenizerFactory.createTokenizer(localFs, job, "de", tokenizerFile, fVocabTrg);
-    
     sLogger.info("Tokenizer and vocabs created successfully.");
 
     fScoreFn = (ScoringModel) new Bm25();
-    fScoreFn.setAvgDocLength(11.0f);      //average sentence length = heuristic based on De-En data
+    fScoreFn.setAvgDocLength(lang2AvgSentLen.get(fLang));      //average sentence length = just a heuristic
     fScoreFn.setDocCount(env.readCollectionDocumentCount());
     transDfTable = CLIRUtils.readTransDfTable(new Path(dfTableFile), localFs);
 
     String modelFileName = localFiles[13].toString();
     classifier = new MoreGenericModelReader(modelFileName, FileSystem.getLocal(job)).constructModel();
   }
-
-  private void loadEnModels(JobConf job) throws Exception {
+  
+  private void loadEModels(JobConf job) throws Exception {
     sLogger.info("Loading models...");
 
     FileSystem fs = FileSystem.get(job);
@@ -178,13 +132,13 @@ public class PreprocessHelper {
     String sentDetectorFile = localFiles[1].toString();
     String tokenizerFile = localFiles[2].toString();
     //for backward compatibility
-    String indexTermsFile = localFiles[12].toString();
-    String dfTableFile = localFiles[0].toString();
+//    String indexTermsFile = localFiles[12].toString();
+//    String dfTableFile = localFiles[0].toString();
 
     RetrievalEnvironment env = new RetrievalEnvironment(dir, fs);
     sLogger.info("Environment created successfully.");
 
-    eTok = TokenizerFactory.createTokenizer(localFs, job, "en", tokenizerFile, eVocabSrc);
+    eTok = TokenizerFactory.createTokenizer(localFs, "en", tokenizerFile, eVocabSrc);
 
     sLogger.info("Tokenizer and vocabs created successfully.");
 
@@ -206,44 +160,31 @@ public class PreprocessHelper {
 //    globalStatsMap.loadDFStats(new Path(dfTableFile));
   }
 
-  public HMapSFW createFDocVector(HMapSIW termTf, int length) {
-    if(termTf.size() < MinVectorTerms){
-//      sLogger.warn("Vector has too few terms = "+termTf);
+  public HMapSFW createFDocVector(String sentence) {
+    return createFDocVector(sentence, new HMapSIW());
+  }
+  
+  public HMapSFW createFDocVector(String sentence, HMapSIW term2Tf) {
+    String[] terms = fTok.processContent(sentence);
+    for(String term : terms){
+      term2Tf.increment(term);
+    }
+    
+    if(term2Tf.size() < MinVectorTerms){
       return null;
     }
     
     //translated tf values
     HMapIFW transTermTf = new HMapIFW();
 
-    for(Entry<String> entry : termTf.entrySet()){
+    for(Entry<String> entry : term2Tf.entrySet()){
       String fTerm = entry.getKey();
       int tf = entry.getValue();
       transTermTf = CLIRUtils.updateTFsByTerm(fTerm, tf, transTermTf, eVocabSrc, eVocabTrg, fVocabSrc, fVocabTrg, e2f_Probs, f2e_Probs, sLogger);
     }
-    HMapSFW weightedVector = CLIRUtils.createTermDocVector(length, transTermTf, eVocabSrc, fScoreFn, transDfTable, true, sLogger);
+    HMapSFW weightedVector = CLIRUtils.createTermDocVector(terms.length, transTermTf, eVocabSrc, fScoreFn, transDfTable, true, sLogger);
     
     return weightedVector;
-  }
-
-  public ArrayListWritable<HMapSFW> createFDocVectors(ArrayListWritable<Text> sentences) {
-    ArrayListWritable<HMapSFW> vectors = new ArrayListWritable<HMapSFW>();
-    ArrayListWritable<Text> filteredSentences = new ArrayListWritable<Text>();
-    for(Text sent : sentences){
-      HMapSIW term2Tf = new HMapSIW();
-      String[] terms = fTok.processContent(sent.toString());
-      for(String term : terms){
-        term2Tf.increment(term);
-      }
-      
-      HMapSFW vector = createFDocVector(term2Tf, terms.length);
-      if(vector!=null){
-        vectors.add(vector);
-        filteredSentences.add(sent);
-      }
-    }
-    tempSentences = filteredSentences;
-    
-    return vectors;
   }
 
   public HMapSFW createEDocVector(String sentence) {
@@ -266,23 +207,8 @@ public class PreprocessHelper {
     
     return weightedVector;
   }
-
-  public ArrayListWritable<HMapSFW> createEDocVectors(ArrayListWritable<Text> sentences) {
-    ArrayListWritable<HMapSFW> vectors = new ArrayListWritable<HMapSFW>();
-    ArrayListWritable<Text> filteredSentences = new ArrayListWritable<Text>();
-    for(Text sent : sentences){     
-      HMapSFW vector = createEDocVector(sent.toString());
-      if(vector!=null){
-        vectors.add(vector);
-        filteredSentences.add(sent);
-      }
-    }
-    tempSentences = filteredSentences;
-    
-    return vectors;
-  }
   
-  public ArrayListWritable<Text> getESentences(String text, ArrayListOfIntsWritable sentLengths) throws ClassNotFoundException, InstantiationException, IllegalAccessException, IOException {
+  public ArrayListWritable<Text> getESentences(String text, ArrayListWritable<HMapSFW> vectors, ArrayListOfIntsWritable sentLengths) throws ClassNotFoundException, InstantiationException, IllegalAccessException, IOException {
     ArrayListWritable<Text> sentences = new ArrayListWritable<Text>();
     String[] lines = text.split("\n");
     
@@ -296,9 +222,12 @@ public class PreprocessHelper {
           }
           int length = eTok.getNumberTokens(sent);
           if(length >= MinSentenceLength){
-            sent = sent.toLowerCase();
-            sentences.add(new Text(sent));
-            if(sentLengths!=null) sentLengths.add(length);
+            HMapSFW vector = createEDocVector(sent.toString());
+            if(vector != null){
+              vectors.add(vector);
+              sentences.add(new Text(sent));
+              if (sentLengths != null) sentLengths.add(length);
+            }
           }
         }
       }
@@ -306,23 +235,40 @@ public class PreprocessHelper {
     return sentences;
   }
   
-  public ArrayListWritable<Text> getFSentences(String text, ArrayListOfIntsWritable sentLengths) throws ClassNotFoundException, InstantiationException, IllegalAccessException, IOException {
+  public ArrayListWritable<Text> getFSentences(String text, ArrayListWritable<HMapSFW> vectors, ArrayListOfIntsWritable sentLengths) throws ClassNotFoundException, InstantiationException, IllegalAccessException, IOException {
     ArrayListWritable<Text> sentences = new ArrayListWritable<Text>();
     String[] lines = text.split("\n");
     
     for(String line : lines){
-      if(!line.matches("\\s+") && !line.isEmpty()){
+      // convert '。' to standard period character '.' for sentence detector to work
+      StringBuffer sb = new StringBuffer();
+      for (int i = 0; i < line.length(); i++) {
+        char c = line.charAt(i);
+        String unicode = String.format("%04x", (int) c);
+        if (unicode.equals("3002")) {
+          sb.append(".");
+        }else {
+          sb.append(c);
+        }
+      }
+      line = sb.toString();
+      
+      if (!line.matches("\\s+") && !line.isEmpty()) {
         String[] sents = fModel.sentDetect(line);
-        
-        for(String sent : sents){
-          if(sent.contains("datei:")||sent.contains("jpg")||sent.contains("png")||sent.contains("gif")||sent.contains("fontsize:")||sent.contains("kategorie:")){
+
+        for (String sent : sents) {
+          // discard some of the non-text content in Wikipedia
+          if (sent.contains("datei:") || sent.contains("jpg") || sent.contains("png") || sent.contains("fontsize:") || sent.contains("kategorie:")) {
             continue;
           }
           int length = fTok.getNumberTokens(sent);
-          if(length >= MinSentenceLength){
-            sent = sent.toLowerCase();
-            sentences.add(new Text(sent));
-            if(sentLengths!=null) sentLengths.add(length);
+          if (length >= MinSentenceLength) {
+            HMapSFW vector = createFDocVector(sent);
+            if (vector != null) {
+              vectors.add(vector);
+              sentences.add(new Text(sent));
+              if (sentLengths!=null) sentLengths.add(length);
+            }
           }
         }
       }
@@ -359,16 +305,11 @@ public class PreprocessHelper {
     return classifier;
   }
 
-
   public Tokenizer getETokenizer() {
     return eTok;
   }
   
   public Tokenizer getFTokenizer() {
     return fTok;
-  }
-  
-  public ArrayListWritable<Text> getTempSentences() {
-    return tempSentences;
   }
 }
