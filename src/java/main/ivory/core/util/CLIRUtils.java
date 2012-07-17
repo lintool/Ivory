@@ -7,7 +7,6 @@ import ivory.core.data.stat.PrefixEncodedGlobalStats;
 import ivory.core.tokenize.Tokenizer;
 import ivory.pwsim.score.Bm25;
 import ivory.pwsim.score.ScoringModel;
-
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -22,7 +21,6 @@ import java.util.List;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
@@ -32,7 +30,6 @@ import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.SequenceFile;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-
 import edu.umd.cloud9.io.map.HMapIFW;
 import edu.umd.cloud9.io.map.HMapSFW;
 import edu.umd.cloud9.io.map.HMapSIW;
@@ -64,7 +61,12 @@ import edu.umd.hooka.ttables.TTable_monolithic_IFAs;
  */
 public class CLIRUtils extends Configured {
   private static final Logger logger = Logger.getLogger(CLIRUtils.class);
-
+  private static final String delims = "`~!@#^&*()-_=+]}[{\\|'\";:/?.>,<";
+  public static final String BitextSeparator = "<F2ELANG>";
+  public static final int MinVectorTerms = 3;
+  public static final int MinSentenceLength = 5;
+  public static final int E = -1, F = 1;
+  
   /**
    * Read df mapping from file.
    * 
@@ -211,7 +213,7 @@ public class CLIRUtils extends Configured {
           float df_f = dfTable.getDf(id);				
           df += (probEF*df_f);
         }else{
-          logger.info(fTerm+" not in dict");
+          logger.debug(fTerm+" not in dict");
         }
       }
       transDfTable.put(e, df);
@@ -380,13 +382,9 @@ public class CLIRUtils extends Configured {
         }
         float probEF;
         String eTerm = eVocabTrg.get(e);
-        if(tokenizer.isStopWord(eTerm)){
-          sLogger.warn("Discarded: "+eTerm+" is a stopword!");
-          continue;
-        }
         int e2 = eVocabSrc.get(eTerm);		//convert between two E vocabs (different ids)
         if(e2 <= 0){
-          sLogger.warn("Warning: "+eTerm+": word not in aligner's final vocab (source side of e2f)");
+          sLogger.debug("Warning: "+eTerm+": word not in aligner's final vocab (source side of e2f)");
           continue;
         }
         probEF = e2fProbs.get(e2, f2);
@@ -432,38 +430,47 @@ public class CLIRUtils extends Configured {
     }
 
     int docLen = 0;
+//    for ( int e2 = 0; e2 < eVocabSrc.size(); e2++ ){
+//    float prob;
     for(edu.umd.cloud9.util.map.MapKI.Entry<String> item : doc.entrySet()){
-      String fTerm = item.getKey();
-      int tf = item.getValue();
-      docLen += tf;
-      int f = fVocabSrc.get(fTerm);
-      if(f <= 0){
-        //				sLogger.warn(f+","+fTerm+": word not in aligner's vocab (source side of f2e)");
-        continue;
-      }
-      int[] eS = f2eProbs.get(f).getTranslations(0.0f);
-
-      int f2 = fVocabTrg.get(fTerm);		//convert between two F vocabs (different ids)
-      if(f2 <= 0){
-        sLogger.info(fTerm+": word not in aligner's vocab (target side of e2f)");
-        continue;
-      }
-      //tf(e) = sum_f{tf(f)*prob(f|e)}
-      float prob;
-      for(int e : eS){
-        String eTerm = eVocabTrg.get(e);
-        int e2 = eVocabSrc.get(eTerm);		//convert between two E vocabs (different ids)
-        if(e2 <= 0){
-          sLogger.info(eTerm+": word not in aligner's final vocab (source side of e2f)");
+        String fTerm = item.getKey();
+        int tf = item.getValue();
+        docLen += tf;
+        int f = fVocabSrc.get(fTerm);
+        if(f <= 0){
+          //				sLogger.warn(f+","+fTerm+": word not in aligner's vocab (source side of f2e)");
           continue;
         }
-        prob = e2fProbs.get(e2, f2);
-        if(prob > 0){
-          sLogger.info("Pr("+eTerm+"|"+fTerm+") = "+prob);
-          tfTable.increment(e2, tf*prob);
+        int[] eS = f2eProbs.get(f).getTranslations(0.0f);
+        sLogger.debug(fTerm+" has "+eS.length+" translations");
+        int f2 = fVocabTrg.get(fTerm);		//convert between two F vocabs (different ids)
+        if(f2 <= 0){
+          sLogger.debug(fTerm+": word not in aligner's vocab (target side of e2f)");
+          continue;
+        }
+
+//        prob = e2fProbs.get(e2, f2);
+//        if (prob > 0) {
+//          tfTable.increment(e2, tf*prob);
+//        }
+
+        //tf(e) = sum_f{tf(f)*prob(f|e)}
+        float prob;
+        for (int e : eS) {
+                String eTerm = eVocabTrg.get(e);
+                int e2 = eVocabSrc.get(eTerm);		//convert between two E vocabs (different ids)
+                if(e2 <= 0){
+                  sLogger.debug(eTerm+": word not in aligner's final vocab (source side of e2f)");
+                  continue;
+                }
+                prob = e2fProbs.get(e2, f2);
+//                sLogger.info(eTerm+" --> "+prob+","+f2eProbs.get(f, e));
+                if(prob > 0){
+                  tfTable.increment(e2, tf*prob);
+                }
         }
       }
-    }
+    
 
     return docLen;
   }
@@ -657,8 +664,10 @@ public class CLIRUtils extends Configured {
     File file = new File(inputFile);
     FileInputStream fis = null;
     BufferedReader bis = null;
-    int cntLongTail = 0, cntShortTail = 0, sumShortTail = 0, cnt = 0;		// for statistical purposes only
-    float sumCumProbs = 0f;											// for statistical purposes only
+//    int cntLongTail = 0, cntShortTail = 0, sumShortTail = 0
+    int cnt = 0;		// for statistical purposes only
+//    float sumCumProbs = 0f;											// for statistical purposes only
+    HookaStats stats = new HookaStats(numTrans, probThreshold);
 
     //In BerkeleyAligner output, dictionary entries of each source term are already sorted by prob. value. 
     try {
@@ -673,7 +682,7 @@ public class CLIRUtils extends Configured {
           line = bis.readLine();
           if(line ==null)
             break;
-          cnt++;
+            cnt++;
         }
         earlyTerminate = false;
         logger.debug("Line:"+line);
@@ -715,15 +724,15 @@ public class CLIRUtils extends Configured {
               }
             }
             if(sumOfProbs > probThreshold){
-              cntShortTail++;		// for statistical purposes only
-              sumShortTail += (i+1);	// for statistical purposes only
+              stats.incCntShortTail(1);
+              stats.incSumShortTail(i+1);
               break;
             }
           }
           if(sumOfProbs <= probThreshold){
             // early termination
-            cntLongTail++;		// for statistical purposes only
-            sumCumProbs += sumOfProbs;
+            stats.incCntLongTail(1);
+            stats.incSumCumProbs(sumOfProbs);
           }
 
           // to enable faster access with binary search, we sort entries by vocabulary index.
@@ -752,12 +761,8 @@ public class CLIRUtils extends Configured {
     logger.info("File "+inputFile+": read "+cnt+" lines");
     logger.info("Vocabulary Target: "+trgVocab.size()+" elements");
     logger.info("Vocabulary Source: "+srcVocab.size()+" elements");
-    logger.info("# source terms with > "+probThreshold+" probability covered: "+cntShortTail+" and average translations per term: "+(sumShortTail/(cntShortTail+0.0f)));
-    float averageCoverageLongTail = sumCumProbs/cntLongTail;
-    logger.info("# source terms with <= "+probThreshold+" probability covered: "+cntLongTail+" (each have "+ numTrans +" translations). Average coverage is: "+averageCoverageLongTail);
-    float averageCoverageOverall = (cntShortTail*probThreshold+cntLongTail*averageCoverageLongTail)/(cntShortTail+cntLongTail);
-    logger.info("Size (total number of dictionary entries) = "+(sumShortTail + cntLongTail*numTrans)+". Average coverage per term (overall) >= "+averageCoverageOverall);
-
+    logger.info(stats);
+    
     DataOutputStream dos = new DataOutputStream(new BufferedOutputStream
         (fs.create(new Path(trgVocabFile))));
     ((VocabularyWritable) trgVocab).write(dos);
@@ -812,9 +817,10 @@ public class CLIRUtils extends Configured {
       TreeSet<PairOfFloatString> topTrans = new TreeSet<PairOfFloatString>();
       String line = "";
       boolean earlyTerminate = false, skipTerm = false;
-      float sumOfProbs = 0.0f, prob, sumCumProbs = 0;
-      int cntLongTail = 0, cntShortTail = 0, sumShortTail = 0;		// for statistical purposes only
-
+      float sumOfProbs = 0.0f, prob;//, sumCumProbs = 0;
+//      int cntLongTail = 0, cntShortTail = 0, sumShortTail = 0;		// for statistical purposes only
+      HookaStats stats = new HookaStats(numTrans, probThreshold);
+      
       while (true) {	
         line = bis.readLine();
         if(line == null)	break;
@@ -831,67 +837,60 @@ public class CLIRUtils extends Configured {
           continue;   // skip alignments to imaginary NULL word
         }
 
-        if(prev==null || !srcTerm.equals(prev)){
+        // new source term (ignore punctuation)
+        if ((prev==null || !srcTerm.equals(prev)) && !delims.contains(srcTerm)){
           if(topTrans.size() > 0){
-            //store previous term's top translations to ttable
-            int finalNumTrans = addToTable(curIndex, topTrans, sumOfProbs, table, trgVocab);
-            if(finalNumTrans < numTrans){
-              cntShortTail++;
-              sumShortTail += finalNumTrans;
-            }else{
-              cntLongTail++;
-              sumCumProbs += sumOfProbs;
-            }
+            // store previous term's top translations to ttable
+            addToTable(curIndex, topTrans, sumOfProbs, table, trgVocab, probThreshold, stats);
           }
+          
           logger.debug("Line:"+line);
 
-          //initialize this term
+          // initialize the translation distribution of the source term
           sumOfProbs = 0.0f;
           topTrans.clear();
-          earlyTerminate = false;		//reset status
+          earlyTerminate = false;		// reset status
           skipTerm = false;
           prev = srcTerm;
           int prevIndex = curIndex;
           curIndex = srcVocab.addOrGet(srcTerm);
           if(curIndex <= prevIndex){
-            //we've seen this foreign term before. probably due to tokenization or sorting error in aligner. just ignore.
-            curIndex = prevIndex;		//revert curIndex value since we're skipping this one
+            // we've seen this foreign term before. probably due to tokenization or sorting error in aligner. just ignore.
+            logger.debug("FLAG: "+line);
+            curIndex = prevIndex;		// revert curIndex value since we're skipping this one
             skipTerm = true;
             continue;
           }
           logger.debug("Processing: "+srcTerm+" with index: "+curIndex);			
           topTrans.add(new PairOfFloatString(prob, trgTerm));
           sumOfProbs += prob;
-        }else if(!earlyTerminate && !skipTerm){	//continue adding translation term,prob pairs (except if early termination is ON)
+          logger.debug("Added to queue: "+trgTerm+" with prob: "+prob+" (sum: "+sumOfProbs+")");      
+        }else if(!earlyTerminate && !skipTerm && !delims.contains(srcTerm)){	//continue adding translation term,prob pairs (except if early termination is ON)
           topTrans.add(new PairOfFloatString(prob, trgTerm));
+          sumOfProbs += prob;
+          logger.debug("Added to queue: "+trgTerm+" with prob: "+prob+" (sum: "+sumOfProbs+")");      
 
           // keep top numTrans translations
           if(topTrans.size() > numTrans){
-            float removedProb = topTrans.pollFirst().getLeftElement();
+            PairOfFloatString pair = topTrans.pollFirst();
+            float removedProb = pair.getLeftElement();
             sumOfProbs -= removedProb;
+            logger.debug("Removed from queue: "+pair.getRightElement()+" (sum: "+sumOfProbs+")");      
           }
-          sumOfProbs += prob;
         }else{
-          logger.debug("Skipped");
+          logger.debug("Skipped line: "+line);
         }
-        if(sumOfProbs > probThreshold){
-          earlyTerminate = true;
-          logger.debug("Sum of probs > "+probThreshold+", early termination.");
-        }
+//        // line processed: check if early terminate
+//        if(sumOfProbs > probThreshold){
+//          earlyTerminate = true;
+//          logger.debug("Sum of probs > "+probThreshold+", early termination.");
+//        }
       }
 
       //last one
       if(topTrans.size()>0){
         //store previous term's top translations to ttable
-        int finalNumTrans = addToTable(curIndex, topTrans, sumOfProbs, table, trgVocab);
-        if(finalNumTrans < numTrans){
-          cntShortTail++;
-          sumShortTail += finalNumTrans;
-        }else{
-          // early termination: <numTrans> elements did not cover <probThreshold> probability
-          cntLongTail++;
-          sumCumProbs += sumOfProbs;
-        }
+        addToTable(curIndex, topTrans, sumOfProbs, table, trgVocab, probThreshold, stats);
       }
 
       // dispose all the resources after using them.
@@ -900,11 +899,7 @@ public class CLIRUtils extends Configured {
       logger.info("File "+filename+": read "+cnt+" lines");
       logger.info("Vocabulary Target: "+trgVocab.size()+" elements");
       logger.info("Vocabulary Source: "+srcVocab.size()+" elements");
-      logger.info("# source terms with > "+probThreshold+" probability covered: "+cntShortTail+" and average translations per term: "+(sumShortTail/(cntShortTail+0.0f)));
-      float averageCoverageLongTail = sumCumProbs/cntLongTail;
-      logger.info("# source terms with <= "+probThreshold+" probability covered: "+cntLongTail+" (each have "+ numTrans +" translations). Average coverage is: "+averageCoverageLongTail);
-      float averageCoverageOverall = (cntShortTail*probThreshold+cntLongTail*averageCoverageLongTail)/(cntShortTail+cntLongTail);
-      logger.info("Size (total number of dictionary entries) = "+(sumShortTail + cntLongTail*numTrans)+" TTable average coverage >= "+averageCoverageOverall);
+      logger.info(stats);
     }catch (FileNotFoundException e) {
       e.printStackTrace();
     } catch (IOException e) {
@@ -957,7 +952,8 @@ public class CLIRUtils extends Configured {
     int curIndex = -1;
     TreeSet<PairOfFloatString> topTrans = new TreeSet<PairOfFloatString>();
     float sumOfProbs = 0.0f, prob, sumCumProbs = 0f;
-    int cntLongTail = 0, cntShortTail = 0, sumShortTail = 0;		// for statistical purposes only
+//    int cntLongTail = 0, cntShortTail = 0, sumShortTail = 0;		// for statistical purposes only
+    HookaStats stats = new HookaStats(numTrans, probThreshold);
 
     //modify current ttable wrt foll. criteria: top numTrans translations per source term, unless cumulative prob. distr. exceeds probThreshold before that.
     for(int srcIndex=1; srcIndex<srcVocab.size(); srcIndex++){
@@ -996,27 +992,13 @@ public class CLIRUtils extends Configured {
 
       //store previous term's top translations to ttable
       if(topTrans.size() > 0){
-        int finalNumTrans = addToTable(curIndex, topTrans, sumOfProbs, finalTTable, finalTrgVocab);
-
-        if(finalNumTrans < numTrans){
-          // <numTrans> elements covered more than <probThreshold> probability, so we terminated early
-          cntShortTail++;
-          sumShortTail += finalNumTrans;
-        }else{
-          // <numTrans> elements did not cover <probThreshold> probability, do not add any more as an efficiency heuristic
-          cntLongTail++;
-          sumCumProbs += sumOfProbs;
-        }
+        addToTable(curIndex, topTrans, sumOfProbs, finalTTable, finalTrgVocab, probThreshold, stats);
       }
     }
     logger.info("Vocabulary Target: "+finalTrgVocab.size()+" elements");
     logger.info("Vocabulary Source: "+finalSrcVocab.size()+" elements");
-    logger.info("# source terms with > "+probThreshold+" probability covered: "+cntShortTail+" and average translations per term: "+(sumShortTail/(cntShortTail+0.0f)));
-    float averageCoverageLongTail = sumCumProbs/cntLongTail;
-    logger.info("# source terms with <= "+probThreshold+" probability covered: "+cntLongTail+" (each have "+ numTrans +" translations). Average coverage is: "+averageCoverageLongTail);
-    float averageCoverageOverall = (cntShortTail*probThreshold+cntLongTail*averageCoverageLongTail)/(cntShortTail+cntLongTail);
-    logger.info("Size (total number of dictionary entries) = "+(sumShortTail + cntLongTail*numTrans)+" TTable average coverage >= "+averageCoverageOverall);
-
+    logger.info(stats);
+    
     DataOutputStream dos = new DataOutputStream(new BufferedOutputStream(fs.create(new Path(finalTrgVocabFile))));
     ((VocabularyWritable) finalTrgVocab).write(dos);
     dos.close();
@@ -1029,39 +1011,40 @@ public class CLIRUtils extends Configured {
   }
 
 
-  public static int addToTable(int curIndex, TreeSet<PairOfFloatString> topTrans, float cumProb, TTable_monolithic_IFAs table, Vocab trgVocab) {
+  public static void addToTable(int curIndex, TreeSet<PairOfFloatString> topTrans, float cumProb, TTable_monolithic_IFAs table, Vocab trgVocab, 
+      float cumProbThreshold, HookaStats stats) {
     List<Integer> sortedIndices = new ArrayList<Integer>();
     HMapIF index2ProbMap = new HMapIF();
 
     float sumOfProbs = 0.0f;    //only extract the top K<15 if the mass prob. exceeds MAX_probThreshold
-    while(!topTrans.isEmpty()){
+    while(!topTrans.isEmpty() && sumOfProbs < cumProbThreshold){
       PairOfFloatString e = topTrans.pollLast();
       String term = e.getRightElement();
       float pr = e.getLeftElement()/cumProb;    // normalize
       int trgIndex = trgVocab.addOrGet(term);
-      sumOfProbs += pr;
-
+      sumOfProbs += e.getLeftElement();         // keep track of unnormalized cumulative prob for determining cutoff
       sortedIndices.add(trgIndex);
       index2ProbMap.put(trgIndex, pr);
     }
-
+   
     // to enable faster access with binary search, we sort entries by vocabulary index.
     Collections.sort(sortedIndices);
     int numEntries = sortedIndices.size();
+
+    // for statistics only
+    stats.update(numEntries, sumOfProbs);
+    
+    // write translation list to TTable object
     int[] indices = new int[numEntries];
     float[] probs = new float[numEntries];
     int i=0;
     for(int sortedIndex : sortedIndices){
       indices[i]=sortedIndex;
       probs[i]=index2ProbMap.get(sortedIndex);
-      logger.debug("Added: "+indices[i]+" with prob: "+probs[i]);
       i++;
     }
     table.set(curIndex, new IndexedFloatArray(indices, probs, true));
-
-    return indices.length;
   }
-
 
   /***
    * 
@@ -1164,10 +1147,9 @@ public class CLIRUtils extends Configured {
 
     return -1;
   }
-
-
+  
   public static void main(String args[]){
-    if(args.length < 9){
+    if(args.length != 10 && args.length != 11 && args.length != 5){
       printUsage();
     }
 
@@ -1189,13 +1171,35 @@ public class CLIRUtils extends Configured {
       }
     }
 
-    String lex_f2e = args[0];
-    String lex_e2f = args[1];
-    String type = args[2];
-    Configuration conf = new Configuration();
-    logger.info("Type of input:" + type);
     try {
+      Configuration conf = new Configuration();
       FileSystem localFS = FileSystem.getLocal(conf);
+
+      // query mode
+      if (args.length == 5) {
+        String srcTerm = args[0], trgTerm = args[1];
+        Vocab srcVocab = HadoopAlign.loadVocab(new Path(args[2]), localFS);
+        Vocab trgVocab = HadoopAlign.loadVocab(new Path(args[3]), localFS);
+        TTable_monolithic_IFAs src2trgProbs = new TTable_monolithic_IFAs(localFS, new Path(args[4]), true);
+
+        if (trgTerm.equals("ALL")) {
+          int[] trgs = src2trgProbs.get(srcVocab.get(srcTerm)).getTranslations(0.0f);
+          System.out.println(srcTerm + " has "+ trgs.length + " translations:");
+          for (int i = 0; i < trgs.length; i++) {
+            trgTerm = trgVocab.get(trgs[i]);
+            System.out.println("Prob("+trgTerm+"|"+srcTerm+")="+src2trgProbs.get(srcVocab.get(srcTerm), trgVocab.get(trgTerm)));
+          }
+        }else {
+          System.out.println("Prob("+trgTerm+"|"+srcTerm+")="+src2trgProbs.get(srcVocab.get(srcTerm), trgVocab.get(trgTerm)));
+        }
+        return;
+      }
+
+      // create mode
+      String lex_f2e = args[0];
+      String lex_e2f = args[1];
+      String type = args[2];
+      logger.info("Type of input:" + type);
       if(type.equals("giza")){
         CLIRUtils.createTTableFromGIZA(lex_f2e, args[3], args[4], args[5], probThreshold, numTrans, localFS);
         CLIRUtils.createTTableFromGIZA(lex_e2f, args[6], args[7], args[8], probThreshold, numTrans, localFS);
