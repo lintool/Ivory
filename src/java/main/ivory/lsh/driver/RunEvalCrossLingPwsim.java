@@ -46,7 +46,8 @@ public class RunEvalCrossLingPwsim extends PwsimEnvironment implements Tool {
       return -1;
     }
     /////////Configuration//////////////////
-
+    long startTime = System.currentTimeMillis();
+    
     PwsimEnvironment.isCrossLingual = true;		
 
     Configuration config = new Configuration();
@@ -193,6 +194,8 @@ public class RunEvalCrossLingPwsim extends PwsimEnvironment implements Tool {
       String[] evalArgs = {"docvectors", getFileNameWithPars(targetLangDir,"IntDocs"), groundTruthOutput, sampleWtdIntDocVectorsPath+"/part-00000", T+"", numResults+""};
       BruteForcePwsim.main(evalArgs);
     }
+
+    sLogger.info("Job finished in " + (System.currentTimeMillis() - startTime) / 1000.0 + " seconds");
 
     // Following is not part of regular evaluation. This is for determining upperbound recall values
 
