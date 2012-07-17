@@ -26,6 +26,7 @@ import ivory.core.preprocess.BuildTranslatedTermDocVectors;
 import ivory.core.preprocess.BuildWeightedIntDocVectors;
 import ivory.core.preprocess.BuildWeightedTermDocVectors;
 import ivory.core.preprocess.ComputeGlobalTermStatistics;
+import ivory.core.tokenize.TokenizerFactory;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -99,6 +100,7 @@ public class PreprocessWikipedia extends Configured implements Tool {
     String rawCollection = args[1];
     String seqCollection = args[2];
     String tokenizerClass = args[3];	
+
     if (args.length > 4) {
       collectionLang = args[4];
       conf.set(Constants.Language, collectionLang);
@@ -106,6 +108,14 @@ public class PreprocessWikipedia extends Configured implements Tool {
         tokenizerModel = args[5];
         conf.set(Constants.TokenizerData, tokenizerModel);
       }
+    }
+
+    // user can either provide a tokenizer class manually, 
+    // or let the factory find an appropriate class based on language code
+    try {
+      Class.forName(tokenizerClass);
+    } catch (ClassNotFoundException e) {
+      tokenizerClass = TokenizerFactory.getTokenizerClass(collectionLang).getCanonicalName();
     }
 
     if (mode == CROSS_LINGUAL_E || mode == CROSS_LINGUAL_F) {		// CROSS-LINGUAL CASE
@@ -222,21 +232,35 @@ public class PreprocessWikipedia extends Configured implements Tool {
     long startTime = System.currentTimeMillis();
     long preprocessStartTime = System.currentTimeMillis();
     LOG.info("Building term doc vectors...");
-    new BuildTermDocVectors(conf).run();
-    LOG.info("Job finished in " + (System.currentTimeMillis() - startTime) / 1000.0 + " seconds");
+    int exitCode = new BuildTermDocVectors(conf).run();
+    if (exitCode >= 0) {
+      LOG.info("Job BuildTermDocVectors finished in " + (System.currentTimeMillis() - startTime) / 1000.0 + " seconds");
+    }else {
+      LOG.info("Error: BuildTermDocVectors. Terminating...");
+      return -1;
+    }
 
     // Get CF and DF counts.
     startTime = System.currentTimeMillis();
     LOG.info("Counting terms...");
-    new ComputeGlobalTermStatistics(conf).run();
+    exitCode = new ComputeGlobalTermStatistics(conf).run();
     LOG.info("TermCount = " + env.readCollectionTermCount());
-    LOG.info("Job finished in " + (System.currentTimeMillis() - startTime) / 1000.0 + " seconds");
-
+    if (exitCode >= 0) {
+      LOG.info("Job ComputeGlobalTermStatistics finished in " + (System.currentTimeMillis() - startTime) / 1000.0 + " seconds");
+    }else {
+      LOG.info("Error: ComputeGlobalTermStatistics. Terminating...");
+      return -1;
+    }
     // Build a map from terms to sequentially generated integer term ids.
     startTime = System.currentTimeMillis();
     LOG.info("Building term-to-integer id mapping...");
-    new BuildDictionary(conf).run();
-    LOG.info("Job finished in " + (System.currentTimeMillis() - startTime) / 1000.0 + " seconds");
+    exitCode = new BuildDictionary(conf).run();
+    if (exitCode >= 0) {
+      LOG.info("Job BuildDictionary finished in " + (System.currentTimeMillis() - startTime) / 1000.0 + " seconds");
+    }else{
+      LOG.info("Error: BuildDictionary. Terminating...");
+      return -1;
+    }
 
     // Compute term weights, and output weighted term doc vectors.
     LOG.info("Building weighted term doc vectors...");
@@ -248,22 +272,31 @@ public class PreprocessWikipedia extends Configured implements Tool {
 
     if (mode == CROSS_LINGUAL_F) {
       // Translate term doc vectors into English.
-      new BuildTranslatedTermDocVectors(conf).run();
+      exitCode = new BuildTranslatedTermDocVectors(conf).run();
     } else {
       // Build weighted term doc vectors.
-      new BuildWeightedTermDocVectors(conf).run();
+      exitCode = new BuildWeightedTermDocVectors(conf).run();
     }
-    LOG.info("Job finished in " + (System.currentTimeMillis() - startTime) / 1000.0 + " seconds");
+    if (exitCode >= 0) {
+      LOG.info("Job BuildTranslated/WeightedTermDocVectors finished in " + (System.currentTimeMillis() - startTime) / 1000.0 + " seconds");
+    }else {
+      LOG.info("Error: BuildTranslated/WeightedTermDocVectors. Terminating...");
+      return -1;
+    }
 
     // normalize (optional) and convert weighted term doc vectors into int doc vectors for efficiency
     startTime = System.currentTimeMillis();
     LOG.info("Building weighted integer doc vectors...");
     conf.setBoolean("Ivory.Normalize", IsNormalized);
     if (mode == MONO_LINGUAL) {
-      new BuildIntDocVectors(conf).run();
-      new BuildWeightedIntDocVectors(conf).run();
-      LOG.info("Job BuildWeightedIntDocVectors finished in " +
-          (System.currentTimeMillis() - startTime) / 1000.0 + " seconds");
+      exitCode = new BuildIntDocVectors(conf).run();
+      exitCode = new BuildWeightedIntDocVectors(conf).run();
+      if (exitCode >= 0) {
+        LOG.info("Job BuildWeightedIntDocVectors finished in "+(System.currentTimeMillis() - startTime) / 1000.0 + " seconds");
+      }else {
+        LOG.info("Error: BuildWeightedIntDocVectors. Terminating...");
+        return -1;
+      }
     } else {
       BuildTargetLangWeightedIntDocVectors weightedIntVectorsTool =
         new BuildTargetLangWeightedIntDocVectors(conf);
@@ -273,9 +306,11 @@ public class PreprocessWikipedia extends Configured implements Tool {
       LOG.info("Job BuildTargetLangWeightedIntDocVectors finished in " +
           (System.currentTimeMillis() - startTime) / 1000.0 + " seconds");
       if (finalNumDocs > 0) {
-        LOG.info("Changed doc count from " + env.readCollectionDocumentCount() +
-            " to = " + finalNumDocs);
+        LOG.info("Changed doc count from " + env.readCollectionDocumentCount() +" to = " + finalNumDocs);
         env.writeCollectionDocumentCount(finalNumDocs);
+      }else {
+        LOG.info("No document output! Terminating...");
+        return -1;
       }
       // set Property.CollectionTermCount to the size of the target vocab. since all docs are translated into that vocab. This property is read by WriteRandomVectors via RunComputeSignatures.
       Vocab engVocabH = null;
@@ -284,12 +319,11 @@ public class PreprocessWikipedia extends Configured implements Tool {
       } catch (IOException e) {
         e.printStackTrace();
       }	
-      LOG.info("Changed term count to : "+env.readCollectionTermCount() + " = " + engVocabH.size());
+      LOG.info("Changed term count to : " + env.readCollectionTermCount() + " = " + engVocabH.size());
       env.writeCollectionTermCount(engVocabH.size());
     }
 
-    LOG.info("Preprocessing job finished in " +
-        (System.currentTimeMillis() - preprocessStartTime) / 1000.0 + " seconds");
+    LOG.info("Preprocessing job finished in " + (System.currentTimeMillis() - preprocessStartTime) / 1000.0 + " seconds");
 
     return 0;
   }

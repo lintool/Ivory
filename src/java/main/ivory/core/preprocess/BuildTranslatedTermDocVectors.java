@@ -318,7 +318,7 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
         conf2.setOutputFormat(NullOutputFormat.class);
         conf2.setMapperClass(DataWriterMapper.class);
         JobClient.runJob(conf2);
-        LOG.info("Done");
+        LOG.info("Translating DF table done.");
       }
     } catch (IOException e) {
       e.printStackTrace();

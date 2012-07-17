@@ -1209,29 +1209,8 @@ public class CLIRUtils extends Configured {
       }else{
         printUsage();
       }
-
-      //debugging
-
-      //			TTable_monolithic_IFAs de2EnProbs = new TTable_monolithic_IFAs(localFS, new Path(args[5]), true);
-      //			TTable_monolithic_IFAs en2DeProbs = new TTable_monolithic_IFAs(localFS, new Path(args[8]), true);
-      //			
-      //			Vocab enSrc = HadoopAlign.loadVocab(new Path(args[6]), conf);
-      //			Vocab zhTrg = HadoopAlign.loadVocab(new Path(args[7]), conf);
-      //
-      //			int[] fS = en2DeProbs.get(enSrc.get("princess")).getTranslations(0.0f);
-      //			System.out.println(fS.length);
-      //
-      //			for(int f : fS){
-      //				String fTerm =  zhTrg.get(f);
-      //				System.out.println(fTerm+","+de2EnProbs.get(enSrc.get("princess"), f));		
-      //			}
-
     } catch (IOException e) {
       e.printStackTrace();
     }
-
-
-
   }
-
 }

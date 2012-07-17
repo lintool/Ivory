@@ -412,7 +412,7 @@ public class BuildTermDocVectors extends PowerTool {
 
     startTime = System.currentTimeMillis();
     job2.waitForCompletion(true);
-    LOG.info("Job Finished in " + (System.currentTimeMillis() - startTime) / 1000.0 + " seconds");
+    LOG.info("Job finished in " + (System.currentTimeMillis() - startTime) / 1000.0 + " seconds");
 
     long collectionSumOfDocLengths =
         job2.getCounters().findCounter(DocLengths.SumOfDocLengths).getValue();
