@@ -951,7 +951,7 @@ public class CLIRUtils extends Configured {
     String srcTerm = null, trgTerm = null;
     int curIndex = -1;
     TreeSet<PairOfFloatString> topTrans = new TreeSet<PairOfFloatString>();
-    float sumOfProbs = 0.0f, prob, sumCumProbs = 0f;
+    float sumOfProbs = 0.0f, prob;
 //    int cntLongTail = 0, cntShortTail = 0, sumShortTail = 0;		// for statistical purposes only
     HookaStats stats = new HookaStats(numTrans, probThreshold);
 

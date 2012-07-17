@@ -983,7 +983,6 @@ public class OpenNLPTokenizer extends ivory.core.tokenize.Tokenizer {
     }
   }
 
-  @SuppressWarnings("unchecked")
   public void setLanguage(String l){
     if(l.startsWith("en")){
       lang = ENGLISH;//"english";

@@ -16,7 +16,6 @@ import org.apache.log4j.Logger;
 public class MoreGenericModelReader {
   private static final Logger sLogger = Logger.getLogger(MoreGenericModelReader.class);
 
-  @SuppressWarnings("unused")
   private AbstractModelReader delegateModelReader;
 
   public MoreGenericModelReader(String f, FileSystem localFs) throws IOException {
