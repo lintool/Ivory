@@ -2,8 +2,6 @@ package ivory.core.tokenize;
 
 import ivory.core.Constants;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 import opennlp.tools.tokenize.Tokenizer;
 import opennlp.tools.tokenize.TokenizerME;
@@ -15,9 +13,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.tartarus.snowball.SnowballStemmer;
-
 import com.google.common.collect.Sets;
-
 import edu.umd.hooka.VocabularyWritable;
 import edu.umd.hooka.alignment.HadoopAlign;
 
@@ -30,10 +26,10 @@ public class OpenNLPTokenizer extends ivory.core.tokenize.Tokenizer {
   private SnowballStemmer stemmer;
   private int lang;
   private boolean isStopwordRemoval;
-
-  protected static int NUM_PREDS, MIN_LENGTH = 2, MAX_LENGTH = 50;
-  String delims = "`~!@#$%^&*()-_=+]}[{\\|'\";:/?.>,<";
-  private static final int ENGLISH=0, FRENCH=1, GERMAN=2;
+  protected static int MIN_LENGTH = 2, MAX_LENGTH = 50;
+  String delims = "`~!@#^&*()-_=+]}[{\\|'\";:/?.>,<";
+  
+  private static final int ENGLISH = 0, FRENCH = 1, GERMAN = 2;
   private static final String[] languages = {"english", "french", "german"};
   private static final String[] TERRIER_STOP_WORDS = {
     "a",
@@ -944,49 +940,34 @@ public class OpenNLPTokenizer extends ivory.core.tokenize.Tokenizer {
   }
 
   @Override
-  public void configure(Configuration mJobConf){
+  public void configure(Configuration conf){
     FileSystem fs;
     try {
-      fs = FileSystem.get(mJobConf);
+      fs = FileSystem.get(conf);
     } catch (IOException e) {
       e.printStackTrace();
       throw new RuntimeException(e);
     } 
-    setTokenizer(fs, new Path(mJobConf.get(Constants.TokenizerData)));
-    if (mJobConf.getBoolean("IsStemming", true)) {
-      setLanguageAndStemmer(mJobConf.get(Constants.Language));
-    }else {
-      setLanguage(mJobConf.get(Constants.Language));
-    }
-    VocabularyWritable vocab;
-    try {
-      vocab = (VocabularyWritable) HadoopAlign.loadVocab(new Path(mJobConf.get("Ivory.CollectionVocab")), fs);
-      setVocab(vocab);
-    } catch (Exception e) {
-      sLogger.warn("No vocabulary provided to tokenizer.");
-      vocab = null;
-    }
-    isStopwordRemoval = mJobConf.getBoolean("IsStopword", true);
-    sLogger.info("Stopword removal is " + isStopwordRemoval);
+    configure(conf, fs);
   }
 
   @Override
   public void configure(Configuration mJobConf, FileSystem fs){
     setTokenizer(fs, new Path(mJobConf.get(Constants.TokenizerData)));
-    if (mJobConf.getBoolean("IsStemming", true)) {
+    if (mJobConf.getBoolean(Constants.Stemming, true)) {
       setLanguageAndStemmer(mJobConf.get(Constants.Language));
     }else {
       setLanguage(mJobConf.get(Constants.Language));
     }
     VocabularyWritable vocab;
     try {
-      vocab = (VocabularyWritable) HadoopAlign.loadVocab(new Path(mJobConf.get("Ivory.CollectionVocab")), fs);
+      vocab = (VocabularyWritable) HadoopAlign.loadVocab(new Path(mJobConf.get(Constants.CollectionVocab)), fs);
       setVocab(vocab);
     } catch (Exception e) {
       sLogger.warn("No vocabulary provided to tokenizer.");
       vocab = null;
     }
-    isStopwordRemoval = mJobConf.getBoolean("IsStopword", true);
+    isStopwordRemoval = mJobConf.getBoolean(Constants.Stopword, true);
     sLogger.info("Stopword removal is " + isStopwordRemoval);
   }
 
@@ -1048,44 +1029,44 @@ public class OpenNLPTokenizer extends ivory.core.tokenize.Tokenizer {
 
   @Override
   public String[] processContent(String text) {
-    if (lang == FRENCH) {
+    text = preNormalize(text);
+    if ( lang == FRENCH ) {
       text = text.replaceAll("'", "' ");    // openNLP does not separate what comes after the apostrophe, which seems to work better
     }
 
     String[] tokens = tokenizer.tokenize(text);
-    List<String> stemmedTokens = new ArrayList<String>();
-    for(String token : tokens){
-      if(isStopwordRemoval && isDiscard(token)){
+    String tokenizedText = "";
+    for ( String token : tokens ){
+      tokenizedText += token + " ";
+    }
+    
+    // do post-normalizations before any stemming or stopword removal 
+    String[] normalizedTokens = postNormalize(tokenizedText).split(" ");
+    tokenizedText = "";
+    for ( int i = 0; i < normalizedTokens.length; i++ ){
+      String token = normalizedTokens[i].toLowerCase();
+      if ( isStopwordRemoval && isDiscard(token) ) {
 //        sLogger.warn("Discarded stopword "+token);
         continue;
       }
 
       //apply stemming on token
-      String finalToken = token;
-      if(stemmer!=null){
+      String stemmedToken = token;
+      if ( stemmer!=null ) {
         stemmer.setCurrent(token);
         stemmer.stem();
-        finalToken = stemmer.getCurrent();
+        stemmedToken = stemmer.getCurrent();
       }
 
       //skip if out of vocab
-      if(vocab!=null && vocab.get(finalToken)<=0){
+      if ( vocab != null && vocab.get(stemmedToken) <= 0) {
 //        sLogger.warn("Discarded OOV "+token);
         continue;
       }
-//      if (lang == FRENCH) {
-//        finalToken = normalizeFrench(finalToken);
-//      }
-      stemmedTokens.add(finalToken.toLowerCase());
+      tokenizedText += (stemmedToken + " ");
     }
 
-    String[] tokensArray = new String[stemmedTokens.size()];
-    int i=0;
-    for(String ss : stemmedTokens){
-      tokensArray[i++]=ss.toLowerCase();
-    }
-    return tokensArray;
-
+    return tokenizedText.trim().split(" ");
   }
 
   public String getLanguage() {
@@ -1099,9 +1080,9 @@ public class OpenNLPTokenizer extends ivory.core.tokenize.Tokenizer {
 
   private boolean isDiscard(String token) {
     // remove characters that may cause problems when processing further
-    token = removeNonUnicodeChars(token);
+    //    token = removeNonUnicodeChars(token);
     
-    return ( token.length() < MIN_LENGTH || token.length() > MAX_LENGTH || delims.contains(token) || (lang==ENGLISH && englishStopwords.contains(token.toLowerCase())) || (lang==FRENCH && frenchStopwords.contains(token.toLowerCase())) );
+    return ( token.length() < MIN_LENGTH || token.length() > MAX_LENGTH || delims.contains(token) || (lang==ENGLISH && englishStopwords.contains(token)) || (lang==FRENCH && frenchStopwords.contains(token)) );
   }
 
   /* 
@@ -1115,20 +1096,5 @@ public class OpenNLPTokenizer extends ivory.core.tokenize.Tokenizer {
   public boolean isFrenchStopWord(String token) {
     return (frenchStopwords.contains(token));
   }
-  
-//  /**
-//   * @param token
-//   * @return
-//   *    if stemmer is available, returns stemmed string. otherwise, throws RuntimeException
-//   */
-//  public String stem(String token) {
-//    if(stemmer!=null){
-//      stemmer.setCurrent(token);
-//      stemmer.stem();
-//      return stemmer.getCurrent().toLowerCase();
-//    }else {
-//      throw new RuntimeException("Stemmer is not initialized for language " + getLanguage() +". Use method setLanguageandStemmer(String lang_code)");
-//    }
-//  }
 
 }

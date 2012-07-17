@@ -5,6 +5,7 @@ public class Constants {
   public static final String NumReduceTasks = "Ivory.NumReduceTasks";
   public static final String CollectionName = "Ivory.CollectionName";
   public static final String CollectionPath = "Ivory.CollectionPath";
+  public static final String CollectionVocab = "Ivory.CollectionVocab";
   public static final String CollectionDocumentCount = "Ivory.CollectionDocumentCount";
   public static final String CollectionTermCount = "Ivory.CollectionTermCount";
   public static final String IndexPath = "Ivory.IndexPath";
@@ -21,6 +22,8 @@ public class Constants {
   public static final String MinSplitSize = "Ivory.MinSplitSize";
   public static final String TermDocVectorSegments = "Ivory.TermDocVectorSegments";
   public static final String Language = "Ivory.Lang";
-  
+  public static final String Stemming = "Ivory.IsStemming";
+  public static final String Stopword = "Ivory.IsStopword";
+
 
 }

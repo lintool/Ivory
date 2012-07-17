@@ -23,6 +23,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.util.regex.Pattern;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -71,7 +72,7 @@ public abstract class Tokenizer {
 
 
   /**
-   * Check for the character ` and separate determiners such as l` and d` from the word following it.
+   * Check for the character (looks like reversed `) and normalize it to standard apostrophe
    * @param 
    *    French text
    * @return 
@@ -87,6 +88,32 @@ public abstract class Tokenizer {
     }
     return out.toString();
   }  
+
+  /**
+   * Normalize several character variations for better tokenization.
+   *  
+   * @param text
+   *    text, before any tokenization
+   * @return
+   *    normalized text, ready to be run through tokenizer   
+   */
+  public String preNormalize(String text) {
+    return text.replaceAll("’", "\'").replaceAll("`", "\'").replaceAll("“", "\"").replaceAll("”", "\"").replaceAll("‘", "'");
+  }
+
+  /**
+   * Fix several common tokenization errors.
+   *  
+   * @param text
+   *    text, after tokenization
+   * @return
+   *    text, after fixing possible errors
+   */
+  public String postNormalize(String text) {
+    return text.replaceAll("\\((\\S)", "( $1").replaceAll("(\\S)\\)", "$1 )").replaceAll("(\\S)-(\\S)", "$1 - $2")
+              .replaceAll("‑", "-").replaceAll("—", "——").replaceAll(" ' s ", " 's ").replaceAll(" l ' ", " l' ")
+              .replaceAll("\"(\\S)", "\" $1").replaceAll("(\\S)\"", "$1 \"");
+  }
 
   /**
    * Overrided by applicable implementing classes.
@@ -107,7 +134,7 @@ public abstract class Tokenizer {
     options.addOption(OptionBuilder.withArgName("full path to model file or directory").hasArg().withDescription("model file").create("model"));
     options.addOption(OptionBuilder.withArgName("full path to input file").hasArg().withDescription("input file").create("input"));
     options.addOption(OptionBuilder.withArgName("full path to output file").hasArg().withDescription("output file").create("output"));
-    options.addOption(OptionBuilder.withArgName("en | zh | de | fr").hasArg().withDescription("2-character language code").create("lang"));
+    options.addOption(OptionBuilder.withArgName("en | zh | de | fr | ar").hasArg().withDescription("2-character language code").create("lang"));
     options.addOption(OptionBuilder.withArgName("true|false").hasArg().withDescription("turn on/off stopword removal").create("stopword"));
     options.addOption(OptionBuilder.withArgName("true|false").hasArg().withDescription("turn on/off stemming").create("stem"));
 
