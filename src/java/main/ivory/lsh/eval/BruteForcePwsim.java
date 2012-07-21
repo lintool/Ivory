@@ -63,8 +63,7 @@ public class BruteForcePwsim extends Configured implements Tool {
   };
 
   private static int printUsage() {
-    System.out
-        .println("usage: [type = signature|termdocvector|intdocvector] [input-path] [output-path] [sample-path] [threshold] [num-results = -1 for all]");
+    System.out.println("usage: [type = signature|termdocvector|intdocvector] [input-path] [output-path] [sample-path] [threshold] [num-results = -1 for all]");
     return -1;
   }
 
@@ -80,7 +79,7 @@ public class BruteForcePwsim extends Configured implements Tool {
    * 
    */
   public static class MyMapperDocVectors extends MapReduceBase implements
-      Mapper<IntWritable, WeightedIntDocVector, IntWritable, PairOfFloatInt> {
+  Mapper<IntWritable, WeightedIntDocVector, IntWritable, PairOfFloatInt> {
 
     @SuppressWarnings("unchecked")
     static List<PairOfWritables<WritableComparable, Writable>> vectors;
@@ -100,6 +99,7 @@ public class BruteForcePwsim extends Configured implements Tool {
         throw new RuntimeException("Error reading doc vectors from "
             + (localFiles != null ? localFiles[0] : "null"));
       }
+      sLogger.info("Read " + vectors.size() + " sample doc vectors");
     }
 
     public void map(IntWritable docno, WeightedIntDocVector docvector,
@@ -125,7 +125,7 @@ public class BruteForcePwsim extends Configured implements Tool {
    * 
    */
   public static class MyMapperTermDocVectors extends MapReduceBase implements
-      Mapper<IntWritable, HMapSFW, IntWritable, PairOfFloatInt> {
+  Mapper<IntWritable, HMapSFW, IntWritable, PairOfFloatInt> {
 
     @SuppressWarnings("unchecked")
     static List<PairOfWritables<WritableComparable, Writable>> vectors;
@@ -145,7 +145,7 @@ public class BruteForcePwsim extends Configured implements Tool {
         throw new RuntimeException("Error reading doc vectors from "
             + (localFiles != null ? localFiles[0] : "null"));
       }
-      sLogger.info(vectors.size());
+      sLogger.info("Read " + vectors.size() + " sample doc vectors");
     }
 
     public void map(IntWritable docno, HMapSFW docvector,
@@ -157,6 +157,22 @@ public class BruteForcePwsim extends Configured implements Tool {
         HMapSFW fromSample = (HMapSFW) vectors.get(i).getRightElement();
 
         float cs = CLIRUtils.cosine(docvector, fromSample);
+        
+        
+          /// debug
+        if (sampleDocno.get() == 1000299154) {
+        reporter.incrCounter(Pairs.DEBUG2, 1);
+        if ( docno.get() == 1534 ) {
+          sLogger.info(fromSample);
+          sLogger.info(docvector);
+          sLogger.info(cs);
+          reporter.incrCounter(Pairs.DEBUG, 1);
+        }
+      }else {
+        continue;
+      }
+        /// debug
+        
         if (cs >= threshold) {
           sLogger.debug(sampleDocno + "," + fromSample + "\n" + fromSample.length());
           sLogger.debug(docno + "," + docvector + "\n" + docvector.length());
@@ -176,7 +192,7 @@ public class BruteForcePwsim extends Configured implements Tool {
    * 
    */
   public static class MyMapperSignature extends MapReduceBase implements
-      Mapper<IntWritable, Signature, IntWritable, PairOfFloatInt> {
+  Mapper<IntWritable, Signature, IntWritable, PairOfFloatInt> {
 
     @SuppressWarnings("unchecked")
     static List<PairOfWritables<WritableComparable, Writable>> signatures;
@@ -216,7 +232,7 @@ public class BruteForcePwsim extends Configured implements Tool {
 
         if (dist <= maxDist) {
           output
-              .collect(new IntWritable(sampleDocno.get()), new PairOfFloatInt(-dist, docno.get()));
+          .collect(new IntWritable(sampleDocno.get()), new PairOfFloatInt(-dist, docno.get()));
           reporter.incrCounter(Pairs.Emitted, 1);
         }
       }
@@ -231,7 +247,7 @@ public class BruteForcePwsim extends Configured implements Tool {
    * 
    */
   public static class MyReducer extends MapReduceBase implements
-      Reducer<IntWritable, PairOfFloatInt, PairOfInts, Text> {
+  Reducer<IntWritable, PairOfFloatInt, PairOfInts, Text> {
     int numResults;
     TreeSet<PairOfFloatInt> list = new TreeSet<PairOfFloatInt>();
     PairOfInts keyOut = new PairOfInts();
@@ -265,7 +281,7 @@ public class BruteForcePwsim extends Configured implements Tool {
         sLogger.debug("output " + cntr + "=" + pair);
 
         keyOut.set(pair.getRightElement(), key.get()); // first english docno, then foreign language
-                                                       // docno
+        // docno
         valOut.set(nf.format(pair.getLeftElement()));
         output.collect(keyOut, valOut);
         cntr++;
@@ -303,7 +319,7 @@ public class BruteForcePwsim extends Configured implements Tool {
     FileOutputFormat.setCompressOutput(job, false);
 
     DistributedCache.addCacheFile(new URI(args[3]), job); // sample doc vectors or signatures in
-                                                          // file
+    // file
 
     job.set("mapred.child.java.opts", "-Xmx2048m");
     job.setInt("mapred.map.max.attempts", 10);

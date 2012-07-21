@@ -256,6 +256,8 @@ public class CLSlidingWindowPwsim extends Configured implements Tool {
 
     FileOutputFormat.setCompressOutput(job, false);
 
+    job.setJarByClass(CLSlidingWindowPwsim.class);
+    
     job.set("mapred.child.java.opts", "-Xmx2048m");
     job.setInt("mapred.task.timeout", 60000000);
     job.setInt("Ivory.SlidingWindowSize", windowSize);
