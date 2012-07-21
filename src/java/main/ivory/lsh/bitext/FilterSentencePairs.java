@@ -185,7 +185,9 @@ public class FilterSentencePairs extends Configured implements Tool {
 		conf.set("fLang", fLang);
 		conf.setFloat("ClassifierThreshold", classifierThreshold);
 		conf.setInt("ClassifierId", classifierId);
-
+    conf.set("fTokenizer", fTokenizer);
+    conf.set("eTokenizer", eTokenizer);
+    
 		sLogger.info("caching files...");
 
 		/////en-files

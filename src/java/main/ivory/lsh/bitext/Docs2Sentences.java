@@ -223,12 +223,14 @@ public class Docs2Sentences extends Configured implements Tool {
     long numEmptyDocsE = (long) counters.findCounter(Docs.EEmpty).getCounter();
     long numEmptyDocsF = (long) counters.findCounter(Docs.FEmpty).getCounter();
     
-    sLogger.info("Number of " + conf.get("eLang") + " sentences (total, per doc) = " + numSentsE + "," + (numSentsE+0.0f/numDocsE));
-    sLogger.info("Number of " + conf.get("fLang") + " sentences (total, per doc) = " + numSentsF + "," + (numSentsF+0.0f/numDocsF));
-    sLogger.info("Average num of tokens per " + conf.get("eLang") + " sentence = " + sumSentLengthsE + "," + (sumSentLengthsE+0.0f/numSentsE));
-    sLogger.info("Average num of tokens per " + conf.get("fLang") + " sentence = " + sumSentLengthsF + "," + (sumSentLengthsF+0.0f/numSentsF));
-    sLogger.info(conf.get("eLang") + " documents discarded due to too few sentences = " + numEmptyDocsE);
-    sLogger.info(conf.get("fLang") + " documents discarded due to too few sentences = " + numEmptyDocsF);
+    sLogger.info("<STATS> "+conf.get("eLang") + " documents = " + numDocsE);
+    sLogger.info("<STATS> "+conf.get("eLang") + " documents = " + numDocsF);
+    sLogger.info("<STATS> "+conf.get("eLang") + " documents discarded due to too few sentences = " + numEmptyDocsE);
+    sLogger.info("<STATS> "+conf.get("fLang") + " documents discarded due to too few sentences = " + numEmptyDocsF);
+    sLogger.info("<STATS> Number of " + conf.get("eLang") + " sentences (total, per doc) = " + numSentsE + "," + (numSentsE+0.0f)/numDocsE);
+    sLogger.info("<STATS> Number of " + conf.get("fLang") + " sentences (total, per doc) = " + numSentsF + "," + (numSentsF+0.0f)/numDocsF);
+    sLogger.info("<STATS> Average num of tokens per " + conf.get("eLang") + " sentence = " + sumSentLengthsE + "," + (sumSentLengthsE+0.0f)/numSentsE);
+    sLogger.info("<STATS> Average num of tokens per " + conf.get("fLang") + " sentence = " + sumSentLengthsF + "," + (sumSentLengthsF+0.0f)/numSentsF);
 
     return 0;
   }

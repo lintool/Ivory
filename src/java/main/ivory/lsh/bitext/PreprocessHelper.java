@@ -81,7 +81,7 @@ public class PreprocessHelper {
 
     String dir = job.get("fDir");
     String sentDetectorFile = localFiles[6].toString();
-    String tokenizerFile = localFiles[7].toString();
+    String tokenizerFile = job.get("fTokenizer");//localFiles[7].toString();
     String eVocabSrcFile = localFiles[3].toString();
     String eVocabTrgFile = localFiles[4].toString();
     String fVocabSrcFile = localFiles[8].toString();
@@ -100,7 +100,7 @@ public class PreprocessHelper {
 
     sLogger.info("Sentence model created successfully.");
 
-    fTok = TokenizerFactory.createTokenizer(localFs, fLang, tokenizerFile, null);
+    fTok = TokenizerFactory.createTokenizer(fs, fLang, tokenizerFile, null);
     
     eVocabSrc = (VocabularyWritable) HadoopAlign.loadVocab(new Path(eVocabSrcFile), localFs);
     eVocabTrg = (VocabularyWritable) HadoopAlign.loadVocab(new Path(eVocabTrgFile), localFs);

@@ -259,10 +259,9 @@ public class FindParallelSentencePairs extends Configured implements Tool {
       }
 
       /**
-       * @TODO look into exact cause of this...
-       *  
-       * if the input collection has differences from the pwsim output, 
-       * we may not find the actual wiki page corresponding to a similar pair of docnos
+       * some sentences in docs are removed in previous step (i.e., Docs2Sentences) due to length etc.
+       * if all of the sentences in a document are removed, then it will not show up here
+       * therefore the pair will be "incomplete". we simply ignore these pairs for bitext extraction.
        */
       if((eCnt == 0 || fCnt == 0)){
         sLogger.debug("Read "+eCnt+","+fCnt+" pages: ="+eDocno+","+fDocno);
@@ -415,6 +414,8 @@ public class FindParallelSentencePairs extends Configured implements Tool {
     conf.set("fLang", fLang);
     conf.setFloat("ClassifierThreshold", classifierThreshold);
     conf.setInt("ClassifierId", classifierId);
+    conf.set("fTokenizer", fTokenizer);
+    conf.set("eTokenizer", eTokenizer);
 
     //e-files
 
