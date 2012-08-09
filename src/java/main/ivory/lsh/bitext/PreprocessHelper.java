@@ -138,7 +138,7 @@ public class PreprocessHelper {
     RetrievalEnvironment env = new RetrievalEnvironment(dir, fs);
     sLogger.info("Environment created successfully.");
 
-    eTok = TokenizerFactory.createTokenizer(localFs, "en", tokenizerFile, eVocabSrc);
+    eTok = TokenizerFactory.createTokenizer(localFs, "en", tokenizerFile, null);
 
     sLogger.info("Tokenizer and vocabs created successfully.");
 
@@ -238,7 +238,6 @@ public class PreprocessHelper {
   public ArrayListWritable<Text> getFSentences(String text, ArrayListWritable<HMapSFW> vectors, ArrayListOfIntsWritable sentLengths) throws ClassNotFoundException, InstantiationException, IllegalAccessException, IOException {
     ArrayListWritable<Text> sentences = new ArrayListWritable<Text>();
     String[] lines = text.split("\n");
-    
     for(String line : lines){
       // convert '。' to standard period character '.' for sentence detector to work
       StringBuffer sb = new StringBuffer();
@@ -261,13 +260,15 @@ public class PreprocessHelper {
           if (sent.contains("datei:") || sent.contains("jpg") || sent.contains("png") || sent.contains("fontsize:") || sent.contains("kategorie:")) {
             continue;
           }
+           sLogger.info("Sent="+sent);
           int length = fTok.getNumberTokens(sent);
           if (length >= MinSentenceLength) {
             HMapSFW vector = createFDocVector(sent);
             if (vector != null) {
               vectors.add(vector);
               sentences.add(new Text(sent));
-              if (sentLengths!=null) sentLengths.add(length);
+
+              if (sentLengths != null) sentLengths.add(length);
             }
           }
         }
