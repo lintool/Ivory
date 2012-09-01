@@ -71,5 +71,9 @@ public class StanfordChineseTokenizer extends Tokenizer {
     }
     return tokens; 
   }
-
+  
+  @Override
+  public String removeBorderStopWords(String tokenizedText) {
+    return tokenizedText;
+  }
 }

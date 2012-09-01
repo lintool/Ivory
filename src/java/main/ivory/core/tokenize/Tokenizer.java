@@ -35,6 +35,8 @@ import org.apache.hadoop.fs.FileSystem;
 public abstract class Tokenizer {
   public abstract void configure(Configuration conf);
   public abstract String[] processContent(String text);
+  protected static String delims = "`~!@#^&*()-_=+]}[{\\|'\";:/?.>,<";
+  protected static int MIN_LENGTH = 2, MAX_LENGTH = 50;
 
   /**
    * Method to return number of tokens in text. Subclasses may override for more efficient implementations.
@@ -75,19 +77,20 @@ public abstract class Tokenizer {
    * @return 
    *    fixed version of the text 
    */
-  public String normalizeFrench(String text) {
+  public static String normalizeFrench(String text) {
     StringBuffer out = new StringBuffer();
     for (int i=0; i<text.length(); i++) {
-      out.append(text.charAt(i));
-      if (String.format("%04x", (int)text.charAt(1)).equals("0027")) {    // 
-        out.append(" ");
-      }      
+      if (String.format("%04x", (int)text.charAt(i)).equals("2019")) {    // 
+        out.append("' ");
+      }else {      
+        out.append(text.charAt(i));
+      }
     }
     return out.toString();
   }  
 
   /**
-   * Normalize several character variations for better tokenization.
+   * Normalize apostrophe variations for better tokenization.
    *  
    * @param text
    *    text, before any tokenization
@@ -95,7 +98,7 @@ public abstract class Tokenizer {
    *    normalized text, ready to be run through tokenizer   
    */
   public String preNormalize(String text) {
-    return text.replaceAll("’", "\'").replaceAll("`", "\'").replaceAll("“", "\"").replaceAll("”", "\"").replaceAll("‘", "'");
+    return text.replaceAll("’", "\'").replaceAll("`", "\'").replaceAll("“", "\"").replaceAll("”", "\"").replaceAll("‘", "'").replace("\u2019", "'");
   }
 
   /**
@@ -108,19 +111,74 @@ public abstract class Tokenizer {
    */
   public String postNormalize(String text) {
     return text.replaceAll("\\((\\S)", "( $1").replaceAll("(\\S)\\)", "$1 )").replaceAll("(\\S)-(\\S)", "$1 - $2")
-              .replaceAll("‑", "-").replaceAll("—", "——").replaceAll(" ' s ", " 's ").replaceAll(" l ' ", " l' ")
-              .replaceAll("\"(\\S)", "\" $1").replaceAll("(\\S)\"", "$1 \"");
+    .replaceAll("‑", "-").replaceAll("—", "——").replaceAll(" ' s ", " 's ").replaceAll(" l ' ", " l' ")
+    .replaceAll("\"(\\S)", "\" $1").replaceAll("(\\S)\"", "$1 \"");
   }
 
   /**
    * Overrided by applicable implementing classes.
    * @param 
-   *    eTerm
+   *    token
    * @return
    *    true if parameter is a stopword, false otherwise
    */
-  public boolean isStopWord(String eTerm) {
-    return false;
+  public boolean isStopWord(String token) {
+    return delims.contains(token);
+  }
+  
+  /**
+   * Overrided by applicable implementing classes.
+   * @param 
+   *    token
+   * @return
+   *    true if parameter is a stemmed version of stopword, false otherwise
+   */
+  public boolean isStemmedStopWord(String token) {
+    return isStopWord(token);
+  }
+  
+  /**
+   * Remove stop words from text that has been tokenized. Useful when postprocessing output of MT system, which is tokenized but not stopword'ed.
+   *  
+   * @param tokenizedText
+   *    input text, assumed to be tokenized.
+   * @return
+   *    same text without the stop words.
+   */
+  public String removeBorderStopWords(String tokenizedText) {
+    String[] tokens = tokenizedText.split(" ");
+    int start = 0, end = tokens.length-1;
+
+    for (int i = 0; i < tokens.length; i++) {
+      if (!isStopWord(tokens[i])) {
+        start = i;
+        break;
+      }
+    }
+    for (int i = tokens.length-1; i >= 0; i--) {
+      if (!isStopWord(tokens[i])) {
+        end = i;
+        break;
+      }
+    }
+    
+    String output = "";
+    for (int i = start; i <= end; i++) {
+      output += ( tokens[i] + " " );
+    }
+    return output.trim();
+  }
+  
+  public String stem(String token) {
+    return token;
+  }
+  
+  public String getUTF8(String token) {
+    String utf8 = "";
+    for (int i = 0; i < token.length(); i++){
+      utf8 += String.format("%04x", (int)token.charAt(i))+" ";
+    }
+    return utf8.trim();
   }
 
   public abstract void configure(Configuration mJobConf, FileSystem fs);
@@ -131,7 +189,7 @@ public abstract class Tokenizer {
     options.addOption(OptionBuilder.withArgName("full path to model file or directory").hasArg().withDescription("model file").create("model"));
     options.addOption(OptionBuilder.withArgName("full path to input file").hasArg().withDescription("input file").create("input"));
     options.addOption(OptionBuilder.withArgName("full path to output file").hasArg().withDescription("output file").create("output"));
-    options.addOption(OptionBuilder.withArgName("en | zh | de | fr | ar").hasArg().withDescription("2-character language code").create("lang"));
+    options.addOption(OptionBuilder.withArgName("en | zh | de | fr | ar | tr").hasArg().withDescription("2-character language code").create("lang"));
     options.addOption(OptionBuilder.withArgName("true|false").hasArg().withDescription("turn on/off stopword removal").create("stopword"));
     options.addOption(OptionBuilder.withArgName("true|false").hasArg().withDescription("turn on/off stemming").create("stem"));
 

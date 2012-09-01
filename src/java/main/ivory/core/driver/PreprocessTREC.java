@@ -39,7 +39,7 @@ public class PreprocessTREC extends Configured implements Tool {
   private static final Logger LOG = Logger.getLogger(PreprocessTREC.class);
 
   private static int printUsage() {
-    System.out.println("usage: [input-path] [index-path] [collection-name] [language] [tokenizer-class] [tokenizer-model-path]");
+    System.out.println("usage: [input-path] [index-path] [collection-name] [language] [stopwords] [tokenizer-class] [tokenizer-model-path]");
     ToolRunner.printGenericCommandUsage(System.out);
     return -1;
   }
@@ -57,16 +57,18 @@ public class PreprocessTREC extends Configured implements Tool {
     String indexRootPath = args[1];
     String collectionName = args[2];
     String language = args[3];
-    String tokenizerClass = args[4];
+    boolean isStopWords = Boolean.parseBoolean(args[4]);
+    String tokenizerClass = args[5];
     
     String tokenizerPath = null;
-    if (args.length == 6) {
-      tokenizerPath = args[5];
+    if (args.length == 7) {
+      tokenizerPath = args[6];
     }
     LOG.info("Tool name: " + PreprocessTREC.class.getCanonicalName());
     LOG.info(" - Collection path: " + collection);
     LOG.info(" - Index path: " + indexRootPath);
     LOG.info(" - Language: " + language);
+    LOG.info(" - Stop-word removal?: " + isStopWords);
     LOG.info(" - Tokenizer class: " + tokenizerClass);
     LOG.info(" - Tokenizer path: " + tokenizerPath);
 
@@ -84,6 +86,7 @@ public class PreprocessTREC extends Configured implements Tool {
     Path mappingFile = env.getDocnoMappingData();
     new TrecDocnoMappingBuilder().build(new Path(collection), mappingFile, conf);
 
+    conf.setBoolean(Constants.Stopword, isStopWords);
     conf.set(Constants.CollectionName, collectionName);
     conf.set(Constants.CollectionPath, collection);
     conf.set(Constants.IndexPath, indexRootPath);

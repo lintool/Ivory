@@ -43,6 +43,12 @@ public class TokenizerFactory {
     conf.setBoolean(Constants.Stopword, isStopword);
     return createTokenizer(fs, conf, lang, modelPath, vocab);
   }
+  
+  public static Tokenizer createTokenizer(FileSystem fs, Configuration conf, String lang, String modelPath, boolean isStemming, boolean isStopword, VocabularyWritable vocab){
+    conf.setBoolean(Constants.Stemming, isStemming);
+    conf.setBoolean(Constants.Stopword, isStopword);
+    return createTokenizer(fs, conf, lang, modelPath, vocab);
+  }
 
   private static Tokenizer createTokenizer(FileSystem fs, Configuration conf, String lang, String modelPath, VocabularyWritable vocab){
     try {

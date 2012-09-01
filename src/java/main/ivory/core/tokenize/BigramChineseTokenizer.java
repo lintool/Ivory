@@ -79,4 +79,9 @@ public class BigramChineseTokenizer extends Tokenizer {
     out.close();
   }
 
+  @Override
+  public String removeBorderStopWords(String tokenizedText) {
+    return tokenizedText;
+  }
+
 }
