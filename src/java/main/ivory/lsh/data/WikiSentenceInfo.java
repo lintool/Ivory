@@ -70,6 +70,9 @@ public class WikiSentenceInfo implements Writable {
     this.sentence = sentence;
     this.vector = vector;
   }
-
+  
+  public String toString() {
+    return sentence.toString();
+  }
 
 }

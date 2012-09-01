@@ -8,7 +8,6 @@ import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapred.Counters;
 import org.apache.hadoop.mapred.FileInputFormat;
 import org.apache.hadoop.mapred.FileOutputFormat;
@@ -27,7 +26,6 @@ import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import edu.umd.cloud9.collection.Indexable;
 import edu.umd.cloud9.collection.wikipedia.WikipediaPage;
 import edu.umd.cloud9.io.array.ArrayListOfIntsWritable;
 import edu.umd.cloud9.io.array.ArrayListWritable;
@@ -73,7 +71,7 @@ public class Docs2Sentences extends Configured implements Tool {
    * @author ferhanture
    */
   private static class MyMapper extends MapReduceBase implements
-  Mapper<Writable, Indexable, PairOfInts, WikiSentenceInfo> {
+  Mapper<IntWritable, WikipediaPage, PairOfInts, WikiSentenceInfo> {
 
     private PairOfInts keyOut;
     private WikiSentenceInfo valOut;
@@ -87,15 +85,12 @@ public class Docs2Sentences extends Configured implements Tool {
       } catch (Exception e) {
         e.printStackTrace();
       }
-
       keyOut = new PairOfInts();
       valOut = new WikiSentenceInfo();
     }
 
-    public void map(Writable docnoKey, Indexable page, OutputCollector<PairOfInts, WikiSentenceInfo> output, Reporter reporter) throws IOException {
-      int docno = ((IntWritable)docnoKey).get();
-
-      WikipediaPage p = (WikipediaPage) page;
+    public void map(IntWritable docnoKey, WikipediaPage p, OutputCollector<PairOfInts, WikiSentenceInfo> output, Reporter reporter) throws IOException {
+      int docno = docnoKey.get();
       String lang = p.getLanguage();
       int langID;
 
@@ -123,33 +118,25 @@ public class Docs2Sentences extends Configured implements Tool {
         if (langID == CLIRUtils.E) {
           reporter.incrCounter(Docs.EEmpty, 1);	
         }else {
-          reporter.incrCounter(Docs.FEmpty, 1);  		       
+          reporter.incrCounter(Docs.FEmpty, 1);
         }
       }else{
         if (langID == CLIRUtils.E) {
           reporter.incrCounter(Docs.E, 1);
         }else {
-          if (docno % 10000 == 0) {
-            sLogger.info("debugging "+p.getTitle());
-          }
           reporter.incrCounter(Docs.F, 1);
         }
-      }
+      }   
 
-      
-      
       for (int i = 0; i < sentences.size(); i++) {
         if (langID == CLIRUtils.E) {
           reporter.incrCounter(Sentences.ELength, sentLengths.get(i));
           reporter.incrCounter(Sentences.E, 1);    
         }else {
-          if (docno % 10000 == 0) {
-            sLogger.info(i+":"+sentences.get(i));
-          }
           reporter.incrCounter(Sentences.FLength, sentLengths.get(i));
           reporter.incrCounter(Sentences.F, 1);    
         }
-        keyOut.set(docno, langID);
+        keyOut.set(docno, langID);      
         valOut.set(langID, sentences.get(i), vectors.get(i));
         output.collect(keyOut, valOut);
       }
@@ -183,7 +170,7 @@ public class Docs2Sentences extends Configured implements Tool {
     String fCollectionPath = args[1];
     String sentsPath = args[2];
 
-    conf.setJobName("Docs2Sentences");  
+    conf.setJobName("Docs2Sentences_"+conf.get("fLang")+"-"+conf.get("eLang"));  
 
     FileInputFormat.addInputPaths(conf, eCollectionPath);
     FileInputFormat.addInputPaths(conf, fCollectionPath);
@@ -195,20 +182,21 @@ public class Docs2Sentences extends Configured implements Tool {
     conf.setBoolean("mapred.reduce.tasks.speculative.execution", false);
 
     conf.setNumMapTasks(100);
-    conf.setNumReduceTasks(100);
+    conf.setNumReduceTasks(200);
     conf.setInt("mapred.min.split.size", 2000000000);
     conf.setFloat("mapred.reduce.slowstart.completed.maps", 0.9f);
 
     conf.setInputFormat(SequenceFileInputFormat.class);
     conf.setOutputFormat(SequenceFileOutputFormat.class);
+//    conf.setOutputFormat(TextOutputFormat.class);
     conf.setMapOutputKeyClass(PairOfInts.class);
     conf.setMapOutputValueClass(WikiSentenceInfo.class);
+    conf.setOutputKeyClass(PairOfInts.class);
+    conf.setOutputValueClass(WikiSentenceInfo.class);
     conf.setMapperClass(MyMapper.class);
     conf.setReducerClass(IdentityReducer.class);
     conf.setPartitionerClass(MyPartitioner.class);
-    conf.setOutputKeyClass(PairOfInts.class);
-    conf.setOutputValueClass(WikiSentenceInfo.class);
-   
+
     long startTime = System.currentTimeMillis();
     RunningJob j = JobClient.runJob(conf);
     System.out.println("Job finished in " + (System.currentTimeMillis() - startTime)
@@ -222,9 +210,9 @@ public class Docs2Sentences extends Configured implements Tool {
     long numDocsF = (long) counters.findCounter(Docs.F).getCounter();
     long numEmptyDocsE = (long) counters.findCounter(Docs.EEmpty).getCounter();
     long numEmptyDocsF = (long) counters.findCounter(Docs.FEmpty).getCounter();
-    
+
     sLogger.info("<STATS> "+conf.get("eLang") + " documents = " + numDocsE);
-    sLogger.info("<STATS> "+conf.get("eLang") + " documents = " + numDocsF);
+    sLogger.info("<STATS> "+conf.get("fLang") + " documents = " + numDocsF);
     sLogger.info("<STATS> "+conf.get("eLang") + " documents discarded due to too few sentences = " + numEmptyDocsE);
     sLogger.info("<STATS> "+conf.get("fLang") + " documents discarded due to too few sentences = " + numEmptyDocsF);
     sLogger.info("<STATS> Number of " + conf.get("eLang") + " sentences (total, per doc) = " + numSentsE + "," + (numSentsE+0.0f)/numDocsE);
