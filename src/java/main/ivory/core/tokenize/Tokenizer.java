@@ -47,7 +47,7 @@ public abstract class Tokenizer {
    * 		number of tokens in text.
    */
   public int getNumberTokens(String text){
-    return processContent(text).length;
+    return text.split("\\s+").length;
   }
 
   /**

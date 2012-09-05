@@ -52,13 +52,13 @@ public class RunEvalCrossLingPwsim extends PwsimEnvironment implements Tool {
 
     Configuration config = new Configuration();
     FileSystem hdfs;
-    if(!PwsimEnvironment.cluster){
-      config.set("mapred.job.tracker", "local");
-      config.set("fs.default.name", "file:///");
-      hdfs = FileSystem.getLocal(config);
-    }else{
+//    if(!PwsimEnvironment.cluster){
+//      config.set("mapred.job.tracker", "local");
+//      config.set("fs.default.name", "file:///");
+//      hdfs = FileSystem.getLocal(config);
+//    }else{
       hdfs = FileSystem.get(config);
-    }
+//    }
 
     String targetLangDir = args[0];
     String srcLangDir = args[1];
@@ -119,10 +119,12 @@ public class RunEvalCrossLingPwsim extends PwsimEnvironment implements Tool {
     // sample from non-English weighted int doc vectors: these are needed by BruteForcePwsim, which finds the ground truth pairs for the sample using dot product of doc vectors
     if(!hdfs.exists(new Path(sampleWtdIntDocVectorsPath))){
       if (hdfs.exists(sampleDocnosPath)) {
+        sLogger.info("Sample docnos exist, creating doc vectors w.r.t this docno list...");
         String[] sampleArgs = {wtdIntDocVectorsPath, sampleWtdIntDocVectorsPath, "100", "-1", sampleDocnosPath.toString()};
         SampleIntDocVectors.main(sampleArgs);
       }else {
         int frequency = (srcCollSize/sampleSize);
+        sLogger.info("Sample docnos don't exist, creating a sample file with frequency " + frequency);
         String[] sampleArgs = {wtdIntDocVectorsPath, sampleWtdIntDocVectorsPath, "100", frequency+""};
         SampleIntDocVectors.main(sampleArgs);
       }
@@ -130,6 +132,7 @@ public class RunEvalCrossLingPwsim extends PwsimEnvironment implements Tool {
 
     // extract sample docnos into a separate file: needed for filtering pwsim pairs
     if(!hdfs.exists(sampleDocnosPath)){
+      sLogger.info("Extracting sample docnos from sampled vectors...");
       SortedMap<WritableComparable, Writable> docno2DocVectors;
       try{
         docno2DocVectors = SequenceFileUtils.readFileIntoMap(new Path(sampleWtdIntDocVectorsPath+"/part-00000"));
