@@ -92,6 +92,12 @@ public class FilterSentencePairs extends Configured implements Tool {
 
 		public void map(LongWritable key, Text sentencePair, OutputCollector<Text, Text> output, Reporter reporter) throws IOException {
 			String sentences[] = sentencePair.toString().split(CLIRUtils.BitextSeparator);
+			if (sentences.length < 2) {
+			  // happens in Arabic, might be due to the right-to-left writing corrupting some pairs
+			  // havent figured it out yet, but negligible number of sents affected
+        reporter.incrCounter(Sentences.ignored, 1);   
+			  return;
+			}
 			eSent = sentences[1];
 			fSent = sentences[0];
 						
