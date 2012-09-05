@@ -60,7 +60,7 @@ public class PreprocessWikipedia extends Configured implements Tool {
    */
   static final int MinDF = 2, MinNumTermsPerArticle = 5, TermIndexWindow = 8;
   static final boolean IsNormalized = true;
-  static final int NUM_MONO = 4, NUM_CROSS_E = 7, NUM_CROSS_F = 12;
+  static final int NUM_MONO = 4, NUM_CROSS_E = 7, NUM_CROSS_F = 13;
   static int MONO_LINGUAL = 0, CROSS_LINGUAL_E = 1, CROSS_LINGUAL_F = 2;
 
   private static int printUsage() {
@@ -69,7 +69,7 @@ public class PreprocessWikipedia extends Configured implements Tool {
         "\n\nInput: English side of cross-lingual Wikipedia collection\nOutput: English weighted document vectors (comparable with the document vectors generated from non-English side)" +
         "\nusage: [index-path] [raw-path] [compressed-path] [tokenizer-class] [collection-lang] [tokenizer-model] [collection-vocab]" +
         "\n\nInput: Non-English side of cross-lingual Wikipedia collection\nOutput: English weighted document vectors (comparable with the document vectors generated from English side)" +
-    "\nusage: [index-path] [raw-path] [compressed-path] [tokenizer-class] [collection-lang] [tokenizer-model] [src-vocab_f] [trg-vocab_e] [prob-table_f-->e] [src-vocab_e] [trg-vocab_f] [prob-table_e-->f])");
+    "\nusage: [index-path] [raw-path] [compressed-path] [tokenizer-class] [collection-lang] [tokenizer-model] [src-vocab_f] [trg-vocab_e] [prob-table_f-->e] [src-vocab_e] [trg-vocab_f] [prob-table_e-->f] [target-index-path]");
     return -1;
   }
 
@@ -134,7 +134,9 @@ public class PreprocessWikipedia extends Configured implements Tool {
         eVocab_e2f = args[9];
         fVocab_e2f = args[10];
         ttable_e2f = args[11];
-
+        String targetIndexPath = args[12];
+        
+        conf.set(Constants.TargetIndexPath, targetIndexPath);
         conf.set("Ivory.F_Vocab_F2E", fVocab_f2e);	
         conf.set("Ivory.E_Vocab_F2E", eVocab_f2e);
         conf.set("Ivory.TTable_F2E", ttable_f2e);
