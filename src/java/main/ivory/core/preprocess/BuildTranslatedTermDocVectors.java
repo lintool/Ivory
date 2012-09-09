@@ -60,7 +60,7 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
   private static final Logger LOG = Logger.getLogger(BuildTranslatedTermDocVectors.class);
   private static int SAMPLING = 1;
 
-  protected static enum Docs { ZERO, SHORT, Total };
+  protected static enum Docs { ZERO1, ZERO2, SHORT, Total };
   protected static enum DF { TransDf, NoDf }
 
   private static class MyMapperTrans extends MapReduceBase implements
@@ -197,28 +197,36 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
       if (docno.get() % SAMPLING != 0) {
         return; // for generating sample document vectors. no sampling if SAMPLING=1
       }
-            
+
       if (!language.equals("english") && !language.equals("en")) {
         docno.set(docno.get() + 1000000000);
         // To distinguish between the two collections in the PWSim sliding window algorithm.
       }
 
       // Translate doc vector.
-      HMapIFW tfS = new HMapIFW();
+      TermDocVector.Reader reader = doc.getReader();
+      int numTerms = reader.getNumberOfTerms(); 
+      if (numTerms == 0) {
+        reporter.incrCounter(Docs.ZERO1, 1);
+        return;
+      }else if (numTerms < MIN_SIZE) {
+        reporter.incrCounter(Docs.SHORT, 1);
+        return;
+      }
 
+      HMapIFW tfS = new HMapIFW();
       // We simply use the source-language doc length since the ratio of doc length to average doc
       // length is unlikely to change significantly (not worth complicating the pipeline)
       int docLen = CLIRUtils.translateTFs(doc, tfS, eVocabSrc, eVocabTrg, fVocabSrc, fVocabTrg,
           e2f_Probs, f2e_Probs, tokenizer, LOG);
+            
       HMapSFW v = CLIRUtils.createTermDocVector(docLen, tfS, eVocabSrc, model, dict, dfTable,
           isNormalize, LOG);
 
       // If no translation of any word is in the target vocab, remove document i.e., our model
       // wasn't capable of translating it.
       if (v.isEmpty()) {
-        reporter.incrCounter(Docs.ZERO, 1);
-      } else if (v.size() < MIN_SIZE) {
-        reporter.incrCounter(Docs.SHORT, 1);
+        reporter.incrCounter(Docs.ZERO2, 1);
       } else {
         reporter.incrCounter(Docs.Total, 1);
         output.collect(docno, v);
