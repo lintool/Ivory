@@ -30,6 +30,8 @@ import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.SequenceFile;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+
+import sun.util.LocaleServiceProviderPool.LocalizedObjectGetter;
 import edu.umd.cloud9.io.map.HMapIFW;
 import edu.umd.cloud9.io.map.HMapSFW;
 import edu.umd.cloud9.io.map.HMapSIW;
@@ -349,10 +351,14 @@ public class CLIRUtils extends Configured {
    * @return
    * @throws IOException
    */
-  public static int translateTFs(TermDocVector doc, HMapIFW tfTable, Vocab eVocabSrc, Vocab eVocabTrg, Vocab fVocabSrc, Vocab fVocabTrg, TTable_monolithic_IFAs e2fProbs, TTable_monolithic_IFAs f2eProbs, Tokenizer tokenizer, Logger sLogger) throws IOException{
+  public static int translateTFs(TermDocVector doc, HMapIFW tfTable, Vocab eVocabSrc, Vocab eVocabTrg, Vocab fVocabSrc, Vocab fVocabTrg, 
+      TTable_monolithic_IFAs e2fProbs, TTable_monolithic_IFAs f2eProbs, Tokenizer tokenizer, Logger sLogger) throws IOException{
     if(sLogger == null){
       sLogger = logger;
     }
+    
+//sLogger.setLevel(Level.DEBUG);
+    
     //translate doc vector		
     TermDocVector.Reader reader = doc.getReader();
     int docLen = 0;
@@ -361,7 +367,7 @@ public class CLIRUtils extends Configured {
       int tf = reader.getTf();
       docLen+=tf;
 
-      //      sLogger.debug("Read "+fTerm+","+tf);
+      sLogger.debug("Read "+fTerm+","+tf);
 
       int f = fVocabSrc.get(fTerm);
       if(f <= 0){
@@ -380,18 +386,19 @@ public class CLIRUtils extends Configured {
         if(e<=0){		//if eTerm is NULL, that means there were cases where fTerm was unaligned in a sentence pair. Just skip these cases, since the word NULL is not in our target vocab.
           continue;
         }
-        float probEF;
         String eTerm = eVocabTrg.get(e);
+        if (tokenizer.isStopWord(eTerm))  continue;
+        
         int e2 = eVocabSrc.get(eTerm);		//convert between two E vocabs (different ids)
         if(e2 <= 0){
           sLogger.debug("Warning: "+eTerm+": word not in aligner's final vocab (source side of e2f)");
           continue;
         }
-        probEF = e2fProbs.get(e2, f2);
+        float probEF = e2fProbs.get(e2, f2);
         if(probEF > 0){
-          //          sLogger.debug(eTerm+" ==> "+probEF);
+          sLogger.debug(eTerm+" ==> "+probEF);
           tfTable.increment(e2, tf*probEF);
-          //          sLogger.debug("updated weight to "+tfTable.get(e2));
+          sLogger.debug("updated weight to "+tfTable.get(e2));
         }
       }
     }
@@ -498,6 +505,9 @@ public class CLIRUtils extends Configured {
     if(sLogger == null){
       sLogger = logger;
     }
+    
+//sLogger.setLevel(Level.DEBUG);
+    
     HMapSFW v = new HMapSFW();
     float normalization=0;
     for(int e : tfTable.keySet()){
@@ -505,11 +515,11 @@ public class CLIRUtils extends Configured {
       String eTerm = eVocabSrc.get(e);
       float tf = tfTable.get(e);
       float df = dfTable.get(e);
-
+      
       // compute score via scoring model
       float score = ((Bm25) scoringModel).computeDocumentWeight(tf, df, docLen);
 
-      //      sLogger.debug(eTerm+" "+tf+" "+df+" "+score);
+      sLogger.debug(eTerm+" "+tf+" "+df+" "+score);
       if(score>0){
         v.put(eTerm, score);
         if(isNormalize){
@@ -547,17 +557,19 @@ public class CLIRUtils extends Configured {
    * @return
    * 		Term doc vector representing the document
    */
-  public static HMapSFW createTermDocVector(int docLen, HMapSIW tfTable, Vocab eVocabSrc, ScoringModel scoringModel, FrequencySortedDictionary dict, DfTableArray dfTable, boolean isNormalize, Logger sLogger) {
+  public static HMapSFW createTermDocVector(int docLen, HMapIFW tfTable, Vocab eVocabSrc, ScoringModel scoringModel, FrequencySortedDictionary dict, DfTableArray dfTable, boolean isNormalize, Logger sLogger) {
     if(sLogger == null){
       sLogger = logger;
     }
+    
+//    sLogger.setLevel(Level.DEBUG);
 
     HMapSFW v = new HMapSFW();
     float normalization=0;
-    for(edu.umd.cloud9.util.map.MapKI.Entry<String> entry : tfTable.entrySet()){
+    for(edu.umd.cloud9.util.map.MapIF.Entry entry : tfTable.entrySet()){
       // retrieve term string, tf and df
-      String eTerm = entry.getKey();
-      int tf = entry.getValue();
+      String eTerm = eVocabSrc.get(entry.getKey());
+      float tf = entry.getValue();
       int eId = dict.getId(eTerm);
       if(eId < 1){		//OOV
         continue;
@@ -568,6 +580,9 @@ public class CLIRUtils extends Configured {
       if(df<1){
         sLogger.warn("Suspicious DF WARNING = "+eTerm+" "+tf+" "+df+" "+score);
       }
+      
+      sLogger.debug(eTerm+" "+tf+" "+df+" "+score);
+
       if(score>0){
         v.put(eTerm, score);
         if(isNormalize){
@@ -585,7 +600,7 @@ public class CLIRUtils extends Configured {
     }
     return v;
   }
-
+  
   /**
    * Uses old globalStats code, which is not supported anymore. Only here for backward compatibility
    */
@@ -1021,6 +1036,7 @@ public class CLIRUtils extends Configured {
       PairOfFloatString e = topTrans.pollLast();
       String term = e.getRightElement();
       float pr = e.getLeftElement()/cumProb;    // normalize
+      logger.info(term+"-->"+pr);
       int trgIndex = trgVocab.addOrGet(term);
       sumOfProbs += e.getLeftElement();         // keep track of unnormalized cumulative prob for determining cutoff
       sortedIndices.add(trgIndex);
@@ -1042,17 +1058,59 @@ public class CLIRUtils extends Configured {
       indices[i]=sortedIndex;
       probs[i]=index2ProbMap.get(sortedIndex);
       i++;
-    }
+    }      
     table.set(curIndex, new IndexedFloatArray(indices, probs, true));
   }
 
+  private static void combineTTables(String ttableFile, String srcEVocabFile, String trgFVocabFile, String ttableE2FFile, String srcFVocabFile, String trgEVocabFile, String ttableF2EFile){
+    TTable_monolithic_IFAs table = new TTable_monolithic_IFAs();
+    Configuration conf = new Configuration();
+    HookaStats stats = new HookaStats(-1, -1);
+    try {
+      FileSystem fs = FileSystem.get(conf);
+      Vocab eVocabTrg = HadoopAlign.loadVocab(new Path(trgEVocabFile), conf);
+      Vocab fVocabSrc = HadoopAlign.loadVocab(new Path(srcFVocabFile), conf);
+      TTable_monolithic_IFAs f2e_Probs = new TTable_monolithic_IFAs(fs, new Path(ttableF2EFile), true);
+      Vocab eVocabSrc = HadoopAlign.loadVocab(new Path(srcEVocabFile), conf);
+      Vocab fVocabTrg = HadoopAlign.loadVocab(new Path(trgFVocabFile), conf);
+      TTable_monolithic_IFAs e2f_Probs = new TTable_monolithic_IFAs(fs, new Path(ttableE2FFile), true);
+
+      TreeSet<PairOfFloatString> topTrans = new TreeSet<PairOfFloatString>();
+      for (int e1 = 1; e1 < eVocabSrc.size(); e1++) {
+        String eTerm = eVocabSrc.get(e1);
+
+        float sumOfProbs = 0;
+        int[] fS = e2f_Probs.get(e1).getTranslations(0.0f);
+        for (int f1 : fS) {
+          float prob1 = e2f_Probs.get(e1, f1);
+          
+          String fTerm = fVocabTrg.get(f1);         
+          int f2 = fVocabSrc.get(fTerm);
+          int e2 = eVocabTrg.get(eTerm);         
+          
+          float prob2 = f2e_Probs.get(f2, e2);
+          float prob = prob1*prob2;
+          sumOfProbs += prob;
+          topTrans.add(new PairOfFloatString(prob, fTerm));
+        }
+        logger.info("Adding "+eTerm);
+        addToTable(e1, topTrans, sumOfProbs, table, fVocabTrg, 1.0f, stats);      
+      }
+      logger.info(stats);
+      DataOutputStream dos = new DataOutputStream(new BufferedOutputStream(fs.create(new Path(ttableFile))));
+      table.write(dos);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+
+  
   /***
    * 
    * Bitext extraction helper functions
    * 
    */
-
-
+  
   public static String[] computeFeaturesF1(HMapSFW eVector, HMapSFW fVector, float eSentLength, float fSentLength) {
     String[] features = new String[1];
 
@@ -1149,10 +1207,16 @@ public class CLIRUtils extends Configured {
   }
   
   public static void main(String args[]){
-    if(args.length != 10 && args.length != 11 && args.length != 5){
+    if(args.length != 10 && args.length != 11 && args.length != 5 && args.length != 7){
       printUsage();
     }
 
+    if(args.length == 7){
+      CLIRUtils.combineTTables(args[0], args[1], args[2], args[3], args[4], args[5], args[6]);//, Float.parseFloat(args[7]), Integer.parseInt(args[8]));
+      return;
+    }
+      
+    
     // Read parameters
     float probThreshold = 0.9f;
     int numTrans = 15;
@@ -1163,6 +1227,7 @@ public class CLIRUtils extends Configured {
         e.printStackTrace();
       }
     }
+    
     if(args.length >= 11){
       try {
         numTrans = Integer.parseInt(args[10]);

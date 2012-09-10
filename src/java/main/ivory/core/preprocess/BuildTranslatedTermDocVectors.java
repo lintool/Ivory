@@ -60,7 +60,7 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
   private static final Logger LOG = Logger.getLogger(BuildTranslatedTermDocVectors.class);
   private static int SAMPLING = 1;
 
-  protected static enum Docs { ZERO1, ZERO2, SHORT, Total };
+  protected static enum Docs { DBG, ZERO2, SHORT, Total };
   protected static enum DF { TransDf, NoDf }
 
   private static class MyMapperTrans extends MapReduceBase implements
@@ -206,10 +206,7 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
       // Translate doc vector.
       TermDocVector.Reader reader = doc.getReader();
       int numTerms = reader.getNumberOfTerms(); 
-      if (numTerms == 0) {
-        reporter.incrCounter(Docs.ZERO1, 1);
-        return;
-      }else if (numTerms < MIN_SIZE) {
+      if (numTerms < MIN_SIZE) {
         reporter.incrCounter(Docs.SHORT, 1);
         return;
       }
