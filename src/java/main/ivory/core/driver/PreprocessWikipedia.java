@@ -124,8 +124,8 @@ public class PreprocessWikipedia extends Configured implements Tool {
       collectionVocab = args[6];
       conf.set(Constants.Language, collectionLang);
       conf.set(Constants.TokenizerData, tokenizerModel);
-      conf.set("Ivory.CollectionVocab", collectionVocab);
-      conf.set("Ivory.FinalVocab", collectionVocab);
+      conf.set(Constants.CollectionVocab, collectionVocab);   // vocabulary to read collection from
+      conf.set("Ivory.FinalVocab", collectionVocab);        // vocabulary to map terms to integers in BuildTargetLang...
 
       if (mode == CROSS_LINGUAL_F) {			// non-English side, needs to be translated
         fVocab_f2e = args[6];		//  this is the collection vocab
@@ -143,7 +143,8 @@ public class PreprocessWikipedia extends Configured implements Tool {
         conf.set("Ivory.E_Vocab_E2F", eVocab_e2f);	
         conf.set("Ivory.F_Vocab_E2F", fVocab_e2f);	
         conf.set("Ivory.TTable_E2F", ttable_e2f);
-        conf.set("Ivory.FinalVocab", eVocab_e2f);
+//        conf.set("Ivory.FinalVocab", eVocab_e2f);
+        conf.set("Ivory.FinalVocab", eVocab_f2e);
       }
     }
 
@@ -308,7 +309,7 @@ public class PreprocessWikipedia extends Configured implements Tool {
       LOG.info("Job BuildTargetLangWeightedIntDocVectors finished in " +
           (System.currentTimeMillis() - startTime) / 1000.0 + " seconds");
       if (finalNumDocs > 0) {
-        LOG.info("Changed doc count from " + env.readCollectionDocumentCount() +" to = " + finalNumDocs);
+        LOG.info("Changed doc count: " + env.readCollectionDocumentCount() +" => " + finalNumDocs);
         env.writeCollectionDocumentCount(finalNumDocs);
       }else {
         LOG.info("No document output! Terminating...");
@@ -321,7 +322,7 @@ public class PreprocessWikipedia extends Configured implements Tool {
       } catch (IOException e) {
         e.printStackTrace();
       }	
-      LOG.info("Changed term count to : " + env.readCollectionTermCount() + " = " + engVocabH.size());
+      LOG.info("Changed term count: " + env.readCollectionTermCount() + " => " + engVocabH.size());
       env.writeCollectionTermCount(engVocabH.size());
     }
 

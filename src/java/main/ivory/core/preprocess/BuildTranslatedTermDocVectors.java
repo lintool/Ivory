@@ -60,7 +60,7 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
   private static final Logger LOG = Logger.getLogger(BuildTranslatedTermDocVectors.class);
   private static int SAMPLING = 1;
 
-  protected static enum Docs { DBG, ZERO2, SHORT, Total };
+  protected static enum Docs { DBG, ZERO, SHORT, Total };
   protected static enum DF { TransDf, NoDf }
 
   private static class MyMapperTrans extends MapReduceBase implements
@@ -217,13 +217,15 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
       int docLen = CLIRUtils.translateTFs(doc, tfS, eVocabSrc, eVocabTrg, fVocabSrc, fVocabTrg,
           e2f_Probs, f2e_Probs, tokenizer, LOG);
             
-      HMapSFW v = CLIRUtils.createTermDocVector(docLen, tfS, eVocabSrc, model, dict, dfTable,
+//      HMapSFW v = CLIRUtils.createTermDocVector(docLen, tfS, eVocabSrc, model, dict, dfTable,
+//          isNormalize, LOG);
+      HMapSFW v = CLIRUtils.createTermDocVector(docLen, tfS, eVocabTrg, model, dict, dfTable,
           isNormalize, LOG);
 
       // If no translation of any word is in the target vocab, remove document i.e., our model
       // wasn't capable of translating it.
       if (v.isEmpty()) {
-        reporter.incrCounter(Docs.ZERO2, 1);
+        reporter.incrCounter(Docs.ZERO, 1);
       } else {
         reporter.incrCounter(Docs.Total, 1);
         output.collect(docno, v);
@@ -287,8 +289,8 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
     } catch (IOException e1) {
       throw new RuntimeException("Error initializing Doclengths file");
     }
-    LOG.info(mDLTable.getAvgDocLength()+" is average doc len.");
-    LOG.info(targetEnv.readCollectionDocumentCount()+" is num docs.");
+    LOG.info(mDLTable.getAvgDocLength()+" is average source-language document length.");
+    LOG.info(targetEnv.readCollectionDocumentCount()+" is number of target-language docs. We use the target-side DF table so we set #docs to this value in our scoring model.");
 
     /////// Configuration setup
 

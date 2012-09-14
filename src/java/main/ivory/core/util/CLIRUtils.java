@@ -176,18 +176,6 @@ public class CLIRUtils extends Configured {
     return sum;
   }
 
-  public static float cosineNormalized2(HMapSFW vectorA, HMapSFW vectorB) {
-    float sum = 0;
-    for(edu.umd.cloud9.util.map.MapKF.Entry<String> e : vectorA.entrySet()){
-      float value = e.getValue();
-      if(vectorB.containsKey(e.getKey())){
-        sum+= value*vectorB.get(e.getKey());
-      }
-    }
-    return sum;
-  }
-
-
   /**
    * Given a mapping from F-terms to their df values, compute a df value for each E-term using the CLIR algorithm: df(e) = sum_f{df(f)*prob(f|e)}
    * 
@@ -262,7 +250,7 @@ public class CLIRUtils extends Configured {
   }
 
   /**
-   * Given a term in a document in F, and its tf value, update the computed tf value for each term in E using the CLIR algorithm: tf(e) = sum_f{tf(f)*prob(f|e)} <p>
+   * Given a term in a document in F, and its tf value, update the computed tf value for each term in E using the CLIR algorithm: tf(e) = sum_f{tf(f)*prob(e|f)} <p>
    * Calling this method computes a single summand of the above equation.
    * 
    * @param fTerm
@@ -289,38 +277,28 @@ public class CLIRUtils extends Configured {
    * 		updated mapping from E-term ids to tf values
    * @throws IOException
    */
-  public static HMapIFW updateTFsByTerm(String fTerm, int tf, HMapIFW tfTable, Vocab eVocabSrc, Vocab eVocabTrg, Vocab fVocabSrc, Vocab fVocabTrg, TTable_monolithic_IFAs e2fProbs, TTable_monolithic_IFAs f2eProbs, Logger sLogger){
+  public static HMapIFW updateTFsByTerm(String fTerm, int tf, HMapIFW tfTable, Vocab eVocabSrc, Vocab eVocabTrg, Vocab fVocabSrc, Vocab fVocabTrg, 
+      TTable_monolithic_IFAs e2fProbs, TTable_monolithic_IFAs f2eProbs, Tokenizer tokenizer, Logger sLogger){
     int f = fVocabSrc.get(fTerm);
     if(f <= 0){
-      //			sLogger.warn(f+","+fTerm+" word not in aligner's vocab (foreign side of f2e)");
       return tfTable;
     }
 
     int[] eS = f2eProbs.get(f).getTranslations(0.0f);
 
-    int f2 = fVocabTrg.get(fTerm);		//convert between two F vocabs  (different ids)
-    if(f2 <= 0){
-      //			sLogger.warn(fTerm+" word not in aligner's vocab (foreign side of e2f)");
-      return tfTable;
-    }
-    //tf(e) = sum_f{tf(f)*prob(f|e)}
+    // tf(e) = sum_f{tf(f)*prob(e|f)}
     for(int e : eS){
       float probEF;
       String eTerm = eVocabTrg.get(e);
-      int e2 = eVocabSrc.get(eTerm);		//convert between two E vocabs (different ids)
-      if(e2 <= 0){
-        //				sLogger.warn(eTerm+" word not in aligner's vocab (english side of e2f)");
-        continue;
-      }
-      probEF = e2fProbs.get(e2, f2);
+      if (tokenizer.isStopWord(eTerm)) continue;
 
+      probEF = f2eProbs.get(f, e);
+      sLogger.debug("Prob(" + eTerm + " | " + fTerm + ") = " + probEF);
       if(probEF > 0){
-        //				sLogger.debug(eVocabSrc.get(e2)+" ==> "+probEF);
-
-        if(tfTable.containsKey(e2)){
-          tfTable.put(e2, tfTable.get(e2)+tf*probEF);
+        if(tfTable.containsKey(e)){
+          tfTable.put(e, tfTable.get(e)+tf*probEF);
         }else{
-          tfTable.put(e2, tf*probEF);
+          tfTable.put(e, tf*probEF);
         }
       }
     }
@@ -328,7 +306,7 @@ public class CLIRUtils extends Configured {
   }
 
   /**
-   * Given a document in F, and its tf mapping, compute a tf value for each term in E using the CLIR algorithm: tf(e) = sum_f{tf(f)*prob(f|e)}
+   * Given a document in F, and its tf mapping, compute a tf value for each term in E using the CLIR algorithm: tf(e) = sum_f{tf(f)*prob(e|f)}
    * 
    * @param doc
    *	 	mapping from F-term strings to tf values
@@ -376,12 +354,7 @@ public class CLIRUtils extends Configured {
       }
       int[] eS = f2eProbs.get(f).getTranslations(0.0f);
 
-      int f2 = fVocabTrg.get(fTerm);		//convert between two F vocabs (different ids)
-      if(f2 <= 0){
-        sLogger.debug("Warning: "+fTerm+": word not in aligner's vocab (target side of e2f)");
-        continue;
-      }
-      //tf(e) = sum_f{tf(f)*prob(f|e)}
+      // tf(e) = sum_f{tf(f)*prob(e|f)}
       for(int e : eS){
         if(e<=0){		//if eTerm is NULL, that means there were cases where fTerm was unaligned in a sentence pair. Just skip these cases, since the word NULL is not in our target vocab.
           continue;
@@ -389,16 +362,11 @@ public class CLIRUtils extends Configured {
         String eTerm = eVocabTrg.get(e);
         if (tokenizer.isStopWord(eTerm))  continue;
         
-        int e2 = eVocabSrc.get(eTerm);		//convert between two E vocabs (different ids)
-        if(e2 <= 0){
-          sLogger.debug("Warning: "+eTerm+": word not in aligner's final vocab (source side of e2f)");
-          continue;
-        }
-        float probEF = e2fProbs.get(e2, f2);
+        float probEF = f2eProbs.get(f, e);
         if(probEF > 0){
-          sLogger.debug(eTerm+" ==> "+probEF);
-          tfTable.increment(e2, tf*probEF);
-          sLogger.debug("updated weight to "+tfTable.get(e2));
+//          sLogger.debug(eTerm+" ==> "+probEF);
+          tfTable.increment(e, tf*probEF);
+//          sLogger.debug("updated weight to "+tfTable.get(e));
         }
       }
     }
@@ -406,9 +374,8 @@ public class CLIRUtils extends Configured {
     return docLen;
   }
 
-
   /**
-   * Given a document in F, and its tf mapping, compute a tf value for each term in E using the CLIR algorithm: tf(e) = sum_f{tf(f)*prob(f|e)}
+   * Given a document in F, and its tf mapping, compute a tf value for each term in E using the CLIR algorithm: tf(e) = sum_f{tf(f)*prob(e|f)}
    * 
    * @param doc
    *	 	mapping from F-term strings to tf values
@@ -431,14 +398,13 @@ public class CLIRUtils extends Configured {
    * @return
    * @throws IOException
    */
-  public static int translateTFs(HMapSIW doc, HMapIFW tfTable, Vocab eVocabSrc, Vocab eVocabTrg, Vocab fVocabSrc, Vocab fVocabTrg, TTable_monolithic_IFAs e2fProbs, TTable_monolithic_IFAs f2eProbs, Logger sLogger) throws IOException{
+  public static int translateTFs(HMapSIW doc, HMapIFW tfTable, Vocab eVocabSrc, Vocab eVocabTrg, Vocab fVocabSrc, Vocab fVocabTrg, 
+      TTable_monolithic_IFAs e2fProbs, TTable_monolithic_IFAs f2eProbs, Tokenizer tokenizer, Logger sLogger) throws IOException{
     if(sLogger == null){
       sLogger = logger;
     }
 
     int docLen = 0;
-//    for ( int e2 = 0; e2 < eVocabSrc.size(); e2++ ){
-//    float prob;
     for(edu.umd.cloud9.util.map.MapKI.Entry<String> item : doc.entrySet()){
         String fTerm = item.getKey();
         int tf = item.getValue();
@@ -450,30 +416,17 @@ public class CLIRUtils extends Configured {
         }
         int[] eS = f2eProbs.get(f).getTranslations(0.0f);
         sLogger.debug(fTerm+" has "+eS.length+" translations");
-        int f2 = fVocabTrg.get(fTerm);		//convert between two F vocabs (different ids)
-        if(f2 <= 0){
-          sLogger.debug(fTerm+": word not in aligner's vocab (target side of e2f)");
-          continue;
-        }
-
-//        prob = e2fProbs.get(e2, f2);
-//        if (prob > 0) {
-//          tfTable.increment(e2, tf*prob);
-//        }
-
-        //tf(e) = sum_f{tf(f)*prob(f|e)}
+       
+        // tf(e) = sum_f{tf(f)*prob(e|f)}
         float prob;
         for (int e : eS) {
                 String eTerm = eVocabTrg.get(e);
-                int e2 = eVocabSrc.get(eTerm);		//convert between two E vocabs (different ids)
-                if(e2 <= 0){
-                  sLogger.debug(eTerm+": word not in aligner's final vocab (source side of e2f)");
-                  continue;
-                }
-                prob = e2fProbs.get(e2, f2);
-//                sLogger.info(eTerm+" --> "+prob+","+f2eProbs.get(f, e));
+                if (tokenizer.isStopWord(eTerm))  continue;
+
+                prob = f2eProbs.get(f, e);
+//              sLogger.info(eTerm+" --> "+prob+","+f2eProbs.get(f, e));
                 if(prob > 0){
-                  tfTable.increment(e2, tf*prob);
+                  tfTable.increment(e, tf*prob);
                 }
         }
       }
@@ -489,7 +442,7 @@ public class CLIRUtils extends Configured {
    * 		doc length
    * @param tfTable
    * 		mapping from term id to tf values
-   * @param eVocabSrc
+   * @param eVocab
    * 		vocabulary object for final doc vector language
    * @param scoring model
    * @param dfTable
@@ -501,7 +454,7 @@ public class CLIRUtils extends Configured {
    * @return
    * 		Term doc vector representing the document
    */
-  public static HMapSFW createTermDocVector(int docLen, HMapIFW tfTable, Vocab eVocabSrc, ScoringModel scoringModel, HMapIFW dfTable, boolean isNormalize, Logger sLogger) {
+  public static HMapSFW createTermDocVector(int docLen, HMapIFW tfTable, Vocab eVocab, ScoringModel scoringModel, HMapIFW dfTable, boolean isNormalize, Logger sLogger) {
     if(sLogger == null){
       sLogger = logger;
     }
@@ -512,7 +465,7 @@ public class CLIRUtils extends Configured {
     float normalization=0;
     for(int e : tfTable.keySet()){
       // retrieve term string, tf and df
-      String eTerm = eVocabSrc.get(e);
+      String eTerm = eVocab.get(e);
       float tf = tfTable.get(e);
       float df = dfTable.get(e);
       
@@ -545,7 +498,7 @@ public class CLIRUtils extends Configured {
    * 		doc length
    * @param tfTable
    * 		mapping from term id to tf values
-   * @param eVocabSrc
+   * @param eVocab
    * 		vocabulary object for final doc vector language
    * @param scoring model
    * @param dfTable
@@ -557,7 +510,7 @@ public class CLIRUtils extends Configured {
    * @return
    * 		Term doc vector representing the document
    */
-  public static HMapSFW createTermDocVector(int docLen, HMapIFW tfTable, Vocab eVocabSrc, ScoringModel scoringModel, FrequencySortedDictionary dict, DfTableArray dfTable, boolean isNormalize, Logger sLogger) {
+  public static HMapSFW createTermDocVector(int docLen, HMapIFW tfTable, Vocab eVocab, ScoringModel scoringModel, FrequencySortedDictionary dict, DfTableArray dfTable, boolean isNormalize, Logger sLogger) {
     if(sLogger == null){
       sLogger = logger;
     }
@@ -568,7 +521,7 @@ public class CLIRUtils extends Configured {
     float normalization=0;
     for(edu.umd.cloud9.util.map.MapIF.Entry entry : tfTable.entrySet()){
       // retrieve term string, tf and df
-      String eTerm = eVocabSrc.get(entry.getKey());
+      String eTerm = eVocab.get(entry.getKey());
       float tf = entry.getValue();
       int eId = dict.getId(eTerm);
       if(eId < 1){		//OOV
