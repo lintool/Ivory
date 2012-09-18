@@ -7,8 +7,6 @@ import ivory.lsh.data.WikiSentenceInfo;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.Iterator;
-
 import opennlp.model.RealValueFileEventStream;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.filecache.DistributedCache;
@@ -149,23 +147,7 @@ public class FilterSentencePairs extends Configured implements Tool {
       }
     }
   }
-
-  /**
-   * Discard duplicate sentence pairs.
-   * 
-   * @author ferhanture
-   *
-   */
-  private static class MyReducer extends MapReduceBase implements
-  Reducer<Text, Text, Text, Text>{
-
-    @Override
-    public void reduce(Text key, Iterator<Text> values, OutputCollector<Text, Text> out,
-        Reporter reporter) throws IOException {
-      out.collect(key, values.next());
-    }
-  }
-
+  
   /**
    * Runs this tool.
    */
