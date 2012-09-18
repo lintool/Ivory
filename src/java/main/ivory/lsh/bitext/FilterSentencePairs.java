@@ -251,7 +251,7 @@ public class FilterSentencePairs extends Configured implements Tool {
     conf.setOutputKeyClass(Text.class);
     conf.setOutputValueClass(Text.class);
     conf.setMapperClass(MyMapper.class);
-    conf.setReducerClass(MyReducer.class);
+    conf.setReducerClass(IdentityReducer.class);
     JobClient.runJob(conf);	
     return 0;
   }
