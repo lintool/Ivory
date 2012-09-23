@@ -32,12 +32,38 @@ import org.apache.commons.cli.ParseException;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 
+import edu.umd.hooka.VocabularyWritable;
+
 public abstract class Tokenizer {
   public abstract void configure(Configuration conf);
   public abstract String[] processContent(String text);
   protected static String delims = "`~!@#^&*()-_=+]}[{\\|'\";:/?.>,<";
   protected static int MIN_LENGTH = 2, MAX_LENGTH = 50;
+  protected VocabularyWritable vocab;
+  protected boolean isStopwordRemoval;  
 
+  public void setStopwordRemoval(boolean b) {
+    isStopwordRemoval = b;
+  }
+  
+  public boolean getStopwordRemoval() {
+    return isStopwordRemoval;
+  }
+    
+  /**
+   * Discard tokens not in the provided vocabulary.
+   * 
+   * @param v
+   *    vocabulary for tokenizer
+   */
+  public void setVocab(VocabularyWritable v){
+    vocab = v;
+  }
+  
+  public VocabularyWritable getVocab(){
+    return vocab;
+  }
+  
   /**
    * Method to return number of tokens in text. Subclasses may override for more efficient implementations.
    * 

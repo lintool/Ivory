@@ -64,15 +64,15 @@ public class TokenizerFactory {
         tokenizer = new StanfordChineseTokenizer();
       }else if(lang.equals("de") || lang.equals("en") || lang.equals("fr")){
         tokenizer = new OpenNLPTokenizer();
-        if (vocab != null) {
-          ((OpenNLPTokenizer) tokenizer).setVocab(vocab);
-        }
       }else if(lang.equals("ar")){
         tokenizer = new LuceneArabicAnalyzer();
       }else if(lang.equals("tr")){
         tokenizer = new LuceneTurkishAnalyzer();
       }
       
+      if (vocab != null) {
+        tokenizer.setVocab(vocab);
+      }
       tokenizer.configure(conf, fs);
       return tokenizer;
     } catch (Exception e) {

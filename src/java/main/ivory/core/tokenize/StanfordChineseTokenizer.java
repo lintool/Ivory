@@ -37,7 +37,7 @@ public class StanfordChineseTokenizer extends Tokenizer {
     }   
     configure(conf, fs);
   }
-  
+
   @SuppressWarnings("unchecked")
   @Override
   public void configure(Configuration conf, FileSystem fs) {
@@ -69,14 +69,23 @@ public class StanfordChineseTokenizer extends Tokenizer {
       sLogger.info("Problem in tokenizing Chinese");
       e.printStackTrace();
     }
-    return tokens; 
+    if (vocab == null) {
+      return tokens;
+    } else {
+      String tokenized = "";
+      for (String token : tokens) {
+        if ( vocab.get(token) <= 0) { continue; }
+        tokenized += ( token + " " );
+      }
+      return tokenized.trim().split("\\s+");
+    }
   }
-  
+
   @Override
   public int getNumberTokens(String text){
     return processContent(text).length;
   }
-  
+
   @Override
   public String removeBorderStopWords(String tokenizedText) {
     return tokenizedText;

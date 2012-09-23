@@ -25,7 +25,6 @@ public class OpenNLPTokenizer extends ivory.core.tokenize.Tokenizer {
   private Tokenizer tokenizer;
   private SnowballStemmer stemmer;
   private int lang;
-  private boolean isStopwordRemoval;  
   private static final int ENGLISH = 0, FRENCH = 1, GERMAN = 2;
   private static final String[] languages = {"english", "french", "german"};
   private static final String[] TERRIER_STOP_WORDS = {
@@ -1850,7 +1849,6 @@ public class OpenNLPTokenizer extends ivory.core.tokenize.Tokenizer {
   private final Set<String> englishStemmedStopwords = Sets.newHashSet(TERRIER_STEMMED_STOP_WORDS);
   private final Set<String> frenchStopwords = Sets.newHashSet(FRENCH_SNOWBALL_STOP_WORDS);
   private final Set<String> frenchStemmedStopwords = Sets.newHashSet(FRENCH_SNOWBALL_STEMMED_STOP_WORDS);
-  VocabularyWritable vocab;
 
   public OpenNLPTokenizer(){
     super();
@@ -1937,10 +1935,6 @@ public class OpenNLPTokenizer extends ivory.core.tokenize.Tokenizer {
       e.printStackTrace();
       throw new RuntimeException(e);
     } 
-  }
-
-  public void setVocab(VocabularyWritable v){
-    vocab = v;
   }
 
   @Override

@@ -1,19 +1,16 @@
 package ivory.core.tokenize;
 
 import ivory.core.Constants;
+
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.Set;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.lucene.analysis.CharArraySet;
-import org.apache.lucene.analysis.LowerCaseFilter;
 import org.apache.lucene.analysis.StopFilter;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.Tokenizer;
-import org.apache.lucene.analysis.ar.ArabicNormalizationFilter;
-import org.apache.lucene.analysis.ar.ArabicStemFilter;
 import org.apache.lucene.analysis.standard.StandardFilter;
 import org.apache.lucene.analysis.standard.StandardTokenizer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
@@ -25,10 +22,12 @@ import org.tartarus.snowball.ext.turkishStemmer;
 
 import com.google.common.collect.Sets;
 
+import edu.umd.hooka.VocabularyWritable;
+
 public class LuceneTurkishAnalyzer extends ivory.core.tokenize.Tokenizer {
   private Tokenizer tokenizer;
   private SnowballStemmer stemmer;
-  private boolean isStemming, isStopwordRemoval;
+  private boolean isStemming;
   private final Set<String> turkishStopwords = Sets.newHashSet(LUCENE_STOP_WORDS);
   private final Set<String> turkishStemmedStopwords = Sets.newHashSet(LUCENE_STEMMED_STOP_WORDS);
   private static final String[] LUCENE_STOP_WORDS = { 
@@ -489,6 +488,9 @@ public class LuceneTurkishAnalyzer extends ivory.core.tokenize.Tokenizer {
           stemmer.stem();
           token = stemmer.getCurrent();
         }
+        if ( vocab != null && vocab.get(token) <= 0) {
+          continue;
+        }
         tokenized += ( token + " " );
       }
     } catch (IOException e) {
@@ -523,5 +525,10 @@ public class LuceneTurkishAnalyzer extends ivory.core.tokenize.Tokenizer {
       e.printStackTrace();
     }
     return token;
+  }
+
+  @Override
+  public void setVocab(VocabularyWritable v) {
+    
   }
 }

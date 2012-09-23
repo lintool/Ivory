@@ -27,9 +27,11 @@ import org.apache.lucene.util.Version;
 
 import com.google.common.collect.Sets;
 
+import edu.umd.hooka.VocabularyWritable;
+
 public class LuceneArabicAnalyzer extends ivory.core.tokenize.Tokenizer {
   private static final Logger LOG = Logger.getLogger(LuceneArabicAnalyzer.class);
-  private boolean isStemming, isStopwordRemoval;
+  private boolean isStemming;
   private org.apache.lucene.analysis.Tokenizer tokenizer;
   private final Set<String> arabicStopwords = Sets.newHashSet(LUCENE_STOP_WORDS); // new HashSet<String>();//
   private final Set<String> arabicStemmedStopwords = Sets.newHashSet(LUCENE_STEMMED_STOP_WORDS);
@@ -272,6 +274,7 @@ public class LuceneArabicAnalyzer extends ivory.core.tokenize.Tokenizer {
 //    }
   }
 
+  
   @Override
   public String[] processContent(String text) {   
     tokenizer = new StandardTokenizer(Version.LUCENE_35, new StringReader(text));
@@ -289,7 +292,11 @@ public class LuceneArabicAnalyzer extends ivory.core.tokenize.Tokenizer {
     String tokenized = "";
     try {
       while (tokenStream.incrementToken()) {
-        tokenized += ( termAtt.toString() + " " );
+        String token = termAtt.toString();
+        if ( vocab != null && vocab.get(token) <= 0) {
+          continue;
+        }
+        tokenized += ( token + " " );
       }
     } catch (IOException e) {
       e.printStackTrace();
