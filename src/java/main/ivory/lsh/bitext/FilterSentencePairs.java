@@ -46,14 +46,14 @@ public class FilterSentencePairs extends Configured implements Tool {
   private static final Logger sLogger = Logger.getLogger(FilterSentencePairs.class);
 
   enum Sentences{
-    parallel, ignored
+    parallel, ignored, dbg, OOV
   }
 
   public FilterSentencePairs() {
   }
 
   private static int printUsage() {
-    sLogger.info("usage: [bitext-input-path] [filtered-output-path] [e-dir] [f-dir] [vocab-dir] [e-lang] [f-lang] [bitext-name] [classifier-threshold] [classifier-idOfPositiveClass]");
+    sLogger.info("usage: [bitext-input-path] [filtered-output-path] [e-dir] [f-dir] [vocab-dir] [e-lang] [f-lang] [bitext-name] [classifier-threshold] [classifier-idOfPositiveClass] ([min in-Vocab term/sentence-rate])");
     ToolRunner.printGenericCommandUsage(System.out);
     return -1;
   }
@@ -73,7 +73,8 @@ public class FilterSentencePairs extends Configured implements Tool {
     private Text outSent1, outSent2;
     private float classifierThreshold;
     private int classifierPositiveId;
-
+    private float minInVocabRate;
+    
     public void configure(JobConf job) {
       sLogger.setLevel(Level.INFO);
 
@@ -82,6 +83,7 @@ public class FilterSentencePairs extends Configured implements Tool {
       } catch (Exception e) {
         e.printStackTrace();
       }
+      minInVocabRate = job.getFloat("MinInVocabRate", 0.5f);    
       classifierThreshold = job.getFloat("ClassifierThreshold", 0.0f);
       classifierPositiveId = job.getInt("ClassifierId", -1);
       if(classifierPositiveId != 0 && classifierPositiveId != 1){
@@ -104,26 +106,27 @@ public class FilterSentencePairs extends Configured implements Tool {
       }
       eSent = sentences[1];
       fSent = sentences[0];
-
       eLen = eTok.getNumberTokens(eSent);
       fLen = fTok.getNumberTokens(fSent);
-
       eVector = helper.createEDocVector(eSent);
-
-      // for foreign language, we create tf map here, so that we can pass it as an argument to F3 classifier.
-      HMapSIW fTfs = new HMapSIW();		
-      fVector = helper.createFDocVector(fSent, fTfs);
-
+      HMapSIW fSrcTfs = new HMapSIW();
+      fVector = helper.createFDocVector(fSent, fSrcTfs);
+      
+      float fInVocab = helper.getFInVocabRate(fSent);
+      float eInVocab = helper.getEInVocabRate(eSent);
+      if (fInVocab < minInVocabRate || eInVocab < minInVocabRate) {
+          reporter.incrCounter(Sentences.OOV, 1);
+          return;
+      }
+      
       if (eVector == null || fVector == null) {
         reporter.incrCounter(Sentences.ignored, 1);	
         return;
       }
 
-      String[] instance = CLIRUtils.computeFeaturesF3(eVector, fTfs, fVector, eLen, fLen, helper.getESrc(), helper.getETrg(), helper.getFSrc(), helper.getFTrg(), helper.getE2F(), helper.getF2E());
-      sLogger.debug("F sentence="+fSent);
-      sLogger.debug("E sentence="+eSent);
-      sLogger.debug(instance[0]);
-
+      String[] instance = CLIRUtils.computeFeaturesF3(eVector, fSrcTfs, fVector, eLen, fLen, 
+          helper.getESrc(), helper.getETrg(), helper.getFSrc(), helper.getFTrg(), helper.getE2F(), helper.getF2E(), sLogger);
+      
       // classify w/ maxent model
       // emit if labeled parallel
       if(instance == null){
@@ -140,7 +143,6 @@ public class FilterSentencePairs extends Configured implements Tool {
       double confidence = probs[classifierPositiveId];
 
       if (confidence > classifierThreshold) {
-        sLogger.debug("parallel");
         reporter.incrCounter(Sentences.parallel, 1);
         outSent1.set(fSent + CLIRUtils.BitextSeparator + eSent);
         output.collect(outSent1, outSent2);
@@ -175,6 +177,7 @@ public class FilterSentencePairs extends Configured implements Tool {
     String bitextName = args[7];
     float classifierThreshold = Float.parseFloat(args[8]);
     int classifierId = Integer.parseInt(args[9]);
+    float minInVocabRate = args.length > 10 ? Float.parseFloat(args[10]) : 0.5f;
 
     String eSentDetect = dataDir+"/sent/"+eLang+"-sent.bin";
     String eTokenizer = dataDir+"/token/"+eLang+"-token.bin";
@@ -199,6 +202,7 @@ public class FilterSentencePairs extends Configured implements Tool {
     conf.set("fLang", fLang);
     conf.setFloat("ClassifierThreshold", classifierThreshold);
     conf.setInt("ClassifierId", classifierId);
+    conf.setFloat("MinInVocabRate", minInVocabRate);
     conf.set("fTokenizer", fTokenizer);
     conf.set("eTokenizer", eTokenizer);
 

@@ -86,7 +86,7 @@ public class PreprocessHelper {
    */
   public PreprocessHelper(int minVectorTerms, int minSentenceLength, Configuration conf) throws Exception {
     super();
-    sLogger.setLevel(Level.DEBUG);
+//    sLogger.setLevel(Level.DEBUG);
     fLang = conf.get("fLang");
     eLang = conf.get("eLang");
     eDir = conf.get("eDir");
@@ -178,7 +178,7 @@ public class PreprocessHelper {
 
   private void loadEModels(JobConf conf) throws Exception {
     sLogger.info("Loading models for " + eLang + " ...");
-    
+
     String sentDetectorFile = getSentDetectorFile(eLang); //localFiles[1].toString();
 
     Path[] localFiles = DistributedCache.getLocalCacheFiles(conf);
@@ -227,11 +227,16 @@ public class PreprocessHelper {
 
   public HMapSFW createFDocVector(String sentence, HMapSIW term2Tf) {
     String[] terms = fTok.processContent(sentence);
+    
+    // don't count numbers for the min #terms constraint since Wikipedia has "sentences" full of numbers that doesn't make any sense
+    int numNonNumbers = 0;
     for(String term : terms){
       term2Tf.increment(term);
+      if (!term.matches("\\d+")) {
+        numNonNumbers++;
+      }
     }
-
-    if(term2Tf.size() < MinVectorTerms){
+    if(numNonNumbers < MinVectorTerms){
       return null;
     }
 
@@ -252,12 +257,16 @@ public class PreprocessHelper {
     HMapSFW weightedVector = new HMapSFW();
     String[] terms = eTok.processContent(sentence);
 
+    // don't count numbers for the min #terms constraint since Wikipedia has "sentences" full of numbers that doesn't make any sense
+    int numNonNumbers = 0;
     for(String term : terms){
       int termId = eVocabTrg.get(term);
       term2Tf.increment(termId, 1);
+      if (!term.matches("\\d+")) {
+        numNonNumbers++;
+      }
     }
-
-    if(term2Tf.size() < MinVectorTerms){
+    if(numNonNumbers < MinVectorTerms){
       return null;
     }
 
@@ -460,5 +469,60 @@ public class PreprocessHelper {
 
     dict = new DefaultFrequencySortedDictionary(new Path(env.getIndexTermsData()), new Path(env.getIndexTermIdsData()), new Path(env.getIndexTermIdMappingData()), localFs);
     dfTable = new DfTableArray(new Path(env.getDfByTermData()), localFs);
+  }
+
+  public float getFInVocabRate(String fSent) {
+    VocabularyWritable v = fTok.getVocab();
+    boolean isStopwordRemoval = fTok.getStopwordRemoval();
+    fTok.setVocab(null);
+    
+    
+//    sLogger.setLevel(Level.INFO);
+//    if (fSent.contains("Canto rodado (escuela de arte)") || fSent.contains("İsim Yaş Tür Bulunuş tarihi Ülke Keşfeden kişiler")) {
+//      sLogger.setLevel(Level.DEBUG);
+//    }
+    
+    
+    String[] fTokens = fTok.processContent(fSent);
+    float oov = 0, total = fTokens.length;
+    for (String fToken : fTokens) {
+      if (fVocabSrc.get(fToken) <= 0 && fVocabTrg.get(fToken) <= 0) {
+        oov++;
+        sLogger.debug(fToken+" --> OOV");
+      }else {
+        sLogger.debug(fToken+" --> in vocab");
+      }
+    }
+    fTok.setVocab(v);
+    fTok.setStopwordRemoval(isStopwordRemoval);
+    return (total-oov) / total;
+  }
+
+  public float getEInVocabRate(String eSent) {
+    VocabularyWritable v = eTok.getVocab();
+    boolean isStopwordRemoval = eTok.getStopwordRemoval();
+    eTok.setVocab(null);
+    eTok.setStopwordRemoval(false);
+    
+//    sLogger.setLevel(Level.INFO);
+//    if (eSent.contains("Name Age Species Date discovered Country Discovered by") || eSent.contains("Harri Rovanper")) {
+//      sLogger.setLevel(Level.DEBUG);
+//    }
+    
+    
+    String[] eTokens = eTok.processContent(eSent);
+    float oov = 0, total = eTokens.length;
+    for (String eToken : eTokens) {
+      if (eVocabSrc.get(eToken) <= 0 && eVocabTrg.get(eToken) <= 0) {
+        oov++;
+        sLogger.debug(eToken+" --> OOV");
+      }else {
+        sLogger.debug(eToken+" --> in vocab");
+      }
+    }
+    eTok.setVocab(v);
+    eTok.setStopwordRemoval(isStopwordRemoval);
+    sLogger.debug(oov / total);
+    return (total-oov) / total;
   }
 }

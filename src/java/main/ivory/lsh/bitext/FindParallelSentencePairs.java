@@ -28,12 +28,14 @@ import org.apache.hadoop.mapred.SequenceFileInputFormat;
 import org.apache.hadoop.mapred.TextOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
+import org.apache.log4j.Appender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import edu.umd.cloud9.io.array.ArrayListOfIntsWritable;
 import edu.umd.cloud9.io.array.ArrayListWritable;
 import edu.umd.cloud9.io.map.HMapSFW;
 import edu.umd.cloud9.io.pair.PairOfInts;
+import edu.umd.cloud9.util.array.ArrayListOfInts;
 import edu.umd.cloud9.util.map.HMapIV;
 
 /**
@@ -48,7 +50,7 @@ public class FindParallelSentencePairs extends Configured implements Tool {
   private static final Logger sLogger = Logger.getLogger(FindParallelSentencePairs.class);
 
   enum Docs{
-    pairsE, pairsF, pairs, pairsIncompleteF, pairsIncompleteE 
+    pairsE, pairsF, pairs, pairsIncompleteF, pairsIncompleteE, dbg
   }
   enum Sentences{
     E, F, pairsE, pairsF, pairsProcessed, pairsCandidate, pairsFilteredByVectorSize, pairsFilteredBySentRatio, parallel 
@@ -91,7 +93,6 @@ public class FindParallelSentencePairs extends Configured implements Tool {
     private ArrayListOfIntsWritable similarDocnos;
     
     public void configure(JobConf job) {
-     
       sLogger.setLevel(Level.INFO);
       mJob = job;
       pwsimMapping = new HMapIV<ArrayListOfIntsWritable>();
@@ -119,7 +120,7 @@ public class FindParallelSentencePairs extends Configured implements Tool {
         Path[] localFiles = null;
         localFiles = DistributedCache.getLocalCacheFiles(job);
 
-        SequenceFile.Reader reader = new SequenceFile.Reader(FileSystem.getLocal(job), localFiles[14], job);
+        SequenceFile.Reader reader = new SequenceFile.Reader(FileSystem.getLocal(job), localFiles[13], job);
 
         PairOfInts key = (PairOfInts) reader.getKeyClass().newInstance();
         IntWritable value = (IntWritable) reader.getValueClass().newInstance();
@@ -152,7 +153,9 @@ public class FindParallelSentencePairs extends Configured implements Tool {
     public void map(PairOfInts sentenceId, WikiSentenceInfo sentenceInfo, OutputCollector<PairOfInts, WikiSentenceInfo> output, Reporter reporter) throws IOException {
       int docno = sentenceId.getLeftElement();
       int langID = sentenceInfo.getLangID();
-
+      
+//      if (docno != 380354 && docno != 151)    return;
+      
       // we only load the mapping once, during the first map() call of a mapper. 
       // this works b/c all input kv pairs of a given mapper will have same lang id (reason explained above)
       if (pwsimMapping.isEmpty()) {
@@ -205,7 +208,7 @@ public class FindParallelSentencePairs extends Configured implements Tool {
     private Text emptyValue = new Text();
 
     public void configure(JobConf job) {
-      sLogger.setLevel(Level.DEBUG);
+//      sLogger.setLevel(Level.DEBUG);
 
       try {
         helper = new PreprocessHelper(CLIRUtils.MinVectorTerms, CLIRUtils.MinSentenceLength, job);
@@ -237,7 +240,7 @@ public class FindParallelSentencePairs extends Configured implements Tool {
 
       fDocno = docnoPair.getLeftElement();
       eDocno = docnoPair.getRightElement();
-
+      
       // parse WikiDocInfo object into sentences and vectors, based on the language id
       WikiSentenceInfo sentenceInfo;
       int eCnt = 0, fCnt = 0;
@@ -258,6 +261,13 @@ public class FindParallelSentencePairs extends Configured implements Tool {
         }
       }
 
+//      if (fDocno == 151 && eDocno == 380354) {
+//        sLogger.setLevel(Level.DEBUG);
+//        reporter.incrCounter(Docs.dbg, 1);
+//      }else {
+//        return;
+//      }
+
       /**
        * some sentences in docs are removed in previous step (i.e., Docs2Sentences) due to length etc.
        * if all of the sentences in a document are removed, then it will not show up here
@@ -273,35 +283,39 @@ public class FindParallelSentencePairs extends Configured implements Tool {
         return;
       }
 
-      reporter.incrCounter(Docs.pairs, 1);
-
       // counters for debug purposes only
+      reporter.incrCounter(Docs.pairs, 1);
       reporter.incrCounter(Sentences.pairsCandidate, fVectors.size() * eVectors.size());
       int numProcessed = 0;
       long time = 0;
-      
+     
+sLogger.debug(fSentences.size()+","+eSentences.size());
+
       // classify each e-f sentence pair in the candidate set
       for (int f = 0; f < fVectors.size(); f++) {
         HMapSFW fVector = fVectors.get(f);
         int fSentLength = fSentences.get(f).getLength();
-
+                  
+        
         for (int e = 0; e < eVectors.size(); e++) {
           HMapSFW eVector = eVectors.get(e);
           int eSentLength = eSentences.get(e).getLength();
-
+          
           if (eSentLength > 2 * fSentLength || fSentLength > 2 * eSentLength) {
+            // sLogger.debug("length filter");
             reporter.incrCounter(Sentences.pairsFilteredBySentRatio, 1);
             continue;
           }
 
           reporter.incrCounter(Sentences.pairsProcessed, 1);        
-          numProcessed++;
-          
+          numProcessed++;      
+            
           // compute features
           long start = System.currentTimeMillis();
           String[] instance = CLIRUtils.computeFeaturesF1(eVector, fVector, eSentLength, fSentLength);
           time += (System.currentTimeMillis()-start);
-
+          
+          
           // classify w/ maxent model
           // emit if labeled parallel
           if (instance == null) {
@@ -315,6 +329,9 @@ public class FindParallelSentencePairs extends Configured implements Tool {
           // check if confidence above specified threshold
           double confidence = probs[classifierPositiveId];
           if (confidence > classifierThreshold) {
+            sLogger.debug("F sentence="+fSentences.get(f));
+            sLogger.debug("E sentence="+eSentences.get(e));
+            sLogger.debug(instance[0]);
             reporter.incrCounter(Sentences.parallel, 1);
             output.collect(new Text(fSentences.get(f) + CLIRUtils.BitextSeparator + eSentences.get(e)), emptyValue);
           }
@@ -429,9 +446,9 @@ public class FindParallelSentencePairs extends Configured implements Tool {
 
     //f-files
     
-    sLogger.info("caching files...5,6,7,8,9");
+    sLogger.info("caching files...5,6,7,8");
 
-    DistributedCache.addCacheFile(new URI(fDir+"/transDf.dat"), conf);
+//    DistributedCache.addCacheFile(new URI(fDir+"/transDf.dat"), conf);
     DistributedCache.addCacheFile(new URI(fSentDetect), conf);
     DistributedCache.addCacheFile(new URI(fTokenizer), conf);
     DistributedCache.addCacheFile(new URI(fVocabSrc), conf);
@@ -439,7 +456,7 @@ public class FindParallelSentencePairs extends Configured implements Tool {
 
     /////cross-lang files
 
-    sLogger.info("caching files...10,11,12,13,14");
+    sLogger.info("caching files...9,10,11,12,13");
 
     DistributedCache.addCacheFile(new URI(f2e_ttableFile), conf);
     DistributedCache.addCacheFile(new URI(e2f_ttableFile), conf);
