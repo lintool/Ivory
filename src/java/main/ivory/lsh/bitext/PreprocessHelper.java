@@ -64,7 +64,8 @@ public class PreprocessHelper {
     lang2AvgSentLen.put("fr",18);       // took average # of tokens per sentence in fr-en.wmt12 train data
     lang2AvgSentLen.put("tr",21);       // took average # of tokens per sentence in tr-en.oflazer train data
     lang2AvgSentLen.put("ar",17);       // took average # of tokens per sentence in ar-en.galep5oct train data
-  };
+    lang2AvgSentLen.put("es",18);       // set to same as fr for now (no data yet)
+};
 
   /**
    * Implemented for HDFS cluster mode, files read from local cache
