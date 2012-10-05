@@ -64,7 +64,8 @@ public class PreprocessHelper {
     lang2AvgSentLen.put("fr",18);       // took average # of tokens per sentence in fr-en.wmt12 train data
     lang2AvgSentLen.put("tr",21);       // took average # of tokens per sentence in tr-en.oflazer train data
     lang2AvgSentLen.put("ar",17);       // took average # of tokens per sentence in ar-en.galep5oct train data
-  };
+    lang2AvgSentLen.put("es",18);       // set to same as fr for now (no data yet)
+};
 
   /**
    * Implemented for HDFS cluster mode, files read from local cache
@@ -162,7 +163,7 @@ public class PreprocessHelper {
 
     // tokenizer file not read from cache, since it might be a directory (e.g. Chinese segmenter)
     String tokenizerFile = conf.get("fTokenizer");
-    fTok = TokenizerFactory.createTokenizer(fs, fLang, tokenizerFile, fVocabSrc);
+    fTok = TokenizerFactory.createTokenizer(fs, fLang, tokenizerFile, null);
     sLogger.info("Tokenizer and vocabs created successfully.");
 
     // average sentence length = just a heuristic derived from sample text
@@ -202,7 +203,7 @@ public class PreprocessHelper {
     sLogger.info("Environment created successfully.");
 
     String tokenizerFile = conf.get("eTokenizer");
-    eTok = TokenizerFactory.createTokenizer(fs, eLang, tokenizerFile, eVocabTrg);
+    eTok = TokenizerFactory.createTokenizer(fs, eLang, tokenizerFile, null);
     sLogger.info("Tokenizer and vocabs created successfully.");
 
     eScoreFn = (ScoringModel) new Bm25();
@@ -228,16 +229,8 @@ public class PreprocessHelper {
   public HMapSFW createFDocVector(String sentence, HMapSIW term2Tf) {
     String[] terms = fTok.processContent(sentence);
     
-    // don't count numbers for the min #terms constraint since Wikipedia has "sentences" full of numbers that doesn't make any sense
-    int numNonNumbers = 0;
     for(String term : terms){
       term2Tf.increment(term);
-      if (!term.matches("\\d+")) {
-        numNonNumbers++;
-      }
-    }
-    if(numNonNumbers < MinVectorTerms){
-      return null;
     }
 
     //translated tf values
@@ -245,37 +238,54 @@ public class PreprocessHelper {
     for(Entry<String> entry : term2Tf.entrySet()){
       String fTerm = entry.getKey();
       int tf = entry.getValue();
+      // transTermTf won't be updated if fTerm not in vocab
       transTermTf = CLIRUtils.updateTFsByTerm(fTerm, tf, transTermTf, eVocabSrc, eVocabTrg, fVocabSrc, fVocabTrg, e2f_Probs, f2e_Probs, eTok, sLogger);
     }
+    
     HMapSFW weightedVector = CLIRUtils.createTermDocVector(terms.length, transTermTf, eVocabTrg, fScoreFn, dict, dfTable, true, sLogger);
-
-    return weightedVector;
-  }
-
-  public HMapSFW createEDocVector(String sentence) {
-    HMapIFW term2Tf = new HMapIFW();
-    HMapSFW weightedVector = new HMapSFW();
-    String[] terms = eTok.processContent(sentence);
-
+  
     // don't count numbers for the min #terms constraint since Wikipedia has "sentences" full of numbers that doesn't make any sense
     int numNonNumbers = 0;
-    for(String term : terms){
-      int termId = eVocabTrg.get(term);
-      term2Tf.increment(termId, 1);
+    for(String term : weightedVector.keySet()){      
       if (!term.matches("\\d+")) {
         numNonNumbers++;
       }
     }
     if(numNonNumbers < MinVectorTerms){
       return null;
+    }else {
+      return weightedVector;
     }
+  }
 
-    weightedVector = CLIRUtils.createTermDocVector(terms.length, term2Tf, eVocabTrg, eScoreFn, dict, dfTable, true, sLogger);
+  public HMapSFW createEDocVector(String sentence) {
+    return createEDocVector(sentence, new HMapSIW());
+  }
 
+  public HMapSFW createEDocVector(String sentence, HMapSIW term2Tf) {
+    HMapSFW weightedVector = new HMapSFW();
+    String[] terms = eTok.processContent(sentence);
+
+    for(String term : terms){
+      term2Tf.increment(term);     
+    }
+    
+    weightedVector = CLIRUtils.createTermDocVector(terms.length, term2Tf, eScoreFn, dict, dfTable, true, sLogger);
     //for backward compatibility
     //    weightedVector = CLIRUtils.createTermDocVector(terms.length, term2Tf, eVocabSrc, eScoreFn, globalStatsMap, true, sLogger);  
 
-    return weightedVector;
+    // don't count numbers for the min #terms constraint since Wikipedia has "sentences" full of numbers that doesn't make any sense
+    int numNonNumbers = 0;
+    for(String term : weightedVector.keySet()){      
+      if (!term.matches("\\d+")) {
+        numNonNumbers++;
+      }
+    }
+    if(numNonNumbers < MinVectorTerms){
+      return null;
+    }else {
+      return weightedVector;
+    }
   }
 
   public ArrayListWritable<Text> getESentences(String text, ArrayListWritable<HMapSFW> vectors, ArrayListOfIntsWritable sentLengths) throws ClassNotFoundException, InstantiationException, IllegalAccessException, IOException {

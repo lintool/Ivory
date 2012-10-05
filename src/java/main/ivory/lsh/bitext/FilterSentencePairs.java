@@ -108,7 +108,8 @@ public class FilterSentencePairs extends Configured implements Tool {
       fSent = sentences[0];
       eLen = eTok.getNumberTokens(eSent);
       fLen = fTok.getNumberTokens(fSent);
-      eVector = helper.createEDocVector(eSent);
+      HMapSIW eSrcTfs = new HMapSIW();
+      eVector = helper.createEDocVector(eSent, eSrcTfs);
       HMapSIW fSrcTfs = new HMapSIW();
       fVector = helper.createFDocVector(fSent, fSrcTfs);
       
@@ -124,7 +125,9 @@ public class FilterSentencePairs extends Configured implements Tool {
         return;
       }
 
-      String[] instance = CLIRUtils.computeFeaturesF3(eVector, fSrcTfs, fVector, eLen, fLen, 
+      sLogger.debug("-------------\n"+fSent+"\n"+eSent+"\n----\n"+fVector+"\n"+fSrcTfs+"\n"+eVector+"\n"+fLen+","+eLen+"\n------------");
+
+      String[] instance = CLIRUtils.computeFeaturesF3(eSrcTfs, eVector, fSrcTfs, fVector, eLen, fLen, 
           helper.getESrc(), helper.getETrg(), helper.getFSrc(), helper.getFTrg(), helper.getE2F(), helper.getF2E(), sLogger);
       
       // classify w/ maxent model
@@ -141,7 +144,7 @@ public class FilterSentencePairs extends Configured implements Tool {
       // e.g., for the F3 de-en classifier probs[1] gives pr(parallel), in F1 classifier probs[0] does
       // we pass this information as a program argument
       double confidence = probs[classifierPositiveId];
-
+          
       if (confidence > classifierThreshold) {
         reporter.incrCounter(Sentences.parallel, 1);
         outSent1.set(fSent + CLIRUtils.BitextSeparator + eSent);

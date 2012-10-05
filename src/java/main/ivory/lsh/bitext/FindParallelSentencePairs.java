@@ -93,7 +93,7 @@ public class FindParallelSentencePairs extends Configured implements Tool {
     private ArrayListOfIntsWritable similarDocnos;
     
     public void configure(JobConf job) {
-      sLogger.setLevel(Level.INFO);
+//      sLogger.setLevel(Level.DEBUG);
       mJob = job;
       pwsimMapping = new HMapIV<ArrayListOfIntsWritable>();
       keyOut = new PairOfInts();
@@ -153,9 +153,7 @@ public class FindParallelSentencePairs extends Configured implements Tool {
     public void map(PairOfInts sentenceId, WikiSentenceInfo sentenceInfo, OutputCollector<PairOfInts, WikiSentenceInfo> output, Reporter reporter) throws IOException {
       int docno = sentenceId.getLeftElement();
       int langID = sentenceInfo.getLangID();
-      
-//      if (docno != 380354 && docno != 151)    return;
-      
+            
       // we only load the mapping once, during the first map() call of a mapper. 
       // this works b/c all input kv pairs of a given mapper will have same lang id (reason explained above)
       if (pwsimMapping.isEmpty()) {
@@ -166,8 +164,7 @@ public class FindParallelSentencePairs extends Configured implements Tool {
       // if no similar docs for docno, return
       if (pwsimMapping.containsKey(docno)) {
         similarDocnos = pwsimMapping.get(docno);  
-      }else{
-        return;
+        sLogger.debug("Found "+similarDocnos.size()+" pairs");
       }
 
       if (langID == CLIRUtils.E) {
@@ -261,20 +258,13 @@ public class FindParallelSentencePairs extends Configured implements Tool {
         }
       }
 
-//      if (fDocno == 151 && eDocno == 380354) {
-//        sLogger.setLevel(Level.DEBUG);
-//        reporter.incrCounter(Docs.dbg, 1);
-//      }else {
-//        return;
-//      }
-
       /**
        * some sentences in docs are removed in previous step (i.e., Docs2Sentences) due to length etc.
        * if all of the sentences in a document are removed, then it will not show up here
        * therefore the pair will be "incomplete". we simply ignore these pairs for bitext extraction.
        */
       if((eCnt == 0 || fCnt == 0)){
-        sLogger.debug("Read "+eCnt+","+fCnt+" pages: ="+eDocno+","+fDocno);
+        sLogger.debug("Read "+eCnt+","+fCnt+" sentences: ="+eDocno+","+fDocno);
         if(eCnt == 0){
           reporter.incrCounter(Docs.pairsIncompleteE, 1);
         }else{
@@ -295,8 +285,7 @@ sLogger.debug(fSentences.size()+","+eSentences.size());
       for (int f = 0; f < fVectors.size(); f++) {
         HMapSFW fVector = fVectors.get(f);
         int fSentLength = fSentences.get(f).getLength();
-                  
-        
+                      
         for (int e = 0; e < eVectors.size(); e++) {
           HMapSFW eVector = eVectors.get(e);
           int eSentLength = eSentences.get(e).getLength();
@@ -329,15 +318,11 @@ sLogger.debug(fSentences.size()+","+eSentences.size());
           // check if confidence above specified threshold
           double confidence = probs[classifierPositiveId];
           if (confidence > classifierThreshold) {
-            sLogger.debug("F sentence="+fSentences.get(f));
-            sLogger.debug("E sentence="+eSentences.get(e));
-            sLogger.debug(instance[0]);
-            reporter.incrCounter(Sentences.parallel, 1);
+            reporter.incrCounter(Sentences.parallel, 1);  
             output.collect(new Text(fSentences.get(f) + CLIRUtils.BitextSeparator + eSentences.get(e)), emptyValue);
           }
         }
       }
-//      sLogger.info("Finished processing "+numProcessed+" out of "+fVectors.size()*eVectors.size()+", avg process time="+time/(1f*numProcessed)+" avg map time="+(System.currentTimeMillis()-mapStartTime)/(1f*numProcessed));
     }
   }
 
