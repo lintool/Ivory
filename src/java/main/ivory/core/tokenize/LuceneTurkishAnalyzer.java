@@ -488,7 +488,7 @@ public class LuceneTurkishAnalyzer extends ivory.core.tokenize.Tokenizer {
           stemmer.stem();
           token = stemmer.getCurrent();
         }
-        if ( vocab != null && vocab.get(token) <= 0) {
+        if ( vocab != null && vocab.get(token) <= 0 ) {
           continue;
         }
         tokenized += ( token + " " );
@@ -511,20 +511,14 @@ public class LuceneTurkishAnalyzer extends ivory.core.tokenize.Tokenizer {
   
   @Override
   public String stem(String token) {
-    tokenizer = new StandardTokenizer(Version.LUCENE_35, new StringReader(token));
-    TokenStream tokenStream = new StandardFilter(Version.LUCENE_35, tokenizer);
-    tokenStream = new TurkishLowerCaseFilter(tokenStream);
-    
-    CharTermAttribute termAtt = tokenStream.getAttribute(CharTermAttribute.class);
-    tokenStream.clearAttributes();
-    try {
-      while (tokenStream.incrementToken()) {
-        return termAtt.toString();
-      }
-    }catch (IOException e) {
-      e.printStackTrace();
+    token = postNormalize(preNormalize(token)).toLowerCase();
+    if ( stemmer!=null ) {
+      stemmer.setCurrent(token);
+      stemmer.stem();
+      return stemmer.getCurrent();
+    }else {
+      return token;
     }
-    return token;
   }
 
   @Override

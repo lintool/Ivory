@@ -124,7 +124,7 @@ public abstract class Tokenizer {
    *    normalized text, ready to be run through tokenizer   
    */
   public String preNormalize(String text) {
-    return text.replaceAll("’", "\'").replaceAll("`", "\'").replaceAll("“", "\"").replaceAll("”", "\"").replaceAll("‘", "'").replace("\u2019", "'");
+    return text.replaceAll("’", "\'").replaceAll("`", "\'").replaceAll("“", "\"").replaceAll("”", "\"").replaceAll("‘", "'").replaceAll("\u2019", "'");
   }
 
   /**
@@ -215,7 +215,7 @@ public abstract class Tokenizer {
     options.addOption(OptionBuilder.withArgName("full path to model file or directory").hasArg().withDescription("model file").create("model"));
     options.addOption(OptionBuilder.withArgName("full path to input file").hasArg().withDescription("input file").create("input"));
     options.addOption(OptionBuilder.withArgName("full path to output file").hasArg().withDescription("output file").create("output"));
-    options.addOption(OptionBuilder.withArgName("en | zh | de | fr | ar | tr").hasArg().withDescription("2-character language code").create("lang"));
+    options.addOption(OptionBuilder.withArgName("en | zh | de | fr | ar | tr | es").hasArg().withDescription("2-character language code").create("lang"));
     options.addOption(OptionBuilder.withArgName("true|false").hasArg().withDescription("turn on/off stopword removal").create("stopword"));
     options.addOption(OptionBuilder.withArgName("true|false").hasArg().withDescription("turn on/off stemming").create("stem"));
 

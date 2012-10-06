@@ -1677,7 +1677,8 @@ public class OpenNLPTokenizer extends ivory.core.tokenize.Tokenizer {
     "sans",
     "soi",
     "l'",
-  "d'"};
+    "n'",
+    "d'"};
   private static final String[] FRENCH_SNOWBALL_STEMMED_STOP_WORDS = {
     "au",
     "aux",
@@ -1843,6 +1844,7 @@ public class OpenNLPTokenizer extends ivory.core.tokenize.Tokenizer {
     "san",
     "soi",
     "l'",
+    "n'",
     "d'"
   };
   private final Set<String> englishStopwords = Sets.newHashSet(TERRIER_STOP_WORDS);

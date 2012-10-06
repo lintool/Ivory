@@ -316,7 +316,7 @@ public class PreprocessHelper {
   }
 
   public ArrayListWritable<Text> getFSentences(String text, ArrayListWritable<HMapSFW> vectors, ArrayListOfIntsWritable sentLengths) throws ClassNotFoundException, InstantiationException, IllegalAccessException, IOException {
-    //    sLogger.setLevel(Level.DEBUG);
+//        sLogger.setLevel(Level.DEBUG);
     sLogger.debug("text length="+text.length());
 
     ArrayListWritable<Text> sentences = new ArrayListWritable<Text>();
@@ -482,17 +482,12 @@ public class PreprocessHelper {
   }
 
   public float getFInVocabRate(String fSent) {
+    // temporarily disable stopword removal and vocabulary filtering
     VocabularyWritable v = fTok.getVocab();
     boolean isStopwordRemoval = fTok.getStopwordRemoval();
     fTok.setVocab(null);
-    
-    
-//    sLogger.setLevel(Level.INFO);
-//    if (fSent.contains("Canto rodado (escuela de arte)") || fSent.contains("İsim Yaş Tür Bulunuş tarihi Ülke Keşfeden kişiler")) {
-//      sLogger.setLevel(Level.DEBUG);
-//    }
-    
-    
+    fTok.setStopwordRemoval(false);
+
     String[] fTokens = fTok.processContent(fSent);
     float oov = 0, total = fTokens.length;
     for (String fToken : fTokens) {
@@ -503,22 +498,19 @@ public class PreprocessHelper {
         sLogger.debug(fToken+" --> in vocab");
       }
     }
+
+    // revert to original settings 
     fTok.setVocab(v);
     fTok.setStopwordRemoval(isStopwordRemoval);
     return (total-oov) / total;
   }
 
   public float getEInVocabRate(String eSent) {
+    // temporarily disable stopword removal and vocabulary filtering
     VocabularyWritable v = eTok.getVocab();
     boolean isStopwordRemoval = eTok.getStopwordRemoval();
     eTok.setVocab(null);
     eTok.setStopwordRemoval(false);
-    
-//    sLogger.setLevel(Level.INFO);
-//    if (eSent.contains("Name Age Species Date discovered Country Discovered by") || eSent.contains("Harri Rovanper")) {
-//      sLogger.setLevel(Level.DEBUG);
-//    }
-    
     
     String[] eTokens = eTok.processContent(eSent);
     float oov = 0, total = eTokens.length;
@@ -530,6 +522,8 @@ public class PreprocessHelper {
         sLogger.debug(eToken+" --> in vocab");
       }
     }
+
+    // revert to original settings 
     eTok.setVocab(v);
     eTok.setStopwordRemoval(isStopwordRemoval);
     sLogger.debug(oov / total);

@@ -14,6 +14,7 @@ public class TokenizerFactory {
   static {
     acceptedLanguages.put("zh", 1);
     acceptedLanguages.put("en", 1);
+    acceptedLanguages.put("es", 1);
     acceptedLanguages.put("ar", 1);
     acceptedLanguages.put("de", 1);
     acceptedLanguages.put("fr", 1);
@@ -59,16 +60,17 @@ public class TokenizerFactory {
       conf.set(Constants.Language, lang);
       conf.set(Constants.TokenizerData, modelPath);
       
-      Tokenizer tokenizer = null;
-      if(lang.equals("zh")){
-        tokenizer = new StanfordChineseTokenizer();
-      }else if(lang.equals("de") || lang.equals("en") || lang.equals("fr")){
-        tokenizer = new OpenNLPTokenizer();
-      }else if(lang.equals("ar")){
-        tokenizer = new LuceneArabicAnalyzer();
-      }else if(lang.equals("tr")){
-        tokenizer = new LuceneTurkishAnalyzer();
-      }
+      Class tokenizerClass = getTokenizerClass(lang);
+      Tokenizer tokenizer = (Tokenizer) tokenizerClass.newInstance();
+//      if(lang.equals("zh")){
+//        tokenizer = new StanfordChineseTokenizer();
+//      }else if(lang.equals("de") || lang.equals("en") || lang.equals("fr")){
+//        tokenizer = new OpenNLPTokenizer();
+//      }else if(lang.equals("ar")){
+//        tokenizer = new LuceneArabicAnalyzer();
+//      }else if(lang.equals("tr")){
+//        tokenizer = new LuceneTurkishAnalyzer();
+//      }
       
       if (vocab != null) {
         tokenizer.setVocab(vocab);
@@ -91,6 +93,8 @@ public class TokenizerFactory {
       return LuceneArabicAnalyzer.class;
     }else if(lang.equals("tr")) {
       return LuceneTurkishAnalyzer.class;
+    }else if(lang.equals("es")) {
+      return LuceneSpanishAnalyzer.class;
     }else {
       Log.info("Unknown class for language: " + lang);
       throw new RuntimeException("Unknown class for language: " + lang);
