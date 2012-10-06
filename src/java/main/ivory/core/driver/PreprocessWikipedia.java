@@ -31,6 +31,13 @@ import ivory.core.tokenize.TokenizerFactory;
 import java.io.IOException;
 import java.util.Arrays;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.GnuParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
@@ -58,84 +65,93 @@ public class PreprocessWikipedia extends Configured implements Tool {
   /*
    * DEFINED PARAMETERS HERE:
    */
-  static final int MinDF = 2, MinNumTermsPerArticle = 5, TermIndexWindow = 8;
-  static final boolean IsNormalized = true;
-  static final int NUM_MONO = 4, NUM_CROSS_E = 7, NUM_CROSS_F = 13;
-  static int MONO_LINGUAL = 0, CROSS_LINGUAL_E = 1, CROSS_LINGUAL_F = 2;
+  private static final int MinDF = 2, MinNumTermsPerArticle = 5, TermIndexWindow = 8;
+  private static final boolean IsNormalized = true;
+  private static final int NUM_MONO = 4, NUM_CROSS_E = 7, NUM_CROSS_F = 13;
+  private static int MONO_LINGUAL = 0, CROSS_LINGUAL_E = 1, CROSS_LINGUAL_F = 2;
+  private String indexRootPath;
+  private String rawCollection;
+  private String seqCollection;
+  private String tokenizerClass;  
+  private String collectionLang = null, tokenizerModel = null, collectionVocab = null, targetIndexPath = null, 
+      fVocab_f2e = null, eVocab_f2e = null, fVocab_e2f, eVocab_e2f = null, ttable_f2e = null, ttable_e2f = null;
+  private int mode;
+  private Options options;
 
-  private static int printUsage() {
-    System.out.println("\nThis program can be run in three different \"modes\":\n=====================\nInput: English Wikipedia collection\nOutput: English weighted document vectors" +
-        "\nusage: [index-path] [raw-path] [compressed-path] [tokenizer-class]" +
-        "\n\nInput: English side of cross-lingual Wikipedia collection\nOutput: English weighted document vectors (comparable with the document vectors generated from non-English side)" +
-        "\nusage: [index-path] [raw-path] [compressed-path] [tokenizer-class] [collection-lang] [tokenizer-model] [collection-vocab]" +
-        "\n\nInput: Non-English side of cross-lingual Wikipedia collection\nOutput: English weighted document vectors (comparable with the document vectors generated from English side)" +
-    "\nusage: [index-path] [raw-path] [compressed-path] [tokenizer-class] [collection-lang] [tokenizer-model] [src-vocab_f] [trg-vocab_e] [prob-table_f-->e] [src-vocab_e] [trg-vocab_f] [prob-table_e-->f] [target-index-path]");
-    return -1;
+  private void printUsage() {
+    HelpFormatter formatter = new HelpFormatter();
+    formatter.printHelp( this.getClass().getCanonicalName(), options );
+    //
+    //    
+    //    System.out.println("\nThis program can be run in three different \"modes\":\n=====================\nInput: English Wikipedia collection\nOutput: English weighted document vectors" +
+    //        "\nusage: [index-path] [raw-path] [compressed-path] [tokenizer-class]" +
+    //        "\n\nInput: English side of cross-lingual Wikipedia collection\nOutput: English weighted document vectors (comparable with the document vectors generated from non-English side)" +
+    //        "\nusage: [index-path] [raw-path] [compressed-path] [tokenizer-class] [collection-lang] [tokenizer-model] [collection-vocab]" +
+    //        "\n\nInput: Non-English side of cross-lingual Wikipedia collection\nOutput: English weighted document vectors (comparable with the document vectors generated from English side)" +
+    //    "\nusage: [index-path] [raw-path] [compressed-path] [tokenizer-class] [collection-lang] [tokenizer-model] [src-vocab_f] [trg-vocab_e] [prob-table_f-->e] [src-vocab_e] [trg-vocab_f] [prob-table_e-->f] [target-index-path]");
+    //    return -1;
   }
 
   /**
    * Runs this tool.
    */
   public int run(String[] args) throws Exception {
-    int numArgs = args.length;
-    int mode;
-    if (numArgs >= NUM_MONO && numArgs < NUM_CROSS_E) {
-      mode = MONO_LINGUAL;
-      LOG.info("Mode: monolingual");
-    } else if (numArgs == NUM_CROSS_E) {
-      mode = CROSS_LINGUAL_E;
-      LOG.info("Mode: crosslingual - English side");
-    } else if (numArgs == NUM_CROSS_F) {
-      mode = CROSS_LINGUAL_F;
-      LOG.info("Mode: crosslingual - nonEnglish side");
-    } else {
+    //    int numArgs = args.length;
+    //    if (numArgs >= NUM_MONO && numArgs < NUM_CROSS_E) {
+    //      mode = MONO_LINGUAL;
+    //      LOG.info("Mode: monolingual");
+    //    } else if (numArgs == NUM_CROSS_E) {
+    //      mode = CROSS_LINGUAL_E;
+    //      LOG.info("Mode: crosslingual - English side");
+    //    } else if (numArgs == NUM_CROSS_F) {
+    //      mode = CROSS_LINGUAL_F;
+    //      LOG.info("Mode: crosslingual - nonEnglish side");
+    //    } else {
+    //      printUsage();
+    //      return -1;
+    //    }
+    if ( parseArgs(args) < 0 ) {
       printUsage();
       return -1;
     }
     Configuration conf = getConf();
 
-    String collectionLang = null, tokenizerModel = null, collectionVocab = null,
-    fVocab_f2e = null, eVocab_f2e = null, fVocab_e2f, eVocab_e2f = null, ttable_f2e = null, ttable_e2f = null;
-    String indexRootPath = args[0];
-    String rawCollection = args[1];
-    String seqCollection = args[2];
-    String tokenizerClass = args[3];	
-
-    if (args.length > 4) {
-      collectionLang = args[4];
-      conf.set(Constants.Language, collectionLang);
-      if (args.length > 5) {
-        tokenizerModel = args[5];
-        conf.set(Constants.TokenizerData, tokenizerModel);
-      }
-    }
+    //    String collectionLang = null, tokenizerModel = null, collectionVocab = null,
+    //    fVocab_f2e = null, eVocab_f2e = null, fVocab_e2f, eVocab_e2f = null, ttable_f2e = null, ttable_e2f = null;
+    //    String indexRootPath = args[0];
+    //    String rawCollection = args[1];
+    //    String seqCollection = args[2];
+    //    String tokenizerClass = args[3];	
+    //
+    //    if (args.length > 4) {
+    //      collectionLang = args[4];
+    //      conf.set(Constants.Language, collectionLang);
+    //      if (args.length > 5) {
+    //        tokenizerModel = args[5];
+    //        conf.set(Constants.TokenizerData, tokenizerModel);
+    //      }
+    //    }
 
     // user can either provide a tokenizer class manually, 
     // or let the factory find an appropriate class based on language code
     try {
       Class.forName(tokenizerClass);
-    } catch (ClassNotFoundException e) {
+    } catch (Exception e) {
       tokenizerClass = TokenizerFactory.getTokenizerClass(collectionLang).getCanonicalName();
     }
 
-    if (mode == CROSS_LINGUAL_E || mode == CROSS_LINGUAL_F) {		// CROSS-LINGUAL CASE
-      collectionLang = args[4];
-      tokenizerModel = args[5];
-      collectionVocab = args[6];
-      conf.set(Constants.Language, collectionLang);
+    conf.set(Constants.Language, collectionLang);
+    if (tokenizerModel != null) {
       conf.set(Constants.TokenizerData, tokenizerModel);
+    }
+    if (collectionVocab != null) {
       conf.set(Constants.CollectionVocab, collectionVocab);   // vocabulary to read collection from
+    }
+
+    if (mode == CROSS_LINGUAL_E || mode == CROSS_LINGUAL_F) {		// CROSS-LINGUAL CASE
       conf.set("Ivory.FinalVocab", collectionVocab);        // vocabulary to map terms to integers in BuildTargetLang...
 
       if (mode == CROSS_LINGUAL_F) {			// non-English side, needs to be translated
-        fVocab_f2e = args[6];		//  this is the collection vocab
-        eVocab_f2e = args[7];
-        ttable_f2e = args[8];
-        eVocab_e2f = args[9];
-        fVocab_e2f = args[10];
-        ttable_e2f = args[11];
-        String targetIndexPath = args[12];
-        
         conf.set(Constants.TargetIndexPath, targetIndexPath);
         conf.set("Ivory.F_Vocab_F2E", fVocab_f2e);	
         conf.set("Ivory.E_Vocab_F2E", eVocab_f2e);
@@ -143,7 +159,6 @@ public class PreprocessWikipedia extends Configured implements Tool {
         conf.set("Ivory.E_Vocab_E2F", eVocab_e2f);	
         conf.set("Ivory.F_Vocab_E2F", fVocab_e2f);	
         conf.set("Ivory.TTable_E2F", ttable_e2f);
-//        conf.set("Ivory.FinalVocab", eVocab_e2f);
         conf.set("Ivory.FinalVocab", eVocab_f2e);
       }
     }
@@ -166,10 +181,10 @@ public class PreprocessWikipedia extends Configured implements Tool {
       LOG.info(" - Tokenizer model: " + tokenizerModel);
 
       if (mode == CROSS_LINGUAL_F) {
-        LOG.info(" - TTable file "+collectionLang+" --> English : " + ttable_f2e);
+        LOG.info(" - TTable file "+collectionLang+" --> E-language : " + ttable_f2e);
         LOG.info(" - Source vocab file: " + fVocab_f2e);
         LOG.info(" - Target vocab file: " + eVocab_f2e);
-        LOG.info(" - TTable file "+"English --> "+collectionLang+" : " + ttable_e2f);
+        LOG.info(" - TTable file "+"E-language --> "+collectionLang+" : " + ttable_e2f);
         LOG.info(" - Source vocab file: " + fVocab_f2e);
         LOG.info(" - Target vocab file: " + eVocab_f2e);
       }
@@ -203,19 +218,17 @@ public class PreprocessWikipedia extends Configured implements Tool {
 
     // Repack Wikipedia into sequential compressed block
     p = new Path(seqCollection);
-    if (!fs.exists(p)) {
-      LOG.info(seqCollection + " doesn't exist, creating...");
-      String[] arr = new String[] { "-input=" + rawCollection,
-          "-output=" + seqCollection,
-          "-mapping_file=" + mappingFile.toString(),
-          "-compression_type=block",
-          "-wiki_language=" + collectionLang };
-      LOG.info("Running RepackWikipedia with args " + Arrays.toString(arr));
+    LOG.info(seqCollection + " doesn't exist, creating...");
+    String[] arr = new String[] { "-input=" + rawCollection,
+        "-output=" + seqCollection,
+        "-mapping_file=" + mappingFile.toString(),
+        "-compression_type=block",
+        "-wiki_language=" + collectionLang };
+    LOG.info("Running RepackWikipedia with args " + Arrays.toString(arr));
 
-      RepackWikipedia tool = new RepackWikipedia();
-      tool.setConf(conf);
-      tool.run(arr);
-    }
+    RepackWikipedia tool = new RepackWikipedia();
+    tool.setConf(conf);
+    tool.run(arr);
 
     conf.set(Constants.CollectionName, "Wikipedia-"+collectionLang);
     conf.setInt(Constants.NumMapTasks, numMappers);
@@ -329,6 +342,72 @@ public class PreprocessWikipedia extends Configured implements Tool {
     LOG.info("Preprocessing job finished in " + (System.currentTimeMillis() - preprocessStartTime) / 1000.0 + " seconds");
 
     return 0;
+  }
+
+  private static final String MODE_OPTION = "mode";
+  private static final String INDEX_PATH_OPTION = "index";
+  private static final String TARGET_INDEX_PATH_OPTION = "targetindex";
+  private static final String XML_PATH_OPTION = "xml";
+  private static final String COMPRESSED_PATH_OPTION = "compressed";
+  private static final String TOKENIZER_CLASS_OPTION = "tokenizerclass";
+  private static final String TOKENIZER_MODEL_OPTION = "tokenizermodel";
+  private static final String COLLECTION_VOCAB_OPTION = "collectionvocab";
+  private static final String LANGUAGE_OPTION = "lang";
+  private static final String FVOCAB_F2E_OPTION = "f_f2e_vocab";
+  private static final String EVOCAB_F2E_OPTION = "e_f2e_vocab";
+  private static final String FVOCAB_E2F_OPTION = "f_e2f_vocab";
+  private static final String EVOCAB_E2F_OPTION = "e_e2f_vocab";
+  private static final String TTABLE_F2E_OPTION = "f2e_ttable";
+  private static final String TTABLE_E2F_OPTION = "e2f_ttable";
+
+  @SuppressWarnings("static-access")
+  private int parseArgs(String[] args) {
+    options = new Options();
+    options.addOption(OptionBuilder.withDescription("preprocessing mode").withArgName("mono|crosslingF|crosslingE").hasArg().isRequired().create(MODE_OPTION));
+    options.addOption(OptionBuilder.withDescription("path to index directory").withArgName("path").hasArg().isRequired().create(INDEX_PATH_OPTION));
+    options.addOption(OptionBuilder.withDescription("path to target index directory (if processing f-side)").withArgName("path").hasArg().create(TARGET_INDEX_PATH_OPTION));
+    options.addOption(OptionBuilder.withDescription("path to XML file").withArgName("path").hasArg().isRequired().create(XML_PATH_OPTION));
+    options.addOption(OptionBuilder.withDescription("path to compressed collection").withArgName("path").hasArg().isRequired().create(COMPRESSED_PATH_OPTION));
+    options.addOption(OptionBuilder.withDescription("tokenizer class").withArgName("class").hasArg().create(TOKENIZER_CLASS_OPTION));
+    options.addOption(OptionBuilder.withDescription("path to tokenizer model file/directory").withArgName("path").hasArg().create(TOKENIZER_MODEL_OPTION));
+    options.addOption(OptionBuilder.withDescription("path to collection vocab file").withArgName("path").hasArg().create(COLLECTION_VOCAB_OPTION));
+    options.addOption(OptionBuilder.withDescription("two-letter collection language code").withArgName("en|de|fr|zh|es|ar|tr").hasArg().isRequired().create(LANGUAGE_OPTION));
+    options.addOption(OptionBuilder.withDescription("path to f-side vocab file of f-to-e translation table").withArgName("path").hasArg().create(FVOCAB_F2E_OPTION));
+    options.addOption(OptionBuilder.withDescription("path to e-side vocab file of f-to-e translation table").withArgName("path").hasArg().create(EVOCAB_F2E_OPTION));
+    options.addOption(OptionBuilder.withDescription("path to f-side vocab file of e-to-f translation table").withArgName("path").hasArg().create(FVOCAB_E2F_OPTION));
+    options.addOption(OptionBuilder.withDescription("path to e-side vocab file of e-to-f translation table").withArgName("path").hasArg().create(EVOCAB_E2F_OPTION));
+    options.addOption(OptionBuilder.withDescription("path to f-to-e translation table").withArgName("path").hasArg().create(TTABLE_F2E_OPTION));
+    options.addOption(OptionBuilder.withDescription("path to e-to-f translation table").withArgName("path").hasArg().create(TTABLE_E2F_OPTION));
+
+    CommandLine cmdline;
+    CommandLineParser parser = new GnuParser();
+    try {
+      cmdline = parser.parse(options, args);
+    } catch (ParseException exp) {
+      System.err.println("Error parsing command line: " + exp.getMessage());
+      return -1;
+    }
+
+    String m = cmdline.getOptionValue("mode");
+    mode = m.equals("mono") ? MONO_LINGUAL : (m.equals("crosslingF") ? CROSS_LINGUAL_F : (m.equals("crosslingE")) ? CROSS_LINGUAL_E : -1); 
+    if (mode == -1) throw new RuntimeException("Incorrect mode selection!");
+
+    indexRootPath = cmdline.getOptionValue(INDEX_PATH_OPTION);
+    rawCollection = cmdline.getOptionValue(XML_PATH_OPTION);
+    seqCollection = cmdline.getOptionValue(COMPRESSED_PATH_OPTION);
+    tokenizerClass = cmdline.getOptionValue(TOKENIZER_CLASS_OPTION);
+    tokenizerModel = cmdline.getOptionValue(TOKENIZER_MODEL_OPTION);
+    collectionVocab = cmdline.getOptionValue(COLLECTION_VOCAB_OPTION);
+    collectionLang = cmdline.getOptionValue(LANGUAGE_OPTION);
+    targetIndexPath = cmdline.getOptionValue(TARGET_INDEX_PATH_OPTION);
+    fVocab_f2e = cmdline.getOptionValue(FVOCAB_F2E_OPTION);
+    eVocab_f2e = cmdline.getOptionValue(EVOCAB_F2E_OPTION);
+    fVocab_e2f = cmdline.getOptionValue(FVOCAB_E2F_OPTION);
+    eVocab_e2f = cmdline.getOptionValue(EVOCAB_E2F_OPTION);
+    ttable_f2e = cmdline.getOptionValue(TTABLE_F2E_OPTION);
+    ttable_e2f = cmdline.getOptionValue(TTABLE_E2F_OPTION);
+
+    return 1;
   }
 
   /**
