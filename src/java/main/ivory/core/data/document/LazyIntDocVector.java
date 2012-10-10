@@ -62,7 +62,6 @@ public class LazyIntDocVector implements IntDocVector {
     if (bytes != null) {
       // This would happen if we're reading in an already-encoded
       // doc vector; if that's the case, simply write out the byte array
-      WritableUtils.writeVInt(out, numTerms);
       writeRawBytes(out);
     } else if (termPositionsMap != null) {
       writeTermPositionsMap(out);
