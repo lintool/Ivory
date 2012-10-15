@@ -43,7 +43,7 @@ public class Docs2Sentences extends Configured implements Tool {
   private static final Logger sLogger = Logger.getLogger(Docs2Sentences.class);
 
   enum Sentences {
-    ELength, FLength, E, F;
+    ELength, FLength, E, F, OOV;
   }
 
   enum Docs {
@@ -76,9 +76,12 @@ public class Docs2Sentences extends Configured implements Tool {
     private PairOfInts keyOut;
     private WikiSentenceInfo valOut;
     private PreprocessHelper helper;							// for modularity, helper provides methods to preprocess data
+    private float minInVocabRate;
 
     public void configure(JobConf job) {
       sLogger.setLevel(Level.INFO);
+
+      minInVocabRate = job.getFloat("MinInVocabRate", 0.5f);    
 
       try {
         helper = new PreprocessHelper(CLIRUtils.MinVectorTerms, CLIRUtils.MinSentenceLength, job);
@@ -101,11 +104,16 @@ public class Docs2Sentences extends Configured implements Tool {
         // identify sentences in document, filter out ones below MinSentLength threshold
         // convert each sentence into a tf-idf vector, using general DF map for collection and a heuristic for avg. doc length
         // filter out sentences for which the vector has less than MinVectorTerms terms
+        String article = p.getContent();
         if (lang.equals("en")) {
-          sentences = helper.getESentences(p.getContent(), vectors, sentLengths);		
+          sentences = helper.getESentences(article, vectors, sentLengths);		
           langID = CLIRUtils.E;
         }else {
-          sentences = helper.getFSentences(p.getContent(), vectors, sentLengths);
+          // Turkish Wiki articles' XML does not encode paragraph breaks
+          if (lang.equals("tr")) {
+            article = article.replaceAll("\\.", ". ");
+          }
+          sentences = helper.getFSentences(article, vectors, sentLengths);
           langID = CLIRUtils.F;
         }
       } catch (Exception e) {
@@ -129,10 +137,19 @@ public class Docs2Sentences extends Configured implements Tool {
       }   
 
       for (int i = 0; i < sentences.size(); i++) {
+        float inVocabRate = 0;
         if (langID == CLIRUtils.E) {
+          if (helper.getEInVocabRate(sentences.get(i).toString()) < minInVocabRate ) {
+            reporter.incrCounter(Sentences.OOV, 1);
+            return;
+          }          
           reporter.incrCounter(Sentences.ELength, sentLengths.get(i));
           reporter.incrCounter(Sentences.E, 1);    
         }else {
+          if (helper.getFInVocabRate(sentences.get(i).toString()) < minInVocabRate ) {
+            reporter.incrCounter(Sentences.OOV, 1);
+            return;
+          }
           reporter.incrCounter(Sentences.FLength, sentLengths.get(i));
           reporter.incrCounter(Sentences.F, 1);    
         }

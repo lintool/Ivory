@@ -4,7 +4,6 @@ import ivory.core.RetrievalEnvironment;
 import ivory.core.tokenize.Tokenizer;
 import ivory.core.util.CLIRUtils;
 import ivory.lsh.data.WikiSentenceInfo;
-
 import java.io.IOException;
 import java.net.URI;
 import opennlp.model.RealValueFileEventStream;
@@ -73,7 +72,6 @@ public class FilterSentencePairs extends Configured implements Tool {
     private Text outSent1, outSent2;
     private float classifierThreshold;
     private int classifierPositiveId;
-    private float minInVocabRate;
     
     public void configure(JobConf job) {
       sLogger.setLevel(Level.INFO);
@@ -83,7 +81,6 @@ public class FilterSentencePairs extends Configured implements Tool {
       } catch (Exception e) {
         e.printStackTrace();
       }
-      minInVocabRate = job.getFloat("MinInVocabRate", 0.5f);    
       classifierThreshold = job.getFloat("ClassifierThreshold", 0.0f);
       classifierPositiveId = job.getInt("ClassifierId", -1);
       if(classifierPositiveId != 0 && classifierPositiveId != 1){
@@ -112,14 +109,7 @@ public class FilterSentencePairs extends Configured implements Tool {
       eVector = helper.createEDocVector(eSent, eSrcTfs);
       HMapSIW fSrcTfs = new HMapSIW();
       fVector = helper.createFDocVector(fSent, fSrcTfs);
-      
-      float fInVocab = helper.getFInVocabRate(fSent);
-      float eInVocab = helper.getEInVocabRate(eSent);
-      if (fInVocab < minInVocabRate || eInVocab < minInVocabRate) {
-          reporter.incrCounter(Sentences.OOV, 1);
-          return;
-      }
-      
+   
       if (eVector == null || fVector == null) {
         reporter.incrCounter(Sentences.ignored, 1);	
         return;
@@ -129,6 +119,13 @@ public class FilterSentencePairs extends Configured implements Tool {
 
       String[] instance = CLIRUtils.computeFeaturesF3(eSrcTfs, eVector, fSrcTfs, fVector, eLen, fLen, 
           helper.getESrc(), helper.getETrg(), helper.getFSrc(), helper.getFTrg(), helper.getE2F(), helper.getF2E(), sLogger);
+      
+//      String[] instance = CLIRUtils.computeFeaturesF4(eSent, eSrcTfs, eVector, fSent, fSrcTfs, fVector, eLen, fLen, 
+//          helper.getESrc(), helper.getETrg(), helper.getFSrc(), helper.getFTrg(), helper.getE2F(), helper.getF2E(), sLogger);
+      String s ="";
+      for (String feat : instance) {
+        s+=feat+" ";
+      }
       
       // classify w/ maxent model
       // emit if labeled parallel
@@ -147,7 +144,7 @@ public class FilterSentencePairs extends Configured implements Tool {
           
       if (confidence > classifierThreshold) {
         reporter.incrCounter(Sentences.parallel, 1);
-        outSent1.set(fSent + CLIRUtils.BitextSeparator + eSent);
+        outSent1.set(fSent + CLIRUtils.BitextSeparator + eSent + CLIRUtils.BitextSeparator + s + CLIRUtils.BitextSeparator + confidence);
         output.collect(outSent1, outSent2);
       }
     }
@@ -168,7 +165,6 @@ public class FilterSentencePairs extends Configured implements Tool {
     String inputPath = args[0];
     String outputPath = args[1];
 
-
     String eDir = args[2];
     String fDir = args[3];
 
@@ -180,7 +176,6 @@ public class FilterSentencePairs extends Configured implements Tool {
     String bitextName = args[7];
     float classifierThreshold = Float.parseFloat(args[8]);
     int classifierId = Integer.parseInt(args[9]);
-    float minInVocabRate = args.length > 10 ? Float.parseFloat(args[10]) : 0.5f;
 
     String eSentDetect = dataDir+"/sent/"+eLang+"-sent.bin";
     String eTokenizer = dataDir+"/token/"+eLang+"-token.bin";
@@ -195,8 +190,10 @@ public class FilterSentencePairs extends Configured implements Tool {
     String f2e_ttableFile = dataDir+"/"+bitextName+"/ttable."+fLang+"-"+eLang;
     String e2f_ttableFile = dataDir+"/"+bitextName+"/ttable."+eLang+"-"+fLang;
 
+//    String classifierFile = dataDir+"/"+bitextName+"/classifier-complexplus."+fLang+"-"+eLang;
     String classifierFile = dataDir+"/"+bitextName+"/classifier-complex."+fLang+"-"+eLang;
 
+//    conf.setJobName("FilterSentencePairs_" + fLang +"-" + eLang +"_F4="+classifierThreshold+"["+classifierId+"]");
     conf.setJobName("FilterSentencePairs_" + fLang +"-" + eLang +"_F3="+classifierThreshold+"["+classifierId+"]");
 
     conf.set("eDir", eDir);
@@ -205,7 +202,6 @@ public class FilterSentencePairs extends Configured implements Tool {
     conf.set("fLang", fLang);
     conf.setFloat("ClassifierThreshold", classifierThreshold);
     conf.setInt("ClassifierId", classifierId);
-    conf.setFloat("MinInVocabRate", minInVocabRate);
     conf.set("fTokenizer", fTokenizer);
     conf.set("eTokenizer", eTokenizer);
 

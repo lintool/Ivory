@@ -153,7 +153,7 @@ public class FindParallelSentencePairs extends Configured implements Tool {
     public void map(PairOfInts sentenceId, WikiSentenceInfo sentenceInfo, OutputCollector<PairOfInts, WikiSentenceInfo> output, Reporter reporter) throws IOException {
       int docno = sentenceId.getLeftElement();
       int langID = sentenceInfo.getLangID();
-            
+                    
       // we only load the mapping once, during the first map() call of a mapper. 
       // this works b/c all input kv pairs of a given mapper will have same lang id (reason explained above)
       if (pwsimMapping.isEmpty()) {
@@ -164,7 +164,8 @@ public class FindParallelSentencePairs extends Configured implements Tool {
       // if no similar docs for docno, return
       if (pwsimMapping.containsKey(docno)) {
         similarDocnos = pwsimMapping.get(docno);  
-        sLogger.debug("Found "+similarDocnos.size()+" pairs");
+      }else{
+        return;
       }
 
       if (langID == CLIRUtils.E) {
@@ -237,7 +238,7 @@ public class FindParallelSentencePairs extends Configured implements Tool {
 
       fDocno = docnoPair.getLeftElement();
       eDocno = docnoPair.getRightElement();
-      
+            
       // parse WikiDocInfo object into sentences and vectors, based on the language id
       WikiSentenceInfo sentenceInfo;
       int eCnt = 0, fCnt = 0;
@@ -299,11 +300,13 @@ sLogger.debug(fSentences.size()+","+eSentences.size());
           reporter.incrCounter(Sentences.pairsProcessed, 1);        
           numProcessed++;      
             
+          sLogger.debug(fSentences.get(f));
+          sLogger.debug(eSentences.get(e));
+            
           // compute features
           long start = System.currentTimeMillis();
           String[] instance = CLIRUtils.computeFeaturesF1(eVector, fVector, eSentLength, fSentLength);
           time += (System.currentTimeMillis()-start);
-          
           
           // classify w/ maxent model
           // emit if labeled parallel
@@ -392,7 +395,9 @@ sLogger.debug(fSentences.size()+","+eSentences.size());
 
     float classifierThreshold = Float.parseFloat(args[11]);
     int classifierId = Integer.parseInt(args[12]);
-    
+  
+    float minInVocabRate = args.length > 13 ? Float.parseFloat(args[13]) : 0.5f;
+
     String eSentDetect = dataDir+"/sent/"+eLang+"-sent.bin";
     String eTokenizer = dataDir+"/token/"+eLang+"-token.bin";
     String eVocabSrc = dataDir+"/"+bitextName+"/vocab."+eLang+"-"+fLang+"."+eLang;
@@ -418,6 +423,7 @@ sLogger.debug(fSentences.size()+","+eSentences.size());
     conf.setInt("ClassifierId", classifierId);
     conf.set("fTokenizer", fTokenizer);
     conf.set("eTokenizer", eTokenizer);
+    conf.setFloat("MinInVocabRate", minInVocabRate);
 
     //e-files
 

@@ -27,10 +27,8 @@ import ivory.core.preprocess.BuildWeightedIntDocVectors;
 import ivory.core.preprocess.BuildWeightedTermDocVectors;
 import ivory.core.preprocess.ComputeGlobalTermStatistics;
 import ivory.core.tokenize.TokenizerFactory;
-
 import java.io.IOException;
 import java.util.Arrays;
-
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
@@ -46,7 +44,6 @@ import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Logger;
-
 import edu.umd.cloud9.collection.wikipedia.BuildWikipediaDocnoMapping;
 import edu.umd.cloud9.collection.wikipedia.RepackWikipedia;
 import edu.umd.cloud9.collection.wikipedia.WikipediaDocnoMapping;
@@ -67,7 +64,6 @@ public class PreprocessWikipedia extends Configured implements Tool {
    */
   private static final int MinDF = 2, MinNumTermsPerArticle = 5, TermIndexWindow = 8;
   private static final boolean IsNormalized = true;
-  private static final int NUM_MONO = 4, NUM_CROSS_E = 7, NUM_CROSS_F = 13;
   private static int MONO_LINGUAL = 0, CROSS_LINGUAL_E = 1, CROSS_LINGUAL_F = 2;
   private String indexRootPath;
   private String rawCollection;

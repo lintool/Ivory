@@ -16,8 +16,11 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -593,7 +596,7 @@ public class CLIRUtils extends Configured {
     }
     return v;
   }
-  
+
   /**
    * Given the TF, DF values, doc length, scoring model, this method creates the term doc vector for a document.
    * 
@@ -1208,22 +1211,22 @@ public class CLIRUtils extends Configured {
 
     float cosine = CLIRUtils.cosineNormalized(eVector, translatedFVector);
     features[0] = "cosine="+cosine;    
-    
+
     float lengthratio1, lengthratio2;
     lengthratio1 = eSentLength/fSentLength;
     lengthratio2 = fSentLength/eSentLength;
     features[1] = "lengthratio1="+lengthratio1;
     features[2] = "lengthratio2="+lengthratio2;				
-    
+
     int cntFVectPos = 0, cntEVectPos = 0, cntFSentPos = 0, cntESentPos = 0;
     float cntFVectAll = 0, cntFSentAll = 0, transratioFVect = 0.0f, cntEVectAll = 0, cntESentAll = 0, transratioEVect = 0.0f, transratioFSent = 0.0f, transratioESent = 0.0f;
     for(String fTerm : fSrcTfs.keySet()){
       int f = fVocabSrc.get(fTerm);
       int srcCnt = fSrcTfs.get(fTerm);
       cntFSentAll += srcCnt;      // consider OOVs as well since they are part of the sentence
-      
-//      if(f < 0 || fTerm.matches("\\d+")){     // only non-number terms since numbers might have noisy translation prob.s
-      if(f < 0){
+
+      if(f < 0 || fTerm.matches("\\d+")){     // only non-number terms since numbers might have noisy translation prob.s
+//      if(f < 0){
         continue;
       }
       boolean found = false;
@@ -1238,32 +1241,32 @@ public class CLIRUtils extends Configured {
           sLogger.debug("f2e:"+fTerm+"-->"+eTerm);
           trgCnt += eSrcTfs.get(eTerm);
           cntFVectPos++;
-          
+
           found = true;
           if (trgCnt >= srcCnt) break;
         }
       }
       cntFSentPos += trgCnt >= srcCnt ? srcCnt : trgCnt;
-//      // if no translation found for fTerm, see if it appears as itself in eSent -- count as half
-//      if (!found && eVector.containsKey(fTerm)) {
-//        cntTrans += 0.5f;
-//      }
+      //      // if no translation found for fTerm, see if it appears as itself in eSent -- count as half
+      //      if (!found && eVector.containsKey(fTerm)) {
+      //        cntTrans += 0.5f;
+      //      }
       cntFVectAll++;
     }
-    
+
     for(String eTerm : eSrcTfs.keySet()){
       int e = eVocabSrc.get(eTerm);
       int srcCnt = eSrcTfs.get(eTerm);
       cntESentAll += srcCnt;      // consider OOVs as well since they are part of the sentence
-      
-      //      if(e < 0 || eTerm.matches("\\d+")){   // only non-number terms since numbers might have noisy translation prob.s
-      if(e < 0){
+
+      if(e < 0 || eTerm.matches("\\d+")){   // only non-number terms since numbers might have noisy translation prob.s
+//      if(e < 0){
         continue;
       }
 
       boolean found = false;
       int[] fS = e2f_Probs.get(e).getTranslations(0.0f);
-      
+
       int trgCnt = 0;
       for(int f : fS){
         String fTerm = fVocabTrg.get(f);
@@ -1271,16 +1274,16 @@ public class CLIRUtils extends Configured {
           sLogger.debug("e2f:"+eTerm+"-->"+fTerm);
           trgCnt += fSrcTfs.get(fTerm);
           cntEVectPos++;
-          
+
           found = true;
           if (trgCnt >= srcCnt) break;
         }
       }
       cntESentPos += trgCnt >= srcCnt ? srcCnt : trgCnt;
-//      // if no translation found for eTerm, see if it appears as itself in fSent -- count as half
-//      if (!found && fSrcTfs.containsKey(eTerm)) {
-//        cntTrans2 += 0.5f;
-//      }
+      //      // if no translation found for eTerm, see if it appears as itself in fSent -- count as half
+      //      if (!found && fSrcTfs.containsKey(eTerm)) {
+      //        cntTrans2 += 0.5f;
+      //      }
       cntEVectAll++;
     }
     //when there are terms in fSent but none of them has a translation or vocab entry, set trans ratio to 0
@@ -1296,12 +1299,228 @@ public class CLIRUtils extends Configured {
     if (cntESentAll != 0) {
       transratioESent = cntESentPos/cntESentAll;
     }
-    
+
     features[3] ="wordtransratio1="+transratioFSent;
     features[4] ="wordtransratio2="+transratioESent;
-//    features[5] ="wordtransratio3="+transratioFSent;
-//    features[6] ="wordtransratio4="+transratioESent;
+    //    features[5] ="wordtransratio3="+transratioFSent;
+    //    features[6] ="wordtransratio4="+transratioESent;
     return features;
+  }
+
+  public static String[] computeFeaturesF4(String eSentence, HMapSIW eSrcTfs, HMapSFW eVector, String fSentence, HMapSIW fSrcTfs, HMapSFW translatedFVector, float eSentLength, float fSentLength,
+      Vocab eVocabSrc, Vocab eVocabTrg, Vocab fVocabSrc, Vocab fVocabTrg, TTable_monolithic_IFAs e2f_Probs, TTable_monolithic_IFAs f2e_Probs){
+    return computeFeaturesF4(eSentence, eSrcTfs, eVector, fSentence, fSrcTfs, translatedFVector, eSentLength, fSentLength, eVocabSrc, eVocabTrg, fVocabSrc, fVocabTrg, e2f_Probs, f2e_Probs, logger);
+  }
+
+  public static String[] computeFeaturesF4(String eSentence, HMapSIW eSrcTfs, HMapSFW eVector, String fSentence, HMapSIW fSrcTfs, HMapSFW translatedFVector, float eSentLength, float fSentLength,
+      Vocab eVocabSrc, Vocab eVocabTrg, Vocab fVocabSrc, Vocab fVocabTrg, TTable_monolithic_IFAs e2f_Probs, TTable_monolithic_IFAs f2e_Probs, Logger sLogger) {
+    String[] features = new String[8];
+
+    if(fSentLength == 0 || eSentLength == 0){
+      return null;
+    }
+
+    float cosine = CLIRUtils.cosineNormalized(eVector, translatedFVector);
+    features[0] = "cosine="+cosine;    
+
+    float lengthratio1, lengthratio2;
+    lengthratio1 = eSentLength/fSentLength;
+    lengthratio2 = fSentLength/eSentLength;
+    features[1] = "lengthratio1="+lengthratio1;
+    features[2] = "lengthratio2="+lengthratio2;       
+
+    ////////////////////////////////////////////////
+
+    int cntFVectPos = 0, cntEVectPos = 0, cntFSentPos = 0, cntESentPos = 0;
+    float cntFVectAll = 0, cntFSentAll = 0, transratioFVect = 0.0f, cntEVectAll = 0, cntESentAll = 0, transratioEVect = 0.0f, transratioFSent = 0.0f, transratioESent = 0.0f;
+    for(String fTerm : fSrcTfs.keySet()){
+      int f = fVocabSrc.get(fTerm);
+      int srcCnt = fSrcTfs.get(fTerm);
+      cntFSentAll += srcCnt;      // consider OOVs as well since they are part of the sentence
+
+      //      if(f < 0 || fTerm.matches("\\d+")){     // only non-number terms since numbers might have noisy translation prob.s
+      if(f < 0){
+        continue;
+      }
+      boolean found = false;
+      int[] eS = f2e_Probs.get(f).getTranslations(0.0f);
+
+      // if there are k occurences of a source token, and m occurrences of a possible translation, that should be taken into account:
+      // we'll count how many target tokens are translations of this source token
+      int trgCnt = 0;
+      for(int e : eS){
+        String eTerm = eVocabTrg.get(e);
+        if(eSrcTfs.containsKey(eTerm)){
+          sLogger.debug("f2e:"+fTerm+"-->"+eTerm);
+          trgCnt += eSrcTfs.get(eTerm);
+          cntFVectPos++;
+
+          found = true;
+          if (trgCnt >= srcCnt) break;
+        }
+      }
+      cntFSentPos += trgCnt >= srcCnt ? srcCnt : trgCnt;
+      //      // if no translation found for fTerm, see if it appears as itself in eSent -- count as half
+      //      if (!found && eVector.containsKey(fTerm)) {
+      //        cntTrans += 0.5f;
+      //      }
+      cntFVectAll++;
+    }
+
+    for(String eTerm : eSrcTfs.keySet()){
+      int e = eVocabSrc.get(eTerm);
+      int srcCnt = eSrcTfs.get(eTerm);
+      cntESentAll += srcCnt;      // consider OOVs as well since they are part of the sentence
+
+      //      if(e < 0 || eTerm.matches("\\d+")){   // only non-number terms since numbers might have noisy translation prob.s
+      if(e < 0){
+        continue;
+      }
+
+      boolean found = false;
+      int[] fS = e2f_Probs.get(e).getTranslations(0.0f);
+
+      int trgCnt = 0;
+      for(int f : fS){
+        String fTerm = fVocabTrg.get(f);
+        if(fSrcTfs.containsKey(fTerm)){
+          sLogger.debug("e2f:"+eTerm+"-->"+fTerm);
+          trgCnt += fSrcTfs.get(fTerm);
+          cntEVectPos++;
+
+          found = true;
+          if (trgCnt >= srcCnt) break;
+        }
+      }
+      cntESentPos += trgCnt >= srcCnt ? srcCnt : trgCnt;
+      //      // if no translation found for eTerm, see if it appears as itself in fSent -- count as half
+      //      if (!found && fSrcTfs.containsKey(eTerm)) {
+      //        cntTrans2 += 0.5f;
+      //      }
+      cntEVectAll++;
+    }
+    //when there are terms in fSent but none of them has a translation or vocab entry, set trans ratio to 0
+    if (cntFVectAll != 0) {
+      transratioFVect = cntFVectPos/cntFVectAll;
+    }     
+    if (cntEVectAll != 0) {
+      transratioEVect = cntEVectPos/cntEVectAll;
+    }
+    if (cntFSentAll != 0) {
+      transratioFSent = cntFSentPos/cntFSentAll;
+    }     
+    if (cntESentAll != 0) {
+      transratioESent = cntESentPos/cntESentAll;
+    }
+
+    features[3] ="wordtransratio1="+transratioFSent;
+    features[4] ="wordtransratio2="+transratioESent;
+
+    ////////////////////////////////////
+
+    // uppercase token matching features : find uppercased tokens that exactly appear on both sides
+    // lack of this evidence does not imply anything, but its existence might indicate parallel
+
+    fSentence.replaceAll("([',:;.?%!])", " $1 ");
+    eSentence.replaceAll("([',:;.?%!])", " $1 ");
+
+    List<String> fTokens = Arrays.asList(fSentence.split("\\s+"));
+    List<String> eTokens = Arrays.asList(eSentence.split("\\s+"));
+    Set<String> fEntities = new HashSet<String>();
+    boolean matchedEntity = false;
+
+    float cntFUppercase = 0, cntUppercaseMatched = 0, cntEUppercase = 0;
+    for (int i=1; i < fTokens.size(); i++) {
+      String fToken = fTokens.get(i);
+      String prevToken = fTokens.get(i-1);
+      if (Character.isUpperCase(fToken.charAt(0))) {
+        cntFUppercase++;
+        if (eTokens.contains(fToken)) {
+          cntUppercaseMatched++;
+        }
+        if (Character.isUpperCase(prevToken.charAt(0))) {
+          fEntities.add(prevToken+" "+fToken);
+        }
+      }
+    }
+
+    for (int i=1; i < eTokens.size(); i++) {
+      String eToken = eTokens.get(i);
+      String prevToken = eTokens.get(i-1);
+      if (Character.isUpperCase(eToken.charAt(0))) {
+        // we only need to count matched tokens once
+        cntEUppercase++;
+        if (Character.isUpperCase(prevToken.charAt(0))) {
+          if (fEntities.contains(prevToken+ " "+ eToken)) {
+            matchedEntity = true;
+          }
+        }
+      }
+    }
+
+    float cntUppercaseMin = Math.min(cntFUppercase, cntEUppercase);   
+    float cntUppercaseMax = Math.max(cntFUppercase, cntEUppercase);   
+    float uppercaseRatioMin = cntUppercaseMin==0 ? 0 : (cntUppercaseMatched/cntUppercaseMin);
+    float uppercaseRatioMax = cntUppercaseMin==0 ? 0 : (cntUppercaseMatched/cntUppercaseMax);
+
+    features[5] = "uppercaseratio="+(matchedEntity ? 1 :0);
+    features[6] = "uppercaseratio2="+uppercaseRatioMin;
+    features[7] = "uppercaseratio3="+uppercaseRatioMax;
+
+    return features;
+  }
+
+  public static boolean isUpperBigramMatch(String fSentence, String eSentence) {
+    fSentence.replaceAll("([',:;.?%!])", " $1 ");
+    eSentence.replaceAll("([',:;.?%!])", " $1 ");
+
+    List<String> fTokens = Arrays.asList(fSentence.split("\\s+"));
+    List<String> eTokens = Arrays.asList(eSentence.split("\\s+"));
+    Set<String> fEntities = new HashSet<String>();
+    boolean matchedEntity = false;
+
+    float cntFUppercase = 0, cntUppercaseMatched = 0, cntEUppercase = 0;
+    for (int i=1; i < fTokens.size(); i++) {
+      String fToken = fTokens.get(i);
+      String prevToken = fTokens.get(i-1);
+      if (Character.isUpperCase(fToken.charAt(0))) {
+        cntFUppercase++;
+        if (eTokens.contains(fToken)) {
+          cntUppercaseMatched++;
+        }
+        if (Character.isUpperCase(prevToken.charAt(0))) {
+          fEntities.add(prevToken+" "+fToken);
+        }
+      }
+    }
+
+    for (int i=1; i < eTokens.size(); i++) {
+      String eToken = eTokens.get(i);
+      String prevToken = eTokens.get(i-1);
+      if (Character.isUpperCase(eToken.charAt(0))) {
+        // we only need to count matched tokens once
+        cntEUppercase++;
+        if (Character.isUpperCase(prevToken.charAt(0))) {
+          if (fEntities.contains(prevToken+ " "+ eToken)) {
+            matchedEntity = true;
+          }
+        }
+      }
+    }
+
+    // uppercase token matching features : find uppercased tokens that exactly appear on both sides
+    // lack of this evidence does not imply anything, but its existence might indicate parallel
+
+    //    float cntUppercaseMin = Math.min(cntFUppercase, cntEUppercase);   
+    //    float cntUppercaseMax = Math.max(cntFUppercase, cntEUppercase);   
+    //    float uppercaseRatioMin = cntUppercaseMin==0 ? 0 : (cntUppercaseMatched/cntUppercaseMin);
+    //    float uppercaseRatioMax = cntUppercaseMin==0 ? 0 : (cntUppercaseMatched/cntUppercaseMax);
+
+    //    features[5] = "uppercaseratio="+(matchedEntity ? 1 :0);
+    //    features[6] = "uppercaseratio2="+uppercaseRatioMin;
+    //    features[7] = "uppercaseratio3="+uppercaseRatioMax;
+
+    return matchedEntity;
   }
 
 

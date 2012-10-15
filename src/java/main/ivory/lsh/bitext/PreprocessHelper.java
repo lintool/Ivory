@@ -330,7 +330,7 @@ public class PreprocessHelper {
         char c = line.charAt(i);
         String unicode = String.format("%04x", (int) c);
         if (unicode.equals("3002")) {
-          sb.append(".");
+          sb.append(". ");
         }else {
           sb.append(c);
         }
