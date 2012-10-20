@@ -10,6 +10,13 @@ import ivory.lsh.pwsim.cl.CLSlidingWindowPwsim;
 import java.util.SortedMap;
 import java.util.Map.Entry;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.GnuParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
@@ -30,18 +37,14 @@ import edu.umd.cloud9.io.SequenceFileUtils;
  * @author ferhanture
  *
  */
-@SuppressWarnings("unused")
 public class RunEvalCrossLingPwsim extends PwsimEnvironment implements Tool {
   private static final Logger sLogger = Logger.getLogger(RunEvalCrossLingPwsim.class);
-
-  private static int printUsage() {
-    System.out.println("usage: [targetlang-dir] [srclang-dir] [num-bits] [type-of-signature] [num-perms] [overlap-size] [window-size] [max-dist] [sample-size] [mode]\nIf you want to run full pwsim on all document pairs, mode=all, otherwise mode=sample\n");
-    return -1;
-  }
-
+  private Options options;
+  private String mode, srcLangDir, targetLangDir;
+  
   @SuppressWarnings("unchecked")
   public int run(String[] args) throws Exception {
-    if (args.length != 10) {
+    if ( parseArgs(args) < 0 ) {
       printUsage();
       return -1;
     }
@@ -60,8 +63,8 @@ public class RunEvalCrossLingPwsim extends PwsimEnvironment implements Tool {
       hdfs = FileSystem.get(config);
 //    }
 
-    String targetLangDir = args[0];
-    String srcLangDir = args[1];
+//    targetLangDir = args[0];
+//    srcLangDir = args[1];
     config.setInt("Ivory.NumMapTasks", 100);
 
     RetrievalEnvironment targetEnv = new RetrievalEnvironment(targetLangDir, hdfs);
@@ -76,18 +79,15 @@ public class RunEvalCrossLingPwsim extends PwsimEnvironment implements Tool {
     config.setInt("Ivory.CollectionDocumentCount", collSize);
 
     ///////Parameters/////////////
-    numOfBits = Integer.parseInt(args[2]);
-    signatureType = args[3].toLowerCase();
-    numOfPermutations = Integer.parseInt(args[4]);
-    chunkOverlapSize = Integer.parseInt(args[5]);
-    slidingWindowSize = Integer.parseInt(args[6]);
-    maxHammingDistance = Integer.parseInt(args[7]);
-    if(chunkOverlapSize<slidingWindowSize){
-      System.out.println("Error: [overlap-size] cannot be less than [window-size] for algorithm's correctness!");
-      return -1;
-    }
-    sampleSize = Integer.parseInt(args[8]);
-    mode = args[9];
+//    numOfBits = Integer.parseInt(args[2]);
+//    signatureType = args[3].toLowerCase();
+//    numOfPermutations = Integer.parseInt(args[4]);
+//    chunkOverlapSize = Integer.parseInt(args[5]);
+//    slidingWindowSize = Integer.parseInt(args[6]);
+//    maxHammingDistance = Integer.parseInt(args[7]);
+
+//    sampleSize = Integer.parseInt(args[8]);
+//    mode = args[9];
 
     PwsimEnvironment.setClassTypes(config);
     config.setInt("Ivory.NumOfBits", numOfBits);
@@ -215,7 +215,72 @@ public class RunEvalCrossLingPwsim extends PwsimEnvironment implements Tool {
 
     return 0;
   }
+  
+  private void printUsage() {
+    HelpFormatter formatter = new HelpFormatter();
+    formatter.printHelp( this.getClass().getCanonicalName(), options );
+    //    System.out.println("usage: [targetlang-dir] [srclang-dir] [num-bits] [type-of-signature] [num-perms] [overlap-size] [window-size] [max-dist] [sample-size] [mode]\nIf you want to run full pwsim on all document pairs, mode=all, otherwise mode=sample\n");
+    //    return -1;
+  }
 
+  private static final String INDEX_PATH_OPTION = "sourceindex";
+  private static final String TARGET_INDEX_PATH_OPTION = "targetindex";
+  private static final String SIGNLENG_OPTION = "length";
+  private static final String SIGNTYPE_OPTION = "type";
+  private static final String NUMPERMS_OPTION = "permutations";
+  private static final String OVERLAPSIZE_OPTION = "overlap";
+  private static final String WINDOWSIZE_OPTION = "window";
+  private static final String THRESHOLD_OPTION = "T";
+  private static final String SAMPLESIZE_OPTION = "sample";
+  private static final String MODE_OPTION = "mode";
+
+  @SuppressWarnings("static-access")
+  private int parseArgs(String[] args) {
+    options = new Options();
+    options.addOption(OptionBuilder.withDescription("Find all pairs or only pairs matching sample").withArgName("all|sample").hasArg().isRequired().create(MODE_OPTION));
+    options.addOption(OptionBuilder.withDescription("path to source-language index directory").withArgName("path").hasArg().isRequired().create(INDEX_PATH_OPTION));
+    options.addOption(OptionBuilder.withDescription("path to target-language index directory").withArgName("path").hasArg().isRequired().create(TARGET_INDEX_PATH_OPTION));
+    options.addOption(OptionBuilder.withDescription("length of signature").withArgName("number of bits").hasArg().isRequired().create(SIGNLENG_OPTION));
+    options.addOption(OptionBuilder.withDescription("type of signature").withArgName("random|minhash|simhash").hasArg().isRequired().create(SIGNTYPE_OPTION));
+    options.addOption(OptionBuilder.withDescription("number of permutations (tables)").withArgName("Q").hasArg().isRequired().create(NUMPERMS_OPTION));
+    options.addOption(OptionBuilder.withDescription("sliding window size").withArgName("B").hasArg().create(WINDOWSIZE_OPTION));
+    options.addOption(OptionBuilder.withDescription("hamming distance threshold for similar pairs").withArgName("threshold").hasArg().isRequired().create(THRESHOLD_OPTION));
+    options.addOption(OptionBuilder.withDescription("number of sampled pairs from source collection").withArgName("sample size").hasArg().create(SAMPLESIZE_OPTION));
+    // not required (default=window size)
+    options.addOption(OptionBuilder.withDescription("size of overlap between chunks (default: window size)").withArgName("overlap size").hasArg().create(OVERLAPSIZE_OPTION));
+
+    CommandLine cmdline;
+    CommandLineParser parser = new GnuParser();
+    try {
+      cmdline = parser.parse(options, args);
+    } catch (ParseException exp) {
+      System.err.println("Error parsing command line: " + exp.getMessage());
+      return -1;
+    }
+
+    mode = cmdline.getOptionValue(MODE_OPTION);
+    srcLangDir = cmdline.getOptionValue(INDEX_PATH_OPTION);
+    targetLangDir = cmdline.getOptionValue(TARGET_INDEX_PATH_OPTION);
+    numOfBits = Integer.parseInt(cmdline.getOptionValue(SIGNLENG_OPTION));
+    signatureType = cmdline.getOptionValue(SIGNTYPE_OPTION);
+    numOfPermutations = Integer.parseInt(cmdline.getOptionValue(NUMPERMS_OPTION));
+    slidingWindowSize = Integer.parseInt(cmdline.getOptionValue(WINDOWSIZE_OPTION));
+    maxHammingDistance = Integer.parseInt(cmdline.getOptionValue(THRESHOLD_OPTION));
+    sampleSize = Integer.parseInt(cmdline.getOptionValue(SAMPLESIZE_OPTION));
+    
+    if (cmdline.hasOption(OVERLAPSIZE_OPTION)){
+      chunkOverlapSize = Integer.parseInt(cmdline.getOptionValue(OVERLAPSIZE_OPTION));      
+    }else {
+      chunkOverlapSize = slidingWindowSize;
+    }
+    if(chunkOverlapSize<slidingWindowSize){
+      System.out.println("Error: [overlap-size] cannot be less than [window-size] for algorithm's correctness!");
+      return -1;
+    }
+
+    return 1;
+  }
+  
   public static void main(String[] args) throws Exception {
     ToolRunner.run(new Configuration(), new RunEvalCrossLingPwsim(), args);
   }

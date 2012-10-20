@@ -384,18 +384,18 @@ public class PreprocessWikipedia extends Configured implements Tool {
       return -1;
     }
 
-    String m = cmdline.getOptionValue("mode");
+    String m = cmdline.getOptionValue(MODE_OPTION);
     mode = m.equals("mono") ? MONO_LINGUAL : (m.equals("crosslingF") ? CROSS_LINGUAL_F : (m.equals("crosslingE")) ? CROSS_LINGUAL_E : -1); 
     if (mode == -1) throw new RuntimeException("Incorrect mode selection!");
 
     indexRootPath = cmdline.getOptionValue(INDEX_PATH_OPTION);
+    targetIndexPath = cmdline.getOptionValue(TARGET_INDEX_PATH_OPTION);
     rawCollection = cmdline.getOptionValue(XML_PATH_OPTION);
     seqCollection = cmdline.getOptionValue(COMPRESSED_PATH_OPTION);
     tokenizerClass = cmdline.getOptionValue(TOKENIZER_CLASS_OPTION);
     tokenizerModel = cmdline.getOptionValue(TOKENIZER_MODEL_OPTION);
     collectionVocab = cmdline.getOptionValue(COLLECTION_VOCAB_OPTION);
     collectionLang = cmdline.getOptionValue(LANGUAGE_OPTION);
-    targetIndexPath = cmdline.getOptionValue(TARGET_INDEX_PATH_OPTION);
     fVocab_f2e = cmdline.getOptionValue(FVOCAB_F2E_OPTION);
     eVocab_f2e = cmdline.getOptionValue(EVOCAB_F2E_OPTION);
     fVocab_e2f = cmdline.getOptionValue(FVOCAB_E2F_OPTION);
