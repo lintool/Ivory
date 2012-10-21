@@ -70,65 +70,26 @@ public class PreprocessWikipedia extends Configured implements Tool {
   private String seqCollection;
   private String tokenizerClass;  
   private String collectionLang = null, tokenizerModel = null, collectionVocab = null, targetIndexPath = null, 
-      fVocab_f2e = null, eVocab_f2e = null, fVocab_e2f, eVocab_e2f = null, ttable_f2e = null, ttable_e2f = null;
+  fVocab_f2e = null, eVocab_f2e = null, fVocab_e2f, eVocab_e2f = null, ttable_f2e = null, ttable_e2f = null;
   private int mode;
   private Options options;
 
   private void printUsage() {
     HelpFormatter formatter = new HelpFormatter();
     formatter.printHelp( this.getClass().getCanonicalName(), options );
-    //
-    //    
-    //    System.out.println("\nThis program can be run in three different \"modes\":\n=====================\nInput: English Wikipedia collection\nOutput: English weighted document vectors" +
-    //        "\nusage: [index-path] [raw-path] [compressed-path] [tokenizer-class]" +
-    //        "\n\nInput: English side of cross-lingual Wikipedia collection\nOutput: English weighted document vectors (comparable with the document vectors generated from non-English side)" +
-    //        "\nusage: [index-path] [raw-path] [compressed-path] [tokenizer-class] [collection-lang] [tokenizer-model] [collection-vocab]" +
-    //        "\n\nInput: Non-English side of cross-lingual Wikipedia collection\nOutput: English weighted document vectors (comparable with the document vectors generated from English side)" +
-    //    "\nusage: [index-path] [raw-path] [compressed-path] [tokenizer-class] [collection-lang] [tokenizer-model] [src-vocab_f] [trg-vocab_e] [prob-table_f-->e] [src-vocab_e] [trg-vocab_f] [prob-table_e-->f] [target-index-path]");
-    //    return -1;
   }
 
   /**
    * Runs this tool.
    */
   public int run(String[] args) throws Exception {
-    //    int numArgs = args.length;
-    //    if (numArgs >= NUM_MONO && numArgs < NUM_CROSS_E) {
-    //      mode = MONO_LINGUAL;
-    //      LOG.info("Mode: monolingual");
-    //    } else if (numArgs == NUM_CROSS_E) {
-    //      mode = CROSS_LINGUAL_E;
-    //      LOG.info("Mode: crosslingual - English side");
-    //    } else if (numArgs == NUM_CROSS_F) {
-    //      mode = CROSS_LINGUAL_F;
-    //      LOG.info("Mode: crosslingual - nonEnglish side");
-    //    } else {
-    //      printUsage();
-    //      return -1;
-    //    }
     if ( parseArgs(args) < 0 ) {
       printUsage();
       return -1;
     }
     Configuration conf = getConf();
 
-    //    String collectionLang = null, tokenizerModel = null, collectionVocab = null,
-    //    fVocab_f2e = null, eVocab_f2e = null, fVocab_e2f, eVocab_e2f = null, ttable_f2e = null, ttable_e2f = null;
-    //    String indexRootPath = args[0];
-    //    String rawCollection = args[1];
-    //    String seqCollection = args[2];
-    //    String tokenizerClass = args[3];	
-    //
-    //    if (args.length > 4) {
-    //      collectionLang = args[4];
-    //      conf.set(Constants.Language, collectionLang);
-    //      if (args.length > 5) {
-    //        tokenizerModel = args[5];
-    //        conf.set(Constants.TokenizerData, tokenizerModel);
-    //      }
-    //    }
-
-    // user can either provide a tokenizer class manually, 
+    // user can either provide a tokenizer class as a program argument, 
     // or let the factory find an appropriate class based on language code
     try {
       Class.forName(tokenizerClass);
@@ -144,19 +105,20 @@ public class PreprocessWikipedia extends Configured implements Tool {
       conf.set(Constants.CollectionVocab, collectionVocab);   // vocabulary to read collection from
     }
 
-    if (mode == CROSS_LINGUAL_E || mode == CROSS_LINGUAL_F) {		// CROSS-LINGUAL CASE
+    // CROSS-LINGUAL CASE
+    if (mode == CROSS_LINGUAL_E){		   // English side
       conf.set("Ivory.FinalVocab", collectionVocab);        // vocabulary to map terms to integers in BuildTargetLang...
+    }
 
-      if (mode == CROSS_LINGUAL_F) {			// non-English side, needs to be translated
-        conf.set(Constants.TargetIndexPath, targetIndexPath);
-        conf.set("Ivory.F_Vocab_F2E", fVocab_f2e);	
-        conf.set("Ivory.E_Vocab_F2E", eVocab_f2e);
-        conf.set("Ivory.TTable_F2E", ttable_f2e);
-        conf.set("Ivory.E_Vocab_E2F", eVocab_e2f);	
-        conf.set("Ivory.F_Vocab_E2F", fVocab_e2f);	
-        conf.set("Ivory.TTable_E2F", ttable_e2f);
-        conf.set("Ivory.FinalVocab", eVocab_f2e);
-      }
+    if (mode == CROSS_LINGUAL_F) {			// non-English side, needs to be translated
+      conf.set(Constants.TargetIndexPath, targetIndexPath);
+      conf.set("Ivory.F_Vocab_F2E", fVocab_f2e);	
+      conf.set("Ivory.E_Vocab_F2E", eVocab_f2e);
+      conf.set("Ivory.TTable_F2E", ttable_f2e);
+      conf.set("Ivory.E_Vocab_E2F", eVocab_e2f);	
+      conf.set("Ivory.F_Vocab_E2F", fVocab_e2f);	
+      conf.set("Ivory.TTable_E2F", ttable_e2f);
+      conf.set("Ivory.FinalVocab", eVocab_f2e);            // vocabulary to map terms to integers in BuildTargetLang...
     }
 
     int numMappers = 100;
@@ -386,8 +348,25 @@ public class PreprocessWikipedia extends Configured implements Tool {
 
     String m = cmdline.getOptionValue(MODE_OPTION);
     mode = m.equals("mono") ? MONO_LINGUAL : (m.equals("crosslingF") ? CROSS_LINGUAL_F : (m.equals("crosslingE")) ? CROSS_LINGUAL_E : -1); 
-    if (mode == -1) throw new RuntimeException("Incorrect mode selection!");
-
+    if (mode < 0) throw new RuntimeException("Incorrect mode selection!");
+    if (mode == CROSS_LINGUAL_F) {
+      if (!options.hasOption(FVOCAB_F2E_OPTION) || !options.hasOption(FVOCAB_E2F_OPTION) || !options.hasOption(EVOCAB_F2E_OPTION) || !options.hasOption(EVOCAB_E2F_OPTION)
+          || !options.hasOption(TTABLE_F2E_OPTION) || !options.hasOption(TTABLE_E2F_OPTION)) {
+        System.err.println("Error, missing translation table arguments: " + FVOCAB_F2E_OPTION + "," + EVOCAB_F2E_OPTION + "," 
+            + FVOCAB_E2F_OPTION + "," + EVOCAB_E2F_OPTION + "," + TTABLE_F2E_OPTION + "," + TTABLE_E2F_OPTION);
+        return -1;
+      }
+    }
+    if (mode == CROSS_LINGUAL_E) {
+      if (!options.hasOption(COLLECTION_VOCAB_OPTION)) {
+        System.err.println("Error, missing collection vocab argument: " + COLLECTION_VOCAB_OPTION);
+        return -1;
+      }
+      if (options.hasOption(FVOCAB_F2E_OPTION) || options.hasOption(FVOCAB_E2F_OPTION) || options.hasOption(EVOCAB_F2E_OPTION) || options.hasOption(EVOCAB_E2F_OPTION)
+          || options.hasOption(TTABLE_F2E_OPTION) || options.hasOption(TTABLE_E2F_OPTION)) {
+        System.err.println("Warning, translation table arguments are ignored in this mode!");
+      }
+    }
     indexRootPath = cmdline.getOptionValue(INDEX_PATH_OPTION);
     targetIndexPath = cmdline.getOptionValue(TARGET_INDEX_PATH_OPTION);
     rawCollection = cmdline.getOptionValue(XML_PATH_OPTION);

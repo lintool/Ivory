@@ -227,9 +227,9 @@ public class RunEvalCrossLingPwsim extends PwsimEnvironment implements Tool {
   private static final String TARGET_INDEX_PATH_OPTION = "targetindex";
   private static final String SIGNLENG_OPTION = "length";
   private static final String SIGNTYPE_OPTION = "type";
-  private static final String NUMPERMS_OPTION = "permutations";
+  private static final String NUMPERMS_OPTION = "Q";
   private static final String OVERLAPSIZE_OPTION = "overlap";
-  private static final String WINDOWSIZE_OPTION = "window";
+  private static final String WINDOWSIZE_OPTION = "B";
   private static final String THRESHOLD_OPTION = "T";
   private static final String SAMPLESIZE_OPTION = "sample";
   private static final String MODE_OPTION = "mode";
@@ -242,8 +242,8 @@ public class RunEvalCrossLingPwsim extends PwsimEnvironment implements Tool {
     options.addOption(OptionBuilder.withDescription("path to target-language index directory").withArgName("path").hasArg().isRequired().create(TARGET_INDEX_PATH_OPTION));
     options.addOption(OptionBuilder.withDescription("length of signature").withArgName("number of bits").hasArg().isRequired().create(SIGNLENG_OPTION));
     options.addOption(OptionBuilder.withDescription("type of signature").withArgName("random|minhash|simhash").hasArg().isRequired().create(SIGNTYPE_OPTION));
-    options.addOption(OptionBuilder.withDescription("number of permutations (tables)").withArgName("Q").hasArg().isRequired().create(NUMPERMS_OPTION));
-    options.addOption(OptionBuilder.withDescription("sliding window size").withArgName("B").hasArg().create(WINDOWSIZE_OPTION));
+    options.addOption(OptionBuilder.withDescription("number of permutations (tables)").withArgName("permutations").hasArg().isRequired().create(NUMPERMS_OPTION));
+    options.addOption(OptionBuilder.withDescription("sliding window size").withArgName("window").hasArg().create(WINDOWSIZE_OPTION));
     options.addOption(OptionBuilder.withDescription("hamming distance threshold for similar pairs").withArgName("threshold").hasArg().isRequired().create(THRESHOLD_OPTION));
     options.addOption(OptionBuilder.withDescription("number of sampled pairs from source collection").withArgName("sample size").hasArg().create(SAMPLESIZE_OPTION));
     // not required (default=window size)
