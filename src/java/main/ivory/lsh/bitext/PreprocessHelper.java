@@ -398,7 +398,6 @@ public class PreprocessHelper {
     return fTok;
   }
 
-
   public TTable_monolithic_IFAs getE2F() {
     return e2f_Probs;
   }
@@ -421,6 +420,14 @@ public class PreprocessHelper {
 
   public Vocab getFTrg() {
     return fVocabTrg;
+  }
+
+  public SentenceDetectorME getFSentenceModel() {
+    return fModel;
+  }
+
+  public SentenceDetectorME getESentenceModel() {
+    return eModel;
   }
 
   private void loadFModels(Configuration conf) throws Exception {
