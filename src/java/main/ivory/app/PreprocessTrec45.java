@@ -16,97 +16,35 @@
 
 package ivory.app;
 
-import ivory.core.Constants;
-import ivory.core.RetrievalEnvironment;
-import ivory.core.preprocess.BuildDictionary;
-import ivory.core.preprocess.BuildIntDocVectors;
-import ivory.core.preprocess.BuildIntDocVectorsForwardIndex;
-import ivory.core.preprocess.BuildTermDocVectors;
-import ivory.core.preprocess.BuildTermDocVectorsForwardIndex;
-import ivory.core.preprocess.ComputeGlobalTermStatistics;
 import ivory.core.tokenize.GalagoTokenizer;
 
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.conf.Configured;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.util.Tool;
+import java.util.Map;
+
 import org.apache.hadoop.util.ToolRunner;
-import org.apache.log4j.Logger;
+
+import com.google.common.collect.ImmutableMap;
 
 import edu.umd.cloud9.collection.trec.TrecDocnoMapping;
-import edu.umd.cloud9.collection.trec.TrecDocnoMappingBuilder;
 import edu.umd.cloud9.collection.trec.TrecDocumentInputFormat;
 
-public class PreprocessTrec45 extends Configured implements Tool {
-  private static final Logger LOG = Logger.getLogger(PreprocessTrec45.class);
-
-  private static int printUsage() {
-    System.out.println("usage: [input-path] [index-path]");
-    ToolRunner.printGenericCommandUsage(System.out);
-    return -1;
-  }
-
-  /**
-   * Runs this tool.
-   */
-  public int run(String[] args) throws Exception {
-    if (args.length != 2) {
-      printUsage();
-      return -1;
-    }
-
-    String collection = args[0];
-    String indexRootPath = args[1];
-
-    LOG.info("Tool name: " + PreprocessTrec45.class.getCanonicalName());
-    LOG.info(" - Collection path: " + collection);
-    LOG.info(" - Index path: " + indexRootPath);
-
-    Configuration conf = getConf();
-    FileSystem fs = FileSystem.get(conf);
-
-    // Create the index directory if it doesn't already exist.
-    Path p = new Path(indexRootPath);
-    if (!fs.exists(p)) {
-      LOG.info("index directory doesn't exist, creating...");
-      fs.mkdirs(p);
-    } else {
-      LOG.info("Index directory " + p + " already exists!");
-      return -1;
-    }
-
-    RetrievalEnvironment env = new RetrievalEnvironment(indexRootPath, fs);
-    Path mappingFile = env.getDocnoMappingData();
-    new TrecDocnoMappingBuilder().build(new Path(collection), mappingFile, conf);
-
-    conf.set(Constants.CollectionName, "TREC_vol45");
-    conf.set(Constants.CollectionPath, collection);
-    conf.set(Constants.IndexPath, indexRootPath);
-    conf.set(Constants.InputFormat, TrecDocumentInputFormat.class.getCanonicalName());
-    conf.set(Constants.Tokenizer, GalagoTokenizer.class.getCanonicalName());
-    conf.set(Constants.DocnoMappingClass, TrecDocnoMapping.class.getCanonicalName());
-    conf.set(Constants.DocnoMappingFile, env.getDocnoMappingData().toString());
-
-    conf.setInt(Constants.DocnoOffset, 0); // docnos start at 1
-    conf.setInt(Constants.MinDf, 2); // toss away singleton terms
-    conf.setInt(Constants.MaxDf, Integer.MAX_VALUE);
-
-    new BuildTermDocVectors(conf).run();
-    new ComputeGlobalTermStatistics(conf).run();
-    new BuildDictionary(conf).run();
-    new BuildIntDocVectors(conf).run();
-
-    new BuildIntDocVectorsForwardIndex(conf).run();
-    new BuildTermDocVectorsForwardIndex(conf).run();
-
-    return 0;
+public class PreprocessTrec45 extends PreprocessCollection {
+  @Override
+  public Map<String, String> getCollectionSettings() {
+    return new ImmutableMap.Builder<String, String>()
+        .put(IndexBuilder.COLLECTION_PATH_OPTION, collectionPath)
+        .put(IndexBuilder.COLLECTION_NAME_OPTION, "TREC_vol45")
+        .put(IndexBuilder.INDEX_OPTION, indexPath)
+        .put(IndexBuilder.MAPPING_OPTION, TrecDocnoMapping.class.getCanonicalName())
+        .put(IndexBuilder.FORMAT_OPTION, TrecDocumentInputFormat.class.getCanonicalName())
+        .put(IndexBuilder.TOKENIZER_OPTION, GalagoTokenizer.class.getCanonicalName())
+        .put(IndexBuilder.MIN_DF_OPTION, "2")
+        .build();
   }
 
   /**
    * Dispatches command-line arguments to the tool via the {@code ToolRunner}.
    */
   public static void main(String[] args) throws Exception {
-    ToolRunner.run(new Configuration(), new PreprocessTrec45(), args);
+    ToolRunner.run(new PreprocessTrec45(), args);
   }
 }
