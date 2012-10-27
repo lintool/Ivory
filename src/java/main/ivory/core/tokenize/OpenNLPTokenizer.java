@@ -763,6 +763,7 @@ public class OpenNLPTokenizer extends ivory.core.tokenize.Tokenizer {
     "zillion",
   };
   private static final String[] TERRIER_STEMMED_STOP_WORDS = {
+"'s",
 "issu",
 "contribut",
 "descript",
