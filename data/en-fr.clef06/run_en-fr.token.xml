@@ -1,6 +1,6 @@
 <parameters>
 
-     <run>en-fr.clir</run>
+     <run>en-fr.token</run>
      <query_type>clir</query_type>
      <index>/scratch0/fture/indexes/clef_lemonde94-95_sda94-95_nostop-index.fr</index>
      <doc_lang>fr</doc_lang>

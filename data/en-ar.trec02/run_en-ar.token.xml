@@ -1,6 +1,6 @@
 <parameters>
 
-     <run>en-ar.clir</run>
+     <run>en-ar.token</run>
      <query_type>clir</query_type>
      <index>/scratch0/fture/indexes/trec01-03_index.ar</index>
      <doc_lang>ar</doc_lang>

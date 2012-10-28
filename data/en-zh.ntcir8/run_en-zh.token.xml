@@ -1,6 +1,6 @@
 <parameters>
 
-     <run>en-zh.clir</run>
+     <run>en-zh.token</run>
      <query_type>clir</query_type>
      <index>/scratch0/fture/indexes/ntcir_xin.zh_02-05.index</index>
      <doc_lang>zh</doc_lang>
