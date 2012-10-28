@@ -1,0 +1,148 @@
+<parameters>
+<query id="2">1.34242272377::movi|电影::the movi|电影|||0.60206001997::between|之间||the|的||is|是||what|什么::what is the between|之间 的 是 什么|||0.214670166373::relationship|关系::relationship|关系|||0.226701259613::"|"::"|"|||1.80843603611::ride|骑车::ride|骑车|||0.945642352104::alon|仅::alon|仅|||1.27300131321::for|为::for|为|||1.52287876606::thousand|数千::thousand of|数千|||0.797959625721::mile|英里::mile|英里|||0.853871941566::"|"||and|,::" and|" ,|||0.60206001997::yimou|张艺谋||yimou|来台::zhang yimou|张艺谋 来台|||0.182655021548::?|?::?|?;-374.53;What is the relationship between the movie "Riding Alone for Thousands of Miles" and ZHANG Yimou?
+</query>
+<query id="12">2.47712135315::?|?::of ?|?|||1.59842574596::is|是||what|什么::what is the|是 什么|||0.173925191164::virus|病毒::virus|病毒|||1.57403123379::sar|sars::sar|sars;-34.9696;What is the virus of SARS?
+</query>
+<query id="15">-1::where|where::where|where|||1.27875363827::will|将||2010|到||2010|2010||2010|年::will 2010|将 到 2010 年|||0.852784872055::expo|世博会::expo|世博会|||-1::be|be::be|be|||-1::held|held::held|held|||0.182655021548::?|?::?|?;-485.939;Where will Expo 2010 be held?
+</query>
+<query id="16">0.616300404072::doe|为什么::whi doe|为什么|||0.970036804676::china|中国||want|要::china want to|中国 要|||-0.0::NULL|的||import|重要||technolog|技术::import technolog to|的 重要 技术|||0.460087925196::build|建设::build|建设|||1.14612805843::shanghai|上海||?|?::shanghai ?|上海 ?|||-0.0::maglev|中的||maglev|磁悬浮::maglev|中的 磁悬浮|||0.298144310713::railway|铁路::railway|铁路;-90.7349;Why does China want to import technology to build Shanghai Maglev Railway?
+</query>
+<query id="18">1.75204849243::is|是||what|什么||?|?::what is the ?|是 什么 ?|||2.4727563858::parti|方::- parti|方|||1.19836759567::six|六::six|六|||0.833668589592::talk|会谈::talk|会谈;-38.4949;What is the Six-Party Talks?
+</query>
+<query id="19">2.00860023499::what|什么||?|?::what of ?|什么 ?|||0.845098018646::the|的||definit|定义||NULL|究竟||is|是::is the definit|的 定义 究竟 是|||0.348953545094::obes|肥胖::obes|肥胖;-42.6802;What is the definition of obesity?
+</query>
+<query id="23">0.875061273575::doe|为什么::whi doe the|为什么|||0.544068038464::flu|禽流感::bird flu|禽流感|||-0.0::to|对||human|人类||?|?::to human ?|对 人类 ?|||0.189319521189::threat|威胁::threat|威胁;-40.4941;Why does the bird flu threat to humans?
+</query>
+<query id="26">2.0::liu|刘::liu|刘|||0.60206001997::between|之间||the|的||is|是||what|什么::what is the between|之间 的 是 什么|||0.214670166373::relationship|关系::relationship|关系|||-1::guoliang|guoliang::guoliang|guoliang|||0.823908746243::and|和::and the|和|||0.778151273727::china|中国||?|?::of china ?|中国 ?|||0.975961744785::'s|男子::men 's|男子|||1.15490198135::team|团队::team|团队|||1.30103003979::tenni|乒乓球队::tabl tenni|乒乓球队;-446.181;What is the relationship between Liu Guoliang and the men's table tennis team of China?
+</query>
+<query id="28">1.63202321529::which|其中::which|其中|||2.47712135315::organ|组织::organ in|组织|||1.47712123394::declar|宣布::declar|宣布|||1.26324141026::prize|诺贝尔::nobel prize|诺贝尔|||0.439332693815::literatur|文学||?|?::literatur ?|文学 ?;-63.3257;Which organization declares Nobel Prize in Literature?
+</query>
+<query id="29">2.47712135315::li|李::of li|李|||0.778151273727::the|的||relationship|关系||what|怎样::what is the relationship|的 关系 怎样|||2.22010803223::yong|涌::yong|涌|||2.47712135315::-|"::-|"|||1.59106457233::bo|柏杨::bo|柏杨|||1.54406809807::and|和||?|?::and the ?|和 ?|||0.778151273727::badminton|羽毛球::badminton|羽毛球|||0.390761435032::chines|中国::chines|中国|||0.945642352104::team|团队::team|团队;-144.73;What is the relationship of Yong-Bo Li and the Chinese badminton team?
+</query>
+<query id="30">0.590630531311::pleas|请::pleas|请|||0.532638609409::list|上市::list|上市|||1.46239805222::the|的||impress|印象::the impress|的 印象|||1.87506127357::seri|系列::seri of|系列|||0.60206001997::yimou|张艺谋||yimou|来台::zhang yimou|张艺谋 来台|||0.123012818396::.|。::.|。;-314.815;Please list the impression series of Zhang Yimou.
+</query>
+<query id="32">1.36317789555::is|是||what|什么||?|?::what is ?|是 什么 ?|||1.28254663944::johnson|约翰逊::johnson|约翰逊|||1.87890458107::the|的||between|关系||and|,::the relationship between and|的 关系 ,|||0.52287876606::xiang|刘翔::liu xiang|刘翔;-59.4042;What is the relationship between Liu Xiang and Johnson?
+</query>
+<query id="33">0.590630531311::pleas|请::pleas|请|||0.532638609409::list|上市::list|上市|||2.17609119415::the|的||event|事件::the event|的 事件|||2.47712135315::NULL|的||relat|关系::relat to|的 关系|||1.39794003963::the|,||taliban|塔利班::the taliban|, 塔利班|||0.823908746243::and|和::and the|和|||0.212303429842::state|美国::unit state|美国;-78.7862;Please list the events related to the Taliban and the United States
+</query>
+<query id="35">1.46612584591::pleas|请||"|"::pleas "|请 "|||0.805023372173::movi|电影::movi|电影|||2.47712135315::event|事件::the event|事件|||-1::list|list::list|list|||1.17609131336::relat|相关||the|的::relat to the|相关 的|||1.09690999985::initi|初步::initi|初步|||1.24667239189::d|研究::d|研究|||1.17609131336::.|。||"|"::" .|。 ";-198.658;Please list the events related to the movie "Initials D".
+</query>
+<query id="36">0.590630531311::pleas|请::pleas|请|||0.532638609409::list|上市::list|上市|||2.47712135315::the|的::the which|的|||1.14612805843::movi|影片||in|在::movi in|影片 在|||0.558043181896::zhao|赵::zhao|赵|||2.3222193718::wei|王伟||.|。::wei .|王伟 。|||0.897337675095::particip|参与::particip|参与;-94.196;Please list the movies in which Zhao Wei participated.
+</query>
+<query id="38">-1::what|what::what|what|||-1::is|is::is|is|||-1::the|the::the|the|||1.20412003994::relationship|关系||?|?::relationship between ?|关系 ?|||1.10037052631::xia|夏::xia|夏|||1.0::yu|余||NULL|先生::yu and|余 先生|||1.0::yuan|元::yuan|元|||1.44715797901::quan|泉州::quan|泉州;-411.746;What is the relationship between Xia Yu and Yuan Quan?
+</query>
+<query id="39">0.979624211788::pleas|请||.|。::pleas .|请 。|||1.77815127373::new|新::the new|新|||-1::list|list::list|list|||2.47712135315::made|提出::made by|提出|||1.77815127373::NULL|的||film|电影::film|的 电影|||2.0::year|今年::year|今年|||1.57403123379::feng|冯::feng|冯|||-1::xiaogang|xiaogang::xiaogang|xiaogang;-549.254;Please list the new year films made by Feng Xiaogang.
+</query>
+<query id="40">0.60206001997::between|之间||the|的||is|是||what|什么::what is the between|之间 的 是 什么|||0.214670166373::relationship|关系::relationship|关系|||0.848628938198::guo|郭::guo|郭|||-1::jingj|jingj::jingj|jingj|||1.39794003963::and|,||?|?::and ?|, ?|||0.795880019665::wu|吴::wu|吴|||-1::minxia|minxia::minxia|minxia;-759.92;What is the relationship between Guo Jingjing and Wu Minxia?
+</query>
+<query id="5">1.43572854996::what|什么||?|?::what ?|什么 ?|||0.477121263742::of|的||definit|定义||is|是::is the definit of|的 定义 是|||0.625862896442::societi|社会::societi|社会|||0.805023372173::age|时代::age|时代;-42.6386;What is the definition of Aging Society?
+</query>
+<query id="41">1.54406809807::who|谁||is|是::who is the|谁 是|||0.908919513226::2004|2004::2004|2004|||1.8692317009::us|美国||?|呢||?|?::us ?|美国 呢 ?|||0.769551098347::presidenti|总统::presidenti|总统|||0.845098018646::democrat|民主党||NULL|的||candid|候选人::democrat candid|民主党 的 候选人;-66.1157;Who is the 2004 US Presidential Democratic candidate?
+</query>
+<query id="42">-0.0::what|如何||industri|产业||?|?::what industri ?|如何 产业 ?|||1.70329141617::petroleum|石油::the petroleum|石油|||-1::is|is::is|is|||2.47712135315::the|的::between the|的|||-1::interrelationship|interrelationship::interrelationship|interrelationship|||0.809185504913::and|和||war|战争::and war|和 战争;-525.366;What is the interrelationship between the petroleum industry and wars?
+</query>
+<query id="43">2.0::NULL|,||might|可能::might|, 可能|||0.301030009985::what|什么样||NULL|的||econom|经济::what econom|什么样 的 经济|||0.366531550884::impact|影响::impact|影响|||1.30103003979::countri|国家||?|?::countri ?|国家 ?|||2.47712135315::game|奥运会::olymp game|奥运会|||1.14092683792::on|对::have on|对|||1.17609131336::host|举办::host|举办;-78.5491;What economic impact might Olympic Games have on host countries?
+</query>
+<query id="44">1.27875363827::how|如何||might|可能会::how might|如何 可能会|||0.60206001997::light|紫外线::ultraviolet light|紫外线|||0.301030009985::human|人类||health|健康||?|?::human health ?|人类 健康 ?|||0.350016444921::threaten|威胁::threaten|威胁;-68.8738;How ultraviolet light might threaten human health?
+</query>
+<query id="45">2.40483379364::?|?::did ?|?|||0.875061273575::when|时::when|时|||1.33745920658::away|去世::pass away|去世|||0.388860344887::arafat|阿拉法特::arafat|阿拉法特;-48.3317;When did Arafat pass away?
+</query>
+<query id="46">2.47712135315::which|,||'s|的::which 's|, 的|||0.931735157967::macau|澳门::macau|澳门|||1.788875103::was|年::year was|年|||1.54406809807::china|中国||?|?::china ?|中国 ?|||1.09690999985::to|回归::return to|回归;-73.7845;Which year was Macau's return to China?
+</query>
+<query id="47">1.54406809807::is|谁||?|?::who is ?|谁 ?|||1.42842936516::david|戴维::david|戴维|||1.87506127357::)|)::- )|)|||1.82607483864::NULL|大||da|辕门::da|大 辕门|||-1::ho(|ho(::ho(|ho(|||0.778151273727::i|我::i|我|||1.87506127357::ho|何::ho|何;-454.53;Who is David Ho(Da-i Ho)?
+</query>
+<query id="48">2.47712135315::who|who::who|who|||-1::is|is::is|is|||-1::sean|sean::sean|sean|||1.34242272377::chen|陈||?|?::chen ?|陈 ?|||-1::chen(|chen(::chen(|chen(|||-0.0::)|)::- an )|)|||1.63346850872::shin|心岱::shin|心岱;-733.06;Who is Sean Chen(Chen Shin-An)?
+</query>
+<query id="49">2.47712135315::who|who::who|who|||-1::is|is::is|is|||1.22563230991::lung|肺部::lung|肺部|||0.845098018646::yingtai|为了::yingtai|为了|||0.182655021548::?|?::?|?;-359.96;Who is Lung Yingtai?
+</query>
+<query id="6">1.36317789555::is|是||what|什么||?|?::what is ?|是 什么 ?|||1.69019603729::bin|宾||laden|拉登::bin laden|宾 拉登|||1.06214785576::and|,::and|,|||0.721246421337::the|的||between|关系::the relationship between|的 关系|||0.903090000153::bali|q||bali|里岛||bomb|爆炸案::bali bomb|q 里岛 爆炸案;-54.8539;What is the relationship between Bali bombings and Bin Laden?
+</query>
+<query id="51">1.35218250751::what|什么||?|?::what doe ?|什么 ?|||1.16136801243::"|"||"|"||repres|代表::" " repres|" " 代表|||-1::dink|dink::dink|dink;-376.634;What does "DINK" represent?
+</query>
+<query id="52">-1::what|what::what|what|||-1::is|is::is|is|||0.120573930442::cholesterol|胆固醇::cholesterol|胆固醇|||0.182655021548::?|?::?|?;-333.506;What is cholesterol?
+</query>
+<query id="53">1.34242272377::what|什么||is|叫做||"|"::what is "|什么 叫做 "|||-1::thangka|thangka::thangka|thangka|||0.588271677494::"|"||?|?::" ?|" ?;-378.163;What is "Thangka"?
+</query>
+<query id="54">1.81954395771::happen|发生||NULL|了||what|什么::what happen|发生 了 什么|||2.00432133675::on|在||?|?::on the ?|在 ?|||1.35024797916::bomb|炸弹::of bomb|炸弹|||1.27300131321::day|天::day|天|||0.842876553535::underground|地下::underground|地下|||0.638272166252::london|伦敦::london|伦敦|||0.945642352104::2005|2005||2005|年::2005|2005 年|||1.20412003994::juli|七月||7|七日::7 juli|七月 七日;-112.15;What happened on the day of 7 July 2005 London Underground bombings?
+</query>
+<query id="56">1.30103003979::russia|俄罗斯::- russia|俄罗斯|||1.57403123379::china|中国::china|中国|||1.34242272377::about|什么::what is about|什么|||1.62324929237::the|的||disput|纠纷::the disput|的 纠纷|||0.301030009985::agreement|协议||?|?::agreement ?|协议 ?|||1.0::border|边界::border|边界|||0.552841961384::eastern|东部::eastern|东部;-83.5747;what is the disputes about China-Russia eastern border agreement?
+</query>
+<query id="57">1.07918119431::japan|日本||what|究竟::what japan|日本 究竟|||2.38381528854::is|是||china|中国||NULL|的||NULL|,||and|并::is china and|是 中国 的 , 并|||0.753327667713::the|的||between|争执::the disput between|的 争执|||1.77815127373::for|对::for the|对|||2.15381479263::in|在||?|呢||?|?::in the ?|在 呢 ?|||0.477121263742::undersea|海底::undersea|海底|||0.493826955557::gas|天然气::natur gas|天然气|||0.42404282093::field|领域::field|领域|||1.07918119431::sea|东海::east china sea|东海;-124.489;What is the disputes between China and Japan for the undersea natural gas field in the East China Sea?
+</query>
+<query id="58">1.7075701952::box|票房::the box|票房|||0.618206620216::did|为什么::whi did|为什么|||1.27300131321::day|天::day|天|||0.19426523149::tsunami|海啸::tsunami|海啸|||0.60206001997::caus|造成||serious|严重::caus serious|造成 严重|||0.795880019665::damag|损害::damag|损害|||0.790050446987::coast|沿海::along the coast|沿海|||1.15381491184::and|和||death|死亡::and death|和 死亡|||1.59106457233::of|的||indonesia|印度尼西亚::of indonesia|的 印度尼西亚|||-0.0::,|,||lanka|斯里兰卡||,|,||india|印度::, sri lanka , india|, 斯里兰卡 , 印度|||1.16633141041::,|,||?|?::, and ?|, ?|||0.156974971294::thailand|泰国::thailand|泰国;-121.803;Why did the Boxing Day Tsunami cause serious damage and deaths along the coasts of Indonesia, Sri Lanka, India, and Thailand?
+</query>
+<query id="59">0.7403627038::reason|原因||is|是||what|什么::what is the reason|原因 是 什么|||2.47712135315::that|,::that was|,|||1.11809933186::iraq|伊拉克::of iraq|伊拉克|||-0.0::invas|入侵::2003 invas|入侵|||2.01283717155::by|为首||the|的::led by the|为首 的|||1.66275787354::us|美国||?|吗||?|?::us ?|美国 吗 ?;-86.0437;What is the reason that 2003 invasion of Iraq was led by the US?
+</query>
+<query id="61">1.63202321529::which|其中::which|其中|||1.46073079109::compani|公司::compani is|公司|||-1::terri|terri::terri|terri|||0.848628938198::guo|郭::guo|郭|||0.301030009985::(|(::( - ming|(|||1.59291660786::tai|戴::tai|戴|||0.848628938198::guo|郭::guo|郭|||0.366531550884::)|)::)|)|||1.17609131336::?|呢||?|?::of ?|呢 ?|||1.07918119431::presid|主席::presid|主席;-223.923;Which company is Terry Guo (Tai-Ming Guo) president of?
+</query>
+<query id="62">2.47712135315::was|满::who was|满|||2.47712135315::the|的||the|,::the of the|的 ,|||0.464284032583::presid|总统::presid|总统|||1.06069779396::state|美国||?|?::unit state ?|美国 ?|||2.47712135315::presid|副总统::vice presid|副总统|||0.698970019817::as|当::when serv as|当|||0.401544123888::cheney|切尼::cheney|切尼;-88.6909;Who was the President of the United States when Cheney served as Vice President?
+</query>
+<query id="63">2.17609119415::the|的::of the|的|||1.0::head|为首::as the head|为首|||1.32221925259::who|也||serv|担任::who serv|也 担任|||0.698970019817::plo|巴勒斯坦||plo|解放||plo|组织::plo|巴勒斯坦 解放 组织|||1.49136173725::negoti|谈判::negoti negoti|谈判|||1.31175386906::affair|事务||depart|部门::affair depart|事务 部门|||0.657577335835::,|,::, and|,|||1.63202321529::of|部长::minist of|部长|||1.07918119431::in|,||'s|的||?|?::in 's ?|, 的 ?|||0.761117935181::minist|总理::prime minist|总理|||-1::qureia|qureia::qureia|qureia|||1.69896996021::first|第一||first|次::first|第一 次|||0.380211234093::cabinet|内阁::cabinet|内阁;-512.954;Who served as the Head of the PLO Negotiation Affairs Department, and Minister of Negotiations in Prime Minister Qureia's first cabinet?
+</query>
+<query id="64">1.25527250767::was|是||how|如何::how was|是 如何|||1.11394333839::zarqawi|札夸威::al - zarqawi|札夸威|||1.85278487206::?|?::in the ?|?|||0.728933215141::involv|涉及::involv|涉及|||-0.0::in|在||iraq|伊拉克||incid|事件::incid in iraq|在 伊拉克 事件|||-0.0::japanes|日本||hostag|人质::japanes hostag|日本 人质;-76.6787;How was al-Zarqawi involved in the Japanese hostage incident in Iraq?
+</query>
+<query id="65">0.301030009985::describ|形容||NULL|的||relationship|关系::describ the relationship|形容 的 关系|||1.27300131321::between|之间::between|之间|||1.07918119431::and|和||china|中国::and china|和 中国|||0.121095396578::brazil|巴西::brazil|巴西|||2.01283717155::,|,::, which have|,|||1.87506127357::.|。::an .|。|||0.60206001997::joint|共同||launch|开展::joint launch|共同 开展|||0.176091253757::earth|地球||resourc|资源||satellit|卫星::earth resourc satellit|地球 资源 卫星;-80.1469;Describe the relationship between Brazil and China, which have jointly launched an earth resources satellite.
+</query>
+<query id="66">2.06818580627::what|什么||is|是||,|,::what is ,|什么 是 ,|||2.03342366219::the|,||politician|政客::the politician|, 政客|||2.47712135315::russian|俄罗斯::russian|俄罗斯|||1.94448268414::two|之间::between two|之间|||-1::relationship|relationship::relationship|relationship|||-1::kasianov|kasianov::kasianov|kasianov|||0.464886784554::and|和||putin|普京::and putin|和 普京|||0.182655021548::?|?::?|?;-641.503;What is the relationship between two Russian politicians, Kasianov and Putin?
+</query>
+<query id="67">-1::what|what::what|what|||-1::is|is::is|is|||-1::the|the::the|the|||0.60206001997::NULL|的||relationship|关系||?|?::relationship between the ?|的 关系 ?|||0.845098018646::uk|英国||and|和::uk and the|英国 和|||0.115393415093::euro|欧元::euro|欧元;-359.455;What is the relationship between the UK and the euro?
+</query>
+<query id="68">0.60206001997::when|至于||NULL|"||was|是::when was|至于 " 是|||0.249877467752::the|"||kyoto|京都||protocol|议定书::the kyoto protocol|" 京都 议定书|||1.04575753212::enforc|执法::enforc|执法|||0.182655021548::?|?::?|?;-147.201;When was the Kyoto Protocol enforced?
+</query>
+<query id="69">2.47712135315::who|who::who|who|||-1::is|is::is|is|||-1::masatoshi|masatoshi::masatoshi|masatoshi|||-1::koshiba|koshiba::koshiba|koshiba|||0.182655021548::?|?::?|?;-1024.32;Who is Masatoshi Koshiba?
+</query>
+<query id="70">2.47712135315::who|who::who|who|||-1::is|is::is|is|||0.845098018646::koichi|华歌尔::koichi|华歌尔|||0.572096765041::tanaka|田中::tanaka|田中|||0.182655021548::?|?::?|?;-355.625;Who is Koichi Tanaka?
+</query>
+<query id="71">2.47712135315::who|who::who|who|||0.60206001997::is|是||bian|陈水扁::is chen shui - bian|是 陈水扁|||0.182655021548::?|?::?|?;-231.898;Who is Chen Shui-Bian?
+</query>
+<query id="72">1.35218250751::are|是||what|什么||?|?::what are ?|是 什么 ?|||0.875061273575::cell|细胞::cell|细胞|||0.636822104454::embryon|胚胎::embryon|胚胎|||2.23044896126::stem|干::stem|干;-37.3741;What are embryonic stem cells?
+</query>
+<query id="73">1.04139268398::diseas|疾病||?|?::diseas ?|疾病 ?|||2.47712135315::'s|的::is 's|的|||-1::what|what::what|what|||0.24303804338::hansen|汉森::hansen|汉森;-154.905;What is Hansen's disease?
+</query>
+<query id="74">1.20412003994::are|哪里||?|?::where are ?|哪里 ?|||2.47712135315::territori|领土::territori|领土|||0.532638609409::'s|日本::japan 's|日本|||0.736758589745::northern|北方::northern|北方|||1.06214785576::locat|位于::locat|位于;-59.7874;Where are Japan's Northern Territories located?
+</query>
+<query id="75">2.47712135315::?|?::have ?|?|||0.958607316017::countri|国家::countri|国家|||1.87506127357::which|的::which|的|||1.77815127373::region|地区||NULL|的::in the region|地区 的|||0.574031293392::border|边界::border|边界|||-1::kashimir|kashimir::kashimir|kashimir;-409.374;Which countries have borders in the Kashimir region?
+</query>
+<query id="76">1.6532125473::where|哪里||is|呢||?|?::where is ?|哪里 呢 ?|||2.17609119415::the|的||locat|地点::the locat|的 地点|||0.589825510979::strip|加沙||gaza|地带::gaza strip|加沙 地带;-56.7946;Where is the Gaza Strip located?
+</query>
+<query id="77">1.04139268398::was|是||what|什么||?|?::what was the ?|是 什么 ?|||0.43969476223::incid|事件::incid|事件|||0.592916607857::bse|疯牛病::bse|疯牛病;-35.2243;What was the BSE incident?
+</query>
+<query id="78">1.03778851032::are|是||what|什么::what are|是 什么|||0.745966553688::the|的||characterist|特点::the characterist of the|的 特点|||1.06214785576::largest|大::largest|大|||2.17609119415::?|?::that ?|?|||0.44773748517::earthquak|地震::earthquak|地震|||2.26007127762::occur|发生::occur of|发生|||1.07918119431::the|在||coast|外海::off the coast|在 外海|||0.301030009985::,|,||indonesia|印度尼西亚||sumatra|苏门答腊::sumatra , indonesia|, 印度尼西亚 苏门答腊;-109.623;What are the characteristics of the largest earthquake that occurred off the coast of Sumatra, Indonesia?
+</query>
+<query id="80">1.20202696323::describ|形容::describ the|形容|||0.193820029497::iraq|伊拉克::iraq|伊拉克|||2.47712135315::was|是::and was|是|||-0.0::war|战争||in|在||march|三月::war in march|战争 在 三月|||1.41497337818::start|开始||which|的::which start|开始 的|||0.312768399715::,|,::,|,|||1.52287876606::2003|二○○三年::2003|二○○三年|||2.47712135315::between|之间||NULL|的||.|。::between .|之间 的 。|||1.73239374161::fought|战斗::fought|战斗|||1.50785589218::NULL|的||militari|军事||forc|力量::militari forc|的 军事 力量|||0.864337384701::regular|定期::regular|定期;-128.148;Describe the Iraq War, which started in March 2003 and was fought between regular military forces.
+</query>
+<query id="9">1.0::will|将||where|何处||?|?::where will ?|将 何处 ?|||2.47712135315::held|举行::be held|举行|||1.02996325493::game|奥运会::olymp game|奥运会|||1.53360259533::2008|2008::2008|2008;-63.1306;Where will Olympics Game 2008 be held?
+</query>
+<query id="82">1.07918119431::did|为什么||whi|会||did|造成::whi did of|为什么 会 造成|||0.532638609409::'s|日本::japan 's|日本|||0.778151273727::dispatch|派出::dispatch|派出|||0.903090000153::the|的||forc|自卫队::the self - defens forc|的 自卫队|||1.46239805222::to|到||trigger|引发::to trigger|到 引发|||0.193820029497::iraq|伊拉克::iraq|伊拉克|||-0.0::a|的||over|争论::a debat over|的 争论|||0.574031293392::amend|修改::amend of the|修改|||0.301030009985::japanes|日本::japanes|日本|||0.60206001997::constitut|宪法||?|?::constitut ?|宪法 ?;-142.147;Why did Japan's dispatch of the Self-Defense Force to Iraq trigger a debate over amendment of the Japanese Constitution?
+</query>
+<query id="83">0.970036804676::did|为什么::whi did the|为什么|||0.301030009985::argentin|阿根廷::argentin|阿根廷|||1.06694674492::econom|经济||?|?::econom ?|经济 ?|||0.60206001997::crisi|危机||occur|发生::crisi occur|危机 发生;-41.122;Why did the Argentine economic crisis occur?
+</query>
+<query id="84">0.618206620216::did|为什么::whi did|为什么|||1.39794003963::franc|法国::franc|法国|||0.886056661606::vote|投票::vote|投票|||0.903090000153::against|反对||?|?::against the ?|反对 ?|||0.301030009985::eu|欧盟||constitut|宪法::eu constitut|欧盟 宪法;-55.0583;Why did France vote against the EU Constitution?
+</query>
+<query id="85">2.36921596527::whi|为什么::whi in|为什么|||2.11394333839::NULL|,||sharpli|大幅度::sharpli|, 大幅度|||1.09690999985::oil|石油::oil|石油|||-1::did|did::did|did|||1.17609131336::price|价格||NULL|的||rise|上涨::price rise|价格 的 上涨|||0.908919513226::2004|2004::2004|2004|||0.182655021548::?|?::?|?;-284.379;Why did oil prices rise sharply in 2004?
+</query>
+<query id="87">-1::what|what::what|what|||-1::is|is::is|is|||-1::the|the::the|the|||-1::relationship|relationship::relationship|relationship|||-1::between|between::between|between|||-0.0::and|又||health|健康||?|呢||?|?::and health ?|又 健康 呢 ?|||1.12221586704::sleep|睡觉::sleep|睡觉;-581.436;What is the relationship between sleep and health?
+</query>
+<query id="90">2.17609119415::the|,::is and the|,|||-1::what|what::what|what|||1.0142403841::the|的||between|关系::the relationship between the|的 关系|||0.397940009832::malacca|麻六甲||strait|海峡::strait of malacca|麻六甲 海峡|||0.778151273727::japanes|日本||?|?::japanes ?|日本 ?|||0.644612312317::peopl|人民::peopl|人民;-176.03;What is the relationship between the Straits of Malacca and the Japanese people?
+</query>
+<query id="91">2.24551272392::there|有||?|?::there ?|有 ?|||2.42160391808::are|是||what|什么::what are|是 什么|||1.33099317551::link|联系::link|联系|||1.42050588131::japan|日本||between|之间::between japan|日本 之间|||0.477121263742::and|和||iraq|伊拉克::and the of iraq|和 伊拉克|||0.298144310713::reconstruct|重建::reconstruct|重建;-74.0545;What links are there between Japan and the reconstruction of Iraq?
+</query>
+<query id="92">1.33243846893::pakistan|巴基斯坦||between|之间||NULL|的::between pakistan|巴基斯坦 之间 的|||1.88081359863::what|什么::what of the|什么|||1.61278390884::is|是||NULL|的||issu|问题::is the issu|是 的 问题|||0.460087925196::import|重要::import|重要|||0.257013171911::negoti|谈判::negoti|谈判|||0.667561531067::india|印度||and|和::india and|印度 和|||0.182655021548::?|?::?|?;-149.574;What is the important issues of the Negotiation between India and Pakistan?
+</query>
+<query id="93">2.33645963669::is|是||what|什么样::what is of|是 什么样|||0.477121263742::the|的||contribut|贡献::the contribut|的 贡献|||1.07918119431::three|三峡||dam|大坝::three gorg dam|三峡 大坝|||0.182655021548::?|?::?|?;-145.914;What is the contributions of Three Gorges Dam?
+</query>
+<query id="94">1.7075701952::you|你::could you|你|||1.04139268398::pleas|请||give|给::pleas give|请 给|||1.57403123379::short|短期::short|短期|||1.81291329861::?|?::to the ?|?|||0.574031293392::descript|描述::descript|描述|||1.6674529314::2002|2002::of 2002|2002|||1.11394333839::lake|盐湖城::salt lake|盐湖城|||0.301030009985::winter|冬季||game|奥运会::winter olymp game|冬季 奥运会;-117.851;Could you please give short descriptions to the Salt Lake Winter Olympic Games of 2002?
+</query>
+<query id="95">0.903090000153::rapid|迅速||expand|扩大::expand rapid|迅速 扩大|||0.698970019817::whi|为什么||report|消息||report|传出::whi report|为什么 消息 传出|||2.17609119415::had|有::had|有|||-1::sar|sar::sar|sar|||2.32837963104::from|来自||?|?::from ?|来自 ?|||1.07918119431::2003|2003::2003|2003;-202.637;Why had SARS reports expanded rapidly from 2003?
+</query>
+<query id="96">-0.0::iraq|伊拉克||war|战争||a|是::iraq war a|伊拉克 战争 是|||0.778151273727::is|为什么::whi is|为什么|||1.13566255569::polit|政治||?|?::polit ?|政治 ?|||2.31175374985::point|指出||NULL|了::point to|指出 了|||2.03342366219::tip|冰山::tip|冰山|||0.752845406532::bush|布什||presid|总统::presid bush|布什 总统;-86.7345;Why is Iraq War a political tipping point to President Bush?
+</query>
+<query id="97">0.618206620216::did|为什么::whi did|为什么|||1.32633590698::china|中国||?|?::china ?|中国 ?|||1.17609131336::make|作出::make a|作出|||0.903090000153::summer|夏季||olymp|奥运会::summer olymp|夏季 奥运会|||1.49136173725::2008|申办::bid to host the 2008|申办;-79.13;Why did China make a bid to host the 2008 Summer Olympics?
+</query>
+<query id="98">0.618206620216::did|为什么::whi did|为什么|||2.0::?|?::in ?|?|||1.57403123379::theater|剧场::theater|剧场|||0.736758589745::moscow|莫斯科::moscow|莫斯科|||2.47712135315::in|在::hold in|在|||1.77815127373::chechen|车臣::chechen|车臣|||1.15490198135::arm|武装::arm|武装|||0.653212487698::hostag|人质::hostag|人质|||0.698970019817::eight|八百||hundr|名::eight hundr|八百 名|||0.933053195477::2002|2002::2002|2002;-124.269;Why did armed Chechens hold eight hundred hostages in Moscow theater in 2002?
+</query>
+<query id="99">0.477121263742::china|中国||did|为什么||did|现在::whi did china|中国 为什么 现在|||1.36172783375::implement|实施||?|?::implement ?|实施 ?|||1.63202321529::2005|2005::2005|2005|||1.68574178219::juli|七月份::in juli|七月份|||0.903090000153::renminbi|人民币||rate|汇率::the renminbi exchang rate|人民币 汇率|||0.0757207125425::reform|改革::reform|改革;-81.7273;Why did China implement the Renminbi exchange rate reform in July 2005?
+</query>
+<query id="100">-1::whi|whi::whi|whi|||-1::did|did::did|did|||0.236572012305::u.s.|美国::u.s.|美国|||0.513333439827::troop|部队::troop|部队|||0.477121263742::occupi|占领||?|呢||?|?::occupi ?|占领 呢 ?|||0.143163561821::baghdad|巴格达::baghdad|巴格达;-497.757;Why did U.S. troops occupy Baghdad?
+</query>
+</parameters>
