@@ -1,0 +1,102 @@
+<parameters>
+<query id="301">0.0746336206794::nestlé|nestl::nestlé|nestl|||0.427903234959::brand|marqu::brand|marqu;-26.2331;Nestlé Brands
+</query>
+<query id="302">0.146707475185::consum|consomm::consum|consomm|||0.111633270979::boycott|boycott::boycott|boycott;-24.002;Consumer Boycotts 
+</query>
+<query id="311">0.154901966453::unemploy|chômag::unemploy|chômag|||0.140661522746::in|en||europ|europ::in europ|en europ;-16.6043;Unemployment in Europe 
+</query>
+<query id="312">1.63202321529::NULL|de||dog|chien::dog|de chien|||0.337242156267::attack|attaqu::attack|attaqu;-22.5005;Dog Attacks 
+</query>
+<query id="313">-0.0::celebr|centenair::centenari celebr|centenair;-20.9384;Centenary Celebrations 
+</query>
+<query id="314">1.32221925259::speci|espec||NULL|en||endang|dang::endang speci|espec en dang;-19.0689;Endangered Species 
+</query>
+<query id="315">0.279840707779::dope|dopag||in|dan||NULL|le||sport|sport::dope in sport|dopag dan le sport;-15.5009;Doping in Sports 
+</query>
+<query id="316">0.736758589745::strike|grev::strike|grev;-16.3687;Strikes 
+</query>
+<query id="317">0.933053195477::drug|médic||anti|anti::anti drug|médic anti|||0.619788765907::-|-::-|-|||0.241592809558::cancer|canc::cancer|canc;-24.4305;Anti-cancer Drugs 
+</query>
+<query id="318">0.0606978386641::educ|éduc||sex|sexuel::sex educ|éduc sexuel;-18.6426;Sex Education 
+</query>
+<query id="319">0.985759556293::global|mondial::global|mondial|||0.318758755922::opium|la||product|product||NULL|d'||opium|opium::opium product|la product d' opium;-22.3707;Global Opium Production 
+</query>
+<query id="320">0.23608918488::crise|cris||energi|énerget::energi crise|cris énerget;-21.0087;Energy Crises 
+</query>
+<query id="303">0.933053195477::italian|italien::italian|italien|||0.527731239796::paint|peintur::paint|peintur;-22.656;Italian paintings 
+</query>
+<query id="321">0.278753608465::the|le||taliban|taliban||in|en||afghanistan|afghanistan::the taliban in afghanistan|le taliban en afghanistan;-11.1865;The Talibans in Afghanistan 
+</query>
+<query id="322">0.193820029497::atom|l'||energi|énerg||atom|atom::atom energi|l' énerg atom;-12.8423;Atomic Energy 
+</query>
+<query id="323">1.33099317551::tighten|renforc||NULL|le::tighten|renforc le|||1.63202321529::requir|exigent||NULL|de||visa|vis::visa requir|exigent de vis;-33.0166;Tightening Visa Requirements 
+</query>
+<query id="324">-1::supermodel|supermodel::supermodel|supermodel;-122.006;Supermodels 
+</query>
+<query id="325">2.0::fee|frais::fee|frais|||1.36317789555::student|aux||student|étudi::student|aux étudi;-28.2041;Student Fees 
+</query>
+<query id="326">0.301030009985::award|récompens||intern|international::intern award|récompens international|||-1::emmi|emmi::emmi|emmi;-135.514;Emmy International Awards 
+</query>
+<query id="327">1.34242272377::NULL|et||NULL|de||NULL|la||citi|vill||in|de||mexico|mexico::in mexico citi|et de la vill de mexico|||0.691791415215::earthquak|trembl||NULL|de||earthquak|terr::earthquak|trembl de terr;-27.9925;Earthquakes in Mexico City 
+</query>
+<query id="328">1.17609131336::iraqi|le||kurd|kurd||iraqi|irakien::iraqi kurd|le kurd irakien|||1.15490198135::and|et||NULL|de||turkey|la||turkey|turqu::and turkey|et de la turqu;-25.4115;Iraqi Kurds and Turkey 
+</query>
+<query id="329">2.17609119415::consequ|par||consequ|conséquent||NULL|,::consequ|par conséquent ,|||1.69896996021::if|si||NULL|le::if|si le|||2.47712135315::divorc|divorc||NULL|de::divorc|divorc de|||0.301030009985::and|et||diana|dian::and diana|et dian|||0.0821107327938::charl|charl::charl|charl;-33.5427;Consequences if Charles and Diana Divorce 
+</query>
+<query id="330">0.27572414279::film|film::film|film|||0.420216411352::with|avec::with|avec|||-1::keanu|keanu::keanu|keanu|||-1::reev|reev::reev|reev;-223.391;Films with Keanu Reeves 
+</query>
+<query id="304">0.698970019817::site|sit||NULL|du||heritag|patrimoin||world|mondial::world heritag site|sit du patrimoin mondial;-20.3242;World Heritage Sites 
+</query>
+<query id="331">1.45484483242::'s|la||polici|polit||econom|économ::'s econom polici|la polit économ|||0.162727296352::zedillo|zedillo::zedillo|zedillo;-35.2762;Zedillo's Economic Policies 
+</query>
+<query id="332">1.09108042717::shoot|assassinat||of|de::shoot of|assassinat de|||-0.0::tupac|tupac::tupac|tupac|||-1::shakur|shakur::shakur|shakur;-129.722;Shooting of Tupac Shakur 
+</query>
+<query id="333">0.286789566278::trial|proces::trial|proces|||0.24303804338::of|de||paul|paul::of paul|de paul|||-1::touvier|touvier::touvier|touvier;-370.153;Trial of Paul Touvier 
+</query>
+<query id="334">0.301030009985::elect|élect::elect|élect|||2.47712135315::w.|w||w.|.||bush|bush||w.|.::w. bush|w . bush .|||0.176091253757::of|de||georg|georg::of georg|de georg;-13.9552;Election of George W. Bush 
+</query>
+<query id="335">0.691791415215::labour|du||labour|travail::labour|du travail|||-0.0::john|john||smith|smith::john smith|john smith|||0.205279648304::after|apres::after|apres;-31.7675;Labour after John Smith 
+</query>
+<query id="336">-1::nba|nba::nba|nba|||1.87506127357::labour|du::labour|du|||0.337242156267::conflict|confl::conflict|confl;-133.653;NBA Labour Conflicts
+</query>
+<query id="337">0.833668589592::civil|la||war|guerr||civil|civil::civil war|la guerr civil|||1.52287876606::in|au::in the|au|||0.184865176678::yemen|yémen::yemen|yémen;-19.3874;Civil War in the Yemen 
+</query>
+<query id="338">1.24667239189::'|"||'|"::'|" "|||0.252400457859::carlo|carlos::carlo|carlos|||1.6532125473::and|et||NULL|au||trial|proces::and trial|et au proces|||0.180456057191::extradit|extradit::extradit|extradit;-37.0258;Carlos' Extradition and Trial 
+</query>
+<query id="339">1.41497337818::sinn|sinn||fein|fein::sinn fein|sinn fein|||0.698970019817::and|et||the|le||anglo|anglo||-|-::and the anglo -|et le anglo -|||0.254404783249::irish|irland::irish|irland|||0.0722875371575::declar|déclar::declar|déclar;-35.167;Sinn Fein and the Anglo-Irish Declaration 
+</query>
+<query id="340">0.363177895546::new|nouveau::new|nouveau|||2.06258201599::premier|premi||premier|ministr::premier|premi ministr|||1.13033378124::quebec|du||quebec|québec::quebec|du québec;-27.8731;New Quebec Premier 
+</query>
+<query id="305">0.971971273422::oil|le||price|prix||oil|du||oil|pétrol::oil price|le prix du pétrol;-8.63323;Oil Prices 
+</query>
+<query id="341">0.130653217435::theft|vol::theft|vol|||1.27875363827::of|de||"|«::of " the|de «|||0.732393741608::scream|hurl::scream|hurl|||0.542622804642::"|"::"|";-40.0007;Theft of "The Scream" 
+</query>
+<query id="342">-0.0::four|quatr||wed|mariag::four wed|quatr mariag|||-0.0::and|et||a|un||funer|enterr::and a funer|et un enterr;-17.9583;Four Weddings and a Funeral 
+</query>
+<query id="343">1.16057908535::south|sud||NULL|-||african|africain::south african|sud - africain|||1.24715459347::nation|le||parti|part||nation|national::nation parti|le part national;-20.3514;South African National Party 
+</query>
+<query id="344">2.0::cup|coup||world|du||world|mond::world cup|coup du mond|||0.472799867392::sweden|la||sweden|sued::sweden|la sued|||0.903090000153::vs.|contr::vs.|contr|||1.17609131336::brazil|au||brazil|brésil::brazil|au brésil|||-1::semifin|semifin::semifin|semifin;-391.974;Brazil vs. Sweden World Cup Semifinals 
+</query>
+<query id="345">0.359021931887::the|aux||game|jeux||olymp|olymp::at the olymp game|aux jeux olymp|||0.60206001997::ski|ski||NULL|de||ski|fond::cross - countri ski|ski de fond|||0.0162234120071::.|.::.|.;-34.6807;Cross-country Skiing at the Olympic Games. 
+</query>
+<query id="346">0.187086641788::grand|grand::grand|grand|||0.634244680405::slam|claqu::slam|claqu|||0.532638609409::winner|gagn::winner|gagn;-39.8716;Grand Slam Winners 
+</query>
+<query id="347">0.273001283407::best|meilleur::best|meilleur|||0.574031293392::pictur|imag::pictur|imag|||0.275222718716::oscar|oscar::oscar|oscar|||0.040958609432::1994|1994::1994|1994;-41.7434;Best Picture Oscar 1994 
+</query>
+<query id="348">-0.0::yann|yann::yann|yann|||-1::piat|piat::piat|piat|||0.528273761272::'s|l'||assassin|assassinat::'s assassin|l' assassinat;-134.786;Yann Piat's Assassination 
+</query>
+<query id="349">0.885785102844::'s|la||death|mort||NULL|de::'s death|la mort de|||0.146128028631::nixon|nixon::nixon|nixon;-27.356;Nixon's Death 
+</query>
+<query id="350">-1::ayrton|ayrton::ayrton|ayrton|||-1::senna|senna::senna|senna|||0.510121524334::'s|la||death|mort::'s death|la mort|||0.0162234120071::.|.::.|.;-475.622;Ayrton Senna's Death. 
+</query>
+<query id="306">1.83250892162::NULL|de||eta|l'||eta|eta::eta|de l' eta|||0.152838796377::activ|activ::activ|activ|||0.0740007311106::in|en||franc|franc::in franc|en franc;-25.0439;ETA Activities in France 
+</query>
+<query id="307">2.0::in|en::set in|en|||0.27572414279::film|film::film|film|||0.359849959612::scotland|écoss::scotland|écoss;-35.7653;Films Set in Scotland 
+</query>
+<query id="308">2.47712135315::solar|le||solar|solair::solar|le solair|||0.372911989689::eclips|éclips::eclips|éclips;-21.0384;Solar Eclipse 
+</query>
+<query id="309">1.87506127357::NULL|de||NULL|la||drug|drogu::drug|de la drogu|||1.07918119431::"|«||hard|dur||"|»::" hard "|« dur »;-28.6398;"Hard" Drugs 
+</query>
+<query id="310">-0.0::treatment|trait||of|de||industri|industriel::treatment of industri|trait de industriel|||0.224268227816::wast|déchet::wast|déchet;-18.453;Treatment of Industrial Waste 
+</query>
+</parameters>
