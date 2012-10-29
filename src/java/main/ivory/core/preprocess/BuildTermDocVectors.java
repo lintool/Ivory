@@ -202,8 +202,8 @@ public class BuildTermDocVectors extends PowerTool {
 
   private static class DocLengthDataWriterMapper extends NullMapper {
     @Override
-    public void run(Mapper<NullWritable, NullWritable, NullWritable, NullWritable>.Context context)
-        throws IOException, InterruptedException {
+    public void runSafely(Mapper<NullWritable, NullWritable, NullWritable, NullWritable>.Context context) {
+	try {
       Configuration conf = context.getConfiguration();
       int collectionDocCount = conf.getInt(Constants.CollectionDocumentCount, -1);
       String inputPath = conf.get(InputPath);
@@ -284,6 +284,9 @@ public class BuildTermDocVectors extends PowerTool {
       LOG.info(n + " doc lengths written");
 
       out.close();
+	} catch ( IOException e ) {
+	    throw new RuntimeException(e);
+	}
     }
   }
 
