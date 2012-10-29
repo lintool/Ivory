@@ -2,6 +2,8 @@ package ivory.core.tokenize;
 
 import static org.junit.Assert.assertTrue;
 import java.io.IOException;
+
+import org.apache.hadoop.conf.Configuration;
 import org.junit.Test;
 
 public class LuceneArabicAnalyzerTest {
@@ -9,7 +11,7 @@ public class LuceneArabicAnalyzerTest {
   @Test
   public void testTokens1() throws IOException{
     ivory.core.tokenize.Tokenizer tokenizer = new LuceneArabicAnalyzer();
-    tokenizer.configure(null);
+    tokenizer.configure(new Configuration());
 
     String sentence = "قرأت كتابا أحمر";
     String[] expectedTokens = new String[] {"قر", "كتابا", "احمر"};
@@ -26,7 +28,7 @@ public class LuceneArabicAnalyzerTest {
   @Test
   public void testTokens2() throws IOException{
     ivory.core.tokenize.Tokenizer tokenizer = new LuceneArabicAnalyzer();
-    tokenizer.configure(null);
+    tokenizer.configure(new Configuration());
 
     String sentence = "الأسبوع القادم سيكون مخصصاً مقالات الرياضيات من 4 أبريل 2011 إلى 10 أبريل 2011.";
     String[] expectedTokens = new String[] { "اسبوع", "قادم",  "سيك", "مخصصا", "مقال", "رياض", "4", "ابريل", "2011", "10", "ابريل", "2011"};
@@ -43,7 +45,7 @@ public class LuceneArabicAnalyzerTest {
   @Test
   public void testTokens3() throws IOException{
     ivory.core.tokenize.Tokenizer tokenizer = new LuceneArabicAnalyzer();
-    tokenizer.configure(null);
+    tokenizer.configure(new Configuration());
 
     String sentence = "القوات الإثيوبية تسيطر على مدينة مَحَاس وسط الصومال بعد يوم من سيطرتها على مدينة عيل";
     String[] expectedTokens = new String[] { "قو","اثيوب",  "تسيطر", "مدين", "محاس", "وسط", "صومال", "يوم", "سيطرت", "مدين", "عيل"};
@@ -60,7 +62,7 @@ public class LuceneArabicAnalyzerTest {
   @Test
   public void testTokens4() throws IOException{
     ivory.core.tokenize.Tokenizer tokenizer = new LuceneArabicAnalyzer();
-    tokenizer.configure(null);
+    tokenizer.configure(new Configuration());
 
     String sentence = "أين أنت ذاهب الليلة؟";
     String[] expectedTokens = new String[] { "اين", "ذاهب",  "ليل"};
