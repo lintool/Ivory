@@ -1,12 +1,16 @@
 package ivory.core.tokenize;
 
 import static org.junit.Assert.assertTrue;
+
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+
+import junit.framework.JUnit4TestAdapter;
+
 import org.apache.hadoop.conf.Configuration;
 import org.junit.Test;
 
@@ -73,5 +77,9 @@ public class LuceneArabicAnalyzerTest {
         tokenCnt++;
       }
     }
+  }
+  
+  public static junit.framework.Test suite() {
+    return new JUnit4TestAdapter(LuceneArabicAnalyzerTest.class);
   }
 }
