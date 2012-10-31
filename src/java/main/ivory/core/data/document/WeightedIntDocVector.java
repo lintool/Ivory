@@ -5,16 +5,12 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import java.util.Iterator;
-
 import org.apache.hadoop.io.WritableUtils;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import edu.umd.cloud9.io.map.HMapIFW;
-
-
 
 /**
  * Implementation of {@link IntDocVector} with term weights
