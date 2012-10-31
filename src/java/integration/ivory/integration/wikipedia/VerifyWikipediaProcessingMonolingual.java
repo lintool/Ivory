@@ -32,40 +32,40 @@ public class VerifyWikipediaProcessingMonolingual {
   private static final String collectionRepacked = tmp + "/enwiki-20110115.repacked";
   private static final String galagoIndex = tmp + "/enwiki.galago";
 
-  // Galago: part 00000, key = 92101
+  // Galago: part 00000, key = 91805
   private ImmutableMap<String, Float> galagoTermDocVector1 = ImmutableMap.of(
-      "2004", 0.039252512f, "replica", 0.11475211f, "refer", -0.014842824f, "first", 0.017736943f);
+      "theori", 0.05498378f, "extern", 0.0021626172f, "refer", -0.01075585f, "50", 0.056969844f);
 
-  // Galago: part 00010, key = 34222
+  // Galago: part 00010, key = 34096
   private ImmutableMap<String, Float> galagoTermDocVector2 = ImmutableMap.of(
-      "brigadi", 0.026055908f, "elvii", 0.034582853f, "film", 0.024715992f, "cultur", 0.017777082f);
+      "extern", 0.005528182f, "librari", 0.12763943f, "film", 0.104365f, "cultur", 0.10795438f);
 
-  // Galago: part 00002, key = 100984
+  // Galago: part 00002, key = 100585
   private ImmutableMap<Integer, Float> galagoIntDocVector1 =
-    ImmutableMap.of(5, 0.017312722f, 1618, 0.07800972f, 7979, 0.12044795f, 3685, 0.12459397f);
+    ImmutableMap.of(5, 0.016333312f, 1660, 0.07839933f, 7889, 0.120369025f, 3792, 0.09966967f);
 
-  // Galago: part 00011, key = 138960
+  // Galago: part 00011, key = 34096
   private ImmutableMap<Integer, Float> galagoIntDocVector2 =
-    ImmutableMap.of(2, 0.0062202225f, 526, 0.109307125f, 2442, 0.16429637f, 421, 0.10314735f);
+    ImmutableMap.of(2, 0.0037445724f, 521, 0.11334762f, 2430, 0.17121725f, 421, 0.10686168f);
 
   private static final String opennlpIndex = tmp + "/enwiki.opennlp";
   private static final String vocabPath = tmp + "/vocab";
 
-  // Opennlp: part 00000, key = 92101
+  // Opennlp: part 00000, key = 91805
   private ImmutableMap<String, Float> opennlpTermDocVector1 = ImmutableMap.of(
-      "extern", 0.0047085057f, "zero", 0.102504365f, "theorem", 0.12850066f, "prime", 0.082574375f);
+      "extern", 0.0031720826f, "zero", 0.10270898f, "theorem", 0.12908114f, "prime", 0.082557835f);
 
-  // Opennlp: part 00010, key = 34222
+  // Opennlp: part 00010, key = 137938
   private ImmutableMap<String, Float> opennlpTermDocVector2 = ImmutableMap.of(
-      "cycl", 0.090582855f, "scholar", 0.08342686f, "229", 0.13324969f, "opinion", 0.09194601f);
+      "cycl", 0.09249325f, "scholar", 0.085096315f, "problem", 0.06792056f, "opinion", 0.093886666f);
 
-  // Opennlp: part 00002, key = 100984
+  // Opennlp: part 00002, key = 4764
   private ImmutableMap<Integer, Float> opennlpIntDocVector1 =
-    ImmutableMap.of(1, -0.0034231273f, 12, 0.022128861f, 102, 0.008630077f, 5, 0.01352463f);
+    ImmutableMap.of(1, -0.0041385624f, 12, 0.021055056f, 102, 0.008587789f, 5, 0.012481997f);
 
-  // Opennlp: part 00011, key = 34222, (terms: conjunto, histori, film, cultur)
+  // Opennlp: part 00011, key = 148600
   private ImmutableMap<Integer, Float> opennlpIntDocVector2 =
-    ImmutableMap.of(3677, 0.048551466f, 14080, 0.07085314f, 260, 0.024108753f, 2365, 0.09521676f);
+    ImmutableMap.of(3535, 0.04832942f, 14163, 0.07156628f, 259, 0.024075758f, 2363, 0.0945287f);
 
   @Test
   public void runBuildIndexGalago() throws Exception {
@@ -105,7 +105,6 @@ public class VerifyWikipediaProcessingMonolingual {
         "-mode=mono", "-index="+galagoIndex, "-xml="+collectionPath, "-compressed="+collectionRepacked,
         "-tokenizerclass="+ivory.core.tokenize.GalagoTokenizer.class.getCanonicalName(), "-lang=en",
         "-tokenizermodel="+vocabPath + "/en-token.bin"});
-
   }
 
   @Test

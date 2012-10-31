@@ -35,42 +35,42 @@ public class VerifyWikipediaProcessingCrosslingual {
   private static final String enwikiRepacked = tmp + "/enwiki-20110115.repacked";
   private static final String enwikiEn = tmp + "/enwiki.en";
 
-  // en side: part 00000, key = 92101
+  // en side: part 00000, key = 91805
   private ImmutableMap<String, Float> enTermDocVector1 = ImmutableMap.of(
-      "total", 0.053489465f, "extern", 0.0047085993f, "side", 0.051586498f, "refer", -0.013051073f);
+      "total", 0.053106617f, "extern", 0.0031720826f, "side", 0.05118692f, "refer", -0.015724683f);
 
-  // en side: part 00010, key = 138960
+  // en side: part 00010, key = 137938
   private ImmutableMap<String, Float> enTermDocVector2 = ImmutableMap.of(
-      "extern", 0.004598105f, "perspect", 0.09756525f, "deal", 0.07042515f, "devianc", 0.18643877f);
+      "extern", 0.003159181f, "perspect", 0.09968591f, "deal", 0.07168619f, "devianc", 0.1912349f);
 
-  // en side: part 00002, key = 150251
+  // en side: part 00002, key = 148600
   private ImmutableMap<Integer, Float> enIntDocVector1 =
-    ImmutableMap.of(42846, 0.059367422f, 1518, 0.038326096f, 307, 0.04928433f, 63715, 0.037885573f);
+    ImmutableMap.of(42846, 0.059385046f, 1518, 0.038532563f, 307, 0.04885947f, 63715, 0.038093522f);
 
-  // en side: part 00011, key = 184192
+  // en side: part 00011, key = 181342
   private ImmutableMap<Integer, Float> enIntDocVector2 =
-    ImmutableMap.of(19446, 0.098102935f, 175, 0.05113173f, 31837, 0.18484645f, 4936, -0.016991744f);
+    ImmutableMap.of(19446, 0.097477354f, 175, 0.05032143f, 31837, 0.18637569f, 4936, -0.020454587f);
 
   private static final String dewikiPath = 
     "/shared/collections/wikipedia/raw/dewiki-20110131-pages-articles.xml";
   private static final String dewikiRepacked = tmp + "/dewiki-20110131.repacked";
   private static final String dewikiEn = tmp + "/dewiki.en";
 
-  // de side: part 00000, key = 1001242228
+  // de side: part 00000, key = 1001172179
   private ImmutableMap<String, Float> deTermDocVector1 = ImmutableMap.of(
-      "everyon", 0.19224185f, "1938", 0.29180187f, "wealthiest", 0.09108173f, "anoth", 0.1812021f);
+      "everyon", 0.122168064f, "2007", 0.080851935f, "wealthiest", 0.01624437f, "literatur", 0.16710931f);
 
-  // de side: part 00010, key = 1000034130
+  // de side: part 00010, key = 1000011705
   private ImmutableMap<String, Float> deTermDocVector2 = ImmutableMap.of(
-      "de", 0.050196763f, "mechan", 0.12113027f, "kinet", 0.15653715f, "great", 0.0015684455f);
+      "european", 0.28855968f, "differ", 0.07924521f, "pere", 0.30542666f, "chang", 0.0298539f);
 
-  // de side: part 00002, key = 1000943946
+  // de side: part 00002, key = 1000059522
   private ImmutableMap<Integer, Float> deIntDocVector1 =
-    ImmutableMap.of(15320, 0.36188218f, 1009, 0.12278663f, 3985, 0.4062647f, 5164, 0.012887947f);
+    ImmutableMap.of(15320, 0.1828537f, 9728, 0.0938793f, 23698, 0.38859853f, 5426, 0.01161581f);
 
-  // de side: part 00011, key = 1000347854
+  // de side: part 00011, key = 1000157792
   private ImmutableMap<Integer, Float> deIntDocVector2 =
-    ImmutableMap.of(51742, 0.2103673f, 2308, 0.08852731f, 9996, 0.01679619f, 1286, 0.0069967806f);
+    ImmutableMap.of(7239, 0.17572549f, 2017, 0.0102842655f, 15320, 0.3721369f, 7121, 0.006977279f);
 
   @Test
   public void runBuildIndexEnSide() throws Exception {
