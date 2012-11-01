@@ -2,7 +2,7 @@
 
      <run>en-ar.1best</run>
      <query_type>mtN</query_type>
-     <index>/scratch0/fture/indexes/trec01-03_index.ar</index>
+     <index>/scratch0/fture/indexes/trec2001-03_cleaned+nodups+notags.ar-nostop.index</index>
      <doc_lang>ar</doc_lang>
      <query_lang>en</query_lang>
      <doc_tokenizer>data/tokenizer/ar-token.bin</doc_tokenizer>
