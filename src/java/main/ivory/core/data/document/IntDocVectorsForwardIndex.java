@@ -130,6 +130,7 @@ public class IntDocVectorsForwardIndex {
     try {
       value = (IntDocVector) reader.getValueClass().newInstance();
     } catch (Exception e) {
+      reader.close();
       throw new RuntimeException("Unable to instantiate key/value pair!");
     }
 
@@ -139,6 +140,7 @@ public class IntDocVectorsForwardIndex {
     if (key.get() != docno) {
       LOG.error("unable to doc vector for docno " + docno + ": found docno " + key
           + " instead");
+      reader.close();
       return null;
     }
 

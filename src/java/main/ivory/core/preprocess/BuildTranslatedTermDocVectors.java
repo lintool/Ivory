@@ -67,7 +67,6 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
       Mapper<IntWritable, TermDocVector, IntWritable, HMapSFW> {
 
     private ScoringModel model;
-//    private HMapIFW transDfTable;
     // eVocabSrc is the English vocabulary for probability table e2f_Probs.
     // engVocabTrgis the English vocabulary for probability table f2e_Probs.
     // fVocabSrc is the German vocabulary for probability table f2e_Probs.

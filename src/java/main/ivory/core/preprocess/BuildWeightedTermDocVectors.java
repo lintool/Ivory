@@ -46,7 +46,6 @@ import org.apache.hadoop.mapred.OutputCollector;
 import org.apache.hadoop.mapred.Reporter;
 import org.apache.hadoop.mapred.SequenceFileInputFormat;
 import org.apache.hadoop.mapred.SequenceFileOutputFormat;
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import com.google.common.collect.Maps;

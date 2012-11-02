@@ -202,91 +202,91 @@ public class BuildTermDocVectors extends PowerTool {
 
   private static class DocLengthDataWriterMapper extends NullMapper {
     @Override
-    public void runSafely(Mapper<NullWritable, NullWritable, NullWritable, NullWritable>.Context context) {
-	try {
-      Configuration conf = context.getConfiguration();
-      int collectionDocCount = conf.getInt(Constants.CollectionDocumentCount, -1);
-      String inputPath = conf.get(InputPath);
-      String dataFile = conf.get(DocLengthDataFile);
+    public void runSafely(
+        Mapper<NullWritable, NullWritable, NullWritable, NullWritable>.Context context) {
+      try {
+        Configuration conf = context.getConfiguration();
+        int collectionDocCount = conf.getInt(Constants.CollectionDocumentCount, -1);
+        String inputPath = conf.get(InputPath);
+        String dataFile = conf.get(DocLengthDataFile);
 
-      int docnoOffset = conf.getInt(Constants.DocnoOffset, 0);
+        int docnoOffset = conf.getInt(Constants.DocnoOffset, 0);
 
-      Path p = new Path(inputPath);
+        Path p = new Path(inputPath);
 
-      LOG.info("InputPath: " + inputPath);
-      LOG.info("DocLengthDataFile: " + dataFile);
-      LOG.info("DocnoOffset: " + docnoOffset);
+        LOG.info("InputPath: " + inputPath);
+        LOG.info("DocLengthDataFile: " + dataFile);
+        LOG.info("DocnoOffset: " + docnoOffset);
 
-      FileSystem fs = FileSystem.get(conf);
-      FileStatus[] fileStats = fs.listStatus(p);
+        FileSystem fs = FileSystem.get(conf);
+        FileStatus[] fileStats = fs.listStatus(p);
 
-      int[] doclengths = new int[collectionDocCount + 1]; // Initial array to hold the doclengths.
-      int maxDocno = 0; // Largest docno.
-      int minDocno = Integer.MAX_VALUE; // Smallest docno.
+        int[] doclengths = new int[collectionDocCount + 1]; // Initial array to hold the doclengths.
+        int maxDocno = 0;                 // Largest docno.
+        int minDocno = Integer.MAX_VALUE; // Smallest docno.
 
-      int nFiles = fileStats.length;
-      for (int i = 0; i < nFiles; i++) {
-        // Skip log files
-        if (fileStats[i].getPath().getName().startsWith("_")) {
-          continue;
+        int nFiles = fileStats.length;
+        for (int i = 0; i < nFiles; i++) {
+          // Skip log files
+          if (fileStats[i].getPath().getName().startsWith("_")) {
+            continue;
+          }
+
+          LOG.info("processing " + fileStats[i].getPath());
+          LineReader reader = new LineReader(fs.open(fileStats[i].getPath()));
+
+          Text line = new Text();
+          while (reader.readLine(line) > 0) {
+            String[] arr = line.toString().split("\\t+", 2);
+
+            int docno = Integer.parseInt(arr[0]);
+            int len = Integer.parseInt(arr[1]);
+
+            // Note that because of speculative execution there may be multiple copies of doclength
+            // data. Therefore, we can't just count number of doclengths read. Instead, keep track
+            // of largest docno encountered.
+            if (docno < docnoOffset) {
+              throw new RuntimeException("Error: docno " + docno + " < docnoOffset " + docnoOffset
+                  + "!");
+            }
+
+            doclengths[docno - docnoOffset] = len;
+
+            if (docno > maxDocno) {
+              maxDocno = docno;
+            }
+            if (docno < minDocno) {
+              minDocno = docno;
+            }
+          }
+          reader.close();
+          context.getCounter(DocLengths.Files).increment(1);
         }
 
-        LOG.info("processing " + fileStats[i].getPath());
-        LineReader reader = new LineReader(fs.open(fileStats[i].getPath()));
+        LOG.info("min docno: " + minDocno);
+        LOG.info("max docno: " + maxDocno);
 
-        Text line = new Text();
-        while (reader.readLine(line) > 0) {
-          String[] arr = line.toString().split("\\t+", 2);
+        // Write out the doc length data into a single file.
+        FSDataOutputStream out = fs.create(new Path(dataFile), true);
 
-          int docno = Integer.parseInt(arr[0]);
-          int len = Integer.parseInt(arr[1]);
+        out.writeInt(docnoOffset); // Write out the docno offset.
+        out.writeInt(maxDocno - docnoOffset); // Write out the collection size.
 
-          // Note that because of speculative execution there may be
-          // multiple copies of doclength data. Therefore, we can't
-          // just count number of doclengths read. Instead, keep track
-          // of largest docno encountered.
-          if (docno < docnoOffset) {
-            throw new RuntimeException(
-                "Error: docno " + docno + " < docnoOffset " + docnoOffset + "!");
-          }
-
-          doclengths[docno - docnoOffset] = len;
-
-          if (docno > maxDocno) {
-            maxDocno = docno;
-          }
-          if (docno < minDocno) {
-            minDocno = docno;
-          }
+        // Write out length of each document (docnos are sequentially
+        // ordered, so no need to explicitly keep track).
+        int n = 0;
+        for (int i = 1; i <= maxDocno - docnoOffset; i++) {
+          out.writeInt(doclengths[i]);
+          n++;
+          context.getCounter(DocLengths.Count).increment(1);
+          context.getCounter(DocLengths.SumOfDocLengths).increment(doclengths[i]);
         }
-        reader.close();
-        context.getCounter(DocLengths.Files).increment(1);
+        LOG.info(n + " doc lengths written");
+
+        out.close();
+      } catch (IOException e) {
+        throw new RuntimeException(e);
       }
-
-      LOG.info("min docno: " + minDocno);
-      LOG.info("max docno: " + maxDocno);
-
-      // Write out the doc length data into a single file.
-      FSDataOutputStream out = fs.create(new Path(dataFile), true);
-
-      out.writeInt(docnoOffset); // Write out the docno offset.
-      out.writeInt(maxDocno - docnoOffset); // Write out the collection size.
-
-      // Write out length of each document (docnos are sequentially
-      // ordered, so no need to explicitly keep track).
-      int n = 0;
-      for (int i = 1; i <= maxDocno - docnoOffset; i++) {
-        out.writeInt(doclengths[i]);
-        n++;
-        context.getCounter(DocLengths.Count).increment(1);
-        context.getCounter(DocLengths.SumOfDocLengths).increment(doclengths[i]);
-      }
-      LOG.info(n + " doc lengths written");
-
-      out.close();
-	} catch ( IOException e ) {
-	    throw new RuntimeException(e);
-	}
     }
   }
 
@@ -311,7 +311,7 @@ public class BuildTermDocVectors extends PowerTool {
     super(conf);
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   public int runTool() throws Exception {
     Configuration conf = getConf();
     FileSystem fs = FileSystem.get(conf);
