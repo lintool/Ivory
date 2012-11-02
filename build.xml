@@ -307,7 +307,7 @@
 			<equals arg1="${platform}" arg2="windows" />
 		</condition>
 
-		<property name="java_command" value="${java} -Xmx2g -classpath &quot;${run.path.id}&quot;" />
+		<property name="java_command" value="${java} -Xmx4g -classpath &quot;${run.path.id}&quot;" />
 
 		<condition property="script_prefix" value="#!/bin/sh${line.separator}if test -s ~/.bashrc${line.separator}then${line.separator}source ~/.bashrc${line.separator}fi${line.separator}">
 			<equals arg1="${platform}" arg2="unix" />
