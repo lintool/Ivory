@@ -124,7 +124,8 @@ public abstract class Tokenizer {
    *    normalized text, ready to be run through tokenizer   
    */
   public String preNormalize(String text) {
-    return text.replaceAll("’", "\'").replaceAll("`", "\'").replaceAll("“", "\"").replaceAll("”", "\"").replaceAll("‘", "'").replaceAll("\u2019", "'");
+//    return text.replaceAll("’", "'").replaceAll("`", "'").replaceAll("“", "\"").replaceAll("”", "\"").replaceAll("‘", "'").replaceAll("\u2019", "'");
+    return text.replaceAll("\u2018", "'").replaceAll("\u2060", "'").replaceAll("\u201C", "\"").replaceAll("\u201D", "\"").replaceAll("\u00B4", "'").replaceAll("\u2019", "'").replaceAll("\u0060", "'");
   }
 
   /**
