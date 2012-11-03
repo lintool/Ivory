@@ -7,6 +7,7 @@ import ivory.core.data.stat.PrefixEncodedGlobalStats;
 import ivory.core.tokenize.Tokenizer;
 import ivory.pwsim.score.Bm25;
 import ivory.pwsim.score.ScoringModel;
+
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -24,6 +25,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
@@ -34,7 +36,6 @@ import org.apache.hadoop.io.SequenceFile;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
-import sun.util.LocaleServiceProviderPool.LocalizedObjectGetter;
 import edu.umd.cloud9.io.map.HMapIFW;
 import edu.umd.cloud9.io.map.HMapSFW;
 import edu.umd.cloud9.io.map.HMapSIW;
