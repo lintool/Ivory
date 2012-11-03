@@ -17,8 +17,8 @@ public class OpenNLPEnTokenizerTest {
 
   @Test
   public void testTokensNoStemNoStopNoVocab() throws IOException{
-//    Tokenizer tokenizer = TokenizerFactory.createTokenizer("en", "/Users/ferhanture/Documents/workspace/ivory-github/Ivory/data/tokenizer/en-token.bin", false, false, null);
-    Tokenizer tokenizer = TokenizerFactory.createTokenizer("en", "/Users/ferhanture/Documents/workspace/ivory-github/Ivory/data/tokenizer/en-token.bin", false, null, null, null);
+//    Tokenizer tokenizer = TokenizerFactory.createTokenizer("en", "data/tokenizer/en-token.bin", false, false, null);
+    Tokenizer tokenizer = TokenizerFactory.createTokenizer("en", "data/tokenizer/en-token.bin", false, null, null, null);
 
     String sentence = "This is a sentence, written in the U.S., which is \"un-tokenized\" (i.e., tokenization not performed).";
     String[] expectedTokens = new String[] {"this", "is", "a", "sentence", ",", "written", "in", "the", "u.s.", ",", "which", "is", "\"", "un", "-", "tokenized", "\"", "(", "i", ".e", ".", ",", "tokenization", "not", "performed", ")", "."};
@@ -29,8 +29,8 @@ public class OpenNLPEnTokenizerTest {
   
   @Test
   public void testTokensNoStemNoVocab() throws IOException{
-//    Tokenizer tokenizer = TokenizerFactory.createTokenizer("en", "/Users/ferhanture/Documents/workspace/ivory-github/Ivory/data/tokenizer/en-token.bin", false, true, null);
-    Tokenizer tokenizer = TokenizerFactory.createTokenizer("en", "/Users/ferhanture/Documents/workspace/ivory-github/Ivory/data/tokenizer/en-token.bin", false, "/Users/ferhanture/Documents/workspace/ivory-github/Ivory/data/tokenizer/en.stop", "/Users/ferhanture/Documents/workspace/ivory-github/Ivory/data/tokenizer/en.stop.stemmed", null);
+//    Tokenizer tokenizer = TokenizerFactory.createTokenizer("en", "data/tokenizer/en-token.bin", false, true, null);
+    Tokenizer tokenizer = TokenizerFactory.createTokenizer("en", "data/tokenizer/en-token.bin", false, "data/tokenizer/en.stop", "data/tokenizer/en.stop.stemmed", null);
 
     String sentence = "This is a sentence, written in the U.S., which is \"un-tokenized\" (i.e., tokenization not performed).";
     String[] expectedTokens = new String[] {"sentence", "written", "u.s.", "un", "tokenized", ".e", "tokenization", "performed"};
@@ -41,8 +41,8 @@ public class OpenNLPEnTokenizerTest {
   
   @Test
   public void testTokensNoVocab() throws IOException{
-//    Tokenizer tokenizer = TokenizerFactory.createTokenizer("en", "/Users/ferhanture/Documents/workspace/ivory-github/Ivory/data/tokenizer/en-token.bin", true, true, null);
-    Tokenizer tokenizer = TokenizerFactory.createTokenizer("en", "/Users/ferhanture/Documents/workspace/ivory-github/Ivory/data/tokenizer/en-token.bin", true, "/Users/ferhanture/Documents/workspace/ivory-github/Ivory/data/tokenizer/en.stop", "/Users/ferhanture/Documents/workspace/ivory-github/Ivory/data/tokenizer/en.stop.stemmed", null);
+//    Tokenizer tokenizer = TokenizerFactory.createTokenizer("en", "data/tokenizer/en-token.bin", true, true, null);
+    Tokenizer tokenizer = TokenizerFactory.createTokenizer("en", "data/tokenizer/en-token.bin", true, "data/tokenizer/en.stop", "data/tokenizer/en.stop.stemmed", null);
 
     String sentence = "This is a sentence, written in the U.S., which is \"un-tokenized\" (i.e., tokenization not performed).";
     String[] expectedTokens = new String[] {"sentenc", "written", "u.s.", "un", "token", ".e", "token", "perform"};
@@ -57,8 +57,8 @@ public class OpenNLPEnTokenizerTest {
     v.addOrGet("sentenc");
     v.addOrGet("token");
     
-//    Tokenizer tokenizer = TokenizerFactory.createTokenizer("en", "/Users/ferhanture/Documents/workspace/ivory-github/Ivory/data/tokenizer/en-token.bin", true, true, v);
-    Tokenizer tokenizer = TokenizerFactory.createTokenizer("en", "/Users/ferhanture/Documents/workspace/ivory-github/Ivory/data/tokenizer/en-token.bin", true, "/Users/ferhanture/Documents/workspace/ivory-github/Ivory/data/tokenizer/en.stop", "/Users/ferhanture/Documents/workspace/ivory-github/Ivory/data/tokenizer/en.stop.stemmed", v);
+//    Tokenizer tokenizer = TokenizerFactory.createTokenizer("en", "data/tokenizer/en-token.bin", true, true, v);
+    Tokenizer tokenizer = TokenizerFactory.createTokenizer("en", "data/tokenizer/en-token.bin", true, "data/tokenizer/en.stop", "data/tokenizer/en.stop.stemmed", v);
 
     String sentence = "This is a sentence, written in the U.S., which is \"un-tokenized\" (i.e., tokenization not performed).";
     String[] expectedTokens = new String[] {"sentenc", "token", "token"};
@@ -69,9 +69,9 @@ public class OpenNLPEnTokenizerTest {
 
   @Test
   public void testPreNormalize() throws IOException{
-    Tokenizer tokenizer = TokenizerFactory.createTokenizer("en", "/Users/ferhanture/Documents/workspace/ivory-github/Ivory/data/tokenizer/en-token.bin", true, "/Users/ferhanture/Documents/workspace/ivory-github/Ivory/data/tokenizer/en.stop", "/Users/ferhanture/Documents/workspace/ivory-github/Ivory/data/tokenizer/en.stop.stemmed", null);
+    Tokenizer tokenizer = TokenizerFactory.createTokenizer("en", "data/tokenizer/en-token.bin", true, "data/tokenizer/en.stop", "data/tokenizer/en.stop.stemmed", null);
 
-    List<String> sentences = readInput("/Users/ferhanture/Documents/workspace/ivory-github/Ivory/etc/tokenizer-normalize-test.txt");
+    List<String> sentences = readInput("etc/tokenizer-normalize-test.txt");
     int cnt = 0;
     for (String sentence : sentences) {
       String[] tokens = tokenizer.processContent(sentence);
@@ -94,11 +94,11 @@ public class OpenNLPEnTokenizerTest {
   @Test
   public void testStopword() throws IOException{
     // ALl of the following should properly handle arguments and behave as if not stopword list was provided
-    Tokenizer tokenizer1 = TokenizerFactory.createTokenizer("en", "/Users/ferhanture/Documents/workspace/ivory-github/Ivory/data/tokenizer/en-token.bin", null);
-    Tokenizer tokenizer2 = TokenizerFactory.createTokenizer("en", "/Users/ferhanture/Documents/workspace/ivory-github/Ivory/data/tokenizer/en-token.bin", true, null, null, null);
-    Tokenizer tokenizer3 = TokenizerFactory.createTokenizer("en", "/Users/ferhanture/Documents/workspace/ivory-github/Ivory/data/tokenizer/en-token.bin", true, "xxxx", "yyyy", null);
-    Tokenizer tokenizer4 = TokenizerFactory.createTokenizer("en", "/Users/ferhanture/Documents/workspace/ivory-github/Ivory/data/tokenizer/en-token.bin", false, null, null, null);
-    Tokenizer tokenizer5 = TokenizerFactory.createTokenizer("en", "/Users/ferhanture/Documents/workspace/ivory-github/Ivory/data/tokenizer/en-token.bin", false, "xxxx", "yyyy", null);
+    Tokenizer tokenizer1 = TokenizerFactory.createTokenizer("en", "data/tokenizer/en-token.bin", null);
+    Tokenizer tokenizer2 = TokenizerFactory.createTokenizer("en", "data/tokenizer/en-token.bin", true, null, null, null);
+    Tokenizer tokenizer3 = TokenizerFactory.createTokenizer("en", "data/tokenizer/en-token.bin", true, "xxxx", "yyyy", null);
+    Tokenizer tokenizer4 = TokenizerFactory.createTokenizer("en", "data/tokenizer/en-token.bin", false, null, null, null);
+    Tokenizer tokenizer5 = TokenizerFactory.createTokenizer("en", "data/tokenizer/en-token.bin", false, "xxxx", "yyyy", null);
     
     String sentence = "This is a sentence, written in the U.S., which is \"un-tokenized\" (i.e., tokenization not performed).";
     String[] expectedTokens1 = new String[] {"this", "is", "a", "sentenc", ",", "written", "in", "the", "u.s.", ",", "which", "is", "\"", "un", "-", "token", "\"", "(", "i", ".e", ".", ",", "token", "not", "perform", ")", "."};
