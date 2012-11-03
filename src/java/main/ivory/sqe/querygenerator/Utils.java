@@ -58,6 +58,15 @@ public class Utils {
     return grammarFile;
   }
 
+  /**
+   * Helper function for <i>generateTranslationTable</i>
+   * 
+   * @param fPhrase
+   * @param transPhrase
+   * @param prob
+   * @param phrase2score
+   * @param phrase2count
+   */
   private static void addToPhraseTable(String fPhrase, String transPhrase, float prob, Map<String, HMapSFW> phrase2score, Map<String, HMapKI<String>> phrase2count){
     fPhrase = fPhrase.trim();
     transPhrase = transPhrase.trim();
@@ -89,6 +98,11 @@ public class Utils {
 
   }
 
+  /**
+   * For a 1-to-many alignment, check if the source token is aligned to a consecutive sequence of target tokens 
+   * @param lst
+   * @return
+   */
   private static boolean isConsecutive(ArrayListOfInts lst) {
     int prev = -1;
     for(int i : lst){
@@ -100,6 +114,14 @@ public class Utils {
     return true;
   }
 
+  /**
+   * Read SCFG (synchronous context-free grammar) and convert into a set of probability distributions, one per source token that appear on LHS of any rule in the grammar
+   * @param conf
+   *    read grammar file from Configuration object
+   * @param docLangTokenizer
+   *    to check for stopwords on RHS
+   * @return
+   */
   public static Map<String, HMapSFW> generateTranslationTable(Configuration conf, Tokenizer docLangTokenizer) {
     String grammarFile = readConf(conf);
 
@@ -216,6 +238,14 @@ public class Utils {
     return scfgDist;
   }
 
+  /**
+   * Read alignments of one SCFG rule and convert into a 1-to-many mapping.
+   * 
+   * @param alignments
+   *    a list of alignments, each one in the form f-e where f denotes position of source token in LHS of rule, and e denotes position of target token in RHS of rule
+   * @return
+   *    a mapping, where each entry is from a single source token position to a list of aligned target tokens (since 1-to-many alignments are allowed)
+   */
   private static HMapIV<ArrayListOfInts> readAlignments(String[] alignments) {
     HMapIV<ArrayListOfInts> one2manyAlign = new HMapIV<ArrayListOfInts>();
     for(String alignment : alignments){
@@ -230,6 +260,11 @@ public class Utils {
     return one2manyAlign;
   }
 
+  /**
+   * Convert prob. distribution to JSONArray in which float at position 2k corresponds to probabilities of term at position 2k+1, k=0...(n/2-1)
+   * @param probMap
+   * @return
+   */
   public static JSONArray probMap2JSON(HMapSFW probMap) {
     if (probMap == null) {
       return null;
@@ -247,6 +282,14 @@ public class Utils {
     return arr;
   }
 
+  /**
+   * Scale a probability distribution (multiply each entry with <i>scale</i>), then filter out entries below <i>threshold</i>
+   * 
+   * @param threshold
+   * @param scale
+   * @param probMap
+   * @return
+   */
   public static HMapSFW scaleProbMap(float threshold, float scale, HMapSFW probMap) {
     HMapSFW scaledProbMap = new HMapSFW();
     
@@ -259,6 +302,16 @@ public class Utils {
     return scaledProbMap;
   }
   
+  /**
+   * Take a weighted average of a given list of prob. distributions. 
+   * @param threshold
+   *    we can put a lowerbound on final probability of entries
+   * @param scale
+   *    value between 0 and 1 that determines total probability in final distribution (e.g., 0.2 scale will scale [0.8 0.1 0.1] into [0.16 0.02 0.02])
+   * @param probMaps
+   *    list of probability distributions
+   * @return
+   */
   public static HMapSFW combineProbMaps(float threshold, float scale, List<PairOfFloatMap> probMaps) {
     HMapSFW combinedProbMap = new HMapSFW();
 
@@ -297,6 +350,15 @@ public class Utils {
   }
 
 
+  /**
+   * Given a distribution of probabilities, normalize so that sum of prob.s is exactly 1.0 or <i>cumProbThreshold</i> (if lower than 1.0). 
+   * If we want to discard entries with prob. below <i>lexProbThreshold</i>, we do that after initial normalization, then re-normalize before cumulative thresholding.
+   * If we want to keep at most <i>maxNumTrans</i> translations in final distribution, it can be specified.
+   * @param probMap
+   * @param lexProbThreshold
+   * @param cumProbThreshold
+   * @param maxNumTrans
+   */
   public static void normalize(Map<String, HMapSFW> probMap, float lexProbThreshold, float cumProbThreshold, int maxNumTrans) {
     for (String sourceTerm : probMap.keySet()) {
       HMapSFW probDist = probMap.get(sourceTerm);
@@ -334,23 +396,34 @@ public class Utils {
     }
   }
   
+  /**
+   * Create a mapping between query-language stemming and document-language stemming. If there is a query token for which we do 
+   * not have any translation, it is helpful to search for that token in documents. However, since we perform stemming on documents 
+   * with doc-language stemmer, we might miss some. 
+   * 
+   * Example: In query 'emmy award', if we dont know how to translate emmy, we should search for 'emmi' in French documents, instead of 'emmy'.
+   * 
+   * @param origQuery
+   * @param queryLangTokenizer
+   *    no stemming or stopword removal
+   * @param queryLangTokenizerWithStemming
+   *    no stopword removal, stemming enabled  
+   * @param docLangTokenizer
+   *    no stopword removal, stemming enabled
+   * @return
+   */
   public static Map<String, String> getStemMapping(String origQuery, Tokenizer queryLangTokenizer, Tokenizer queryLangTokenizerWithStemming, Tokenizer docLangTokenizer) {
     Map<String, String> map = new HashMap<String, String>();
 
     // strip out punctuation to prevent problems (FIX THIS)
     // ===> this aims to remove end of sentence period but accidentally removes last dot from u.s.a. as well
-//    origQuery = origQuery.replaceAll("\\?\\s*$", "").replaceAll("\"", "").replaceAll("\\(", "").replaceAll("\\)", "");  
+    //    origQuery = origQuery.replaceAll("\\?\\s*$", "").replaceAll("\"", "").replaceAll("\\(", "").replaceAll("\\)", "");  
     
-//    LOG.info(origQuery);
-    // split by space so we can 
     String[] tokens = queryLangTokenizer.processContent(origQuery);
-//    LOG.info(tokens.length);
 
     for (int i = 0; i < tokens.length; i++) {
-//      LOG.info(tokens[i]);
       String stem1 = queryLangTokenizerWithStemming.processContent(tokens[i].trim())[0];
       String stem2 = docLangTokenizer.processContent(tokens[i].trim())[0];
-//      LOG.info("<"+stem1+"->"+stem2+"<");
       map.put(stem1, stem2);
     }
     return map;

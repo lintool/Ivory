@@ -3,7 +3,6 @@ package ivory.sqe.querygenerator;
 import ivory.core.RetrievalEnvironment;
 import ivory.core.exception.ConfigurationException;
 import ivory.core.tokenize.BigramChineseTokenizer;
-import ivory.core.tokenize.GalagoTokenizer;
 import ivory.core.tokenize.Tokenizer;
 import ivory.core.tokenize.TokenizerFactory;
 import ivory.sqe.retrieval.Constants;
@@ -48,6 +47,9 @@ public class SCFGQueryGenerator implements QueryGenerator {
     LOG.info(conf.get(Constants.MaxWindow));
     LOG.info(conf.get(Constants.SCFGWeight));
 
+    LOG.info("Stemmed stopword list file in query-language:" + conf.get(Constants.StemmedStopwordListQ));
+    LOG.info("Stemmed stopword list file in doc-language:" + conf.get(Constants.StemmedStopwordListD));
+    
     numTransPerToken = conf.getInt(Constants.NumTransPerToken, Integer.MAX_VALUE);
 
     queryLang = conf.get(Constants.QueryLanguage);
@@ -71,9 +73,8 @@ public class SCFGQueryGenerator implements QueryGenerator {
       e.printStackTrace();
     }
 
-    queryLangTokenizer = TokenizerFactory.createTokenizer(fs, conf.get(Constants.QueryLanguage), conf.get(Constants.QueryTokenizerData), false, false, null);
-    conf.set("stopword", "/fs/clip-qa/ferhan/clir-experiments/stopword."+docLang);
-    docLangTokenizer = TokenizerFactory.createTokenizer(fs, conf, docLang, conf.get(Constants.DocTokenizerData), false, false, null);
+    queryLangTokenizer = TokenizerFactory.createTokenizer(fs, conf.get(Constants.QueryLanguage), conf.get(Constants.QueryTokenizerData), false, null, null, null);
+    docLangTokenizer = TokenizerFactory.createTokenizer(fs, conf, docLang, conf.get(Constants.DocTokenizerData), true, null, conf.get(Constants.StemmedStopwordListD), null);
 
     // construct prob. dist. from translation grammar (SCFG)
     probMap = Utils.generateTranslationTable(conf, docLangTokenizer);

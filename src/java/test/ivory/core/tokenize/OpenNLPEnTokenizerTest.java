@@ -10,88 +10,68 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import junit.framework.JUnit4TestAdapter;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
 import org.junit.Test;
 import edu.umd.hooka.VocabularyWritable;
-import edu.umd.hooka.alignment.HadoopAlign;
 
 public class OpenNLPEnTokenizerTest {
 
   @Test
-  public void testTokens1() throws IOException{
-    Tokenizer tokenizer = TokenizerFactory.createTokenizer("en", "data/tokenizer/en-token.bin", false, false, null);
+  public void testTokensNoStemNoStopNoVocab() throws IOException{
+//    Tokenizer tokenizer = TokenizerFactory.createTokenizer("en", "/Users/ferhanture/Documents/workspace/ivory-github/Ivory/data/tokenizer/en-token.bin", false, false, null);
+    Tokenizer tokenizer = TokenizerFactory.createTokenizer("en", "/Users/ferhanture/Documents/workspace/ivory-github/Ivory/data/tokenizer/en-token.bin", false, null, null, null);
 
     String sentence = "This is a sentence, written in the U.S., which is \"un-tokenized\" (i.e., tokenization not performed).";
     String[] expectedTokens = new String[] {"this", "is", "a", "sentence", ",", "written", "in", "the", "u.s.", ",", "which", "is", "\"", "un", "-", "tokenized", "\"", "(", "i", ".e", ".", ",", "tokenization", "not", "performed", ")", "."};
 
     String[] tokens = tokenizer.processContent(sentence);
-    int tokenCnt = 0;
-    for (String token : tokens) {
-      System.out.println("Token "+tokenCnt+":"+token);
-      assertTrue("token "+tokenCnt+"="+token+"!="+expectedTokens[tokenCnt], token.equals(expectedTokens[tokenCnt]));
-      tokenCnt++;
-    }
+    verifyTokens(tokens, expectedTokens);
   }
   
   @Test
-  public void testTokens2() throws IOException{
-    Tokenizer tokenizer = TokenizerFactory.createTokenizer("en", "data/tokenizer/en-token.bin", false, true, null);
+  public void testTokensNoStemNoVocab() throws IOException{
+//    Tokenizer tokenizer = TokenizerFactory.createTokenizer("en", "/Users/ferhanture/Documents/workspace/ivory-github/Ivory/data/tokenizer/en-token.bin", false, true, null);
+    Tokenizer tokenizer = TokenizerFactory.createTokenizer("en", "/Users/ferhanture/Documents/workspace/ivory-github/Ivory/data/tokenizer/en-token.bin", false, "/Users/ferhanture/Documents/workspace/ivory-github/Ivory/data/tokenizer/en.stop", "/Users/ferhanture/Documents/workspace/ivory-github/Ivory/data/tokenizer/en.stop.stemmed", null);
 
     String sentence = "This is a sentence, written in the U.S., which is \"un-tokenized\" (i.e., tokenization not performed).";
     String[] expectedTokens = new String[] {"sentence", "written", "u.s.", "un", "tokenized", ".e", "tokenization", "performed"};
 
     String[] tokens = tokenizer.processContent(sentence);
-    int tokenCnt = 0;
-    for (String token : tokens) {
-      System.out.println("Token "+tokenCnt+":"+token);
-      assertTrue("token "+tokenCnt+"="+token+"!="+expectedTokens[tokenCnt], token.equals(expectedTokens[tokenCnt]));
-      tokenCnt++;
-    }
+    verifyTokens(tokens, expectedTokens);
   }
   
   @Test
-  public void testTokens3() throws IOException{
-    Tokenizer tokenizer = TokenizerFactory.createTokenizer("en", "data/tokenizer/en-token.bin", true, true, null);
+  public void testTokensNoVocab() throws IOException{
+//    Tokenizer tokenizer = TokenizerFactory.createTokenizer("en", "/Users/ferhanture/Documents/workspace/ivory-github/Ivory/data/tokenizer/en-token.bin", true, true, null);
+    Tokenizer tokenizer = TokenizerFactory.createTokenizer("en", "/Users/ferhanture/Documents/workspace/ivory-github/Ivory/data/tokenizer/en-token.bin", true, "/Users/ferhanture/Documents/workspace/ivory-github/Ivory/data/tokenizer/en.stop", "/Users/ferhanture/Documents/workspace/ivory-github/Ivory/data/tokenizer/en.stop.stemmed", null);
 
     String sentence = "This is a sentence, written in the U.S., which is \"un-tokenized\" (i.e., tokenization not performed).";
     String[] expectedTokens = new String[] {"sentenc", "written", "u.s.", "un", "token", ".e", "token", "perform"};
 
     String[] tokens = tokenizer.processContent(sentence);
-    int tokenCnt = 0;
-    for (String token : tokens) {
-      System.out.println("Token "+tokenCnt+":"+token);
-      assertTrue("token "+tokenCnt+"="+token+"!="+expectedTokens[tokenCnt], token.equals(expectedTokens[tokenCnt]));
-      tokenCnt++;
-    }
+    verifyTokens(tokens, expectedTokens);
   }
   
   @Test
-  public void testTokens4() throws IOException{
+  public void testTokensAllInclusive() throws IOException{
     VocabularyWritable v = new VocabularyWritable();
     v.addOrGet("sentenc");
     v.addOrGet("token");
     
-    Tokenizer tokenizer = TokenizerFactory.createTokenizer("en", "data/tokenizer/en-token.bin", true, true, v);
+//    Tokenizer tokenizer = TokenizerFactory.createTokenizer("en", "/Users/ferhanture/Documents/workspace/ivory-github/Ivory/data/tokenizer/en-token.bin", true, true, v);
+    Tokenizer tokenizer = TokenizerFactory.createTokenizer("en", "/Users/ferhanture/Documents/workspace/ivory-github/Ivory/data/tokenizer/en-token.bin", true, "/Users/ferhanture/Documents/workspace/ivory-github/Ivory/data/tokenizer/en.stop", "/Users/ferhanture/Documents/workspace/ivory-github/Ivory/data/tokenizer/en.stop.stemmed", v);
 
     String sentence = "This is a sentence, written in the U.S., which is \"un-tokenized\" (i.e., tokenization not performed).";
     String[] expectedTokens = new String[] {"sentenc", "token", "token"};
 
     String[] tokens = tokenizer.processContent(sentence);
-    int tokenCnt = 0;
-    for (String token : tokens) {
-      System.out.println("Token "+tokenCnt+":"+token);
-      assertTrue("token "+tokenCnt+"="+token+"!="+expectedTokens[tokenCnt], token.equals(expectedTokens[tokenCnt]));
-      tokenCnt++;
-    }
+    verifyTokens(tokens, expectedTokens);
   }
-  
+
   @Test
   public void testPreNormalize() throws IOException{
-    Tokenizer tokenizer = TokenizerFactory.createTokenizer("en", "data/tokenizer/en-token.bin", true, true, null);
+    Tokenizer tokenizer = TokenizerFactory.createTokenizer("en", "/Users/ferhanture/Documents/workspace/ivory-github/Ivory/data/tokenizer/en-token.bin", true, "/Users/ferhanture/Documents/workspace/ivory-github/Ivory/data/tokenizer/en.stop", "/Users/ferhanture/Documents/workspace/ivory-github/Ivory/data/tokenizer/en.stop.stemmed", null);
 
-    List<String> sentences = readInput("etc/tokenizer-normalize-test.txt");
+    List<String> sentences = readInput("/Users/ferhanture/Documents/workspace/ivory-github/Ivory/etc/tokenizer-normalize-test.txt");
     int cnt = 0;
     for (String sentence : sentences) {
       String[] tokens = tokenizer.processContent(sentence);
@@ -109,6 +89,41 @@ public class OpenNLPEnTokenizerTest {
       }
       cnt++;
     }
+  }
+  
+  @Test
+  public void testStopword() throws IOException{
+    // ALl of the following should properly handle arguments and behave as if not stopword list was provided
+    Tokenizer tokenizer1 = TokenizerFactory.createTokenizer("en", "/Users/ferhanture/Documents/workspace/ivory-github/Ivory/data/tokenizer/en-token.bin", null);
+    Tokenizer tokenizer2 = TokenizerFactory.createTokenizer("en", "/Users/ferhanture/Documents/workspace/ivory-github/Ivory/data/tokenizer/en-token.bin", true, null, null, null);
+    Tokenizer tokenizer3 = TokenizerFactory.createTokenizer("en", "/Users/ferhanture/Documents/workspace/ivory-github/Ivory/data/tokenizer/en-token.bin", true, "xxxx", "yyyy", null);
+    Tokenizer tokenizer4 = TokenizerFactory.createTokenizer("en", "/Users/ferhanture/Documents/workspace/ivory-github/Ivory/data/tokenizer/en-token.bin", false, null, null, null);
+    Tokenizer tokenizer5 = TokenizerFactory.createTokenizer("en", "/Users/ferhanture/Documents/workspace/ivory-github/Ivory/data/tokenizer/en-token.bin", false, "xxxx", "yyyy", null);
+    
+    String sentence = "This is a sentence, written in the U.S., which is \"un-tokenized\" (i.e., tokenization not performed).";
+    String[] expectedTokens1 = new String[] {"this", "is", "a", "sentenc", ",", "written", "in", "the", "u.s.", ",", "which", "is", "\"", "un", "-", "token", "\"", "(", "i", ".e", ".", ",", "token", "not", "perform", ")", "."};
+    String[] expectedTokens2 = new String[] {"this", "is", "a", "sentence", ",", "written", "in", "the", "u.s.", ",", "which", "is", "\"", "un", "-", "tokenized", "\"", "(", "i", ".e", ".", ",", "tokenization", "not", "performed", ")", "."};
+
+    String[] tokens1 = tokenizer1.processContent(sentence);
+    String[] tokens2 = tokenizer2.processContent(sentence);
+    String[] tokens3 = tokenizer3.processContent(sentence);
+    String[] tokens4 = tokenizer4.processContent(sentence);
+    String[] tokens5 = tokenizer5.processContent(sentence);
+
+    verifyTokens(tokens1, expectedTokens1);
+    verifyTokens(tokens2, expectedTokens1);
+    verifyTokens(tokens3, expectedTokens1);
+    verifyTokens(tokens4, expectedTokens2);
+    verifyTokens(tokens5, expectedTokens2);
+  }
+  
+  private void verifyTokens(String[] tokens, String[] expectedTokens) {
+    int tokenCnt = 0;
+    for (String token : tokens) {
+      System.out.println("Token "+tokenCnt+":"+token);
+      assertTrue("token "+tokenCnt+"="+token+"!="+expectedTokens[tokenCnt], token.equals(expectedTokens[tokenCnt]));
+      tokenCnt++;
+    }    
   }
   
   private List<String> readInput(String file) {

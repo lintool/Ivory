@@ -24,7 +24,7 @@ public class Constants {
   public static final String TermDocVectorSegments = "Ivory.TermDocVectorSegments";
   public static final String Language = "Ivory.Lang";
   public static final String Stemming = "Ivory.IsStemming";
-  public static final String Stopword = "Ivory.IsStopword";
-
+  public static final String StopwordList = "stopwordlist";
+  public static final String StemmedStopwordList = "stemmed_stopwordlist";
 
 }

@@ -22,36 +22,39 @@ public class TokenizerFactory {
   }
 
   public static Tokenizer createTokenizer(String lang, String modelPath, VocabularyWritable vocab){
-    return createTokenizer(lang, modelPath, true, true, vocab);
+    return createTokenizer(lang, modelPath, true, null, null, vocab);
   }
   
-  public static Tokenizer createTokenizer(String lang, String modelPath, boolean isStemming, boolean isStopword, VocabularyWritable vocab){
+  public static Tokenizer createTokenizer(String lang, String modelPath, boolean isStemming, String stopwordFile, String stemmedStopwordFile, VocabularyWritable vocab){
     try {
       FileSystem fs = FileSystem.get(new Configuration());
-      return createTokenizer(fs, lang, modelPath, isStemming, isStopword, vocab);
+      return createTokenizer(fs, lang, modelPath, isStemming, stopwordFile, stemmedStopwordFile, vocab);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
   }
 
   public static Tokenizer createTokenizer(FileSystem fs, String lang, String modelPath, VocabularyWritable vocab){
-    return createTokenizer(fs, lang, modelPath, true, true, vocab);
+    return createTokenizer(fs, lang, modelPath, true, null, null, vocab);
   }
   
-  public static Tokenizer createTokenizer(FileSystem fs, String lang, String modelPath, boolean isStemming, boolean isStopword, VocabularyWritable vocab){
+  public static Tokenizer createTokenizer(FileSystem fs, String lang, String modelPath, boolean isStemming, String stopwordFile, String stemmedStopwordFile, VocabularyWritable vocab){
     Configuration conf = new Configuration();
-    conf.setBoolean(Constants.Stemming, isStemming);
-    conf.setBoolean(Constants.Stopword, isStopword);
-    return createTokenizer(fs, conf, lang, modelPath, vocab);
+    return createTokenizer(fs, conf, lang, modelPath, isStemming, stopwordFile, stemmedStopwordFile, vocab);
   }
   
-  public static Tokenizer createTokenizer(FileSystem fs, Configuration conf, String lang, String modelPath, boolean isStemming, boolean isStopword, VocabularyWritable vocab){
+  public static Tokenizer createTokenizer(FileSystem fs, Configuration conf, String lang, String modelPath, boolean isStemming, String stopwordFile, String stemmedStopwordFile, VocabularyWritable vocab){
     conf.setBoolean(Constants.Stemming, isStemming);
-    conf.setBoolean(Constants.Stopword, isStopword);
+    if (stopwordFile != null) {
+      conf.set(Constants.StopwordList, stopwordFile);
+    }
+    if (stemmedStopwordFile != null) {
+      conf.set(Constants.StemmedStopwordList, stemmedStopwordFile);
+    }
     return createTokenizer(fs, conf, lang, modelPath, vocab);
   }
 
-  private static Tokenizer createTokenizer(FileSystem fs, Configuration conf, String lang, String modelPath, VocabularyWritable vocab){
+  public static Tokenizer createTokenizer(FileSystem fs, Configuration conf, String lang, String modelPath, VocabularyWritable vocab){
     try {
       if (!acceptedLanguages.containsKey(lang)) {
         throw new RuntimeException("Unknown language code: "+lang);

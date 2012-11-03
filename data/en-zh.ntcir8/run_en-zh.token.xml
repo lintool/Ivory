@@ -13,4 +13,8 @@
      <LexProbThreshold>0.005</LexProbThreshold>
      <CumProbThreshold>0.95</CumProbThreshold>
 
+<query_stemmed_stopwordlist>data/tokenizer/en.stop.stemmed</query_stemmed_stopwordlist>
+<qrels_path>data/en-zh.ntcir8/qrels.en-zh.ntcir8.txt</qrels_path>
+<quiet>false</quiet>
+
 </parameters>

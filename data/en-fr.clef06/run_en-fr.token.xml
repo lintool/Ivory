@@ -1,5 +1,6 @@
 <parameters>
 
+
      <run>en-fr.token</run>
      <query_type>clir</query_type>
      <index>/scratch0/fture/indexes/clef_lemonde94-95_sda94-95_nostop-index.fr</index>
@@ -13,4 +14,8 @@
      <LexProbThreshold>0.005</LexProbThreshold>
      <CumProbThreshold>0.95</CumProbThreshold>
 
+<doc_stemmed_stopwordlist>data/tokenizer/fr.stop.stemmed</doc_stemmed_stopwordlist>
+<query_stemmed_stopwordlist>data/tokenizer/en.stop.stemmed</query_stemmed_stopwordlist>
+<qrels_path>data/en-fr.clef06/qrels.en-fr.clef06.txt</qrels_path>
+<quiet>false</quiet>
 </parameters>

@@ -1,5 +1,6 @@
 <parameters>
-
+<qrels_path>data/en-ar.trec02/qrels.en-ar.trec02.txt</qrels_path>
+<quiet>false</quiet>
      <run>en-ar.token</run>
      <query_type>clir</query_type>
      <index>/scratch0/fture/indexes/trec2001-03_cleaned+nodups+notags.ar-nostop.index</index>
@@ -12,5 +13,8 @@
      <f2eProbs>data/vocab/ttable.en-ar</f2eProbs>
      <LexProbThreshold>0.005</LexProbThreshold>
      <CumProbThreshold>0.95</CumProbThreshold>
+
+     <doc_stemmed_stopwordlist>data/tokenizer/ar.stop.stemmed</doc_stemmed_stopwordlist>
+     <query_stemmed_stopwordlist>data/tokenizer/en.stop.stemmed</query_stemmed_stopwordlist>
 
 </parameters>

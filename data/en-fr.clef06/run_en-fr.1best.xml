@@ -20,4 +20,9 @@
      <scfg_path>data/en-fr.clef06/grammar.en-fr.clef06</scfg_path>
      <kBest>1</kBest>
 
+<doc_stemmed_stopwordlist>data/tokenizer/fr.stop.stemmed</doc_stemmed_stopwordlist>
+<query_stemmed_stopwordlist>data/tokenizer/en.stop.stemmed</query_stemmed_stopwordlist>
+<qrels_path>data/en-fr.clef06/qrels.en-fr.clef06.txt</qrels_path>
+<quiet>false</quiet>
+
 </parameters>

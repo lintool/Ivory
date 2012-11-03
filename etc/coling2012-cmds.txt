@@ -1,18 +1,18 @@
 // Commands to run English-French CLEF06 experiments
 
-etc/run.sh data/en-fr.clef06/run_en-fr.gridbest.xml data/en-fr.clef06/queries.en-fr.k10.clef06.xml >& run.en-fr.gridbest.log
+etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-fr.clef06/run_en-fr.gridbest.xml -queries_path data/en-fr.clef06/queries.en-fr.k10.clef06.xml >& run.en-fr.gridbest.log
 ./trec_eval data/en-fr.clef06/qrels.en-fr.clef06.txt ranking.en-fr.gridbest_10-30-30-100.txt
 
-etc/run.sh data/en-fr.clef06/run_en-fr.10best.xml data/en-fr.clef06/queries.en-fr.k10.clef06.xml > & run.en-fr.10best.log
+etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-fr.clef06/run_en-fr.10best.xml -queries_path data/en-fr.clef06/queries.en-fr.k10.clef06.xml > & run.en-fr.10best.log
 ./trec_eval data/en-fr.clef06/qrels.en-fr.clef06.txt ranking.en-fr.10best_10-100-0-100.txt
 
-etc/run.sh data/en-fr.clef06/run_en-fr.1best.xml data/en-fr.clef06/queries.en-fr.k1.clef06.xml > & run.en-fr.1best.log
+etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-fr.clef06/run_en-fr.1best.xml -queries_path data/en-fr.clef06/queries.en-fr.k1.clef06.xml > & run.en-fr.1best.log
 ./trec_eval data/en-fr.clef06/qrels.en-fr.clef06.txt ranking.en-fr.1best_1-100-0-100.txt 
 
-etc/run.sh data/en-fr.clef06/run_en-fr.phrase.xml  data/en-fr.clef06/queries.en-fr.k10.clef06.xml > & run.en-fr.phrase.log
+etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-fr.clef06/run_en-fr.phrase.xml -queries_path data/en-fr.clef06/queries.en-fr.k10.clef06.xml > & run.en-fr.phrase.log
 ./trec_eval data/en-fr.clef06/qrels.en-fr.clef06.txt ranking.en-fr.phrase_10-0-0-100.txt
 
-etc/run.sh data/en-fr.clef06/run_en-fr.token.xml  data/en-fr.clef06/queries.en-fr.clef06.xml >& run.en-fr.token.log
+etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-fr.clef06/run_en-fr.token.xml -queries_path data/en-fr.clef06/queries.en-fr.clef06.xml >& run.en-fr.token.log
 ./trec_eval data/en-fr.clef06/qrels.en-fr.clef06.txt ranking.en-fr.token_0-0-0-0.txt
 
 etc/junit.sh ivory.regression.coling2012.EnFr_CLEF06 >& log &
@@ -21,19 +21,19 @@ etc/junit.sh ivory.regression.coling2012.EnFr_CLEF06 >& log &
 
 // Commands to run English-Arabic TREC 2002 experiments
 
-etc/run.sh data/en-ar.trec02//run_en-ar.gridbest.xml data/en-ar.trec02/queries.en-ar.k10.trec02.xml  >& run.en-ar.gridbest.log
+etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-ar.trec02//run_en-ar.gridbest.xml -queries_path data/en-ar.trec02/queries.en-ar.k10.trec02.xml  >& run.en-ar.gridbest.log
 ./trec_eval data/en-ar.trec02/qrels.en-ar.trec02.txt ranking.en-ar.gridbest_10-0-0-100.txt
 
-etc/run.sh data/en-ar.trec02//run_en-ar.10best.xml data/en-ar.trec02/queries.en-ar.k10.trec02.xml > & run.en-ar.10best.log
+etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-ar.trec02//run_en-ar.10best.xml -queries_path data/en-ar.trec02/queries.en-ar.k10.trec02.xml > & run.en-ar.10best.log
  ./trec_eval data/en-ar.trec02/qrels.en-ar.trec02.txt ranking.en-ar.10best_10-100-0-100.txt
 
-etc/run.sh data/en-ar.trec02//run_en-ar.phrase.xml data/en-ar.trec02/queries.en-ar.k10.trec02.xml > & run.en-ar.phrase.log
+etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-ar.trec02//run_en-ar.phrase.xml -queries_path data/en-ar.trec02/queries.en-ar.k10.trec02.xml > & run.en-ar.phrase.log
 ./trec_eval data/en-ar.trec02/qrels.en-ar.trec02.txt ranking.en-ar.phrase_10-0-0-100.txt 
 
-etc/run.sh data/en-ar.trec02/run_en-ar.token.xml  data/en-ar.trec02/queries.en-ar.trec02.xml  > & run.en-ar.token.log
+etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-ar.trec02/run_en-ar.token.xml -queries_path data/en-ar.trec02/queries.en-ar.trec02.xml  > & run.en-ar.token.log
 ./trec_eval data/en-ar.trec02/qrels.en-ar.trec02.txt  ranking.en-ar.token_0-0-0-0.txt 
 
-etc/run.sh data/en-ar.trec02/run_en-ar.1best.xml  data/en-ar.trec02/queries.en-ar.k1.trec02.xml > & run.en-ar.1best.log
+etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-ar.trec02/run_en-ar.1best.xml -queries_path data/en-ar.trec02/queries.en-ar.k1.trec02.xml > & run.en-ar.1best.log
 ./trec_eval data/en-ar.trec02/qrels.en-ar.trec02.txt ranking.en-ar.1best_1-100-0-100.txt
 
 etc/junit.sh ivory.regression.coling2012.EnAr_TREC02 >& log &
@@ -44,19 +44,19 @@ etc/junit.sh ivory.regression.coling2012.EnAr_TREC02 >& log &
 
 // Commands to run English-French NTCIR-8 experiments
 
-etc/run.sh data/en-zh.ntcir8/run_en-zh.gridbest.xml data/en-zh.ntcir8/queries.en-zh.k10.ntcir8.xml >& run.en-zh.gridbest.log
+etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-zh.ntcir8/run_en-zh.gridbest.xml -queries_path data/en-zh.ntcir8/queries.en-zh.k10.ntcir8.xml >& run.en-zh.gridbest.log
 ./trec_eval data/en-zh.ntcir8/qrels.en-zh.ntcir8.txt ranking.en-zh.gridbest_10-20-10-100.txt
 
-etc/run.sh data/en-zh.ntcir8/run_en-zh.10best.xml data/en-zh.ntcir8/queries.en-zh.k10.ntcir8.xml >& run.en-zh.10best.log 
+etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-zh.ntcir8/run_en-zh.10best.xml -queries_path data/en-zh.ntcir8/queries.en-zh.k10.ntcir8.xml >& run.en-zh.10best.log 
 ./trec_eval data/en-zh.ntcir8/qrels.en-zh.ntcir8.txt ranking.en-zh.10best_10-100-0-100.txt
 
-etc/run.sh data/en-zh.ntcir8/run_en-zh.phrase.xml  data/en-zh.ntcir8/queries.en-zh.k10.ntcir8.xml > & run.en-zh.phrase.log
+etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-zh.ntcir8/run_en-zh.phrase.xml -queries_path data/en-zh.ntcir8/queries.en-zh.k10.ntcir8.xml > & run.en-zh.phrase.log
 ./trec_eval data/en-zh.ntcir8/qrels.en-zh.ntcir8.txt ranking.en-zh.phrase_10-0-0-100.txt
 
-etc/run.sh data/en-zh.ntcir8/run_en-zh.1best.xml  data/en-zh.ntcir8/queries.en-zh.k1.ntcir8.xml > & run.en-zh.1best.log
+etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-zh.ntcir8/run_en-zh.1best.xml -queries_path data/en-zh.ntcir8/queries.en-zh.k1.ntcir8.xml > & run.en-zh.1best.log
 ./trec_eval data/en-zh.ntcir8/qrels.en-zh.ntcir8.txt ranking.en-zh.1best_1-100-0-100.txt
 
-etc/run.sh data/en-zh.ntcir8/run_en-zh.token.xml data/en-zh.ntcir8/queries.en-zh.ntcir8.xml  > & run.en-zh.token.log
+etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-zh.ntcir8/run_en-zh.token.xml -queries_path data/en-zh.ntcir8/queries.en-zh.ntcir8.xml  > & run.en-zh.token.log
 ./trec_eval data/en-zh.ntcir8/qrels.en-zh.ntcir8.txt ranking.en-zh.token_0-0-0-0.txt
 
 etc/junit.sh ivory.regression.coling2012.EnZh_NTCIR8 >& log &
