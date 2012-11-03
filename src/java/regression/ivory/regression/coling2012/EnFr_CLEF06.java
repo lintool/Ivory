@@ -131,7 +131,7 @@ public class EnFr_CLEF06 {
     Map<String, GroundTruth> g = Maps.newHashMap();
 
     g.put("en-fr.token_0-0-0-0", new GroundTruth(Metric.AP, 50, baseline_token_p005_c95_Fr_CLEF06_AP, 0.2617f));
-    g.put("en-fr.phrase_10-0-0-100", new GroundTruth(Metric.AP, 50, phrase_p005_c95_Fr_CLEF06_AP, 0.2867f));
+    g.put("en-fr.phrase_10-0-0-100", new GroundTruth(Metric.AP, 50, phrase_p005_c95_Fr_CLEF06_AP, 0.2868f));
     g.put("en-fr.1best_1-100-0-100", new GroundTruth(Metric.AP, 50, Onebest_p005_c95_Fr_CLEF06_AP, 0.2829f));
     g.put("en-fr.10best_10-100-0-100", new GroundTruth(Metric.AP, 50, Nbest_p005_c95_Fr_CLEF06_AP, 0.2979f));
     g.put("en-fr.gridbest_10-30-30-100", new GroundTruth(Metric.AP, 50, Gridbest_p005_c95_Fr_CLEF06_AP, 0.3084f));      // nbest=0.3, bitext=0.3 scfg=0.4
