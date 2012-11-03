@@ -35,7 +35,7 @@ public class RunQueryEngine {
 
   private static final Logger LOG = Logger.getLogger(RunQueryEngine.class);
 
- 
+
   public static void main(String[] args) throws Exception {
     Configuration conf = parseArgs(args);
     if (conf == null) {
@@ -93,7 +93,7 @@ public class RunQueryEngine {
         LOG.info("Completed in "+(end - start)+" ms");
 
         String setting = Utils.getSetting(conf);
-        
+
         float MAP = eval(qe, conf, setting);
         if (MAP > bestMAP) {
           bestMAP = MAP;
@@ -140,6 +140,10 @@ public class RunQueryEngine {
     options.addOption(OptionBuilder.withArgName("string").hasArg().withDescription("name of CLIR run").create(Constants.RunName));
     options.addOption(OptionBuilder.withDescription("run grid search on parameters").create(Constants.GridSearch));
     options.addOption(OptionBuilder.withDescription("do not print log info").create(Constants.Quiet));
+    options.addOption(OptionBuilder.withArgName("path").hasArg().withDescription("one stopword per line, query lang").create(Constants.StopwordListQ));
+    options.addOption(OptionBuilder.withArgName("path").hasArg().withDescription("one stemmed stopword per line, query lang").create(Constants.StemmedStopwordListQ));
+    options.addOption(OptionBuilder.withArgName("path").hasArg().withDescription("one stopword per line, doc lang").create(Constants.StopwordListD));
+    options.addOption(OptionBuilder.withArgName("path").hasArg().withDescription("one stemmed stopword per line, doc lang").create(Constants.StemmedStopwordListD));
 
     // read options from commandline or XML
     Configuration conf = new Configuration();
@@ -157,70 +161,82 @@ public class RunQueryEngine {
         conf.set(Constants.QueryLanguage, cmdline.getOptionValue(Constants.QueryLanguage));
         conf.set(Constants.DocTokenizerData, cmdline.getOptionValue(Constants.DocTokenizerData));
         conf.set(Constants.QueryTokenizerData, cmdline.getOptionValue(Constants.QueryTokenizerData));
-
-        if (cmdline.hasOption(Constants.BigramSegment)) {
-          conf.set(Constants.BigramSegment, cmdline.getOptionValue(Constants.BigramSegment));
-        } else {
-          conf.set(Constants.BigramSegment, "off");   //default
-        }       
-        if (cmdline.hasOption(Constants.SCFGPath)) {
-          conf.set(Constants.SCFGPath, cmdline.getOptionValue(Constants.SCFGPath));
-        }      
-        if (cmdline.hasOption(Constants.f2eProbsPath) && cmdline.hasOption(Constants.QueryVocab) && cmdline.hasOption(Constants.DocVocab)) {
-          conf.set(Constants.f2eProbsPath, cmdline.getOptionValue(Constants.f2eProbsPath));
-          conf.set(Constants.QueryVocab, cmdline.getOptionValue(Constants.QueryVocab));
-          conf.set(Constants.DocVocab, cmdline.getOptionValue(Constants.DocVocab));
-        }     
-        if (cmdline.hasOption(Constants.LexicalProbThreshold)) {
-          conf.setFloat(Constants.LexicalProbThreshold, Float.parseFloat(cmdline.getOptionValue(Constants.LexicalProbThreshold)));
-        }
-        if (cmdline.hasOption(Constants.CumulativeProbThreshold)) {
-          conf.setFloat(Constants.CumulativeProbThreshold, Float.parseFloat(cmdline.getOptionValue(Constants.CumulativeProbThreshold)));
-        }
-        if (cmdline.hasOption(Constants.TokenWeight)) {
-          conf.setFloat(Constants.TokenWeight, Float.parseFloat(cmdline.getOptionValue(Constants.TokenWeight)));
-        }
-        if (cmdline.hasOption(Constants.PhraseWeight)) {
-          conf.setFloat(Constants.PhraseWeight, Float.parseFloat(cmdline.getOptionValue(Constants.PhraseWeight)));
-        }
-        if (cmdline.hasOption(Constants.MTWeight)) {
-          conf.setFloat(Constants.MTWeight, Float.parseFloat(cmdline.getOptionValue(Constants.MTWeight)));
-        }
-        if (cmdline.hasOption(Constants.BitextWeight)) {
-          conf.setFloat(Constants.BitextWeight, Float.parseFloat(cmdline.getOptionValue(Constants.BitextWeight)));
-        }
-        if (cmdline.hasOption(Constants.SCFGWeight)) {
-          conf.setFloat(Constants.SCFGWeight, Float.parseFloat(cmdline.getOptionValue(Constants.SCFGWeight)));
-        }
-        if (cmdline.hasOption(Constants.KBest)) {
-          conf.setInt(Constants.KBest, Integer.parseInt(cmdline.getOptionValue(Constants.KBest)));
-        }
-        if (cmdline.hasOption(Constants.NumTransPerToken)) {
-          conf.setInt(Constants.NumTransPerToken, Integer.parseInt(cmdline.getOptionValue(Constants.NumTransPerToken)));
-        }
-        if (cmdline.hasOption(Constants.MinWindow) && cmdline.hasOption(Constants.MaxWindow)) {
-          conf.setInt(Constants.MinWindow, Integer.parseInt(cmdline.getOptionValue(Constants.MinWindow)));
-          conf.setInt(Constants.MaxWindow, Integer.parseInt(cmdline.getOptionValue(Constants.MaxWindow)));
-        }
-        if (cmdline.hasOption(Constants.Heuristic3)) {
-          conf.set(Constants.Heuristic3, cmdline.getOptionValue(Constants.Heuristic3));
-        }
-        if (cmdline.hasOption(Constants.Scaling)) {
-          conf.setBoolean(Constants.Scaling, true);
-        }
-        if (cmdline.hasOption(Constants.Alpha)) {
-          conf.setFloat(Constants.Alpha , Float.parseFloat(cmdline.getOptionValue(Constants.Alpha)));
-        }
-        if (cmdline.hasOption(Constants.RunName)) {
-          conf.set(Constants.RunName , cmdline.getOptionValue(Constants.RunName));
-        }
-        if (cmdline.hasOption(Constants.GridSearch)) {
-          conf.setBoolean(Constants.GridSearch, true);
-        }
-        if (cmdline.hasOption(Constants.Quiet)) {
-          conf.setBoolean(Constants.Quiet, true);
-        }
       }
+      if (cmdline.hasOption(Constants.BigramSegment)) {
+        conf.set(Constants.BigramSegment, cmdline.getOptionValue(Constants.BigramSegment));
+      } else {
+        conf.set(Constants.BigramSegment, "off");   //default
+      }       
+      if (cmdline.hasOption(Constants.SCFGPath)) {
+        conf.set(Constants.SCFGPath, cmdline.getOptionValue(Constants.SCFGPath));
+      }      
+      if (cmdline.hasOption(Constants.f2eProbsPath) && cmdline.hasOption(Constants.QueryVocab) && cmdline.hasOption(Constants.DocVocab)) {
+        conf.set(Constants.f2eProbsPath, cmdline.getOptionValue(Constants.f2eProbsPath));
+        conf.set(Constants.QueryVocab, cmdline.getOptionValue(Constants.QueryVocab));
+        conf.set(Constants.DocVocab, cmdline.getOptionValue(Constants.DocVocab));
+      }     
+      if (cmdline.hasOption(Constants.LexicalProbThreshold)) {
+        conf.setFloat(Constants.LexicalProbThreshold, Float.parseFloat(cmdline.getOptionValue(Constants.LexicalProbThreshold)));
+      }
+      if (cmdline.hasOption(Constants.CumulativeProbThreshold)) {
+        conf.setFloat(Constants.CumulativeProbThreshold, Float.parseFloat(cmdline.getOptionValue(Constants.CumulativeProbThreshold)));
+      }
+      if (cmdline.hasOption(Constants.TokenWeight)) {
+        conf.setFloat(Constants.TokenWeight, Float.parseFloat(cmdline.getOptionValue(Constants.TokenWeight)));
+      }
+      if (cmdline.hasOption(Constants.PhraseWeight)) {
+        conf.setFloat(Constants.PhraseWeight, Float.parseFloat(cmdline.getOptionValue(Constants.PhraseWeight)));
+      }
+      if (cmdline.hasOption(Constants.MTWeight)) {
+        conf.setFloat(Constants.MTWeight, Float.parseFloat(cmdline.getOptionValue(Constants.MTWeight)));
+      }
+      if (cmdline.hasOption(Constants.BitextWeight)) {
+        conf.setFloat(Constants.BitextWeight, Float.parseFloat(cmdline.getOptionValue(Constants.BitextWeight)));
+      }
+      if (cmdline.hasOption(Constants.SCFGWeight)) {
+        conf.setFloat(Constants.SCFGWeight, Float.parseFloat(cmdline.getOptionValue(Constants.SCFGWeight)));
+      }
+      if (cmdline.hasOption(Constants.KBest)) {
+        conf.setInt(Constants.KBest, Integer.parseInt(cmdline.getOptionValue(Constants.KBest)));
+      }
+      if (cmdline.hasOption(Constants.NumTransPerToken)) {
+        conf.setInt(Constants.NumTransPerToken, Integer.parseInt(cmdline.getOptionValue(Constants.NumTransPerToken)));
+      }
+      if (cmdline.hasOption(Constants.MinWindow) && cmdline.hasOption(Constants.MaxWindow)) {
+        conf.setInt(Constants.MinWindow, Integer.parseInt(cmdline.getOptionValue(Constants.MinWindow)));
+        conf.setInt(Constants.MaxWindow, Integer.parseInt(cmdline.getOptionValue(Constants.MaxWindow)));
+      }
+      if (cmdline.hasOption(Constants.Heuristic3)) {
+        conf.set(Constants.Heuristic3, cmdline.getOptionValue(Constants.Heuristic3));
+      }
+      if (cmdline.hasOption(Constants.Scaling)) {
+        conf.setBoolean(Constants.Scaling, true);
+      }
+      if (cmdline.hasOption(Constants.Alpha)) {
+        conf.setFloat(Constants.Alpha , Float.parseFloat(cmdline.getOptionValue(Constants.Alpha)));
+      }
+      if (cmdline.hasOption(Constants.RunName)) {
+        conf.set(Constants.RunName , cmdline.getOptionValue(Constants.RunName));
+      }
+      if (cmdline.hasOption(Constants.GridSearch)) {
+        conf.setBoolean(Constants.GridSearch, true);
+      }
+      if (cmdline.hasOption(Constants.Quiet)) {
+        conf.setBoolean(Constants.Quiet, true);
+      }
+      if (cmdline.hasOption(Constants.StopwordListD)) {
+        conf.set(Constants.StopwordListD , cmdline.getOptionValue(Constants.StopwordListD));
+      }
+      if (cmdline.hasOption(Constants.StemmedStopwordListD)) {
+        conf.set(Constants.StemmedStopwordListD , cmdline.getOptionValue(Constants.StemmedStopwordListD));
+      }
+      if (cmdline.hasOption(Constants.StopwordListQ)) {
+        conf.set(Constants.StopwordListQ , cmdline.getOptionValue(Constants.StopwordListQ));
+      }
+      if (cmdline.hasOption(Constants.StemmedStopwordListQ)) {
+        conf.set(Constants.StemmedStopwordListQ , cmdline.getOptionValue(Constants.StemmedStopwordListQ));
+      }
+
     } catch (ConfigurationException e) {
       e.printStackTrace();
       HelpFormatter formatter = new HelpFormatter();
@@ -257,7 +273,7 @@ public class RunQueryEngine {
 
     list = d.getElementsByTagName(Constants.QrelsPath);
     if (list.getLength() > 0) {  conf.set(Constants.QrelsPath, list.item(0).getTextContent());  }
-    
+
     list = d.getElementsByTagName(Constants.RunName);
     if (list.getLength() > 0) {  conf.set(Constants.RunName, list.item(0).getTextContent());  }
 
@@ -317,21 +333,27 @@ public class RunQueryEngine {
 
     list = d.getElementsByTagName(Constants.MinWindow);
     if (list.getLength() > 0) {  conf.setInt(Constants.MinWindow, Integer.parseInt(list.item(0).getTextContent()));  } 
-    
+
     list = d.getElementsByTagName(Constants.MaxWindow);
     if (list.getLength() > 0) {  conf.setInt(Constants.MaxWindow, Integer.parseInt(list.item(0).getTextContent()));  }
-    
+
     list = d.getElementsByTagName(Constants.NumTransPerToken);
     if (list.getLength() > 0) {  conf.setInt(Constants.NumTransPerToken, Integer.parseInt(list.item(0).getTextContent()));  }
-    
-    //    conf.setBoolean(Constants.GridSearch, true);
-    //    conf.setFloat(Constants.Alpha , Float.parseFloat(cmdline.getOptionValue(Constants.Alpha)));
-    //    conf.setBoolean(Constants.Scaling, true);
-    //    conf.set(Constants.Heuristic3, cmdline.getOptionValue(Constants.Heuristic3));
 
+    list = d.getElementsByTagName(Constants.StopwordListD);
+    if (list.getLength() > 0) {  conf.set(Constants.StopwordListD, list.item(0).getTextContent());  }  
+
+    list = d.getElementsByTagName(Constants.StemmedStopwordListD);
+    if (list.getLength() > 0) {  conf.set(Constants.StemmedStopwordListD, list.item(0).getTextContent());  }  
+
+    list = d.getElementsByTagName(Constants.StopwordListQ);
+    if (list.getLength() > 0) {  conf.set(Constants.StopwordListQ, list.item(0).getTextContent());  }  
+
+    list = d.getElementsByTagName(Constants.StemmedStopwordListQ);
+    if (list.getLength() > 0) {  conf.set(Constants.StemmedStopwordListQ, list.item(0).getTextContent());  }  
   }
 
-  
+
   static float eval(QueryEngine qe, Configuration conf, String setting){
     Qrels qrels = new Qrels(conf.get(Constants.QrelsPath));
     DocnoMapping mapping = qe.getDocnoMapping();

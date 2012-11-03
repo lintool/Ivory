@@ -63,9 +63,12 @@ public class MtNQueryGenerator implements QueryGenerator {
     if (conf.getBoolean(Constants.Quiet, false)) {
       LOG.setLevel(Level.OFF);
     }
-    
+
     queryLang = conf.get(Constants.QueryLanguage);
     docLang = conf.get(Constants.DocLanguage);
+
+    LOG.info("Stemmed stopword list file in query-language:" + conf.get(Constants.StemmedStopwordListQ));
+    LOG.info("Stemmed stopword list file in doc-language:" + conf.get(Constants.StemmedStopwordListD));
 
     tokenWeight = conf.getFloat(Constants.TokenWeight, 1f);
     phraseWeight = conf.getFloat(Constants.PhraseWeight, 0f);
@@ -79,11 +82,9 @@ public class MtNQueryGenerator implements QueryGenerator {
     LOG.info("K = " + kBest);
 
     init(conf);
-    queryLangTokenizer = TokenizerFactory.createTokenizer(queryLang, queryTokenizerPath, false, false, null);
-    queryLangTokenizerWithStemming = TokenizerFactory.createTokenizer(queryLang, queryTokenizerPath, true, false, null);
-
-    conf.set("stopword", "/fs/clip-qa/ferhan/clir-experiments/stopword."+docLang);
-    docLangTokenizer = TokenizerFactory.createTokenizer(fs, conf, docLang, docTokenizerPath, true, false, null);
+    queryLangTokenizer = TokenizerFactory.createTokenizer(queryLang, queryTokenizerPath, false, null, null, null);
+    queryLangTokenizerWithStemming = TokenizerFactory.createTokenizer(queryLang, queryTokenizerPath, true, null, conf.get(Constants.StemmedStopwordListQ), null);
+    docLangTokenizer = TokenizerFactory.createTokenizer(fs, conf, docLang, docTokenizerPath, true, null, conf.get(Constants.StemmedStopwordListD), null);
 
     clGenerator = new CLWordQueryGenerator();
     clGenerator.init(fs, conf);
@@ -93,7 +94,7 @@ public class MtNQueryGenerator implements QueryGenerator {
   }
 
   public JSONObject parseQuery(String query){
-       
+
     JSONObject queryJson = new JSONObject();
     JSONObject queryTJson = new JSONObject();
     JSONObject queryPJson = new JSONObject();
@@ -105,12 +106,12 @@ public class MtNQueryGenerator implements QueryGenerator {
 
       String[] kbestTranslations = query.trim().split("\\|\\|\\|\\|");
       String origQuery = kbestTranslations[0].split(";")[2].trim(); 
-      
+
       // if no weighting, delegate to appropriate generator class
       if (mtWeight == 0 && scfgWeight == 0 && bitextWeight == 1) {
         return clGenerator.parseQuery(";"+origQuery);
       }
-      
+
       String[] stemmedSourceTokens = queryLangTokenizerWithStemming.processContent(origQuery);
       Map<String,String> stemmed2Stemmed = Utils.getStemMapping(origQuery, queryLangTokenizer, queryLangTokenizerWithStemming, docLangTokenizer);
 
@@ -223,7 +224,7 @@ public class MtNQueryGenerator implements QueryGenerator {
                 target = stemmed2Stemmed.get(target);
               }
 
-//              LOG.info("assign:{"+source+"}->["+target+"]="+transProb);
+              //              LOG.info("assign:{"+source+"}->["+target+"]="+transProb);
               if (target == null || queryLangTokenizerWithStemming.isStemmedStopWord(source) || source.equals("NULL") || docLangTokenizer.isStemmedStopWord(target)) {
                 continue;
               }
@@ -330,10 +331,10 @@ public class MtNQueryGenerator implements QueryGenerator {
           }
           queryTJson.put("#combine", tokensArr);
         }
-        
+
         // combine the token-based and phrase-based representations into a #combweight structure
         JSONArray queryJsonArr = new JSONArray();
-        
+
         HMapSFW normalizedPhrase2Weight = null;
         if (phraseWeight > 0) {
           normalizedPhrase2Weight = Utils.scaleProbMap(lexProbThreshold, phraseWeight/cumPhraseProbs, phrase2weight);      

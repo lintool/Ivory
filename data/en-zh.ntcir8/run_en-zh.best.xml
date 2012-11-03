@@ -5,7 +5,7 @@
      <index>/scratch0/fture/indexes/ntcir_xin.zh_02-05.index</index>
      <doc_lang>zh</doc_lang>
      <query_lang>en</query_lang>
-     <doc_tokenizer>/fs/clip-qa/ferhan/tokenizer-models/zh-token.bin</doc_tokenizer>
+     <doc_tokenizer>data/vocab/zh-token.bin</doc_tokenizer>
      <query_tokenizer>data/tokenizer/en-token.bin</query_tokenizer>
      <query_vocab>data/vocab/vocab.en-zh.en</query_vocab>
      <doc_vocab>data/vocab/vocab.en-zh.zh</doc_vocab>

@@ -1,4 +1,6 @@
 <parameters>
+<qrels_path>data/en-ar.trec02/qrels.en-ar.trec02.txt</qrels_path>
+<quiet>false</quiet>
 
      <run>en-ar.10best</run>
      <query_type>mtN</query_type>
@@ -19,5 +21,7 @@
      <phrase_weight>0</phrase_weight>
      <scfg_path>data/en-ar.trec02/grammar.en-ar.trec02</scfg_path>
      <kBest>10</kBest>
+     <doc_stemmed_stopwordlist>data/tokenizer/ar.stop.stemmed</doc_stemmed_stopwordlist>
+     <query_stemmed_stopwordlist>data/tokenizer/en.stop.stemmed</query_stemmed_stopwordlist>
 
 </parameters>

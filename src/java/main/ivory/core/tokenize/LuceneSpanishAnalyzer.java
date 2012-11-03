@@ -6,6 +6,8 @@ import java.io.StringReader;
 import java.util.Set;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.CharArraySet;
 import org.apache.lucene.analysis.LowerCaseFilter;
 import org.apache.lucene.analysis.StopFilter;
@@ -15,333 +17,22 @@ import org.apache.lucene.analysis.es.SpanishAnalyzer;
 import org.apache.lucene.analysis.standard.StandardFilter;
 import org.apache.lucene.analysis.standard.StandardTokenizer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
-import org.apache.lucene.analysis.tr.TurkishLowerCaseFilter;
 import org.apache.lucene.util.Version;
 import org.tartarus.snowball.SnowballStemmer;
 import org.tartarus.snowball.ext.spanishStemmer;
-import com.google.common.collect.Sets;
 import edu.umd.hooka.VocabularyWritable;
 
 public class LuceneSpanishAnalyzer extends ivory.core.tokenize.Tokenizer {
+  private static final Logger LOG = Logger.getLogger(LuceneSpanishAnalyzer.class);
+  static{
+    LOG.setLevel(Level.WARN);
+  }
   private Tokenizer tokenizer;
   private SnowballStemmer stemmer;
   private boolean isStemming;
-  private final Set<String> spanishStopwords = Sets.newHashSet(LUCENE_STOP_WORDS);
-  private final Set<String> spanishStemmedStopwords = Sets.newHashSet(LUCENE_STEMMED_STOP_WORDS);
-  private static final String[] LUCENE_STOP_WORDS = { 
-    "de",
-    "la",
-    "que",
-    "el",
-    "en",
-    "y",
-    "a",
-    "los",
-    "del",
-    "se",
-    "las",
-    "por",
-    "un",
-    "para",
-    "con",
-    "no",
-    "una",
-    "su",
-    "al",
-    "lo",
-    "como",
-    "más",
-    "pero",
-    "sus",
-    "le",
-    "ya",
-    "o",
-    "este",
-    "sí",
-    "porque",
-    "esta",
-    "entre",
-    "cuando",
-    "muy",
-    "sin",
-    "sobre",
-    "también",
-    "me",
-    "hasta",
-    "hay",
-    "donde",
-    "quien",
-    "desde",
-    "todo",
-    "nos",
-    "durante",
-    "todos",
-    "uno",
-    "les",
-    "ni",
-    "contra",
-    "otros",
-    "ese",
-    "eso",
-    "ante",
-    "ellos",
-    "e",
-    "esto",
-    "mí",
-    "antes",
-    "algunos",
-    "qué",
-    "unos",
-    "yo",
-    "otro",
-    "otras",
-    "otra",
-    "él",
-    "tanto",
-    "esa",
-    "estos",
-    "mucho",
-    "quienes",
-    "nada",
-    "muchos",
-    "cual",
-    "poco",
-    "ella",
-    "estar",
-    "estas",
-    "algunas",
-    "algo",
-    "nosotros",
-    "mi",
-    "mis",
-    "tú",
-    "te",
-    "ti",
-    "tu",
-    "tus",
-    "ellas",
-    "nosotras",
-    "vosotros",
-    "vosotras",
-    "os",
-    "mío",
-    "mía",
-    "míos",
-    "mías",
-    "tuyo",
-    "tuya",
-    "tuyos",
-    "tuyas",
-    "suyo",
-    "suya",
-    "suyos",
-    "suyas",
-    "nuestro",
-    "nuestra",
-    "nuestros",
-    "nuestras",
-    "vuestro",
-    "vuestra",
-    "vuestros",
-    "vuestras",
-    "esos",
-    "esas",
-    "estoy",
-    "estás",
-    "está",
-    "estamos",
-    "estáis",
-    "están",
-    "esté",
-    "estés",
-    "estemos",
-    "estéis",
-    "estén",
-    "estaré",
-    "estarás",
-    "estará",
-    "estaremos",
-    "estaréis",
-    "estarán",
-    "estaría",
-    "estarías",
-    "estaríamos",
-    "estaríais",
-    "estarían",
-    "estaba",
-    "estabas",
-    "estábamos",
-    "estabais",
-    "estaban",
-    "estuve",
-    "estuviste",
-    "estuvo",
-    "estuvimos",
-    "estuvisteis",
-    "estuvieron",
-    "estuviera",
-    "estuvieras",
-    "estuviéramos",
-    "estuvierais",
-    "estuvieran",
-    "estuviese",
-    "estuvieses",
-    "estuviésemos",
-    "estuvieseis",
-    "estuviesen",
-    "estando",
-    "estado",
-    "estada",
-    "estados",
-    "estadas",
-    "estad",
-    "he",
-    "has",
-    "ha",
-    "hemos",
-    "habéis",
-    "han",
-    "haya",
-    "hayas",
-    "hayamos",
-    "hayáis",
-    "hayan",
-    "habré",
-    "habrás",
-    "habrá",
-    "habremos",
-    "habréis",
-    "habrán",
-    "habría",
-    "habrías",
-    "habríamos",
-    "habríais",
-    "habrían",
-    "había",
-    "habías",
-    "habíamos",
-    "habíais",
-    "habían",
-    "hube",
-    "hubiste",
-    "hubo",
-    "hubimos",
-    "hubisteis",
-    "hubieron",
-    "hubiera",
-    "hubieras",
-    "hubiéramos",
-    "hubierais",
-    "hubieran",
-    "hubiese",
-    "hubieses",
-    "hubiésemos",
-    "hubieseis",
-    "hubiesen",
-    "habiendo",
-    "habido",
-    "habida",
-    "habidos",
-    "habidas",
-    "soy",
-    "eres",
-    "es",
-    "somos",
-    "sois",
-    "son",
-    "sea",
-    "seas",
-    "seamos",
-    "seáis",
-    "sean",
-    "seré",
-    "serás",
-    "será",
-    "seremos",
-    "seréis",
-    "serán",
-    "sería",
-    "serías",
-    "seríamos",
-    "seríais",
-    "serían",
-    "era",
-    "eras",
-    "éramos",
-    "erais",
-    "eran",
-    "fui",
-    "fuiste",
-    "fue",
-    "fuimos",
-    "fuisteis",
-    "fueron",
-    "fuera",
-    "fueras",
-    "fuéramos",
-    "fuerais",
-    "fueran",
-    "fuese",
-    "fueses",
-    "fuésemos",
-    "fueseis",
-    "fuesen",
-    "siendo",
-    "sido",
-    "tengo",
-    "tienes",
-    "tiene",
-    "tenemos",
-    "tenéis",
-    "tienen",
-    "tenga",
-    "tengas",
-    "tengamos",
-    "tengáis",
-    "tengan",
-    "tendré",
-    "tendrás",
-    "tendrá",
-    "tendremos",
-    "tendréis",
-    "tendrán",
-    "tendría",
-    "tendrías",
-    "tendríamos",
-    "tendríais",
-    "tendrían",
-    "tenía",
-    "tenías",
-    "teníamos",
-    "teníais",
-    "tenían",
-    "tuve",
-    "tuviste",
-    "tuvo",
-    "tuvimos",
-    "tuvisteis",
-    "tuvieron",
-    "tuviera",
-    "tuvieras",
-    "tuviéramos",
-    "tuvierais",
-    "tuvieran",
-    "tuviese",
-    "tuvieses",
-    "tuviésemos",
-    "tuvieseis",
-    "tuviesen",
-    "teniendo",
-    "tenido",
-    "tenida",
-    "tenidos",
-    "tenidas",
-    "tened"
-  };
-  private static final String[] LUCENE_STEMMED_STOP_WORDS = {
-
-  };
-
+  private Set<String> stopwords;
+  private Set<String> stemmedStopwords;
+  
   @Override
   public void configure(Configuration conf) {
     configure(conf, null);
@@ -349,14 +40,21 @@ public class LuceneSpanishAnalyzer extends ivory.core.tokenize.Tokenizer {
 
   @Override
   public void configure(Configuration conf, FileSystem fs) {
-    isStopwordRemoval = conf.getBoolean(Constants.Stopword, true);      
-    isStemming = conf.getBoolean(Constants.Stemming, true);
+    // read stopwords from file (stopwords will be empty set if file does not exist or is empty)
+    String stopwordsFile = conf.get(Constants.StopwordList);
+    stopwords = readInput(stopwordsFile);      
+    String stemmedStopwordsFile = conf.get(Constants.StemmedStopwordList);
+    stemmedStopwords = readInput(stemmedStopwordsFile);
+    isStopwordRemoval = !stopwords.isEmpty();
     
+    isStemming = conf.getBoolean(Constants.Stemming, true);
     if (isStemming) {
       stemmer = new spanishStemmer();
     }
+    
+    LOG.warn("Stemming is " + isStemming + "; Stopword removal is " + isStopwordRemoval +"; number of stopwords: " + stopwords.size() +"; stemmed: " + stemmedStopwords.size());
   }
-
+  
   @Override
   public String[] processContent(String text) {  
     tokenizer = new StandardTokenizer(Version.LUCENE_35, new StringReader(text));
@@ -390,12 +88,12 @@ public class LuceneSpanishAnalyzer extends ivory.core.tokenize.Tokenizer {
   
   @Override
   public boolean isStopWord(String token) {
-    return spanishStopwords.contains(token) || delims.contains(token);
+    return stopwords.contains(token) || delims.contains(token);
   }
   
   @Override
   public boolean isStemmedStopWord(String token) {
-    return spanishStemmedStopwords.contains(token) || delims.contains(token);
+    return stemmedStopwords.contains(token) || delims.contains(token);
   }
   
   @Override

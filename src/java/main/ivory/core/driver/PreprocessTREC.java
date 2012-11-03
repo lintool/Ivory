@@ -57,7 +57,7 @@ public class PreprocessTREC extends Configured implements Tool {
     String indexRootPath = args[1];
     String collectionName = args[2];
     String language = args[3];
-    boolean isStopWords = Boolean.parseBoolean(args[4]);
+    String stopwordsFile = args[4];
     String tokenizerClass = args[5];
     
     String tokenizerPath = null;
@@ -68,7 +68,7 @@ public class PreprocessTREC extends Configured implements Tool {
     LOG.info(" - Collection path: " + collection);
     LOG.info(" - Index path: " + indexRootPath);
     LOG.info(" - Language: " + language);
-    LOG.info(" - Stop-word removal?: " + isStopWords);
+    LOG.info(" - Stop-word removal?: " + stopwordsFile);
     LOG.info(" - Tokenizer class: " + tokenizerClass);
     LOG.info(" - Tokenizer path: " + tokenizerPath);
 
@@ -80,13 +80,13 @@ public class PreprocessTREC extends Configured implements Tool {
     if (!fs.exists(p)) {
       LOG.info("index directory doesn't exist, creating...");
       fs.mkdirs(p);
-    }	
+    } 
 
     RetrievalEnvironment env = new RetrievalEnvironment(indexRootPath, fs);
     Path mappingFile = env.getDocnoMappingData();
     new TrecDocnoMappingBuilder().build(new Path(collection), mappingFile, conf);
 
-    conf.setBoolean(Constants.Stopword, isStopWords);
+    conf.set(Constants.StopwordList, stopwordsFile);
     conf.set(Constants.CollectionName, collectionName);
     conf.set(Constants.CollectionPath, collection);
     conf.set(Constants.IndexPath, indexRootPath);

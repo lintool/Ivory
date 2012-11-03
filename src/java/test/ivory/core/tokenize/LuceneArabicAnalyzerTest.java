@@ -1,7 +1,7 @@
 package ivory.core.tokenize;
 
 import static org.junit.Assert.assertTrue;
-
+import ivory.core.Constants;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -59,7 +59,9 @@ public class LuceneArabicAnalyzerTest {
   @Test
   public void testTokens1() throws IOException{
     ivory.core.tokenize.Tokenizer tokenizer = new LuceneArabicAnalyzer();
-    tokenizer.configure(new Configuration());
+    Configuration conf = new Configuration();
+    conf.set(Constants.StopwordList, "data/tokenizer/ar.stop");
+    tokenizer.configure(conf);
 
     List<String> sentences = readInput(arabicRawLinesFile);
     List<String[]> expectedTokenArrays = readTokenizedInput(arabicTokenizedLinesFile);
@@ -67,13 +69,13 @@ public class LuceneArabicAnalyzerTest {
     for (int i = 0; i < 4; i++) {
       String sentence = sentences.get(i);
       String[] expectedTokens = expectedTokenArrays.get(i);
-//      System.out.println("Sentence:"+sentence);
+      System.out.println("Testing sentence:"+sentence);
 
       String[] tokens = tokenizer.processContent(sentence);
       int tokenCnt = 0;
       for (String token : tokens) {
-//        System.out.println("Token "+tokenCnt+":"+token);
-        assertTrue("token "+tokenCnt+",expected="+expectedTokens[tokenCnt], token.equals(expectedTokens[tokenCnt]));
+	System.out.println("Token "+tokenCnt+":"+token);
+        assertTrue("token "+tokenCnt+":"+token+",expected="+expectedTokens[tokenCnt], token.equals(expectedTokens[tokenCnt]));
         tokenCnt++;
       }
     }

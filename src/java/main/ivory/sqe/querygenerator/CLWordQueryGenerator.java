@@ -54,23 +54,25 @@ public class CLWordQueryGenerator implements QueryGenerator {
 
   @Override
   public void init(Configuration conf) throws IOException {     }
-  
+
   public void init(FileSystem fs, Configuration conf) throws IOException {
     if (conf.getBoolean(Constants.Quiet, false)) {
       LOG.setLevel(Level.OFF);
     }
-    
+
     queryLang = conf.get(Constants.QueryLanguage);
     docLang = conf.get(Constants.DocLanguage);
     fVocab_f2e = (VocabularyWritable) HadoopAlign.loadVocab(new Path(conf.get(Constants.QueryVocab)), fs);
     eVocab_f2e = (VocabularyWritable) HadoopAlign.loadVocab(new Path(conf.get(Constants.DocVocab)), fs);
     f2eProbs = new TTable_monolithic_IFAs(fs, new Path(conf.get(Constants.f2eProbsPath)), true);
-    
-    queryLangTokenizer = TokenizerFactory.createTokenizer(fs, queryLang, conf.get(Constants.QueryTokenizerData), false, false, null);
-    queryLangTokenizerWithStem = TokenizerFactory.createTokenizer(queryLang, conf.get(Constants.QueryTokenizerData), true, false, null);
-    conf.set("stopword", "/fs/clip-qa/ferhan/clir-experiments/stopword."+docLang);
-    docLangTokenizer = TokenizerFactory.createTokenizer(fs, conf, docLang, conf.get(Constants.DocTokenizerData), true, false, null);
-    
+
+    LOG.info("Stemmed stopword list file in query-language:" + conf.get(Constants.StemmedStopwordListQ));
+    LOG.info("Stemmed stopword list file in doc-language:" + conf.get(Constants.StemmedStopwordListD));
+
+    queryLangTokenizer = TokenizerFactory.createTokenizer(fs, queryLang, conf.get(Constants.QueryTokenizerData), false, null, null, null);
+    queryLangTokenizerWithStem = TokenizerFactory.createTokenizer(queryLang, conf.get(Constants.QueryTokenizerData), true, null, conf.get(Constants.StemmedStopwordListQ), null);
+    docLangTokenizer = TokenizerFactory.createTokenizer(fs, conf, docLang, conf.get(Constants.DocTokenizerData), true, null, conf.get(Constants.StemmedStopwordListD), null);
+
     lexProbThreshold = conf.getFloat(Constants.LexicalProbThreshold, 0f);
     cumProbThreshold = conf.getFloat(Constants.CumulativeProbThreshold, 1f);
     numTransPerToken = conf.getInt(Constants.NumTransPerToken, Integer.MAX_VALUE);
@@ -102,7 +104,7 @@ public class CLWordQueryGenerator implements QueryGenerator {
     try {
       String origQuery = query.trim().split(";")[1].trim(); 
       Map<String,String> stemmed2Stemmed = Utils.getStemMapping(origQuery, queryLangTokenizer, queryLangTokenizerWithStem, docLangTokenizer);
-      
+
       String[] tokens = queryLangTokenizerWithStem.processContent(origQuery);
 
       length = tokens.length;
@@ -140,7 +142,7 @@ public class CLWordQueryGenerator implements QueryGenerator {
   protected String getBestTranslation(String token) {
     int f = fVocab_f2e.get(token);
     if (f <= 0) {
-//      LOG.info("OOV "+token);
+      //      LOG.info("OOV "+token);
       // heuristic: if no translation found, include itself as only translation
       return null;
     }
@@ -160,7 +162,7 @@ public class CLWordQueryGenerator implements QueryGenerator {
     int f = fVocab_f2e.get(token);
     if (f <= 0) {
       // LOG.info("OOV: "+token);
-      
+
       // heuristic: if no translation found, include itself as only translation
       String targetStem = stemmed2Stemmed.get(token);
       String target = (stemmed2Stemmed == null || targetStem == null) ? token : stemmed2Stemmed.get(token);
@@ -168,7 +170,7 @@ public class CLWordQueryGenerator implements QueryGenerator {
       return probDist;
     }
     PriorityQueue<PairOfFloatInt> eS = f2eProbs.get(f).getTranslationsWithProbs(lexProbThreshold);
-//    LOG.info("Adding "+ eS.size() +" translations for "+token+","+f);
+    //    LOG.info("Adding "+ eS.size() +" translations for "+token+","+f);
 
     float sumProbEF = 0;
     int numTrans = 0;
@@ -178,37 +180,39 @@ public class CLWordQueryGenerator implements QueryGenerator {
       float probEF = entry.getLeftElement();
       int e = entry.getRightElement();
       String eTerm = eVocab_f2e.get(e);
-      
-//      LOG.info("Pr("+eTerm+"|"+token+")="+probEF);
-      
+
+      //      LOG.info("Pr("+eTerm+"|"+token+")="+probEF);
+
       if (probEF > 0 && e > 0 && !docLangTokenizer.isStemmedStopWord(eTerm) && (pairsInSCFG == null || pairsInSCFG.contains(new PairOfStrings(token,eTerm)))) {      
-          // assuming our bilingual dictionary is learned from normally segmented text, but we want to use bigram tokenizer for CLIR purposes
-          // then we need to convert the translations of each source token into a sequence of bigrams
-          // we can distribute the translation probability equally to the each bigram
-          if (bigramSegment) {
-            String[] eTokens = docLangTokenizer.processContent(eTerm);
-            float splitProb = probEF / eTokens.length;
-            for (String eToken : eTokens) {
-              // filter tokens that are not in the index for efficiency
-              if (env.getPostingsList(eToken) != null) {
-                probDist.put(eToken, splitProb);
-              }
-            }
-            // here we add probability for tokens that we ignored in above condition, 
-            // but it works better (empirically) this way 
-            // AND it is consistent with what we would get if we did not do the index-filtering above
-            // only faster
-            sumProbEF += probEF;      
-          }else {
-            if (env.getPostingsList(eTerm) != null) {
-              probDist.increment(eTerm, probEF);
-              sumProbEF += probEF;
+        // assuming our bilingual dictionary is learned from normally segmented text, but we want to use bigram tokenizer for CLIR purposes
+        // then we need to convert the translations of each source token into a sequence of bigrams
+        // we can distribute the translation probability equally to the each bigram
+        if (bigramSegment) {
+          String[] eTokens = docLangTokenizer.processContent(eTerm);
+          float splitProb = probEF / eTokens.length;
+          for (String eToken : eTokens) {
+            // filter tokens that are not in the index for efficiency
+            if (env.getPostingsList(eToken) != null) {
+              probDist.put(eToken, splitProb);
             }
           }
-          numTrans++;
-//          LOG.info("adding "+eTerm+","+probEF+","+sumProbEF);
+          // here we add probability for tokens that we ignored in above condition, 
+          // but it works better (empirically) this way 
+          // AND it is consistent with what we would get if we did not do the index-filtering above
+          // only faster
+          sumProbEF += probEF;      
+        }else {
+          if (env.getPostingsList(eTerm) != null) {
+            probDist.increment(eTerm, probEF);
+            sumProbEF += probEF;
+          }
+        }
+        numTrans++;
+        //          LOG.info("adding "+eTerm+","+probEF+","+sumProbEF);
+      }else{
+        LOG.info("Skipped target stopword/OOV " + eTerm);
       }
-      
+
       // early terminate if cumulative prob. has reached specified threshold
       if (sumProbEF > cumProbThreshold || numTrans >= numTransPerToken) {
         break;
@@ -220,7 +224,7 @@ public class CLWordQueryGenerator implements QueryGenerator {
       probDist.put(e, probDist.get(e) / sumProbEF);
     }
 
-//    LOG.info("Translations of "+token+"="+probDist);
+    //    LOG.info("Translations of "+token+"="+probDist);
 
     return probDist;
   }
@@ -251,8 +255,6 @@ public class CLWordQueryGenerator implements QueryGenerator {
     }
   }
 
-
-  
   public int getQueryLength(){
     return length;  
   }

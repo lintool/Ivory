@@ -1,249 +1,33 @@
 package ivory.core.tokenize;
 
 import ivory.core.Constants;
-
-import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.StringReader;
-import java.util.HashSet;
 import java.util.Set;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.CharArraySet;
 import org.apache.lucene.analysis.LowerCaseFilter;
+import org.apache.lucene.analysis.StopFilter;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.ar.ArabicAnalyzer;
 import org.apache.lucene.analysis.ar.ArabicNormalizationFilter;
 import org.apache.lucene.analysis.ar.ArabicStemFilter;
-import org.apache.lucene.analysis.StopFilter;
 import org.apache.lucene.analysis.standard.StandardTokenizer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.util.Version;
 
-import com.google.common.collect.Sets;
-
-import edu.umd.hooka.VocabularyWritable;
-
 public class LuceneArabicAnalyzer extends ivory.core.tokenize.Tokenizer {
   private static final Logger LOG = Logger.getLogger(LuceneArabicAnalyzer.class);
+  static{
+    LOG.setLevel(Level.WARN);
+  }
   private boolean isStemming;
   private org.apache.lucene.analysis.Tokenizer tokenizer;
-  private final Set<String> arabicStopwords = Sets.newHashSet(LUCENE_STOP_WORDS); // new HashSet<String>();//
-  private final Set<String> arabicStemmedStopwords = Sets.newHashSet(LUCENE_STEMMED_STOP_WORDS);
-  private static final String[] LUCENE_STOP_WORDS = { 
-    "من",
-    "ومن",
-    "منها",
-    "منه",
-    "في",
-    "وفي",
-    "فيها",
-    "فيه",
-    "و",
-    "ف",
-    "ثم",
-    "او",
-    "أو",
-    "ب",
-    "بها",
-    "به",
-    "ا",
-    "أ",
-    "اى",
-    "اي",
-    "أي",
-    "أى",
-    "لا",
-    "ولا",
-    "الا",
-    "ألا",
-    "إلا",
-    "لكن",
-    "ما",
-    "وما",
-    "كما",
-    "فما",
-    "عن",
-    "مع",
-    "اذا",
-    "إذا",
-    "ان",
-    "أن",
-    "إن",
-    "انها",
-    "أنها",
-    "إنها",
-    "انه",
-    "أنه",
-    "إنه",
-    "بان",
-    "بأن",
-    "فان",
-    "فأن",
-    "وان",
-    "وأن",
-    "وإن",
-    "التى",
-    "التي",
-    "الذى",
-    "الذي",
-    "الذين",
-    "الى",
-    "الي",
-    "إلى",
-    "إلي",
-    "على",
-    "عليها",
-    "عليه",
-    "اما",
-    "أما",
-    "إما",
-    "ايضا",
-    "أيضا",
-    "كل",
-    "وكل",
-    "لم",
-    "ولم",
-    "لن",
-    "ولن",
-    "هى",
-    "هي",
-    "هو",
-    "وهى",
-    "وهي",
-    "وهو",
-    "فهى",
-    "فهي",
-    "فهو",
-    "انت",
-    "أنت",
-    "لك",
-    "لها",
-    "له",
-    "هذه",
-    "هذا",
-    "تلك",
-    "ذلك",
-    "هناك",
-    "كانت",
-    "كان",
-    "يكون",
-    "تكون",
-    "وكانت",
-    "وكان",
-    "غير",
-    "بعض",
-    "قد",
-    "نحو",
-    "بين",
-    "بينما",
-    "منذ",
-    "ضمن",
-    "حيث",
-    "الان",
-    "الآن",
-    "خلال",
-    "بعد",
-    "قبل",
-    "حتى",
-    "عند",
-    "عندما",
-    "لدى",
-    "جميع",
-    "ضد",
-    "ت",
-    "ل"
-  };
-  private static final String[] LUCENE_STEMMED_STOP_WORDS =   {
-    "ومن",
-    "من",
-    "في",
-    "وف",
-    "في",
-    "و",
-    "ف",
-    "ثم",
-    "او",
-    "ب",
-    "بها",
-    "به",
-    "ا",
-    "اي",
-    "لا",
-    "ولا",
-    "الا",
-    "لكن",
-    "ما",
-    "وما",
-    "كما",
-    "فما",
-    "عن",
-    "مع",
-    "اذا",
-    "اذا",
-    "ان",
-    "بان",
-    "فان",
-    "وان",
-    "تي",
-    "ذي",
-    "ذين",
-    "ال",
-    "عل",
-    "اما",
-    "ايضا",
-    "كل",
-    "وكل",
-    "لم",
-    "ولم",
-    "لن",
-    "ولن",
-    "هي",
-    "هو",
-    "وه",
-    "وهو",
-    "فه",
-    "فهو",
-    "انت",
-    "لك",
-    "لها",
-    "له",
-    "هذ",
-    "هذا",
-    "تلك",
-    "هناك",
-    "كانت",
-    "كان",
-    "تك",
-    "كانت",
-    "كان",
-    "غير",
-    "بعض",
-    "قد",
-    "نحو",
-    "بين",
-    "بينما",
-    "منذ",
-    "ضمن",
-    "حيث",
-    "ان",
-    "خلال",
-    "بعد",
-    "قبل",
-    "حت",
-    "عند",
-    "عندما",
-    "لد",
-    "جميع",
-    "ضد",
-    "ت",
-    "ل"
-  };
+  private Set<String> stopwords;
+  private Set<String> stemmedStopwords;
 
   @Override
   public void configure(Configuration conf) {
@@ -251,29 +35,18 @@ public class LuceneArabicAnalyzer extends ivory.core.tokenize.Tokenizer {
   }
 
   @Override
-  public void configure(Configuration conf, FileSystem fs) {
-    isStopwordRemoval = conf.getBoolean(Constants.Stopword, true);      
+  public void configure(Configuration conf, FileSystem fs) {    
+    // read stopwords from file (stopwords will be empty set if file does not exist or is empty)
+    String stopwordsFile = conf.get(Constants.StopwordList);
+    stopwords = readInput(stopwordsFile);      
+    String stemmedStopwordsFile = conf.get(Constants.StemmedStopwordList);
+    stemmedStopwords = readInput(stemmedStopwordsFile);
+    isStopwordRemoval = !stopwords.isEmpty();
+
     isStemming = conf.getBoolean(Constants.Stemming, true);
     
-//    try {
-//      BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(conf.get("stopword")), "UTF8"));
-//      BufferedReader in2 = new BufferedReader(new InputStreamReader(new FileInputStream(conf.get("stopword")+".stemmed"), "UTF8"));
-//      String stopword = null;
-//      while ((stopword = in.readLine()) != null) {
-//      for (String stopword : LUCENE_STOP_WORDS) {
-//        arabicStopwords.add(stopword.trim());
-//        LOG.info("added1\n"+stopword.trim()+"\n"+getUTF8(stopword.trim()));
-//      }
-//      for (String stopword : LUCENE_STEMMED_STOP_WORDS) {
-//      while ((stopword = in2.readLine()) != null) {
-//        arabicStemmedStopwords.add(stopword.trim());
-//        LOG.info("added2\n"+stopword.trim()+"\n"+getUTF8(stopword.trim()));
-//      }
-//    } catch (IOException e) {
-//      e.printStackTrace();
-//    }
+    LOG.warn("Stemming is " + isStemming + "; Stopword removal is " + isStopwordRemoval +"; number of stopwords: " + stopwords.size() +"; stemmed: " + stemmedStopwords.size());
   }
-
   
   @Override
   public String[] processContent(String text) {   
@@ -306,7 +79,7 @@ public class LuceneArabicAnalyzer extends ivory.core.tokenize.Tokenizer {
 
   @Override
   public boolean isStopWord(String token) {
-    return arabicStopwords.contains(token) || delims.contains(token) || token.length()==1;
+    return stopwords.contains(token) || delims.contains(token) || token.length()==1;
   }
 
   @Override
@@ -330,7 +103,6 @@ public class LuceneArabicAnalyzer extends ivory.core.tokenize.Tokenizer {
 
   @Override
   public boolean isStemmedStopWord(String token) {
-//    LOG.info("tested\n"+token+"\n"+getUTF8(token)+"\n"+arabicStemmedStopwords.contains(getUTF8(token)));
-    return arabicStemmedStopwords.contains(token) || delims.contains(token) || token.length()==1;
+    return stemmedStopwords.contains(token) || delims.contains(token) || token.length()==1;
   }
 }
