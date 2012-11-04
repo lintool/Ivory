@@ -75,7 +75,7 @@ public class OpenNLPTokenizer extends ivory.core.tokenize.Tokenizer {
     }
     isStopwordRemoval = !stopwords.isEmpty();
   
-    sLogger.warn("Stopword removal is " + isStopwordRemoval +"; number of stopwords: " + stopwords.size() +"; stemmed: " + stemmedStopwords.size());
+    sLogger.warn("Stemmer: " + stemmer + "\nStopword removal is " + isStopwordRemoval +"; number of stopwords: " + stopwords.size() +"; stemmed: " + stemmedStopwords.size());
   }
 
   public void setTokenizer(FileSystem fs, Path p){

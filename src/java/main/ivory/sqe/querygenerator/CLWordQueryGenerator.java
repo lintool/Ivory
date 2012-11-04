@@ -69,8 +69,8 @@ public class CLWordQueryGenerator implements QueryGenerator {
     LOG.info("Stemmed stopword list file in query-language:" + conf.get(Constants.StemmedStopwordListQ));
     LOG.info("Stemmed stopword list file in doc-language:" + conf.get(Constants.StemmedStopwordListD));
 
-    queryLangTokenizer = TokenizerFactory.createTokenizer(fs, queryLang, conf.get(Constants.QueryTokenizerData), false, null, null, null);
-    queryLangTokenizerWithStem = TokenizerFactory.createTokenizer(queryLang, conf.get(Constants.QueryTokenizerData), true, null, conf.get(Constants.StemmedStopwordListQ), null);
+    queryLangTokenizer = TokenizerFactory.createTokenizer(fs, conf, queryLang, conf.get(Constants.QueryTokenizerData), false, null, null, null);
+    queryLangTokenizerWithStem = TokenizerFactory.createTokenizer(fs, conf, queryLang, conf.get(Constants.QueryTokenizerData), true, null, conf.get(Constants.StemmedStopwordListQ), null);
     docLangTokenizer = TokenizerFactory.createTokenizer(fs, conf, docLang, conf.get(Constants.DocTokenizerData), true, null, conf.get(Constants.StemmedStopwordListD), null);
 
     lexProbThreshold = conf.getFloat(Constants.LexicalProbThreshold, 0f);

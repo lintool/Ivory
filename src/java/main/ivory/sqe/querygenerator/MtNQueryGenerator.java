@@ -82,8 +82,8 @@ public class MtNQueryGenerator implements QueryGenerator {
     LOG.info("K = " + kBest);
 
     init(conf);
-    queryLangTokenizer = TokenizerFactory.createTokenizer(queryLang, queryTokenizerPath, false, null, null, null);
-    queryLangTokenizerWithStemming = TokenizerFactory.createTokenizer(queryLang, queryTokenizerPath, true, null, conf.get(Constants.StemmedStopwordListQ), null);
+    queryLangTokenizer = TokenizerFactory.createTokenizer(fs, conf, queryLang, queryTokenizerPath, false, null, null, null);
+    queryLangTokenizerWithStemming = TokenizerFactory.createTokenizer(fs, conf, queryLang, queryTokenizerPath, true, null, conf.get(Constants.StemmedStopwordListQ), null);
     docLangTokenizer = TokenizerFactory.createTokenizer(fs, conf, docLang, docTokenizerPath, true, null, conf.get(Constants.StemmedStopwordListD), null);
 
     clGenerator = new CLWordQueryGenerator();
