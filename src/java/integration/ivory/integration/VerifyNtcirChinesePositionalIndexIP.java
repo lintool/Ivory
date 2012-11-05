@@ -72,6 +72,8 @@ public class VerifyNtcirChinesePositionalIndexIP {
         new Path(index + "/ttable.en-zh"));
     fs.copyFromLocalFile(false, true, new Path("data/en-zh.ntcir8/grammar.en-zh.ntcir8"),
         new Path(index + "/grammar.en-zh.ntcir8"));
+    fs.copyFromLocalFile(false, true, new Path("data/en-zh.ntcir8/queries.en-zh.k10.ntcir8.xml"),
+        new Path(index + "/queries.en-zh.k10.ntcir8.xml"));
 
     conf = RunQueryEngine.parseArgs(new String[] {
         "-index=" + index,
