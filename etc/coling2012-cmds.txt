@@ -1,6 +1,9 @@
-### Each collection was preprocessed to remove duplicates and all tags except for <DOC> and <DOCNO>, and also convert NTCIR format to TREC format.
-### scripts and instructions are available under $IVORY/etc/clir.scripts/[collection]
-cat [collection files] | perl clean-collection-[collection.name].pl > [collection.name]-cleaned.xml
+### Each collection was preprocessed to remove duplicates and all tags except for <DOC> and <DOCNO>, and also convert NTCIR tag names to be TREC-compatible.
+### scripts and instructions for each collection are available under $IVORY/etc/clir.scripts/[collection]
+### below are the md5 checksum values the final indexed collection files (generated with md5sum command):
+6da9494cca1324334ce4a8e4f64f5a5a  clef/lemonde94-95+sda94-95.fr-cleaned.xml
+36e29a6c446408c23a8b92a28ceb6785  ntcir/gigaword-xin.2002-06.zh-cleaned.xml
+8a9c5b47c54e2a3ffabc8dc7c556fbca  trec/ldc2001t55.ar-cleaned.xml
 
 ### MT derivations are represented in a compressed format understood by our query parser.
 Since there are n derivations, we represent each one, separated by four lines:
