@@ -73,7 +73,7 @@ public class SCFGQueryGenerator implements QueryGenerator {
       e.printStackTrace();
     }
 
-    queryLangTokenizer = TokenizerFactory.createTokenizer(fs, conf.get(Constants.QueryLanguage), conf.get(Constants.QueryTokenizerData), false, null, null, null);
+    queryLangTokenizer = TokenizerFactory.createTokenizer(fs, conf, conf.get(Constants.QueryLanguage), conf.get(Constants.QueryTokenizerData), false, null, null, null);
     docLangTokenizer = TokenizerFactory.createTokenizer(fs, conf, docLang, conf.get(Constants.DocTokenizerData), true, null, conf.get(Constants.StemmedStopwordListD), null);
 
     // construct prob. dist. from translation grammar (SCFG)

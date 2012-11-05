@@ -1,6 +1,6 @@
 <parameters>
-<qrels_path>data/en-ar.trec02/qrels.en-ar.trec02.txt</qrels_path>
-<quiet>false</quiet>
+<!--<qrels_path>data/en-ar.trec02/qrels.en-ar.trec02.txt</qrels_path>-->
+
 
      <run>en-ar.10best</run>
      <query_type>mtN</query_type>

@@ -34,7 +34,7 @@ import edu.umd.cloud9.collection.DocnoMapping;
 public class RunQueryEngine {
 
   private static final Logger LOG = Logger.getLogger(RunQueryEngine.class);
-
+  FileSystem fs;
 
   public static void main(String[] args) throws Exception {
     Configuration conf = parseArgs(args);
@@ -105,8 +105,13 @@ public class RunQueryEngine {
     LOG.info("Best = "+bestMAP+"\t"+bestLambda1+"\t"+bestLambda2);    
   }
 
-  @SuppressWarnings("static-access")
-  public static Configuration parseArgs(String[] args) {
+  public static Configuration parseArgs(String[] args) throws IOException {
+    Configuration conf = new Configuration();
+    return parseArgs(args, FileSystem.getLocal(conf), conf);
+  }
+
+  @SuppressWarnings("static-access")  
+  public static Configuration parseArgs(String[] args, FileSystem fs, Configuration conf) {
     // option descriptions
     Options options = new Options();
     options.addOption(OptionBuilder.withArgName("path").hasArg().withDescription("config xml").create(Constants.ConfigXML));
@@ -146,21 +151,22 @@ public class RunQueryEngine {
     options.addOption(OptionBuilder.withArgName("path").hasArg().withDescription("one stemmed stopword per line, doc lang").create(Constants.StemmedStopwordListD));
 
     // read options from commandline or XML
-    Configuration conf = new Configuration();
     try {
       CommandLineParser parser = new GnuParser();
       CommandLine cmdline = parser.parse(options, args);
       if (cmdline.hasOption(Constants.ConfigXML) && cmdline.hasOption(Constants.QueriesPath)) {
-        readXMLOptions(cmdline, conf);
+        readXMLOptions(cmdline, fs, conf);
       } else{
         conf.set(Constants.QueryType, cmdline.getOptionValue(Constants.QueryType));
         conf.set(Constants.IndexPath, cmdline.getOptionValue(Constants.IndexPath));
         conf.set(Constants.QueriesPath, cmdline.getOptionValue(Constants.QueriesPath));
-        conf.set(Constants.QrelsPath, cmdline.getOptionValue(Constants.QrelsPath));
         conf.set(Constants.DocLanguage, cmdline.getOptionValue(Constants.DocLanguage));
         conf.set(Constants.QueryLanguage, cmdline.getOptionValue(Constants.QueryLanguage));
         conf.set(Constants.DocTokenizerData, cmdline.getOptionValue(Constants.DocTokenizerData));
         conf.set(Constants.QueryTokenizerData, cmdline.getOptionValue(Constants.QueryTokenizerData));
+      }
+      if (cmdline.hasOption(Constants.QrelsPath)) {
+        conf.set(Constants.QrelsPath, cmdline.getOptionValue(Constants.QrelsPath));
       }
       if (cmdline.hasOption(Constants.BigramSegment)) {
         conf.set(Constants.BigramSegment, cmdline.getOptionValue(Constants.BigramSegment));
@@ -252,12 +258,12 @@ public class RunQueryEngine {
 
   }
 
-  private static void readXMLOptions(CommandLine cmdline, Configuration conf) throws ConfigurationException {
+  private static void readXMLOptions(CommandLine cmdline, FileSystem fs, Configuration conf) throws ConfigurationException {
     String element = cmdline.getOptionValue(Constants.ConfigXML);
 
     Document d = null;
     try {
-      d = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(FileSystem.getLocal(conf).open(new Path(element)));
+      d = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(fs.open(new Path(element)));
     } catch (SAXException e) {
       throw new ConfigurationException(e.getMessage());
     } catch (IOException e) {
@@ -352,7 +358,6 @@ public class RunQueryEngine {
     list = d.getElementsByTagName(Constants.StemmedStopwordListQ);
     if (list.getLength() > 0) {  conf.set(Constants.StemmedStopwordListQ, list.item(0).getTextContent());  }  
   }
-
 
   static float eval(QueryEngine qe, Configuration conf, String setting){
     Qrels qrels = new Qrels(conf.get(Constants.QrelsPath));
