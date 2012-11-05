@@ -21,7 +21,7 @@ import com.google.common.collect.Lists;
 public class VerifyTrecArabicPositionalIndexIP {
   private static final Logger LOG = Logger.getLogger(VerifyTrecArabicPositionalIndexIP.class);
 
-  private Path collectionPath = new Path("/shared/collections/clir/trec/arabic.trec01-03_cleaned+nodups.docs");
+  private Path collectionPath = new Path("/shared/collections/clir/trec/trec2001-02.ar-cleaned.xml");
   private String index = this.getClass().getCanonicalName() + "-index";
   private String arTokenizerFile = "/user/fture/data/token/ar-token.bin";
   private String enTokenizerFile = "/user/fture/data/token/en-token.bin";
