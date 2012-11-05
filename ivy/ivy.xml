@@ -23,7 +23,7 @@
     <dependency org="" name="fastutil" rev="6.0.0" />
     <dependency org="com.martiansoftware" name="jsap" rev="2.1" />
     <dependency org="commons-collections" name="commons-collections" rev="3.2.1" />
-    <dependency org="" name="stanford-chinese-segmenter" rev="2011-09-14" />    
+    <!--dependency org="" name="stanford-chinese-segmenter" rev="2011-09-14" /-->
 
     <dependency org="xerces" name="xercesImpl" rev="2.9.1" />
     <dependency org="javax.mail" name="mail" rev="1.4.1"/>    
