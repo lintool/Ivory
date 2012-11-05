@@ -1,6 +1,5 @@
 #!/bin/sh
 
-svn up
 ant clean
 ant
-ant integration
+ant -lib etc/mail.jar integration

@@ -1,6 +1,5 @@
 #!/bin/sh
 
-svn up
 ant clean
 ant
-ant regression-complete
+ant -lib etc/mail.jar regression-complete
