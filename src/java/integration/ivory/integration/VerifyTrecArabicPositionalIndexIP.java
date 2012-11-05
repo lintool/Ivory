@@ -22,7 +22,7 @@ public class VerifyTrecArabicPositionalIndexIP {
   private static final Logger LOG = Logger.getLogger(VerifyTrecArabicPositionalIndexIP.class);
 
   private Path collectionPath = new Path("/shared/collections/clir/trec/arabic.trec01-03_cleaned+nodups.docs");
-  private String index = "/tmp/" + this.getClass().getCanonicalName() + "-index";
+  private String index = this.getClass().getCanonicalName() + "-index";
   private String arTokenizerFile = "/user/fture/data/token/ar-token.bin";
   private String enTokenizerFile = "/user/fture/data/token/en-token.bin";
   
@@ -66,6 +66,8 @@ public class VerifyTrecArabicPositionalIndexIP {
         new Path(index + "/ttable.en-ar"));
     fs.copyFromLocalFile(false, true, new Path("data/en-ar.trec02/grammar.en-ar.trec02"),
         new Path(index + "/grammar.en-ar.trec02"));
+    fs.copyFromLocalFile(false, true, new Path("data/en-ar.trec02/queries.en-ar.k10.trec02.xml"),
+        new Path(index + "/queries.en-ar.k10.trec02.xml"));
 
     // Done with indexing, now do retrieval run.
     conf = RunQueryEngine.parseArgs(new String[] {

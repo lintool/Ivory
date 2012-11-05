@@ -22,7 +22,7 @@ public class VerifyClefFrenchPositionalIndexIP {
   private static final Logger LOG = Logger.getLogger(VerifyClefFrenchPositionalIndexIP.class);
 
   private Path collectionPath = new Path("/shared/collections/clir/clef/lemonde94-95+sda94-95.fr-cleaned.xml");
-  private String index = "/tmp/" + this.getClass().getCanonicalName() + "-index";
+  private String index = this.getClass().getCanonicalName() + "-index";
   private String frTokenizerFile = "/user/fture/data/token/fr-token.bin";
   private String enTokenizerFile = "/user/fture/data/token/en-token.bin";
   
@@ -72,6 +72,8 @@ public class VerifyClefFrenchPositionalIndexIP {
         new Path(index + "/ttable.en-fr"));
     fs.copyFromLocalFile(false, true, new Path("data/en-fr.clef06/grammar.en-fr.clef06"),
         new Path(index + "/grammar.en-fr.clef06"));
+    fs.copyFromLocalFile(false, true, new Path("/data/en-fr.clef06/queries.en-fr.k10.clef06.xml"),
+        new Path(index + "/queries.en-fr.k10.clef06.xml"));
 
     conf = RunQueryEngine.parseArgs(new String[] {
         "-index=" + index,
