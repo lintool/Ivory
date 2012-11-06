@@ -322,7 +322,7 @@ public class Basic {
     String[] paramsBloomRanker = new String[] {
       "-index", Basic.IVORY_INDEX_PATH,
       "-posting", postingIndex.getPath(),
-      "-bloom", bloomOutput.getPath(),
+      "-bloom", bloomIndex.getPath(),
       "-query", "data/clue/queries.web09.1-25.xml",
       "-spam", Basic.SPAM_PATH,
       "-output", bloomOutput.getPath(),
