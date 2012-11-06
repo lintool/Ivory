@@ -1,8 +1,10 @@
-package ivory.bloomir.basic;
+package ivory.bloomir;
 
 import java.io.File;
 
 import junit.framework.JUnit4TestAdapter;
+
+import com.google.common.io.Files;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
@@ -272,13 +274,13 @@ public class Basic {
     "clueweb09-en0000-00-03030",
     "clueweb09-en0000-00-03043" };
 
-  private static final String IVORY_INDEX_PATH = "";
-  private static final String SPAM_PATH = "";
+  private static final String IVORY_INDEX_PATH = "/scratch0/indexes/clue.en.01.nopos/";
+  private static final String SPAM_PATH = "/scratch0/nima/docscores-spam.dat.en.01";
 
   @Test public void runRegression() throws Exception {
     FileSystem fs = FileSystem.getLocal(new Configuration());
-    File postingIndex = File.createTempFile("bloomirP", null);
-    File bloomIndex = File.createTempFile("bloomirB", null);
+    File postingIndex = Files.createTempDir();
+    File bloomIndex = Files.createTempDir();
     File postingOutput = File.createTempFile("bloomirPO", null);
     File bloomOutput = File.createTempFile("bloomirBO", null);
 
@@ -324,18 +326,11 @@ public class Basic {
       "-query", "data/clue/queries.web09.1-25.xml",
       "-spam", Basic.SPAM_PATH,
       "-output", bloomOutput.getPath(),
-      "-hits", "100"
+      "-hits", "1000"
     };
 
-    start = System.currentTimeMillis();
     SmallAdaptiveRanker.main(paramsSARanker);
-    end = System.currentTimeMillis();
-    LOG.info("Total retrieval time (Small Adaptive): " + (end - start) + "ms");
-
-    start = System.currentTimeMillis();
     BloomRanker.main(paramsBloomRanker);
-    end = System.currentTimeMillis();
-    LOG.info("Total retrieval time (Bloom): " + (end - start) + "ms");
 
     FSDataInputStream saInput = fs.open(new Path(postingOutput.getPath()));
     String line;
@@ -347,25 +342,36 @@ public class Basic {
       }
     }
     saInput.close();
-    assertEquals(i, 100);
+    assertEquals(EXACT_RETRIEVAL.length, i);
+    LOG.info("Small Adaptive output checked.");
 
     FSDataInputStream bInput = fs.open(new Path(bloomOutput.getPath()));
+    int c = 0, lastQid = -1;
     i = 0;
     while((line = bInput.readLine()) != null) {
       if(line.startsWith("<judgment")) {
-        String docid = line.split("\"")[3];
-        if(EXACT_RETRIEVAL[i].equals(docid)) {
-          i++;
+        int qid = Integer.parseInt(line.split("\"")[1]);
+        if(qid != lastQid) {
+          lastQid = qid;
+          c = 0;
+        }
+
+        if(c < 10) {
+          String docid = line.split("\"")[3];
+          if(EXACT_RETRIEVAL[i].equals(docid)) {
+            i++;
+            c++;
+          }
         }
       }
     }
     bInput.close();
-    assertEquals(i, 100);
+    assertEquals(EXACT_RETRIEVAL.length, i);
 
-    postingIndex.delete();
-    postingOutput.delete();
-    bloomIndex.delete();
-    bloomOutput.delete();
+    fs.delete(new Path(postingIndex.getPath()), true);
+    fs.delete(new Path(postingOutput.getPath()), true);
+    fs.delete(new Path(bloomIndex.getPath()), true);
+    fs.delete(new Path(bloomOutput.getPath()), true);
   }
 
   public static junit.framework.Test suite() {
