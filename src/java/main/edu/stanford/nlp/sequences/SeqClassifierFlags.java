@@ -671,7 +671,7 @@ public class SeqClassifierFlags implements Serializable {
    */
   public String unknownWordDistSimClass = "null";
 
-
+  /** @author ferhanture **/
   public Configuration conf;
   
   public void setConf(Configuration  c){
