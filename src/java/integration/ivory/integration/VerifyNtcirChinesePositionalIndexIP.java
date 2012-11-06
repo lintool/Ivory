@@ -21,7 +21,7 @@ import com.google.common.collect.Lists;
 public class VerifyNtcirChinesePositionalIndexIP {
   private static final Logger LOG = Logger.getLogger(VerifyNtcirChinesePositionalIndexIP.class);
 
-  private Path collectionPath = new Path("/shared/collections/clir/ntcir8/chinese-gigaword_xinhua-only.02-05.xml");
+  private Path collectionPath = new Path("/shared/collections/clir/ntcir/gigaword-xin.2002-06.zh-cleaned.xml");
   private String index = this.getClass().getCanonicalName() + "-index";
   private String zhTokenizerFile = "/user/fture/data/token/zh-token.bin";
   private String enTokenizerFile = "/user/fture/data/token/en-token.bin";
