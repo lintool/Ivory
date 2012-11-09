@@ -1,0 +1,9 @@
+iconv -f ISO8859-1 -t UTF-8 lemonde94.raw | perl ~/ferhan/clir-experiments/Ivory/etc/clir.scripts/clef/clean-collection-lemonde.pl | grep -v '^$' > lemonde94.utf8.clean
+
+iconv -f ISO8859-1 -t UTF-8 lemonde95.raw | perl ~/ferhan/clir-experiments/Ivory/etc/clir.scripts/clef/clean-collection-lemonde.pl | grep -v '^$' > lemonde95.utf8.clean
+
+iconv -f ISO8859-1 -t UTF-8 sda94.raw | perl ~/ferhan/clir-experiments/Ivory/etc/clir.scripts/clef/clean-collection-sda.pl | grep -v '^$' > sda94.utf8.clean
+
+iconv -f ISO8859-1 -t UTF-8 sda95.raw | perl ~/ferhan/clir-experiments/Ivory/etc/clir.scripts/clef/clean-collection-sda.pl | grep -v '^$' > sda95.utf8.clean
+
+cat lemonde94.utf8.clean lemonde95.utf8.clean sda94.utf8.clean sda95.utf8.clean > lemonde94-95+sda94-95.fr-cleaned.xml

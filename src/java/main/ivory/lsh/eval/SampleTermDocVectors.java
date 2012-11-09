@@ -1,11 +1,8 @@
 package ivory.lsh.eval;
 
 import ivory.lsh.eval.SampleSignatures.mapoutput;
-
 import java.io.IOException;
 import java.net.URI;
-import java.util.Iterator;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.filecache.DistributedCache;
@@ -20,10 +17,10 @@ import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.MapReduceBase;
 import org.apache.hadoop.mapred.Mapper;
 import org.apache.hadoop.mapred.OutputCollector;
-import org.apache.hadoop.mapred.Reducer;
 import org.apache.hadoop.mapred.Reporter;
 import org.apache.hadoop.mapred.SequenceFileInputFormat;
 import org.apache.hadoop.mapred.SequenceFileOutputFormat;
+import org.apache.hadoop.mapred.lib.IdentityReducer;
 import org.apache.hadoop.util.LineReader;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
@@ -81,13 +78,13 @@ import edu.umd.cloud9.util.map.HMapII;
 public class SampleTermDocVectors extends Configured implements Tool {
   @SuppressWarnings("unchecked")
   static Class keyClass = IntWritable.class, valueClass = HMapSFW.class,
-      inputFormat = SequenceFileInputFormat.class;
+  inputFormat = SequenceFileInputFormat.class;
 
   private static final Logger sLogger = Logger.getLogger(SampleTermDocVectors.class);
 
   private static int printUsage() {
     System.out
-        .println("usage: [input] [output-dir] [number-of-mappers] [sample-freq] ([sample-docnos-path])");
+    .println("usage: [input] [output-dir] [number-of-mappers] [sample-freq] ([sample-docnos-path])");
     return -1;
   }
 
@@ -96,7 +93,7 @@ public class SampleTermDocVectors extends Configured implements Tool {
   }
 
   private static class MyMapper extends MapReduceBase implements
-      Mapper<IntWritable, HMapSFW, IntWritable, HMapSFW> {
+  Mapper<IntWritable, HMapSFW, IntWritable, HMapSFW> {
     static int sampleFreq;
     HMapII samplesMap = null;
     static Path[] localFiles;
@@ -145,15 +142,6 @@ public class SampleTermDocVectors extends Configured implements Tool {
     }
   }
 
-  public static class MyReducer extends MapReduceBase implements
-      Reducer<IntWritable, HMapSFW, IntWritable, HMapSFW> {
-
-    @Override
-    public void reduce(IntWritable key, Iterator<HMapSFW> values,
-        OutputCollector<IntWritable, HMapSFW> output, Reporter reporter) throws IOException {
-      output.collect(key, values.next());
-    }
-  }
 
   @SuppressWarnings("unchecked")
   public int run(String[] args) throws Exception {
@@ -220,7 +208,7 @@ public class SampleTermDocVectors extends Configured implements Tool {
     job.setOutputKeyClass(keyClass);
     job.setOutputValueClass(valueClass);
     job.setMapperClass(MyMapper.class);
-    job.setReducerClass(MyReducer.class);
+    job.setReducerClass(IdentityReducer.class);
     job.setOutputFormat(SequenceFileOutputFormat.class);
 
     JobClient.runJob(job);
