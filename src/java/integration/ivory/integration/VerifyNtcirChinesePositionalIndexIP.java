@@ -44,7 +44,6 @@ public class VerifyNtcirChinesePositionalIndexIP {
     jars.add(IntegrationUtils.getJar("lib", "jsap"));
     jars.add(IntegrationUtils.getJar("lib", "sux4j"));
     jars.add(IntegrationUtils.getJar("lib", "commons-collections"));
-    jars.add(IntegrationUtils.getJar("dist", "ivory"));
     jars.add(IntegrationUtils.getJar("lib", "lucene-analyzers"));
     jars.add(IntegrationUtils.getJar("lib", "lucene-core"));
     jars.add(IntegrationUtils.getJar("lib", "tools"));
@@ -52,7 +51,9 @@ public class VerifyNtcirChinesePositionalIndexIP {
     jars.add(IntegrationUtils.getJar("lib", "commons-lang"));
     jars.add(IntegrationUtils.getJar("lib", "commons-cli"));
     jars.add(IntegrationUtils.getJar("lib", "bliki-core"));
-    
+    jars.add(IntegrationUtils.getJar("lib", "stanford-chinese-segmenter"));
+    jars.add(IntegrationUtils.getJar("dist", "ivory"));
+
     String libjars = String.format("-libjars=%s", Joiner.on(",").join(jars));
 
     PreprocessTREC.main(new String[] { libjars, IntegrationUtils.D_JT, IntegrationUtils.D_NN,
