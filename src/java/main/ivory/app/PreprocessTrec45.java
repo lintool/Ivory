@@ -18,33 +18,34 @@ package ivory.app;
 
 import ivory.core.tokenize.GalagoTokenizer;
 
+import java.util.List;
 import java.util.Map;
 
 import org.apache.hadoop.util.ToolRunner;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 
 import edu.umd.cloud9.collection.trec.TrecDocnoMapping;
 import edu.umd.cloud9.collection.trec.TrecDocumentInputFormat;
 
 public class PreprocessTrec45 extends PreprocessCollection {
-  @Override
-  public Map<String, String> getCollectionSettings() {
-    return new ImmutableMap.Builder<String, String>()
-        .put(IndexBuilder.COLLECTION_PATH_OPTION, collectionPath)
-        .put(IndexBuilder.COLLECTION_NAME_OPTION, "TREC_vol45")
-        .put(IndexBuilder.INDEX_OPTION, indexPath)
-        .put(IndexBuilder.MAPPING_OPTION, TrecDocnoMapping.class.getCanonicalName())
-        .put(IndexBuilder.FORMAT_OPTION, TrecDocumentInputFormat.class.getCanonicalName())
-        .put(IndexBuilder.TOKENIZER_OPTION, GalagoTokenizer.class.getCanonicalName())
-        .put(IndexBuilder.MIN_DF_OPTION, "2")
-        .build();
-  }
-
-  /**
-   * Dispatches command-line arguments to the tool via the {@code ToolRunner}.
-   */
+  // Append a few hard-coded arguments and then dispatch to generic superclass.
   public static void main(String[] args) throws Exception {
-    ToolRunner.run(new PreprocessTrec45(), args);
+    Map<String, String> map = new ImmutableMap.Builder<String, String>()
+        .put(IndexBuilder.COLLECTION_NAME, "TREC_vol45")
+        .put(IndexBuilder.DOCNO_MAPPING, TrecDocnoMapping.class.getCanonicalName())
+        .put(IndexBuilder.INPUTFORMAT, TrecDocumentInputFormat.class.getCanonicalName())
+        .put(IndexBuilder.TOKENIZER, GalagoTokenizer.class.getCanonicalName())
+        .put(IndexBuilder.MIN_DF, "2")
+        .build();
+    
+    List<String> s = Lists.newArrayList(args);
+    for (Map.Entry<String, String> e : map.entrySet()) {
+      s.add("-" + e.getKey());
+      s.add(e.getValue());
+    }
+
+    ToolRunner.run(new PreprocessTrec45(), s.toArray(new String[s.size()]));
   }
 }

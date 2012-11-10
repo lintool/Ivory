@@ -1,13 +1,15 @@
 package ivory.integration;
 
 import static org.junit.Assert.assertTrue;
-import ivory.app.BuildPositionalIndexIP;
+import ivory.app.BuildIndex;
+import ivory.app.PreprocessCollection;
 import ivory.app.PreprocessTrec45;
 import ivory.core.eval.Qrels;
 import ivory.regression.basic.Robust04_Basic;
 import ivory.smrf.retrieval.BatchQueryRunner;
 
 import java.util.List;
+import java.util.Random;
 
 import junit.framework.JUnit4TestAdapter;
 
@@ -22,9 +24,10 @@ import com.google.common.collect.Lists;
 
 public class VerifyTrecPositionalIndexIPLocal {
   private static final Logger LOG = Logger.getLogger(VerifyTrecPositionalIndexIPLocal.class);
+  private static final Random RANDOM = new Random();
 
   private Path collectionPath = new Path("/scratch0/collections/trec/trec4-5_noCRFR.xml");
-  private String index = this.getClass().getCanonicalName() + "-index";
+  private String index = this.getClass().getCanonicalName() + "-index-" + RANDOM.nextInt(10000);
 
   @Test
   public void runBuildIndex() throws Exception {
@@ -48,10 +51,15 @@ public class VerifyTrecPositionalIndexIPLocal {
 
     String libjars = String.format("-libjars=%s", Joiner.on(",").join(jars));
 
-    PreprocessTrec45.main(new String[] { libjars, IntegrationUtils.D_JT_LOCAL,
-        IntegrationUtils.D_NN_LOCAL, collectionPath.toString(), index });
-    BuildPositionalIndexIP.main(new String[] { libjars, IntegrationUtils.D_JT_LOCAL,
-        IntegrationUtils.D_NN_LOCAL, index, "10" });
+    PreprocessTrec45.main(new String[] { libjars,
+        IntegrationUtils.D_JT_LOCAL, IntegrationUtils.D_NN_LOCAL,
+        "-" + PreprocessCollection.COLLECTION_PATH, collectionPath.toString(),
+        "-" + PreprocessCollection.INDEX_PATH, index });
+    BuildIndex.main(new String[] { libjars,
+        IntegrationUtils.D_JT_LOCAL, IntegrationUtils.D_NN_LOCAL,
+        "-" + BuildIndex.POSITIONAL_INDEX_IP,
+        "-" + BuildIndex.INDEX_PATH, index,
+        "-" + BuildIndex.INDEX_PARTITIONS, "10" });
 
     // Done with indexing, now do retrieval run.
     String[] params = new String[] {

@@ -14,7 +14,7 @@
  * permissions and limitations under the License.
  */
 
-package ivory.core.driver;
+package ivory.app;
 
 import ivory.core.Constants;
 import ivory.core.RetrievalEnvironment;
@@ -389,6 +389,6 @@ public class PreprocessWikipedia extends Configured implements Tool {
    * Dispatches command-line arguments to the tool via the {@code ToolRunner}.
    */
   public static void main(String[] args) throws Exception {
-    ToolRunner.run(new Configuration(), new PreprocessWikipedia(), args);
+    ToolRunner.run(new PreprocessWikipedia(), args);
   }
 }

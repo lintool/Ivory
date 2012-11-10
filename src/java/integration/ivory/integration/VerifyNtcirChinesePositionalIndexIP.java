@@ -2,7 +2,7 @@ package ivory.integration;
 
 import static org.junit.Assert.assertTrue;
 import ivory.app.BuildPositionalIndexIP;
-import ivory.core.driver.PreprocessTREC;
+import ivory.app.PreprocessTrecForeign;
 import ivory.core.eval.Qrels;
 import ivory.core.tokenize.StanfordChineseTokenizer;
 import ivory.regression.coling2012.EnZh_NTCIR8;
@@ -56,7 +56,7 @@ public class VerifyNtcirChinesePositionalIndexIP {
 
     String libjars = String.format("-libjars=%s", Joiner.on(",").join(jars));
 
-    PreprocessTREC.main(new String[] { libjars, IntegrationUtils.D_JT, IntegrationUtils.D_NN,
+    PreprocessTrecForeign.main(new String[] { libjars, IntegrationUtils.D_JT, IntegrationUtils.D_NN,
         "-input=" + collectionPath.toString(), "-index=" + index, 
         "-lang=zh" , "-tokenizerclass=" + StanfordChineseTokenizer.class.getCanonicalName(),
         "-tokenizermodel=" + zhTokenizerFile, "-name=NTCIR8.Chinese"

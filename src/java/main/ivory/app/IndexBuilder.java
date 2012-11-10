@@ -40,47 +40,47 @@ import edu.umd.cloud9.collection.DocnoMapping;
 public class IndexBuilder extends Configured implements Tool {
   private static final Logger LOG = Logger.getLogger(IndexBuilder.class);
 
-  public static final String COLLECTION_PATH_OPTION = "collection";
-  public static final String COLLECTION_NAME_OPTION = "collectionName";
-  public static final String INDEX_OPTION = "index";
-  public static final String FORMAT_OPTION = "inputFormat";
-  public static final String TOKENIZER_OPTION = "tokenizer";
-  public static final String MAPPING_OPTION = "docnoMapping";
-  public static final String MIN_DF_OPTION = "minDf";
+  public static final String COLLECTION_PATH = "collection";
+  public static final String COLLECTION_NAME = "collectionName";
+  public static final String INDEX_PATH = "index";
+  public static final String INPUTFORMAT = "inputFormat";
+  public static final String TOKENIZER = "tokenizer";
+  public static final String DOCNO_MAPPING = "docnoMapping";
+  public static final String MIN_DF = "minDf";
 
-  public static final String POSITIONAL_INDEX_IP_OPTION = "positionalIndexIP";
-  public static final String NONPOSITIONAL_INDEX_IP_OPTION = "nonpositionalIndexIP";
-  public static final String INDEX_PARTITIONS_OPTION = "indexPartitions";
+  public static final String POSITIONAL_INDEX_IP = "positionalIndexIP";
+  public static final String NONPOSITIONAL_INDEX_IP = "nonpositionalIndexIP";
+  public static final String INDEX_PARTITIONS = "indexPartitions";
 
   @SuppressWarnings({"static-access"}) @Override
   public int run(String[] args) throws Exception {
     Options options = new Options();
-    options.addOption(new Option(POSITIONAL_INDEX_IP_OPTION,
+    options.addOption(new Option(POSITIONAL_INDEX_IP,
         "build positional index (IP algorithm)"));
-    options.addOption(new Option(NONPOSITIONAL_INDEX_IP_OPTION,
+    options.addOption(new Option(NONPOSITIONAL_INDEX_IP,
         "build nonpositional index (IP algorithm)"));
 
     options.addOption(OptionBuilder.withArgName("path").hasArg()
-        .withDescription("(required) collection path").create(COLLECTION_PATH_OPTION));
+        .withDescription("(required) collection path").create(COLLECTION_PATH));
     options.addOption(OptionBuilder.withArgName("name").hasArg()
-        .withDescription("(required) collection name").create(COLLECTION_NAME_OPTION));
+        .withDescription("(required) collection name").create(COLLECTION_NAME));
     options.addOption(OptionBuilder.withArgName("path").hasArg()
-        .withDescription("(required) index path").create(INDEX_OPTION));
+        .withDescription("(required) index path").create(INDEX_PATH));
     options.addOption(OptionBuilder.withArgName("class").hasArg()
-        .withDescription("(required) fully-qualified DocnoMapping").create(MAPPING_OPTION));
+        .withDescription("(required) fully-qualified DocnoMapping").create(DOCNO_MAPPING));
 
     options.addOption(OptionBuilder.withArgName("class").hasArg()
         .withDescription("(optional) fully-qualified Hadoop InputFormat: SequenceFileInputFormat default")
-        .create(FORMAT_OPTION));
+        .create(INPUTFORMAT));
     options.addOption(OptionBuilder.withArgName("class").hasArg()
         .withDescription("(optional) fully-qualified Tokenizer: GalagoTokenizer default")
-        .create(TOKENIZER_OPTION));
+        .create(TOKENIZER));
     options.addOption(OptionBuilder.withArgName("num").hasArg()
         .withDescription("(optional) number of index partitions: 64 default")
-        .create(INDEX_PARTITIONS_OPTION));
+        .create(INDEX_PARTITIONS));
     options.addOption(OptionBuilder.withArgName("num").hasArg()
         .withDescription("(optional) min Df")
-        .create(MIN_DF_OPTION));
+        .create(MIN_DF));
 
     CommandLine cmdline;
     CommandLineParser parser = new GnuParser();
@@ -91,8 +91,8 @@ public class IndexBuilder extends Configured implements Tool {
       return -1;
     }
 
-    if (!cmdline.hasOption(COLLECTION_PATH_OPTION) || !cmdline.hasOption(COLLECTION_NAME_OPTION) ||
-        !cmdline.hasOption(INDEX_OPTION) || !cmdline.hasOption(MAPPING_OPTION)) {
+    if (!cmdline.hasOption(COLLECTION_PATH) || !cmdline.hasOption(COLLECTION_NAME) ||
+        !cmdline.hasOption(INDEX_PATH) || !cmdline.hasOption(DOCNO_MAPPING)) {
       HelpFormatter formatter = new HelpFormatter();
       formatter.setWidth(120);
       formatter.printHelp(this.getClass().getName(), options);
@@ -100,54 +100,55 @@ public class IndexBuilder extends Configured implements Tool {
       return -1;
     }
 
-    String collection = cmdline.getOptionValue(COLLECTION_PATH_OPTION);
-    String collectionName = cmdline.getOptionValue(COLLECTION_NAME_OPTION);
-    String indexPath = cmdline.getOptionValue(INDEX_OPTION);
+    String collection = cmdline.getOptionValue(COLLECTION_PATH);
+    String collectionName = cmdline.getOptionValue(COLLECTION_NAME);
+    String indexPath = cmdline.getOptionValue(INDEX_PATH);
 
-    int indexPartitions = cmdline.hasOption(INDEX_PARTITIONS_OPTION) ?
-        Integer.parseInt(cmdline.getOptionValue(INDEX_PARTITIONS_OPTION)) : 64;
+    int indexPartitions = cmdline.hasOption(INDEX_PARTITIONS) ?
+        Integer.parseInt(cmdline.getOptionValue(INDEX_PARTITIONS)) : 64;
 
     Class<? extends DocnoMapping> docnoMappingClass = null;
     try {
       docnoMappingClass = (Class<? extends DocnoMapping>)
-          Class.forName(cmdline.getOptionValue(MAPPING_OPTION));
+          Class.forName(cmdline.getOptionValue(DOCNO_MAPPING));
     } catch (ClassNotFoundException e) {
       throw new RuntimeException(e);
     }
 
+    @SuppressWarnings("rawtypes")
     Class<? extends InputFormat> inputFormatClass = SequenceFileInputFormat.class;
-    if (cmdline.hasOption(FORMAT_OPTION)) {
+    if (cmdline.hasOption(INPUTFORMAT)) {
       try {
         inputFormatClass = (Class<? extends InputFormat<?, ?>>)
-            Class.forName(cmdline.getOptionValue(FORMAT_OPTION));
+            Class.forName(cmdline.getOptionValue(INPUTFORMAT));
       } catch (ClassNotFoundException e) {
         throw new RuntimeException(e);
       }
     }
 
     Class<? extends Tokenizer> tokenizerClass = GalagoTokenizer.class;
-    if (cmdline.hasOption(TOKENIZER_OPTION)) {
+    if (cmdline.hasOption(TOKENIZER)) {
       try {
         tokenizerClass = (Class<? extends Tokenizer>)
-            Class.forName(cmdline.getOptionValue(TOKENIZER_OPTION));
+            Class.forName(cmdline.getOptionValue(TOKENIZER));
       } catch (ClassNotFoundException e) {
         throw new RuntimeException(e);
       }
     }
 
     int minDf = 2;
-    if (cmdline.hasOption(MIN_DF_OPTION)) {
-      minDf = Integer.parseInt(cmdline.getOptionValue(MIN_DF_OPTION));
+    if (cmdline.hasOption(MIN_DF)) {
+      minDf = Integer.parseInt(cmdline.getOptionValue(MIN_DF));
     }
 
     LOG.info("Tool name: " + IndexBuilder.class.getCanonicalName());
-    LOG.info(String.format(" -%s %s", COLLECTION_PATH_OPTION, collection));
-    LOG.info(String.format(" -%s %s", COLLECTION_NAME_OPTION, collectionName));
-    LOG.info(String.format(" -%s %s", INDEX_OPTION, indexPath));
-    LOG.info(String.format(" -%s %s", MAPPING_OPTION, docnoMappingClass.getCanonicalName()));
-    LOG.info(String.format(" -%s %s", FORMAT_OPTION, inputFormatClass.getCanonicalName()));
-    LOG.info(String.format(" -%s %s", TOKENIZER_OPTION, tokenizerClass.getCanonicalName()));
-    LOG.info(String.format(" -%s %d", MIN_DF_OPTION, minDf));
+    LOG.info(String.format(" -%s %s", COLLECTION_PATH, collection));
+    LOG.info(String.format(" -%s %s", COLLECTION_NAME, collectionName));
+    LOG.info(String.format(" -%s %s", INDEX_PATH, indexPath));
+    LOG.info(String.format(" -%s %s", DOCNO_MAPPING, docnoMappingClass.getCanonicalName()));
+    LOG.info(String.format(" -%s %s", INPUTFORMAT, inputFormatClass.getCanonicalName()));
+    LOG.info(String.format(" -%s %s", TOKENIZER, tokenizerClass.getCanonicalName()));
+    LOG.info(String.format(" -%s %d", MIN_DF, minDf));
 
     Configuration conf = getConf();
     FileSystem fs = FileSystem.get(conf);
@@ -187,9 +188,9 @@ public class IndexBuilder extends Configured implements Tool {
     new BuildIntDocVectorsForwardIndex(conf).run();
     new BuildTermDocVectorsForwardIndex(conf).run();
 
-    if (cmdline.hasOption(POSITIONAL_INDEX_IP_OPTION)) {
+    if (cmdline.hasOption(POSITIONAL_INDEX_IP)) {
       LOG.info("Building positional index (IP algorithms)");
-      LOG.info(String.format(" -%s: %d", INDEX_PARTITIONS_OPTION, indexPartitions));
+      LOG.info(String.format(" -%s: %d", INDEX_PARTITIONS, indexPartitions));
 
       conf.setInt(Constants.NumReduceTasks, indexPartitions);
       conf.set(Constants.PostingsListsType,

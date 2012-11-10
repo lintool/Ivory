@@ -18,33 +18,33 @@ package ivory.app;
 
 import ivory.core.tokenize.GalagoTokenizer;
 
+import java.util.List;
 import java.util.Map;
 
 import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
 import org.apache.hadoop.util.ToolRunner;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 
 import edu.umd.cloud9.collection.trecweb.Wt10gDocnoMapping;
 
 public class PreprocessWt10g extends PreprocessCollection {
-  @Override
-  public Map<String, String> getCollectionSettings() {
-    return new ImmutableMap.Builder<String, String>()
-        .put(IndexBuilder.COLLECTION_PATH_OPTION, collectionPath)
-        .put(IndexBuilder.COLLECTION_NAME_OPTION, "Wt10g")
-        .put(IndexBuilder.INDEX_OPTION, indexPath)
-        .put(IndexBuilder.MAPPING_OPTION, Wt10gDocnoMapping.class.getCanonicalName())
-        .put(IndexBuilder.FORMAT_OPTION, SequenceFileInputFormat.class.getCanonicalName())
-        .put(IndexBuilder.TOKENIZER_OPTION, GalagoTokenizer.class.getCanonicalName())
-        .put(IndexBuilder.MIN_DF_OPTION, "10")
-        .build();
-  }
-
-  /**
-   * Dispatches command-line arguments to the tool via the {@code ToolRunner}.
-   */
   public static void main(String[] args) throws Exception {
-    ToolRunner.run(new PreprocessWt10g(), args);
+    Map<String, String> map = new ImmutableMap.Builder<String, String>()
+        .put(IndexBuilder.COLLECTION_NAME, "Wt10g")
+        .put(IndexBuilder.DOCNO_MAPPING, Wt10gDocnoMapping.class.getCanonicalName())
+        .put(IndexBuilder.INPUTFORMAT, SequenceFileInputFormat.class.getCanonicalName())
+        .put(IndexBuilder.TOKENIZER, GalagoTokenizer.class.getCanonicalName())
+        .put(IndexBuilder.MIN_DF, "10")
+        .build();
+    
+    List<String> s = Lists.newArrayList(args);
+    for (Map.Entry<String, String> e : map.entrySet()) {
+      s.add("-" + e.getKey());
+      s.add(e.getValue());
+    }
+
+    ToolRunner.run(new PreprocessWt10g(), s.toArray(new String[s.size()]));
   }
 }

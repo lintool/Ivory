@@ -1,13 +1,15 @@
 package ivory.integration;
 
 import static org.junit.Assert.assertTrue;
-import ivory.app.BuildPositionalIndexIP;
+import ivory.app.BuildIndex;
+import ivory.app.PreprocessCollection;
 import ivory.app.PreprocessWt10g;
 import ivory.core.eval.Qrels;
 import ivory.regression.basic.Wt10g_Basic;
 import ivory.smrf.retrieval.BatchQueryRunner;
 
 import java.util.List;
+import java.util.Random;
 
 import junit.framework.JUnit4TestAdapter;
 
@@ -22,9 +24,10 @@ import com.google.common.collect.Lists;
 
 public class VerifyWt10gPositionalIndexIP {
   private static final Logger LOG = Logger.getLogger(VerifyWt10gPositionalIndexIP.class);
+  private static final Random RANDOM = new Random();
 
   private Path collectionPath = new Path("/shared/collections/wt10g/collection.compressed.block");
-  private String index = "/tmp/" + this.getClass().getCanonicalName() + "-index";
+  private String index = this.getClass().getCanonicalName() + "-index-" + RANDOM.nextInt(10000);
 
   @Test
   public void runBuildIndex() throws Exception {
@@ -48,10 +51,15 @@ public class VerifyWt10gPositionalIndexIP {
 
     String libjars = String.format("-libjars=%s", Joiner.on(",").join(jars));
 
-    PreprocessWt10g.main(new String[] { libjars, IntegrationUtils.D_JT, IntegrationUtils.D_NN,
-        collectionPath.toString(), index });
-    BuildPositionalIndexIP.main(new String[] { libjars, IntegrationUtils.D_JT, IntegrationUtils.D_NN,
-        index, "10" });
+    PreprocessWt10g.main(new String[] { libjars,
+        IntegrationUtils.D_JT, IntegrationUtils.D_NN,
+        "-" + PreprocessCollection.COLLECTION_PATH, collectionPath.toString(),
+        "-" + PreprocessCollection.INDEX_PATH, index });
+    BuildIndex.main(new String[] { libjars,
+        IntegrationUtils.D_JT, IntegrationUtils.D_NN,
+        "-" + BuildIndex.POSITIONAL_INDEX_IP,
+        "-" + BuildIndex.INDEX_PATH, index,
+        "-" + BuildIndex.INDEX_PARTITIONS, "10" });
 
     // Done with indexing, now do retrieval run.
     fs.copyFromLocalFile(false, true, new Path("data/wt10g/run.wt10g.basic.xml"),

@@ -2,7 +2,7 @@ package ivory.integration;
 
 import static org.junit.Assert.assertTrue;
 import ivory.app.BuildPositionalIndexIP;
-import ivory.core.driver.PreprocessTREC;
+import ivory.app.PreprocessTrecForeign;
 import ivory.core.eval.Qrels;
 import ivory.core.tokenize.OpenNLPTokenizer;
 import ivory.regression.coling2012.EnFr_CLEF06;
@@ -55,7 +55,7 @@ public class VerifyClefFrenchPositionalIndexIP {
 
     String libjars = String.format("-libjars=%s", Joiner.on(",").join(jars));
 
-    PreprocessTREC.main(new String[] { libjars, IntegrationUtils.D_JT, IntegrationUtils.D_NN,
+    PreprocessTrecForeign.main(new String[] { libjars, IntegrationUtils.D_JT, IntegrationUtils.D_NN,
         "-input=" + collectionPath.toString(), "-index=" + index, 
         "-lang=fr" , "-tokenizerclass=" + OpenNLPTokenizer.class.getCanonicalName(),
         "-tokenizermodel=" + frTokenizerFile, "-name=CLEF2006.French"

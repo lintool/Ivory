@@ -42,10 +42,10 @@ public class BuildPositionalIndexIP extends Configured implements Tool {
   public int run(String[] args) throws Exception {
     Options options = new Options();
     options.addOption(OptionBuilder.withArgName("path").hasArg()
-        .withDescription("(required) index path").create(IndexBuilder.INDEX_OPTION));
+        .withDescription("(required) index path").create(IndexBuilder.INDEX_PATH));
     options.addOption(OptionBuilder.withArgName("num").hasArg()
         .withDescription("(optional) number of index partitions: 64 default")
-        .create(IndexBuilder.INDEX_PARTITIONS_OPTION));
+        .create(IndexBuilder.INDEX_PARTITIONS));
 
     CommandLine cmdline;
     CommandLineParser parser = new GnuParser();
@@ -56,7 +56,7 @@ public class BuildPositionalIndexIP extends Configured implements Tool {
       return -1;
     }
 
-    if (!cmdline.hasOption(IndexBuilder.INDEX_OPTION)) {
+    if (!cmdline.hasOption(IndexBuilder.INDEX_PATH)) {
       HelpFormatter formatter = new HelpFormatter();
       formatter.setWidth(120);
       formatter.printHelp(this.getClass().getName(), options);
@@ -64,13 +64,13 @@ public class BuildPositionalIndexIP extends Configured implements Tool {
       return -1;
     }
 
-    int indexPartitions = cmdline.hasOption(IndexBuilder.INDEX_PARTITIONS_OPTION) ?
-        Integer.parseInt(cmdline.getOptionValue(IndexBuilder.INDEX_PARTITIONS_OPTION)) : 64;
+    int indexPartitions = cmdline.hasOption(IndexBuilder.INDEX_PARTITIONS) ?
+        Integer.parseInt(cmdline.getOptionValue(IndexBuilder.INDEX_PARTITIONS)) : 64;
 
     Configuration conf = getConf();
     FileSystem fs = FileSystem.get(conf);
 
-    String indexPath = cmdline.getOptionValue(IndexBuilder.INDEX_OPTION);
+    String indexPath = cmdline.getOptionValue(IndexBuilder.INDEX_PATH);
 
     Path p = new Path(indexPath);
     if (!fs.exists(p)) {
@@ -79,8 +79,8 @@ public class BuildPositionalIndexIP extends Configured implements Tool {
     }
 
     LOG.info("Tool name: " + BuildPositionalIndexIP.class.getSimpleName());
-    LOG.info(String.format(" -%s %s", IndexBuilder.INDEX_OPTION, indexPath));
-    LOG.info(String.format(" -%s %d", IndexBuilder.INDEX_PARTITIONS_OPTION, indexPartitions));
+    LOG.info(String.format(" -%s %s", IndexBuilder.INDEX_PATH, indexPath));
+    LOG.info(String.format(" -%s %d", IndexBuilder.INDEX_PARTITIONS, indexPartitions));
 
     conf.set(Constants.IndexPath, indexPath);
     conf.setInt(Constants.NumReduceTasks, indexPartitions);
