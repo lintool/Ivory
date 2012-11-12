@@ -8,6 +8,8 @@ import ivory.core.data.stat.DfTableArray;
 import ivory.core.data.stat.DocLengthTable;
 import ivory.core.data.stat.DocLengthTable4B;
 import ivory.core.tokenize.OpenNLPTokenizer;
+import ivory.core.tokenize.Tokenizer;
+import ivory.core.tokenize.TokenizerFactory;
 import ivory.core.util.CLIRUtils;
 import ivory.pwsim.score.ScoringModel;
 
@@ -73,7 +75,7 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
     // fVocabTrg is the German vocabulary for probability table e2f_Probs.	
     static Vocab eVocabSrc, fVocabSrc, fVocabTrg, eVocabTrg;
     static TTable_monolithic_IFAs f2e_Probs, e2f_Probs;
-    private OpenNLPTokenizer tokenizer;
+    private Tokenizer tokenizer;
     static float avgDocLen;
     static int numDocs;
     static boolean isNormalize;
@@ -137,6 +139,12 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
           } else if (p.toString().contains(conf.get("Ivory.TTable_E2F"))) {
             pathMapping.put("Ivory.TTable_E2F", p);
             LOG.info("Ivory.TTable_E2F -> " + p);
+          } else if (p.toString().contains(conf.get(Constants.TargetStopwordList))) {
+            pathMapping.put(Constants.TargetStopwordList, p);
+            LOG.info(Constants.TargetStopwordList + " -> " + p);
+          } else if (p.toString().contains(conf.get(Constants.TargetTokenizer))) {
+            pathMapping.put(Constants.TargetTokenizer, p);
+            LOG.info(Constants.TargetTokenizer + " -> " + p);
           }
         }
 
@@ -162,6 +170,8 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
         eVocabSrc = HadoopAlign.loadVocab(pathMapping.get("Ivory.E_Vocab_E2F"), fs);
         fVocabTrg = HadoopAlign.loadVocab(pathMapping.get("Ivory.F_Vocab_E2F"), fs);
         e2f_Probs = new TTable_monolithic_IFAs(fs, pathMapping.get("Ivory.TTable_E2F"), true);
+      
+        tokenizer = TokenizerFactory.createTokenizer(fs, conf.get(Constants.TargetLanguage), pathMapping.get(Constants.TargetTokenizer).toString(), false, pathMapping.get(Constants.TargetStopwordList).toString(), null, null);   // just for stopword removal in translateTFs
       } catch (IOException e) {
         throw new RuntimeException ("Local cache files not read properly.");
       }
@@ -177,7 +187,6 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
       model.setAvgDocLength(avgDocLen);
 
       try {
-        tokenizer = new OpenNLPTokenizer();		// just for stopword removal in translateTFs
       } catch (Exception e) {
         e.printStackTrace();
         throw new RuntimeException("Error initializing tokenizer!");
@@ -256,6 +265,9 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
     String eVocab_e2f = getConf().get("Ivory.E_Vocab_E2F");  // eVocab from P(f|e)
     String fVocab_e2f = getConf().get("Ivory.F_Vocab_E2F");  // fVocab from P(f|e)
     String ttable_e2f = getConf().get("Ivory.TTable_E2F");   // P(f|e)
+    
+    String eStopwords = getConf().get(Constants.TargetStopwordList); 
+    String eTokenizerModel = getConf().get(Constants.TargetTokenizer); 
 
 //    createTranslatedDFFile(transDfFile);
     String targetIndexPath = getConf().get(Constants.TargetIndexPath);
@@ -320,6 +332,9 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
     DistributedCache.addCacheFile(new URI(eVocab_e2f), conf);
     DistributedCache.addCacheFile(new URI(fVocab_e2f), conf);
     DistributedCache.addCacheFile(new URI(ttable_e2f), conf);
+    DistributedCache.addCacheFile(new URI(ttable_e2f), conf);
+    DistributedCache.addCacheFile(new URI(eStopwords), conf);
+    DistributedCache.addCacheFile(new URI(eTokenizerModel), conf);
 
     FileInputFormat.setInputPaths(conf, new Path(inputPath));
     FileOutputFormat.setOutputPath(conf, new Path(outputPath));
