@@ -30,6 +30,7 @@ public class VerifyWikipediaProcessingCrosslingual {
   private static final String tmp = "tmp-" + VerifyWikipediaProcessingCrosslingual.class.getSimpleName() + rand.nextInt(10000);
 
   private static final String vocabPath = tmp + "/vocab";
+  private static final String tokenizerPath = tmp + "/tokenizer";
   private static final String enwikiPath = 
     "/shared/collections/wikipedia/raw/enwiki-20110115-pages-articles.xml";
   private static final String enwikiRepacked = tmp + "/enwiki-20110115.repacked";
@@ -37,19 +38,19 @@ public class VerifyWikipediaProcessingCrosslingual {
 
   // en side: part 00000, key = 91805
   private ImmutableMap<String, Float> enTermDocVector1 = ImmutableMap.of(
-      "total", 0.053106617f, "extern", 0.0031720826f, "side", 0.05118692f, "refer", -0.015724683f);
+      "total", 0.052498523f, "extern", 0.0031357605f, "side", 0.050600808f, "refer", -0.015544628f);
 
   // en side: part 00010, key = 137938
   private ImmutableMap<String, Float> enTermDocVector2 = ImmutableMap.of(
-      "extern", 0.003159181f, "perspect", 0.09968591f, "deal", 0.07168619f, "devianc", 0.1912349f);
+      "extern", 0.0031639708f, "perspect", 0.09983705f, "deal", 0.07179488f, "devianc", 0.19152483f);
 
   // en side: part 00002, key = 148600
   private ImmutableMap<Integer, Float> enIntDocVector1 =
-    ImmutableMap.of(42846, 0.059385046f, 1518, 0.038532563f, 307, 0.04885947f, 63715, 0.038093522f);
+    ImmutableMap.of(42846, 0.059275027f, 1518, 0.038548473f, 307, 0.048701696f, 63715, 0.038108308f);
 
   // en side: part 00011, key = 181342
   private ImmutableMap<Integer, Float> enIntDocVector2 =
-    ImmutableMap.of(19446, 0.097477354f, 175, 0.05032143f, 31837, 0.18637569f, 4936, -0.020454587f);
+    ImmutableMap.of(19446, 0.09696824f, 175, 0.049885243f, 31837, 0.18476018f, 4936, -0.020277286f);
 
   private static final String dewikiPath = 
     "/shared/collections/wikipedia/raw/dewiki-20110131-pages-articles.xml";
@@ -58,19 +59,19 @@ public class VerifyWikipediaProcessingCrosslingual {
 
   // de side: part 00000, key = 1001172179
   private ImmutableMap<String, Float> deTermDocVector1 = ImmutableMap.of(
-      "everyon", 0.122168064f, "2007", 0.080851935f, "wealthiest", 0.01624437f, "literatur", 0.16710931f);
+      "stauffenberg", 0.46342498f, "2007", 0.054127622f, "consider", 0.003471215f, "famili", 0.068220295f);
 
   // de side: part 00010, key = 1000011705
   private ImmutableMap<String, Float> deTermDocVector2 = ImmutableMap.of(
-      "european", 0.28855968f, "differ", 0.07924521f, "pere", 0.30542666f, "chang", 0.0298539f);
+      "...]", 0.041361164f, "zbigniev", 0.07212809f, "da", 0.0030834419f, "buzek", 0.21578267f);
 
   // de side: part 00002, key = 1000059522
   private ImmutableMap<Integer, Float> deIntDocVector1 =
-    ImmutableMap.of(15320, 0.1828537f, 9728, 0.0938793f, 23698, 0.38859853f, 5426, 0.01161581f);
+    ImmutableMap.of(29656, 0.28162858f, 3265, 0.0063452665f, 13338, 0.24359147f, 9189, 0.045881663f);
 
   // de side: part 00011, key = 1000157792
   private ImmutableMap<Integer, Float> deIntDocVector2 =
-    ImmutableMap.of(7239, 0.17572549f, 2017, 0.0102842655f, 15320, 0.3721369f, 7121, 0.006977279f);
+    ImmutableMap.of(3225, 0.0065635326f, 101, 0.60966045f, 9315, 0.054609142f, 46972, 0.080685005f);
 
   @Test
   public void runBuildIndexEnSide() throws Exception {
@@ -82,9 +83,11 @@ public class VerifyWikipediaProcessingCrosslingual {
     fs.delete(new Path(enwikiEn), true);
     fs.delete(new Path(enwikiRepacked), true);
     fs.delete(new Path(vocabPath), true);
+    fs.delete(new Path(tokenizerPath), true);
 
     fs.copyFromLocalFile(false, true, new Path("data/vocab"), new Path(vocabPath));
-
+    fs.copyFromLocalFile(false, true, new Path("data/tokenizer"), new Path(tokenizerPath));
+    
     List<String> jars = Lists.newArrayList();
     jars.add(IntegrationUtils.getJar("lib", "cloud9"));
     jars.add(IntegrationUtils.getJar("lib", "bliki-core"));
@@ -108,11 +111,13 @@ public class VerifyWikipediaProcessingCrosslingual {
         IntegrationUtils.D_JT, IntegrationUtils.D_NN,
         "-index="+enwikiEn, "-xml="+enwikiPath, "-compressed="+enwikiRepacked,
         "tokenizerclass="+ivory.core.tokenize.OpenNLPTokenizer.class.getCanonicalName(), "-lang=en",
-        "-tokenizermodel="+vocabPath + "/en-token.bin",	"-collectionvocab="+vocabPath + "/vocab.de-en.en", "-mode=crosslingE"});
+        "-tokenizermodel="+tokenizerPath + "/en-token.bin",	"-collectionvocab="+vocabPath + "/vocab.de-en.en", 
+        "-mode=crosslingE", "-e_stopword=" + tokenizerPath + "/en.stop.stemmed",});
   }
 
   @Test
   public void verifyTermDocVectorsEn() throws Exception {
+    System.out.println("verifyTermDocVectorsEn");
     Configuration conf = IntegrationUtils.getBespinConfiguration();
     FileSystem fs = FileSystem.get(conf);
 
@@ -123,16 +128,19 @@ public class VerifyWikipediaProcessingCrosslingual {
     reader = new SequenceFile.Reader(fs,
         new Path(enwikiEn + "/wt-term-doc-vectors/part-00000"), fs.getConf());
     reader.next(key, value);
+    System.out.println("enTermDocVector1\n"+value);
     verifyTermDocVector(enTermDocVector1, value);
 
     reader = new SequenceFile.Reader(fs,
         new Path(enwikiEn + "/wt-term-doc-vectors/part-00010"), fs.getConf());
     reader.next(key, value);
+    System.out.println("enTermDocVector2\n"+value);
     verifyTermDocVector(enTermDocVector2, value);
   }
 
   @Test
   public void verifyIntDocVectorsEn() throws Exception {
+    System.out.println("verifyIntDocVectorsEn");
     Configuration conf = IntegrationUtils.getBespinConfiguration();
     FileSystem fs = FileSystem.get(conf);
 
@@ -143,11 +151,13 @@ public class VerifyWikipediaProcessingCrosslingual {
     reader = new SequenceFile.Reader(fs,
         new Path(enwikiEn + "/wt-int-doc-vectors/part-00002"), fs.getConf());
     reader.next(key, value);
+    System.out.println("enIntDocVector1\n"+value);
     verifyIntDocVector(enIntDocVector1, value);
 
     reader = new SequenceFile.Reader(fs,
         new Path(enwikiEn + "/wt-int-doc-vectors/part-00011"), fs.getConf());
     reader.next(key, value);
+    System.out.println("enIntDocVector2\n"+value);
     verifyIntDocVector(enIntDocVector2, value);
   }
 
@@ -161,8 +171,10 @@ public class VerifyWikipediaProcessingCrosslingual {
     fs.delete(new Path(dewikiEn), true);
     fs.delete(new Path(dewikiRepacked), true);
     fs.delete(new Path(vocabPath), true);
+    fs.delete(new Path(tokenizerPath), true);
 
     fs.copyFromLocalFile(false, true, new Path("data/vocab"), new Path(vocabPath));
+    fs.copyFromLocalFile(false, true, new Path("data/tokenizer"), new Path(tokenizerPath));
 
     List<String> jars = Lists.newArrayList();
     jars.add(IntegrationUtils.getJar("lib", "cloud9"));
@@ -187,15 +199,18 @@ public class VerifyWikipediaProcessingCrosslingual {
         IntegrationUtils.D_JT, IntegrationUtils.D_NN,
         "-index="+dewikiEn, "-xml="+dewikiPath, "-compressed="+dewikiRepacked,
         "tokenizerclass="+ivory.core.tokenize.OpenNLPTokenizer.class.getCanonicalName(), "-lang=de",
-        "-tokenizermodel="+vocabPath + "/de-token.bin", "-e_e2f_vocab="+vocabPath + "/vocab.en-de.en",
+        "-tokenizermodel="+tokenizerPath + "/de-token.bin", "-e_e2f_vocab="+vocabPath + "/vocab.en-de.en",
         "-f_e2f_vocab="+vocabPath + "/vocab.en-de.de", "-f_f2e_vocab="+vocabPath + "/vocab.de-en.de",
         "-e_f2e_vocab="+vocabPath + "/vocab.de-en.en", "-f2e_ttable="+vocabPath + "/ttable.de-en",   
         "-e2f_ttable="+vocabPath + "/ttable.en-de", "-collectionvocab="+vocabPath + "/vocab.de-en.en", 
-        "-mode=crosslingF", "-targetindex="+enwikiEn});
+        "-mode=crosslingF", "-targetindex="+enwikiEn, "-e_stopword=" + tokenizerPath + "/en.stop.stemmed", 
+        "-f_stopword=" + tokenizerPath + "/de.stop.stemmed", "-e_tokenizermodel=" + tokenizerPath + "/en-token.bin",
+        "-target_lang=en"});
   }
 
   @Test
   public void verifyTermDocVectorsDe() throws Exception {
+    System.out.println("verifyTermDocVectorsDe");
     Configuration conf = IntegrationUtils.getBespinConfiguration();
     FileSystem fs = FileSystem.get(conf);
 
@@ -206,16 +221,19 @@ public class VerifyWikipediaProcessingCrosslingual {
     reader = new SequenceFile.Reader(fs,
         new Path(dewikiEn + "/wt-term-doc-vectors/part-00000"), fs.getConf());
     reader.next(key, value);
+    System.out.println("deTermDocVector1\n"+value);
     verifyTermDocVector(deTermDocVector1, value);
 
     reader = new SequenceFile.Reader(fs,
         new Path(dewikiEn + "/wt-term-doc-vectors/part-00010"), fs.getConf());
     reader.next(key, value);
+    System.out.println("deTermDocVector2\n"+value);
     verifyTermDocVector(deTermDocVector2, value);
   }
 
   @Test
   public void verifyIntDocVectorsDe() throws Exception {
+    System.out.println("verifyIntDocVectorsDe");
     Configuration conf = IntegrationUtils.getBespinConfiguration();
     FileSystem fs = FileSystem.get(conf);
 
@@ -226,11 +244,13 @@ public class VerifyWikipediaProcessingCrosslingual {
     reader = new SequenceFile.Reader(fs,
         new Path(dewikiEn + "/wt-int-doc-vectors/part-00002"), fs.getConf());
     reader.next(key, value);
+    System.out.println("deIntDocVector1\n"+value);
     verifyIntDocVector(deIntDocVector1, value);
 
     reader = new SequenceFile.Reader(fs,
         new Path(dewikiEn + "/wt-int-doc-vectors/part-00011"), fs.getConf());
     reader.next(key, value);
+    System.out.println("deIntDocVector2\n"+value);
     verifyIntDocVector(deIntDocVector2, value);
   }
 

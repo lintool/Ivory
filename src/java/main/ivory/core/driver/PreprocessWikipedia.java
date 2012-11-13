@@ -65,12 +65,10 @@ public class PreprocessWikipedia extends Configured implements Tool {
   private static final int MinDF = 2, MinNumTermsPerArticle = 5, TermIndexWindow = 8;
   private static final boolean IsNormalized = true;
   private static int MONO_LINGUAL = 0, CROSS_LINGUAL_E = 1, CROSS_LINGUAL_F = 2;
-  private String indexRootPath;
-  private String rawCollection;
-  private String seqCollection;
-  private String tokenizerClass;  
+  private String indexRootPath, rawCollection, seqCollection, tokenizerClass, f_stopwordList, 
+      e_stopwordList, e_tokenizerModel, targetLang;  
   private String collectionLang = null, tokenizerModel = null, collectionVocab = null, targetIndexPath = null, 
-  fVocab_f2e = null, eVocab_f2e = null, fVocab_e2f, eVocab_e2f = null, ttable_f2e = null, ttable_e2f = null;
+      fVocab_f2e = null, eVocab_f2e = null, fVocab_e2f, eVocab_e2f = null, ttable_f2e = null, ttable_e2f = null;
   private int mode;
   private Options options;
 
@@ -104,10 +102,13 @@ public class PreprocessWikipedia extends Configured implements Tool {
     if (collectionVocab != null) {
       conf.set(Constants.CollectionVocab, collectionVocab);   // vocabulary to read collection from
     }
-
+    if (e_stopwordList != null) {
+      conf.set(Constants.StopwordList, e_stopwordList);
+    }
     // CROSS-LINGUAL CASE
     if (mode == CROSS_LINGUAL_E){		   // English side
       conf.set("Ivory.FinalVocab", collectionVocab);        // vocabulary to map terms to integers in BuildTargetLang...
+      conf.set(Constants.StopwordList, e_stopwordList);
     }
 
     if (mode == CROSS_LINGUAL_F) {			// non-English side, needs to be translated
@@ -119,11 +120,16 @@ public class PreprocessWikipedia extends Configured implements Tool {
       conf.set("Ivory.F_Vocab_E2F", fVocab_e2f);	
       conf.set("Ivory.TTable_E2F", ttable_e2f);
       conf.set("Ivory.FinalVocab", eVocab_f2e);            // vocabulary to map terms to integers in BuildTargetLang...
+      conf.set(Constants.StopwordList, f_stopwordList);
+      conf.set(Constants.TargetStopwordList, e_stopwordList);
+      conf.set(Constants.TargetTokenizer, e_tokenizerModel);
+      conf.set(Constants.TargetLanguage, targetLang);
     }
 
     int numMappers = 100;
     int numReducers = 100;
 
+    // Print out options
     LOG.info("Tool name: WikipediaDriver");
     LOG.info(" - Index path: " + indexRootPath);
     LOG.info(" - Raw collection path: " + rawCollection);
@@ -132,6 +138,7 @@ public class PreprocessWikipedia extends Configured implements Tool {
     LOG.info(" - Tokenizer class: " + tokenizerClass);
     LOG.info(" - Tokenizer model: " + tokenizerModel);
     LOG.info(" - Minimum # terms per article : " + MinNumTermsPerArticle);
+    LOG.info(" - Stopwords file: " + e_stopwordList);
 
     if (mode == CROSS_LINGUAL_E || mode == CROSS_LINGUAL_F) {
       LOG.info("Cross-lingual collection : Preprocessing "+collectionLang+" side.");
@@ -139,12 +146,14 @@ public class PreprocessWikipedia extends Configured implements Tool {
       LOG.info(" - Tokenizer model: " + tokenizerModel);
 
       if (mode == CROSS_LINGUAL_F) {
-        LOG.info(" - TTable file "+collectionLang+" --> E-language : " + ttable_f2e);
+        LOG.info(" - TTable file " + collectionLang+" --> " + targetLang + " : " + ttable_f2e);
         LOG.info(" - Source vocab file: " + fVocab_f2e);
         LOG.info(" - Target vocab file: " + eVocab_f2e);
-        LOG.info(" - TTable file "+"E-language --> "+collectionLang+" : " + ttable_e2f);
+        LOG.info(" - TTable file " + targetLang + " --> " + collectionLang+" : " + ttable_e2f);
         LOG.info(" - Source vocab file: " + fVocab_f2e);
         LOG.info(" - Target vocab file: " + eVocab_f2e);
+        LOG.info(" - Target stopwords file: " + e_stopwordList);
+        LOG.info(" - Target tokenizer path: " + e_tokenizerModel);
       }
     }
 
@@ -311,12 +320,16 @@ public class PreprocessWikipedia extends Configured implements Tool {
   private static final String TOKENIZER_MODEL_OPTION = "tokenizermodel";
   private static final String COLLECTION_VOCAB_OPTION = "collectionvocab";
   private static final String LANGUAGE_OPTION = "lang";
+  private static final String E_LANGUAGE_OPTION = "target_lang";
+  private static final String F_STOPWORD_OPTION = "f_stopword";
+  private static final String E_STOPWORD_OPTION = "e_stopword";
   private static final String FVOCAB_F2E_OPTION = "f_f2e_vocab";
   private static final String EVOCAB_F2E_OPTION = "e_f2e_vocab";
   private static final String FVOCAB_E2F_OPTION = "f_e2f_vocab";
   private static final String EVOCAB_E2F_OPTION = "e_e2f_vocab";
   private static final String TTABLE_F2E_OPTION = "f2e_ttable";
   private static final String TTABLE_E2F_OPTION = "e2f_ttable";
+  private static final String E_TOKENIZER_MODEL_OPTION = "e_tokenizermodel";
 
   @SuppressWarnings("static-access")
   private int parseArgs(String[] args) {
@@ -328,8 +341,12 @@ public class PreprocessWikipedia extends Configured implements Tool {
     options.addOption(OptionBuilder.withDescription("path to compressed collection").withArgName("path").hasArg().isRequired().create(COMPRESSED_PATH_OPTION));
     options.addOption(OptionBuilder.withDescription("tokenizer class").withArgName("class").hasArg().create(TOKENIZER_CLASS_OPTION));
     options.addOption(OptionBuilder.withDescription("path to tokenizer model file/directory").withArgName("path").hasArg().create(TOKENIZER_MODEL_OPTION));
+    options.addOption(OptionBuilder.withDescription("path to target-side tokenizer model file/directory").withArgName("path").hasArg().create(E_TOKENIZER_MODEL_OPTION));
     options.addOption(OptionBuilder.withDescription("path to collection vocab file").withArgName("path").hasArg().create(COLLECTION_VOCAB_OPTION));
     options.addOption(OptionBuilder.withDescription("two-letter collection language code").withArgName("en|de|fr|zh|es|ar|tr").hasArg().isRequired().create(LANGUAGE_OPTION));
+    options.addOption(OptionBuilder.withDescription("two-letter target language code").withArgName("en|de|fr|zh|es|ar|tr").hasArg().create(E_LANGUAGE_OPTION));
+    options.addOption(OptionBuilder.withDescription("path to f-side stopwords list").withArgName("path").hasArg().create(F_STOPWORD_OPTION));
+    options.addOption(OptionBuilder.withDescription("path to e-side stopwords list").withArgName("path").hasArg().create(E_STOPWORD_OPTION));
     options.addOption(OptionBuilder.withDescription("path to f-side vocab file of f-to-e translation table").withArgName("path").hasArg().create(FVOCAB_F2E_OPTION));
     options.addOption(OptionBuilder.withDescription("path to e-side vocab file of f-to-e translation table").withArgName("path").hasArg().create(EVOCAB_F2E_OPTION));
     options.addOption(OptionBuilder.withDescription("path to f-side vocab file of e-to-f translation table").withArgName("path").hasArg().create(FVOCAB_E2F_OPTION));
@@ -351,9 +368,9 @@ public class PreprocessWikipedia extends Configured implements Tool {
     if (mode < 0) throw new RuntimeException("Incorrect mode selection!");
     if (mode == CROSS_LINGUAL_F) {
       if (!options.hasOption(FVOCAB_F2E_OPTION) || !options.hasOption(FVOCAB_E2F_OPTION) || !options.hasOption(EVOCAB_F2E_OPTION) || !options.hasOption(EVOCAB_E2F_OPTION)
-          || !options.hasOption(TTABLE_F2E_OPTION) || !options.hasOption(TTABLE_E2F_OPTION)) {
+          || !options.hasOption(TTABLE_F2E_OPTION) || !options.hasOption(TTABLE_E2F_OPTION) || !options.hasOption(E_TOKENIZER_MODEL_OPTION) || !options.hasOption(E_LANGUAGE_OPTION)) {
         System.err.println("Error, missing translation table arguments: " + FVOCAB_F2E_OPTION + "," + EVOCAB_F2E_OPTION + "," 
-            + FVOCAB_E2F_OPTION + "," + EVOCAB_E2F_OPTION + "," + TTABLE_F2E_OPTION + "," + TTABLE_E2F_OPTION);
+            + FVOCAB_E2F_OPTION + "," + EVOCAB_E2F_OPTION + "," + TTABLE_F2E_OPTION + "," + TTABLE_E2F_OPTION + "," + E_TOKENIZER_MODEL_OPTION + "," + E_LANGUAGE_OPTION);
         return -1;
       }
     }
@@ -375,13 +392,17 @@ public class PreprocessWikipedia extends Configured implements Tool {
     tokenizerModel = cmdline.getOptionValue(TOKENIZER_MODEL_OPTION);
     collectionVocab = cmdline.getOptionValue(COLLECTION_VOCAB_OPTION);
     collectionLang = cmdline.getOptionValue(LANGUAGE_OPTION);
+    f_stopwordList = cmdline.getOptionValue(F_STOPWORD_OPTION);
+    e_stopwordList = cmdline.getOptionValue(E_STOPWORD_OPTION);
     fVocab_f2e = cmdline.getOptionValue(FVOCAB_F2E_OPTION);
     eVocab_f2e = cmdline.getOptionValue(EVOCAB_F2E_OPTION);
     fVocab_e2f = cmdline.getOptionValue(FVOCAB_E2F_OPTION);
     eVocab_e2f = cmdline.getOptionValue(EVOCAB_E2F_OPTION);
     ttable_f2e = cmdline.getOptionValue(TTABLE_F2E_OPTION);
     ttable_e2f = cmdline.getOptionValue(TTABLE_E2F_OPTION);
-
+    e_tokenizerModel = cmdline.getOptionValue(E_TOKENIZER_MODEL_OPTION);
+    targetLang = cmdline.getOptionValue(E_LANGUAGE_OPTION);
+    
     return 1;
   }
 

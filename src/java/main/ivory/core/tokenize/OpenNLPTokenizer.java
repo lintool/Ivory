@@ -61,9 +61,9 @@ public class OpenNLPTokenizer extends ivory.core.tokenize.Tokenizer {
 
     // read stopwords from file (stopwords will be empty set if file does not exist or is empty)
     String stopwordsFile = mJobConf.get(Constants.StopwordList);
-    stopwords = readInput(stopwordsFile);      
+    stopwords = readInput(fs, stopwordsFile);      
     String stemmedStopwordsFile = mJobConf.get(Constants.StemmedStopwordList);
-    stemmedStopwords = readInput(stemmedStopwordsFile);
+    stemmedStopwords = readInput(fs, stemmedStopwordsFile);
 
     VocabularyWritable vocab;
     try {
@@ -148,7 +148,7 @@ public class OpenNLPTokenizer extends ivory.core.tokenize.Tokenizer {
     for ( int i = 0; i < normalizedTokens.length; i++ ){
       String token = normalizedTokens[i].toLowerCase();
       if ( isStopwordRemoval && isDiscard(token) ) {
-        sLogger.warn("Discarded stopword "+token);
+//        sLogger.warn("Discarded stopword "+token);
         continue;
       }
 
@@ -204,12 +204,22 @@ public class OpenNLPTokenizer extends ivory.core.tokenize.Tokenizer {
    */
   @Override
   public boolean isStopWord(String token) {
-    return ( stopwords.contains(token) || delims.contains(token) );
+    if (stopwords == null) {
+      Log.warn("Tokenizer does not have stopwords loaded!");
+      return false;
+    }else {
+      return ( stopwords.contains(token) || delims.contains(token) );
+    }
   }
 
   @Override
   public boolean isStemmedStopWord(String token) {
-    return ( stemmedStopwords.contains(token) || delims.contains(token) );
+    if (stemmedStopwords == null) {
+      Log.warn("Tokenizer does not have stopwords loaded!");
+      return false;
+    }else {
+      return ( stemmedStopwords.contains(token) || delims.contains(token) );
+    }
   }
 
 }

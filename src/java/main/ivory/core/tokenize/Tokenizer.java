@@ -33,7 +33,9 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
 import org.mortbay.log.Log;
 
 import edu.umd.hooka.VocabularyWritable;
@@ -68,10 +70,11 @@ public abstract class Tokenizer {
     return vocab;
   }
   
-  protected Set<String> readInput(String file) {
+  protected Set<String> readInput(FileSystem fs, String file) {
     Set<String> lines = new HashSet<String>();
     try {
-      FileInputStream fis = new FileInputStream(file);
+      Log.warn("File " + file + " exists? " + fs.exists(new Path(file)) + ", fs: "+fs);
+      FSDataInputStream fis = fs.open(new Path(file));
       InputStreamReader isr = new InputStreamReader(fis, "UTF8");
       BufferedReader in = new BufferedReader(isr);
       String line;

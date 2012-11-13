@@ -8,9 +8,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
-
 import junit.framework.JUnit4TestAdapter;
-
+import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.conf.Configuration;
 import org.junit.Test;
 
@@ -61,7 +60,7 @@ public class LuceneArabicAnalyzerTest {
     ivory.core.tokenize.Tokenizer tokenizer = new LuceneArabicAnalyzer();
     Configuration conf = new Configuration();
     conf.set(Constants.StopwordList, "data/tokenizer/ar.stop");
-    tokenizer.configure(conf);
+    tokenizer.configure(conf, FileSystem.getLocal(conf));
 
     List<String> sentences = readInput(arabicRawLinesFile);
     List<String[]> expectedTokenArrays = readTokenizedInput(arabicTokenizedLinesFile);

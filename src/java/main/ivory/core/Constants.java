@@ -24,7 +24,10 @@ public class Constants {
   public static final String TermDocVectorSegments = "Ivory.TermDocVectorSegments";
   public static final String Language = "Ivory.Lang";
   public static final String Stemming = "Ivory.IsStemming";
-  public static final String StopwordList = "stopwordlist";
-  public static final String StemmedStopwordList = "stemmed_stopwordlist";
+  public static final String StopwordList = "Ivory.Stopwordlist";
+  public static final String StemmedStopwordList = "Ivory.StemmedStopwordlist";
+  public static final String TargetStopwordList = "Ivory.TargetStopwordlist";
+  public static final String TargetTokenizer = "Ivory.TargetTokenizer";
+  public static final String TargetLanguage = "Ivory.TargetLang";
 
 }
