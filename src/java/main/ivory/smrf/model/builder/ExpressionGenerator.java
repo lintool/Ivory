@@ -16,7 +16,7 @@
 
 package ivory.smrf.model.builder;
 
-import ivory.core.exception.ConfigurationException;
+import ivory.core.ConfigurationException;
 
 import org.w3c.dom.Node;
 

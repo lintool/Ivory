@@ -121,8 +121,6 @@ public class BuildDictionary extends PowerTool {
         throw new RuntimeException("More than one record for term: " + term);
       }
 
-      //termsOut.writeUTF(term);
-
       terms[curKeyIndex] = term;
       seqNums[curKeyIndex] = curKeyIndex;
       dfs[curKeyIndex] = -df;
