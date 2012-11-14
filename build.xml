@@ -202,7 +202,7 @@
 
 	<target name="integration" depends="jar" description="Run integration tests">
 		<mkdir dir="${integration.dir}" />
-		<junit printsummary="yes" fork="yes" maxmemory="2048m">
+		<junit printsummary="yes" fork="yes" maxmemory="4096m">
 			<sysproperty key="java.library.path" path="${lib.dir}" />
 			<sysproperty key="org.xml.sax.driver" value="org.apache.xerces.parsers.SAXParser" />
 			<classpath refid="run.path.id" />
