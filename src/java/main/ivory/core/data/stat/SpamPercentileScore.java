@@ -80,13 +80,13 @@ public class SpamPercentileScore implements DocScoreTable {
    */
   @Override
   public float getScore(int docno) {
-    // Remember that docnos are numbered starting from one. We add one to
-    // avoid computing log(0).
+    // Remember that docnos are numbered starting from one.
+    // We add one to avoid computing log(0).
     return (float) Math.log(scores[docno - docnoOffset] + 1);
   }
 
   public byte getRawScore(int docno) {
-    // docnos are numbered starting from one
+    // Docnos are numbered starting from one.
     return scores[docno - docnoOffset];
   }
 

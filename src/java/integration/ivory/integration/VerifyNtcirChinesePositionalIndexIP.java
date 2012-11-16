@@ -23,8 +23,6 @@ public class VerifyNtcirChinesePositionalIndexIP {
 
   private Path collectionPath = new Path("/shared/collections/clir/ntcir/gigaword-xin.2002-06.zh-cleaned.xml");
   private String index = this.getClass().getCanonicalName() + "-index";
-  private String zhTokenizerFile = "/user/fture/data/token/zh-token.bin";
-  private String enTokenizerFile = "/user/fture/data/token/en-token.bin";
   
   @Test
   public void runBuildIndex() throws Exception {
@@ -55,15 +53,7 @@ public class VerifyNtcirChinesePositionalIndexIP {
     jars.add(IntegrationUtils.getJar("dist", "ivory"));
 
     String libjars = String.format("-libjars=%s", Joiner.on(",").join(jars));
-
-    PreprocessTREC.main(new String[] { libjars, IntegrationUtils.D_JT, IntegrationUtils.D_NN,
-        "-input=" + collectionPath.toString(), "-index=" + index, 
-        "-lang=zh" , "-tokenizerclass=" + StanfordChineseTokenizer.class.getCanonicalName(),
-        "-tokenizermodel=" + zhTokenizerFile, "-name=NTCIR8.Chinese"
-    });
-    BuildPositionalIndexIP.main(new String[] { libjars, IntegrationUtils.D_JT, IntegrationUtils.D_NN,
-        index, "10" });
-
+    
     // Done with indexing, now do retrieval run.
     fs.copyFromLocalFile(false, true, new Path("data/vocab/vocab.en-zh.en"),
         new Path(index + "/vocab.en-zh.en"));
@@ -75,6 +65,21 @@ public class VerifyNtcirChinesePositionalIndexIP {
         new Path(index + "/grammar.en-zh.ntcir8"));
     fs.copyFromLocalFile(false, true, new Path("data/en-zh.ntcir8/queries.en-zh.k10.ntcir8.xml"),
         new Path(index + "/queries.en-zh.k10.ntcir8.xml"));
+    fs.copyFromLocalFile(false, true, new Path("data/tokenizer/zh-token.bin"),
+        new Path(index + "/zh-token.bin"));
+    fs.copyFromLocalFile(false, true, new Path("data/tokenizer/en-token.bin"),
+        new Path(index + "/en-token.bin"));
+    fs.copyFromLocalFile(false, true, new Path("data/tokenizer/en.stop.stemmed"),
+        new Path(index + "/en.stop.stemmed"));
+
+    PreprocessTREC.main(new String[] { libjars, IntegrationUtils.D_JT, IntegrationUtils.D_NN,
+        "-input=" + collectionPath.toString(), "-index=" + index, 
+        "-lang=zh" , "-tokenizerclass=" + StanfordChineseTokenizer.class.getCanonicalName(),
+        "-tokenizermodel=" + index + "/zh-token.bin", "-name=NTCIR8.Chinese"
+    });
+    
+    BuildPositionalIndexIP.main(new String[] { libjars, IntegrationUtils.D_JT, IntegrationUtils.D_NN,
+        index, "10" });
 
     conf = RunQueryEngine.parseArgs(new String[] {
         "-index=" + index,
@@ -83,8 +88,8 @@ public class VerifyNtcirChinesePositionalIndexIP {
         "-query_type=mtN",
         "-doc_lang=zh",
         "-query_lang=en", 
-        "-doc_tokenizer=" + zhTokenizerFile,
-        "-query_tokenizer=" + enTokenizerFile,
+        "-doc_tokenizer=" + index + "/zh-token.bin",
+        "-query_tokenizer=" + index + "/en-token.bin",
         "-query_vocab=" + index + "/vocab.en-zh.en",
         "-doc_vocab=" + index + "/vocab.en-zh.zh",
         "-f2eProbs=" + index + "/ttable.en-zh",
@@ -95,9 +100,9 @@ public class VerifyNtcirChinesePositionalIndexIP {
         "-bitext_weight=0.1",
         "-token_weight=1",
         "-phrase_weight=0",
-        "-scfg_path=data/en-zh.ntcir8/grammar.en-zh.ntcir8",
+        "-scfg_path=" + index + "/grammar.en-zh.ntcir8",
         "-kBest=10", 
-        "-query_stemmed_stopwordlist=data/tokenizer/en.stop.stemmed"
+        "-query_stemmed_stopwordlist=" + index + "/en.stop.stemmed"
     }, fs, conf);
     QueryEngine qr = new QueryEngine();
     qr.init(conf, fs);

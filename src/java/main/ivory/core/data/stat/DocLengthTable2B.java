@@ -147,8 +147,8 @@ public class DocLengthTable2B implements DocLengthTable {
 
     long startingMemoryUse = MemoryUsageUtils.getUsedMemory();
 
-    DocLengthTable2B lengths = new DocLengthTable2B(new Path(args[0]), FileSystem
-        .get(new Configuration()));
+    DocLengthTable2B lengths = new DocLengthTable2B(new Path(args[0]),
+        FileSystem.get(new Configuration()));
     long endingMemoryUse = MemoryUsageUtils.getUsedMemory();
 
     System.out.println("Memory usage: " + (endingMemoryUse - startingMemoryUse) + " bytes\n");
