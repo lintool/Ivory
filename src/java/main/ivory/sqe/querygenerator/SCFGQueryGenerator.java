@@ -77,7 +77,7 @@ public class SCFGQueryGenerator implements QueryGenerator {
     docLangTokenizer = TokenizerFactory.createTokenizer(fs, conf, docLang, conf.get(Constants.DocTokenizerData), true, null, conf.get(Constants.StemmedStopwordListD), null);
 
     // construct prob. dist. from translation grammar (SCFG)
-    probMap = Utils.generateTranslationTable(conf, docLangTokenizer);
+    probMap = Utils.generateTranslationTable(fs, conf, docLangTokenizer);
 
     //remove low-prob entries, cut off after certain cumulative prob., and normalize
     Utils.normalize(probMap, lexProbThreshold, cumProbThreshold, 30);      

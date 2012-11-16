@@ -23,8 +23,6 @@ public class VerifyClefFrenchPositionalIndexIP {
 
   private Path collectionPath = new Path("/shared/collections/clir/clef/lemonde94-95+sda94-95.fr-cleaned.xml");
   private String index = this.getClass().getCanonicalName() + "-index";
-  private String frTokenizerFile = "/user/fture/data/token/fr-token.bin";
-  private String enTokenizerFile = "/user/fture/data/token/en-token.bin";
   
   @Test
   public void runBuildIndex() throws Exception {
@@ -55,14 +53,6 @@ public class VerifyClefFrenchPositionalIndexIP {
 
     String libjars = String.format("-libjars=%s", Joiner.on(",").join(jars));
 
-    PreprocessTREC.main(new String[] { libjars, IntegrationUtils.D_JT, IntegrationUtils.D_NN,
-        "-input=" + collectionPath.toString(), "-index=" + index, 
-        "-lang=fr" , "-tokenizerclass=" + OpenNLPTokenizer.class.getCanonicalName(),
-        "-tokenizermodel=" + frTokenizerFile, "-name=CLEF2006.French"
-    });
-    BuildPositionalIndexIP.main(new String[] { libjars, IntegrationUtils.D_JT, IntegrationUtils.D_NN,
-       index, "10" });
-
     // Done with indexing, now do retrieval run.
     fs.copyFromLocalFile(false, true, new Path("data/vocab/vocab.en-fr.en"),
         new Path(index + "/vocab.en-fr.en"));
@@ -70,10 +60,27 @@ public class VerifyClefFrenchPositionalIndexIP {
         new Path(index + "/vocab.en-fr.fr"));
     fs.copyFromLocalFile(false, true, new Path("data/vocab/ttable.en-fr"),
         new Path(index + "/ttable.en-fr"));
+    fs.copyFromLocalFile(false, true, new Path("data/tokenizer/fr-token.bin"),
+        new Path(index + "/fr-token.bin"));
+    fs.copyFromLocalFile(false, true, new Path("data/tokenizer/en-token.bin"),
+        new Path(index + "/en-token.bin"));
+    fs.copyFromLocalFile(false, true, new Path("data/tokenizer/fr.stop.stemmed"),
+        new Path(index + "/fr.stop.stemmed"));
+    fs.copyFromLocalFile(false, true, new Path("data/tokenizer/en.stop.stemmed"),
+        new Path(index + "/en.stop.stemmed"));
     fs.copyFromLocalFile(false, true, new Path("data/en-fr.clef06/grammar.en-fr.clef06"),
         new Path(index + "/grammar.en-fr.clef06"));
     fs.copyFromLocalFile(false, true, new Path("data/en-fr.clef06/queries.en-fr.k10.clef06.xml"),
         new Path(index + "/queries.en-fr.k10.clef06.xml"));
+  
+    PreprocessTREC.main(new String[] { libjars, IntegrationUtils.D_JT, IntegrationUtils.D_NN,
+        "-input=" + collectionPath.toString(), "-index=" + index, 
+        "-lang=fr" , "-tokenizerclass=" + OpenNLPTokenizer.class.getCanonicalName(),
+        "-tokenizermodel=" + index + "/fr-token.bin", "-name=CLEF2006.French"
+    });
+    
+    BuildPositionalIndexIP.main(new String[] { libjars, IntegrationUtils.D_JT, IntegrationUtils.D_NN,
+        index, "10" });
 
     conf = RunQueryEngine.parseArgs(new String[] {
         "-index=" + index,
@@ -82,8 +89,8 @@ public class VerifyClefFrenchPositionalIndexIP {
         "-query_type=mtN",
         "-doc_lang=fr",
         "-query_lang=en", 
-        "-doc_tokenizer=" + frTokenizerFile,
-        "-query_tokenizer=" + enTokenizerFile,
+        "-doc_tokenizer=" + index + "/fr-token.bin",
+        "-query_tokenizer=" + index + "/en-token.bin",
         "-query_vocab=" + index + "/vocab.en-fr.en",
         "-doc_vocab=" + index + "/vocab.en-fr.fr",
         "-f2eProbs=" + index + "/ttable.en-fr",
@@ -94,10 +101,10 @@ public class VerifyClefFrenchPositionalIndexIP {
         "-bitext_weight=0.3",
         "-token_weight=1",
         "-phrase_weight=0",
-        "-scfg_path=data/en-fr.clef06/grammar.en-fr.clef06",
+        "-scfg_path=" + index + "/grammar.en-fr.clef06",
         "-kBest=10", 
-        "-doc_stemmed_stopwordlist=data/tokenizer/fr.stop.stemmed",
-        "-query_stemmed_stopwordlist=data/tokenizer/en.stop.stemmed"
+        "-doc_stemmed_stopwordlist=" + index + "/fr.stop.stemmed",
+        "-query_stemmed_stopwordlist=" + index + "/en.stop.stemmed"
     }, fs, conf);
     QueryEngine qr = new QueryEngine();
     qr.init(conf, fs);
