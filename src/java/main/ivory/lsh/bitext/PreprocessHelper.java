@@ -3,7 +3,6 @@ package ivory.lsh.bitext;
 import ivory.core.RetrievalEnvironment;
 import ivory.core.data.dictionary.DefaultFrequencySortedDictionary;
 import ivory.core.data.stat.DfTableArray;
-import ivory.core.data.stat.PrefixEncodedGlobalStats;
 import ivory.core.tokenize.Tokenizer;
 import ivory.core.tokenize.TokenizerFactory;
 import ivory.core.util.CLIRUtils;
@@ -12,12 +11,10 @@ import ivory.pwsim.score.ScoringModel;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
-
 import opennlp.model.MaxentModel;
 import ivory.lsh.bitext.MoreGenericModelReader;
 import opennlp.tools.sentdetect.SentenceDetectorME;
 import opennlp.tools.sentdetect.SentenceModel;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.filecache.DistributedCache;
 import org.apache.hadoop.fs.FileSystem;
@@ -26,9 +23,7 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-
 import com.google.common.collect.Maps;
-
 import edu.umd.cloud9.io.array.ArrayListOfIntsWritable;
 import edu.umd.cloud9.io.array.ArrayListWritable;
 import edu.umd.cloud9.io.map.HMapIFW;
@@ -40,7 +35,6 @@ import edu.umd.hooka.VocabularyWritable;
 import edu.umd.hooka.alignment.HadoopAlign;
 import edu.umd.hooka.ttables.TTable_monolithic_IFAs;
 
-@SuppressWarnings("deprecation")
 public class PreprocessHelper {
   private String eLang, fLang, eDir;
   private int MinVectorTerms, MinSentenceLength;
@@ -163,7 +157,7 @@ public class PreprocessHelper {
 
     // tokenizer file not read from cache, since it might be a directory (e.g. Chinese segmenter)
     String tokenizerFile = conf.get("fTokenizer");
-    fTok = TokenizerFactory.createTokenizer(fs, fLang, tokenizerFile, null);
+    fTok = TokenizerFactory.createTokenizer(fs, fLang, tokenizerFile, true, conf.get("fStopword"), null, null);
     sLogger.info("Tokenizer and vocabs created successfully.");
 
     // average sentence length = just a heuristic derived from sample text
@@ -203,7 +197,7 @@ public class PreprocessHelper {
     sLogger.info("Environment created successfully.");
 
     String tokenizerFile = conf.get("eTokenizer");
-    eTok = TokenizerFactory.createTokenizer(fs, eLang, tokenizerFile, null);
+    eTok = TokenizerFactory.createTokenizer(fs, eLang, tokenizerFile, true, conf.get("eStopword"), null, null);
     sLogger.info("Tokenizer and vocabs created successfully.");
 
     eScoreFn = (ScoringModel) new Bm25();
@@ -430,6 +424,9 @@ public class PreprocessHelper {
     return eModel;
   }
 
+  /**
+   * Load from local FS instead of HDFS
+   */
   private void loadFModels(Configuration conf) throws Exception {
     sLogger.info("Loading models for " + fLang + " ...");
     //    FileSystem fs = FileSystem.get(conf);
@@ -449,7 +446,7 @@ public class PreprocessHelper {
 
     // tokenizer file not read from cache, since it might be a directory (e.g. Chinese segmenter)
     String tokenizerFile = conf.get("fTokenizer");
-    fTok = TokenizerFactory.createTokenizer(localFs, fLang, tokenizerFile, fVocabSrc);
+    fTok = TokenizerFactory.createTokenizer(localFs, fLang, tokenizerFile, true, conf.get("fStopword"), null, null);
     sLogger.info("Tokenizer and vocabs created successfully.");
 
     // average sentence length = just a heuristic derived from sample text
@@ -477,7 +474,7 @@ public class PreprocessHelper {
     sLogger.info("Environment created successfully.");
 
     String tokenizerFile = conf.get("eTokenizer");
-    eTok = TokenizerFactory.createTokenizer(localFs, eLang, tokenizerFile, eVocabTrg);
+    eTok = TokenizerFactory.createTokenizer(localFs, eLang, tokenizerFile, true, conf.get("eStopword"), null, null);
     sLogger.info("Tokenizer and vocabs created successfully.");
 
     eScoreFn = (ScoringModel) new Bm25();
@@ -488,6 +485,9 @@ public class PreprocessHelper {
     dfTable = new DfTableArray(new Path(env.getDfByTermData()), localFs);
   }
 
+  /**
+   * Load from local FS instead of HDFS
+   */
   public float getFInVocabRate(String fSent) {
     // temporarily disable stopword removal and vocabulary filtering
     VocabularyWritable v = fTok.getVocab();

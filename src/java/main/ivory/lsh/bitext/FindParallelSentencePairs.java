@@ -74,13 +74,13 @@ public class FindParallelSentencePairs extends Configured implements Tool {
   /**
    * Candidate generation
    * 
-   * Map: (docno, wikiPage) --> (<fDocno, fSentID, eDocno, eSentID>, <lang id,vector,sentence>)
-   * input is union of source and target collections
-   *     sentences = extract sentences in wikiPage
-   *     vectors = convert sentence text into td-idf vector
-   *        similar_pairs = from pwsim output, find if there's any pair corresponding to docno
-   *     foreach similar_pair
-   *        emit(similar_pair, <lang id,docno,vectors,sentences>)
+   *  Map: (docno, wikiPage) --> (<fDocno, fSentID, eDocno, eSentID>, <lang id,vector,sentence>)
+   *  input is union of source and target collections
+   *    sentences = extract sentences in wikiPage
+   *    vectors = convert sentence text into td-idf vector
+   *    similar_pairs = from pwsim output, find if there's any pair corresponding to docno
+   *    foreach similar_pair
+   *      emit(similar_pair, <lang id,docno,vectors,sentences>)
    * 
    * @author ferhanture
    */
@@ -401,11 +401,13 @@ sLogger.debug(fSentences.size()+","+eSentences.size());
     String eSentDetect = dataDir+"/sent/"+eLang+"-sent.bin";
     String eTokenizer = dataDir+"/token/"+eLang+"-token.bin";
     String eVocabSrc = dataDir+"/"+bitextName+"/vocab."+eLang+"-"+fLang+"."+eLang;
+    String eStopwords = dataDir+"/token/"+eLang+".stop";
     String eVocabTrg = dataDir+"/"+bitextName+"/vocab."+fLang+"-"+eLang+"."+eLang;
 
     String fSentDetect = dataDir+"/sent/"+fLang+"-sent.bin";
     String fTokenizer = dataDir+"/token/"+fLang+"-token.bin";
     String fVocabSrc = dataDir+"/"+bitextName+"/vocab."+fLang+"-"+eLang+"."+fLang;
+    String fStopwords = dataDir+"/token/"+fLang+".stop";
     String fVocabTrg = dataDir+"/"+bitextName+"/vocab."+eLang+"-"+fLang+"."+fLang;
 
     String f2e_ttableFile = dataDir+"/"+bitextName+"/ttable."+fLang+"-"+eLang;
@@ -424,6 +426,8 @@ sLogger.debug(fSentences.size()+","+eSentences.size());
     conf.set("fTokenizer", fTokenizer);
     conf.set("eTokenizer", eTokenizer);
     conf.setFloat("MinInVocabRate", minInVocabRate);
+    conf.set("eStopword", eStopwords);
+    conf.set("fStopword", fStopwords);
 
     //e-files
 
