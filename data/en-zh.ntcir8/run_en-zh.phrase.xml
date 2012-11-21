@@ -1,0 +1,27 @@
+<parameters>
+
+     <run>en-zh.phrase</run>
+     <query_type>mtN</query_type>
+     <index>/scratch0/fture/indexes/ntcir_xin.zh_02-05.index</index>
+     <doc_lang>zh</doc_lang>
+     <query_lang>en</query_lang>
+     <doc_tokenizer>/fs/clip-qa/ferhan/tokenizer-models/zh-token.bin</doc_tokenizer>
+     <query_tokenizer>data/tokenizer/en-token.bin</query_tokenizer>
+     <query_vocab>data/vocab/vocab.en-zh.en</query_vocab>
+     <doc_vocab>data/vocab/vocab.en-zh.zh</doc_vocab>
+     <f2eProbs>data/vocab/ttable.en-zh</f2eProbs>
+     <LexProbThreshold>0.005</LexProbThreshold>
+     <CumProbThreshold>0.95</CumProbThreshold>
+     <mt_weight>0</mt_weight>
+     <scfg_weight>1</scfg_weight>
+     <bitext_weight>0</bitext_weight>
+     <token_weight>1</token_weight>
+     <phrase_weight>0</phrase_weight>
+     <scfg_path>data/en-zh.ntcir8/grammar.en-zh.ntcir8</scfg_path>
+     <kBest>10</kBest>
+
+<query_stemmed_stopwordlist>data/tokenizer/en.stop.stemmed</query_stemmed_stopwordlist>
+<!--<qrels_path>data/en-zh.ntcir8/qrels.en-zh.ntcir8.txt</qrels_path>-->
+
+
+</parameters>

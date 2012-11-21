@@ -4,15 +4,10 @@ import static org.junit.Assert.assertTrue;
 import ivory.lsh.data.NBitSignature;
 import ivory.lsh.data.PermutationByBit;
 import ivory.lsh.data.SixtyFourBitSignature;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.PriorityQueue;
-
+import junit.framework.JUnit4TestAdapter;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
@@ -22,7 +17,6 @@ import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.io.WritableComparable;
 import org.junit.Test;
-
 import edu.umd.cloud9.io.SequenceFileUtils;
 import edu.umd.cloud9.io.array.ArrayListOfIntsWritable;
 import edu.umd.cloud9.io.pair.PairOfWritables;
@@ -324,15 +318,8 @@ public class Signature64Test {
     System.out.println("From 5 to 9: " + slide2);
 
   }
-  // @Test
-  // public void testExtract(){
-  // BitsSignature64 s = new BitsSignature64(10);
-  // s.set(2, true);
-  // // s.set(4, true);
-  //
-  // BitsSignature64 sub = s.getSubSignature(0, 4);
-  // System.out.println(sub);
-  // System.out.println(s);
-  //
-  // }
+  
+  public static junit.framework.Test suite() {
+    return new JUnit4TestAdapter(Signature64Test.class);
+  }
 }

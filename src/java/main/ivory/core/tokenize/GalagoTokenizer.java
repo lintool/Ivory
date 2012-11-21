@@ -824,8 +824,11 @@ public class GalagoTokenizer extends Tokenizer {
   }
 
   @Override
-  public void configure(Configuration conf) {}
+  public void configure(Configuration conf) { }
 
+  @Override
+  public void configure(Configuration mJobConf, FileSystem fs) { }
+  
   public static void main(String[] args) {
     String text = " this is a the <test> for the teokenizer 101 546 345-543543545436-4656765865865 rgger <xml> ergtre 456435klj345lj34590";
 
@@ -840,7 +843,6 @@ public class GalagoTokenizer extends Tokenizer {
     }
   }
 
-@Override
-public void configure(Configuration mJobConf, FileSystem fs) {}
+
 
 }

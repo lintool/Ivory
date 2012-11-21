@@ -88,6 +88,7 @@ public class IntPostingsForwardIndex {
       value = (PostingsList) Class.forName(reader.getValueClassName()).newInstance();
     } catch (Exception e) {
       e.printStackTrace();
+      reader.close();
       return null;
     }
 
@@ -97,6 +98,7 @@ public class IntPostingsForwardIndex {
     if (key.get() != termid) {
       LOG.error("unable to fetch postings for term \"" + termid + "\": found key \""
           + key + "\" instead");
+      reader.close();
       return null;
     }
 
