@@ -53,8 +53,8 @@ public class CLSlidingWindowPwsim extends Configured implements Tool {
 
   private static final Logger sLogger = Logger.getLogger(CLSlidingWindowPwsim.class);
 
-  static enum mapoutput {
-    count, PROCESSEDPAIRS, EMITTEDPAIRS, PrefixSum
+  static enum Pairs {
+    Processed, Emitted, PrefixSum
   }
 
   private static int printUsage() {
@@ -130,18 +130,12 @@ public class CLSlidingWindowPwsim extends Configured implements Tool {
               continue;
             }
             int prefix = signatures[i].getLongestPrefix(signatures[j]);
-            reporter.incrCounter(mapoutput.PrefixSum, prefix);
-            reporter.incrCounter(mapoutput.PROCESSEDPAIRS, 1);
+            reporter.incrCounter(Pairs.PrefixSum, prefix);
+            reporter.incrCounter(Pairs.Processed, 1);
             hammingDistance = signatures[i].hammingDistance(signatures[j], maxDist);
             sLogger.debug(hammingDistance);
             if (hammingDistance <= maxDist) {
-              reporter.incrCounter(mapoutput.EMITTEDPAIRS, 1);
-
-              // If filtering results by a sample set (i.e., samplesMap!=null), change output format
-              // outValue.set(docNos[i]);
-              // outKey.set(hammingDistance, docNos[j]); //pair format: english docno first, then
-              // german docno
-              // output.collect(outValue, outKey);
+              reporter.incrCounter(Pairs.Emitted, 1);
 
               outValue.set(hammingDistance);
               outKey.set(docNos[j], docNos[i]); // pair format: english docno first, then german
@@ -154,17 +148,12 @@ public class CLSlidingWindowPwsim extends Configured implements Tool {
               continue;
             }
             int prefix = signatures[i].getLongestPrefix(signatures[j]);
-            reporter.incrCounter(mapoutput.PrefixSum, prefix);
-            reporter.incrCounter(mapoutput.PROCESSEDPAIRS, 1);
+            reporter.incrCounter(Pairs.PrefixSum, prefix);
+            reporter.incrCounter(Pairs.Processed, 1);
             hammingDistance = signatures[i].hammingDistance(signatures[j], maxDist);
             sLogger.debug(hammingDistance);
             if (hammingDistance <= maxDist) {
-              reporter.incrCounter(mapoutput.EMITTEDPAIRS, 1);
-
-              // If filtering results by a sample set (i.e., samplesMap!=null), change output format
-              // outValue.set(docNos[i]);
-              // outKey.set(hammingDistance, docNos[j]);
-              // output.collect(outValue, outKey);
+              reporter.incrCounter(Pairs.Emitted, 1);
 
               outValue.set(hammingDistance);
               outKey.set(docNos[j], docNos[i]);
@@ -187,6 +176,8 @@ public class CLSlidingWindowPwsim extends Configured implements Tool {
     public void reduce(PairOfInts key, Iterator<IntWritable> val,
         OutputCollector<PairOfInts, IntWritable> output, Reporter reporter) throws IOException {
       output.collect(key, val.next());
+      reporter.incrCounter(Pairs.Emitted, 1);
+      
     }
   }
 
@@ -208,7 +199,6 @@ public class CLSlidingWindowPwsim extends Configured implements Tool {
       while (values.hasNext()) {
         PairOfInts p = values.next();
         list.add(new PairOfInts(p.getLeftElement(), p.getRightElement()));
-        reporter.incrCounter(mapoutput.count, 1);
       }
       int cntr = 0;
       while (!list.isEmpty() && cntr < numResults) {
@@ -266,6 +256,8 @@ public class CLSlidingWindowPwsim extends Configured implements Tool {
 
     FileOutputFormat.setCompressOutput(job, false);
 
+    job.setJarByClass(CLSlidingWindowPwsim.class);
+    
     job.set("mapred.child.java.opts", "-Xmx2048m");
     job.setInt("mapred.task.timeout", 60000000);
     job.setInt("Ivory.SlidingWindowSize", windowSize);
@@ -304,8 +296,8 @@ public class CLSlidingWindowPwsim extends Configured implements Tool {
     System.out.println("Job finished in " + (System.currentTimeMillis() - startTime)
         + " milliseconds");
     Counters counters = j.getCounters();
-    long processed = (long) counters.findCounter(mapoutput.PROCESSEDPAIRS).getCounter();
-    long prefixsum = (long) counters.findCounter(mapoutput.PrefixSum).getCounter();
+    long processed = (long) counters.findCounter(Pairs.Processed).getCounter();
+    long prefixsum = (long) counters.findCounter(Pairs.PrefixSum).getCounter();
     System.out.println("Avg prefix length = " + (prefixsum / (float) processed));
 
     return 0;

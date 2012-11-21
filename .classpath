@@ -16,14 +16,11 @@
 	<classpathentry kind="lib" path="lib/commons-el-1.0.jar"/>
 	<classpathentry kind="lib" path="lib/commons-httpclient-3.1.jar"/>
 	<classpathentry kind="lib" path="lib/commons-lang-2.4.jar"/>
-	<classpathentry kind="lib" path="lib/commons-logging-1.0.4.jar"/>
 	<classpathentry kind="lib" path="lib/commons-net-1.4.1.jar"/>
 	<classpathentry kind="lib" path="lib/concurrent-1.3.4.jar"/>
 	<classpathentry kind="lib" path="lib/core-3.1.1.jar"/>
 	<classpathentry kind="lib" path="lib/dsiutils-1.0.12.jar"/>
 	<classpathentry kind="lib" path="lib/fastutil-6.0.0.jar"/>
-	<classpathentry kind="lib" path="lib/guava-r09.jar"/>
-	<classpathentry kind="lib" path="lib/hadoop-core-0.20.2-cdh3u1.jar"/>
 	<classpathentry kind="lib" path="lib/hsqldb-1.8.0.7.jar"/>
 	<classpathentry kind="lib" path="lib/htmlparser-1.6.jar"/>
 	<classpathentry kind="lib" path="lib/jackson-core-asl-1.5.2.jar"/>
@@ -49,7 +46,6 @@
 	<classpathentry kind="lib" path="lib/pcj-1.2.jar"/>
 	<classpathentry kind="lib" path="lib/servlet-api-2.5.jar"/>
 	<classpathentry kind="lib" path="lib/spy-2.4.jar"/>
-	<classpathentry kind="lib" path="lib/stanford-chinese-segmenter-2011-09-14.jar"/>
 	<classpathentry kind="lib" path="lib/sux4j-2.0.1.jar"/>
 	<classpathentry kind="lib" path="lib/tools-1.5.0.jar"/>
 	<classpathentry kind="lib" path="lib/xercesImpl-2.9.1.jar"/>
@@ -58,9 +54,30 @@
 	<classpathentry kind="lib" path="lib/xmlenc-0.52.jar"/>
 	<classpathentry kind="lib" path="lib/lucene-analyzers-3.5.0.jar"/>
 	<classpathentry kind="lib" path="lib/lucene-core-3.5.0.jar"/>
-	<classpathentry kind="lib" path="lib/cloud9-1.3.2.jar"/>
 	<classpathentry kind="lib" path="lib/kamikaze-3.0.3.jar"/>
+	<classpathentry kind="lib" path="lib/commons-collections-3.2.1-javadoc.jar"/>
+	<classpathentry kind="lib" path="lib/commons-collections-3.2.1-sources.jar"/>
+	<classpathentry kind="lib" path="lib/commons-logging-1.1.1.jar"/>
+	<classpathentry kind="lib" path="lib/guava-13.0.1-javadoc.jar"/>
+	<classpathentry kind="lib" path="lib/guava-13.0.1-sources.jar"/>
+	<classpathentry kind="lib" path="lib/guava-13.0.1.jar"/>
+	<classpathentry kind="lib" path="lib/guava-r09-jarjar.jar"/>
+	<classpathentry kind="lib" path="lib/hadoop-core-0.20.2-cdh3u3-sources.jar"/>
+	<classpathentry kind="lib" path="lib/hadoop-core-0.20.2-cdh3u3.jar"/>
 	<classpathentry kind="lib" path="lib/jsp-api-2.0.jar"/>
+	<classpathentry kind="lib" path="lib/jsr305-1.3.9.jar"/>
+	<classpathentry kind="lib" path="lib/lucene-analyzers-3.5.0-javadoc.jar"/>
+	<classpathentry kind="lib" path="lib/lucene-analyzers-3.5.0-sources.jar"/>
+	<classpathentry kind="lib" path="lib/lucene-core-3.5.0-javadoc.jar"/>
+	<classpathentry kind="lib" path="lib/lucene-core-3.5.0-sources.jar"/>
+	<classpathentry kind="lib" path="lib/mail-1.4.1-sources.jar"/>
+	<classpathentry kind="lib" path="lib/mrunit-0.8.0-incubating.jar"/>
 	<classpathentry kind="lib" path="lib/servlet-api-2.5-20081211.jar"/>
+	<classpathentry kind="lib" path="lib/tools-1.5.0-javadoc.jar"/>
+	<classpathentry kind="lib" path="lib/tools-1.5.0-sources.jar"/>
+	<classpathentry kind="lib" path="lib/cloud9-1.3.5-javadoc.jar"/>
+	<classpathentry kind="lib" path="lib/cloud9-1.3.5-sources.jar"/>
+	<classpathentry kind="lib" path="lib/cloud9-1.3.5.jar"/>
+	<classpathentry kind="lib" path="lib/stanford-chinese-segmenter-2011-09-14-ivory.jar"/>
 	<classpathentry kind="output" path="build"/>
 </classpath>

@@ -302,10 +302,10 @@ public class FilterResults extends Configured implements Tool {
       job.setMapOutputValueClass(IntWritable.class);
     }
 
+    job.setJarByClass(FilterResults.class);
     job.setNumMapTasks(numMappers2);
     job.setNumReduceTasks(numReducers2);
     job.setInputFormat(SequenceFileInputFormat.class);
-    // job2.setOutputFormat(SequenceFileOutputFormat.class);
 
     JobClient.runJob(job);
 

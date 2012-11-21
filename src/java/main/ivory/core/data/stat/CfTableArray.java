@@ -45,6 +45,7 @@ public class CfTableArray implements CfTable {
 
   /**
    * Creates a {@code CfTableArray} object.
+   *
    * @param file collection frequency data file
    * @throws IOException
    */
@@ -54,6 +55,7 @@ public class CfTableArray implements CfTable {
 
   /**
    * Creates a {@code CfTableArray} object.
+   *
    * @param file collection frequency data file
    * @param fs FileSystem to read from
    * @throws IOException

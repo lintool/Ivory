@@ -1,10 +1,7 @@
 package ivory.lsh.data;
 
-import ivory.core.util.CLIRUtils;
-
 import java.io.DataInput;
 import java.io.IOException;
-
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
