@@ -1,15 +1,8 @@
 package ivory.core.tokenize;
 
 import ivory.core.Constants;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.util.Properties;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
@@ -34,28 +27,18 @@ public class StanfordChineseTokenizer extends Tokenizer {
     super();
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public void configure(Configuration conf) {
-    Properties props = new Properties();
-    props.setProperty("sighanCorporaDict", conf.get(Constants.TokenizerData));		//data
-    props.setProperty("serDictionary",conf.get(Constants.TokenizerData)+"/dict-chris6.ser");//"data/dict-chris6.ser.gz");
-    props.setProperty("inputEncoding", "UTF-8");
-    props.setProperty("sighanPostProcessing", "true");
-
+    FileSystem fs;
     try {
-      FileSystem fs = FileSystem.get(conf);		
-      classifier = new CRFClassifier(props);
-      FSDataInputStream in = fs.open(new Path(conf.get(Constants.TokenizerData)+"/pku"));
-      FSDataInputStream inDict = fs.open(new Path(conf.get(Constants.TokenizerData)+"/dict-chris6.ser"));
-      classifier.loadClassifier(in, props);			//data/pku.gz
-      classifier.flags.setConf(conf);
-      readerWriter = classifier.makeReaderAndWriter(inDict);
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
+      fs = FileSystem.get(conf);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }   
+    configure(conf, fs);
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public void configure(Configuration conf, FileSystem fs) {
     Properties props = new Properties();
@@ -80,35 +63,31 @@ public class StanfordChineseTokenizer extends Tokenizer {
   public String[] processContent(String text) {
     String[] tokens = null;
     try {
-      text = text.toLowerCase();
+      text = text.toLowerCase();      // for non-Chinese characters
       tokens = classifier.classifyStringAndReturnAnswers(text, readerWriter);
     } catch (IOException e) {
       sLogger.info("Problem in tokenizing Chinese");
       e.printStackTrace();
     }
-    return tokens; 
-  }
-
-  public static void main(String[] args) throws IOException, ClassNotFoundException, InstantiationException, IllegalAccessException{
-    if(args.length < 4){
-      System.err.println("usage: [input] [language] [tokenizer-model-path] [output-file]");
-      System.exit(-1);
-    }
-    ivory.core.tokenize.Tokenizer tokenizer = TokenizerFactory.createTokenizer(args[1], args[2], null);
-    BufferedWriter out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(args[3]), "UTF8"));
-    BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(args[0]), "UTF8"));
-
-    //	  DataInput in = new DataInputStream(new BufferedInputStream(FileSystem.getLocal(new Configuration()).open(new Path(args[0]))));
-    String line = null;
-    while((line = in.readLine()) != null){
-      String[] tokens = tokenizer.processContent(line);
-      String s = "";
+    if (vocab == null) {
+      return tokens;
+    } else {
+      String tokenized = "";
       for (String token : tokens) {
-        s += token+" ";
+        if ( vocab.get(token) <= 0) { continue; }
+        tokenized += ( token + " " );
       }
-      out.write(s+"\n");
+      return tokenized.trim().split("\\s+");
     }
-    out.close();
   }
 
+  @Override
+  public int getNumberTokens(String text){
+    return processContent(text).length;
+  }
+
+  @Override
+  public String removeBorderStopWords(String tokenizedText) {
+    return tokenizedText;
+  }
 }

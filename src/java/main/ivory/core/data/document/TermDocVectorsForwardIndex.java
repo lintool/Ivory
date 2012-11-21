@@ -119,6 +119,7 @@ public class TermDocVectorsForwardIndex {
     try {
       value = (TermDocVector) reader.getValueClass().newInstance();
     } catch (Exception e) {
+      reader.close();
       throw new RuntimeException("Unable to instantiate key/value pair!");
     }
 
@@ -128,6 +129,7 @@ public class TermDocVectorsForwardIndex {
     if (key.get() != docno) {
       LOG.error(String.format("Unable to doc vector for docno %d: found docno %d instead.",
           docno, key));
+      reader.close();
       return null;
     }
 

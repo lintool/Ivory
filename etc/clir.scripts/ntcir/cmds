@@ -1,0 +1,14 @@
+# unzip and concatenate source text into chinese-gigaword-xin.2002-06.raw
+perl concat.pl &
+
+# remove all content except for <DOC>
+# TREC format requires DOC id to be in <DOCNO> tag
+# remove duplicates, if any (indexing tool might fail otherwise)
+
+grep -vP '\<\w+\>|\</[^D]\w*\>' chinese-gigaword-xin.2002-06.raw | grep -v 'DATELINE' | perl -ne 's/\<DOC id="(.+)" type.*\>/<DOC>\n<DOCNO> $1 \<\/DOCNO>/g;print;' | perl rm-dups.pl > gigaword-xin.2002-06.zh-cleaned.xml &
+
+# convert NTCIR qrels format to TREC qrels format
+sed 's|ACLIA2-CS-000||g;s|ACLIA2-CS-00||g;s|ACLIA2-CS-00||g;s|ACLIA2-CS-0||g;s|L0|0|g;s|L1|1|g;s|L2|1|g;' qrels | awk '{print $1,0,$2,$3;}' > qrels8.zh
+
+# convert the NTCIR topics format to TREC style
+cat topics | perl conv-topics.pl

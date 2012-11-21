@@ -1,76 +1,108 @@
 package ivory.core.tokenize;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import ivory.core.Constants;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.apache.lucene.analysis.CharArraySet;
+import org.apache.lucene.analysis.LowerCaseFilter;
+import org.apache.lucene.analysis.StopFilter;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.ar.ArabicAnalyzer;
+import org.apache.lucene.analysis.ar.ArabicNormalizationFilter;
+import org.apache.lucene.analysis.ar.ArabicStemFilter;
+import org.apache.lucene.analysis.standard.StandardTokenizer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.util.Version;
 
-public class LuceneArabicAnalyzer extends Tokenizer {
-  private ArabicAnalyzer analyzer;
-  private TokenStream tokenStream;
-  
+public class LuceneArabicAnalyzer extends ivory.core.tokenize.Tokenizer {
+  private static final Logger LOG = Logger.getLogger(LuceneArabicAnalyzer.class);
+  static{
+    LOG.setLevel(Level.WARN);
+  }
+  private boolean isStemming;
+  private org.apache.lucene.analysis.Tokenizer tokenizer;
+  private Set<String> stopwords;
+  private Set<String> stemmedStopwords;
+
   @Override
   public void configure(Configuration conf) {
-    analyzer = new ArabicAnalyzer(Version.LUCENE_35);
+    configure(conf, null);
   }
 
   @Override
-  public void configure(Configuration mJobConf, FileSystem fs) {
-    analyzer = new ArabicAnalyzer(Version.LUCENE_35);
-  }
+  public void configure(Configuration conf, FileSystem fs) {    
+    // read stopwords from file (stopwords will be empty set if file does not exist or is empty)
+    String stopwordsFile = conf.get(Constants.StopwordList);
+    stopwords = readInput(fs, stopwordsFile);      
+    String stemmedStopwordsFile = conf.get(Constants.StemmedStopwordList);
+    stemmedStopwords = readInput(fs, stemmedStopwordsFile);
+    isStopwordRemoval = !stopwords.isEmpty();
 
+    isStemming = conf.getBoolean(Constants.Stemming, true);
+    
+    LOG.warn("Stemming is " + isStemming + "; Stopword removal is " + isStopwordRemoval +"; number of stopwords: " + stopwords.size() +"; stemmed: " + stemmedStopwords.size());
+  }
+  
   @Override
-  public String[] processContent(String text) {
-    List<String> tokens = new ArrayList<String>();
+  public String[] processContent(String text) {   
+    tokenizer = new StandardTokenizer(Version.LUCENE_35, new StringReader(text));
+    TokenStream tokenStream = new LowerCaseFilter(Version.LUCENE_35, tokenizer);
+    if (isStopwordRemoval) {
+      tokenStream = new StopFilter( Version.LUCENE_35, tokenStream, (CharArraySet) ArabicAnalyzer.getDefaultStopSet());
+    }
+    tokenStream = new ArabicNormalizationFilter(tokenStream);
+    if (isStemming) {
+      tokenStream = new ArabicStemFilter(tokenStream);
+    }
+
+    CharTermAttribute termAtt = tokenStream.getAttribute(CharTermAttribute.class);
+    tokenStream.clearAttributes();
+    String tokenized = "";
     try {
-      tokenStream = analyzer.tokenStream("dummy", new StringReader(text));
-      CharTermAttribute termAtt = tokenStream.getAttribute(CharTermAttribute.class);
-      tokenStream.clearAttributes();
       while (tokenStream.incrementToken()) {
-        tokens.add(termAtt.toString());
+        String token = termAtt.toString();
+        if ( vocab != null && vocab.get(token) <= 0) {
+          continue;
+        }
+        tokenized += ( token + " " );
       }
     } catch (IOException e) {
       e.printStackTrace();
     }
-    String[] arr = new String[tokens.size()];
-    return tokens.toArray(arr);
+    return tokenized.trim().split("\\s+");
   }
-  
-  public static void main(String[] args) throws IOException, ClassNotFoundException, InstantiationException, IllegalAccessException{
-    if(args.length < 2){
-      System.err.println("usage: [input] [output-file]");
-      System.exit(-1);
-    }
-//    ivory.core.tokenize.Tokenizer tokenizer = TokenizerFactory.createTokenizer(args[1], args[2], null);
-    ivory.core.tokenize.Tokenizer tokenizer = new LuceneArabicAnalyzer();
-    tokenizer.configure(null);
-    BufferedWriter out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(args[1]), "UTF8"));
-    BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(args[0]), "UTF8"));
 
-    //    DataInput in = new DataInputStream(new BufferedInputStream(FileSystem.getLocal(new Configuration()).open(new Path(args[0]))));
-    String line = null;
-    while((line = in.readLine()) != null){
-      String[] tokens = tokenizer.processContent(line);
-      System.out.println("Found "+tokens.length+" tokens:");
-      String s = "";
-      for (String token : tokens) {
-        s += token+"||";
+  @Override
+  public boolean isStopWord(String token) {
+    return stopwords.contains(token) || delims.contains(token) || token.length()==1;
+  }
+
+  @Override
+  public String stem(String token) {
+    tokenizer = new StandardTokenizer(Version.LUCENE_35, new StringReader(token));
+    TokenStream tokenStream = new LowerCaseFilter(Version.LUCENE_35, tokenizer);
+    tokenStream = new ArabicNormalizationFilter(tokenStream);
+    tokenStream = new ArabicStemFilter(tokenStream);
+
+    CharTermAttribute termAtt = tokenStream.getAttribute(CharTermAttribute.class);
+    tokenStream.clearAttributes();
+    try {
+      while (tokenStream.incrementToken()) {
+        return termAtt.toString();
       }
-      out.write(s+"\n");
+    }catch (IOException e) {
+      e.printStackTrace();
     }
-    out.close();
+    return token;
   }
 
+  @Override
+  public boolean isStemmedStopWord(String token) {
+    return stemmedStopwords.contains(token) || delims.contains(token) || token.length()==1;
+  }
 }
