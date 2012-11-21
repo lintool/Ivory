@@ -12,6 +12,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.PriorityQueue;
 
+import junit.framework.JUnit4TestAdapter;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -315,15 +317,8 @@ public class SignatureTest {
     // System.out.println(slide2);
 
   }
-  // @Test
-  // public void testExtract(){
-  // BitsSignature s = new BitsSignature(10);
-  // s.set(2, true);
-  // // s.set(4, true);
-  //
-  // BitsSignature sub = s.getSubSignature(0, 4);
-  // System.out.println(sub);
-  // System.out.println(s);
-  //
-  // }
+
+  public static junit.framework.Test suite() {
+    return new JUnit4TestAdapter(SignatureTest.class);
+  }
 }

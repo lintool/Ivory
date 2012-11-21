@@ -53,7 +53,7 @@ public class ComputeGlobalTermStatistics extends PowerTool {
 
     @Override
     public void map(IntWritable key, TermDocVector doc, Context context)
-        throws IOException, InterruptedException {
+    throws IOException, InterruptedException {
       TermDocVector.Reader r = doc.getReader();
       int dl = 0, tf = 0;
       while (r.hasMoreTerms()) {
@@ -74,7 +74,7 @@ public class ComputeGlobalTermStatistics extends PowerTool {
 
     @Override
     public void reduce(Text key, Iterable<PairOfIntLong> values, Context context)
-        throws IOException, InterruptedException {
+    throws IOException, InterruptedException {
       int df = 0;
       long cf = 0;
       for (PairOfIntLong pair : values) {
@@ -99,7 +99,7 @@ public class ComputeGlobalTermStatistics extends PowerTool {
 
     @Override
     public void reduce(Text key, Iterable<PairOfIntLong> values, Context context)
-        throws IOException, InterruptedException {
+    throws IOException, InterruptedException {
       int df = 0;
       long cf = 0;
       for (PairOfIntLong pair : values) {
@@ -116,7 +116,7 @@ public class ComputeGlobalTermStatistics extends PowerTool {
   }
 
   public static final String[] RequiredParameters = {
-          Constants.CollectionName, Constants.IndexPath, Constants.MinDf, Constants.MaxDf };
+    Constants.CollectionName, Constants.IndexPath, Constants.MinDf, Constants.MaxDf };
 
   public String[] getRequiredParameters() {
     return RequiredParameters;
@@ -146,10 +146,10 @@ public class ComputeGlobalTermStatistics extends PowerTool {
     }
 
     if (!fs.exists(new Path(termDocVectorsPath))) {
-        LOG.info("term doc vectors path doesn't existing: skipping!");
-        return 0;
-      }
-    
+      LOG.info("term doc vectors path doesn't existing: skipping!");
+      return 0;
+    }
+
     LOG.info("PowerTool: " + ComputeGlobalTermStatistics.class.getCanonicalName());
     LOG.info(String.format(" - %s: %s", Constants.CollectionName, collectionName));
     LOG.info(String.format(" - %s: %s", Constants.IndexPath, indexPath));
@@ -181,7 +181,8 @@ public class ComputeGlobalTermStatistics extends PowerTool {
     job.setMapperClass(MyMapper.class);
     job.setCombinerClass(MyCombiner.class);
     job.setReducerClass(MyReducer.class);
-
+    job.setJarByClass(ComputeGlobalTermStatistics.class);
+    
     long startTime = System.currentTimeMillis();
     job.waitForCompletion(true);
     LOG.info("Job Finished in " + (System.currentTimeMillis() - startTime) / 1000.0 + " seconds");

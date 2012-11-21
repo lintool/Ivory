@@ -1,0 +1,104 @@
+### Each collection was preprocessed to remove duplicates and all tags except for <DOC> and <DOCNO>, and also convert NTCIR tag names to be TREC-compatible.
+### scripts and instructions for each collection are available under $IVORY/etc/clir.scripts/[collection]
+### below are the md5 checksum values the final indexed collection files (generated with md5sum command):
+6da9494cca1324334ce4a8e4f64f5a5a  clef/lemonde94-95+sda94-95.fr-cleaned.xml
+36e29a6c446408c23a8b92a28ceb6785  ntcir/gigaword-xin.2002-06.zh-cleaned.xml
+8a9c5b47c54e2a3ffabc8dc7c556fbca  trec/ldc2001t55.ar-cleaned.xml
+
+### MT derivations are represented in a compressed format understood by our query parser.
+Since there are n derivations, we represent each one, separated by four lines:
+	<query>derivation of best translation;log_prob;original_query||||derivation of 2nd best translation;logprob;original_query|||| ... </query>
+where each derivation a sequence of rules, each separated by triple lines:
+	rule_1|||rule_2|||...
+and each rule is represented by its own likelihood, list of token-to-token alignments, and its left and right hand side content:
+	-log_prob::word_alignments_list::LHS_rule|RHS_rule
+and word alignments are separated by double lines:
+	src_token1|trg_token1||...
+
+==============================================================================
+
+### If using cdec, here are instructions on how to generate the query file as above.
+
+### Assumptions:
+### collection name is $name
+### grammar file for topic $i is: $name.grammar/grammar.$i
+### we want to do $n-best MT
+### cdec binary is $cdec, cdec ini file is $inifile, weights file is $weights
+### $e is query language code, $f is document language code
+### $name.$e.seg is the set of topics in cdec input format:
+	<seg id="i" grammar="path to grammar file of topic #i"> topic #i </seg>
+
+### run cdec with --show_derivations option to output derivations to folder derivs.$nbest
+mkdir derivs.${n}best
+cat $name.$e.seg | $cdec -c $inifile -w $weights -k $n --show_derivations derivs.${n}best 1> out.$n 2> err.$n
+
+### convert derivations to Ivory input format
+cat derivs.${n}best/derivs.* > derivs.${n}best.singlefile
+cat $name.grammar/grammar.* > $name.grammar.singlefile
+perl deriv2queries.pl derivs.${n}best.singlefile $name.grammar.singlefile $name.$e $offset 1> $name_$e-$f-trans$n.xml 2> err
+
+==============================================================================
+
+### Commands to run English-French CLEF06 experiments
+
+etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-fr.clef06/run_en-fr.gridbest.xml -queries_path data/en-fr.clef06/queries.en-fr.k10.clef06.xml >& run.en-fr.gridbest.log
+./trec_eval data/en-fr.clef06/qrels.en-fr.clef06.txt ranking.en-fr.gridbest_10-30-30-100.txt
+
+etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-fr.clef06/run_en-fr.10best.xml -queries_path data/en-fr.clef06/queries.en-fr.k10.clef06.xml > & run.en-fr.10best.log
+./trec_eval data/en-fr.clef06/qrels.en-fr.clef06.txt ranking.en-fr.10best_10-100-0-100.txt
+
+etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-fr.clef06/run_en-fr.1best.xml -queries_path data/en-fr.clef06/queries.en-fr.k1.clef06.xml > & run.en-fr.1best.log
+./trec_eval data/en-fr.clef06/qrels.en-fr.clef06.txt ranking.en-fr.1best_1-100-0-100.txt 
+
+etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-fr.clef06/run_en-fr.phrase.xml -queries_path data/en-fr.clef06/queries.en-fr.k10.clef06.xml > & run.en-fr.phrase.log
+./trec_eval data/en-fr.clef06/qrels.en-fr.clef06.txt ranking.en-fr.phrase_10-0-0-100.txt
+
+etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-fr.clef06/run_en-fr.token.xml -queries_path data/en-fr.clef06/queries.en-fr.clef06.xml >& run.en-fr.token.log
+./trec_eval data/en-fr.clef06/qrels.en-fr.clef06.txt ranking.en-fr.token_0-0-0-0.txt
+
+etc/junit.sh ivory.regression.coling2012.EnFr_CLEF06 >& log &
+
+==============================================================================
+
+### Commands to run English-Arabic TREC 2002 experiments
+
+etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-ar.trec02//run_en-ar.gridbest.xml -queries_path data/en-ar.trec02/queries.en-ar.k10.trec02.xml  >& run.en-ar.gridbest.log
+./trec_eval data/en-ar.trec02/qrels.en-ar.trec02.txt ranking.en-ar.gridbest_10-0-0-100.txt
+
+etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-ar.trec02//run_en-ar.10best.xml -queries_path data/en-ar.trec02/queries.en-ar.k10.trec02.xml > & run.en-ar.10best.log
+ ./trec_eval data/en-ar.trec02/qrels.en-ar.trec02.txt ranking.en-ar.10best_10-100-0-100.txt
+
+etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-ar.trec02//run_en-ar.phrase.xml -queries_path data/en-ar.trec02/queries.en-ar.k10.trec02.xml > & run.en-ar.phrase.log
+./trec_eval data/en-ar.trec02/qrels.en-ar.trec02.txt ranking.en-ar.phrase_10-0-0-100.txt 
+
+etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-ar.trec02/run_en-ar.token.xml -queries_path data/en-ar.trec02/queries.en-ar.trec02.xml  > & run.en-ar.token.log
+./trec_eval data/en-ar.trec02/qrels.en-ar.trec02.txt  ranking.en-ar.token_0-0-0-0.txt 
+
+etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-ar.trec02/run_en-ar.1best.xml -queries_path data/en-ar.trec02/queries.en-ar.k1.trec02.xml > & run.en-ar.1best.log
+./trec_eval data/en-ar.trec02/qrels.en-ar.trec02.txt ranking.en-ar.1best_1-100-0-100.txt
+
+etc/junit.sh ivory.regression.coling2012.EnAr_TREC02 >& log &
+
+/////////////////////////////////////////////////////////////
+
+### WARNING: Before running NTCIR English-Chinese experiments, please download zh-token.bin from https://github.com/ferhanture/stanford-segmenter-ivory.git and add it to data/tokenizer/.
+
+### Commands to run English-French NTCIR-8 experiments
+
+etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-zh.ntcir8/run_en-zh.gridbest.xml -queries_path data/en-zh.ntcir8/queries.en-zh.k10.ntcir8.xml >& run.en-zh.gridbest.log
+./trec_eval data/en-zh.ntcir8/qrels.en-zh.ntcir8.txt ranking.en-zh.gridbest_10-20-10-100.txt
+
+etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-zh.ntcir8/run_en-zh.10best.xml -queries_path data/en-zh.ntcir8/queries.en-zh.k10.ntcir8.xml >& run.en-zh.10best.log 
+./trec_eval data/en-zh.ntcir8/qrels.en-zh.ntcir8.txt ranking.en-zh.10best_10-100-0-100.txt
+
+etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-zh.ntcir8/run_en-zh.phrase.xml -queries_path data/en-zh.ntcir8/queries.en-zh.k10.ntcir8.xml > & run.en-zh.phrase.log
+./trec_eval data/en-zh.ntcir8/qrels.en-zh.ntcir8.txt ranking.en-zh.phrase_10-0-0-100.txt
+
+etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-zh.ntcir8/run_en-zh.1best.xml -queries_path data/en-zh.ntcir8/queries.en-zh.k1.ntcir8.xml > & run.en-zh.1best.log
+./trec_eval data/en-zh.ntcir8/qrels.en-zh.ntcir8.txt ranking.en-zh.1best_1-100-0-100.txt
+
+etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-zh.ntcir8/run_en-zh.token.xml -queries_path data/en-zh.ntcir8/queries.en-zh.ntcir8.xml  > & run.en-zh.token.log
+./trec_eval data/en-zh.ntcir8/qrels.en-zh.ntcir8.txt ranking.en-zh.token_0-0-0-0.txt
+
+etc/junit.sh ivory.regression.coling2012.EnZh_NTCIR8 >& log &
+

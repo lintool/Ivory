@@ -1,0 +1,543 @@
+<parameters>
+<query id="301">0.0746336206794::nestlé|nestl::nestlé|nestl|||0.427903234959::brand|marqu::brand|marqu;-26.2331;Nestlé Brands
+||||0.32451108098::nestlé|nestl::nestlé|nestl|||0.427903234959::brand|marqu::brand|marqu;-26.808;Nestlé Brands
+||||1.04575753212::brand|marqu::brand|marqu|||0.0746336206794::nestlé|nestl::nestlé|nestl;-27.6808;Nestlé Brands
+||||1.27875363827::nestlé|nestl::nestlé|nestl|||0.427903234959::brand|marqu::brand|marqu;-28.1198;Nestlé Brands
+||||1.77815127373::brand|marqu::brand|marqu|||0.0746336206794::nestlé|nestl::nestlé|nestl;-28.4664;Nestlé Brands
+||||0.0746336206794::nestlé|nestl::nestlé|nestl|||2.47712135315::brand|épingl::brand|épingl;-29.9234;Nestlé Brands
+||||1.77815127373::NULL|de||brand|marqu::brand|de marqu|||0.0746336206794::nestlé|nestl::nestlé|nestl;-30.1325;Nestlé Brands
+||||0.32451108098::nestlé|nestl::nestlé|nestl|||2.47712135315::brand|épingl::brand|épingl;-30.4983;Nestlé Brands
+||||2.47712135315::brand|marqu||NULL|de::brand|marqu de|||0.0746336206794::nestlé|nestl::nestlé|nestl;-31.0394;Nestlé Brands
+||||2.0::NULL|le||brand|marqu::brand|le marqu|||0.0746336206794::nestlé|nestl::nestlé|nestl;-33.1014;Nestlé Brands
+</query>
+<query id="302">0.146707475185::consum|consomm::consum|consomm|||0.111633270979::boycott|boycott::boycott|boycott;-24.002;Consumer Boycotts 
+||||0.52287876606::consum|consomm::consum|consomm|||0.111633270979::boycott|boycott::boycott|boycott;-24.8765;Consumer Boycotts 
+||||0.52287876606::boycott|boycott::boycott|boycott|||0.146707475185::consum|consomm::consum|consomm;-24.9597;Consumer Boycotts 
+||||1.57403123379::NULL|de||consum|consomm::consum|de consomm|||0.111633270979::boycott|boycott::boycott|boycott;-25.0496;Consumer Boycotts 
+||||2.47712135315::consum|le||NULL|de||consum|consomm::consum|le de consomm|||0.111633270979::boycott|boycott::boycott|boycott;-25.0581;Consumer Boycotts 
+||||1.63202321529::NULL|de||boycott|boycott::boycott|de boycott|||0.146707475185::consum|consomm::consum|consomm;-26.1578;Consumer Boycotts 
+||||2.0::consum|consomm||NULL|de::consum|consomm de|||0.111633270979::boycott|boycott::boycott|boycott;-26.9474;Consumer Boycotts 
+||||2.0::consum|le||consum|consomm::consum|le consomm|||0.111633270979::boycott|boycott::boycott|boycott;-27.1846;Consumer Boycotts 
+||||2.0::consum|le||consum|consomm::consum|le consomm|||0.111633270979::boycott|boycott::boycott|boycott;-27.2023;Consumer Boycotts 
+||||1.43572854996::boycott|boycott::boycott|boycott|||0.146707475185::consum|consomm::consum|consomm;-27.4624;Consumer Boycotts 
+</query>
+<query id="311">0.154901966453::unemploy|chômag::unemploy|chômag|||0.140661522746::in|en||europ|europ::in europ|en europ;-16.6043;Unemployment in Europe 
+||||0.306425035::unemploy|chômag||in|en||europ|europ::unemploy in europ|chômag en europ;-16.7582;Unemployment in Europe 
+||||0.246672332287::in|en||europ|europ::in europ|en europ|||0.154901966453::unemploy|chômag::unemploy|chômag;-16.838;Unemployment in Europe 
+||||0.451815396547::unemploy|chômag::unemploy|chômag|||0.140661522746::in|en||europ|europ::in europ|en europ;-17.2908;Unemployment in Europe 
+||||1.90848505497::unemploy|le||unemploy|chômag||in|en||europ|europ::unemploy in europ|le chômag en europ;-17.7384;Unemployment in Europe 
+||||2.0::unemploy|le||unemploy|chômag::unemploy|le chômag|||0.140661522746::in|en||europ|europ::in europ|en europ;-18.1432;Unemployment in Europe 
+||||2.0::unemploy|le||unemploy|chômag::unemploy|le chômag|||0.140661522746::in|en||europ|europ::in europ|en europ;-18.1609;Unemployment in Europe 
+||||0.246672332287::in|en||europ|europ::in europ|en europ|||2.0::unemploy|le||unemploy|chômag::unemploy|le chômag;-18.3946;Unemployment in Europe 
+||||0.706269264221::unemploy|chômag||in|en::unemploy in|chômag en|||0.427903234959::europ|europ::europ|europ;-18.5933;Unemployment in Europe 
+||||0.728933215141::unemploy|chômag||in|en::unemploy in|chômag en|||0.427903234959::europ|europ::europ|europ;-18.6293;Unemployment in Europe 
+</query>
+<query id="312">1.63202321529::NULL|de||dog|chien::dog|de chien|||0.337242156267::attack|attaqu::attack|attaqu;-22.5005;Dog Attacks 
+||||0.207608312368::dog|chien::dog|chien|||0.337242156267::attack|attaqu::attack|attaqu;-23.1916;Dog Attacks 
+||||2.17609119415::attack|attaqu||NULL|de::attack|attaqu de|||0.207608312368::dog|chien::dog|chien;-23.4835;Dog Attacks 
+||||0.537602007389::dog|chien::dog|chien|||0.337242156267::attack|attaqu::attack|attaqu;-23.9566;Dog Attacks 
+||||0.677780687809::attack|attaqu::attack|attaqu|||0.207608312368::dog|chien::dog|chien;-23.9816;Dog Attacks 
+||||2.0::NULL|d'||attack|attaqu::attack|d' attaqu|||0.207608312368::dog|chien::dog|chien;-25.7385;Dog Attacks 
+||||1.63202321529::NULL|de||dog|chien::dog|de chien|||0.92081874609::attack|attentat::attack|attentat;-26.7879;Dog Attacks 
+||||2.47712135315::attack|attentat||NULL|de::attack|attentat de|||0.207608312368::dog|chien::dog|chien;-27.1007;Dog Attacks 
+||||1.87506127357::NULL|de||attack|attaqu::attack|de attaqu|||0.207608312368::dog|chien::dog|chien;-27.1067;Dog Attacks 
+||||1.52287876606::attack|attaqu::attack|attaqu|||0.207608312368::dog|chien::dog|chien;-27.8274;Dog Attacks 
+</query>
+<query id="313">-0.0::celebr|centenair::centenari celebr|centenair;-20.9384;Centenary Celebrations 
+||||0.301030009985::centenari|centenair::centenari|centenair|||0.383699566126::celebr|célebr::celebr|célebr;-28.9012;Centenary Celebrations 
+||||0.3467874825::centenari|centenair::centenari|centenair|||0.383699566126::celebr|célebr::celebr|célebr;-28.992;Centenary Celebrations 
+||||0.625862896442::celebr|célebr::celebr|célebr|||0.301030009985::centenari|centenair::centenari|centenair;-29.4578;Centenary Celebrations 
+||||2.0::NULL|de||celebr|célebr::celebr|de célebr|||0.301030009985::centenari|centenair::centenari|centenair;-30.1875;Centenary Celebrations 
+||||2.17609119415::celebr|célebr::celebr|célebr|||0.301030009985::centenari|centenair::centenari|centenair;-30.2497;Centenary Celebrations 
+||||1.0::centenari|100e||centenari|anniversair::centenari|100e anniversair|||0.383699566126::celebr|célebr::celebr|célebr;-31.2244;Centenary Celebrations 
+||||1.0::centenari|100e||centenari|anniversair::centenari|100e anniversair|||0.383699566126::celebr|célebr::celebr|célebr;-31.2422;Centenary Celebrations 
+||||0.301030009985::centenari|centenair::centenari|centenair|||1.04575753212::celebr|fêt::celebr|fêt;-31.6376;Centenary Celebrations 
+||||2.17609119415::celebr|fêt::celebr|fêt|||0.301030009985::centenari|centenair::centenari|centenair;-31.646;Centenary Celebrations 
+</query>
+<query id="314">1.32221925259::speci|espec||NULL|en||endang|dang::endang speci|espec en dang;-19.0689;Endangered Species 
+||||0.648803412914::speci|espec||endang|menac::endang speci|espec menac;-20.0132;Endangered Species 
+||||2.0::NULL|en||endang|dang::endang|en dang|||0.104209251702::speci|espec::speci|espec;-20.7777;Endangered Species 
+||||0.459747165442::speci|espec::endang speci|espec;-21.623;Endangered Species 
+||||2.0::NULL|en||endang|dang::endang|en dang|||2.47712135315::speci|de||speci|espec::speci|de espec;-23.4824;Endangered Species 
+||||2.0::NULL|en||endang|dang::endang|en dang|||2.47712135315::speci|le||speci|espec::speci|le espec;-23.9375;Endangered Species 
+||||1.30103003979::speci|espec::speci|espec|||0.795880019665::endang|menac::endang|menac;-23.9802;Endangered Species 
+||||2.17609119415::endang|menac::endang|menac|||0.104209251702::speci|espec::speci|espec;-24.4152;Endangered Species 
+||||1.32221925259::speci|espec||endang|menac||NULL|d'||speci|extinct::endang speci|espec menac d' extinct;-25.9653;Endangered Species 
+||||0.744727492332::endang|dang::endang|dang|||0.104209251702::speci|espec::speci|espec;-27.3943;Endangered Species 
+</query>
+<query id="315">0.279840707779::dope|dopag||in|dan||NULL|le||sport|sport::dope in sport|dopag dan le sport;-15.5009;Doping in Sports 
+||||1.12493872643::dope|le||dope|dopag||in|dan||NULL|le||sport|sport::dope in sport|le dopag dan le sport;-15.9689;Doping in Sports 
+||||0.411442488432::dope|dopag||in|dan||NULL|le::dope in|dopag dan le|||0.224268227816::sport|sport::sport|sport;-16.1991;Doping in Sports 
+||||0.254404783249::dope|dopag::dope|dopag|||0.468521088362::in|dan||NULL|le||sport|sport::in sport|dan le sport;-16.4237;Doping in Sports 
+||||1.21307480335::dope|le||dope|dopag||in|dan||NULL|le::dope in|le dopag dan le|||0.224268227816::sport|sport::sport|sport;-16.564;Doping in Sports 
+||||0.542622804642::in|dan||NULL|le||sport|sport::in sport|dan le sport|||0.254404783249::dope|dopag::dope|dopag;-16.5817;Doping in Sports 
+||||0.44773748517::dope|dopag::dope|dopag|||0.468521088362::in|dan||NULL|le||sport|sport::in sport|dan le sport;-16.8645;Doping in Sports 
+||||0.843652784824::NULL|le||sport|sport::sport|le sport|||0.25883230567::dope|dopag||in|dan::dope in|dopag dan;-17.3062;Doping in Sports 
+||||1.39794003963::dope|le||dope|dopag::dope|le dopag|||0.468521088362::in|dan||NULL|le||sport|sport::in sport|dan le sport;-17.5995;Doping in Sports 
+||||0.542622804642::in|dan||NULL|le||sport|sport::in sport|dan le sport|||1.39794003963::dope|le||dope|dopag::dope|le dopag;-17.7575;Doping in Sports 
+</query>
+<query id="316">0.736758589745::strike|grev::strike|grev;-16.3687;Strikes 
+||||0.875061273575::strike|frapp::strike|frapp;-19.5283;Strikes 
+||||0.886056661606::strike|trouv::strike|trouv;-22.9297;Strikes 
+||||1.77815127373::strike|attaqu::strike|attaqu;-22.9732;Strikes 
+||||2.17609119415::strike|éton::strike|éton;-26.0656;Strikes 
+||||2.47712135315::strike|équilibr::strike|équilibr;-26.4011;Strikes 
+||||1.87506127357::strike|éclat::strike|éclat;-28.0731;Strikes 
+||||1.87506127357::strike|sembl::strike|sembl;-28.556;Strikes 
+||||1.69896996021::strike|établ::strike|établ;-28.808;Strikes 
+||||2.17609119415::strike|marqu::strike|marqu;-29.0939;Strikes 
+</query>
+<query id="317">0.933053195477::drug|médic||anti|anti::anti drug|médic anti|||0.619788765907::-|-::-|-|||0.241592809558::cancer|canc::cancer|canc;-24.4305;Anti-cancer Drugs 
+||||0.933053195477::drug|médic||anti|anti::anti drug|médic anti|||0.971971273422::cancer|canc::cancer|canc|||0.44773748517::-|-::-|-;-25.7548;Anti-cancer Drugs 
+||||0.933053195477::drug|médic||anti|anti::anti drug|médic anti|||1.34242272377::-|-||cancer|cancer::- cancer|- cancer;-28.1348;Anti-cancer Drugs 
+||||0.933053195477::drug|médic||anti|anti::anti drug|médic anti|||0.619788765907::-|-::-|-|||1.02996325493::cancer|cancer::cancer|cancer;-28.7178;Anti-cancer Drugs 
+||||0.933053195477::drug|médic||anti|anti::anti drug|médic anti|||1.33099317551::cancer|cancer::cancer|cancer|||0.44773748517::-|-::-|-;-29.0237;Anti-cancer Drugs 
+||||1.77815127373::drug|médic||anti|contr::anti drug|médic contr|||0.342422693968::-|le||cancer|canc::- cancer|le canc;-30.1116;Anti-cancer Drugs 
+||||0.778151273727::drug|médic||drug|contr||NULL|le||cancer|canc::cancer drug|médic contr le canc|||0.644612312317::anti|anti||-|-::anti -|anti -;-31.1303;Anti-cancer Drugs 
+||||0.644612312317::anti|anti||-|-::anti -|anti -|||0.778151273727::drug|médic||drug|contr||NULL|le||cancer|canc::cancer drug|médic contr le canc;-31.148;Anti-cancer Drugs 
+||||0.585026681423::anti|anti::anti|anti|||0.778151273727::drug|médic||drug|contr||NULL|le||cancer|canc::cancer drug|médic contr le canc|||0.44773748517::-|-::-|-;-31.9227;Anti-cancer Drugs 
+||||0.778151273727::drug|médic||drug|contr||NULL|le||cancer|canc::cancer drug|médic contr le canc|||0.596307635307::anti|anti::anti|anti|||0.44773748517::-|-::-|-;-31.9318;Anti-cancer Drugs 
+</query>
+<query id="318">0.0606978386641::educ|éduc||sex|sexuel::sex educ|éduc sexuel;-18.6426;Sex Education 
+||||1.77815127373::sex|sexuel::sex|sexuel|||0.191563948989::educ|éduc::educ|éduc;-23.0245;Sex Education 
+||||2.17609119415::educ|éduc::educ|éduc|||0.579494178295::sex|sexuel::sex|sexuel;-24.8885;Sex Education 
+||||0.359849959612::sex|sex::sex|sex|||0.191563948989::educ|éduc::educ|éduc;-25.2087;Sex Education 
+||||0.644612312317::sex|sex::sex|sex|||0.191563948989::educ|éduc::educ|éduc;-25.8664;Sex Education 
+||||1.77815127373::sex|sexuel::sex|sexuel|||1.87506127357::educ|l'||educ|éduc::educ|l' éduc;-26.4554;Sex Education 
+||||1.22184872627::educ|éduc::educ|éduc|||0.359849959612::sex|sex::sex|sex;-27.6346;Sex Education 
+||||2.47712135315::sex|le||NULL|de||sex|sex::sex|le de sex|||0.191563948989::educ|éduc::educ|éduc;-27.8699;Sex Education 
+||||2.47712135315::sex|le||NULL|de||sex|sex::sex|le de sex|||0.843652784824::educ|enseign::educ|enseign;-28.0363;Sex Education 
+||||0.579494178295::sex|sexuel::sex|sexuel|||0.191563948989::educ|éduc::educ|éduc;-28.4411;Sex Education 
+</query>
+<query id="319">0.985759556293::global|mondial::global|mondial|||0.318758755922::opium|la||product|product||NULL|d'||opium|opium::opium product|la product d' opium;-22.3707;Global Opium Production 
+||||1.69896996021::NULL|,||opium|la||product|product||NULL|d'||opium|opium::opium product|, la product d' opium|||0.761117935181::global|global::global|global;-25.6677;Global Opium Production 
+||||2.17609119415::global|la||global|mondial::global|la mondial|||0.795880019665::product|product||NULL|d'||opium|opium::opium product|product d' opium;-27.1183;Global Opium Production 
+||||1.39794003963::NULL|de||opium|la||product|product||NULL|d'||opium|opium::opium product|de la product d' opium|||0.327902138233::global|mondial::global|mondial;-27.1937;Global Opium Production 
+||||0.985759556293::global|mondial::global|mondial|||2.39793992043::opium|la||NULL|d'||opium|opium::opium|la d' opium|||0.464284032583::product|product::product|product;-28.2573;Global Opium Production 
+||||0.985759556293::global|mondial::global|mondial|||0.795880019665::product|product||NULL|d'||opium|opium::opium product|product d' opium;-28.7776;Global Opium Production 
+||||0.327902138233::global|mondial::global|mondial|||0.318758755922::opium|la||product|product||NULL|d'||opium|opium::opium product|la product d' opium;-29.1911;Global Opium Production 
+||||1.69896996021::NULL|,||opium|la||product|product||NULL|d'||opium|opium::opium product|, la product d' opium|||0.327902138233::global|mondial::global|mondial;-29.6404;Global Opium Production 
+||||0.52287876606::opium|la||product|product||NULL|d'||opium|opium::opium product|la product d' opium|||0.327902138233::global|mondial::global|mondial;-29.6575;Global Opium Production 
+||||0.761117935181::global|global::global|global|||0.318758755922::opium|la||product|product||NULL|d'||opium|opium::opium product|la product d' opium;-29.7992;Global Opium Production 
+</query>
+<query id="320">0.23608918488::crise|cris||energi|énerget::energi crise|cris énerget;-21.0087;Energy Crises 
+||||1.19033169746::crise|cris||NULL|de||NULL|l'||energi|énerg::energi crise|cris de l' énerg;-21.3879;Energy Crises 
+||||0.864337384701::crise|cris::crise|cris|||0.590630531311::energi|énerget::energi|énerget;-23.7537;Energy Crises 
+||||2.47712135315::NULL|de||NULL|l'||energi|énerg::energi|de l' énerg|||0.0441519655287::crise|cris::crise|cris;-24.3987;Energy Crises 
+||||1.69896996021::energi|énerget::energi|énerget|||0.0441519655287::crise|cris::crise|cris;-24.4372;Energy Crises 
+||||1.49136173725::crise|énerg::energi crise|énerg;-26.0598;Energy Crises 
+||||0.241592809558::energi|énerg::energi|énerg|||0.0441519655287::crise|cris::crise|cris;-26.1848;Energy Crises 
+||||0.864337384701::crise|cris::crise|cris|||0.241592809558::energi|énerg::energi|énerg;-27.0625;Energy Crises 
+||||0.843652784824::energi|énerg::energi|énerg|||0.0441519655287::crise|cris::crise|cris;-27.5951;Energy Crises 
+||||1.24667239189::NULL|de||crise|cris::crise|de cris|||0.241592809558::energi|énerg::energi|énerg;-27.6371;Energy Crises 
+</query>
+<query id="303">0.933053195477::italian|italien::italian|italien|||0.527731239796::paint|peintur::paint|peintur;-22.656;Italian paintings 
+||||2.47712135315::paint|peintur::paint|peintur|||0.0489864610136::italian|italien::italian|italien;-25.1828;Italian paintings 
+||||0.0489864610136::italian|italien::italian|italien|||0.527731239796::paint|peintur::paint|peintur;-27.3788;Italian paintings 
+||||1.87506127357::NULL|de||NULL|la||paint|peintur::paint|de la peintur|||0.0489864610136::italian|italien::italian|italien;-27.517;Italian paintings 
+||||2.17609119415::NULL|de||paint|peintur::paint|de peintur|||0.0489864610136::italian|italien::italian|italien;-28.7177;Italian paintings 
+||||1.17609131336::paint|peintur::paint|peintur|||0.0489864610136::italian|italien::italian|italien;-28.8988;Italian paintings 
+||||1.01472330093::italian|italien::italian|italien|||0.527731239796::paint|peintur::paint|peintur;-29.6516;Italian paintings 
+||||2.47712135315::italian|italien||NULL|de::italian|italien de|||0.527731239796::paint|peintur::paint|peintur;-30.5672;Italian paintings 
+||||2.47712135315::NULL|à||NULL|la||paint|peintur::paint|à la peintur|||0.0489864610136::italian|italien::italian|italien;-30.6148;Italian paintings 
+||||1.69896996021::NULL|la||paint|peintur::paint|la peintur|||0.0489864610136::italian|italien::italian|italien;-30.6799;Italian paintings 
+</query>
+<query id="321">0.278753608465::the|le||taliban|taliban||in|en||afghanistan|afghanistan::the taliban in afghanistan|le taliban en afghanistan;-11.1865;The Talibans in Afghanistan 
+||||0.380211234093::the|le||taliban|taliban::the taliban|le taliban|||0.0915149822831::in|en||afghanistan|afghanistan::in afghanistan|en afghanistan;-11.516;The Talibans in Afghanistan 
+||||0.193820029497::in|en||afghanistan|afghanistan::in afghanistan|en afghanistan|||0.380211234093::the|le||taliban|taliban::the taliban|le taliban;-11.741;The Talibans in Afghanistan 
+||||0.52287876606::the|le||taliban|taliban::the taliban|le taliban|||0.0915149822831::in|en||afghanistan|afghanistan::in afghanistan|en afghanistan;-11.8367;The Talibans in Afghanistan 
+||||0.547702312469::the|le::the|le|||0.0705810710788::taliban|taliban||in|en||afghanistan|afghanistan::taliban in afghanistan|taliban en afghanistan;-11.8636;The Talibans in Afghanistan 
+||||0.590630531311::the|le::the|le|||0.0705810710788::taliban|taliban||in|en||afghanistan|afghanistan::taliban in afghanistan|taliban en afghanistan;-11.9477;The Talibans in Afghanistan 
+||||0.547702312469::the|le::the|le|||0.0757207125425::taliban|taliban::taliban|taliban|||0.0915149822831::in|en||afghanistan|afghanistan::in afghanistan|en afghanistan;-11.9647;The Talibans in Afghanistan 
+||||0.590630531311::the|le::the|le|||0.0757207125425::taliban|taliban::taliban|taliban|||0.0915149822831::in|en||afghanistan|afghanistan::in afghanistan|en afghanistan;-12.0488;The Talibans in Afghanistan 
+||||0.547702312469::the|le::the|le|||0.193820029497::in|en||afghanistan|afghanistan::in afghanistan|en afghanistan|||0.0757207125425::taliban|taliban::taliban|taliban;-12.1896;The Talibans in Afghanistan 
+||||0.193820029497::in|en||afghanistan|afghanistan::in afghanistan|en afghanistan|||0.590630531311::the|le::the|le|||0.0757207125425::taliban|taliban::taliban|taliban;-12.2737;The Talibans in Afghanistan 
+</query>
+<query id="322">0.193820029497::atom|l'||energi|énerg||atom|atom::atom energi|l' énerg atom;-12.8423;Atomic Energy 
+||||1.24667239189::energi|énerg||atom|atom::atom energi|énerg atom;-18.1001;Atomic Energy 
+||||1.30103003979::atom|l'||energi|énerg||atom|nucléair::atom energi|l' énerg nucléair;-18.8588;Atomic Energy 
+||||1.57403123379::atom|atom::atom|atom|||0.241592809558::energi|énerg::energi|énerg;-19.3036;Atomic Energy 
+||||2.0::energi|énerg::energi|énerg|||0.596307635307::atom|atom::atom|atom;-21.1552;Atomic Energy 
+||||1.57403123379::atom|atom::atom|atom|||2.17609119415::energi|l'||energi|énerg::energi|l' énerg;-22.5178;Atomic Energy 
+||||2.47712135315::energi|energ||atom|atom::atom energi|energ atom;-26.0166;Atomic Energy 
+||||2.47712135315::atom|l'||energi|énerg::atom energi|l' énerg;-26.0328;Atomic Energy 
+||||2.17609119415::energi|l'||energi|energ||atom|atom::atom energi|l' energ atom;-26.3048;Atomic Energy 
+||||2.17609119415::atom|nucléair::atom|nucléair|||2.17609119415::energi|l'||energi|énerg::energi|l' énerg;-27.3361;Atomic Energy 
+</query>
+<query id="323">1.33099317551::tighten|renforc||NULL|le::tighten|renforc le|||1.63202321529::requir|exigent||NULL|de||visa|vis::visa requir|exigent de vis;-33.0166;Tightening Visa Requirements 
+||||1.33099317551::tighten|renforc||NULL|le::tighten|renforc le|||2.0::requir|exigent||NULL|de::requir|exigent de|||0.115393415093::visa|vis::visa|vis;-34.0172;Tightening Visa Requirements 
+||||1.33099317551::tighten|renforc||NULL|le::tighten|renforc le|||1.63202321529::NULL|de||visa|vis::visa|de vis|||0.823908746243::requir|exigent::requir|exigent;-34.8249;Tightening Visa Requirements 
+||||2.17609119415::tighten|serr||NULL|la::tighten|serr la|||0.752845406532::requir|vis::visa requir|vis;-35.1335;Tightening Visa Requirements 
+||||1.33099317551::tighten|renforc||NULL|le::tighten|renforc le|||0.613798379898::requir|oblig||NULL|de||visa|vis::visa requir|oblig de vis;-36.4286;Tightening Visa Requirements 
+||||2.0::NULL|de||NULL|l'||requir|oblig||NULL|de||visa|vis::visa requir|de l' oblig de vis|||0.3467874825::tighten|renforc::tighten|renforc;-36.7982;Tightening Visa Requirements 
+||||1.87506127357::NULL|de||requir|exigent||NULL|en||NULL|mati||NULL|de||visa|vis::visa requir|de exigent en mati de vis|||0.3467874825::tighten|renforc::tighten|renforc;-36.8355;Tightening Visa Requirements 
+||||2.17609119415::tighten|le||tighten|renforc||NULL|de::tighten|le renforc de|||2.0::requir|exigent::requir|exigent|||0.115393415093::visa|vis::visa|vis;-36.8844;Tightening Visa Requirements 
+||||2.17609119415::NULL|le||requir|exigent||NULL|en||NULL|mati||NULL|de||visa|vis::visa requir|le exigent en mati de vis|||0.3467874825::tighten|renforc::tighten|renforc;-36.9828;Tightening Visa Requirements 
+||||0.3467874825::tighten|renforc::tighten|renforc|||0.752845406532::requir|vis::visa requir|vis;-37.3906;Tightening Visa Requirements 
+</query>
+<query id="324">-1::supermodel|supermodel::supermodel|supermodel;-122.006;Supermodels 
+</query>
+<query id="325">2.0::fee|frais::fee|frais|||1.36317789555::student|aux||student|étudi::student|aux étudi;-28.2041;Student Fees 
+||||2.47712135315::student|aux||student|étudi::student|aux étudi|||0.908919513226::fee|frais::fee|frais;-28.2584;Student Fees 
+||||2.0::fee|frais||NULL|de::fee|frais de|||0.126873239875::student|étudi::student|étudi;-28.5952;Student Fees 
+||||0.126873239875::student|étudi::student|étudi|||0.908919513226::fee|frais::fee|frais;-31.3688;Student Fees 
+||||0.126873239875::student|étudi::student|étudi|||0.843652784824::fee|redev::fee|redev;-31.4908;Student Fees 
+||||2.0::fee|frais::fee|frais|||0.126873239875::student|étudi::student|étudi;-31.7389;Student Fees 
+||||2.0::NULL|le||fee|frais::fee|le frais|||0.126873239875::student|étudi::student|étudi;-31.8505;Student Fees 
+||||2.47712135315::NULL|de||fee|redev::fee|de redev|||0.126873239875::student|étudi::student|étudi;-31.8507;Student Fees 
+||||0.126873239875::student|étudi::student|étudi|||1.24667239189::fee|honorair::fee|honorair;-31.9095;Student Fees 
+||||2.17609119415::NULL|de||fee|frais::fee|de frais|||0.126873239875::student|étudi::student|étudi;-32.0228;Student Fees 
+</query>
+<query id="326">0.301030009985::award|récompens||intern|international::intern award|récompens international|||-1::emmi|emmi::emmi|emmi;-135.514;Emmy International Awards 
+||||-1::emmi|emmi::emmi|emmi|||0.301030009985::award|récompens||intern|international::intern award|récompens international;-135.532;Emmy International Awards 
+||||-1::emmi|emmi::emmi|emmi|||0.301030009985::award|prix||intern|international::intern award|prix international;-138.07;Emmy International Awards 
+||||-1::emmi|emmi::emmi|emmi|||0.221848756075::intern|international::intern|international|||1.15490198135::award|décern::award|décern;-138.859;Emmy International Awards 
+||||-1::emmi|emmi::emmi|emmi|||0.985759556293::intern|international::intern|international|||0.613798379898::award|attribu::award|attribu;-139.024;Emmy International Awards 
+||||-1::emmi|emmi::emmi|emmi|||0.221848756075::intern|international::intern|international|||0.613798379898::award|attribu::award|attribu;-139.104;Emmy International Awards 
+||||-1::emmi|emmi::emmi|emmi|||1.33099317551::award|décern::award|décern|||0.221848756075::intern|international::intern|international;-139.259;Emmy International Awards 
+||||-1::emmi|emmi::emmi|emmi|||0.833668589592::award|attribu::award|attribu|||0.221848756075::intern|international::intern|international;-139.608;Emmy International Awards 
+||||-1::emmi|emmi::emmi|emmi|||0.985759556293::intern|international::intern|international|||1.15490198135::award|décern::award|décern;-139.984;Emmy International Awards 
+||||1.24667239189::intern|international::intern|international|||-1::emmi|emmi::emmi|emmi|||0.613798379898::award|attribu::award|attribu;-140.057;Emmy International Awards 
+</query>
+<query id="327">1.34242272377::NULL|et||NULL|de||NULL|la||citi|vill||in|de||mexico|mexico::in mexico citi|et de la vill de mexico|||0.691791415215::earthquak|trembl||NULL|de||earthquak|terr::earthquak|trembl de terr;-27.9925;Earthquakes in Mexico City 
+||||0.691791415215::earthquak|trembl||NULL|de||earthquak|terr::earthquak|trembl de terr|||0.166331425309::in|à||citi|mexico::in mexico citi|à mexico;-28.4814;Earthquakes in Mexico City 
+||||0.228479325771::in|à||citi|mexico::in mexico citi|à mexico|||0.691791415215::earthquak|trembl||NULL|de||earthquak|terr::earthquak|trembl de terr;-28.6111;Earthquakes in Mexico City 
+||||0.823908746243::earthquak|trembl||NULL|de||earthquak|terr::earthquak|trembl de terr|||0.166331425309::in|à||citi|mexico::in mexico citi|à mexico;-28.777;Earthquakes in Mexico City 
+||||1.04139268398::in|de||citi|mexico::in mexico citi|de mexico|||0.728933215141::earthquak|séism::earthquak|séism;-30.4968;Earthquakes in Mexico City 
+||||0.728933215141::earthquak|séism::earthquak|séism|||1.04139268398::in|de||citi|mexico::in mexico citi|de mexico;-30.5146;Earthquakes in Mexico City 
+||||0.971971273422::earthquak|séism::earthquak|séism|||1.04139268398::in|de||citi|mexico::in mexico citi|de mexico;-31.0733;Earthquakes in Mexico City 
+||||0.728933215141::earthquak|séism::earthquak|séism|||0.166331425309::in|à||citi|mexico::in mexico citi|à mexico;-31.3599;Earthquakes in Mexico City 
+||||0.228479325771::in|à||citi|mexico::in mexico citi|à mexico|||0.728933215141::earthquak|séism::earthquak|séism;-31.4896;Earthquakes in Mexico City 
+||||0.971971273422::earthquak|séism::earthquak|séism|||0.166331425309::in|à||citi|mexico::in mexico citi|à mexico;-31.9186;Earthquakes in Mexico City 
+</query>
+<query id="328">1.17609131336::iraqi|le||kurd|kurd||iraqi|irakien::iraqi kurd|le kurd irakien|||1.15490198135::and|et||NULL|de||turkey|la||turkey|turqu::and turkey|et de la turqu;-25.4115;Iraqi Kurds and Turkey 
+||||1.17609131336::iraqi|le||kurd|kurd||iraqi|irakien::iraqi kurd|le kurd irakien|||1.15490198135::and|et||NULL|de||turkey|la||turkey|turqu::and turkey|et de la turqu;-25.4292;Iraqi Kurds and Turkey 
+||||-0.0::kurd|kurd||iraqi|irakien||and|et::iraqi kurd and|kurd irakien et|||0.200659453869::turkey|la||turkey|turqu::turkey|la turqu;-25.4398;Iraqi Kurds and Turkey 
+||||1.19836759567::and|et||NULL|de||turkey|la||turkey|turqu::and turkey|et de la turqu|||1.17609131336::iraqi|le||kurd|kurd||iraqi|irakien::iraqi kurd|le kurd irakien;-25.5146;Iraqi Kurds and Turkey 
+||||1.17609131336::iraqi|le||kurd|kurd||iraqi|irakien::iraqi kurd|le kurd irakien|||0.0826695710421::and|et::and|et|||0.200659453869::turkey|la||turkey|turqu::turkey|la turqu;-25.5506;Iraqi Kurds and Turkey 
+||||1.17609131336::iraqi|le||kurd|kurd||iraqi|irakien::iraqi kurd|le kurd irakien|||0.0826695710421::and|et::and|et|||0.200659453869::turkey|la||turkey|turqu::turkey|la turqu;-25.5683;Iraqi Kurds and Turkey 
+||||1.17609131336::iraqi|le||kurd|kurd||iraqi|irakien::iraqi kurd|le kurd irakien|||0.262277394533::and|et||turkey|la||turkey|turqu::and turkey|et la turqu;-25.6289;Iraqi Kurds and Turkey 
+||||1.17609131336::iraqi|le||kurd|kurd||iraqi|irakien::iraqi kurd|le kurd irakien|||0.262277394533::and|et||turkey|la||turkey|turqu::and turkey|et la turqu;-25.6466;Iraqi Kurds and Turkey 
+||||0.295277655125::and|et||turkey|la||turkey|turqu::and turkey|et la turqu|||1.17609131336::iraqi|le||kurd|kurd||iraqi|irakien::iraqi kurd|le kurd irakien;-25.7072;Iraqi Kurds and Turkey 
+||||1.17609131336::iraqi|le||kurd|kurd||iraqi|irakien::iraqi kurd|le kurd irakien|||1.15490198135::and|et||NULL|de::and|et de|||0.200659453869::turkey|la||turkey|turqu::turkey|la turqu;-25.7415;Iraqi Kurds and Turkey 
+</query>
+<query id="329">2.17609119415::consequ|par||consequ|conséquent||NULL|,::consequ|par conséquent ,|||1.69896996021::if|si||NULL|le::if|si le|||2.47712135315::divorc|divorc||NULL|de::divorc|divorc de|||0.301030009985::and|et||diana|dian::and diana|et dian|||0.0821107327938::charl|charl::charl|charl;-33.5427;Consequences if Charles and Diana Divorce 
+||||2.17609119415::consequ|par||consequ|conséquent||NULL|,::consequ|par conséquent ,|||1.69896996021::if|si||NULL|le::if|si le|||2.47712135315::divorc|divorc||NULL|de::divorc|divorc de|||0.164389356971::charl|charl::charl|charl|||0.301030009985::and|et||diana|dian::and diana|et dian;-33.7379;Consequences if Charles and Diana Divorce 
+||||2.17609119415::consequ|par||consequ|conséquent||NULL|,::consequ|par conséquent ,|||1.69896996021::if|si||NULL|le::if|si le|||2.47712135315::divorc|divorc||NULL|de::divorc|divorc de|||0.400924861431::diana|dian::diana|dian|||0.164389356971::charl|charl::charl|charl|||0.0826695710421::and|et::and|et;-34.025;Consequences if Charles and Diana Divorce 
+||||2.17609119415::consequ|par||consequ|conséquent||NULL|,::consequ|par conséquent ,|||1.69896996021::if|si||NULL|le::if|si le|||2.47712135315::divorc|divorc||NULL|de::divorc|divorc de|||0.164389356971::charl|charl::charl|charl|||0.400924861431::diana|dian::diana|dian|||0.0826695710421::and|et::and|et;-34.025;Consequences if Charles and Diana Divorce 
+||||2.17609119415::consequ|par||consequ|conséquent||NULL|,::consequ|par conséquent ,|||1.69896996021::if|si||NULL|le::if|si le|||2.47712135315::divorc|divorc||NULL|de::divorc|divorc de|||0.400924861431::diana|dian::diana|dian|||0.209949523211::and|et::and|et|||0.0821107327938::charl|charl::charl|charl;-34.1317;Consequences if Charles and Diana Divorce 
+||||2.17609119415::consequ|par||consequ|conséquent||NULL|,::consequ|par conséquent ,|||1.69896996021::if|si||NULL|le::if|si le|||2.47712135315::divorc|divorc||NULL|de::divorc|divorc de|||0.400924861431::diana|dian::diana|dian|||0.301030009985::charl|charl||and|et::charl and|charl et;-34.2989;Consequences if Charles and Diana Divorce 
+||||2.17609119415::consequ|par||consequ|conséquent||NULL|,::consequ|par conséquent ,|||1.69896996021::if|si||NULL|le::if|si le|||2.47712135315::divorc|divorc||NULL|de::divorc|divorc de|||0.164389356971::charl|charl::charl|charl|||0.416423410177::and|et::and|et|||0.272258251905::diana|dian::diana|dian;-34.5114;Consequences if Charles and Diana Divorce 
+||||2.17609119415::consequ|par||consequ|conséquent||NULL|,::consequ|par conséquent ,|||1.69896996021::if|si||NULL|le::if|si le|||2.47712135315::divorc|divorc||NULL|de::divorc|divorc de|||0.513333439827::and|et::and|et|||0.0821107327938::charl|charl::charl|charl|||0.272258251905::diana|dian::diana|dian;-34.9774;Consequences if Charles and Diana Divorce 
+||||0.264933645725::consequ|conséquent::consequ|conséquent|||1.69896996021::if|si||NULL|le::if|si le|||2.47712135315::divorc|divorc||NULL|de::divorc|divorc de|||0.301030009985::and|et||diana|dian::and diana|et dian|||0.0821107327938::charl|charl::charl|charl;-35.3364;Consequences if Charles and Diana Divorce 
+||||0.264933645725::consequ|conséquent::consequ|conséquent|||1.69896996021::if|si||NULL|le::if|si le|||2.47712135315::divorc|divorc||NULL|de::divorc|divorc de|||0.164389356971::charl|charl::charl|charl|||0.301030009985::and|et||diana|dian::and diana|et dian;-35.5315;Consequences if Charles and Diana Divorce 
+</query>
+<query id="330">0.27572414279::film|film::film|film|||0.420216411352::with|avec::with|avec|||-1::keanu|keanu::keanu|keanu|||-1::reev|reev::reev|reev;-223.391;Films with Keanu Reeves 
+||||0.532638609409::with|avec::with|avec|||0.27572414279::film|film::film|film|||-1::keanu|keanu::keanu|keanu|||-1::reev|reev::reev|reev;-223.64;Films with Keanu Reeves 
+||||0.27572414279::film|film::film|film|||0.590630531311::with|avec::with|avec|||-1::keanu|keanu::keanu|keanu|||-1::reev|reev::reev|reev;-223.777;Films with Keanu Reeves 
+||||0.619788765907::film|film::film|film|||0.420216411352::with|avec::with|avec|||-1::keanu|keanu::keanu|keanu|||-1::reev|reev::reev|reev;-224.189;Films with Keanu Reeves 
+||||0.706269264221::with|avec::with|avec|||0.27572414279::film|film::film|film|||-1::keanu|keanu::keanu|keanu|||-1::reev|reev::reev|reev;-224.465;Films with Keanu Reeves 
+||||0.619788765907::film|film::film|film|||0.590630531311::with|avec::with|avec|||-1::keanu|keanu::keanu|keanu|||-1::reev|reev::reev|reev;-224.576;Films with Keanu Reeves 
+||||2.47712135315::film|le||film|film::film|le film|||0.420216411352::with|avec::with|avec|||-1::keanu|keanu::keanu|keanu|||-1::reev|reev::reev|reev;-226.586;Films with Keanu Reeves 
+||||2.47712135315::film|le||film|film::film|le film|||0.420216411352::with|avec::with|avec|||-1::keanu|keanu::keanu|keanu|||-1::reev|reev::reev|reev;-226.603;Films with Keanu Reeves 
+||||0.532638609409::with|avec::with|avec|||2.47712135315::film|le||film|film::film|le film|||-1::keanu|keanu::keanu|keanu|||-1::reev|reev::reev|reev;-226.852;Films with Keanu Reeves 
+||||2.47712135315::film|le||film|film::film|le film|||0.590630531311::with|avec::with|avec|||-1::keanu|keanu::keanu|keanu|||-1::reev|reev::reev|reev;-226.972;Films with Keanu Reeves 
+</query>
+<query id="304">0.698970019817::site|sit||NULL|du||heritag|patrimoin||world|mondial::world heritag site|sit du patrimoin mondial;-20.3242;World Heritage Sites 
+||||0.875061273575::site|patrimoin||world|mondial::world heritag site|patrimoin mondial;-23.5285;World Heritage Sites 
+||||1.13469862938::site|sit::site|sit|||1.07918119431::world|du||heritag|patrimoin||world|mondial::world heritag|du patrimoin mondial;-23.7714;World Heritage Sites 
+||||1.36172783375::site|sit||NULL|du||heritag|patrimoin::heritag site|sit du patrimoin|||0.644612312317::world|mondial::world|mondial;-24.9118;World Heritage Sites 
+||||1.87506127357::NULL|de||site|sit::site|de sit|||0.301030009985::heritag|patrimoin||world|mondial::world heritag|patrimoin mondial;-25.3176;World Heritage Sites 
+||||1.52287876606::world|mondial::world|mondial|||0.759667873383::site|sit||NULL|du||heritag|patrimoin::heritag site|sit du patrimoin;-25.5669;World Heritage Sites 
+||||1.36172783375::site|patrimoin::heritag site|patrimoin|||0.644612312317::world|mondial::world|mondial;-26.0658;World Heritage Sites 
+||||1.52287876606::world|mondial::world|mondial|||0.58357656002::site|patrimoin::heritag site|patrimoin;-26.3032;World Heritage Sites 
+||||2.47712135315::site|sit||NULL|du::site|sit du|||0.301030009985::heritag|patrimoin||world|mondial::world heritag|patrimoin mondial;-26.7424;World Heritage Sites 
+||||0.301030009985::heritag|patrimoin||world|mondial::world heritag|patrimoin mondial|||2.47712135315::site|de||site|sit::site|de sit;-26.7633;World Heritage Sites 
+</query>
+<query id="331">1.45484483242::'s|la||polici|polit||econom|économ::'s econom polici|la polit économ|||0.162727296352::zedillo|zedillo::zedillo|zedillo;-35.2762;Zedillo's Economic Policies 
+||||1.75587487221::'s|la||polici|polit||econom|économ||NULL|de::'s econom polici|la polit économ de|||0.162727296352::zedillo|zedillo::zedillo|zedillo;-37.9895;Zedillo's Economic Policies 
+||||0.162727296352::zedillo|zedillo::zedillo|zedillo|||0.755874872208::'s|la||polici|polit||econom|économ::'s econom polici|la polit économ;-38.286;Zedillo's Economic Policies 
+||||0.301030009985::zedillo|zedillo::zedillo|zedillo|||0.755874872208::'s|la||polici|polit||econom|économ::'s econom polici|la polit économ;-38.5963;Zedillo's Economic Policies 
+||||0.162727296352::zedillo|zedillo::zedillo|zedillo|||1.04575753212::'s|la::'s|la|||0.146707475185::polici|polit||econom|économ::econom polici|polit économ;-39.1933;Zedillo's Economic Policies 
+||||0.301030009985::zedillo|zedillo::zedillo|zedillo|||1.04575753212::'s|la::'s|la|||0.146707475185::polici|polit||econom|économ::econom polici|polit économ;-39.5036;Zedillo's Economic Policies 
+||||2.17609119415::'s|la||NULL|de::'s|la de|||0.162727296352::zedillo|zedillo::zedillo|zedillo|||0.146707475185::polici|polit||econom|économ::econom polici|polit économ;-39.6195;Zedillo's Economic Policies 
+||||2.47712135315::'s|la||polici|polit||NULL|de::'s polici|la polit de|||0.162727296352::zedillo|zedillo::zedillo|zedillo|||0.0774475336075::econom|économ::econom|économ;-40.1692;Zedillo's Economic Policies 
+||||0.162727296352::zedillo|zedillo::zedillo|zedillo|||0.644612312317::polici|polit||econom|économ::econom polici|polit économ|||1.04575753212::'s|la::'s|la;-40.3565;Zedillo's Economic Policies 
+||||0.162727296352::zedillo|zedillo::zedillo|zedillo|||1.63202321529::'s|la||polici|polit::'s polici|la polit|||0.0774475336075::econom|économ::econom|économ;-40.4018;Zedillo's Economic Policies 
+</query>
+<query id="332">1.09108042717::shoot|assassinat||of|de::shoot of|assassinat de|||-0.0::tupac|tupac::tupac|tupac|||-1::shakur|shakur::shakur|shakur;-129.722;Shooting of Tupac Shakur 
+||||-0.0::tupac|tupac::tupac|tupac|||1.09108042717::shoot|assassinat||of|de::shoot of|assassinat de|||-1::shakur|shakur::shakur|shakur;-129.74;Shooting of Tupac Shakur 
+||||1.09108042717::shoot|assassinat||of|de::shoot of|assassinat de|||-0.0::tupac|tupac::tupac|tupac|||-1::shakur|shakur::shakur|shakur;-129.74;Shooting of Tupac Shakur 
+||||1.09108042717::shoot|assassinat||of|de::shoot of|assassinat de|||-0.0::tupac|tupac::tupac|tupac|||-1::shakur|shakur::shakur|shakur;-129.74;Shooting of Tupac Shakur 
+||||1.09108042717::shoot|assassinat||of|de::shoot of|assassinat de|||-0.0::tupac|tupac::tupac|tupac|||-1::shakur|shakur::shakur|shakur;-129.758;Shooting of Tupac Shakur 
+||||1.56820178032::shoot|fusillad||of|de::shoot of|fusillad de|||-0.0::tupac|tupac::tupac|tupac|||-1::shakur|shakur::shakur|shakur;-129.878;Shooting of Tupac Shakur 
+||||1.56820178032::shoot|fusillad||of|de::shoot of|fusillad de|||-0.0::tupac|tupac::tupac|tupac|||-1::shakur|shakur::shakur|shakur;-129.895;Shooting of Tupac Shakur 
+||||-0.0::tupac|tupac::tupac|tupac|||1.56820178032::shoot|fusillad||of|de::shoot of|fusillad de|||-1::shakur|shakur::shakur|shakur;-129.895;Shooting of Tupac Shakur 
+||||1.56820178032::shoot|fusillad||of|de::shoot of|fusillad de|||-0.0::tupac|tupac::tupac|tupac|||-1::shakur|shakur::shakur|shakur;-129.895;Shooting of Tupac Shakur 
+||||1.56820178032::shoot|fusillad||of|de::shoot of|fusillad de|||-0.0::tupac|tupac::tupac|tupac|||-1::shakur|shakur::shakur|shakur;-129.913;Shooting of Tupac Shakur 
+</query>
+<query id="333">0.286789566278::trial|proces::trial|proces|||0.24303804338::of|de||paul|paul::of paul|de paul|||-1::touvier|touvier::touvier|touvier;-370.153;Trial of Paul Touvier 
+||||0.286789566278::trial|proces::trial|proces|||0.301030009985::of|de||paul|paul::of paul|de paul|||-1::touvier|touvier::touvier|touvier;-370.273;Trial of Paul Touvier 
+||||0.301030009985::of|de||paul|paul::of paul|de paul|||0.286789566278::trial|proces::trial|proces|||-1::touvier|touvier::touvier|touvier;-370.273;Trial of Paul Touvier 
+||||0.286789566278::trial|proces::trial|proces|||0.226701259613::of|de::of|de|||0.205279648304::paul|paul::paul|paul|||-1::touvier|touvier::touvier|touvier;-370.473;Trial of Paul Touvier 
+||||0.481841892004::trial|proces||of|de::trial of|proces de|||0.205279648304::paul|paul::paul|paul|||-1::touvier|touvier::touvier|touvier;-370.526;Trial of Paul Touvier 
+||||0.289600521326::of|de::of|de|||0.286789566278::trial|proces::trial|proces|||0.205279648304::paul|paul::paul|paul|||-1::touvier|touvier::touvier|touvier;-370.605;Trial of Paul Touvier 
+||||0.286789566278::trial|proces::trial|proces|||0.226701259613::of|de::of|de|||0.32483291626::paul|paul::paul|paul|||-1::touvier|touvier::touvier|touvier;-370.739;Trial of Paul Touvier 
+||||0.286789566278::trial|proces::trial|proces|||0.366531550884::of|de::of|de|||0.205279648304::paul|paul::paul|paul|||-1::touvier|touvier::touvier|touvier;-370.787;Trial of Paul Touvier 
+||||0.481841892004::trial|proces||of|de::trial of|proces de|||0.32483291626::paul|paul::paul|paul|||-1::touvier|touvier::touvier|touvier;-370.792;Trial of Paul Touvier 
+||||0.604413866997::trial|proces||of|de::trial of|proces de|||0.205279648304::paul|paul::paul|paul|||-1::touvier|touvier::touvier|touvier;-370.799;Trial of Paul Touvier 
+</query>
+<query id="334">0.301030009985::elect|élect::elect|élect|||2.47712135315::w.|w||w.|.||bush|bush||w.|.::w. bush|w . bush .|||0.176091253757::of|de||georg|georg::of georg|de georg;-13.9552;Election of George W. Bush 
+||||0.301030009985::elect|élect::elect|élect|||0.218843236566::of|de||georg|georg::of georg|de georg|||2.47712135315::w.|w||w.|.||bush|bush||w.|.::w. bush|w . bush .;-14.0566;Election of George W. Bush 
+||||2.47712135315::w.|w||w.|.||bush|bush||w.|.::w. bush|w . bush .|||0.301030009985::of|de||georg|georg::of georg|de georg|||0.301030009985::elect|élect::elect|élect;-14.2338;Election of George W. Bush 
+||||0.60206001997::elect|élect||of|de::elect of|élect de|||2.47712135315::w.|w||w.|.||bush|bush||w.|.::w. bush|w . bush .|||0.0757207125425::georg|georg::georg|georg;-14.4311;Election of George W. Bush 
+||||0.67094129324::elect|élect||of|de::elect of|élect de|||2.47712135315::w.|w||w.|.||bush|bush||w.|.::w. bush|w . bush .|||0.0757207125425::georg|georg::georg|georg;-14.5768;Election of George W. Bush 
+||||2.47712135315::w.|w||w.|.||bush|bush||w.|.::w. bush|w . bush .|||0.67094129324::elect|élect||of|de::elect of|élect de|||0.0757207125425::georg|georg::georg|georg;-14.5768;Election of George W. Bush 
+||||0.60206001997::elect|élect||of|de::elect of|élect de|||0.144682794809::georg|georg::georg|georg|||2.47712135315::w.|w||w.|.||bush|bush||w.|.::w. bush|w . bush .;-14.5947;Election of George W. Bush 
+||||0.67094129324::elect|élect||of|de::elect of|élect de|||0.144682794809::georg|georg::georg|georg|||2.47712135315::w.|w||w.|.||bush|bush||w.|.::w. bush|w . bush .;-14.7404;Election of George W. Bush 
+||||0.691791415215::elect|élect::elect|élect|||2.47712135315::w.|w||w.|.||bush|bush||w.|.::w. bush|w . bush .|||0.176091253757::of|de||georg|georg::of georg|de georg;-14.8643;Election of George W. Bush 
+||||2.47712135315::w.|w||w.|.||bush|bush||w.|.::w. bush|w . bush .|||0.691791415215::elect|élect::elect|élect|||0.176091253757::of|de||georg|georg::of georg|de georg;-14.8643;Election of George W. Bush 
+</query>
+<query id="335">0.691791415215::labour|du||labour|travail::labour|du travail|||-0.0::john|john||smith|smith::john smith|john smith|||0.205279648304::after|apres::after|apres;-31.7675;Labour after John Smith 
+||||0.691791415215::labour|du||labour|travail::labour|du travail|||0.205279648304::after|apres::after|apres|||-0.0::john|john||smith|smith::john smith|john smith;-31.7852;Labour after John Smith 
+||||0.691791415215::labour|du||labour|travail::labour|du travail|||0.334106445312::after|apres::after|apres|||-0.0::john|john||smith|smith::john smith|john smith;-32.073;Labour after John Smith 
+||||-0.0::john|john||smith|smith::john smith|john smith|||0.427903234959::after|apres::after|apres|||0.691791415215::labour|du||labour|travail::labour|du travail;-32.2778;Labour after John Smith 
+||||0.427903234959::after|apres::after|apres|||0.691791415215::labour|du||labour|travail::labour|du travail|||-0.0::john|john||smith|smith::john smith|john smith;-32.2955;Labour after John Smith 
+||||0.691791415215::labour|du||labour|travail::labour|du travail|||0.205279648304::after|apres::after|apres|||0.159057915211::john|john::john|john|||0.113231979311::smith|smith::smith|smith;-32.3028;Labour after John Smith 
+||||0.691791415215::labour|du||labour|travail::labour|du travail|||0.205279648304::after|apres::after|apres|||0.246672332287::john|john::john|john|||0.113231979311::smith|smith::smith|smith;-32.4929;Labour after John Smith 
+||||0.691791415215::labour|du||labour|travail::labour|du travail|||0.205279648304::after|apres::after|apres|||0.205546244979::smith|smith::smith|smith|||0.159057915211::john|john::john|john;-32.5041;Labour after John Smith 
+||||0.691791415215::labour|du||labour|travail::labour|du travail|||0.334106445312::after|apres::after|apres|||0.159057915211::john|john::john|john|||0.113231979311::smith|smith::smith|smith;-32.5907;Labour after John Smith 
+||||0.691791415215::labour|du||labour|travail::labour|du travail|||0.477121263742::after|apres||john|john::after john|apres john|||0.113231979311::smith|smith::smith|smith;-32.6808;Labour after John Smith 
+</query>
+<query id="336">-1::nba|nba::nba|nba|||1.87506127357::labour|du::labour|du|||0.337242156267::conflict|confl::conflict|confl;-133.653;NBA Labour Conflicts
+||||-1::nba|nba::nba|nba|||0.657577335835::conflict|confl::conflict|confl|||1.87506127357::labour|du::labour|du;-134.395;NBA Labour Conflicts
+||||-1::nba|nba::nba|nba|||1.30103003979::conflict|confl::conflict|confl|||0.691791415215::labour|du||labour|travail::labour|du travail;-134.727;NBA Labour Conflicts
+||||-1::nba|nba::nba|nba|||2.47712135315::NULL|de||labour|travail::labour|de travail|||0.337242156267::conflict|confl::conflict|confl;-135.562;NBA Labour Conflicts
+||||2.47712135315::NULL|de||labour|travail::labour|de travail|||-1::nba|nba::nba|nba|||0.337242156267::conflict|confl::conflict|confl;-135.976;NBA Labour Conflicts
+||||-1::nba|nba::nba|nba|||2.47712135315::NULL|de||labour|travail::labour|de travail|||0.477121263742::conflict|conflit::conflict|conflit;-136.209;NBA Labour Conflicts
+||||2.47712135315::NULL|de||labour|travail::labour|de travail|||-1::nba|nba::nba|nba|||0.477121263742::conflict|conflit::conflict|conflit;-136.623;NBA Labour Conflicts
+||||-1::nba|nba::nba|nba|||2.47712135315::labour|du||labour|travail::labour|du travail|||0.337242156267::conflict|confl::conflict|confl;-136.675;NBA Labour Conflicts
+||||2.47712135315::labour|du||labour|travail::labour|du travail|||-1::nba|nba::nba|nba|||0.337242156267::conflict|confl::conflict|confl;-137.386;NBA Labour Conflicts
+||||2.47712135315::NULL|le||labour|du||labour|travail::labour|le du travail|||-1::nba|nba::nba|nba|||0.337242156267::conflict|confl::conflict|confl;-137.559;NBA Labour Conflicts
+</query>
+<query id="337">0.833668589592::civil|la||war|guerr||civil|civil::civil war|la guerr civil|||1.52287876606::in|au::in the|au|||0.184865176678::yemen|yémen::yemen|yémen;-19.3874;Civil War in the Yemen 
+||||0.903090000153::war|guerr||civil|civil||in|au::civil war in the|guerr civil au|||0.184865176678::yemen|yémen::yemen|yémen;-19.7683;Civil War in the Yemen 
+||||1.02996325493::civil|la||war|guerr||civil|civil::civil war|la guerr civil|||1.52287876606::in|au::in the|au|||0.184865176678::yemen|yémen::yemen|yémen;-19.8353;Civil War in the Yemen 
+||||0.833668589592::civil|la||war|guerr||civil|civil::civil war|la guerr civil|||0.513333439827::yemen|yémen::yemen|yémen|||1.87506127357::the|au::in the|au;-21.0018;Civil War in the Yemen 
+||||0.109765335917::war|guerr||civil|civil::civil war|guerr civil|||1.52287876606::in|au::in the|au|||0.184865176678::yemen|yémen::yemen|yémen;-21.3705;Civil War in the Yemen 
+||||1.02996325493::civil|la||war|guerr||civil|civil::civil war|la guerr civil|||0.513333439827::yemen|yémen::yemen|yémen|||1.87506127357::the|au::in the|au;-21.4496;Civil War in the Yemen 
+||||2.17609119415::war|guerr||civil|civil::civil war|guerr civil|||1.19836759567::in|dan||the|la::in the|dan la|||0.833668589592::yemen|au||yemen|yémen::yemen|au yémen;-21.5123;Civil War in the Yemen 
+||||0.875061273575::yemen|au||yemen|yémen::yemen|au yémen|||2.17609119415::war|guerr||civil|civil::civil war|guerr civil|||1.19836759567::in|dan||the|la::in the|dan la;-21.5928;Civil War in the Yemen 
+||||0.343582332134::war|guerr||civil|civil::civil war|guerr civil|||1.52287876606::in|au::in the|au|||0.184865176678::yemen|yémen::yemen|yémen;-21.9073;Civil War in the Yemen 
+||||2.17609119415::civil|la||civil|civil::civil|la civil|||0.0588199645281::war|guerr::war|guerr|||1.52287876606::in|au::in the|au|||0.184865176678::yemen|yémen::yemen|yémen;-22.565;Civil War in the Yemen 
+</query>
+<query id="338">1.24667239189::'|"||'|"::'|" "|||0.252400457859::carlo|carlos::carlo|carlos|||1.6532125473::and|et||NULL|au||trial|proces::and trial|et au proces|||0.180456057191::extradit|extradit::extradit|extradit;-37.0258;Carlos' Extradition and Trial 
+||||1.24667239189::'|"||'|"::'|" "|||0.252400457859::carlo|carlos::carlo|carlos|||1.21085333824::extradit|extrad||and|et::extradit and|extrad et|||1.06214785576::trial|jug::trial|jug;-37.5942;Carlos' Extradition and Trial 
+||||1.24667239189::'|"||'|"::'|" "|||0.252400457859::carlo|carlos::carlo|carlos|||0.468521088362::extradit|extradit::extradit|extradit|||1.6532125473::and|et||NULL|au||trial|proces::and trial|et au proces;-37.709;Carlos' Extradition and Trial 
+||||1.24667239189::'|"||'|"::'|" "|||0.252400457859::carlo|carlos::carlo|carlos|||1.6532125473::and|et||trial|jug::and trial|et jug|||0.778151273727::extradit|extrad::extradit|extrad;-37.9698;Carlos' Extradition and Trial 
+||||1.81291329861::NULL|d'||extradit|extradit||and|et||NULL|de::extradit and|d' extradit et de|||1.24667239189::'|"||'|"::'|" "|||0.252400457859::carlo|carlos::carlo|carlos|||0.286789566278::trial|proces::trial|proces;-38.0255;Carlos' Extradition and Trial 
+||||1.24667239189::'|"||'|"::'|" "|||0.252400457859::carlo|carlos::carlo|carlos|||0.180456057191::extradit|extradit::extradit|extradit|||0.698970019817::and|et||NULL|le||trial|proces::and trial|et le proces;-38.3427;Carlos' Extradition and Trial 
+||||1.6532125473::and|et||NULL|au||trial|proces::and trial|et au proces|||0.786925196648::extradit|extradit::extradit|extradit|||1.24667239189::'|"||'|"::'|" "|||0.252400457859::carlo|carlos::carlo|carlos;-38.4465;Carlos' Extradition and Trial 
+||||1.24667239189::'|"||'|"::'|" "|||0.252400457859::carlo|carlos::carlo|carlos|||0.985759556293::extradit|extrad::extradit|extrad|||1.6532125473::and|et||trial|jug::and trial|et jug;-38.4622;Carlos' Extradition and Trial 
+||||1.6532125473::and|et||NULL|au||trial|proces::and trial|et au proces|||1.69896996021::'|"||'|"::'|" "|||0.252400457859::carlo|carlos::carlo|carlos|||0.180456057191::extradit|extradit::extradit|extradit;-38.5121;Carlos' Extradition and Trial 
+||||1.69896996021::'|"||'|"::'|" "|||0.252400457859::carlo|carlos::carlo|carlos|||1.6532125473::and|et||NULL|au||trial|proces::and trial|et au proces|||0.180456057191::extradit|extradit::extradit|extradit;-38.5121;Carlos' Extradition and Trial 
+</query>
+<query id="339">1.41497337818::sinn|sinn||fein|fein::sinn fein|sinn fein|||0.698970019817::and|et||the|le||anglo|anglo||-|-::and the anglo -|et le anglo -|||0.254404783249::irish|irland::irish|irland|||0.0722875371575::declar|déclar::declar|déclar;-35.167;Sinn Fein and the Anglo-Irish Declaration 
+||||1.41497337818::sinn|sinn||fein|fein::sinn fein|sinn fein|||0.706269264221::and|et||the|le::and the|et le|||0.564271450043::anglo|anglo||-|-||irish|irland::anglo - irish|anglo - irland|||0.0722875371575::declar|déclar::declar|déclar;-35.9192;Sinn Fein and the Anglo-Irish Declaration 
+||||0.472799867392::declar|déclar::declar|déclar|||1.41497337818::sinn|sinn||fein|fein::sinn fein|sinn fein|||0.698970019817::and|et||the|le||anglo|anglo||-|-::and the anglo -|et le anglo -|||0.254404783249::irish|irland::irish|irland;-36.0992;Sinn Fein and the Anglo-Irish Declaration 
+||||1.41497337818::sinn|sinn||fein|fein::sinn fein|sinn fein|||1.01472330093::and|et||the|l'::and the|et l'|||0.564271450043::anglo|anglo||-|-||irish|irland::anglo - irish|anglo - irland|||0.0722875371575::declar|déclar::declar|déclar;-36.3789;Sinn Fein and the Anglo-Irish Declaration 
+||||1.41497337818::sinn|sinn||fein|fein::sinn fein|sinn fein|||0.706269264221::and|et||the|le::and the|et le|||0.103070318699::anglo|anglo::anglo|anglo|||0.778151273727::-|-||irish|irland::- irish|- irland|||0.0722875371575::declar|déclar::declar|déclar;-36.5251;Sinn Fein and the Anglo-Irish Declaration 
+||||1.41497337818::sinn|sinn||fein|fein::sinn fein|sinn fein|||0.706269264221::and|et||the|le::and the|et le|||0.647564888::anglo|anglo||-|-::anglo -|anglo -|||0.254404783249::irish|irland::irish|irland|||0.0722875371575::declar|déclar::declar|déclar;-36.5743;Sinn Fein and the Anglo-Irish Declaration 
+||||1.41497337818::sinn|sinn||fein|fein::sinn fein|sinn fein|||0.778151273727::and|et||the|le||anglo|anglo::and the anglo|et le anglo|||0.778151273727::-|-||irish|irland::- irish|- irland|||0.0722875371575::declar|déclar::declar|déclar;-36.597;Sinn Fein and the Anglo-Irish Declaration 
+||||1.41497337818::sinn|sinn||fein|fein::sinn fein|sinn fein|||0.706269264221::and|et||the|le::and the|et le|||0.103070318699::anglo|anglo::anglo|anglo|||0.619788765907::-|-::-|-|||0.254404783249::irish|irland::irish|irland|||0.0722875371575::declar|déclar::declar|déclar;-36.6069;Sinn Fein and the Anglo-Irish Declaration 
+||||1.41497337818::sinn|sinn||fein|fein::sinn fein|sinn fein|||0.778151273727::and|et||the|le||anglo|anglo::and the anglo|et le anglo|||0.619788765907::-|-::-|-|||0.254404783249::irish|irland::irish|irland|||0.0722875371575::declar|déclar::declar|déclar;-36.6789;Sinn Fein and the Anglo-Irish Declaration 
+||||0.472799867392::declar|déclar::declar|déclar|||1.41497337818::sinn|sinn||fein|fein::sinn fein|sinn fein|||0.706269264221::and|et||the|le::and the|et le|||0.564271450043::anglo|anglo||-|-||irish|irland::anglo - irish|anglo - irland;-36.8514;Sinn Fein and the Anglo-Irish Declaration 
+</query>
+<query id="340">0.363177895546::new|nouveau::new|nouveau|||2.06258201599::premier|premi||premier|ministr::premier|premi ministr|||1.13033378124::quebec|du||quebec|québec::quebec|du québec;-27.8731;New Quebec Premier 
+||||0.44773748517::new|nouveau::new|nouveau|||2.06258201599::premier|premi||premier|ministr::premier|premi ministr|||1.13033378124::quebec|du||quebec|québec::quebec|du québec;-28.0559;New Quebec Premier 
+||||0.330993205309::new|nouvel::new|nouvel|||2.06258201599::premier|premi||premier|ministr::premier|premi ministr|||1.13033378124::quebec|du||quebec|québec::quebec|du québec;-28.8583;New Quebec Premier 
+||||0.431798279285::new|nouvel::new|nouvel|||2.06258201599::premier|premi||premier|ministr::premier|premi ministr|||1.13033378124::quebec|du||quebec|québec::quebec|du québec;-29.0797;New Quebec Premier 
+||||0.363177895546::new|nouveau::new|nouveau|||1.13033378124::quebec|québec::quebec|québec|||0.326185494661::premier|premi||premier|ministr::premier|premi ministr;-31.4133;New Quebec Premier 
+||||0.44773748517::new|nouveau::new|nouveau|||1.13033378124::quebec|québec::quebec|québec|||0.326185494661::premier|premi||premier|ministr::premier|premi ministr;-31.5962;New Quebec Premier 
+||||1.43136382103::quebec|québec::quebec|québec|||0.363177895546::new|nouveau::new|nouveau|||0.326185494661::premier|premi||premier|ministr::premier|premi ministr;-32.5409;New Quebec Premier 
+||||0.330993205309::new|nouvel::new|nouvel|||1.13033378124::quebec|québec::quebec|québec|||0.326185494661::premier|premi||premier|ministr::premier|premi ministr;-32.6015;New Quebec Premier 
+||||2.0::new|nouvel::new|nouvel|||2.06258201599::premier|premi||premier|ministr::premier|premi ministr|||1.13033378124::quebec|du||quebec|québec::quebec|du québec;-32.6737;New Quebec Premier 
+||||0.363177895546::new|nouveau::new|nouveau|||2.06258201599::premier|premi||premier|ministr::premier|premi ministr|||1.13033378124::quebec|québécois::quebec|québécois;-32.705;New Quebec Premier 
+</query>
+<query id="305">0.971971273422::oil|le||price|prix||oil|du||oil|pétrol::oil price|le prix du pétrol;-8.63323;Oil Prices 
+||||0.508638322353::price|prix||oil|du||oil|pétrol::oil price|prix du pétrol;-13.9218;Oil Prices 
+||||2.47712135315::oil|le||price|prix||oil|du||oil|baril||NULL|de||oil|pétrol::oil price|le prix du baril de pétrol;-15.0006;Oil Prices 
+||||1.19836759567::oil|du||price|prix||oil|du||oil|pétrol::oil price|du prix du pétrol;-17.0124;Oil Prices 
+||||2.0::oil|du||oil|pétrol::oil|du pétrol|||0.0879551693797::price|prix::price|prix;-17.5217;Oil Prices 
+||||1.06214785576::price|prix::price|prix|||1.04575753212::oil|du||oil|pétrol::oil|du pétrol;-17.569;Oil Prices 
+||||2.17609119415::oil|le||price|cour||oil|du||oil|pétrol::oil price|le cour du pétrol;-18.7073;Oil Prices 
+||||1.63202321529::oil|du||price|pétrol::oil price|du pétrol;-21.6692;Oil Prices 
+||||2.47712135315::oil|le||price|prix||oil|du||oil|baril::oil price|le prix du baril;-22.1999;Oil Prices 
+||||2.47712135315::oil|le||price|prix||oil|pétroli::oil price|le prix pétroli;-22.4625;Oil Prices 
+</query>
+<query id="341">0.130653217435::theft|vol::theft|vol|||1.27875363827::of|de||"|«::of " the|de «|||0.732393741608::scream|hurl::scream|hurl|||0.542622804642::"|"::"|";-40.0007;Theft of "The Scream" 
+||||0.130653217435::theft|vol::theft|vol|||1.27875363827::of|de||"|«::of " the|de «|||0.82930380106::scream|hurl::scream|hurl|||0.542622804642::"|"::"|";-40.2128;Theft of "The Scream" 
+||||0.130653217435::theft|vol::theft|vol|||0.684729576111::"|"::"|"|||1.27875363827::of|de||"|«::of " the|de «|||0.732393741608::scream|hurl::scream|hurl;-40.32;Theft of "The Scream" 
+||||0.130653217435::theft|vol::theft|vol|||1.27875363827::of|de||"|«::of " the|de «|||0.684729576111::"|"::"|"|||0.732393741608::scream|hurl::scream|hurl;-40.32;Theft of "The Scream" 
+||||0.130653217435::theft|vol::theft|vol|||0.226701259613::of|de::of|de|||-0.0::scream|cris::the scream|cris|||0.769551098347::"|«::"|«|||0.971971273422::"|»::"|»;-40.3735;Theft of "The Scream" 
+||||1.27875363827::of|de||"|«::of " the|de «|||0.130653217435::theft|vol::theft|vol|||0.732393741608::scream|hurl::scream|hurl|||0.542622804642::"|"::"|";-40.4143;Theft of "The Scream" 
+||||0.130653217435::theft|vol::theft|vol|||-0.0::scream|cris::the scream|cris|||0.985759556293::of|de||"|«::of "|de «|||0.971971273422::"|»::"|»;-40.4768;Theft of "The Scream" 
+||||0.289600521326::of|de::of|de|||0.130653217435::theft|vol::theft|vol|||-0.0::scream|cris::the scream|cris|||0.769551098347::"|«::"|«|||0.971971273422::"|»::"|»;-40.5049;Theft of "The Scream" 
+||||0.355387657881::theft|vol::theft|vol|||1.27875363827::of|de||"|«::of " the|de «|||0.732393741608::scream|hurl::scream|hurl|||0.542622804642::"|"::"|";-40.516;Theft of "The Scream" 
+||||-0.0::scream|cris::the scream|cris|||1.02996325493::of|de||"|«::of "|de «|||0.130653217435::theft|vol::theft|vol|||0.971971273422::"|»::"|»;-40.5639;Theft of "The Scream" 
+</query>
+<query id="342">-0.0::four|quatr||wed|mariag::four wed|quatr mariag|||-0.0::and|et||a|un||funer|enterr::and a funer|et un enterr;-17.9583;Four Weddings and a Funeral 
+||||-0.0::and|et||a|un||funer|enterr::and a funer|et un enterr|||-0.0::four|quatr||wed|mariag::four wed|quatr mariag;-17.9583;Four Weddings and a Funeral 
+||||-0.0::four|quatr||funer|enterr::four funer|quatr enterr|||-0.0::wed|mariag||and|et||a|un::wed and a|mariag et un;-17.9583;Four Weddings and a Funeral 
+||||-0.0::four|quatr||wed|mariag::four wed|quatr mariag|||-0.0::and|et||a|un||funer|enterr::and a funer|et un enterr;-17.976;Four Weddings and a Funeral 
+||||-0.0::wed|mariag||and|et||a|un||funer|enterr::wed and a funer|mariag et un enterr|||0.0346414856613::four|quatr::four|quatr;-18.0405;Four Weddings and a Funeral 
+||||0.0346414856613::four|quatr::four|quatr|||-0.0::wed|mariag||and|et||a|un||funer|enterr::wed and a funer|mariag et un enterr;-18.0582;Four Weddings and a Funeral 
+||||-0.0::four|quatr||wed|mariag||and|et||a|un||funer|enterr::four wed and a funer|quatr mariag et un enterr;-18.1042;Four Weddings and a Funeral 
+||||0.196087881923::four|quatr::four|quatr|||-0.0::wed|mariag||and|et||a|un||funer|enterr::wed and a funer|mariag et un enterr;-18.4234;Four Weddings and a Funeral 
+||||-0.0::four|quatr||a|un||funer|enterr::four a funer|quatr un enterr|||0.301030009985::wed|mariag||and|et::wed and|mariag et;-18.6723;Four Weddings and a Funeral 
+||||0.0346414856613::four|quatr::four|quatr|||-0.0::and|et||a|un||funer|enterr::and a funer|et un enterr|||0.477121263742::wed|mariag::wed|mariag;-19.0439;Four Weddings and a Funeral 
+</query>
+<query id="343">1.16057908535::south|sud||NULL|-||african|africain::south african|sud - africain|||1.24715459347::nation|le||parti|part||nation|national::nation parti|le part national;-20.3514;South African National Party 
+||||1.16057908535::south|sud||NULL|-||african|africain::south african|sud - africain|||2.0::nation|le||nation|national::nation|le national|||0.152838796377::parti|part::parti|part;-22.3536;South African National Party 
+||||1.16057908535::south|sud||NULL|-||african|africain::south african|sud - africain|||0.148318678141::parti|part||nation|national::nation parti|part national;-23.5586;South African National Party 
+||||1.50242710114::parti|part||nation|national::nation parti|part national|||0.174514874816::south|sud||NULL|-||african|africain::south african|sud - africain;-24.4315;South African National Party 
+||||2.13830280304::NULL|de||NULL|l'||african|afriqu||south|du||south|sud::south african|de l' afriqu du sud|||1.24715459347::nation|le||parti|part||nation|national::nation parti|le part national;-25.8693;South African National Party 
+||||2.13830280304::NULL|en||african|afriqu||south|du||south|sud::south african|en afriqu du sud|||1.24715459347::nation|le||parti|part||nation|national::nation parti|le part national;-26.0262;South African National Party 
+||||1.01472330093::parti|part::parti|part|||1.16057908535::south|sud||NULL|-||african|africain::south african|sud - africain|||0.2596372962::nation|national::nation|national;-26.0834;South African National Party 
+||||1.16057908535::south|sud||NULL|-||african|africain::south african|sud - africain|||1.01472330093::parti|part::parti|part|||0.2596372962::nation|national::nation|national;-26.0834;South African National Party 
+||||1.16057908535::south|sud||NULL|-||african|africain::south african|sud - africain|||1.17609131336::nation|national::nation|national|||0.152838796377::parti|part::parti|part;-26.2129;South African National Party 
+||||1.16057908535::south|sud||NULL|-||african|africain::south african|sud - africain|||2.17609119415::parti|part||NULL|de::parti|part de|||0.2596372962::nation|national::nation|national;-26.6533;South African National Party 
+</query>
+<query id="344">2.0::cup|coup||world|du||world|mond::world cup|coup du mond|||0.472799867392::sweden|la||sweden|sued::sweden|la sued|||0.903090000153::vs.|contr::vs.|contr|||1.17609131336::brazil|au||brazil|brésil::brazil|au brésil|||-1::semifin|semifin::semifin|semifin;-391.974;Brazil vs. Sweden World Cup Semifinals 
+||||2.0::cup|coup||world|du||world|mond::world cup|coup du mond|||1.39794003963::brazil|au||brazil|brésil::brazil|au brésil|||0.472799867392::sweden|la||sweden|sued::sweden|la sued|||0.778151273727::vs.|contr::vs.|contr|||-1::semifin|semifin::semifin|semifin;-392.204;Brazil vs. Sweden World Cup Semifinals 
+||||2.0::cup|coup||world|du||world|mond::world cup|coup du mond|||0.472799867392::sweden|la||sweden|sued::sweden|la sued|||1.39794003963::brazil|au||brazil|brésil::brazil|au brésil|||0.778151273727::vs.|contr::vs.|contr|||-1::semifin|semifin::semifin|semifin;-392.204;Brazil vs. Sweden World Cup Semifinals 
+||||2.0::cup|coup||world|du||world|mond::world cup|coup du mond|||1.39794003963::brazil|au||brazil|brésil::brazil|au brésil|||1.07918119431::vs.|contr::vs.|contr|||0.283996641636::sweden|la||sweden|sued::sweden|la sued|||-1::semifin|semifin::semifin|semifin;-392.47;Brazil vs. Sweden World Cup Semifinals 
+||||0.92081874609::brazil|le||brazil|brésil::brazil|le brésil|||1.38021123409::vs.|ou::vs.|ou|||0.283996641636::sweden|la||sweden|sued::sweden|la sued|||0.321785211563::cup|coup||world|du||world|mond::world cup|coup du mond|||-1::semifin|semifin::semifin|semifin;-392.494;Brazil vs. Sweden World Cup Semifinals 
+||||1.02996325493::brazil|le||brazil|brésil::brazil|le brésil|||1.38021123409::vs.|ou::vs.|ou|||0.283996641636::sweden|la||sweden|sued::sweden|la sued|||0.321785211563::cup|coup||world|du||world|mond::world cup|coup du mond|||-1::semifin|semifin::semifin|semifin;-392.735;Brazil vs. Sweden World Cup Semifinals 
+||||0.92081874609::brazil|le||brazil|brésil::brazil|le brésil|||0.472799867392::sweden|la||sweden|sued::sweden|la sued|||1.38021123409::vs.|ou::vs.|ou|||0.321785211563::cup|coup||world|du||world|mond::world cup|coup du mond|||-1::semifin|semifin::semifin|semifin;-392.924;Brazil vs. Sweden World Cup Semifinals 
+||||0.92081874609::brazil|le||brazil|brésil::brazil|le brésil|||0.778151273727::vs.|contr::vs.|contr|||0.283996641636::sweden|la||sweden|sued::sweden|la sued|||0.321785211563::cup|coup||world|du||world|mond::world cup|coup du mond|||-1::semifin|semifin::semifin|semifin;-392.971;Brazil vs. Sweden World Cup Semifinals 
+||||2.0::cup|coup||world|du||world|mond::world cup|coup du mond|||1.38021123409::vs.|contr::vs.|contr|||1.17609131336::brazil|au||brazil|brésil::brazil|au brésil|||0.283996641636::sweden|la||sweden|sued::sweden|la sued|||-1::semifin|semifin::semifin|semifin;-393.089;Brazil vs. Sweden World Cup Semifinals 
+||||0.301030009985::brazil|brésil||sweden|la||sweden|sued::brazil sweden|brésil la sued|||0.778151273727::vs.|contr::vs.|contr|||0.321785211563::cup|coup||world|du||world|mond::world cup|coup du mond|||-1::semifin|semifin::semifin|semifin;-393.162;Brazil vs. Sweden World Cup Semifinals 
+</query>
+<query id="345">0.359021931887::the|aux||game|jeux||olymp|olymp::at the olymp game|aux jeux olymp|||0.60206001997::ski|ski||NULL|de||ski|fond::cross - countri ski|ski de fond|||0.0162234120071::.|.::.|.;-34.6807;Cross-country Skiing at the Olympic Games. 
+||||0.104209251702::.|.::.|.|||0.359021931887::the|aux||game|jeux||olymp|olymp::at the olymp game|aux jeux olymp|||0.60206001997::ski|ski||NULL|de||ski|fond::cross - countri ski|ski de fond;-34.8716;Cross-country Skiing at the Olympic Games. 
+||||0.60206001997::ski|ski||NULL|de||ski|fond::cross - countri ski|ski de fond|||1.20412003994::at|à||the|l'||olymp|occas||NULL|de||game|jeux||olymp|olymp::at the olymp game|à l' occas de jeux olymp|||0.0162234120071::.|.::.|.;-37.0632;Cross-country Skiing at the Olympic Games. 
+||||0.60206001997::ski|ski||NULL|de||ski|fond::cross - countri ski|ski de fond|||1.20412003994::at|pour||the|le||game|jeux||olymp|olymp::at the olymp game|pour le jeux olymp|||0.0162234120071::.|.::.|.;-37.0773;Cross-country Skiing at the Olympic Games. 
+||||1.20412003994::at|à||the|l'||olymp|occas||NULL|de||game|jeux||olymp|olymp::at the olymp game|à l' occas de jeux olymp|||0.60206001997::ski|ski||NULL|de||ski|fond::cross - countri ski|ski de fond|||0.0162234120071::.|.::.|.;-37.0809;Cross-country Skiing at the Olympic Games. 
+||||0.60206001997::ski|ski||NULL|de||ski|fond::cross - countri ski|ski de fond|||1.20412003994::at|à||the|l'||olymp|occas||NULL|de||game|jeux||olymp|olymp::at the olymp game|à l' occas de jeux olymp|||0.0162234120071::.|.::.|.;-37.0809;Cross-country Skiing at the Olympic Games. 
+||||0.60206001997::ski|ski||NULL|de||ski|fond::cross - countri ski|ski de fond|||1.20412003994::at|à||the|l'||olymp|occas||NULL|de||game|jeux||olymp|olymp::at the olymp game|à l' occas de jeux olymp|||0.0162234120071::.|.::.|.;-37.0809;Cross-country Skiing at the Olympic Games. 
+||||0.60206001997::ski|ski||NULL|de||ski|fond::cross - countri ski|ski de fond|||1.20412003994::at|pour||the|le||game|jeux||olymp|olymp::at the olymp game|pour le jeux olymp|||0.0162234120071::.|.::.|.;-37.095;Cross-country Skiing at the Olympic Games. 
+||||0.60206001997::ski|ski||NULL|de||ski|fond::cross - countri ski|ski de fond|||1.20412003994::at|pour||the|le||game|jeux||olymp|olymp::at the olymp game|pour le jeux olymp|||0.0162234120071::.|.::.|.;-37.095;Cross-country Skiing at the Olympic Games. 
+||||0.60206001997::ski|ski||NULL|de||ski|fond::cross - countri ski|ski de fond|||1.20412003994::at|à||the|l'||olymp|occas||NULL|de||game|jeux||olymp|olymp::at the olymp game|à l' occas de jeux olymp|||0.0162234120071::.|.::.|.;-37.0986;Cross-country Skiing at the Olympic Games. 
+</query>
+<query id="346">0.187086641788::grand|grand::grand|grand|||0.634244680405::slam|claqu::slam|claqu|||0.532638609409::winner|gagn::winner|gagn;-39.8716;Grand Slam Winners 
+||||0.27846416831::grand|grand::grand|grand|||0.634244680405::slam|claqu::slam|claqu|||0.532638609409::winner|gagn::winner|gagn;-40.0706;Grand Slam Winners 
+||||0.187086641788::grand|grand::grand|grand|||0.793945491314::slam|claqu::slam|claqu|||0.532638609409::winner|gagn::winner|gagn;-40.2327;Grand Slam Winners 
+||||0.187086641788::grand|grand::grand|grand|||1.43572854996::NULL|de||winner|gagn::winner|de gagn|||0.634244680405::slam|claqu::slam|claqu;-40.3357;Grand Slam Winners 
+||||0.27846416831::grand|grand::grand|grand|||0.793945491314::slam|claqu::slam|claqu|||0.532638609409::winner|gagn::winner|gagn;-40.4317;Grand Slam Winners 
+||||0.187086641788::grand|grand::grand|grand|||0.634244680405::slam|claqu::slam|claqu|||0.92081874609::winner|vainqueur::winner|vainqueur;-40.4637;Grand Slam Winners 
+||||0.27846416831::grand|grand::grand|grand|||1.43572854996::NULL|de||winner|gagn::winner|de gagn|||0.634244680405::slam|claqu::slam|claqu;-40.5348;Grand Slam Winners 
+||||1.43572854996::NULL|de||winner|gagn::winner|de gagn|||0.27846416831::grand|grand::grand|grand|||0.634244680405::slam|claqu::slam|claqu;-40.5348;Grand Slam Winners 
+||||0.27846416831::grand|grand::grand|grand|||0.634244680405::slam|claqu::slam|claqu|||0.92081874609::winner|vainqueur::winner|vainqueur;-40.6627;Grand Slam Winners 
+||||0.187086641788::grand|grand::grand|grand|||0.908919513226::winner|gagn::winner|gagn|||0.634244680405::slam|claqu::slam|claqu;-40.7463;Grand Slam Winners 
+</query>
+<query id="347">0.273001283407::best|meilleur::best|meilleur|||0.574031293392::pictur|imag::pictur|imag|||0.275222718716::oscar|oscar::oscar|oscar|||0.040958609432::1994|1994::1994|1994;-41.7434;Best Picture Oscar 1994 
+||||0.390761435032::best|meilleur::best|meilleur|||0.574031293392::pictur|imag::pictur|imag|||0.275222718716::oscar|oscar::oscar|oscar|||0.040958609432::1994|1994::1994|1994;-42.005;Best Picture Oscar 1994 
+||||0.273001283407::best|meilleur::best|meilleur|||0.574031293392::pictur|imag::pictur|imag|||0.191563948989::1994|1994::1994|1994|||0.275222718716::oscar|oscar::oscar|oscar;-42.0829;Best Picture Oscar 1994 
+||||0.273001283407::best|meilleur::best|meilleur|||0.574031293392::pictur|imag::pictur|imag|||0.43492358923::oscar|oscar::oscar|oscar|||0.040958609432::1994|1994::1994|1994;-42.1045;Best Picture Oscar 1994 
+||||0.390761435032::best|meilleur::best|meilleur|||0.574031293392::pictur|imag::pictur|imag|||0.191563948989::1994|1994::1994|1994|||0.275222718716::oscar|oscar::oscar|oscar;-42.3445;Best Picture Oscar 1994 
+||||0.390761435032::best|meilleur::best|meilleur|||0.574031293392::pictur|imag::pictur|imag|||0.43492358923::oscar|oscar::oscar|oscar|||0.040958609432::1994|1994::1994|1994;-42.3661;Best Picture Oscar 1994 
+||||0.273001283407::best|meilleur::best|meilleur|||0.611014842987::oscar|oscar::oscar|oscar|||0.574031293392::pictur|imag::pictur|imag|||0.040958609432::1994|1994::1994|1994;-42.5222;Best Picture Oscar 1994 
+||||0.273001283407::best|meilleur::best|meilleur|||1.0::pictur|imag::pictur|imag|||0.275222718716::oscar|oscar::oscar|oscar|||0.040958609432::1994|1994::1994|1994;-42.7361;Best Picture Oscar 1994 
+||||0.611014842987::oscar|oscar::oscar|oscar|||0.390761435032::best|meilleur::best|meilleur|||0.574031293392::pictur|imag::pictur|imag|||0.040958609432::1994|1994::1994|1994;-42.7838;Best Picture Oscar 1994 
+||||0.390761435032::best|meilleur::best|meilleur|||0.611014842987::oscar|oscar::oscar|oscar|||0.574031293392::pictur|imag::pictur|imag|||0.040958609432::1994|1994::1994|1994;-42.7838;Best Picture Oscar 1994 
+</query>
+<query id="348">-0.0::yann|yann::yann|yann|||-1::piat|piat::piat|piat|||0.528273761272::'s|l'||assassin|assassinat::'s assassin|l' assassinat;-134.786;Yann Piat's Assassination 
+||||-0.0::yann|yann::yann|yann|||-1::piat|piat::piat|piat|||1.22184872627::'s|l'::'s|l'|||0.212303429842::assassin|assassinat::assassin|assassinat;-136.807;Yann Piat's Assassination 
+||||-0.0::yann|yann::yann|yann|||-1::piat|piat::piat|piat|||0.477121263742::assassin|assassinat::assassin|assassinat|||1.22184872627::'s|l'::'s|l';-137.417;Yann Piat's Assassination 
+||||-0.0::yann|yann::yann|yann|||-1::piat|piat::piat|piat|||1.63202321529::'s|l'::'s|l'|||0.212303429842::assassin|assassinat::assassin|assassinat;-137.762;Yann Piat's Assassination 
+||||-0.0::yann|yann::yann|yann|||-1::piat|piat::piat|piat|||1.43136382103::'s|l'||assassin|assassin::'s assassin|l' assassin;-137.822;Yann Piat's Assassination 
+||||-0.0::yann|yann::yann|yann|||-1::piat|piat::piat|piat|||1.13033378124::'s|l'||assassin|assassinat||'s|de::'s assassin|l' assassinat de;-138.051;Yann Piat's Assassination 
+||||-0.0::yann|yann::yann|yann|||-1::piat|piat::piat|piat|||1.43136382103::'s|l'||assassin|assassinat||'s|du::'s assassin|l' assassinat du;-138.126;Yann Piat's Assassination 
+||||-0.0::yann|yann::yann|yann|||-1::piat|piat::piat|piat|||1.36317789555::'s|de::'s|de|||0.212303429842::assassin|assassinat::assassin|assassinat;-138.198;Yann Piat's Assassination 
+||||-0.0::yann|yann::yann|yann|||-1::piat|piat::piat|piat|||1.02996325493::'s|le::'s|le|||0.212303429842::assassin|assassinat::assassin|assassinat;-138.447;Yann Piat's Assassination 
+||||-0.0::yann|yann::yann|yann|||-1::piat|piat::piat|piat|||1.22184872627::'s|l'::'s|l'|||0.638272166252::assassin|assassin::assassin|assassin;-138.711;Yann Piat's Assassination 
+</query>
+<query id="349">0.885785102844::'s|la||death|mort||NULL|de::'s death|la mort de|||0.146128028631::nixon|nixon::nixon|nixon;-27.356;Nixon's Death 
+||||1.20412003994::'s|de||nixon|nixon::nixon 's|de nixon|||0.217049866915::death|mort::death|mort;-29.2969;Nixon's Death 
+||||0.903090000153::'s|nixon::nixon 's|nixon|||0.217049866915::death|mort::death|mort;-29.6682;Nixon's Death 
+||||1.28443074226::nixon|nixon::nixon|nixon|||0.811151504517::'s|la||death|mort||'s|de::'s death|la mort de;-29.8788;Nixon's Death 
+||||1.58546078205::NULL|de||nixon|nixon::nixon|de nixon|||0.510121524334::'s|la||death|mort::'s death|la mort;-29.8788;Nixon's Death 
+||||1.20412003994::'s|nixon::nixon 's|nixon|||0.217049866915::death|mort::death|mort;-30.3645;Nixon's Death 
+||||1.20412003994::'s|le||NULL|de||nixon|nixon::nixon 's|le de nixon|||0.971971273422::death|déces::death|déces;-30.8965;Nixon's Death 
+||||0.769551098347::death|mort::death|mort|||0.903090000153::'s|nixon::nixon 's|nixon;-30.9609;Nixon's Death 
+||||1.20412003994::'s|le||NULL|de||nixon|nixon::nixon 's|le de nixon|||0.217049866915::death|mort::death|mort;-30.9803;Nixon's Death 
+||||1.20412003994::'s|de||nixon|nixon::nixon 's|de nixon|||0.971971273422::death|déces::death|déces;-31.6254;Nixon's Death 
+</query>
+<query id="350">-1::ayrton|ayrton::ayrton|ayrton|||-1::senna|senna::senna|senna|||0.510121524334::'s|la||death|mort::'s death|la mort|||0.0162234120071::.|.::.|.;-475.622;Ayrton Senna's Death. 
+||||-1::ayrton|ayrton::ayrton|ayrton|||-1::senna|senna::senna|senna|||0.104209251702::.|.::.|.|||0.510121524334::'s|la||death|mort::'s death|la mort;-475.813;Ayrton Senna's Death. 
+||||-1::ayrton|ayrton::ayrton|ayrton|||0.726998746395::'s|la||death|mort||.|.::'s death .|la mort .|||-1::senna|senna::senna|senna;-479.231;Ayrton Senna's Death. 
+||||-1::ayrton|ayrton::ayrton|ayrton|||0.885785102844::'s|la||death|mort||NULL|de::'s death|la mort de|||-1::senna|senna::senna|senna|||0.0162234120071::.|.::.|.;-479.344;Ayrton Senna's Death. 
+||||-1::ayrton|ayrton::ayrton|ayrton|||-1::senna|senna::senna|senna|||2.08990502357::'s|la||death|mort::'s death|la mort|||0.0162234120071::.|.::.|.;-479.351;Ayrton Senna's Death. 
+||||-1::ayrton|ayrton::ayrton|ayrton|||0.104209251702::.|.::.|.|||0.885785102844::'s|la||death|mort||NULL|de::'s death|la mort de|||-1::senna|senna::senna|senna;-479.535;Ayrton Senna's Death. 
+||||-1::ayrton|ayrton::ayrton|ayrton|||-1::senna|senna::senna|senna|||1.788875103::'s|du||death|déces::'s death|du déces|||0.0162234120071::.|.::.|.;-479.813;Ayrton Senna's Death. 
+||||-1::ayrton|ayrton::ayrton|ayrton|||0.943777084351::'s|la||death|mort||NULL|de::'s death|la mort de|||-1::senna|senna::senna|senna|||0.0162234120071::.|.::.|.;-479.895;Ayrton Senna's Death. 
+||||-1::ayrton|ayrton::ayrton|ayrton|||-1::senna|senna::senna|senna|||0.104209251702::.|.::.|.|||1.788875103::'s|du||death|déces::'s death|du déces;-480.004;Ayrton Senna's Death. 
+||||-1::ayrton|ayrton::ayrton|ayrton|||1.18681514263::'s|la||death|mort::'s death|la mort|||-1::senna|senna::senna|senna|||0.0162234120071::.|.::.|.;-480.232;Ayrton Senna's Death. 
+</query>
+<query id="306">1.83250892162::NULL|de||eta|l'||eta|eta::eta|de l' eta|||0.152838796377::activ|activ::activ|activ|||0.0740007311106::in|en||franc|franc::in franc|en franc;-25.0439;ETA Activities in France 
+||||1.87506127357::activ|activ||NULL|de::activ|activ de|||0.186595633626::eta|l'||eta|eta::eta|l' eta|||0.0740007311106::in|en||franc|franc::in franc|en franc;-25.2249;ETA Activities in France 
+||||0.244125142694::in|en||franc|franc::in franc|en franc|||1.83250892162::NULL|de||eta|l'||eta|eta::eta|de l' eta|||0.152838796377::activ|activ::activ|activ;-25.4297;ETA Activities in France 
+||||0.244125142694::in|en||franc|franc::in franc|en franc|||1.87506127357::activ|activ||NULL|de::activ|activ de|||0.186595633626::eta|l'||eta|eta::eta|l' eta;-25.6106;ETA Activities in France 
+||||0.176091253757::activ|activ||in|en||franc|franc::activ in franc|activ en franc|||0.186595633626::eta|l'||eta|eta::eta|l' eta;-25.8686;ETA Activities in France 
+||||0.186595633626::eta|l'||eta|eta::eta|l' eta|||0.152838796377::activ|activ::activ|activ|||0.0740007311106::in|en||franc|franc::in franc|en franc;-25.8785;ETA Activities in France 
+||||0.186595633626::eta|l'||eta|eta::eta|l' eta|||0.176091253757::activ|activ||in|en||franc|franc::activ in franc|activ en franc;-25.8863;ETA Activities in France 
+||||2.0::activ|activ||NULL|de::activ|activ de|||0.186595633626::eta|l'||eta|eta::eta|l' eta|||0.0740007311106::in|en||franc|franc::in franc|en franc;-25.9348;ETA Activities in France 
+||||-0.0::activ|activ||NULL|d'||eta|eta::eta activ|activ d' eta|||0.0740007311106::in|en||franc|franc::in franc|en franc;-26.1536;ETA Activities in France 
+||||-0.0::activ|activ||NULL|d'||eta|eta::eta activ|activ d' eta|||0.0740007311106::in|en||franc|franc::in franc|en franc;-26.1713;ETA Activities in France 
+</query>
+<query id="307">2.0::in|en::set in|en|||0.27572414279::film|film::film|film|||0.359849959612::scotland|écoss::scotland|écoss;-35.7653;Films Set in Scotland 
+||||0.27572414279::film|film::film|film|||0.933053195477::set|mis||in|en::set in|mis en|||0.359849959612::scotland|écoss::scotland|écoss;-35.9411;Films Set in Scotland 
+||||0.27572414279::film|film::film|film|||0.971971273422::set|mis||in|en::set in|mis en|||0.359849959612::scotland|écoss::scotland|écoss;-36.0157;Films Set in Scotland 
+||||0.27572414279::film|film::film|film|||0.886056661606::set|fix::set|fix|||0.150785386562::in|en||scotland|écoss::in scotland|en écoss;-36.1559;Films Set in Scotland 
+||||0.27572414279::film|film::film|film|||1.27300131321::set|mis::set|mis|||0.150785386562::in|en||scotland|écoss::in scotland|en écoss;-36.2515;Films Set in Scotland 
+||||1.07918119431::set|mis||in|en::set in|mis en|||0.27572414279::film|film::film|film|||0.359849959612::scotland|écoss::scotland|écoss;-36.27;Films Set in Scotland 
+||||0.625862896442::scotland|écoss::scotland|écoss|||2.0::in|en::set in|en|||0.27572414279::film|film::film|film;-36.3785;Films Set in Scotland 
+||||0.27572414279::film|film::film|film|||0.625862896442::scotland|écoss::scotland|écoss|||0.933053195477::set|mis||in|en::set in|mis en;-36.5543;Films Set in Scotland 
+||||2.17609119415::in|en::set in|en|||0.27572414279::film|film::film|film|||0.359849959612::scotland|écoss::scotland|écoss;-36.5965;Films Set in Scotland 
+||||0.27572414279::film|film::film|film|||0.373317539692::in|en||scotland|écoss::in scotland|en écoss|||0.886056661606::set|fix::set|fix;-36.666;Films Set in Scotland 
+</query>
+<query id="308">2.47712135315::solar|le||solar|solair::solar|le solair|||0.372911989689::eclips|éclips::eclips|éclips;-21.0384;Solar Eclipse 
+||||1.33099317551::solar|solair::solar|solair|||0.372911989689::eclips|éclips::eclips|éclips;-23.1512;Solar Eclipse 
+||||2.47712135315::solar|de||solar|solair::solar|de solair|||0.372911989689::eclips|éclips::eclips|éclips;-30.1015;Solar Eclipse 
+||||0.289600521326::solar|solair::solar|solair|||0.372911989689::eclips|éclips::eclips|éclips;-30.3578;Solar Eclipse 
+||||0.656908631325::eclips|éclips::eclips|éclips|||0.289600521326::solar|solair::solar|solair;-31.0137;Solar Eclipse 
+||||1.19836759567::solar|solair::solar|solair|||0.372911989689::eclips|éclips::eclips|éclips;-32.4955;Solar Eclipse 
+||||1.02996325493::solar|énerg||solar|solair::solar|énerg solair|||0.372911989689::eclips|éclips::eclips|éclips;-33.1496;Solar Eclipse 
+||||1.11539340019::solar|énerg||solar|solair::solar|énerg solair|||0.372911989689::eclips|éclips::eclips|éclips;-33.3345;Solar Eclipse 
+||||1.87506127357::solar|l'::solar|l'|||0.372911989689::eclips|éclips::eclips|éclips;-33.7326;Solar Eclipse 
+||||0.656908631325::eclips|éclips::eclips|éclips|||1.02996325493::solar|énerg||solar|solair::solar|énerg solair;-33.8055;Solar Eclipse 
+</query>
+<query id="309">1.87506127357::NULL|de||NULL|la||drug|drogu::drug|de la drogu|||1.07918119431::"|«||hard|dur||"|»::" hard "|« dur »;-28.6398;"Hard" Drugs 
+||||1.77815127373::NULL|de||drug|drogu::drug|de drogu|||1.07918119431::"|«||hard|dur||"|»::" hard "|« dur »;-29.6528;"Hard" Drugs 
+||||1.87506127357::NULL|de||NULL|la||drug|drogu::drug|de la drogu|||1.07918119431::hard|dur||"|»::hard "|dur »|||0.769551098347::"|«::"|«;-30.3859;"Hard" Drugs 
+||||0.769551098347::"|«::"|«|||1.87506127357::NULL|de||NULL|la||drug|drogu::drug|de la drogu|||1.07918119431::hard|dur||"|»::hard "|dur »;-30.4036;"Hard" Drugs 
+||||1.87506127357::NULL|de||NULL|la||drug|drogu::drug|de la drogu|||0.933053195477::"|«::"|«|||1.07918119431::hard|dur||"|»::hard "|dur »;-30.7736;"Hard" Drugs 
+||||0.933053195477::"|«::"|«|||1.87506127357::NULL|de||NULL|la||drug|drogu::drug|de la drogu|||1.07918119431::hard|dur||"|»::hard "|dur »;-30.7736;"Hard" Drugs 
+||||1.87506127357::NULL|de||NULL|la||drug|drogu::drug|de la drogu|||1.19836759567::"|«||"|»::" "|« »|||0.933053195477::hard|dur::hard|dur;-30.9896;"Hard" Drugs 
+||||1.77815127373::NULL|de||drug|drogu::drug|de drogu|||1.07918119431::hard|dur||"|»::hard "|dur »|||0.769551098347::"|«::"|«;-31.3989;"Hard" Drugs 
+||||1.57403123379::NULL|le||drug|drogu::drug|le drogu|||1.07918119431::"|«||hard|dur||"|»::" hard "|« dur »;-31.7453;"Hard" Drugs 
+||||1.87506127357::NULL|de||NULL|la||drug|drogu::drug|de la drogu|||1.46239805222::"|«||hard|dur::" hard|« dur|||0.971971273422::"|»::"|»;-31.7749;"Hard" Drugs 
+</query>
+<query id="310">-0.0::treatment|trait||of|de||industri|industriel::treatment of industri|trait de industriel|||0.224268227816::wast|déchet::wast|déchet;-18.453;Treatment of Industrial Waste 
+||||0.301030009985::of|de||wast|déchet||industri|industriel::of industri wast|de déchet industriel|||0.115393415093::treatment|trait::treatment|trait;-18.9087;Treatment of Industrial Waste 
+||||0.115393415093::treatment|trait::treatment|trait|||0.301030009985::of|de||wast|déchet||industri|industriel::of industri wast|de déchet industriel;-18.9264;Treatment of Industrial Waste 
+||||0.115393415093::treatment|trait::treatment|trait|||0.226701259613::of|de::of|de|||0.161850824952::wast|déchet||industri|industriel::industri wast|déchet industriel;-19.0058;Treatment of Industrial Waste 
+||||0.289600521326::of|de::of|de|||0.115393415093::treatment|trait::treatment|trait|||0.161850824952::wast|déchet||industri|industriel::industri wast|déchet industriel;-19.1373;Treatment of Industrial Waste 
+||||0.115393415093::treatment|trait::treatment|trait|||0.366531550884::of|de::of|de|||0.161850824952::wast|déchet||industri|industriel::industri wast|déchet industriel;-19.3197;Treatment of Industrial Waste 
+||||0.490349531174::treatment|trait||of|de::treatment of|trait de|||0.161850824952::wast|déchet||industri|industriel::industri wast|déchet industriel;-19.4856;Treatment of Industrial Waste 
+||||0.590630531311::treatment|trait||of|de::treatment of|trait de|||0.161850824952::wast|déchet||industri|industriel::industri wast|déchet industriel;-19.7058;Treatment of Industrial Waste 
+||||0.485895186663::treatment|trait::treatment|trait|||0.301030009985::of|de||wast|déchet||industri|industriel::of industri wast|de déchet industriel;-19.7875;Treatment of Industrial Waste 
+||||0.416423410177::of|de::of|de|||0.115393415093::treatment|trait::treatment|trait|||0.161850824952::wast|déchet||industri|industriel::industri wast|déchet industriel;-19.8517;Treatment of Industrial Waste 
+</query>
+</parameters>
