@@ -41,9 +41,9 @@ public class LuceneTurkishAnalyzer extends ivory.core.tokenize.Tokenizer {
     
     // read stopwords from file (stopwords will be empty set if file does not exist or is empty)
     String stopwordsFile = conf.get(Constants.StopwordList);
-    stopwords = readInput(stopwordsFile);      
+    stopwords = readInput(fs, stopwordsFile);      
     String stemmedStopwordsFile = conf.get(Constants.StemmedStopwordList);
-    stemmedStopwords = readInput(stemmedStopwordsFile);
+    stemmedStopwords = readInput(fs, stemmedStopwordsFile);
     isStopwordRemoval = !stopwords.isEmpty();
   }
 

@@ -16,6 +16,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FSDataInputStream;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -122,7 +125,7 @@ public class Utils {
    *    to check for stopwords on RHS
    * @return
    */
-  public static Map<String, HMapSFW> generateTranslationTable(Configuration conf, Tokenizer docLangTokenizer) {
+  public static Map<String, HMapSFW> generateTranslationTable(FileSystem fs, Configuration conf, Tokenizer docLangTokenizer) {
     String grammarFile = readConf(conf);
 
 //    LOG.info("Generating translation table from " + grammarFile);
@@ -136,7 +139,10 @@ public class Utils {
     Map<String,HMapKI<String>> phrase2count = new HashMap<String,HMapKI<String>>();
 
     try {
-      BufferedReader r = new BufferedReader(new InputStreamReader(new FileInputStream(grammarFile), "UTF-8"));
+      FSDataInputStream fis = fs.open(new Path(grammarFile));
+      InputStreamReader isr = new InputStreamReader(fis, "UTF8");
+      BufferedReader r = new BufferedReader(isr);
+      
       String rule = null;
       while ((rule = r.readLine())!=null) {
         String[] parts = rule.split("\\|\\|\\|");

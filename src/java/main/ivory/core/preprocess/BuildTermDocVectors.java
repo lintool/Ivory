@@ -335,6 +335,7 @@ public class BuildTermDocVectors extends PowerTool {
     LOG.info(String.format(" - %s: %s", Constants.DocnoOffset, docnoOffset));
     LOG.info(String.format(" - %s: %s", Constants.TermDocVectorSegments, numReducers));
     LOG.info(String.format(" - %s: %s", Constants.CollectionVocab, conf.get(Constants.CollectionVocab)));
+    LOG.info(String.format(" - %s: %s", Constants.StopwordList, conf.get(Constants.StopwordList)));
 
     RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fs);
     Path mappingFile = env.getDocnoMappingData();

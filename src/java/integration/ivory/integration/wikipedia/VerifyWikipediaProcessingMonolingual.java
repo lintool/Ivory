@@ -50,22 +50,23 @@ public class VerifyWikipediaProcessingMonolingual {
 
   private static final String opennlpIndex = tmp + "/enwiki.opennlp";
   private static final String vocabPath = tmp + "/vocab";
+  private static final String tokenizerPath = tmp + "/tokenizer";
 
   // Opennlp: part 00000, key = 91805
   private ImmutableMap<String, Float> opennlpTermDocVector1 = ImmutableMap.of(
-      "extern", 0.0031720826f, "zero", 0.10270898f, "theorem", 0.12908114f, "prime", 0.082557835f);
+      "extern", 0.0031357605f, "zero", 0.101532206f, "theorem", 0.1276031f, "prime", 0.08161251f);
 
   // Opennlp: part 00010, key = 137938
   private ImmutableMap<String, Float> opennlpTermDocVector2 = ImmutableMap.of(
-      "cycl", 0.09249325f, "scholar", 0.085096315f, "problem", 0.06792056f, "opinion", 0.093886666f);
+      "cycl", 0.092633486f, "scholar", 0.085225f, "problem", 0.06802353f, "opinion", 0.09402901f);
 
   // Opennlp: part 00002, key = 4764
   private ImmutableMap<Integer, Float> opennlpIntDocVector1 =
-    ImmutableMap.of(1, -0.0041385624f, 12, 0.021055056f, 102, 0.008587789f, 5, 0.012481997f);
+    ImmutableMap.of(5, 0.03059925f, 11206, 0.20217548f, 23, 0.041687272f, 879, 0.11775808f);
 
   // Opennlp: part 00011, key = 148600
   private ImmutableMap<Integer, Float> opennlpIntDocVector2 =
-    ImmutableMap.of(3535, 0.04832942f, 14163, 0.07156628f, 259, 0.024075758f, 2363, 0.0945287f);
+    ImmutableMap.of(1, -0.0068670297f, 4868, 0.05292152f, 3248, 0.046914175f, 2177, 0.0760979f);
 
   @Test
   public void runBuildIndexGalago() throws Exception {
@@ -78,8 +79,10 @@ public class VerifyWikipediaProcessingMonolingual {
     fs.delete(new Path(galagoIndex), true);
     fs.delete(new Path(collectionRepacked), true);
     fs.delete(new Path(vocabPath), true);
+    fs.delete(new Path(tokenizerPath), true);
 
     fs.copyFromLocalFile(false, true, new Path("data/vocab"), new Path(vocabPath));
+    fs.copyFromLocalFile(false, true, new Path("data/tokenizer"), new Path(tokenizerPath));
 
     List<String> jars = Lists.newArrayList();
     jars.add(IntegrationUtils.getJar("lib", "cloud9"));
@@ -104,7 +107,7 @@ public class VerifyWikipediaProcessingMonolingual {
         IntegrationUtils.D_JT, IntegrationUtils.D_NN,
         "-mode=mono", "-index="+galagoIndex, "-xml="+collectionPath, "-compressed="+collectionRepacked,
         "-tokenizerclass="+ivory.core.tokenize.GalagoTokenizer.class.getCanonicalName(), "-lang=en",
-        "-tokenizermodel="+vocabPath + "/en-token.bin"});
+        "-tokenizermodel="+tokenizerPath + "/en-token.bin"});
   }
 
   @Test
@@ -159,8 +162,10 @@ public class VerifyWikipediaProcessingMonolingual {
     fs.delete(new Path(opennlpIndex), true);
     fs.delete(new Path(collectionRepacked), true);
     fs.delete(new Path(vocabPath), true);
+    fs.delete(new Path(tokenizerPath), true);
 
     fs.copyFromLocalFile(false, true, new Path("data/vocab"), new Path(vocabPath));
+    fs.copyFromLocalFile(false, true, new Path("data/tokenizer"), new Path(tokenizerPath));
 
     List<String> jars = Lists.newArrayList();
     jars.add(IntegrationUtils.getJar("lib", "cloud9"));
@@ -184,8 +189,8 @@ public class VerifyWikipediaProcessingMonolingual {
     PreprocessWikipedia.main(new String[] { libjars,
         IntegrationUtils.D_JT, IntegrationUtils.D_NN,
         "-mode=mono", "-index="+opennlpIndex, "-xml="+collectionPath, "-compressed="+collectionRepacked,
-        "-tokenizerclass="+ivory.core.tokenize.OpenNLPTokenizer.class.getCanonicalName(), "-lang=en",
-        "-tokenizermodel="+vocabPath + "/en-token.bin", "-collectionvocab="+vocabPath + "/vocab.de-en.en"});
+        "-tokenizerclass=" + ivory.core.tokenize.OpenNLPTokenizer.class.getCanonicalName(), "-lang=en",
+        "-tokenizermodel=" + tokenizerPath + "/en-token.bin", "-collectionvocab=" + vocabPath + "/vocab.de-en.en", "-e_stopword=" + tokenizerPath + "/en.stop.stemmed"});
   }
 
   @Test
@@ -201,11 +206,13 @@ public class VerifyWikipediaProcessingMonolingual {
     reader = new SequenceFile.Reader(fs,
         new Path(opennlpIndex + "/wt-term-doc-vectors/part-00000"), fs.getConf());
     reader.next(key, value);
+    System.out.println("opennlpterm1\n"+value);
     verifyTermDocVector(opennlpTermDocVector1, value);
 
     reader = new SequenceFile.Reader(fs,
         new Path(opennlpIndex + "/wt-term-doc-vectors/part-00010"), fs.getConf());
     reader.next(key, value);
+    System.out.println("opennlpterm2\n"+value);
     verifyTermDocVector(opennlpTermDocVector2, value);
   }
 
@@ -222,18 +229,20 @@ public class VerifyWikipediaProcessingMonolingual {
     reader = new SequenceFile.Reader(fs,
         new Path(opennlpIndex + "/wt-int-doc-vectors/part-00002"), fs.getConf());
     reader.next(key, value);
+    System.out.println("opennlpInt1\n"+value);
     verifyIntDocVector(opennlpIntDocVector1, value);
 
     reader = new SequenceFile.Reader(fs,
         new Path(opennlpIndex + "/wt-int-doc-vectors/part-00011"), fs.getConf());
     reader.next(key, value);
+    System.out.println("opennlpInt2\n"+value);
     verifyIntDocVector(opennlpIntDocVector2, value);
   }
 
   private void verifyTermDocVector(Map<String, Float> doc, HMapSFW value) {
     for (Map.Entry<String, Float> entry : doc.entrySet()) {
-      assertTrue(value.containsKey(entry.getKey()));
-      assertEquals(entry.getValue(), value.get(entry.getKey()), 10e-6);
+     assertTrue(value.containsKey(entry.getKey()));
+     assertEquals(entry.getValue(), value.get(entry.getKey()), 10e-6);
     }
   }
 
