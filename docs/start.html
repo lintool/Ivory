@@ -2,16 +2,16 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>Getting · Bootstrap</title>
+    <title>Ivory: Getting Started</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
 
     <!-- Le styles -->
-    <link href="docs/assets/css/bootstrap.css" rel="stylesheet">
-    <link href="docs/assets/css/bootstrap-responsive.css" rel="stylesheet">
-    <link href="docs/assets/css/docs.css" rel="stylesheet">
-    <link href="docs/assets/js/google-code-prettify/prettify.css" rel="stylesheet">
+    <link href="assets/css/bootstrap.css" rel="stylesheet">
+    <link href="assets/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="assets/css/docs.css" rel="stylesheet">
+    <link href="assets/js/google-code-prettify/prettify.css" rel="stylesheet">
 
     <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
@@ -41,20 +41,20 @@
           </button>
           <div class="nav-collapse collapse">
             <ul class="nav">
+              <li class="">
+                <a href="../index.html">Home</a>
+              </li>
               <li class="active">
-                <a href="./index.html">Home</a>
+                <a href="./start.html">Get started</a>
               </li>
               <li class="">
-                <a href="./docs/start.html">Get started</a>
+                <a href="./publications.html">Publications</a>
               </li>
               <li class="">
-                <a href="./docs/publications.html">Publications</a>
+                <a href="./experiments.html">Experiments</a>
               </li>
               <li class="">
-                <a href="./docs/experiments.html">Experiments</a>
-              </li>
-              <li class="">
-                <a href="./docs/team.html">Team</a>
+                <a href="./team.html">Team</a>
               </li>
             </ul>
           </div>
@@ -62,43 +62,28 @@
       </div>
     </div>
 
-<div class="jumbotron masthead">
+<!-- Subhead
+================================================== -->
+<header class="jumbotron subhead" id="overview">
   <div class="container">
     <h1>Ivory</h1>
-    <p>A Hadoop toolkit for web-scale information retrieval research</p>
-    <ul class="masthead-links">
-      <li>
-        <a href="http://github.com/twitter/bootstrap">GitHub project</a>
-      </li>
-      <li>
-        Version 0.7.0
-      </li>
-    </ul>
+    <p class="lead">A Hadoop toolkit for web-scale information retrieval research</p>
   </div>
-</div>
+</header>
 
   <div class="container">
 
-<p class="lead" style="padding-top: 60px">Ivory is a research system
-for exploring large-scale indexing and retrieval algorithms with
-MapReduce.</p>
+<div class="page-header">
+<h2>Getting Started</h2>
+</div>
 
-<p>If you're looking for something that "just works", then Ivory
-probably isn't for
-you. Try <a href="http://lucene.apache.org/java/docs/index.html">Lucene</a>
-instead. On the other hand, if you're interested in implementations of
-state-of-the-art retrieval algorithms, this may be the system for
-you. Ivory's core retrieval engine implements the Markov Random Field
-(MRF) model of retrieval, with additional extensions such as Latent
-Concept Expansion (LCE). It was specifically designed to work with
-Hadoop "out of the box" on
-the <a href="http://boston.lti.cs.cmu.edu/clueweb09/wiki/tiki-index.php?page=ClueWeb09%20Wiki">ClueWeb09
-collection</a>, a 1 billion page (25 TB) Web crawl distributed by
-Carnegie Mellon University. Ivory is meant to serve as a reference
-implementation of indexing and retrieval algorithms that can operate
-at the multi-terabyte scale.</p>
+<p>The following are papers about Ivory or describing algorithms
+implemented in Ivory:</p>
+
 
   </div>
+
+
 
     <!-- Footer
     ================================================== -->
@@ -107,9 +92,9 @@ at the multi-terabyte scale.</p>
         <p class="pull-right"><a href="#">Back to top</a></p>
         <p>Designed using <a href="http://twitter.github.com/bootstrap/">Bootstrap</a>.</p>
         <p>Code licensed under <a href="http://www.apache.org/licenses/LICENSE-2.0" target="_blank">Apache License v2.0</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
-        <p style="padding-top: 40px">This work is or has been supported by the following sources: NSF under awards IIS-0836560 and IIS-0705832; Google and IBM under the Academic Cloud Computing Initiative (ACCI); the Intramural Research Program of the NIH, National Library of Medicine; DARPA/IPTO Contract No. HR0011-06-2-0001 under the GALE program, Contract No. HR0011-12-C-0015 under the BOLT program; and Amazon Web Services.  Any opinions, findings, conclusions, or recommendations expressed here do not necessarily reflect those of the sponsors.</p>
       </div>
     </footer>
+
 
 
     <!-- Le javascript
@@ -132,6 +117,23 @@ at the multi-terabyte scale.</p>
     <script src="assets/js/bootstrap-typeahead.js"></script>
     <script src="assets/js/bootstrap-affix.js"></script>
     <script src="assets/js/application.js"></script>
+
+
+    <!-- Analytics
+    ================================================== -->
+    <script>
+      var _gauges = _gauges || [];
+      (function() {
+        var t   = document.createElement('script');
+        t.type  = 'text/javascript';
+        t.async = true;
+        t.id    = 'gauges-tracker';
+        t.setAttribute('data-site-id', '4f0dc9fef5a1f55508000013');
+        t.src = '//secure.gaug.es/track.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(t, s);
+      })();
+    </script>
 
   </body>
 </html>
