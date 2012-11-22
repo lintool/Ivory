@@ -18,13 +18,6 @@
       <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
 
-    <!-- Le fav and touch icons -->
-    <link rel="shortcut icon" href="assets/ico/favicon.ico">
-    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="assets/ico/apple-touch-icon-144-precomposed.png">
-    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="assets/ico/apple-touch-icon-114-precomposed.png">
-    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="assets/ico/apple-touch-icon-72-precomposed.png">
-    <link rel="apple-touch-icon-precomposed" href="assets/ico/apple-touch-icon-57-precomposed.png">
-
   </head>
 
   <body data-spy="scroll" data-target=".bs-docs-sidebar">
@@ -79,25 +72,48 @@
 
   <div class="container">
 
-<p class="lead" style="padding-top: 60px">Ivory is a research system
-for exploring large-scale indexing and retrieval algorithms with
-MapReduce.</p>
+<p class="lead" style="padding-top: 60px">Ivory is a research toolkit
+for exploring large-scale indexing and retrieval algorithms.</p>
 
 <p>If you're looking for something that "just works", then Ivory
 probably isn't for
 you. Try <a href="http://lucene.apache.org/java/docs/index.html">Lucene</a>
 instead. On the other hand, if you're interested in playing with
 (half-baked) implementations of state-of-the-art retrieval algorithms,
-this may be the system for you! Ivory's core retrieval engine
-implements the Markov Random Field (MRF) retrieval model, with
-additional extensions such as the Weighted Sequential Dependence (WSD)
-model and Latent Concept Expansion (LCE). It was designed
-to work with Hadoop "out of the box" on
+this may be the system for you! Ivory includes features presented in
+many academic research papers:</p>
+
+<ul>
+
+<li>A scalable inverted indexing algorithm implemented in Hadoop (TREC
+2009), designed to work "out of the box" with
 the <a href="http://boston.lti.cs.cmu.edu/clueweb09/wiki/tiki-index.php?page=ClueWeb09%20Wiki">ClueWeb09
-collection</a>, a one billion page (25 TB) web crawl distributed by
-Carnegie Mellon University. Ivory is meant to serve as a reference
-implementation of indexing and retrieval algorithms that can operate
-at the multi-terabyte scale.</p>
+collection</a> web crawl.</li>
+
+<li>A retrieval engine that implements the Markov Random Field
+retrieval model (SIGIR 2005), with additional extensions such as the
+Weighted Sequential Dependence model (WSDM 2010) and Latent Concept
+Expansion (SIGIR 2007).</li>
+
+<li>Implementations of "learning to efficient rank" models: the
+efficient sequential dependence model (SIGIR 2010),
+temporally-constrained ranking functions (CIKM 2010), and ranking
+cascades (SIGIR 2011).</li>
+
+<li>The Postings Cartesian Product algorithm for pairwise similarity
+computations (SIGIR 2009).</li>
+
+<li>A cross-language pairwise similarity computation engine based on
+locality-sensitive hashing (SIGIR 2011).</li>
+
+<li>State-of-the-art cross-language retrieval models based on
+Synchronous Context Free Grammars and other statistical machine
+translation techniques (COLING 2012).</li>
+
+</ul>
+
+<p>See our <a href="docs/publications.html">publications page</a> for a
+full list of publications.</p>
 
   </div>
 
@@ -112,27 +128,23 @@ at the multi-terabyte scale.</p>
       </div>
     </footer>
 
-
     <!-- Le javascript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
-    <script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
-    <script src="assets/js/jquery.js"></script>
-    <script src="assets/js/google-code-prettify/prettify.js"></script>
-    <script src="assets/js/bootstrap-transition.js"></script>
-    <script src="assets/js/bootstrap-alert.js"></script>
-    <script src="assets/js/bootstrap-modal.js"></script>
-    <script src="assets/js/bootstrap-dropdown.js"></script>
-    <script src="assets/js/bootstrap-scrollspy.js"></script>
-    <script src="assets/js/bootstrap-tab.js"></script>
-    <script src="assets/js/bootstrap-tooltip.js"></script>
-    <script src="assets/js/bootstrap-popover.js"></script>
-    <script src="assets/js/bootstrap-button.js"></script>
-    <script src="assets/js/bootstrap-collapse.js"></script>
-    <script src="assets/js/bootstrap-carousel.js"></script>
-    <script src="assets/js/bootstrap-typeahead.js"></script>
-    <script src="assets/js/bootstrap-affix.js"></script>
-    <script src="assets/js/application.js"></script>
+    <script src="docs/assets/js/google-code-prettify/prettify.js"></script>
+    <script src="docs/assets/js/bootstrap-transition.js"></script>
+    <script src="docs/assets/js/bootstrap-alert.js"></script>
+    <script src="docs/assets/js/bootstrap-modal.js"></script>
+    <script src="docs/assets/js/bootstrap-dropdown.js"></script>
+    <script src="docs/assets/js/bootstrap-scrollspy.js"></script>
+    <script src="docs/assets/js/bootstrap-tab.js"></script>
+    <script src="docs/assets/js/bootstrap-tooltip.js"></script>
+    <script src="docs/assets/js/bootstrap-popover.js"></script>
+    <script src="docs/assets/js/bootstrap-button.js"></script>
+    <script src="docs/assets/js/bootstrap-collapse.js"></script>
+    <script src="docs/assets/js/bootstrap-carousel.js"></script>
+    <script src="docs/assets/js/bootstrap-typeahead.js"></script>
+    <script src="docs/assets/js/bootstrap-affix.js"></script>
 
   </body>
 </html>
