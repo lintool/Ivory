@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Ivory: Experiments</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Le styles -->
+    <link href="assets/css/bootstrap.css" rel="stylesheet">
+    <link href="assets/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="assets/css/docs.css" rel="stylesheet">
+    <link href="assets/js/google-code-prettify/prettify.css" rel="stylesheet">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le fav and touch icons -->
+    <link rel="shortcut icon" href="assets/ico/favicon.ico">
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="assets/ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="assets/ico/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="assets/ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="assets/ico/apple-touch-icon-57-precomposed.png">
+
+  </head>
+
+  <body data-spy="scroll" data-target=".bs-docs-sidebar">
+
+    <!-- Navbar
+    ================================================== -->
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <div class="nav-collapse collapse">
+            <ul class="nav">
+              <li class="">
+                <a href="../index.html">Home</a>
+              </li>
+              <li class="">
+                <a href="./start.html">Get started</a>
+              </li>
+              <li class="">
+                <a href="./publications.html">Publications</a>
+              </li>
+              <li class="active">
+                <a href="./experiments.html">Experiments</a>
+              </li>
+              <li class="">
+                <a href="./team.html">Team</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+<!-- Subhead
+================================================== -->
+<header class="jumbotron subhead" id="overview">
+  <div class="container">
+    <h1>Ivory</h1>
+    <p class="lead">A Hadoop toolkit for web-scale information retrieval research</p>
+  </div>
+</header>
+
+  <div class="container">
+
+<div class="page-header">
+<h2>Experiments: Cascade Model from SIGIR 2011</h2>
+</div>
+
+<p>These regression runs represent experiments presented in Wang et al.'s SIGIR 2011 paper on <b><a href="publications/Wang_etal_SIGIR2011.pdf">A Cascade Ranking Model for Efficient Ranked Retrieval</a></b>.</p>
+
+<h3>Wt10g results</h3>
+
+<p>Main results in Table 2:</p>
+
+<pre class="code">
+# command-line
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/wt10g/run.wt10g.SIGIR2011.xml data/wt10g/queries.wt10g.501-550.xml
+
+# evaluating effectiveness
+trec_eval data/wt10g/qrels.wt10g.all ranking.SIGIR2011-Wt10g-QL.txt
+trec_eval data/wt10g/qrels.wt10g.all ranking.SIGIR2011-Wt10g-AdaRank.txt
+trec_eval data/wt10g/qrels.wt10g.all ranking.SIGIR2011-Wt10g-FeaturePrune.txt
+trec_eval data/wt10g/qrels.wt10g.all ranking.SIGIR2011-Wt10g-Cascade.txt
+
+# junit
+etc/junit.sh ivory.regression.sigir2011.Wt10g_Cascade
+</pre>
+
+<table class="table" style="width: 700px;">
+<thead>
+<tr><td style="width: 375px;"><b>description</b></td>
+    <td style="width: 225px;"><b>tag</b></td>
+    <td style="width: 50px;"><b>NDCG</b></td>
+    <td style="width: 50px;"><b>P20</b></td></tr></thead>
+
+<tr><td>Baseline query-likelihood (Dirichlet scoring)</td>
+    <td>Wt10g-QL</td>
+    <td>0.3407</td>
+    <td>0.3240</td></tr>
+
+<tr><td>AdaRank</td>
+    <td>Wt10g-AdaRank</td>
+    <td>0.3549</td>
+    <td>0.3350</td></tr>
+
+<tr><td>Feature pruning (SIGIR 2010)</td>
+    <td>Wt10g-FeaturePrune</td>
+    <td>0.3486</td>
+    <td>0.3310</td></tr>
+
+<tr><td>Cascade</td>
+    <td>Wt10g-Cascade</td>
+    <td>0.3560</td>
+    <td>0.3380</td></tr>
+
+</table>
+
+<p>Results in Figure 3:</p>
+
+<pre class="code">
+# command-line
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/wt10g/run.wt10g.SIGIR2011.varying.tradeoff.featureprune.xml data/wt10g/queries.wt10g.501-550.xml
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/wt10g/run.wt10g.SIGIR2011.varying.tradeoff.cascade.xml data/wt10g/queries.wt10g.501-550.xml
+
+# junit
+etc/junit.sh ivory.regression.sigir2011.Wt10g_VaryingTradeoff_FeaturePrune
+etc/junit.sh ivory.regression.sigir2011.Wt10g_VaryingTradeoff_Cascade
+</pre>
+
+<h3>Gov2 results</h3>
+
+<p>Main results in Table 2:</p>
+
+<pre class="code">
+# command-line
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/gov2/run.gov2.SIGIR2011.xml data/gov2/gov2.title.776-850
+
+# evaluating effectiveness
+trec_eval data/gov2/qrels.gov2.all ranking.SIGIR2011-Gov2-QL.txt
+trec_eval data/gov2/qrels.gov2.all ranking.SIGIR2011-Gov2-AdaRank.txt
+trec_eval data/gov2/qrels.gov2.all ranking.SIGIR2011-Gov2-FeaturePrune.txt
+trec_eval data/gov2/qrels.gov2.all ranking.SIGIR2011-Gov2-Cascade.txt
+
+# junit
+etc/junit.sh ivory.regression.sigir2011.Gov2_Cascade
+</pre>
+
+<table class="table" style="width: 700px;">
+<thead>
+<tr><td style="width: 375px;"><b>description</b></td>
+    <td style="width: 225px;"><b>tag</b></td>
+    <td style="width: 50px;"><b>NDCG</b></td>
+    <td style="width: 50px;"><b>P20</b></td></tr></thead>
+
+<tr><td>Baseline query-likelihood (Dirichlet scoring)</td>
+    <td>Gov2-QL</td>
+    <td>0.4457</td>
+    <td>0.5093</td></tr>
+
+<tr><td>AdaRank</td>
+    <td>Gov2-AdaRank</td>
+    <td>0.4737</td>
+    <td>0.5360</td></tr>
+
+<tr><td>Feature pruning (SIGIR 2010)</td>
+    <td>Gov2-FeaturePrune</td>
+    <td>0.4716</td>
+    <td>0.5187</td></tr>
+
+<tr><td>Cascade</td>
+    <td>Gov2-Cascade</td>
+    <td>0.4744</td>
+    <td>0.5447</td></tr>
+
+</table>
+
+<p>Results in Figure 3:</p>
+
+<pre class="code">
+# command-line
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/gov2/run.gov2.SIGIR2011.varying.tradeoff.featureprune.xml data/gov2/gov2.title.776-850
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/gov2/run.gov2.SIGIR2011.varying.tradeoff.cascade.xml data/gov2/gov2.title.776-850
+
+# junit
+etc/junit.sh ivory.regression.sigir2011.Gov2_VaryingTradeoff_FeaturePrune
+etc/junit.sh ivory.regression.sigir2011.Gov2_VaryingTradeoff_Cascade
+</pre>
+
+<h3>Web09 category B results (i.e. Clue)</h3>
+
+<p>Main results in Table 2:</p>
+
+<pre class="code">
+# command-line
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/clue/run.clue.SIGIR2011.xml data/clue/queries.web09.26-50.xml
+
+# evaluating effectiveness
+trec_eval data/clue/qrels.web09catB.txt ranking.SIGIR2011-Clue-QL.txt
+trec_eval data/clue/qrels.web09catB.txt ranking.SIGIR2011-Clue-AdaRank.txt
+trec_eval data/clue/qrels.web09catB.txt ranking.SIGIR2011-Clue-FeaturePrune.txt
+trec_eval data/clue/qrels.web09catB.txt ranking.SIGIR2011-Clue-Cascade.txt
+
+# junit
+etc/junit.sh ivory.regression.sigir2011.Clue_Cascade
+</pre>
+
+<table class="table" style="width: 700px;">
+<thead>
+<tr><td style="width: 375px;"><b>description</b></td>
+    <td style="width: 225px;"><b>tag</b></td>
+    <td style="width: 50px;"><b>NDCG</b></td>
+    <td style="width: 50px;"><b>P20</b></td></tr></thead>
+
+<tr><td>Baseline query-likelihood (Dirichlet scoring)</td>
+    <td>Clue-QL</td>
+    <td>0.2750</td>
+    <td>0.3420</td></tr>
+
+<tr><td>AdaRank</td>
+    <td>Clue-AdaRank</td>
+    <td>0.3094</td>
+    <td>0.3740</td></tr>
+
+<tr><td>Feature pruning (SIGIR 2010)</td>
+    <td>Clue-FeaturePrune</td>
+    <td>0.2966</td>
+    <td>0.3620</td></tr>
+
+<tr><td>Cascade</td>
+    <td>Clue-Cascade</td>
+    <td>0.3060</td>
+    <td>0.3740</td></tr>
+
+</table>
+
+<p>Results in Figure 3:</p>
+
+<pre class="code">
+# command-line
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/clue/run.clue.SIGIR2011.varying.tradeoff.featureprune.xml data/clue/queries.web09.26-50.xml
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/clue/run.clue.SIGIR2011.varying.tradeoff.cascade.xml data/clue/queries.web09.26-50.xml
+
+# junit
+etc/junit.sh ivory.regression.sigir2011.Clue_VaryingTradeoff_FeaturePrune
+etc/junit.sh ivory.regression.sigir2011.Clue_VaryingTradeoff_Cascade
+</pre>
+
+
+  </div>
+
+
+
+    <!-- Footer
+    ================================================== -->
+    <footer class="footer">
+      <div class="container">
+        <p class="pull-right"><a href="#">Back to top</a></p>
+        <p>Designed using <a href="http://twitter.github.com/bootstrap/">Bootstrap</a>.</p>
+        <p>Code licensed under <a href="http://www.apache.org/licenses/LICENSE-2.0" target="_blank">Apache License v2.0</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
+      </div>
+    </footer>
+
+
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
+    <script src="assets/js/jquery.js"></script>
+    <script src="assets/js/google-code-prettify/prettify.js"></script>
+    <script src="assets/js/bootstrap-transition.js"></script>
+    <script src="assets/js/bootstrap-alert.js"></script>
+    <script src="assets/js/bootstrap-modal.js"></script>
+    <script src="assets/js/bootstrap-dropdown.js"></script>
+    <script src="assets/js/bootstrap-scrollspy.js"></script>
+    <script src="assets/js/bootstrap-tab.js"></script>
+    <script src="assets/js/bootstrap-tooltip.js"></script>
+    <script src="assets/js/bootstrap-popover.js"></script>
+    <script src="assets/js/bootstrap-button.js"></script>
+    <script src="assets/js/bootstrap-collapse.js"></script>
+    <script src="assets/js/bootstrap-carousel.js"></script>
+    <script src="assets/js/bootstrap-typeahead.js"></script>
+    <script src="assets/js/bootstrap-affix.js"></script>
+    <script src="assets/js/application.js"></script>
+
+  </body>
+</html>
+

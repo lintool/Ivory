@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>Ivory: Project Team</title>
+    <title>Ivory: Experiments</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
@@ -50,10 +50,10 @@
               <li class="">
                 <a href="./publications.html">Publications</a>
               </li>
-              <li class="">
+              <li class="active">
                 <a href="./experiments.html">Experiments</a>
               </li>
-              <li class="active">
+              <li class="">
                 <a href="./team.html">Team</a>
               </li>
             </ul>
@@ -74,54 +74,70 @@
   <div class="container">
 
 <div class="page-header">
-<h2>Project Team</h2>
+<h2>Experiments: Wt10g</h2>
 </div>
 
-<h3>Current Members</h3>
+<h3>Basic MRF models</h3>
 
-<table border="0" cellpadding="5" cellspacing="5">
-<tr>
-<td><img src="images/pic-jimmy.jpg" alt="picture of Jimmy" /></td>
-<td><b><a href="http://www.umiacs.umd.edu/~jimmylin/">Jimmy Lin</a></b><br/>
-Associate Professor<br/>
-The iSchool (College of Information Studies), University of Maryland</td>
-</tr>
+<p>Retrieval using basic Markov Random Field (MRF) models: full
+independence ("bag of words"), sequential dependence, full
+dependence:</p>
 
-<tr>
-<td style="border: 0 none;" align="center"><img src="images/pic-nima.png" alt="Nima Asadi"/></td>
-<td><b>Nima Asadi</b><br/>Ph.D. student<br/>Department of Computer Science, University of Maryland</td>
-</tr>
+<pre class="code">
+# command-line
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal \
+  data/wt10g/run.wt10g.basic.xml data/wt10g/queries.wt10g.451-500.xml data/wt10g/queries.wt10g.501-550.xml
 
-<tr>
-<td style="border: 0 none;" align="center"><img src="images/pic-ferhan.png" alt="Ferhan Ture"/></td>
-<td><b><a href="http://www.cs.umd.edu/~fture/">Ferhan Ture</a></b><br/>Ph.D. student<br/>Department of Computer Science, University of Maryland</td>
-</tr>
+# evaluating effectiveness
+trec_eval data/wt10g/qrels.wt10g.all ranking.wt10g-dir-base.txt
+trec_eval data/wt10g/qrels.wt10g.all ranking.wt10g-dir-sd.txt
+trec_eval data/wt10g/qrels.wt10g.all ranking.wt10g-dir-fd.txt
+trec_eval data/wt10g/qrels.wt10g.all ranking.wt10g-bm25-base.txt
+trec_eval data/wt10g/qrels.wt10g.all ranking.wt10g-bm25-sd.txt
+trec_eval data/wt10g/qrels.wt10g.all ranking.wt10g-bm25-fd.txt
+
+# junit
+etc/junit.sh ivory.regression.basic.Wt10g_Basic
+</pre>
+
+<table class="table" style="width: 700px;">
+<thead>
+<tr><td style="width: 375px;"><b>description</b></td>
+    <td style="width: 225px;"><b>tag</b></td>
+    <td style="width: 50px;"><b>MAP</b></td>
+    <td style="width: 50px;"><b>P10</b></td></tr></thead>
+
+<tr><td>Dirichlet, full independence</td>
+    <td>wt10g-dir-base</td>
+    <td>0.2093</td>
+    <td>0.3131</td></tr>
+
+<tr><td>Dirichlet, sequential dependence</td>
+    <td>wt10g-dir-sd</td>
+    <td>0.2187</td>
+    <td>0.3192</td></tr>
+
+<tr><td>Dirichlet, full dependence</td>
+    <td>wt10g-dir-fd</td>
+    <td>0.2205</td>
+    <td>0.3242</td></tr>
+
+<tr><td>bm25, full independence</td>
+    <td>wt10g-bm25-base</td>
+    <td>0.2105</td>
+    <td>0.3202</td></tr>
+
+<tr><td>bm25, sequential dependence</td>
+    <td>wt10g-bm25-sd</td>
+    <td>0.2248</td>
+    <td>0.3333</td></tr>
+
+<tr><td>bm25, full dependence</td>
+    <td>wt10g-bm25-fd</td>
+    <td>0.2226</td>
+    <td>0.3394</td></tr>
 
 </table>
-
-<h3>Past Members</h3>
-
-<table border="0" cellpadding="5" cellspacing="5">
-
-<tr>
-<td style="" align="center"><img src="images/pic-don.jpg" alt="picture of Don" /></td>
-<td><b><a href="http://don-metzler.net/web/home.html">Don Metzler</a></b><br/>Senior Software Engineer<br/>
-Google</td></tr>
-
-<tr>
-<td style="border: 0 none;" align="center"><img src="images/pic-tamer.png" alt="Tamer Elyased"/></td>
-<td><b><a href="http://www.qu.edu.qa/engineering/computer/faculty/TamerElsayed.php">Tamer Elsayed</a></b> (Ph.D. 2009, University of Maryland)<br/>
-Assistant Professor<br/>
-Computer Science, Qatar University</td>
-</tr>
-
-<tr>
-<td style="border: 0 none;" align="center"><img src="images/pic-lidan.png" alt="Lidan Wang"/></td>
-<td><b>Lidan Wang</b> (Ph.D. 2012, University of Maryland)<br/>Applied Researcher<br/>Microsoft Bing</td>
-</tr>
-
-</table>
-
 
   </div>
 

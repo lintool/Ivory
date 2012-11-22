@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Ivory: Experiments</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Le styles -->
+    <link href="assets/css/bootstrap.css" rel="stylesheet">
+    <link href="assets/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="assets/css/docs.css" rel="stylesheet">
+    <link href="assets/js/google-code-prettify/prettify.css" rel="stylesheet">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le fav and touch icons -->
+    <link rel="shortcut icon" href="assets/ico/favicon.ico">
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="assets/ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="assets/ico/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="assets/ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="assets/ico/apple-touch-icon-57-precomposed.png">
+
+  </head>
+
+  <body data-spy="scroll" data-target=".bs-docs-sidebar">
+
+    <!-- Navbar
+    ================================================== -->
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <div class="nav-collapse collapse">
+            <ul class="nav">
+              <li class="">
+                <a href="../index.html">Home</a>
+              </li>
+              <li class="">
+                <a href="./start.html">Get started</a>
+              </li>
+              <li class="">
+                <a href="./publications.html">Publications</a>
+              </li>
+              <li class="active">
+                <a href="./experiments.html">Experiments</a>
+              </li>
+              <li class="">
+                <a href="./team.html">Team</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+<!-- Subhead
+================================================== -->
+<header class="jumbotron subhead" id="overview">
+  <div class="container">
+    <h1>Ivory</h1>
+    <p class="lead">A Hadoop toolkit for web-scale information retrieval research</p>
+  </div>
+</header>
+
+  <div class="container">
+
+<div class="page-header">
+<h2>Experiments: TREC Disks 4-5</h2>
+</div>
+
+<p>This tutorial provides a guide to batch and interactive retrieval
+with Ivory on the venerable TREC disks 4 and 5 document collection,
+which is distributed by <a href="http://www.nist.gov/">NIST</a> and
+used in many <a href="http://trec.nist.gov/">Text Retrieval
+Conferences</a> (TRECs).  Although the collection is over a decade
+old, it is still used as a starting point for information retrieval
+research.  This guide will cover both indexing the collection,
+performing retrieval runs with queries from the TREC 2004 robust
+track, and interactive querying.</p>
+
+<h3>Getting the Collection</h3>
+
+<p>The first task is to obtain the collection (from NIST).  We're
+assuming you have it in hand already.  A standard "view" of the disks
+is to ignore the Congressional Record (CR) and Federal Register (FR),
+so the collection is often written shorthand as TREC 45 (-CR,FR) or
+something similar. There are a total of 472,525 documents in the
+collection as described above, distributed in a number of files;
+see <a href="../data/trec/files.TREC45-noCRFR.txt">complete list of
+all files</a>.  Since Hadoop doesn't work well will lots of small
+files, the first step is to prepare the collection by concatenating
+all the documents into a large file.  This is most easily done with a
+Perl or Python script.  See
+this <a href="../data/trec/cat_all_docs.pl">simple Perl script</a>,
+but it should be very easy to write your own.</p>
+
+<h3>Basic MRF models</h3>
+
+<p>Retrieval using basic Markov Random Field (MRF) models: full
+independence ("bag of words"), sequential dependence, full
+dependence:</p>
+
+<pre class="code">
+# command-line
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/trec/run.robust04.basic.xml data/trec/queries.robust04.xml
+
+# evaluating effectiveness
+trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-base.txt
+trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-sd.txt
+trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-fd.txt
+trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-bm25-base.txt
+trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-bm25-sd.txt
+trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-bm25-fd.txt
+
+# junit
+etc/junit.sh ivory.regression.basic.Robust04_Basic
+</pre>
+
+<table class="table" style="width: 700px;">
+<thead>
+<tr><td style="width: 375px;"><b>description</b></td>
+    <td style="width: 225px;"><b>tag</b></td>
+    <td style="width: 50px;"><b>MAP</b></td>
+    <td style="width: 50px;"><b>P10</b></td></tr></thead>
+
+<tr><td>Dirichlet, full independence</td>
+    <td>robust04-dir-base</td>
+    <td>0.3063</td>
+    <td>0.4424</td></tr>
+
+<tr><td>Dirichlet, sequential dependence</td>
+    <td>robust04-dir-sd</td>
+    <td>0.3194</td>
+    <td>0.4485</td></tr>
+
+<tr><td>Dirichlet, full dependence</td>
+    <td>robust04-dir-fd</td>
+    <td>0.3253</td>
+    <td>0.4576</td></tr>
+
+<tr><td>bm25, full independence</td>
+    <td>robust04-bm25-base</td>
+    <td>0.3033</td>
+    <td>0.4283</td></tr>
+
+<tr><td>bm25, sequential dependence</td>
+    <td>robust04-bm25-sd</td>
+    <td>0.3212</td>
+    <td>0.4505</td></tr>
+
+<tr><td>bm25, full dependence</td>
+    <td>robust04-bm25-fd</td>
+    <td>0.3213</td>
+    <td>0.4545</td></tr>
+
+</table>
+
+<h3>WSD models</h3>
+
+<p>WSD refers to Bendersky et al.'s Weighted Sequential Dependence model (WSDM 2010).</p>
+
+<pre class="code">
+# command-line
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/trec/run.robust04.wsd.xml data/trec/queries.robust04.xml
+
+# evaluating effectiveness
+trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-wsd-sd.txt
+trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-wsd-fd.txt
+
+# junit
+etc/junit.sh ivory.regression.basic.Robust04_WSD
+</pre>
+
+<table class="table" style="width: 700px;">
+<thead>
+<tr><td style="width: 375px;"><b>description</b></td>
+    <td style="width: 225px;"><b>tag</b></td>
+    <td style="width: 50px;"><b>MAP</b></td>
+    <td style="width: 50px;"><b>P10</b></td></tr></thead>
+
+<tr><td>Dirichlet, WSD, sequential dependence</td>
+    <td>robust04-dir-wsd-sd</td>
+    <td>0.3246</td>
+    <td>0.4626</td></tr>
+
+<tr><td>Dirichlet, WSD, full dependence</td>
+    <td>robust04-dir-wsd-fd</td>
+    <td>0.3283</td>
+    <td>0.4667</td></tr>
+
+</table>
+
+<h3>Basic MRF + LCE models</h3>
+
+<p>LCE refers to Metzler et al.'s Latent Concept Expansion model (SIGIR 2007).</p>
+
+<pre class="code">
+# command-line
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/trec/run.robust04.basic.lce.xml data/trec/queries.robust04.xml
+
+# evaluating effectiveness
+trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-rm3-f.txt
+trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-rm3-s.txt
+trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-sd-lce-f.txt
+trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-sd-lce-s.txt
+trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-sd-lce-bigram.txt
+
+# junit
+etc/junit.sh ivory.regression.basic.Robust04_Basic_LCE
+</pre>
+
+<table class="table" style="width: 700px;">
+<thead>
+<tr><td style="width: 375px;"><b>description</b></td>
+    <td style="width: 225px;"><b>tag</b></td>
+    <td style="width: 50px;"><b>MAP</b></td>
+    <td style="width: 50px;"><b>P10</b></td></tr></thead>
+
+<tr><td>Dir., full indep., LCE (unigrams) ["RM3"] (fast)</td>
+    <td>robust04-dir-rm3-f</td>
+    <td>0.3558</td>
+    <td>0.4596</td></tr>
+
+<tr><td>Dir., full indep., LCE (unigrams) ["RM3"] (slow)</td>
+    <td>robust04-dir-rm3-s</td>
+    <td>0.3557</td>
+    <td>0.4596</td></tr>
+
+
+<tr><td>Dir., SD, LCE (unigrams) (fast)</td>
+    <td>robust04-dir-sd-lce-f</td>
+    <td>0.3789</td>
+    <td>0.4808</td></tr>
+
+<tr><td>Dir., SD, LCE (unigrams) (slow)</td>
+    <td>robust04-dir-sd-lce-s</td>
+    <td>0.3753</td>
+    <td>0.4657</td></tr>
+
+<tr><td>Dir., SD, LCE (bigrams)</td>
+    <td>robust04-dir-sd-lce-bigram</td>
+    <td>0.3510</td>
+    <td>0.4535</td></tr>
+
+</table>
+
+<h3>WSD + LCE models</h3>
+
+<pre class="code">
+# command-line
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/trec/run.robust04.wsd.lce.xml data/trec/queries.robust04.xml
+
+# evaluating effectiveness
+trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-wsd-lce.txt
+
+# junit
+etc/junit.sh ivory.regression.basic.Robust04_WSD_LCE
+</pre>
+
+<table class="table" style="width: 700px;">
+<thead>
+<tr><td style="width: 375px;"><b>description</b></td>
+    <td style="width: 225px;"><b>tag</b></td>
+    <td style="width: 50px;"><b>MAP</b></td>
+    <td style="width: 50px;"><b>P10</b></td></tr></thead>
+
+<tr><td>Dir., WSD, LCE (unigrams) (fast)</td>
+    <td>robust04-dir-wsd-lce</td>
+    <td>0.3941</td>
+    <td>0.4980</td></tr>
+
+</table>
+
+  </div>
+
+
+
+    <!-- Footer
+    ================================================== -->
+    <footer class="footer">
+      <div class="container">
+        <p class="pull-right"><a href="#">Back to top</a></p>
+        <p>Designed using <a href="http://twitter.github.com/bootstrap/">Bootstrap</a>.</p>
+        <p>Code licensed under <a href="http://www.apache.org/licenses/LICENSE-2.0" target="_blank">Apache License v2.0</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
+      </div>
+    </footer>
+
+
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
+    <script src="assets/js/jquery.js"></script>
+    <script src="assets/js/google-code-prettify/prettify.js"></script>
+    <script src="assets/js/bootstrap-transition.js"></script>
+    <script src="assets/js/bootstrap-alert.js"></script>
+    <script src="assets/js/bootstrap-modal.js"></script>
+    <script src="assets/js/bootstrap-dropdown.js"></script>
+    <script src="assets/js/bootstrap-scrollspy.js"></script>
+    <script src="assets/js/bootstrap-tab.js"></script>
+    <script src="assets/js/bootstrap-tooltip.js"></script>
+    <script src="assets/js/bootstrap-popover.js"></script>
+    <script src="assets/js/bootstrap-button.js"></script>
+    <script src="assets/js/bootstrap-collapse.js"></script>
+    <script src="assets/js/bootstrap-carousel.js"></script>
+    <script src="assets/js/bootstrap-typeahead.js"></script>
+    <script src="assets/js/bootstrap-affix.js"></script>
+    <script src="assets/js/application.js"></script>
+
+  </body>
+</html>
+
