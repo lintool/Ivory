@@ -1,20 +1,25 @@
 package ivory.integration;
 
 import static org.junit.Assert.assertTrue;
+
 import ivory.app.BuildPositionalIndexIP;
-import ivory.core.driver.PreprocessTREC;
+import ivory.app.PreprocessTrecForeign;
 import ivory.core.eval.Qrels;
 import ivory.core.tokenize.OpenNLPTokenizer;
 import ivory.regression.coling2012.EnFr_CLEF06;
 import ivory.sqe.retrieval.QueryEngine;
 import ivory.sqe.retrieval.RunQueryEngine;
+
 import java.util.List;
+
 import junit.framework.JUnit4TestAdapter;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
 import org.junit.Test;
+
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
@@ -73,7 +78,7 @@ public class VerifyClefFrenchPositionalIndexIP {
     fs.copyFromLocalFile(false, true, new Path("data/en-fr.clef06/queries.en-fr.k10.clef06.xml"),
         new Path(index + "/queries.en-fr.k10.clef06.xml"));
   
-    PreprocessTREC.main(new String[] { libjars, IntegrationUtils.D_JT, IntegrationUtils.D_NN,
+    PreprocessTrecForeign.main(new String[] { libjars, IntegrationUtils.D_JT, IntegrationUtils.D_NN,
         "-input=" + collectionPath.toString(), "-index=" + index, 
         "-lang=fr" , "-tokenizerclass=" + OpenNLPTokenizer.class.getCanonicalName(),
         "-tokenizermodel=" + index + "/fr-token.bin", "-name=CLEF2006.French"

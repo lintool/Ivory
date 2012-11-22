@@ -78,7 +78,7 @@ public class BuildIndex extends Configured implements Tool {
 
       new BuildIPInvertedIndexDocSorted(conf).run();
       new BuildIntPostingsForwardIndex(conf).run();
-    } if (cmdline.hasOption(NONPOSITIONAL_INDEX_IP)) {
+    } else if (cmdline.hasOption(NONPOSITIONAL_INDEX_IP)) {
       LOG.info(String.format(" -%s", IndexBuilder.NONPOSITIONAL_INDEX_IP));
       conf.set(Constants.IndexPath, indexPath);
       conf.setInt(Constants.NumReduceTasks, indexPartitions);
