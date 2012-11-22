@@ -96,6 +96,21 @@ Perl or Python script.  See
 this <a href="../data/trec/cat_all_docs.pl">simple Perl script</a>,
 but it should be very easy to write your own.</p>
 
+<table><tr><td valign="top"><span class="label label-info">Info</span></td>
+<td style="padding-left: 10px">Before running
+the following experiments, make sure you've built
+the <code>trec_eval</code> evaluation package
+from <a href="http://trec.nist.gov/trec_eval/">NIST</a>. For your
+convenience, v9.0 is included
+in <code>etc/trec_eval.9.0.tar.gz</code>. Build the package
+by <code>make</code> and place the executable at <code>etc/trec_eval</code>.</td></tr></table>
+
+<table><tr><td valign="top"><span class="label label-info">Info</span></td>
+<td style="padding-left: 10px">Before running
+the following experiments, make sure to change the index location in the
+<code>run.xml</code> files to the actual index path (under the
+<code>&lt;index&gt;</code> attribute).</td></tr></table>
+
 <h3>Basic MRF models</h3>
 
 <p>Retrieval using basic Markov Random Field (MRF) models: full
@@ -107,12 +122,12 @@ dependence:</p>
 etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/trec/run.robust04.basic.xml data/trec/queries.robust04.xml
 
 # evaluating effectiveness
-trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-base.txt
-trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-sd.txt
-trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-fd.txt
-trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-bm25-base.txt
-trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-bm25-sd.txt
-trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-bm25-fd.txt
+etc/trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-base.txt
+etc/trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-sd.txt
+etc/trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-fd.txt
+etc/trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-bm25-base.txt
+etc/trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-bm25-sd.txt
+etc/trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-bm25-fd.txt
 
 # junit
 etc/junit.sh ivory.regression.basic.Robust04_Basic
@@ -152,7 +167,7 @@ etc/junit.sh ivory.regression.basic.Robust04_Basic
 
 <tr><td>bm25, full dependence</td>
     <td>robust04-bm25-fd</td>
-    <td>0.3213</td>
+    <td>0.3212</td>
     <td>0.4545</td></tr>
 
 </table>
@@ -166,8 +181,8 @@ etc/junit.sh ivory.regression.basic.Robust04_Basic
 etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/trec/run.robust04.wsd.xml data/trec/queries.robust04.xml
 
 # evaluating effectiveness
-trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-wsd-sd.txt
-trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-wsd-fd.txt
+etc/trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-wsd-sd.txt
+etc/trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-wsd-fd.txt
 
 # junit
 etc/junit.sh ivory.regression.basic.Robust04_WSD
@@ -201,11 +216,11 @@ etc/junit.sh ivory.regression.basic.Robust04_WSD
 etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/trec/run.robust04.basic.lce.xml data/trec/queries.robust04.xml
 
 # evaluating effectiveness
-trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-rm3-f.txt
-trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-rm3-s.txt
-trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-sd-lce-f.txt
-trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-sd-lce-s.txt
-trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-sd-lce-bigram.txt
+etc/trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-rm3-f.txt
+etc/trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-rm3-s.txt
+etc/trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-sd-lce-f.txt
+etc/trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-sd-lce-s.txt
+etc/trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-sd-lce-bigram.txt
 
 # junit
 etc/junit.sh ivory.regression.basic.Robust04_Basic_LCE
@@ -253,7 +268,7 @@ etc/junit.sh ivory.regression.basic.Robust04_Basic_LCE
 etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/trec/run.robust04.wsd.lce.xml data/trec/queries.robust04.xml
 
 # evaluating effectiveness
-trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-wsd-lce.txt
+etc/trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-wsd-lce.txt
 
 # junit
 etc/junit.sh ivory.regression.basic.Robust04_WSD_LCE
