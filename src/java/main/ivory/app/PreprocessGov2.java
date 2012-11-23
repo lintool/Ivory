@@ -32,11 +32,11 @@ import edu.umd.cloud9.collection.trecweb.Gov2DocnoMapping;
 public class PreprocessGov2 extends PreprocessCollection {
   public static void main(String[] args) throws Exception {
     Map<String, String> map = new ImmutableMap.Builder<String, String>()
-        .put(IndexBuilder.COLLECTION_NAME, "Gov2")
-        .put(IndexBuilder.DOCNO_MAPPING, Gov2DocnoMapping.class.getCanonicalName())
-        .put(IndexBuilder.INPUTFORMAT, SequenceFileInputFormat.class.getCanonicalName())
-        .put(IndexBuilder.TOKENIZER, GalagoTokenizer.class.getCanonicalName())
-        .put(IndexBuilder.MIN_DF, "10")
+        .put(PreprocessCollection.COLLECTION_NAME, "Gov2")
+        .put(PreprocessCollection.DOCNO_MAPPING, Gov2DocnoMapping.class.getCanonicalName())
+        .put(PreprocessCollection.INPUTFORMAT, SequenceFileInputFormat.class.getCanonicalName())
+        .put(PreprocessCollection.TOKENIZER, GalagoTokenizer.class.getCanonicalName())
+        .put(PreprocessCollection.MIN_DF, "10")
         .build();
     
     List<String> s = Lists.newArrayList(args);

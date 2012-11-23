@@ -33,11 +33,11 @@ public class PreprocessTrec45 extends PreprocessCollection {
   // Append a few hard-coded arguments and then dispatch to generic superclass.
   public static void main(String[] args) throws Exception {
     Map<String, String> map = new ImmutableMap.Builder<String, String>()
-        .put(IndexBuilder.COLLECTION_NAME, "TREC_vol45")
-        .put(IndexBuilder.DOCNO_MAPPING, TrecDocnoMapping.class.getCanonicalName())
-        .put(IndexBuilder.INPUTFORMAT, TrecDocumentInputFormat.class.getCanonicalName())
-        .put(IndexBuilder.TOKENIZER, GalagoTokenizer.class.getCanonicalName())
-        .put(IndexBuilder.MIN_DF, "2")
+        .put(PreprocessCollection.COLLECTION_NAME, "TREC_vol45")
+        .put(PreprocessCollection.DOCNO_MAPPING, TrecDocnoMapping.class.getCanonicalName())
+        .put(PreprocessCollection.INPUTFORMAT, TrecDocumentInputFormat.class.getCanonicalName())
+        .put(PreprocessCollection.TOKENIZER, GalagoTokenizer.class.getCanonicalName())
+        .put(PreprocessCollection.MIN_DF, "2")
         .build();
     
     List<String> s = Lists.newArrayList(args);
