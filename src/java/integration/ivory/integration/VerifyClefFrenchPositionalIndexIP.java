@@ -2,7 +2,7 @@ package ivory.integration;
 
 import static org.junit.Assert.assertTrue;
 
-import ivory.app.BuildPositionalIndexIP;
+import ivory.app.BuildIndex;
 import ivory.app.PreprocessTrecForeign;
 import ivory.core.eval.Qrels;
 import ivory.core.tokenize.OpenNLPTokenizer;
@@ -84,8 +84,8 @@ public class VerifyClefFrenchPositionalIndexIP {
         "-tokenizermodel=" + index + "/fr-token.bin", "-name=CLEF2006.French"
     });
     
-    BuildPositionalIndexIP.main(new String[] { libjars, IntegrationUtils.D_JT, IntegrationUtils.D_NN,
-        index, "10" });
+    BuildIndex.main(new String[] { libjars, IntegrationUtils.D_JT, IntegrationUtils.D_NN,
+        "-index=" + index, "-indexPartitions=10", "-positionalIndexIP" });
 
     conf = RunQueryEngine.parseArgs(new String[] {
         "-index=" + index,

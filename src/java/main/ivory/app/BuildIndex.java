@@ -19,7 +19,7 @@ import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Logger;
 
 public class BuildIndex extends Configured implements Tool {
-  private static final Logger LOG = Logger.getLogger(IndexBuilder.class);
+  private static final Logger LOG = Logger.getLogger(BuildIndex.class);
 
   public static final String INDEX_PATH = "index";
   public static final String INDEX_PARTITIONS = "indexPartitions";
@@ -66,11 +66,11 @@ public class BuildIndex extends Configured implements Tool {
     Configuration conf = getConf();
 
     LOG.info("Tool name: " + this.getClass().getSimpleName());
-    LOG.info(String.format(" -%s %s", IndexBuilder.INDEX_PATH, indexPath));
-    LOG.info(String.format(" -%s %d", IndexBuilder.INDEX_PARTITIONS, indexPartitions));
+    LOG.info(String.format(" -%s %s", INDEX_PATH, indexPath));
+    LOG.info(String.format(" -%s %d", INDEX_PARTITIONS, indexPartitions));
 
     if (cmdline.hasOption(POSITIONAL_INDEX_IP)) {
-      LOG.info(String.format(" -%s", IndexBuilder.POSITIONAL_INDEX_IP));
+      LOG.info(String.format(" -%s", POSITIONAL_INDEX_IP));
       conf.set(Constants.IndexPath, indexPath);
       conf.setInt(Constants.NumReduceTasks, indexPartitions);
       conf.set(Constants.PostingsListsType,
@@ -79,7 +79,7 @@ public class BuildIndex extends Configured implements Tool {
       new BuildIPInvertedIndexDocSorted(conf).run();
       new BuildIntPostingsForwardIndex(conf).run();
     } else if (cmdline.hasOption(NONPOSITIONAL_INDEX_IP)) {
-      LOG.info(String.format(" -%s", IndexBuilder.NONPOSITIONAL_INDEX_IP));
+      LOG.info(String.format(" -%s", NONPOSITIONAL_INDEX_IP));
       conf.set(Constants.IndexPath, indexPath);
       conf.setInt(Constants.NumReduceTasks, indexPartitions);
       conf.set(Constants.PostingsListsType,

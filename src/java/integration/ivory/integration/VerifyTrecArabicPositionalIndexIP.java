@@ -2,7 +2,7 @@ package ivory.integration;
 
 import static org.junit.Assert.assertTrue;
 
-import ivory.app.BuildPositionalIndexIP;
+import ivory.app.BuildIndex;
 import ivory.app.PreprocessTrecForeign;
 import ivory.core.eval.Qrels;
 import ivory.core.tokenize.LuceneArabicAnalyzer;
@@ -77,9 +77,9 @@ public class VerifyTrecArabicPositionalIndexIP {
         "-lang=ar" , "-tokenizerclass=" + LuceneArabicAnalyzer.class.getCanonicalName(),
         "-tokenizermodel=" + index + "/ar-token.bin", "-name=TREC2001-02.Arabic"
     });
-    
-    BuildPositionalIndexIP.main(new String[] { libjars, IntegrationUtils.D_JT, IntegrationUtils.D_NN,
-        index, "10" });
+
+    BuildIndex.main(new String[] { libjars, IntegrationUtils.D_JT, IntegrationUtils.D_NN,
+        "-index=" + index, "-indexPartitions=10", "-positionalIndexIP" });
 
     // Done with indexing, now do retrieval run.
     conf = RunQueryEngine.parseArgs(new String[] {
