@@ -3,6 +3,7 @@ package ivory.app;
 import ivory.core.Constants;
 import ivory.core.index.BuildIPInvertedIndexDocSorted;
 import ivory.core.index.BuildIntPostingsForwardIndex;
+import ivory.core.index.BuildLPInvertedIndexDocSorted;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -25,15 +26,16 @@ public class BuildIndex extends Configured implements Tool {
   public static final String INDEX_PARTITIONS = "indexPartitions";
 
   public static final String POSITIONAL_INDEX_IP = "positionalIndexIP";
+  public static final String POSITIONAL_INDEX_LP = "positionalIndexLP";
   public static final String NONPOSITIONAL_INDEX_IP = "nonpositionalIndexIP";
 
-  @SuppressWarnings({"static-access"}) @Override
+  @SuppressWarnings({ "static-access" })
+  @Override
   public int run(String[] args) throws Exception {
     Options options = new Options();
-    options.addOption(new Option(POSITIONAL_INDEX_IP,
-        "build positional index (IP algorithm)"));
-    options.addOption(new Option(NONPOSITIONAL_INDEX_IP,
-        "build nonpositional index (IP algorithm)"));
+    options.addOption(new Option(POSITIONAL_INDEX_IP, "build positional index (IP algorithm)"));
+    options.addOption(new Option(POSITIONAL_INDEX_LP, "build positional index (LP algorithm)"));
+    options.addOption(new Option(NONPOSITIONAL_INDEX_IP, "build nonpositional index (IP algorithm)"));
 
     options.addOption(OptionBuilder.withArgName("path").hasArg()
         .withDescription("(required) index path").create(INDEX_PATH));
@@ -60,8 +62,8 @@ public class BuildIndex extends Configured implements Tool {
 
     String indexPath = cmdline.getOptionValue(INDEX_PATH);
 
-    int indexPartitions = cmdline.hasOption(INDEX_PARTITIONS) ?
-        Integer.parseInt(cmdline.getOptionValue(INDEX_PARTITIONS)) : 64;
+    int indexPartitions = cmdline.hasOption(INDEX_PARTITIONS) ? Integer.parseInt(cmdline
+        .getOptionValue(INDEX_PARTITIONS)) : 64;
 
     Configuration conf = getConf();
 
@@ -78,6 +80,20 @@ public class BuildIndex extends Configured implements Tool {
 
       new BuildIPInvertedIndexDocSorted(conf).run();
       new BuildIntPostingsForwardIndex(conf).run();
+    } if (cmdline.hasOption(POSITIONAL_INDEX_LP)) {
+      LOG.info(String.format(" -%s", POSITIONAL_INDEX_LP));
+      conf.set(Constants.IndexPath, indexPath);
+      conf.setInt(Constants.NumReduceTasks, indexPartitions);
+      conf.set(Constants.PostingsListsType,
+          ivory.core.data.index.PostingsListDocSortedPositional.class.getCanonicalName());
+
+      conf.setFloat("Ivory.IndexingMapMemoryThreshold", 0.9f);
+      conf.setFloat("Ivory.IndexingReduceMemoryThreshold", 0.9f);
+      conf.setInt("Ivory.MaxHeap", 2048);
+      conf.setInt("Ivory.MaxNDocsBeforeFlush", 50000);
+
+      new BuildLPInvertedIndexDocSorted(conf).run();
+      new BuildIntPostingsForwardIndex(conf).run();
     } else if (cmdline.hasOption(NONPOSITIONAL_INDEX_IP)) {
       LOG.info(String.format(" -%s", IndexBuilder.NONPOSITIONAL_INDEX_IP));
       conf.set(Constants.IndexPath, indexPath);
@@ -88,8 +104,8 @@ public class BuildIndex extends Configured implements Tool {
       new BuildIPInvertedIndexDocSorted(conf).run();
       new BuildIntPostingsForwardIndex(conf).run();
     } else {
-      LOG.info(String.format("Nothing to do: specify either %s or %s",
-          POSITIONAL_INDEX_IP, NONPOSITIONAL_INDEX_IP));
+      LOG.info(String.format("Nothing to do: specify either %s or %s", POSITIONAL_INDEX_IP,
+          NONPOSITIONAL_INDEX_IP));
     }
 
     return 0;
