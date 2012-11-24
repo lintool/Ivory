@@ -7,5 +7,4 @@ etc/run.sh
 etc/hadoop-local.sh
 ivy/ivy.jar
 lib/
-test/
 ranking.*
