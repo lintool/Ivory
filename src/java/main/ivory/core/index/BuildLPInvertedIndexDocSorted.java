@@ -16,18 +16,13 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
-import org.apache.hadoop.mapred.FileInputFormat;
-import org.apache.hadoop.mapred.FileOutputFormat;
-import org.apache.hadoop.mapred.JobClient;
-import org.apache.hadoop.mapred.JobConf;
-import org.apache.hadoop.mapred.MapReduceBase;
-import org.apache.hadoop.mapred.Mapper;
-import org.apache.hadoop.mapred.OutputCollector;
-import org.apache.hadoop.mapred.Reducer;
-import org.apache.hadoop.mapred.Reporter;
-import org.apache.hadoop.mapred.RunningJob;
-import org.apache.hadoop.mapred.SequenceFileInputFormat;
-import org.apache.hadoop.mapred.SequenceFileOutputFormat;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 import org.apache.log4j.Logger;
 
 import edu.umd.cloud9.util.PowerTool;
@@ -35,13 +30,10 @@ import edu.umd.cloud9.util.map.HMapIV;
 import edu.umd.cloud9.util.map.MapIV;
 
 /**
- * <p>
  * Indexer for building document-sorted inverted indexes.
- * </p>
- * 
+ *
  * @author Tamer Elsayed
  * @author Jimmy Lin
- * 
  */
 public class BuildLPInvertedIndexDocSorted extends PowerTool {
   private static final Logger LOG = Logger.getLogger(BuildLPInvertedIndexDocSorted.class);
@@ -54,15 +46,11 @@ public class BuildLPInvertedIndexDocSorted extends PowerTool {
   protected static enum Reduce { Merges, OnePL }
   protected static enum IndexedTerms { Total }
 
-  private static class MyMapper extends MapReduceBase implements
+  private static class MyMapper extends
       Mapper<IntWritable, IntDocVector, IntWritable, PostingsListDocSortedPositional> {
 
     // key
     private static IntWritable sTerm = new IntWritable();
-
-    // keep reference to OutputCollector and Reporter to use in close()
-    private OutputCollector<IntWritable, PostingsListDocSortedPositional> mOutput;
-    private Reporter mReporter;
 
     // current docno
     private int mDocno;
@@ -87,22 +75,21 @@ public class BuildLPInvertedIndexDocSorted extends PowerTool {
     // max number of docs before flushing
     int maxNDocsBeforeFlush = 50000;
 
-    public void configure(JobConf job) {
-      mMapMemoryThreshold = job.getFloat("Ivory.IndexingMapMemoryThreshold", 0.9f);
-      mCollectionDocumentCount = job.getInt("Ivory.CollectionDocumentCount", 0);
-      maxNDocsBeforeFlush = job.getInt("Ivory.MaxNDocsBeforeFlush", 50000);
+    @Override
+    public void setup(Context context) {
+      Configuration conf = context.getConfiguration();
+      mMapMemoryThreshold = conf.getFloat("Ivory.IndexingMapMemoryThreshold", 0.9f);
+      mCollectionDocumentCount = conf.getInt("Ivory.CollectionDocumentCount", 0);
+      maxNDocsBeforeFlush = conf.getInt("Ivory.MaxNDocsBeforeFlush", 50000);
     }
 
-    public void map(IntWritable key, IntDocVector doc,
-        OutputCollector<IntWritable, PostingsListDocSortedPositional> output, Reporter reporter)
-        throws IOException {
+    @Override
+    public void map(IntWritable key, IntDocVector doc, Context context)
+        throws IOException, InterruptedException {
       mDocno = key.get();
 
-      mOutput = output;
-      mReporter = reporter;
-
       // check if we should flush what we have so far
-      flushPartialLists(false, nDocs);
+      flushPartialLists(false, nDocs, context);
 
       long startTime = System.currentTimeMillis();
 
@@ -123,29 +110,31 @@ public class BuildLPInvertedIndexDocSorted extends PowerTool {
         pl.add(mDocno, tp);
         dl += tp.length;
       }
-      reporter.incrCounter(MapTime.Parsing, System.currentTimeMillis() - startTime);
+      context.getCounter(MapTime.Parsing).increment(System.currentTimeMillis() - startTime);
 
       // update number of indexed terms
-      reporter.incrCounter(IndexedTerms.Total, dl);
+      context.getCounter(IndexedTerms.Total).increment(dl);
 
       nDocs++;
-      flushPartialLists(false, nDocs);
-      reporter.incrCounter(Docs.Total, 1);
+      flushPartialLists(false, nDocs, context);
+      context.getCounter(Docs.Total).increment(1);
     }
 
     // test flushing conditions and flush if test successful
-    private boolean flushPartialLists(boolean forced, int nDocs) throws IOException {
+    private boolean flushPartialLists(boolean forced, int nDocs, Context context)
+        throws IOException, InterruptedException {
       if (!forced) {
         float memoryUsagePercent = 1 - (runtime.freeMemory() * 1.0f / runtime.totalMemory());
-        mReporter.setStatus("m" + memoryUsagePercent);
+        context.setStatus("m" + memoryUsagePercent);
         if (memoryUsagePercent < mMapMemoryThreshold) {
           if (nDocs % maxNDocsBeforeFlush != 0)
             return false;
         }
-        if (memoryUsagePercent >= mMapMemoryThreshold)
-          mReporter.incrCounter(MemoryFlushes.AfterMemoryFilled, 1);
-        else
-          mReporter.incrCounter(MemoryFlushes.AfterNDocs, 1);
+        if (memoryUsagePercent >= mMapMemoryThreshold) {
+          context.getCounter(MemoryFlushes.AfterMemoryFilled).increment(1);
+        } else {
+          context.getCounter(MemoryFlushes.AfterNDocs).increment(1);
+        }
       }
       if (sortedPartialPostings.size() == 0)
         return true;
@@ -157,7 +146,7 @@ public class BuildLPInvertedIndexDocSorted extends PowerTool {
       for (MapIV.Entry<PartialPostings> e : sortedPartialPostings.entrySet()) {
         // emit a partial posting list for each term
         sTerm.set(e.getKey());
-        mReporter.setStatus("t" + sTerm.get());
+        context.setStatus("t" + sTerm.get());
         sortedPL = e.getValue();
         pl.clear();
         pl.setCollectionDocumentCount(mCollectionDocumentCount);
@@ -170,31 +159,28 @@ public class BuildLPInvertedIndexDocSorted extends PowerTool {
           tp.set(positions[i], (short) positions[i].length);
           pl.add(docnos[i], tp.getTf(), tp);
         }
-        mOutput.collect(sTerm, pl);
+        context.write(sTerm, pl);
       }
-      mReporter.incrCounter(MapTime.Spilling, System.currentTimeMillis() - startTime);
+      context.getCounter(MapTime.Spilling).increment(System.currentTimeMillis() - startTime);
       sortedPartialPostings.clear();
       return true;
     }
 
-    public void close() throws IOException {
+    @Override
+    public void cleanup(Context context) throws IOException, InterruptedException {
       if (sortedPartialPostings.size() > 0) {
         // force flushing
-        flushPartialLists(true, nDocs);
-        mReporter.incrCounter(MemoryFlushes.AtClose, 1);
+        flushPartialLists(true, nDocs, context);
+        context.getCounter(MemoryFlushes.AtClose).increment(1);
       }
     }
   }
 
-  public static class MyReducer extends MapReduceBase
-      implements
+  public static class MyReducer extends 
       Reducer<IntWritable, PostingsListDocSortedPositional, IntWritable, PostingsListDocSortedPositional> {
     int docCnt = 0;
     private Runtime runtime = Runtime.getRuntime();
     private static float mReduceMemoryThreshold = 0.9f;
-
-    // keep reference to reporter
-    private Reporter mReporter;
 
     // a list of merged partial lists
     ArrayList<PostingsList> mergedList = new ArrayList<PostingsList>();
@@ -205,23 +191,25 @@ public class BuildLPInvertedIndexDocSorted extends PowerTool {
     // final merged list
     PostingsListDocSortedPositional finalPostingsList = new PostingsListDocSortedPositional();
 
-    public void configure(JobConf job) {
-      docCnt = job.getInt("Ivory.CollectionDocumentCount", 0);
-      mReduceMemoryThreshold = job.getFloat("Ivory.IndexingReduceMemoryThreshold", 0.9f);
+    @Override
+    public void setup(Context context) {
+      Configuration conf = context.getConfiguration();
+      docCnt = conf.getInt("Ivory.CollectionDocumentCount", 0);
+      mReduceMemoryThreshold = conf.getFloat("Ivory.IndexingReduceMemoryThreshold", 0.9f);
     }
 
-    public void reduce(IntWritable term, Iterator<PostingsListDocSortedPositional> values,
-        OutputCollector<IntWritable, PostingsListDocSortedPositional> output, Reporter reporter)
-        throws IOException {
+    @Override
+    public void reduce(IntWritable term, Iterable<PostingsListDocSortedPositional> values, Context context)
+        throws IOException, InterruptedException {
       // sLogger.setLevel(Level.INFO);
-      mReporter = reporter;
-      mReporter.setStatus("t" + term);
+      context.setStatus("t" + term);
       long start = System.currentTimeMillis();
 
-      PostingsListDocSortedPositional pl = values.next();
-      if (!values.hasNext()) { // it's just one partial list
-        output.collect(term, pl);
-        mReporter.incrCounter(Reduce.OnePL, 1);
+      Iterator<PostingsListDocSortedPositional> iter = values.iterator();
+      PostingsListDocSortedPositional pl = iter.next();
+      if (!iter.hasNext()) { // it's just one partial list
+        context.write(term, pl);
+        context.getCounter(Reduce.OnePL).increment(1);
       } else {// it has at least 2 partial lists
         mergedList.clear();
         incomingPLs.clear();
@@ -231,35 +219,35 @@ public class BuildLPInvertedIndexDocSorted extends PowerTool {
 
         // add the rest (at least another one)
         do {
-          incomingPLs.add(PostingsListDocSortedPositional.create(values.next().serialize()));
-          mergeLists(false, incomingPLs, mergedList);
-        } while (values.hasNext());
+          incomingPLs.add(PostingsListDocSortedPositional.create(iter.next().serialize()));
+          mergeLists(false, incomingPLs, mergedList, context);
+        } while (iter.hasNext());
 
         // force merging lists at the end
-        mergeLists(true, incomingPLs, mergedList);
+        mergeLists(true, incomingPLs, mergedList, context);
 
         if (mergedList.size() == 1) {
-          output.collect(term, (PostingsListDocSortedPositional) mergedList.get(0));
+          context.write(term, (PostingsListDocSortedPositional) mergedList.get(0));
         } else {
           LOG.info("Merging the master list");
           finalPostingsList.clear();
           PostingsListDocSortedPositional.mergeList(finalPostingsList, mergedList, docCnt);
-          output.collect(term, finalPostingsList);
+          context.write(term, finalPostingsList);
         }
       }
       long duration = System.currentTimeMillis() - start;
-      reporter.incrCounter(ReduceTime.Total, duration);
+      context.getCounter(ReduceTime.Total).increment(duration);
     }
 
     // test merging condition and merge if test successful + add the new
     // list to mergedList
     private boolean mergeLists(boolean forced, ArrayList<PostingsList> plList,
-        ArrayList<PostingsList> mergedList) throws IOException {
+        ArrayList<PostingsList> mergedList, Context context) throws IOException {
       if (plList.size() == 0)
         return false;
 
       float memoryUsagePercent = 1 - (runtime.freeMemory() * 1.0f / runtime.totalMemory());
-      mReporter.setStatus("m" + memoryUsagePercent);
+      context.setStatus("m" + memoryUsagePercent);
       if (!forced && (memoryUsagePercent < mReduceMemoryThreshold)) {
         return false;
       }
@@ -272,13 +260,13 @@ public class BuildLPInvertedIndexDocSorted extends PowerTool {
         plList.clear();
         mergedList.add(PostingsListDocSortedPositional.create(merged.serialize()));
         // runtime.gc();
-        mReporter.incrCounter(Reduce.Merges, 1);
+        context.getCounter(Reduce.Merges).increment(1);
       } else {
         PostingsList pl = plList.remove(0);
         pl.setCollectionDocumentCount(docCnt);
         mergedList.add(pl);
       }
-      mReporter.incrCounter(ReduceTime.Merging, System.currentTimeMillis() - startTime);
+      context.getCounter(ReduceTime.Merging).increment(System.currentTimeMillis() - startTime);
       return true;
     }
   }
@@ -295,9 +283,7 @@ public class BuildLPInvertedIndexDocSorted extends PowerTool {
   }
 
   public int runTool() throws Exception {
-    // create a new JobConf, inheriting from the configuration of this
-    // PowerTool
-    JobConf conf = new JobConf(getConf(), BuildLPInvertedIndexDocSorted.class);
+    Configuration conf = getConf();
     FileSystem fs = FileSystem.get(conf);
 
     String indexPath = conf.get("Ivory.IndexPath");
@@ -338,10 +324,6 @@ public class BuildLPInvertedIndexDocSorted extends PowerTool {
       return 0;
     }
 
-    conf.setJobName("BuildLPInvertedIndex:" + collectionName);
-
-    conf.setNumMapTasks(mapTasks);
-    conf.setNumReduceTasks(reduceTasks);
 
     conf.setInt("Ivory.CollectionDocumentCount", collectionDocCount);
 
@@ -349,24 +331,29 @@ public class BuildLPInvertedIndexDocSorted extends PowerTool {
     // conf.set("mapred.child.java.opts", "-Xmx2048m");
 
     conf.set("mapred.child.java.opts", "-Xmx" + maxHeap + "m");
-    FileInputFormat.setInputPaths(conf, inputPath);
-    FileOutputFormat.setOutputPath(conf, postingsPath);
 
-    conf.setInputFormat(SequenceFileInputFormat.class);
-    conf.setOutputFormat(SequenceFileOutputFormat.class);
+    Job job = new Job(conf, BuildLPInvertedIndexDocSorted.class.getSimpleName() + ":" + collectionName);
+    job.setJarByClass(BuildLPInvertedIndexDocSorted.class);
 
-    conf.setMapOutputKeyClass(IntWritable.class);
-    conf.setMapOutputValueClass(PostingsListDocSortedPositional.class);
-    conf.setOutputKeyClass(IntWritable.class);
-    conf.setOutputValueClass(PostingsListDocSortedPositional.class);
+    job.setNumReduceTasks(reduceTasks);
 
-    conf.setMapperClass(MyMapper.class);
-    // conf.setCombinerClass(MyReducer.class);
-    conf.setReducerClass(MyReducer.class);
+    FileInputFormat.setInputPaths(job, inputPath);
+    FileOutputFormat.setOutputPath(job, postingsPath);
+
+    job.setInputFormatClass(SequenceFileInputFormat.class);
+    job.setOutputFormatClass(SequenceFileOutputFormat.class);
+
+    job.setMapOutputKeyClass(IntWritable.class);
+    job.setMapOutputValueClass(PostingsListDocSortedPositional.class);
+    job.setOutputKeyClass(IntWritable.class);
+    job.setOutputValueClass(PostingsListDocSortedPositional.class);
+
+    job.setMapperClass(MyMapper.class);
+    job.setReducerClass(MyReducer.class);
 
     System.out.println("MaxHeap: " + maxHeap);
     long startTime = System.currentTimeMillis();
-    RunningJob job = JobClient.runJob(conf);
+    job.waitForCompletion(true);
     LOG.info("Job Finished in " + (System.currentTimeMillis() - startTime) / 1000.0
         + " seconds");
 
@@ -374,5 +361,4 @@ public class BuildLPInvertedIndexDocSorted extends PowerTool {
 
     return 0;
   }
-
 }
