@@ -1,3 +1,19 @@
+/*
+ * Ivory: A Hadoop toolkit for web-scale information retrieval
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you
+ * may not use this file except in compliance with the License. You may
+ * obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+ * implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
+
 package ivory.core.index;
 
 import ivory.core.RetrievalEnvironment;
@@ -11,6 +27,7 @@ import ivory.core.util.QuickSort;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
@@ -48,48 +65,35 @@ public class BuildLPInvertedIndexDocSorted extends PowerTool {
 
   private static class MyMapper extends
       Mapper<IntWritable, IntDocVector, IntWritable, PostingsListDocSortedPositional> {
+    private static final IntWritable TERM = new IntWritable();
+    // Runtime object to get the used amount of memory.
+    private static final Runtime runtime = Runtime.getRuntime();
 
-    // key
-    private static IntWritable sTerm = new IntWritable();
+    private static float MAP_MEMORY_THRESHOLD = 0.9f;    // Memory usage threshold.
+    private static int MAX_DOCS_BEFORE_FLUSH = 50000;    // Max number of docs before flushing.
 
-    // current docno
-    private int mDocno;
+    private int docno;                       // Current docno.
+    private int collectionDocumentCount;     // Total number of docs in collection.
+    private int docs = 0;                    // Number of documents read so far.
 
-    // total number of docs in collection
-    private int mCollectionDocumentCount;
-
-    // memory usage threshold
-    private static float mMapMemoryThreshold = 0.9f;
-
-    // reusable posting list
-    private PostingsListDocSortedPositional pl = new PostingsListDocSortedPositional();
-
-    HMapIV<PartialPostings> sortedPartialPostings = new HMapIV<PartialPostings>();
-
-    // run time object to get the used amount of memory
-    private Runtime runtime = Runtime.getRuntime();
-
-    // number of documents read so far
-    int nDocs = 0;
-
-    // max number of docs before flushing
-    int maxNDocsBeforeFlush = 50000;
+    private PostingsListDocSortedPositional postingsList = new PostingsListDocSortedPositional();
+    private HMapIV<PartialPostings> partialPostings = new HMapIV<PartialPostings>();
 
     @Override
     public void setup(Context context) {
       Configuration conf = context.getConfiguration();
-      mMapMemoryThreshold = conf.getFloat("Ivory.IndexingMapMemoryThreshold", 0.9f);
-      mCollectionDocumentCount = conf.getInt("Ivory.CollectionDocumentCount", 0);
-      maxNDocsBeforeFlush = conf.getInt("Ivory.MaxNDocsBeforeFlush", 50000);
+      MAP_MEMORY_THRESHOLD = conf.getFloat("Ivory.IndexingMapMemoryThreshold", 0.9f);
+      MAX_DOCS_BEFORE_FLUSH = conf.getInt("Ivory.MaxNDocsBeforeFlush", 50000);
+      collectionDocumentCount = conf.getInt("Ivory.CollectionDocumentCount", 0);
     }
 
     @Override
     public void map(IntWritable key, IntDocVector doc, Context context)
         throws IOException, InterruptedException {
-      mDocno = key.get();
+      docno = key.get();
 
-      // check if we should flush what we have so far
-      flushPartialLists(false, nDocs, context);
+      // Check if we should flush what we have so far.
+      flushPostings(false, context);
 
       long startTime = System.currentTimeMillis();
 
@@ -102,75 +106,74 @@ public class BuildLPInvertedIndexDocSorted extends PowerTool {
       while (r.hasMoreTerms()) {
         term = r.nextTerm();
         tp = r.getPositions();
-        pl = sortedPartialPostings.get(term);
+        pl = partialPostings.get(term);
         if (pl == null) {
           pl = new PartialPostings();
-          sortedPartialPostings.put(term, pl);
+          partialPostings.put(term, pl);
         }
-        pl.add(mDocno, tp);
+        pl.add(docno, tp);
         dl += tp.length;
       }
       context.getCounter(MapTime.Parsing).increment(System.currentTimeMillis() - startTime);
 
-      // update number of indexed terms
+      // Update number of indexed terms.
       context.getCounter(IndexedTerms.Total).increment(dl);
 
-      nDocs++;
-      flushPartialLists(false, nDocs, context);
+      docs++;
+      flushPostings(false, context);
       context.getCounter(Docs.Total).increment(1);
     }
 
-    // test flushing conditions and flush if test successful
-    private boolean flushPartialLists(boolean forced, int nDocs, Context context)
+    private boolean flushPostings(boolean force, Context context)
         throws IOException, InterruptedException {
-      if (!forced) {
+      if (!force) {
         float memoryUsagePercent = 1 - (runtime.freeMemory() * 1.0f / runtime.totalMemory());
         context.setStatus("m" + memoryUsagePercent);
-        if (memoryUsagePercent < mMapMemoryThreshold) {
-          if (nDocs % maxNDocsBeforeFlush != 0)
+        if (memoryUsagePercent < MAP_MEMORY_THRESHOLD && docs % MAX_DOCS_BEFORE_FLUSH != 0) {
             return false;
         }
-        if (memoryUsagePercent >= mMapMemoryThreshold) {
+        if (memoryUsagePercent >= MAP_MEMORY_THRESHOLD) {
           context.getCounter(MemoryFlushes.AfterMemoryFilled).increment(1);
         } else {
           context.getCounter(MemoryFlushes.AfterNDocs).increment(1);
         }
       }
-      if (sortedPartialPostings.size() == 0)
+
+      if (partialPostings.size() == 0) {
         return true;
+      }
 
       TermPositions tp = new TermPositions();
-      PartialPostings sortedPL;
-      // start the timer
+      // Start the timer.
       long startTime = System.currentTimeMillis();
-      for (MapIV.Entry<PartialPostings> e : sortedPartialPostings.entrySet()) {
-        // emit a partial posting list for each term
-        sTerm.set(e.getKey());
-        context.setStatus("t" + sTerm.get());
-        sortedPL = e.getValue();
-        pl.clear();
-        pl.setCollectionDocumentCount(mCollectionDocumentCount);
-        pl.setNumberOfPostings(sortedPL.size());
+      for (MapIV.Entry<PartialPostings> e : partialPostings.entrySet()) {
+        // Emit a partial posting list for each term.
+        TERM.set(e.getKey());
+        context.setStatus("t" + TERM.get());
+        PartialPostings pl = e.getValue();
+        postingsList.clear();
+        postingsList.setCollectionDocumentCount(collectionDocumentCount);
+        postingsList.setNumberOfPostings(pl.size());
 
-        int[] docnos = sortedPL.getDocnos();
-        int[][] positions = sortedPL.getPositions();
-        QuickSort.quicksortWithStack(positions, docnos, 0, sortedPL.size() - 1);
-        for (int i = 0; i < sortedPL.size(); i++) {
+        int[] docnos = pl.getDocnos();
+        int[][] positions = pl.getPositions();
+        QuickSort.quicksortWithStack(positions, docnos, 0, pl.size() - 1);
+        for (int i = 0; i < pl.size(); i++) {
           tp.set(positions[i], (short) positions[i].length);
-          pl.add(docnos[i], tp.getTf(), tp);
+          postingsList.add(docnos[i], tp.getTf(), tp);
         }
-        context.write(sTerm, pl);
+        context.write(TERM, postingsList);
       }
       context.getCounter(MapTime.Spilling).increment(System.currentTimeMillis() - startTime);
-      sortedPartialPostings.clear();
+      partialPostings.clear();
       return true;
     }
 
     @Override
     public void cleanup(Context context) throws IOException, InterruptedException {
-      if (sortedPartialPostings.size() > 0) {
-        // force flushing
-        flushPartialLists(true, nDocs, context);
+      // Force flushing.
+      if (partialPostings.size() > 0) {
+        flushPostings(true, context);
         context.getCounter(MemoryFlushes.AtClose).increment(1);
       }
     }
@@ -178,60 +181,62 @@ public class BuildLPInvertedIndexDocSorted extends PowerTool {
 
   public static class MyReducer extends 
       Reducer<IntWritable, PostingsListDocSortedPositional, IntWritable, PostingsListDocSortedPositional> {
-    int docCnt = 0;
-    private Runtime runtime = Runtime.getRuntime();
-    private static float mReduceMemoryThreshold = 0.9f;
+    private static float REDUCE_MEMORY_THRESHOLD = 0.9f;
+    private static final Runtime runtime = Runtime.getRuntime();
 
-    // a list of merged partial lists
-    ArrayList<PostingsList> mergedList = new ArrayList<PostingsList>();
+    private int collectionDocumentCount = 0;
 
-    // a list of incoming partial lists since last merging
-    ArrayList<PostingsList> incomingPLs = new ArrayList<PostingsList>();
+    // A list of merged partial lists.
+    private List<PostingsList> mergedList = new ArrayList<PostingsList>();
 
-    // final merged list
-    PostingsListDocSortedPositional finalPostingsList = new PostingsListDocSortedPositional();
+    // A list of incoming partial lists since last merging.
+    private List<PostingsList> incomingLists = new ArrayList<PostingsList>();
+
+    // Final merged list.
+    private PostingsListDocSortedPositional finalPostingsList = new PostingsListDocSortedPositional();
 
     @Override
     public void setup(Context context) {
       Configuration conf = context.getConfiguration();
-      docCnt = conf.getInt("Ivory.CollectionDocumentCount", 0);
-      mReduceMemoryThreshold = conf.getFloat("Ivory.IndexingReduceMemoryThreshold", 0.9f);
+      REDUCE_MEMORY_THRESHOLD = conf.getFloat("Ivory.IndexingReduceMemoryThreshold", 0.9f);
+      collectionDocumentCount = conf.getInt("Ivory.CollectionDocumentCount", 0);
     }
 
     @Override
     public void reduce(IntWritable term, Iterable<PostingsListDocSortedPositional> values, Context context)
         throws IOException, InterruptedException {
-      // sLogger.setLevel(Level.INFO);
       context.setStatus("t" + term);
       long start = System.currentTimeMillis();
 
       Iterator<PostingsListDocSortedPositional> iter = values.iterator();
       PostingsListDocSortedPositional pl = iter.next();
-      if (!iter.hasNext()) { // it's just one partial list
+      if (!iter.hasNext()) {
+        // It's just one partial list.
         context.write(term, pl);
         context.getCounter(Reduce.OnePL).increment(1);
-      } else {// it has at least 2 partial lists
+      } else {
+        // Has at least 2 partial lists...
         mergedList.clear();
-        incomingPLs.clear();
+        incomingLists.clear();
 
-        // add the first
-        incomingPLs.add(PostingsListDocSortedPositional.create(pl.serialize()));
+        // Add the first.
+        incomingLists.add(PostingsListDocSortedPositional.create(pl.serialize()));
 
-        // add the rest (at least another one)
+        // Add the rest (at least another one).
         do {
-          incomingPLs.add(PostingsListDocSortedPositional.create(iter.next().serialize()));
-          mergeLists(false, incomingPLs, mergedList, context);
+          incomingLists.add(PostingsListDocSortedPositional.create(iter.next().serialize()));
+          mergeLists(false, incomingLists, mergedList, context);
         } while (iter.hasNext());
 
-        // force merging lists at the end
-        mergeLists(true, incomingPLs, mergedList, context);
+        // Force merging lists at the end.
+        mergeLists(true, incomingLists, mergedList, context);
 
         if (mergedList.size() == 1) {
           context.write(term, (PostingsListDocSortedPositional) mergedList.get(0));
         } else {
           LOG.info("Merging the master list");
           finalPostingsList.clear();
-          PostingsListDocSortedPositional.mergeList(finalPostingsList, mergedList, docCnt);
+          PostingsListDocSortedPositional.mergeList(finalPostingsList, mergedList, collectionDocumentCount);
           context.write(term, finalPostingsList);
         }
       }
@@ -239,33 +244,33 @@ public class BuildLPInvertedIndexDocSorted extends PowerTool {
       context.getCounter(ReduceTime.Total).increment(duration);
     }
 
-    // test merging condition and merge if test successful + add the new
-    // list to mergedList
-    private boolean mergeLists(boolean forced, ArrayList<PostingsList> plList,
-        ArrayList<PostingsList> mergedList, Context context) throws IOException {
-      if (plList.size() == 0)
+    private boolean mergeLists(boolean forced, List<PostingsList> lists,
+        List<PostingsList> mergedList, Context context) throws IOException {
+      if (lists.size() == 0) {
         return false;
+      }
 
       float memoryUsagePercent = 1 - (runtime.freeMemory() * 1.0f / runtime.totalMemory());
       context.setStatus("m" + memoryUsagePercent);
-      if (!forced && (memoryUsagePercent < mReduceMemoryThreshold)) {
+      if (!forced && (memoryUsagePercent < REDUCE_MEMORY_THRESHOLD)) {
         return false;
       }
-      // start the timer
+
+      // Start the timer.
       long startTime = System.currentTimeMillis();
-      LOG.info(">> merging a list of " + plList.size() + " partial lists");
-      if (plList.size() > 1) {
+      LOG.info(">> merging a list of " + lists.size() + " partial lists");
+      if (lists.size() > 1) {
         PostingsListDocSortedPositional merged = new PostingsListDocSortedPositional();
-        PostingsListDocSortedPositional.mergeList(merged, plList, docCnt);
-        plList.clear();
+        PostingsListDocSortedPositional.mergeList(merged, lists, collectionDocumentCount);
+        lists.clear();
         mergedList.add(PostingsListDocSortedPositional.create(merged.serialize()));
-        // runtime.gc();
         context.getCounter(Reduce.Merges).increment(1);
       } else {
-        PostingsList pl = plList.remove(0);
-        pl.setCollectionDocumentCount(docCnt);
+        PostingsList pl = lists.remove(0);
+        pl.setCollectionDocumentCount(collectionDocumentCount);
         mergedList.add(pl);
       }
+
       context.getCounter(ReduceTime.Merging).increment(System.currentTimeMillis() - startTime);
       return true;
     }
@@ -324,12 +329,9 @@ public class BuildLPInvertedIndexDocSorted extends PowerTool {
       return 0;
     }
 
-
     conf.setInt("Ivory.CollectionDocumentCount", collectionDocCount);
 
     conf.setInt("mapred.min.split.size", minSplitSize);
-    // conf.set("mapred.child.java.opts", "-Xmx2048m");
-
     conf.set("mapred.child.java.opts", "-Xmx" + maxHeap + "m");
 
     Job job = new Job(conf, BuildLPInvertedIndexDocSorted.class.getSimpleName() + ":" + collectionName);
@@ -351,7 +353,6 @@ public class BuildLPInvertedIndexDocSorted extends PowerTool {
     job.setMapperClass(MyMapper.class);
     job.setReducerClass(MyReducer.class);
 
-    System.out.println("MaxHeap: " + maxHeap);
     long startTime = System.currentTimeMillis();
     job.waitForCompletion(true);
     LOG.info("Job Finished in " + (System.currentTimeMillis() - startTime) / 1000.0

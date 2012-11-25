@@ -23,8 +23,8 @@ import org.junit.Test;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
-public class VerifyTrecPositionalIndexIPLocal {
-  private static final Logger LOG = Logger.getLogger(VerifyTrecPositionalIndexIPLocal.class);
+public class VerifyTrecPositionalIndexLPLocal {
+  private static final Logger LOG = Logger.getLogger(VerifyTrecPositionalIndexLPLocal.class);
   private static final Random RANDOM = new Random();
 
   private Path collectionPath = new Path("/scratch0/collections/trec/trec4-5_noCRFR.xml");
@@ -58,7 +58,7 @@ public class VerifyTrecPositionalIndexIPLocal {
         "-" + PreprocessCollection.INDEX_PATH, index });
     BuildIndex.main(new String[] { libjars,
         IntegrationUtils.D_JT_LOCAL, IntegrationUtils.D_NN_LOCAL,
-        "-" + BuildIndex.POSITIONAL_INDEX_IP,
+        "-" + BuildIndex.POSITIONAL_INDEX_LP,
         "-" + BuildIndex.INDEX_PATH, index,
         "-" + BuildIndex.INDEX_PARTITIONS, "10" });
 
@@ -82,6 +82,6 @@ public class VerifyTrecPositionalIndexIPLocal {
   }
 
   public static junit.framework.Test suite() {
-    return new JUnit4TestAdapter(VerifyTrecPositionalIndexIPLocal.class);
+    return new JUnit4TestAdapter(VerifyTrecPositionalIndexLPLocal.class);
   }
 }
