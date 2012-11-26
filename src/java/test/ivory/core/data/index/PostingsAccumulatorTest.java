@@ -1,3 +1,19 @@
+/*
+ * Ivory: A Hadoop toolkit for web-scale information retrieval
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you
+ * may not use this file except in compliance with the License. You may
+ * obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+ * implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
+
 package ivory.core.data.index;
 
 import static org.junit.Assert.assertEquals;
@@ -12,10 +28,10 @@ import junit.framework.JUnit4TestAdapter;
 
 import org.junit.Test;
 
-public class PartialPostingsTest {
+public class PostingsAccumulatorTest {
   @Test
   public void testSerialize() throws IOException {
-    PartialPostings p1 = new PartialPostings();
+    PostingsAccumulator p1 = new PostingsAccumulator();
 
     ByteArrayOutputStream bytesOut = new ByteArrayOutputStream();
     DataOutputStream dataOut = new DataOutputStream(bytesOut);
@@ -73,7 +89,7 @@ public class PartialPostingsTest {
     assertEquals(141, p1.getPositions()[2][6]);
     assertEquals(155, p1.getPositions()[2][7]);
 
-    PartialPostings p2 = new PartialPostings();
+    PostingsAccumulator p2 = new PostingsAccumulator();
     p2.readFields(new DataInputStream(new ByteArrayInputStream(bytesOut.toByteArray())));
 
     assertEquals(3, p2.size());
@@ -107,7 +123,7 @@ public class PartialPostingsTest {
 
     p1.write(dataOut);
 
-    p2 = new PartialPostings();
+    p2 = new PostingsAccumulator();
     p2.readFields(new DataInputStream(new ByteArrayInputStream(bytesOut.toByteArray())));
 
     assertEquals(6, p2.size());
@@ -123,6 +139,6 @@ public class PartialPostingsTest {
   }
 
   public static junit.framework.Test suite() {
-    return new JUnit4TestAdapter(PartialPostingsTest.class);
+    return new JUnit4TestAdapter(PostingsAccumulatorTest.class);
   }
 }

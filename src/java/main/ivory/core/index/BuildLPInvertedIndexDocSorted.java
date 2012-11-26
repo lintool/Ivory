@@ -16,9 +16,10 @@
 
 package ivory.core.index;
 
+import ivory.core.Constants;
 import ivory.core.RetrievalEnvironment;
 import ivory.core.data.document.IntDocVector;
-import ivory.core.data.index.PartialPostings;
+import ivory.core.data.index.PostingsAccumulator;
 import ivory.core.data.index.PostingsList;
 import ivory.core.data.index.PostingsListDocSortedPositional;
 import ivory.core.data.index.TermPositions;
@@ -77,7 +78,7 @@ public class BuildLPInvertedIndexDocSorted extends PowerTool {
     private int docs = 0;                    // Number of documents read so far.
 
     private PostingsListDocSortedPositional postingsList = new PostingsListDocSortedPositional();
-    private HMapIV<PartialPostings> partialPostings = new HMapIV<PartialPostings>();
+    private HMapIV<PostingsAccumulator> partialPostings = new HMapIV<PostingsAccumulator>();
 
     @Override
     public void setup(Context context) {
@@ -102,13 +103,13 @@ public class BuildLPInvertedIndexDocSorted extends PowerTool {
       int[] tp;
 
       int dl = 0;
-      PartialPostings pl;
+      PostingsAccumulator pl;
       while (r.hasMoreTerms()) {
         term = r.nextTerm();
         tp = r.getPositions();
         pl = partialPostings.get(term);
         if (pl == null) {
-          pl = new PartialPostings();
+          pl = new PostingsAccumulator();
           partialPostings.put(term, pl);
         }
         pl.add(docno, tp);
@@ -146,11 +147,11 @@ public class BuildLPInvertedIndexDocSorted extends PowerTool {
       TermPositions tp = new TermPositions();
       // Start the timer.
       long startTime = System.currentTimeMillis();
-      for (MapIV.Entry<PartialPostings> e : partialPostings.entrySet()) {
+      for (MapIV.Entry<PostingsAccumulator> e : partialPostings.entrySet()) {
         // Emit a partial posting list for each term.
         TERM.set(e.getKey());
         context.setStatus("t" + TERM.get());
-        PartialPostings pl = e.getValue();
+        PostingsAccumulator pl = e.getValue();
         postingsList.clear();
         postingsList.setCollectionDocumentCount(collectionDocumentCount);
         postingsList.setNumberOfPostings(pl.size());
@@ -276,8 +277,7 @@ public class BuildLPInvertedIndexDocSorted extends PowerTool {
     }
   }
 
-  public static final String[] RequiredParameters = { "Ivory.NumReduceTasks",
-      "Ivory.IndexPath", "Ivory.IndexingMapMemoryThreshold", "Ivory.IndexingReduceMemoryThreshold" };
+  public static final String[] RequiredParameters = { Constants.NumReduceTasks, Constants.IndexPath };
 
   public String[] getRequiredParameters() {
     return RequiredParameters;
@@ -291,31 +291,38 @@ public class BuildLPInvertedIndexDocSorted extends PowerTool {
     Configuration conf = getConf();
     FileSystem fs = FileSystem.get(conf);
 
-    String indexPath = conf.get("Ivory.IndexPath");
+    String indexPath = conf.get(Constants.IndexPath);
     RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fs);
 
     String collectionName = env.readCollectionName();
 
-    int mapTasks = conf.getInt("Ivory.NumMapTasks", 0);
-    int reduceTasks = conf.getInt("Ivory.NumReduceTasks", 0);
-    int minSplitSize = conf.getInt("Ivory.MinSplitSize", 0);
+    int reduceTasks = conf.getInt(Constants.NumReduceTasks, 0);
+    int minSplitSize = conf.getInt(Constants.MinSplitSize, 0);
     int collectionDocCount = env.readCollectionDocumentCount();
-    float mapMemoryThreshold = conf.getFloat("Ivory.IndexingMapMemoryThreshold", 0.9f);
-    float reduceMemoryThreshold = conf.getFloat("Ivory.IndexingReduceMemoryThreshold", 0.9f);
-    int maxHeap = conf.getInt("Ivory.MaxHeap", 2048);
-    int maxNDocsBeforeFlush = conf.getInt("Ivory.MaxNDocsBeforeFlush", 50000);
 
-    LOG.info("PowerTool: BuildLPInvertedIndexDocSorted");
-    LOG.info(" - IndexPath: " + indexPath);
-    LOG.info(" - CollectionName: " + collectionName);
-    LOG.info(" - CollectionDocumentCount: " + collectionDocCount);
-    LOG.info(" - IndexingMapMemoryThreshold: " + mapMemoryThreshold);
-    LOG.info(" - IndexingReduceMemoryThreshold: " + reduceMemoryThreshold);
-    LOG.info(" - NumMapTasks: " + mapTasks);
-    LOG.info(" - NumReduceTasks: " + reduceTasks);
-    LOG.info(" - MinSplitSize: " + minSplitSize);
-    LOG.info(" - MaxHeap: " + maxHeap);
-    LOG.info(" - MaxNDocsBeforeFlush: " + maxNDocsBeforeFlush);
+    String postingsType = conf.get(Constants.PostingsListsType,
+        PostingsListDocSortedPositional.class.getCanonicalName());
+    @SuppressWarnings("unchecked")
+    Class<? extends PostingsList> postingsClass =
+        (Class<? extends PostingsList>) Class.forName(postingsType);
+
+    // These are the default values for the LP algorithm.
+    float mapMemoryThreshold = conf.getFloat(Constants.IndexingMapMemoryThreshold, 0.9f);
+    float reduceMemoryThreshold = conf.getFloat(Constants.IndexingReduceMemoryThreshold, 0.9f);
+    int maxHeap = conf.getInt(Constants.MaxHeap, 2048);
+    int maxNDocsBeforeFlush = conf.getInt(Constants.MaxNDocsBeforeFlush, 50000);
+
+    LOG.info("PowerTool: " + BuildLPInvertedIndexDocSorted.class.getSimpleName());
+    LOG.info(String.format(" - %s: %s", Constants.IndexPath, indexPath));
+    LOG.info(String.format(" - %s: %s", Constants.CollectionName, collectionName));
+    LOG.info(String.format(" - %s: %s", Constants.CollectionDocumentCount, collectionDocCount));
+    LOG.info(String.format(" - %s: %s", Constants.PostingsListsType, postingsClass.getCanonicalName()));
+    LOG.info(String.format(" - %s: %s", Constants.NumReduceTasks, reduceTasks));
+    LOG.info(String.format(" - %s: %s", Constants.MinSplitSize, minSplitSize));
+    LOG.info(String.format(" - %s: %s", Constants.IndexingMapMemoryThreshold, mapMemoryThreshold));
+    LOG.info(String.format(" - %s: %s", Constants.IndexingReduceMemoryThreshold, reduceMemoryThreshold));
+    LOG.info(String.format(" - %s: %s", Constants.MaxHeap, maxHeap));
+    LOG.info(String.format(" - %s: %s", Constants.MaxNDocsBeforeFlush, maxNDocsBeforeFlush));
 
     if (!fs.exists(new Path(indexPath))) {
       fs.mkdirs(new Path(indexPath));
@@ -329,7 +336,7 @@ public class BuildLPInvertedIndexDocSorted extends PowerTool {
       return 0;
     }
 
-    conf.setInt("Ivory.CollectionDocumentCount", collectionDocCount);
+    conf.setInt(Constants.CollectionDocumentCount, collectionDocCount);
 
     conf.setInt("mapred.min.split.size", minSplitSize);
     conf.set("mapred.child.java.opts", "-Xmx" + maxHeap + "m");
@@ -355,8 +362,7 @@ public class BuildLPInvertedIndexDocSorted extends PowerTool {
 
     long startTime = System.currentTimeMillis();
     job.waitForCompletion(true);
-    LOG.info("Job Finished in " + (System.currentTimeMillis() - startTime) / 1000.0
-        + " seconds");
+    LOG.info("Job Finished in " + (System.currentTimeMillis() - startTime) / 1000.0 + " seconds");
 
     env.writePostingsType("ivory.data.PostingsListDocSortedPositional");
 
