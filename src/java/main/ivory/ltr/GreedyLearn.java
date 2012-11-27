@@ -18,7 +18,7 @@ package ivory.ltr;
 
 
 
-import ivory.core.exception.ConfigurationException;
+import ivory.core.ConfigurationException;
 
 import java.io.IOException;
 import java.util.ArrayList;

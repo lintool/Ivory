@@ -17,9 +17,9 @@
 package ivory.cascade.retrieval;
 
 import ivory.cascade.model.CascadeClique;
+import ivory.core.ConfigurationException;
 import ivory.core.RetrievalEnvironment;
-import ivory.core.exception.ConfigurationException;
-import ivory.core.exception.RetrievalException;
+import ivory.core.RetrievalException;
 import ivory.smrf.model.Clique;
 import ivory.smrf.model.DocumentNode;
 import ivory.smrf.model.GlobalTermEvidence;

@@ -1,7 +1,7 @@
 package ivory.sqe.retrieval;
 
+import ivory.core.ConfigurationException;
 import ivory.core.RetrievalEnvironment;
-import ivory.core.exception.ConfigurationException;
 import ivory.smrf.model.GlobalEvidence;
 import ivory.smrf.model.score.BM25ScoringFunction;
 import ivory.smrf.model.score.ScoringFunction;

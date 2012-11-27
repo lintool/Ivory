@@ -1,20 +1,25 @@
 package ivory.integration;
 
 import static org.junit.Assert.assertTrue;
-import ivory.app.BuildPositionalIndexIP;
-import ivory.core.driver.PreprocessTREC;
+
+import ivory.app.BuildIndex;
+import ivory.app.PreprocessTrecForeign;
 import ivory.core.eval.Qrels;
 import ivory.core.tokenize.StanfordChineseTokenizer;
 import ivory.regression.coling2012.EnZh_NTCIR8;
 import ivory.sqe.retrieval.QueryEngine;
 import ivory.sqe.retrieval.RunQueryEngine;
+
 import java.util.List;
+
 import junit.framework.JUnit4TestAdapter;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
 import org.junit.Test;
+
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
@@ -72,14 +77,14 @@ public class VerifyNtcirChinesePositionalIndexIP {
     fs.copyFromLocalFile(false, true, new Path("data/tokenizer/en.stop.stemmed"),
         new Path(index + "/en.stop.stemmed"));
 
-    PreprocessTREC.main(new String[] { libjars, IntegrationUtils.D_JT, IntegrationUtils.D_NN,
+    PreprocessTrecForeign.main(new String[] { libjars, IntegrationUtils.D_JT, IntegrationUtils.D_NN,
         "-input=" + collectionPath.toString(), "-index=" + index, 
         "-lang=zh" , "-tokenizerclass=" + StanfordChineseTokenizer.class.getCanonicalName(),
         "-tokenizermodel=" + index + "/zh-token.bin", "-name=NTCIR8.Chinese"
     });
-    
-    BuildPositionalIndexIP.main(new String[] { libjars, IntegrationUtils.D_JT, IntegrationUtils.D_NN,
-        index, "10" });
+
+    BuildIndex.main(new String[] { libjars, IntegrationUtils.D_JT, IntegrationUtils.D_NN,
+        "-index=" + index, "-indexPartitions=10", "-positionalIndexIP" });
 
     conf = RunQueryEngine.parseArgs(new String[] {
         "-index=" + index,

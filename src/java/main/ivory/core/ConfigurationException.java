@@ -14,16 +14,16 @@
  * permissions and limitations under the License.
  */
 
-package ivory.core.exception;
+package ivory.core;
 
-public class RetrievalException extends RuntimeException {
-  private static final long serialVersionUID = 4875722587648912695L;
+public class ConfigurationException extends Exception {
+  private static final long serialVersionUID = 3443583832454125315L;
 
-  public RetrievalException(String msg) {
+  public ConfigurationException(String msg) {
     super(msg);
   }
 
-  public RetrievalException(String msg, Throwable cause) {
+  public ConfigurationException(String msg, Throwable cause) {
     super(msg, cause);
   }
 }

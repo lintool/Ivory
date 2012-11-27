@@ -1,7 +1,7 @@
 package ivory.integration;
 
 import static org.junit.Assert.assertTrue;
-import ivory.app.BuildPositionalIndexIP;
+import ivory.app.BuildIndex;
 import ivory.app.PreprocessClueWebEnglish;
 import ivory.core.eval.Qrels;
 import ivory.regression.basic.Web09catB_All;
@@ -51,8 +51,11 @@ public class VerifyCluePositionalIndexIP {
 
     PreprocessClueWebEnglish.main(new String[] { libjars,
         IntegrationUtils.D_JT, IntegrationUtils.D_NN, collectionPath.toString(), index, "1" });
-    BuildPositionalIndexIP.main(new String[] { libjars,
-        IntegrationUtils.D_JT, IntegrationUtils.D_NN, index, "200" });
+    BuildIndex.main(new String[] { libjars,
+        IntegrationUtils.D_JT, IntegrationUtils.D_NN,
+        "-" + BuildIndex.POSITIONAL_INDEX_IP,
+        "-" + BuildIndex.INDEX_PATH, index,
+        "-" + BuildIndex.INDEX_PARTITIONS, "200" });
 
     // Done with indexing, now do retrieval run.
     fs.copyFromLocalFile(false, true, new Path("data/clue/run.web09catB.all.xml"),

@@ -1,10 +1,23 @@
+/*
+ * Ivory: A Hadoop toolkit for web-scale information retrieval
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you
+ * may not use this file except in compliance with the License. You may
+ * obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+ * implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
+
 package ivory.app;
 
 import ivory.core.Constants;
 import ivory.core.RetrievalEnvironment;
-import ivory.core.data.index.PostingsListDocSortedPositional;
-import ivory.core.index.BuildIPInvertedIndexDocSorted;
-import ivory.core.index.BuildIntPostingsForwardIndex;
 import ivory.core.preprocess.BuildDictionary;
 import ivory.core.preprocess.BuildIntDocVectors;
 import ivory.core.preprocess.BuildIntDocVectorsForwardIndex;
@@ -31,47 +44,51 @@ import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Logger;
 
+import cern.colt.Arrays;
+
 import edu.umd.cloud9.collection.DocnoMapping;
-import edu.umd.cloud9.collection.trec.TrecDocnoMapping;
-import edu.umd.cloud9.collection.trecweb.Gov2DocnoMapping;
-import edu.umd.cloud9.collection.trecweb.Wt10gDocnoMapping;
 
 @SuppressWarnings("unchecked")
-public class GenericIndexBuilder extends Configured implements Tool {
-  private static final Logger LOG = Logger.getLogger(GenericIndexBuilder.class);
+public class PreprocessCollection extends Configured implements Tool {
+  private static final Logger LOG = Logger.getLogger(PreprocessCollection.class);
+  
+  public static final String COLLECTION_PATH = "collection";
+  public static final String COLLECTION_NAME = "collectionName";
+  public static final String INDEX_PATH = "index";
+  public static final String INPUTFORMAT = "inputFormat";
+  public static final String TOKENIZER = "tokenizer";
+  public static final String DOCNO_MAPPING = "docnoMapping";
+  public static final String MIN_DF = "minDf";
 
-  private static final String INPUT_OPTION = "collection";
-  private static final String NAME_OPTION = "collectionName";
-  private static final String INDEX_OPTION = "index";
-  private static final String FORMAT_OPTION = "inputFormat";
-  private static final String TOKENIZER_OPTION = "tokenizer";
-  private static final String MAPPING_OPTION = "docnoMapping";
-  private static final String INDEX_PARTITIONS_OPTION = "indexPartitions";
-
+  /**
+   * Runs this tool.
+   */
   @SuppressWarnings({"static-access"}) @Override
   public int run(String[] args) throws Exception {
     Options options = new Options();
+
     options.addOption(OptionBuilder.withArgName("path").hasArg()
-        .withDescription("(required) collection path").create(INPUT_OPTION));
+        .withDescription("(required) collection path").create(COLLECTION_PATH));
     options.addOption(OptionBuilder.withArgName("name").hasArg()
-        .withDescription("(required) collection name").create(NAME_OPTION));
+        .withDescription("(required) collection name").create(COLLECTION_NAME));
     options.addOption(OptionBuilder.withArgName("path").hasArg()
-        .withDescription("(required) output path").create(INDEX_OPTION));
+        .withDescription("(required) index path").create(INDEX_PATH));
     options.addOption(OptionBuilder.withArgName("class").hasArg()
-        .withDescription("(required) fully-qualified DocnoMapping").create(MAPPING_OPTION));
+        .withDescription("(required) fully-qualified DocnoMapping").create(DOCNO_MAPPING));
 
     options.addOption(OptionBuilder.withArgName("class").hasArg()
         .withDescription("(optional) fully-qualified Hadoop InputFormat: SequenceFileInputFormat default")
-        .create(FORMAT_OPTION));
+        .create(INPUTFORMAT));
     options.addOption(OptionBuilder.withArgName("class").hasArg()
         .withDescription("(optional) fully-qualified Tokenizer: GalagoTokenizer default")
-        .create(TOKENIZER_OPTION));
+        .create(TOKENIZER));
     options.addOption(OptionBuilder.withArgName("num").hasArg()
-        .withDescription("(optional) number of index partitions: 100 default")
-        .create(INDEX_PARTITIONS_OPTION));
+        .withDescription("(optional) min Df")
+        .create(MIN_DF));
 
     CommandLine cmdline;
     CommandLineParser parser = new GnuParser();
+
     try {
       cmdline = parser.parse(options, args);
     } catch (ParseException exp) {
@@ -79,8 +96,9 @@ public class GenericIndexBuilder extends Configured implements Tool {
       return -1;
     }
 
-    if (!cmdline.hasOption(INPUT_OPTION) || !cmdline.hasOption(NAME_OPTION) ||
-        !cmdline.hasOption(INDEX_OPTION) || !cmdline.hasOption(MAPPING_OPTION)) {
+    if (!cmdline.hasOption(COLLECTION_PATH) || !cmdline.hasOption(COLLECTION_NAME) ||
+        !cmdline.hasOption(INDEX_PATH) || !cmdline.hasOption(DOCNO_MAPPING)) {
+      System.out.println("args: " + Arrays.toString(args));
       HelpFormatter formatter = new HelpFormatter();
       formatter.setWidth(120);
       formatter.printHelp(this.getClass().getName(), options);
@@ -88,71 +106,52 @@ public class GenericIndexBuilder extends Configured implements Tool {
       return -1;
     }
 
-    String collection = cmdline.getOptionValue(INPUT_OPTION);
-    String collectionName = cmdline.getOptionValue(NAME_OPTION);
-    String indexPath = cmdline.getOptionValue(INDEX_OPTION);
-
-    int indexPartitions = cmdline.hasOption(INDEX_PARTITIONS_OPTION) ?
-        Integer.parseInt(cmdline.getOptionValue(INDEX_PARTITIONS_OPTION)) : 64;
+    String collection = cmdline.getOptionValue(COLLECTION_PATH);
+    String collectionName = cmdline.getOptionValue(COLLECTION_NAME);
+    String indexPath = cmdline.getOptionValue(INDEX_PATH);
 
     Class<? extends DocnoMapping> docnoMappingClass = null;
     try {
       docnoMappingClass = (Class<? extends DocnoMapping>)
-          Class.forName(cmdline.getOptionValue(MAPPING_OPTION));
+          Class.forName(cmdline.getOptionValue(DOCNO_MAPPING));
     } catch (ClassNotFoundException e) {
       throw new RuntimeException(e);
     }
 
+    @SuppressWarnings("rawtypes")
     Class<? extends InputFormat> inputFormatClass = SequenceFileInputFormat.class;
-    if (cmdline.hasOption(FORMAT_OPTION)) {
+    if (cmdline.hasOption(INPUTFORMAT)) {
       try {
-        inputFormatClass = (Class<? extends InputFormat>)
-            Class.forName(cmdline.getOptionValue(FORMAT_OPTION));
+        inputFormatClass = (Class<? extends InputFormat<?, ?>>)
+            Class.forName(cmdline.getOptionValue(INPUTFORMAT));
       } catch (ClassNotFoundException e) {
         throw new RuntimeException(e);
       }
     }
 
     Class<? extends Tokenizer> tokenizerClass = GalagoTokenizer.class;
-    if (cmdline.hasOption(TOKENIZER_OPTION)) {
+    if (cmdline.hasOption(TOKENIZER)) {
       try {
         tokenizerClass = (Class<? extends Tokenizer>)
-            Class.forName(cmdline.getOptionValue(TOKENIZER_OPTION));
+            Class.forName(cmdline.getOptionValue(TOKENIZER));
       } catch (ClassNotFoundException e) {
         throw new RuntimeException(e);
       }
     }
 
     int minDf = 2;
+    if (cmdline.hasOption(MIN_DF)) {
+      minDf = Integer.parseInt(cmdline.getOptionValue(MIN_DF));
+    }
 
-    LOG.info("Tool name: " + GenericIndexBuilder.class.getCanonicalName());
-    LOG.info(String.format(" -%s: %s", INPUT_OPTION, collection));
-    LOG.info(String.format(" -%s: %s", NAME_OPTION, collectionName));
-    LOG.info(String.format(" -%s: %s", INDEX_OPTION, indexPath));
-    LOG.info(String.format(" -%s: %s", MAPPING_OPTION, docnoMappingClass.getCanonicalName()));
-    LOG.info(String.format(" -%s: %s", FORMAT_OPTION, inputFormatClass.getCanonicalName()));
-    LOG.info(String.format(" -%s: %s", TOKENIZER_OPTION, tokenizerClass.getCanonicalName()));
-    LOG.info(String.format(" -%s: %d", INDEX_PARTITIONS_OPTION, indexPartitions));
-
-    if (docnoMappingClass.equals(TrecDocnoMapping.class)) {
-      indexPartitions = 10;
-      minDf = 2;
-      LOG.info("Recognized TREC collection: setting special defaults...");
-      LOG.info(String.format(" -%s: %d", INDEX_PARTITIONS_OPTION, indexPartitions));
-      LOG.info(String.format(" -minDf: %d", minDf));
-    } else if (docnoMappingClass.equals(Wt10gDocnoMapping.class)) {
-      indexPartitions = 10;
-      minDf = 10;
-      LOG.info("Recognized Wt10g collection: setting special defaults...");
-      LOG.info(String.format(" -%s: %d", INDEX_PARTITIONS_OPTION, indexPartitions));
-      LOG.info(String.format(" -minDf: %d", minDf));
-    } else if (docnoMappingClass.equals(Gov2DocnoMapping.class)) {
-      indexPartitions = 100;
-      minDf = 10;
-      LOG.info("Recognized Gov2 collection: setting special defaults...");
-      LOG.info(String.format(" -%s: %d", INDEX_PARTITIONS_OPTION, indexPartitions));
-      LOG.info(String.format(" -minDf: %d", minDf));
-    } 
+    LOG.info("Tool name: " + this.getClass().getSimpleName());
+    LOG.info(String.format(" -%s %s", COLLECTION_PATH, collection));
+    LOG.info(String.format(" -%s %s", COLLECTION_NAME, collectionName));
+    LOG.info(String.format(" -%s %s", INDEX_PATH, indexPath));
+    LOG.info(String.format(" -%s %s", DOCNO_MAPPING, docnoMappingClass.getCanonicalName()));
+    LOG.info(String.format(" -%s %s", INPUTFORMAT, inputFormatClass.getCanonicalName()));
+    LOG.info(String.format(" -%s %s", TOKENIZER, tokenizerClass.getCanonicalName()));
+    LOG.info(String.format(" -%s %d", MIN_DF, minDf));
 
     Configuration conf = getConf();
     FileSystem fs = FileSystem.get(conf);
@@ -177,8 +176,8 @@ public class GenericIndexBuilder extends Configured implements Tool {
     conf.set(Constants.DocnoMappingClass, docnoMappingClass.getCanonicalName());
     conf.set(Constants.DocnoMappingFile, env.getDocnoMappingData().toString());
 
-    conf.setInt(Constants.DocnoOffset, 0); // docnos start at 1
-    conf.setInt(Constants.MinDf, minDf); // toss away singleton terms
+    conf.setInt(Constants.DocnoOffset, 0); // Assume docnos start at 1
+    conf.setInt(Constants.MinDf, minDf);
     conf.setInt(Constants.MaxDf, Integer.MAX_VALUE);
 
     Path mappingFile = env.getDocnoMappingData();
@@ -192,19 +191,10 @@ public class GenericIndexBuilder extends Configured implements Tool {
     new BuildIntDocVectorsForwardIndex(conf).run();
     new BuildTermDocVectorsForwardIndex(conf).run();
 
-    conf.setInt(Constants.NumReduceTasks, indexPartitions);
-    conf.set(Constants.PostingsListsType, PostingsListDocSortedPositional.class.getCanonicalName());
-
-    new BuildIPInvertedIndexDocSorted(conf).run();
-    new BuildIntPostingsForwardIndex(conf).run();
-
     return 0;
   }
 
-  /**
-   * Dispatches command-line arguments to the tool via the {@code ToolRunner}.
-   */
   public static void main(String[] args) throws Exception {
-    ToolRunner.run(new Configuration(), new GenericIndexBuilder(), args);
+    ToolRunner.run(new PreprocessCollection(), args);
   }
 }

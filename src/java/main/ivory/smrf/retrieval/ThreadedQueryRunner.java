@@ -16,7 +16,7 @@
 
 package ivory.smrf.retrieval;
 
-import ivory.core.exception.ConfigurationException;
+import ivory.core.ConfigurationException;
 import ivory.smrf.model.MarkovRandomField;
 import ivory.smrf.model.builder.MRFBuilder;
 import ivory.smrf.model.expander.MRFExpander;

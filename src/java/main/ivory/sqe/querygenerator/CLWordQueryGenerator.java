@@ -1,7 +1,7 @@
 package ivory.sqe.querygenerator;
 
+import ivory.core.ConfigurationException;
 import ivory.core.RetrievalEnvironment;
-import ivory.core.exception.ConfigurationException;
 import ivory.core.tokenize.Tokenizer;
 import ivory.core.tokenize.TokenizerFactory;
 import ivory.sqe.retrieval.Constants;

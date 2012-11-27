@@ -1,6 +1,6 @@
 package ivory.sqe.retrieval;
 
-import ivory.core.exception.ConfigurationException;
+import ivory.core.ConfigurationException;
 import ivory.core.util.ResultWriter;
 import ivory.core.util.XMLTools;
 import ivory.smrf.retrieval.Accumulator;

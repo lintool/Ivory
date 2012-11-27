@@ -30,7 +30,6 @@ import ivory.core.data.index.ProximityPostingsReaderUnorderedWindow;
 import ivory.core.data.stat.DocLengthTable;
 import ivory.core.data.stat.DocLengthTable2B;
 import ivory.core.data.stat.DocScoreTable;
-import ivory.core.exception.ConfigurationException;
 import ivory.core.tokenize.Tokenizer;
 import ivory.smrf.model.builder.Expression;
 import ivory.smrf.model.importance.ConceptImportanceModel;

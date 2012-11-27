@@ -14,7 +14,7 @@
  * permissions and limitations under the License.
  */
 
-package ivory.core.driver;
+package ivory.app;
 
 import java.io.IOException;
 
@@ -44,8 +44,8 @@ import edu.umd.cloud9.collection.trec.TrecDocnoMapping;
 import edu.umd.cloud9.collection.trec.TrecDocnoMappingBuilder;
 import edu.umd.cloud9.collection.trec.TrecDocumentInputFormat;
 
-public class PreprocessTREC extends Configured implements Tool {
-  private static final Logger LOG = Logger.getLogger(PreprocessTREC.class);
+public class PreprocessTrecForeign extends Configured implements Tool {
+  private static final Logger LOG = Logger.getLogger(PreprocessTrecForeign.class);
   private Options options;
 
   /**
@@ -131,7 +131,7 @@ public class PreprocessTREC extends Configured implements Tool {
         conf.set(Constants.TokenizerData, tokenizerPath);
       }
 
-      LOG.info("Tool name: " + PreprocessTREC.class.getCanonicalName());
+      LOG.info("Tool name: " + PreprocessTrecForeign.class.getCanonicalName());
       LOG.info(" - Collection path: " + collection);
       LOG.info(" - Index path: " + indexRootPath);
       LOG.info(" - Language: " + language);
@@ -159,6 +159,6 @@ public class PreprocessTREC extends Configured implements Tool {
    * Dispatches command-line arguments to the tool via the {@code ToolRunner}.
    */
   public static void main(String[] args) throws Exception {
-    ToolRunner.run(new Configuration(), new PreprocessTREC(), args);
+    ToolRunner.run(new PreprocessTrecForeign(), args);
   }
 }
