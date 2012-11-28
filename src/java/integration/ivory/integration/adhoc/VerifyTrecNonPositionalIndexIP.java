@@ -1,13 +1,16 @@
-package ivory.integration;
+package ivory.integration.adhoc;
 
 import static org.junit.Assert.assertTrue;
 import ivory.app.BuildIndex;
-import ivory.app.PreprocessClueWebEnglish;
+import ivory.app.PreprocessCollection;
+import ivory.app.PreprocessTrec45;
 import ivory.core.eval.Qrels;
-import ivory.regression.basic.Web09catB_All;
+import ivory.integration.IntegrationUtils;
+import ivory.regression.basic.Robust04_Basic;
 import ivory.smrf.retrieval.BatchQueryRunner;
 
 import java.util.List;
+import java.util.Random;
 
 import junit.framework.JUnit4TestAdapter;
 
@@ -20,12 +23,12 @@ import org.junit.Test;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
-public class VerifyClueNonPositionalIndexIP {
-  private static final Logger LOG = Logger.getLogger(VerifyClueNonPositionalIndexIP.class);
+public class VerifyTrecNonPositionalIndexIP {
+  private static final Logger LOG = Logger.getLogger(VerifyTrecNonPositionalIndexIP.class);
+  private static final Random RANDOM = new Random();
 
-  private Path collectionPath =
-      new Path("/shared/collections/ClueWeb09/collection.compressed.block/en.01");
-  private String index = "/tmp/" + this.getClass().getCanonicalName() + "-index";
+  private Path collectionPath = new Path("/shared/collections/trec/trec4-5_noCRFR.xml");
+  private String index = this.getClass().getCanonicalName() + "-index-" + RANDOM.nextInt(10000);
 
   @Test
   public void runBuildIndex() throws Exception {
@@ -49,24 +52,26 @@ public class VerifyClueNonPositionalIndexIP {
 
     String libjars = String.format("-libjars=%s", Joiner.on(",").join(jars));
 
-    PreprocessClueWebEnglish.main(new String[] { libjars,
-        IntegrationUtils.D_JT, IntegrationUtils.D_NN, collectionPath.toString(), index, "1" });
+    PreprocessTrec45.main(new String[] { libjars,
+        IntegrationUtils.D_JT, IntegrationUtils.D_NN,
+        "-" + PreprocessCollection.COLLECTION_PATH, collectionPath.toString(),
+        "-" + PreprocessCollection.INDEX_PATH, index });
     BuildIndex.main(new String[] { libjars,
         IntegrationUtils.D_JT, IntegrationUtils.D_NN,
         "-" + BuildIndex.NONPOSITIONAL_INDEX_IP,
         "-" + BuildIndex.INDEX_PATH, index,
-        "-" + BuildIndex.INDEX_PARTITIONS, "200" });
+        "-" + BuildIndex.INDEX_PARTITIONS, "10" });
 
     // Done with indexing, now do retrieval run.
     fs.copyFromLocalFile(false, true,
-        new Path("data/clue/run.web09catB.nonpositional.baselines.xml"),
-        new Path(index + "/run.web09catB.nonpositional.baselines.xml"));
-    fs.copyFromLocalFile(false, true, new Path("data/clue/queries.web09.xml"),
-        new Path(index + "/queries.web09.xml"));
+        new Path("data/trec/run.robust04.nonpositional.baselines.xml"),
+        new Path(index + "/run.robust04.nonpositional.baselines.xml"));
+    fs.copyFromLocalFile(false, true, new Path("data/trec/queries.robust04.xml"),
+        new Path(index + "/queries.robust04.xml"));
 
     String[] params = new String[] {
-            index + "/run.web09catB.nonpositional.baselines.xml",
-            index + "/queries.web09.xml" };
+            index + "/run.robust04.nonpositional.baselines.xml",
+            index + "/queries.robust04.xml" };
 
     BatchQueryRunner qr = new BatchQueryRunner(params, fs, index);
 
@@ -76,13 +81,13 @@ public class VerifyClueNonPositionalIndexIP {
 
     LOG.info("Total query time: " + (end - start) + "ms");
 
-    Web09catB_All.verifyAllResults(qr.getModels(), qr.getAllResults(), qr.getDocnoMapping(),
-        new Qrels("data/clue/qrels.web09catB.txt"));
+    Robust04_Basic.verifyAllResults(qr.getModels(), qr.getAllResults(), qr.getDocnoMapping(),
+        new Qrels("data/trec/qrels.robust04.noCRFR.txt"));
 
     LOG.info("Done!");
   }
 
   public static junit.framework.Test suite() {
-    return new JUnit4TestAdapter(VerifyClueNonPositionalIndexIP.class);
+    return new JUnit4TestAdapter(VerifyTrecNonPositionalIndexIP.class);
   }
 }

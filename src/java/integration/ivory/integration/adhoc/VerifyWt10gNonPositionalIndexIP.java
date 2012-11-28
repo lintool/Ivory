@@ -1,13 +1,16 @@
-package ivory.integration;
+package ivory.integration.adhoc;
 
 import static org.junit.Assert.assertTrue;
 import ivory.app.BuildIndex;
-import ivory.app.PreprocessClueWebEnglish;
+import ivory.app.PreprocessCollection;
+import ivory.app.PreprocessWt10g;
 import ivory.core.eval.Qrels;
-import ivory.regression.basic.Web09catB_All;
+import ivory.integration.IntegrationUtils;
+import ivory.regression.basic.Wt10g_NonPositional_Baselines;
 import ivory.smrf.retrieval.BatchQueryRunner;
 
 import java.util.List;
+import java.util.Random;
 
 import junit.framework.JUnit4TestAdapter;
 
@@ -20,12 +23,12 @@ import org.junit.Test;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
-public class VerifyCluePositionalIndexIP {
-  private static final Logger LOG = Logger.getLogger(VerifyCluePositionalIndexIP.class);
+public class VerifyWt10gNonPositionalIndexIP {
+  private static final Logger LOG = Logger.getLogger(VerifyWt10gNonPositionalIndexIP.class);
+  private static final Random RANDOM = new Random();
 
-  private Path collectionPath =
-      new Path("/shared/collections/ClueWeb09/collection.compressed.block/en.01");
-  private String index = "/tmp/" + this.getClass().getCanonicalName() + "-index";
+  private Path collectionPath = new Path("/shared/collections/wt10g/collection.compressed.block");
+  private String index = this.getClass().getCanonicalName() + "-index-" + RANDOM.nextInt(10000);
 
   @Test
   public void runBuildIndex() throws Exception {
@@ -49,23 +52,28 @@ public class VerifyCluePositionalIndexIP {
 
     String libjars = String.format("-libjars=%s", Joiner.on(",").join(jars));
 
-    PreprocessClueWebEnglish.main(new String[] { libjars,
-        IntegrationUtils.D_JT, IntegrationUtils.D_NN, collectionPath.toString(), index, "1" });
+    PreprocessWt10g.main(new String[] { libjars,
+        IntegrationUtils.D_JT, IntegrationUtils.D_NN,
+        "-" + PreprocessCollection.COLLECTION_PATH, collectionPath.toString(),
+        "-" + PreprocessCollection.INDEX_PATH, index });
     BuildIndex.main(new String[] { libjars,
         IntegrationUtils.D_JT, IntegrationUtils.D_NN,
-        "-" + BuildIndex.POSITIONAL_INDEX_IP,
+        "-" + BuildIndex.NONPOSITIONAL_INDEX_IP,
         "-" + BuildIndex.INDEX_PATH, index,
-        "-" + BuildIndex.INDEX_PARTITIONS, "200" });
+        "-" + BuildIndex.INDEX_PARTITIONS, "10" });
 
     // Done with indexing, now do retrieval run.
-    fs.copyFromLocalFile(false, true, new Path("data/clue/run.web09catB.all.xml"),
-        new Path(index + "/" + "run.web09catB.all.xml"));
-    fs.copyFromLocalFile(false, true, new Path("data/clue/queries.web09.xml"),
-        new Path(index + "/" + "queries.web09.xml"));
+    fs.copyFromLocalFile(false, true, new Path("data/wt10g/run.wt10g.nonpositional.baselines.xml"),
+        new Path(index + "/" + "run.wt10g.nonpositional.baselines.xml"));
+    fs.copyFromLocalFile(false, true, new Path("data/wt10g/queries.wt10g.451-500.xml"),
+        new Path(index + "/" + "queries.wt10g.451-500.xml"));
+    fs.copyFromLocalFile(false, true, new Path("data/wt10g/queries.wt10g.501-550.xml"),
+        new Path(index + "/" + "queries.wt10g.501-550.xml"));
 
     String[] params = new String[] {
-            index + "/run.web09catB.all.xml",
-            index + "/queries.web09.xml" };
+            index + "/run.wt10g.nonpositional.baselines.xml",
+            index + "/queries.wt10g.451-500.xml",
+            index + "/queries.wt10g.501-550.xml"};
 
     BatchQueryRunner qr = new BatchQueryRunner(params, fs, index);
 
@@ -75,13 +83,13 @@ public class VerifyCluePositionalIndexIP {
 
     LOG.info("Total query time: " + (end - start) + "ms");
 
-    Web09catB_All.verifyAllResults(qr.getModels(), qr.getAllResults(), qr.getDocnoMapping(),
-        new Qrels("data/clue/qrels.web09catB.txt"));
+    Wt10g_NonPositional_Baselines.verifyAllResults(qr.getModels(), qr.getAllResults(),
+        qr.getDocnoMapping(), new Qrels("data/wt10g/qrels.wt10g.all"));
 
     LOG.info("Done!");
   }
 
   public static junit.framework.Test suite() {
-    return new JUnit4TestAdapter(VerifyCluePositionalIndexIP.class);
+    return new JUnit4TestAdapter(VerifyWt10gNonPositionalIndexIP.class);
   }
 }

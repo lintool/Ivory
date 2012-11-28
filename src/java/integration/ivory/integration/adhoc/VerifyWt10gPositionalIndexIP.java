@@ -1,10 +1,11 @@
-package ivory.integration;
+package ivory.integration.adhoc;
 
 import static org.junit.Assert.assertTrue;
 import ivory.app.BuildIndex;
 import ivory.app.PreprocessCollection;
 import ivory.app.PreprocessWt10g;
 import ivory.core.eval.Qrels;
+import ivory.integration.IntegrationUtils;
 import ivory.regression.basic.Wt10g_Basic;
 import ivory.smrf.retrieval.BatchQueryRunner;
 

@@ -1,11 +1,12 @@
-package ivory.integration;
+package ivory.integration.adhoc;
 
 import static org.junit.Assert.assertTrue;
 import ivory.app.BuildIndex;
 import ivory.app.PreprocessCollection;
-import ivory.app.PreprocessTrec45;
+import ivory.app.PreprocessGov2;
 import ivory.core.eval.Qrels;
-import ivory.regression.basic.Robust04_Basic;
+import ivory.integration.IntegrationUtils;
+import ivory.regression.basic.Gov2_Basic;
 import ivory.smrf.retrieval.BatchQueryRunner;
 
 import java.util.List;
@@ -22,11 +23,11 @@ import org.junit.Test;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
-public class VerifyTrecPositionalIndexIP {
-  private static final Logger LOG = Logger.getLogger(VerifyTrecPositionalIndexIP.class);
+public class VerifyGov2PositionalIndexIP {
+  private static final Logger LOG = Logger.getLogger(VerifyGov2PositionalIndexIP.class);
   private static final Random RANDOM = new Random();
 
-  private Path collectionPath = new Path("/shared/collections/trec/trec4-5_noCRFR.xml");
+  private Path collectionPath = new Path("/shared/collections/gov2/collection.compressed.block");
   private String index = this.getClass().getCanonicalName() + "-index-" + RANDOM.nextInt(10000);
 
   @Test
@@ -51,7 +52,7 @@ public class VerifyTrecPositionalIndexIP {
 
     String libjars = String.format("-libjars=%s", Joiner.on(",").join(jars));
 
-    PreprocessTrec45.main(new String[] { libjars,
+    PreprocessGov2.main(new String[] { libjars,
         IntegrationUtils.D_JT, IntegrationUtils.D_NN,
         "-" + PreprocessCollection.COLLECTION_PATH, collectionPath.toString(),
         "-" + PreprocessCollection.INDEX_PATH, index });
@@ -59,17 +60,20 @@ public class VerifyTrecPositionalIndexIP {
         IntegrationUtils.D_JT, IntegrationUtils.D_NN,
         "-" + BuildIndex.POSITIONAL_INDEX_IP,
         "-" + BuildIndex.INDEX_PATH, index,
-        "-" + BuildIndex.INDEX_PARTITIONS, "10" });
+        "-" + BuildIndex.INDEX_PARTITIONS, "100" });
 
     // Done with indexing, now do retrieval run.
-    fs.copyFromLocalFile(false, true, new Path("data/trec/run.robust04.basic.xml"),
-        new Path(index + "/" + "run.robust04.basic.xml"));
-    fs.copyFromLocalFile(false, true, new Path("data/trec/queries.robust04.xml"),
-        new Path(index + "/" + "queries.robust04.xml"));
+    fs.copyFromLocalFile(false, true, new Path("data/gov2/run.gov2.basic.xml"),
+        new Path(index + "/" + "run.gov2.basic.xml"));
+    fs.copyFromLocalFile(false, true, new Path("data/gov2/gov2.title.701-775"),
+        new Path(index + "/" + "gov2.title.701-775"));
+    fs.copyFromLocalFile(false, true, new Path("data/gov2/gov2.title.776-850"),
+        new Path(index + "/" + "gov2.title.776-850"));
 
     String[] params = new String[] {
-            index + "/run.robust04.basic.xml",
-            index + "/queries.robust04.xml" };
+            index + "/run.gov2.basic.xml",
+            index + "/gov2.title.701-775",
+            index + "/gov2.title.776-850"};
 
     BatchQueryRunner qr = new BatchQueryRunner(params, fs, index);
 
@@ -79,13 +83,13 @@ public class VerifyTrecPositionalIndexIP {
 
     LOG.info("Total query time: " + (end - start) + "ms");
 
-    Robust04_Basic.verifyAllResults(qr.getModels(), qr.getAllResults(), qr.getDocnoMapping(),
-        new Qrels("data/trec/qrels.robust04.noCRFR.txt"));
+    Gov2_Basic.verifyAllResults(qr.getModels(), qr.getAllResults(), qr.getDocnoMapping(),
+        new Qrels("data/gov2/qrels.gov2.all"));
 
     LOG.info("Done!");
   }
 
   public static junit.framework.Test suite() {
-    return new JUnit4TestAdapter(VerifyTrecPositionalIndexIP.class);
+    return new JUnit4TestAdapter(VerifyGov2PositionalIndexIP.class);
   }
 }

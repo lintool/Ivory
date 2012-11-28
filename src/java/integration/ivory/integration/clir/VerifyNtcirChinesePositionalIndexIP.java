@@ -1,4 +1,4 @@
-package ivory.integration;
+package ivory.integration.clir;
 
 import static org.junit.Assert.assertTrue;
 
@@ -6,6 +6,7 @@ import ivory.app.BuildIndex;
 import ivory.app.PreprocessTrecForeign;
 import ivory.core.eval.Qrels;
 import ivory.core.tokenize.StanfordChineseTokenizer;
+import ivory.integration.IntegrationUtils;
 import ivory.regression.coling2012.EnZh_NTCIR8;
 import ivory.sqe.retrieval.QueryEngine;
 import ivory.sqe.retrieval.RunQueryEngine;
