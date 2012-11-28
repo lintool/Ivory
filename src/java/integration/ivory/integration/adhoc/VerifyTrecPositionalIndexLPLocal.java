@@ -1,4 +1,4 @@
-package ivory.integration;
+package ivory.integration.adhoc;
 
 import static org.junit.Assert.assertTrue;
 
@@ -6,6 +6,7 @@ import ivory.app.BuildIndex;
 import ivory.app.PreprocessCollection;
 import ivory.app.PreprocessTrec45;
 import ivory.core.eval.Qrels;
+import ivory.integration.IntegrationUtils;
 import ivory.regression.basic.Robust04_Basic;
 import ivory.smrf.retrieval.BatchQueryRunner;
 
