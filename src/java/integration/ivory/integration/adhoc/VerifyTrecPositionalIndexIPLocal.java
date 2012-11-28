@@ -1,6 +1,7 @@
 package ivory.integration.adhoc;
 
 import static org.junit.Assert.assertTrue;
+
 import ivory.app.BuildIndex;
 import ivory.app.PreprocessCollection;
 import ivory.app.PreprocessTrec45;
