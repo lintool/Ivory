@@ -234,7 +234,7 @@ public class PostingsReaderWrapper {
   }
 
   /**
-   * @param curDocno
+   * @param docno
    * @return next smallest docno from posting lists of leaf nodes
    */
   public int getNextCandidate(int docno) {

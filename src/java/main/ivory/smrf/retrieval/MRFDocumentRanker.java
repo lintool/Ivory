@@ -16,7 +16,7 @@
 
 package ivory.smrf.retrieval;
 
-import ivory.core.exception.ConfigurationException;
+import ivory.core.ConfigurationException;
 import ivory.smrf.model.Clique;
 import ivory.smrf.model.DocumentNode;
 import ivory.smrf.model.GraphNode;

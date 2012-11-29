@@ -16,9 +16,9 @@
 
 package ivory.smrf.model.builder;
 
+import ivory.core.ConfigurationException;
 import ivory.core.RetrievalEnvironment;
-import ivory.core.exception.ConfigurationException;
-import ivory.core.exception.RetrievalException;
+import ivory.core.RetrievalException;
 import ivory.core.util.XMLTools;
 import ivory.smrf.model.Clique;
 import ivory.smrf.model.MarkovRandomField;

@@ -1,8 +1,8 @@
 package ivory.sqe.retrieval;
 
+import ivory.core.ConfigurationException;
 import ivory.core.eval.Qrels;
 import ivory.core.eval.RankedListEvaluator;
-import ivory.core.exception.ConfigurationException;
 import ivory.smrf.retrieval.Accumulator;
 import ivory.sqe.querygenerator.Utils;
 

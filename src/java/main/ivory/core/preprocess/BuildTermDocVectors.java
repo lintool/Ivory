@@ -341,8 +341,7 @@ public class BuildTermDocVectors extends PowerTool {
     Path mappingFile = env.getDocnoMappingData();
 
     if (!fs.exists(mappingFile)) {
-      LOG.error("Error, docno mapping data file " + mappingFile + " doesn't exist!");
-      return 0;
+      throw new RuntimeException("Error, docno mapping data file " + mappingFile + " doesn't exist!");
     }
 
     DistributedCache.addCacheFile(mappingFile.toUri(), conf);

@@ -189,8 +189,6 @@ public class CLIRUtils extends Configured {
    * 		target-side vocabulary of the ttable E-->F (i.e., Pr(f|e))
    * @param e2f_probs
    * 		ttable E-->F (i.e., Pr(f|e))
-   * @param globalStatsMap
-   * 		contains mapping from F-terms to their df values
    * @return
    * 		mapping from E-terms to their computed df values
    */
@@ -330,7 +328,6 @@ public class CLIRUtils extends Configured {
    * 		ttable F-->E (i.e., Pr(e|f))
    * @param sLogger
    * 		Logger object for log output
-   * @return
    * @throws IOException
    */
   public static int translateTFs(TermDocVector doc, HMapIFW tfTable, Vocab eVocabSrc, Vocab eVocabTrg, Vocab fVocabSrc, Vocab fVocabTrg, 
@@ -399,7 +396,6 @@ public class CLIRUtils extends Configured {
    * 		ttable F-->E (i.e., Pr(e|f))
    * @param sLogger
    * 		Logger object for log output
-   * @return
    * @throws IOException
    */
   public static int translateTFs(HMapSIW doc, HMapIFW tfTable, Vocab eVocabSrc, Vocab eVocabTrg, Vocab fVocabSrc, Vocab fVocabTrg, 
@@ -448,7 +444,7 @@ public class CLIRUtils extends Configured {
    * 		mapping from term id to tf values
    * @param eVocab
    * 		vocabulary object for final doc vector language
-   * @param scoring model
+   * @param scoringModel model
    * @param dfTable
    * 		mapping from term id to df values
    * @param isNormalize
@@ -544,15 +540,14 @@ public class CLIRUtils extends Configured {
    * 		mapping from term id to tf values
    * @param eVocab
    * 		vocabulary object for final doc vector language
-   * @param scoring model
+   * @param scoringModel model
    * @param dfTable
    * 		mapping from term id to df values
    * @param isNormalize
    * 		indicating whether to normalize the doc vector weights or not
    * @param sLogger
    * 		Logger object for log output
-   * @return
-   * 		Term doc vector representing the document
+   * @return term doc vector representing the document
    */
   public static HMapSFW createTermDocVector(int docLen, HMapIFW tfTable, Vocab eVocab, ScoringModel scoringModel, FrequencySortedDictionary dict, DfTableArray dfTable, boolean isNormalize, Logger sLogger) {
     if(sLogger == null){
@@ -605,7 +600,7 @@ public class CLIRUtils extends Configured {
    *    doc length
    * @param tfTable
    *    mapping from term string to tf values
-   * @param scoring model
+   * @param scoringModel model
    * @param dfTable
    *    mapping from term id to df values
    * @param isNormalize
@@ -855,7 +850,7 @@ public class CLIRUtils extends Configured {
    * This method converts the output of GIZA into a TTable_monolithic_IFAs object. 
    * For each source language term, top numTrans entries (with highest translation probability) are kept, unless the top K < numTrans entries have a cumulatite probability above probThreshold.
    * 
-   * @param inputFile
+   * @param filename
    * 		output of GIZA (probability values from source language to target language. In GIZA, format of each line should be: 
    * 			[target-word1] [source-word] [prob1]
    * 			[target-word2] [source-word] [prob2]

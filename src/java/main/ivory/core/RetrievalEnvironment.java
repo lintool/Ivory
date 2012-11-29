@@ -30,7 +30,6 @@ import ivory.core.data.index.ProximityPostingsReaderUnorderedWindow;
 import ivory.core.data.stat.DocLengthTable;
 import ivory.core.data.stat.DocLengthTable2B;
 import ivory.core.data.stat.DocScoreTable;
-import ivory.core.exception.ConfigurationException;
 import ivory.core.tokenize.Tokenizer;
 import ivory.smrf.model.builder.Expression;
 import ivory.smrf.model.importance.ConceptImportanceModel;
@@ -505,13 +504,6 @@ public class RetrievalEnvironment {
 		return appendPath(indexPath, "wt-term-doc-vectors/");
 	}
 
-	/**
-	 * Returns file that contains an index into the {@link WeightedIntDocVector}
-	 * representation of the collection. This file serves as input to
-	 * {@link WeightedIntDocVectorsForwardIndex}, which provides random access to the
-	 * document
-	 * vectors.
-	 */
 	public String getWeightedIntDocVectorsForwardIndex() {
 		return appendPath(indexPath, "wt-int-doc-vectors-forward-index.dat");
 	}

@@ -41,9 +41,9 @@ import edu.umd.cloud9.debug.MemoryUsageUtils;
  * Object providing an index into one or more {@code SequenceFile}s
  * containing {@link TermDocVector}s, providing random access to the document
  * vectors.
- * 
+ *
  * @see BuildTermDocVectorsForwardIndex
- * 
+ *
  * @author Jimmy Lin
  */
 public class TermDocVectorsForwardIndex {

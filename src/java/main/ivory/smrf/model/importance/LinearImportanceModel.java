@@ -16,8 +16,8 @@
 
 package ivory.smrf.model.importance;
 
-import ivory.core.exception.ConfigurationException;
-import ivory.core.exception.RetrievalException;
+import ivory.core.ConfigurationException;
+import ivory.core.RetrievalException;
 import ivory.core.util.XMLTools;
 import ivory.smrf.model.Clique;
 

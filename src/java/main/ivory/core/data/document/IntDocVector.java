@@ -55,7 +55,7 @@ public interface IntDocVector extends Writable {
     /**
      * Returns {@code true} if there are more terms to read.
      *
-     * @returns {@code true} if there are more terms to read
+     * @return {@code true} if there are more terms to read
      */
     boolean hasMoreTerms();
 
