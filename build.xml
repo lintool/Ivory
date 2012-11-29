@@ -1,6 +1,10 @@
 <project name="ivory" default="scripts" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant" xmlns:artifact="antlib:org.apache.maven.artifact.ant">
   <description>Ivory: A Hadoop toolkit for web-scale information retrieval</description>
 
+  <presetdef name="javac">
+    <javac includeantruntime="false" />
+  </presetdef>
+
   <property name="lib.dir" value="lib" />
   <property name="build.dir" value="build"/>
   <property name="src.dir" value="src"/>
