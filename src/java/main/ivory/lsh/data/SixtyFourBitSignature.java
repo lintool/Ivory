@@ -25,9 +25,6 @@ public class SixtyFourBitSignature extends Signature{//implements WritableCompar
 
   /**
    * Create a BitsSignature object with the specified number of bits, all initially set to 0.
-   * 
-   * @param size
-   * 		number of bits
    */
   public SixtyFourBitSignature(){
     super();
@@ -60,9 +57,9 @@ public class SixtyFourBitSignature extends Signature{//implements WritableCompar
   }
 
   /**
-   * @param start
+   * @param b
    * 	first index to be included in sub-signature
-   * @param end
+   * @param e
    * 	last index to be included in sub-signature
    * @return
    * 	return a new BitsSignature object, containing the bits of this object from <code>start</code> to <code>end</code>

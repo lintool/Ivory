@@ -238,7 +238,7 @@
 			</fileset>
 			<link href="http://download.oracle.com/javase/6/docs/api/" />
 			<link href="http://hadoop.apache.org/common/docs/current/api/" />
-			<link href="http://www.umiacs.umd.edu/~jimmylin/Cloud9/docs/api//" />
+			<link href="http://lintool.github.com/Cloud9/docs/api/" />
 		</javadoc>
 	</target>
 

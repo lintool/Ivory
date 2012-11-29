@@ -58,7 +58,7 @@ public class ThreadedQueryRunner implements QueryRunner {
   }
 
   /**
-   * Runs a query asynchronously. Results can be fetched using {@link getResults}.
+   * Runs a query asynchronously. Results can be fetched using {@link #getResults}.
    */
   public void runQuery(String qid, String[] query) {
     Preconditions.checkNotNull(qid);

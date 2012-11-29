@@ -504,13 +504,6 @@ public class RetrievalEnvironment {
 		return appendPath(indexPath, "wt-term-doc-vectors/");
 	}
 
-	/**
-	 * Returns file that contains an index into the {@link WeightedIntDocVector}
-	 * representation of the collection. This file serves as input to
-	 * {@link WeightedIntDocVectorsForwardIndex}, which provides random access to the
-	 * document
-	 * vectors.
-	 */
 	public String getWeightedIntDocVectorsForwardIndex() {
 		return appendPath(indexPath, "wt-int-doc-vectors-forward-index.dat");
 	}

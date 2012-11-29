@@ -73,7 +73,7 @@ public class CascadeThreadedQueryRunner implements CascadeQueryRunner {
 
 	/**
 	 * Runs a query asynchronously. Results can be fetched using
-	 * {@link getResults}.
+	 * {@link #getResults}.
 	 */
 	public void runQuery(String qid, String[] query) {
 		Preconditions.checkNotNull(qid);

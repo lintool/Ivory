@@ -104,7 +104,6 @@ public class Utils {
   /**
    * For a 1-to-many alignment, check if the source token is aligned to a consecutive sequence of target tokens 
    * @param lst
-   * @return
    */
   private static boolean isConsecutive(ArrayListOfInts lst) {
     int prev = -1;
@@ -123,7 +122,6 @@ public class Utils {
    *    read grammar file from Configuration object
    * @param docLangTokenizer
    *    to check for stopwords on RHS
-   * @return
    */
   public static Map<String, HMapSFW> generateTranslationTable(FileSystem fs, Configuration conf, Tokenizer docLangTokenizer) {
     String grammarFile = readConf(conf);
@@ -269,7 +267,6 @@ public class Utils {
   /**
    * Convert prob. distribution to JSONArray in which float at position 2k corresponds to probabilities of term at position 2k+1, k=0...(n/2-1)
    * @param probMap
-   * @return
    */
   public static JSONArray probMap2JSON(HMapSFW probMap) {
     if (probMap == null) {
@@ -294,7 +291,6 @@ public class Utils {
    * @param threshold
    * @param scale
    * @param probMap
-   * @return
    */
   public static HMapSFW scaleProbMap(float threshold, float scale, HMapSFW probMap) {
     HMapSFW scaledProbMap = new HMapSFW();
@@ -316,7 +312,6 @@ public class Utils {
    *    value between 0 and 1 that determines total probability in final distribution (e.g., 0.2 scale will scale [0.8 0.1 0.1] into [0.16 0.02 0.02])
    * @param probMaps
    *    list of probability distributions
-   * @return
    */
   public static HMapSFW combineProbMaps(float threshold, float scale, List<PairOfFloatMap> probMaps) {
     HMapSFW combinedProbMap = new HMapSFW();
@@ -416,7 +411,6 @@ public class Utils {
    *    no stopword removal, stemming enabled  
    * @param docLangTokenizer
    *    no stopword removal, stemming enabled
-   * @return
    */
   public static Map<String, String> getStemMapping(String origQuery, Tokenizer queryLangTokenizer, Tokenizer queryLangTokenizerWithStemming, Tokenizer docLangTokenizer) {
     Map<String, String> map = new HashMap<String, String>();
