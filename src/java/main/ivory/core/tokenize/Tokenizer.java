@@ -124,10 +124,8 @@ public abstract class Tokenizer {
 
   /**
    * Check for the character (looks like reversed `) and normalize it to standard apostrophe
-   * @param 
-   *    French text
-   * @return 
-   *    fixed version of the text 
+   * @param text French text
+   * @return fixed version of the text 
    */
   public static String normalizeFrench(String text) {
     StringBuffer out = new StringBuffer();

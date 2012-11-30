@@ -18,9 +18,9 @@ package ivory.cascade.model.builder;
 
 import ivory.cascade.model.CascadeClique;
 import ivory.cascade.model.builder.CascadeCliqueSet;
+import ivory.core.ConfigurationException;
 import ivory.core.RetrievalEnvironment;
-import ivory.core.exception.ConfigurationException;
-import ivory.core.exception.RetrievalException;
+import ivory.core.RetrievalException;
 import ivory.core.util.XMLTools;
 import ivory.smrf.model.builder.FeatureBasedMRFBuilder;
 import ivory.smrf.model.Clique;

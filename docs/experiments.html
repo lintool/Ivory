@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Ivory: Experiments</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Le styles -->
+    <link href="assets/css/bootstrap.css" rel="stylesheet">
+    <link href="assets/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="assets/css/docs.css" rel="stylesheet">
+    <link href="assets/js/google-code-prettify/prettify.css" rel="stylesheet">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+  </head>
+
+  <body data-spy="scroll" data-target=".bs-docs-sidebar">
+
+    <!-- Navbar
+    ================================================== -->
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <div class="nav-collapse collapse">
+            <ul class="nav">
+              <li class="">
+                <a href="../index.html">Home</a>
+              </li>
+              <li class="">
+                <a href="./start.html">Get started</a>
+              </li>
+              <li class="">
+                <a href="./publications.html">Publications</a>
+              </li>
+              <li class="active">
+                <a href="./experiments.html">Experiments</a>
+              </li>
+              <li class="">
+                <a href="./team.html">Team</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+<!-- Subhead
+================================================== -->
+<header class="jumbotron subhead" id="overview">
+  <div class="container">
+    <h1>Ivory</h1>
+    <p class="lead">A Hadoop toolkit for web-scale information retrieval research</p>
+  </div>
+</header>
+
+  <div class="container">
+
+<div class="page-header">
+<h2>Experimental Results</h2>
+</div>
+
+<p/>
+
+<p>This page describes a number of experiments on standard test
+collections using Ivory.  Each experiment is associated with a
+command-line invocation to perform the experiment, command-line
+invocations to evaluate the results, and a JUnit test case that
+performs the experiment and checks to see if the results are as
+expected (in terms of standard metrics of effectiveness).  The purpose
+of enumerating these experiments is for others to be able to replicate
+our results, thereby providing a solid foundation for building on our
+work.</p>
+
+<p>Here are the experiments categorized:</p>
+
+<ul>
+
+  <li>Experiments on <a href="exp-trec45.html">TREC Disks 4-5</a>: baselines,
+  weighted sequential dependence model, latent concept expansion</li>
+
+  <li>Experiments on <a href="exp-wt10g.html">Wt10g</a>: baselines</li>
+
+  <li>Experiments on <a href="exp-gov2.html">Gov2</a>: baselines</li>
+
+  <li>Experiments for <a href="exp-web09catB.html">TREC 2009 web track, category B</a>
+  (i.e., first segment of ClueWeb09): baselines, incorporating
+  Waterloo spam scores</li>
+
+  <li>Experiments from Wang et al.'s <a href="exp-sigir2010.html">SIGIR 2010
+  paper</a>: the efficient sequential dependence model (ESD) on Wt10g,
+  Gov2, and Clue</li>
+
+  <li>Experiments from Wang et al.'s <a href="exp-cikm2010.html">CIKM 2010 
+  paper</a>: temporally constrained linear models on Wt10g, Gov2, and Clue</li>
+
+  <li>Experiments from Wang et al.'s <a href="exp-sigir2011.html">SIGIR 2011
+  paper</a>: cascade model on Wt10g, Gov2, and Clue</li>
+
+</ul>
+
+  </div>
+
+
+
+    <!-- Footer
+    ================================================== -->
+    <footer class="footer">
+      <div class="container">
+        <p class="pull-right"><a href="#">Back to top</a></p>
+        <p>Designed using <a href="http://twitter.github.com/bootstrap/">Bootstrap</a>.</p>
+        <p>Code licensed under <a href="http://www.apache.org/licenses/LICENSE-2.0" target="_blank">Apache License v2.0</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
+      </div>
+    </footer>
+
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="assets/js/jquery.js"></script>
+    <script src="assets/js/google-code-prettify/prettify.js"></script>
+    <script src="assets/js/bootstrap-transition.js"></script>
+    <script src="assets/js/bootstrap-alert.js"></script>
+    <script src="assets/js/bootstrap-modal.js"></script>
+    <script src="assets/js/bootstrap-dropdown.js"></script>
+    <script src="assets/js/bootstrap-scrollspy.js"></script>
+    <script src="assets/js/bootstrap-tab.js"></script>
+    <script src="assets/js/bootstrap-tooltip.js"></script>
+    <script src="assets/js/bootstrap-popover.js"></script>
+    <script src="assets/js/bootstrap-button.js"></script>
+    <script src="assets/js/bootstrap-collapse.js"></script>
+    <script src="assets/js/bootstrap-carousel.js"></script>
+    <script src="assets/js/bootstrap-typeahead.js"></script>
+    <script src="assets/js/bootstrap-affix.js"></script>
+
+  </body>
+</html>
+

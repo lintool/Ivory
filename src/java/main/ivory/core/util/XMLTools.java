@@ -17,7 +17,7 @@
 package ivory.core.util;
 
 
-import ivory.core.exception.ConfigurationException;
+import ivory.core.ConfigurationException;
 
 import java.io.IOException;
 import java.io.StringReader;

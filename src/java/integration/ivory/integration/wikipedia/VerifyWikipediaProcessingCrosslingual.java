@@ -2,8 +2,8 @@ package ivory.integration.wikipedia;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import ivory.app.PreprocessWikipedia;
 import ivory.core.data.document.WeightedIntDocVector;
-import ivory.core.driver.PreprocessWikipedia;
 import ivory.integration.IntegrationUtils;
 import java.io.IOException;
 import java.util.List;

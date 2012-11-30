@@ -12,7 +12,7 @@
   <artifactId>ivory</artifactId>
   <packaging>jar</packaging>
   <name>Ivory</name>
-  <version>0.7.0</version>
+  <version>0.7.1</version>
   <description>A Hadoop toolkit for web-scale information retrieval</description>
   <url>http://ivory.cc</url>
   <licenses>
