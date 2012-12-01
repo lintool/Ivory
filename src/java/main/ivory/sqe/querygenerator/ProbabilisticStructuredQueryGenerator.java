@@ -36,8 +36,8 @@ import edu.umd.hooka.ttables.TTable_monolithic_IFAs;
  * @author ferhanture
  *
  */
-public class CLWordQueryGenerator implements QueryGenerator {
-  private static final Logger LOG = Logger.getLogger(CLWordQueryGenerator.class);
+public class ProbabilisticStructuredQueryGenerator implements QueryGenerator {
+  private static final Logger LOG = Logger.getLogger(ProbabilisticStructuredQueryGenerator.class);
   private Tokenizer queryLangTokenizer, queryLangTokenizerWithStem, docLangTokenizer;
   private VocabularyWritable fVocab_f2e, eVocab_f2e;
   private TTable_monolithic_IFAs f2eProbs;
@@ -48,7 +48,7 @@ public class CLWordQueryGenerator implements QueryGenerator {
   private RetrievalEnvironment env;
   private String queryLang, docLang;
 
-  public CLWordQueryGenerator() throws IOException {
+  public ProbabilisticStructuredQueryGenerator() throws IOException {
     super();
   }
 

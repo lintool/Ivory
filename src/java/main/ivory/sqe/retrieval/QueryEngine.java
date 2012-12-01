@@ -4,8 +4,8 @@ import ivory.core.ConfigurationException;
 import ivory.core.util.ResultWriter;
 import ivory.core.util.XMLTools;
 import ivory.smrf.retrieval.Accumulator;
-import ivory.sqe.querygenerator.CLWordQueryGenerator;
-import ivory.sqe.querygenerator.DefaultBagOfWordQueryGenerator;
+import ivory.sqe.querygenerator.ProbabilisticStructuredQueryGenerator;
+import ivory.sqe.querygenerator.BagOfWordsQueryGenerator;
 import ivory.sqe.querygenerator.MtNQueryGenerator;
 import ivory.sqe.querygenerator.QueryGenerator;
 import ivory.sqe.querygenerator.Utils;
@@ -65,11 +65,11 @@ public class QueryEngine {
       mapping = ranker.getDocnoMapping();
       queries = parseQueries(conf.get(Constants.QueriesPath), fs);
       if (conf.get(Constants.QueryType).equals(Constants.CLIR)) {
-        generator = new CLWordQueryGenerator();
+        generator = new ProbabilisticStructuredQueryGenerator();
       }else if (conf.get(Constants.QueryType).equals(Constants.MTN)) {
         generator = new MtNQueryGenerator();
       }else {
-        generator = new DefaultBagOfWordQueryGenerator();
+        generator = new BagOfWordsQueryGenerator();
       }    
       generator.init(fs, conf);
 

@@ -39,7 +39,7 @@ public class MtNQueryGenerator implements QueryGenerator {
   int length;
   private int kBest;
   boolean bigramSegment = false;
-  private CLWordQueryGenerator clGenerator;
+  private ProbabilisticStructuredQueryGenerator clGenerator;
   private SCFGQueryGenerator scfgGenerator;
   private float mtWeight, bitextWeight,scfgWeight, tokenWeight, phraseWeight, alpha, lexProbThreshold;
   private String queryLang, docLang;
@@ -86,7 +86,7 @@ public class MtNQueryGenerator implements QueryGenerator {
     queryLangTokenizerWithStemming = TokenizerFactory.createTokenizer(fs, conf, queryLang, queryTokenizerPath, true, null, conf.get(Constants.StemmedStopwordListQ), null);
     docLangTokenizer = TokenizerFactory.createTokenizer(fs, conf, docLang, docTokenizerPath, true, null, conf.get(Constants.StemmedStopwordListD), null);
 
-    clGenerator = new CLWordQueryGenerator();
+    clGenerator = new ProbabilisticStructuredQueryGenerator();
     clGenerator.init(fs, conf);
 
     scfgGenerator = new SCFGQueryGenerator();

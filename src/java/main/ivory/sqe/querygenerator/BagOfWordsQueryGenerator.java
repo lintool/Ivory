@@ -17,12 +17,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class DefaultBagOfWordQueryGenerator implements QueryGenerator {
-  private static final Logger LOG = Logger.getLogger(CLWordQueryGenerator.class);
+public class BagOfWordsQueryGenerator implements QueryGenerator {
+  private static final Logger LOG = Logger.getLogger(ProbabilisticStructuredQueryGenerator.class);
   Tokenizer tokenizer;
   int length;
   
-  public DefaultBagOfWordQueryGenerator() {
+  public BagOfWordsQueryGenerator() {
 	  super();
   }
 
