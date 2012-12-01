@@ -6,14 +6,18 @@ import ivory.core.tokenize.BigramChineseTokenizer;
 import ivory.core.tokenize.Tokenizer;
 import ivory.core.tokenize.TokenizerFactory;
 import ivory.sqe.retrieval.Constants;
+
 import java.io.IOException;
 import java.util.Map;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.log4j.Logger;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
+
 import edu.umd.cloud9.io.map.HMapSFW;
 
 /**
@@ -83,36 +87,36 @@ public class SCFGQueryGenerator implements QueryGenerator {
     Utils.normalize(probMap, lexProbThreshold, cumProbThreshold, 30);      
   }
 
-  public JSONObject parseQuery(String query) {
-    JSONObject queryJson = new JSONObject();
-    try {
-      String[] tokens = query.trim().split("\\s");
+  @Override
+  public JsonObject parseQuery(String query) {
+    JsonObject queryJson = new JsonObject();
 
-      length = tokens.length;
-      JSONArray tokenTranslations = new JSONArray();
-      for (String token : tokens) {
+    String[] tokens = query.trim().split("\\s");
 
-        //        LOG.info("Processing "+token);
-        // if we do bigram segmentation on translation alternatives, we have to a have a weight structure, even if k=1
-        // unless the token has less than 3 characters, in which bigram segmentation will only return the token itself
-        if (numTransPerToken == 1 && !bigramSegment){
-          String trans = getBestTranslation(token);
-          if (trans != null) {
-            tokenTranslations.put(trans);
-          }
-        }else {
-          JSONObject tokenTrans = new JSONObject();
-          JSONArray weights = Utils.probMap2JSON(getTranslations(token, null));
-          if (weights != null) {        
-            tokenTrans.put("#weight", weights);
-            tokenTranslations.put(tokenTrans);
-          }
+    length = tokens.length;
+    JsonArray tokenTranslations = new JsonArray();
+    for (String token : tokens) {
+
+      // if we do bigram segmentation on translation alternatives, we have to a have a weight
+      // structure, even if k=1
+      // unless the token has less than 3 characters, in which bigram segmentation will only return
+      // the token itself
+      if (numTransPerToken == 1 && !bigramSegment) {
+        String trans = getBestTranslation(token);
+        if (trans != null) {
+          tokenTranslations.add(new JsonPrimitive(trans));
+        }
+      } else {
+        JsonObject tokenTrans = new JsonObject();
+        JsonArray weights = Utils.createJsonArrayFromProbabilities(getTranslations(token, null));
+        if (weights != null) {
+          tokenTrans.add("#weight", weights);
+          tokenTranslations.add(tokenTrans);
         }
       }
-      queryJson.put("#combine", tokenTranslations);
-    } catch (JSONException e) {
-      e.printStackTrace();
     }
+    queryJson.add("#combine", tokenTranslations);
+
     return queryJson;
   }
 

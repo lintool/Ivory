@@ -8,13 +8,14 @@ import ivory.core.data.index.ProximityPostingsReaderOrderedWindow;
 import ivory.smrf.model.GlobalEvidence;
 import ivory.smrf.model.GlobalTermEvidence;
 import ivory.smrf.model.score.ScoringFunction;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+
 import com.google.common.base.Preconditions;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 public class PostingsReaderWrapper {
   // Default score for potentials with no postings.
@@ -32,17 +33,16 @@ public class PostingsReaderWrapper {
   protected int lastScoredDocno = 0, iterStart = 0, iterStep = 1;
 
   protected String operator, termOrPhrase, terms[];
-  protected JSONArray values;
+  protected JsonArray values;
   protected List<PostingsReaderWrapper> children;
 
   protected boolean isOOV = false;
   protected float weights[];// , normalizationFactor;
 
-  public PostingsReaderWrapper(JSONObject query, RetrievalEnvironment env,
-      ScoringFunction scoringFunction, GlobalEvidence ge)
-  throws JSONException {
-    this.operator = query.keys().next();
-    this.values = query.getJSONArray(operator);
+  public PostingsReaderWrapper(JsonObject query, RetrievalEnvironment env,
+      ScoringFunction scoringFunction, GlobalEvidence ge) {
+    this.operator = query.entrySet().iterator().next().getKey();
+    this.values = query.getAsJsonArray(operator);
 
     // //LOG.info("operator= "+operator);
     // //LOG.info("values= "+values.toString());
@@ -50,12 +50,12 @@ public class PostingsReaderWrapper {
     if (operator.equals("#weight") || operator.equals("#combweight")) {
       iterStart = 1;
       iterStep = 2;
-      weights = new float[values.length() / 2];
+      weights = new float[values.size() / 2];
 
       // in #weight or #combweight structure, even-numbered indices corr. to
       // weights, odd-numbered indices corr. to terms/phrases
-      for (int i = 0; i < values.length(); i = i + iterStep) {
-        weights[i / 2] = (float) values.getDouble(i);
+      for (int i = 0; i < values.size(); i = i + iterStep) {
+        weights[i / 2] = (float) values.get(i).getAsDouble();
       }
     }
 
@@ -68,17 +68,17 @@ public class PostingsReaderWrapper {
     // If this is not a leaf node, create children
     children = new ArrayList<PostingsReaderWrapper>();
     // //LOG.info("non-leaf node with "+values.length()+" children");
-    for (int i = iterStart; i < values.length(); i = i + iterStep) {
+    for (int i = iterStart; i < values.size(); i = i + iterStep) {
       // //LOG.info("child "+i+":");
-      JSONObject child = values.optJSONObject(i);
+      //JsonObject child = values.get(i).getAsJsonObject();
       // ////LOG.info(child);
-      if (child != null) {
+      if (!values.get(i).isJsonPrimitive()) {
         // If child is an object (non-leaf), call nonleaf-constructor
-        children.add(new PostingsReaderWrapper(values.getJSONObject(i),
+        children.add(new PostingsReaderWrapper(values.get(i).getAsJsonObject(),
             env, scoringFunction, ge));
       } else {
         // If child is leaf, call leaf-constructor
-        children.add(new PostingsReaderWrapper(values.getString(i),
+        children.add(new PostingsReaderWrapper(values.get(i).getAsString(),
             env, scoringFunction, ge));
       }
     }
@@ -88,8 +88,7 @@ public class PostingsReaderWrapper {
   }
 
   public PostingsReaderWrapper(String termOrPhrase, RetrievalEnvironment env,
-      ScoringFunction scoringFunction, GlobalEvidence ge)
-  throws JSONException {
+      ScoringFunction scoringFunction, GlobalEvidence ge) {
     this.env = Preconditions.checkNotNull(env);
     this.scoringFunction = Preconditions.checkNotNull(scoringFunction);
 

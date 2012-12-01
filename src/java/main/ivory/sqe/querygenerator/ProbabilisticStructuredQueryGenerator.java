@@ -5,6 +5,7 @@ import ivory.core.RetrievalEnvironment;
 import ivory.core.tokenize.Tokenizer;
 import ivory.core.tokenize.TokenizerFactory;
 import ivory.sqe.retrieval.Constants;
+
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -15,14 +16,17 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Set;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
+
 import edu.umd.cloud9.io.map.HMapSFW;
 import edu.umd.cloud9.io.pair.PairOfFloatInt;
 import edu.umd.cloud9.io.pair.PairOfStrings;
@@ -99,43 +103,46 @@ public class ProbabilisticStructuredQueryGenerator implements QueryGenerator {
     }
   }
 
-  public JSONObject parseQuery(String query) {
-    JSONObject queryJson = new JSONObject();
-    try {
-      String origQuery = query.trim().split(";")[1].trim(); 
-      Map<String,String> stemmed2Stemmed = Utils.getStemMapping(origQuery, queryLangTokenizer, queryLangTokenizerWithStem, docLangTokenizer);
+  @Override
+  public JsonObject parseQuery(String query) {
+    JsonObject queryJson = new JsonObject();
 
-      String[] tokens = queryLangTokenizerWithStem.processContent(origQuery);
+    String origQuery = query.trim().split(";")[1].trim();
+    Map<String, String> stemmed2Stemmed = Utils.getStemMapping(origQuery, queryLangTokenizer,
+        queryLangTokenizerWithStem, docLangTokenizer);
 
-      length = tokens.length;
-      JSONArray tokenTranslations = new JSONArray();
-      for (String token : tokens) {
-        LOG.info("Processing token "+token);
-        if (queryLangTokenizerWithStem.isStemmedStopWord(token))  continue;
-        LOG.info("not stopword");
+    String[] tokens = queryLangTokenizerWithStem.processContent(origQuery);
 
-        // output is not a weighted structure iff numTransPerToken=1 
-        // and we're not doing bigram segmentation (which requires a weighted structure since it splits a single token into multiple ones)
-        if (numTransPerToken == 1 && !bigramSegment){
-          String trans = getBestTranslation(token);
-          if (trans != null) {
-            tokenTranslations.put(trans);
-          }
-        }else {
-          JSONObject tokenTrans = new JSONObject();
-          HMapSFW distr = getTranslations(token, stemmed2Stemmed);
-          if (distr == null) { continue; }
-          JSONArray weights = Utils.probMap2JSON(distr);
-          if (weights != null) {				
-            tokenTrans.put("#weight", weights);
-            tokenTranslations.put(tokenTrans);
-          }
+    length = tokens.length;
+    JsonArray tokenTranslations = new JsonArray();
+    for (String token : tokens) {
+      LOG.info("Processing token " + token);
+      if (queryLangTokenizerWithStem.isStemmedStopWord(token))
+        continue;
+      LOG.info("not stopword");
+
+      // output is not a weighted structure iff numTransPerToken=1
+      // and we're not doing bigram segmentation (which requires a weighted structure since it
+      // splits a single token into multiple ones)
+      if (numTransPerToken == 1 && !bigramSegment) {
+        String trans = getBestTranslation(token);
+        if (trans != null) {
+          tokenTranslations.add(new JsonPrimitive(trans));
+        }
+      } else {
+        JsonObject tokenTrans = new JsonObject();
+        HMapSFW distr = getTranslations(token, stemmed2Stemmed);
+        if (distr == null) {
+          continue;
+        }
+        JsonArray weights = Utils.createJsonArrayFromProbabilities(distr);
+        if (weights != null) {
+          tokenTrans.add("#weight", weights);
+          tokenTranslations.add(tokenTrans);
         }
       }
-      queryJson.put("#combine", tokenTranslations);
-    } catch (JSONException e) {
-      e.printStackTrace();
     }
+    queryJson.add("#combine", tokenTranslations);
     return queryJson;
   }
 

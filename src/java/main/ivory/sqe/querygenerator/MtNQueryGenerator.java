@@ -4,19 +4,23 @@ import ivory.core.tokenize.Tokenizer;
 import ivory.core.tokenize.TokenizerFactory;
 import ivory.sqe.retrieval.Constants;
 import ivory.sqe.retrieval.PairOfFloatMap;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.tartarus.snowball.SnowballStemmer;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
+
 import edu.umd.cloud9.io.map.HMapSFW;
 import edu.umd.cloud9.util.map.HMapKI;
 import edu.umd.cloud9.util.map.MapKF.Entry;
@@ -93,12 +97,13 @@ public class MtNQueryGenerator implements QueryGenerator {
     scfgGenerator.init(fs, conf);
   }
 
-  public JSONObject parseQuery(String query){
+  @Override
+  public JsonObject parseQuery(String query){
 
-    JSONObject queryJson = new JSONObject();
-    JSONObject queryTJson = new JSONObject();
-    JSONObject queryPJson = new JSONObject();
-    try {
+    JsonObject queryJson = new JsonObject();
+    JsonObject queryTJson = new JsonObject();
+    JsonObject queryPJson = new JsonObject();
+
       List<String> tokensBOW = new ArrayList<String>(), tokensBOP = new ArrayList<String>();
       Map<String, HMapSFW> src2trg2weight = new HashMap<String, HMapSFW>();
       Map<String,String> target2source = new HashMap<String,String>(); 
@@ -159,22 +164,22 @@ public class MtNQueryGenerator implements QueryGenerator {
 
         String[] bopArr = new String[tokensBOP.size()];
         bopArr = tokensBOP.toArray(bopArr);
-        JSONArray bop = new JSONArray(bopArr);
-        JSONObject bopJson = new JSONObject();
-        bopJson.put("#combine", bop);
+        JsonArray bop = Utils.createJsonArray(bopArr);
+        JsonObject bopJson = new JsonObject();
+        bopJson.add("#combine", bop);
 
         String[] bowArr = new String[tokensBOW.size()];
         bowArr = tokensBOW.toArray(bowArr);
-        JSONArray bow = new JSONArray(bowArr);
-        JSONObject bowJson = new JSONObject();
-        bowJson.put("#combine", bow);
+        JsonArray bow = Utils.createJsonArray(bowArr);
+        JsonObject bowJson = new JsonObject();
+        bowJson.add("#combine", bow);
 
-        JSONArray weightedQuery = new JSONArray();
-        weightedQuery.put(tokenWeight);
-        weightedQuery.put(bowJson);
-        weightedQuery.put(phraseWeight);
-        weightedQuery.put(bopJson);
-        queryJson.put("#weight", weightedQuery);
+        JsonArray weightedQuery = new JsonArray();
+        weightedQuery.add(new JsonPrimitive(tokenWeight));
+        weightedQuery.add(bowJson);
+        weightedQuery.add(new JsonPrimitive(phraseWeight));
+        weightedQuery.add(bopJson);
+        queryJson.add("#weight", weightedQuery);
       }else {     // k > 1
 
         // apply discount on logprobs to avoid floating point errors
@@ -253,12 +258,12 @@ public class MtNQueryGenerator implements QueryGenerator {
 
         // add phrase translations into a #weight array structure
         if (phraseWeight > 0) {
-          JSONArray pArr = Utils.probMap2JSON(Utils.scaleProbMap(lexProbThreshold, 1/cumPhraseProbs, phrase2weight));
-          queryPJson.put("#weight", pArr);
+          JsonArray pArr = Utils.createJsonArrayFromProbabilities(Utils.scaleProbMap(lexProbThreshold, 1/cumPhraseProbs, phrase2weight));
+          queryPJson.add("#weight", pArr);
         }
 
         // add token translations into a #combine of #weight array structures
-        JSONArray tokensArr = new JSONArray();
+        JsonArray tokensArr = new JsonArray();
         if (tokenWeight > 0) {
           for (String srcToken : stemmedSourceTokens) {
             HMapSFW nbestDist = src2trg2weight.get(srcToken);
@@ -268,7 +273,7 @@ public class MtNQueryGenerator implements QueryGenerator {
               LOG.info("Skipped stopword "+srcToken);
               continue;
             }
-            JSONObject tokenWeightedArr = new JSONObject();
+            JsonObject tokenWeightedArr = new JsonObject();
             LOG.info("Processing "+srcToken);
 
             // skip stop words among source query words
@@ -308,7 +313,7 @@ public class MtNQueryGenerator implements QueryGenerator {
               tokenRepresentationList.add(new PairOfFloatMap(nbestDist, mtWeight));
             }
 
-            JSONArray combinedArr;
+            JsonArray combinedArr;
             float scale = 1;
             if (scaling) {
               scale = scale * tokenCount.get(srcToken)/((float) kbestTranslations.length);
@@ -316,42 +321,39 @@ public class MtNQueryGenerator implements QueryGenerator {
             if(tokenRepresentationList.size() == 0) {
               continue;       // if empty distr., do not represent this source token in query
             } else if(tokenRepresentationList.size() == 1) {
-              combinedArr = Utils.probMap2JSON(Utils.scaleProbMap(lexProbThreshold, scale, tokenRepresentationList.get(0).getMap()));
+              combinedArr = Utils.createJsonArrayFromProbabilities(Utils.scaleProbMap(lexProbThreshold, scale, tokenRepresentationList.get(0).getMap()));
             } else {
-              combinedArr = Utils.probMap2JSON(Utils.combineProbMaps(lexProbThreshold, scale, tokenRepresentationList));
+              combinedArr = Utils.createJsonArrayFromProbabilities(Utils.combineProbMaps(lexProbThreshold, scale, tokenRepresentationList));
             }
 
-            tokenWeightedArr.put("#weight", combinedArr);
+            tokenWeightedArr.add("#weight", combinedArr);
 
             // optional: if this source token has occurred more than once per query, reflect this in the representation
             //  for (int i = 0; i < Math.ceil(tokenCount.get(srcToken)/(float)kBest); i++) {
             //    tokensArr.put(tokenWeightedArr);
             //  }
-            tokensArr.put(tokenWeightedArr);
+            tokensArr.add(tokenWeightedArr);
           }
-          queryTJson.put("#combine", tokensArr);
+          queryTJson.add("#combine", tokensArr);
         }
 
         // combine the token-based and phrase-based representations into a #combweight structure
-        JSONArray queryJsonArr = new JSONArray();
+        JsonArray queryJsonArr = new JsonArray();
 
         HMapSFW normalizedPhrase2Weight = null;
         if (phraseWeight > 0) {
           normalizedPhrase2Weight = Utils.scaleProbMap(lexProbThreshold, phraseWeight/cumPhraseProbs, phrase2weight);      
           for (String phrase : normalizedPhrase2Weight.keySet()) {
-            queryJsonArr.put(normalizedPhrase2Weight.get(phrase));
-            queryJsonArr.put(phrase);
+            queryJsonArr.add(new JsonPrimitive(normalizedPhrase2Weight.get(phrase)));
+            queryJsonArr.add(new JsonPrimitive(phrase));
           }
         }
         if (tokenWeight > 0) {
-          queryJsonArr.put(tokenWeight);
-          queryJsonArr.put(queryTJson);
+          queryJsonArr.add(new JsonPrimitive(tokenWeight));
+          queryJsonArr.add(queryTJson);
         }
-        queryJson.put("#combweight", queryJsonArr);
+        queryJson.add("#combweight", queryJsonArr);
       }
-    } catch (JSONException e) {
-      e.printStackTrace();
-    }
     return queryJson;
   }
 

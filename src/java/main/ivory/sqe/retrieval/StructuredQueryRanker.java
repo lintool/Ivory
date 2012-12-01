@@ -6,14 +6,17 @@ import ivory.smrf.model.GlobalEvidence;
 import ivory.smrf.model.score.BM25ScoringFunction;
 import ivory.smrf.model.score.ScoringFunction;
 import ivory.smrf.retrieval.Accumulator;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.PriorityQueue;
+
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.log4j.Logger;
-import org.json.JSONException;
-import org.json.JSONObject;
+
+import com.google.gson.JsonObject;
+
 import edu.umd.cloud9.collection.DocnoMapping;
 
 public class StructuredQueryRanker {
@@ -36,18 +39,12 @@ public class StructuredQueryRanker {
     docnoMapping = getDocnoMapping();
   }
 
-  public Accumulator[] rank(String qid, JSONObject query, int queryLength) {
+  public Accumulator[] rank(String qid, JsonObject query, int queryLength) {
     GlobalEvidence globalEvidence = new GlobalEvidence(env.getDocumentCount(), env.getCollectionSize(), queryLength);
 
     PostingsReaderWrapper structureReader;
     ScoringFunction scoringFunction = new BM25ScoringFunction();
-    try {
-      structureReader = new PostingsReaderWrapper(query, env, scoringFunction, globalEvidence);
-    } catch (JSONException e) {
-      e.printStackTrace();
-      throw new RuntimeException(e);
-    }
-    ////System.out.println("Ranker created.");
+    structureReader = new PostingsReaderWrapper(query, env, scoringFunction, globalEvidence);
 
     sortedAccumulators.clear();
     Accumulator a = new Accumulator(0, 0.0f);

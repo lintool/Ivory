@@ -4,10 +4,11 @@ import java.io.IOException;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
-import org.json.JSONObject;
+
+import com.google.gson.JsonObject;
 
 public interface QueryGenerator {
-	  public JSONObject parseQuery(String query);
+	  public JsonObject parseQuery(String query);
 	  public void init(FileSystem fs, Configuration conf) throws IOException;
     public void init(Configuration conf) throws IOException;
     public int getQueryLength();

@@ -1,21 +1,22 @@
 package ivory.sqe.querygenerator;
 
-import java.io.IOException;
-
 import ivory.core.tokenize.BigramChineseTokenizer;
 import ivory.core.tokenize.GalagoTokenizer;
 import ivory.core.tokenize.Tokenizer;
 import ivory.core.tokenize.TokenizerFactory;
 import ivory.sqe.retrieval.Constants;
 
+import java.io.IOException;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 
 public class BagOfWordsQueryGenerator implements QueryGenerator {
   private static final Logger LOG = Logger.getLogger(ProbabilisticStructuredQueryGenerator.class);
@@ -59,17 +60,15 @@ public class BagOfWordsQueryGenerator implements QueryGenerator {
     // TODO Auto-generated method stub
     
   }
-  
-  public JSONObject parseQuery(String query){
+
+  @Override
+  public JsonObject parseQuery(String query){
 	  String[] tokens = tokenizer.processContent(query.trim());
 	  length = tokens.length;
 
-	  JSONObject queryJson = new JSONObject();
-	  try {
-		  queryJson.put("#combine", new JSONArray(tokens));
-	  } catch (JSONException e) {
-		  e.printStackTrace();
-	  }
+	  JsonObject queryJson = new JsonObject();
+		queryJson.add("#combine", Utils.createJsonArray(tokens));
+		  
 	  return queryJson;
  }
   
