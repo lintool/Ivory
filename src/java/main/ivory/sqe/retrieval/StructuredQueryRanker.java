@@ -68,7 +68,7 @@ public class StructuredQueryRanker {
       //		e.printStackTrace();
       //      }
       NodeWeight sc = structureReader.computeScore(docno,0);
-      score = sc.getBM25((int) env.getDocumentCount(), env.getDocumentLength(docno), env.getCollectionSize()/ (float) env.getDocumentCount());
+      score = sc.getScore();
 //      LOG.info("Docno " + docno + ","+docnoMapping.getDocid(docno)+" scored: "+score);
 
       cnt++;

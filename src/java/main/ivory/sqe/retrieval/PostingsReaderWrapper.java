@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.mortbay.log.Log;
+
 import com.google.common.base.Preconditions;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -147,7 +149,11 @@ public class PostingsReaderWrapper {
     //LOG.info("@"+depth+" Scoring... docno="+curDocno+" node="+this.toString());
     NodeWeight score;
     if (isOOV) {
-      score = new TfDfWeight(0,0);
+      int docLen = env.getDocumentLength(curDocno);
+      int numDocs = (int) env.getDocumentCount();
+      float avgDocLen = env.getCollectionSize() / numDocs;
+
+      score = new TfDfWeight(0,0, numDocs, docLen, avgDocLen);
     } else if (!isLeaf()) {
       // If this is not a leaf node, compute scores from children and
       // combine them w.r.t operator
@@ -182,7 +188,11 @@ public class PostingsReaderWrapper {
         tf = postingsReader.getTf();
       }
  
-      score = new TfDfWeight(tf, gte.getDf());
+      int docLen = env.getDocumentLength(curDocno);
+      int numDocs = (int) env.getDocumentCount();
+      float avgDocLen = env.getCollectionSize() / numDocs;
+
+      score = new TfDfWeight(tf, gte.getDf(), numDocs, docLen, avgDocLen);
       //LOG.info(tf + "," + gte.getDf());//+ "," + ge.queryLength+"," + ge.numDocs+"," + ge.collectionLength);
 
       lastScoredDocno = curDocno;
@@ -196,32 +206,30 @@ public class PostingsReaderWrapper {
       // sum bm25 scores
       float score = 0f;
       for (int i = 0; i < scores.length; i++) {
-        float bm25 = scores[i].getBM25(numDocs, docLen, avgDocLen);
+        float bm25 = scores[i].getScore();
         //LOG.info("Child #"+i+" bm25 = "+bm25);
         score += bm25;
       }
       resultScore = new FloatWeight(score);
     } else if (operator.equals("#weight")) {
-      try {
-        resultScore = scores[0].getClass().newInstance();
-      } catch (Exception e) {
-        return new TfDfWeight(0,0);
+      if (scores.length == 0) {
+        resultScore = new FloatWeight();
+      } else {
+        if (scores[0] instanceof TfDfWeight) {
+          resultScore = new TfDfWeight(0, 0, numDocs, docLen, avgDocLen);
+        } else {
+          resultScore = new FloatWeight();
+        }
+        // tf,df = sum{weight_i * (tf_i,df_i)}
+        for (int i = 0; i < scores.length; i++) {
+          resultScore.add(scores[i].multiply(weights[i]));
+        }
       }
-      // tf,df = sum{weight_i * (tf_i,df_i)} 
-      for (int i = 0; i < scores.length; i++) {
-        resultScore.add(scores[i].multiply(weights[i]));
-      }
-//    } else if (operator.equals("#pweight")) {
-//      resultScore = new TfDfWeight();
-//      // tf,df = sum{weight_i * (tf_i,df_i)} 
-//      for (int i = 0; i < scores.length; i++) {
-//        resultScore.add(scores[i].multiply(weights[i]));
-//      }
     } else if (operator.equals("#combweight")) {
       // sum bm25 scores
       float score = 0f;
       for (int i = 0; i < scores.length; i++) {
-        float bm25 = scores[i].getBM25(numDocs, docLen, avgDocLen);
+        float bm25 = scores[i].getScore();
         //LOG.info("Child #"+i+" bm25 = "+bm25);
         score += bm25 * weights[i];
       }
