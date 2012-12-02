@@ -5,6 +5,8 @@ import ivory.core.RetrievalEnvironment;
 import ivory.core.tokenize.Tokenizer;
 import ivory.core.tokenize.TokenizerFactory;
 import ivory.sqe.retrieval.Constants;
+import ivory.sqe.retrieval.StructuredQuery;
+
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -15,14 +17,17 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Set;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
+
 import edu.umd.cloud9.io.map.HMapSFW;
 import edu.umd.cloud9.io.pair.PairOfFloatInt;
 import edu.umd.cloud9.io.pair.PairOfStrings;
@@ -36,8 +41,8 @@ import edu.umd.hooka.ttables.TTable_monolithic_IFAs;
  * @author ferhanture
  *
  */
-public class CLWordQueryGenerator implements QueryGenerator {
-  private static final Logger LOG = Logger.getLogger(CLWordQueryGenerator.class);
+public class ProbabilisticStructuredQueryGenerator implements QueryGenerator {
+  private static final Logger LOG = Logger.getLogger(ProbabilisticStructuredQueryGenerator.class);
   private Tokenizer queryLangTokenizer, queryLangTokenizerWithStem, docLangTokenizer;
   private VocabularyWritable fVocab_f2e, eVocab_f2e;
   private TTable_monolithic_IFAs f2eProbs;
@@ -48,13 +53,11 @@ public class CLWordQueryGenerator implements QueryGenerator {
   private RetrievalEnvironment env;
   private String queryLang, docLang;
 
-  public CLWordQueryGenerator() throws IOException {
+  public ProbabilisticStructuredQueryGenerator() throws IOException {
     super();
   }
 
   @Override
-  public void init(Configuration conf) throws IOException {     }
-
   public void init(FileSystem fs, Configuration conf) throws IOException {
     if (conf.getBoolean(Constants.Quiet, false)) {
       LOG.setLevel(Level.OFF);
@@ -99,50 +102,52 @@ public class CLWordQueryGenerator implements QueryGenerator {
     }
   }
 
-  public JSONObject parseQuery(String query) {
-    JSONObject queryJson = new JSONObject();
-    try {
-      String origQuery = query.trim().split(";")[1].trim(); 
-      Map<String,String> stemmed2Stemmed = Utils.getStemMapping(origQuery, queryLangTokenizer, queryLangTokenizerWithStem, docLangTokenizer);
+  @Override
+  public StructuredQuery parseQuery(String query) {
+    JsonObject queryJson = new JsonObject();
 
-      String[] tokens = queryLangTokenizerWithStem.processContent(origQuery);
+    String origQuery = query.trim().split(";")[1].trim();
+    Map<String, String> stemmed2Stemmed = Utils.getStemMapping(origQuery, queryLangTokenizer,
+        queryLangTokenizerWithStem, docLangTokenizer);
 
-      length = tokens.length;
-      JSONArray tokenTranslations = new JSONArray();
-      for (String token : tokens) {
-        LOG.info("Processing token "+token);
-        if (queryLangTokenizerWithStem.isStemmedStopWord(token))  continue;
-        LOG.info("not stopword");
+    String[] tokens = queryLangTokenizerWithStem.processContent(origQuery);
 
-        // output is not a weighted structure iff numTransPerToken=1 
-        // and we're not doing bigram segmentation (which requires a weighted structure since it splits a single token into multiple ones)
-        if (numTransPerToken == 1 && !bigramSegment){
-          String trans = getBestTranslation(token);
-          if (trans != null) {
-            tokenTranslations.put(trans);
-          }
-        }else {
-          JSONObject tokenTrans = new JSONObject();
-          HMapSFW distr = getTranslations(token, stemmed2Stemmed);
-          if (distr == null) { continue; }
-          JSONArray weights = Utils.probMap2JSON(distr);
-          if (weights != null) {				
-            tokenTrans.put("#weight", weights);
-            tokenTranslations.put(tokenTrans);
-          }
+    length = tokens.length;
+    JsonArray tokenTranslations = new JsonArray();
+    for (String token : tokens) {
+      LOG.info("Processing token " + token);
+      if (queryLangTokenizerWithStem.isStemmedStopWord(token))
+        continue;
+      LOG.info("not stopword");
+
+      // output is not a weighted structure iff numTransPerToken=1
+      // and we're not doing bigram segmentation (which requires a weighted structure since it
+      // splits a single token into multiple ones)
+      if (numTransPerToken == 1 && !bigramSegment) {
+        String trans = getBestTranslation(token);
+        if (trans != null) {
+          tokenTranslations.add(new JsonPrimitive(trans));
+        }
+      } else {
+        JsonObject tokenTrans = new JsonObject();
+        HMapSFW distr = getTranslations(token, stemmed2Stemmed);
+        if (distr == null) {
+          continue;
+        }
+        JsonArray weights = Utils.createJsonArrayFromProbabilities(distr);
+        if (weights != null) {
+          tokenTrans.add("#weight", weights);
+          tokenTranslations.add(tokenTrans);
         }
       }
-      queryJson.put("#combine", tokenTranslations);
-    } catch (JSONException e) {
-      e.printStackTrace();
     }
-    return queryJson;
+    queryJson.add("#combine", tokenTranslations);
+    return new StructuredQuery(queryJson, length);
   }
 
   protected String getBestTranslation(String token) {
     int f = fVocab_f2e.get(token);
     if (f <= 0) {
-      //      LOG.info("OOV "+token);
       // heuristic: if no translation found, include itself as only translation
       return null;
     }
@@ -208,7 +213,6 @@ public class CLWordQueryGenerator implements QueryGenerator {
           }
         }
         numTrans++;
-        //          LOG.info("adding "+eTerm+","+probEF+","+sumProbEF);
       }else{
         LOG.info("Skipped target stopword/OOV " + eTerm);
       }
@@ -235,14 +239,12 @@ public class CLWordQueryGenerator implements QueryGenerator {
       reader = new BufferedReader(new InputStreamReader(new FileInputStream(grammarFile), "UTF-8"));
       String rule = null;
       while ((rule = reader.readLine())!=null) {
-        //      LOG.info("SCFG rule = " + rule);
         String[] parts = rule.split("\\|\\|\\|");
         String[] lhs = parts[1].trim().split(" ");
         String[] rhs = parts[2].trim().split(" ");;
         for (String l : lhs) {
           for (String r : rhs) {
             pairsInSCFG.add(new PairOfStrings(l, r));
-            //            LOG.info("added "+l+"|||"+r);
           }
         }
       }
@@ -254,9 +256,4 @@ public class CLWordQueryGenerator implements QueryGenerator {
       e.printStackTrace();
     }
   }
-
-  public int getQueryLength(){
-    return length;  
-  }
-
 }

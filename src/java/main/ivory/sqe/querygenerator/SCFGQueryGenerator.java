@@ -6,14 +6,19 @@ import ivory.core.tokenize.BigramChineseTokenizer;
 import ivory.core.tokenize.Tokenizer;
 import ivory.core.tokenize.TokenizerFactory;
 import ivory.sqe.retrieval.Constants;
+import ivory.sqe.retrieval.StructuredQuery;
+
 import java.io.IOException;
 import java.util.Map;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.log4j.Logger;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
+
 import edu.umd.cloud9.io.map.HMapSFW;
 
 /**
@@ -36,10 +41,6 @@ public class SCFGQueryGenerator implements QueryGenerator {
   }
 
   @Override
-  public void init(Configuration conf) throws IOException {
-
-  }
-
   public void init(FileSystem fs, Configuration conf) throws IOException {
     LOG.info(conf.get(Constants.DocLanguage));
     LOG.info(conf.get(Constants.DocTokenizerData));
@@ -83,46 +84,43 @@ public class SCFGQueryGenerator implements QueryGenerator {
     Utils.normalize(probMap, lexProbThreshold, cumProbThreshold, 30);      
   }
 
-  public JSONObject parseQuery(String query) {
-    JSONObject queryJson = new JSONObject();
-    try {
-      String[] tokens = query.trim().split("\\s");
+  @Override
+  public StructuredQuery parseQuery(String query) {
+    JsonObject queryJson = new JsonObject();
 
-      length = tokens.length;
-      JSONArray tokenTranslations = new JSONArray();
-      for (String token : tokens) {
+    String[] tokens = query.trim().split("\\s");
 
-        //        LOG.info("Processing "+token);
-        // if we do bigram segmentation on translation alternatives, we have to a have a weight structure, even if k=1
-        // unless the token has less than 3 characters, in which bigram segmentation will only return the token itself
-        if (numTransPerToken == 1 && !bigramSegment){
-          String trans = getBestTranslation(token);
-          if (trans != null) {
-            tokenTranslations.put(trans);
-          }
-        }else {
-          JSONObject tokenTrans = new JSONObject();
-          JSONArray weights = Utils.probMap2JSON(getTranslations(token, null));
-          if (weights != null) {        
-            tokenTrans.put("#weight", weights);
-            tokenTranslations.put(tokenTrans);
-          }
+    length = tokens.length;
+    JsonArray tokenTranslations = new JsonArray();
+    for (String token : tokens) {
+
+      // if we do bigram segmentation on translation alternatives, we have to a have a weight
+      // structure, even if k=1
+      // unless the token has less than 3 characters, in which bigram segmentation will only return
+      // the token itself
+      if (numTransPerToken == 1 && !bigramSegment) {
+        String trans = getBestTranslation(token);
+        if (trans != null) {
+          tokenTranslations.add(new JsonPrimitive(trans));
+        }
+      } else {
+        JsonObject tokenTrans = new JsonObject();
+        JsonArray weights = Utils.createJsonArrayFromProbabilities(getTranslations(token, null));
+        if (weights != null) {
+          tokenTrans.add("#weight", weights);
+          tokenTranslations.add(tokenTrans);
         }
       }
-      queryJson.put("#combine", tokenTranslations);
-    } catch (JSONException e) {
-      e.printStackTrace();
     }
-    return queryJson;
+    queryJson.add("#combine", tokenTranslations);
+
+    return new StructuredQuery(queryJson, length);
   }
 
   private String getBestTranslation(String token) {
     HMapSFW probDist = probMap.get(token);
 
     if(probDist == null){
-      //      LOG.info("OOV: "+token);
-
-      // heuristic: if no translation found, include itself as only translation
       return token;
     }
 
@@ -137,16 +135,9 @@ public class SCFGQueryGenerator implements QueryGenerator {
     return maxProbTrans;
   }
 
-  public int getQueryLength(){
-    return length;  
-  }
-
   protected HMapSFW getTranslations(String token, Map<String, String> stemmed2Stemmed) {
     HMapSFW probDist = probMap.get(token);
-    //    LOG.info("Translations of "+token+"="+probDist);
     if(probDist == null){
-      //      LOG.info("OOV: "+token);
-
       // heuristic: if no translation found, include itself as only translation
       probDist = new HMapSFW();
       String targetStem = stemmed2Stemmed.get(token);
@@ -155,30 +146,6 @@ public class SCFGQueryGenerator implements QueryGenerator {
       return probDist;
     }
 
-    // // support for bigram segmentation
-    //    if (bigramSegment) {
-    //      HMapSFW probDistBigram = new HMapSFW();
-    //      for (String translation : probDist.keySet()) {
-    //        float prob = probDist.get(translation);
-    //
-    //        translation = translation.replaceAll(" ", "");
-    //        String[] eTokens = bigramTokenizer.processContent(translation);
-    //        float splitProb = prob / eTokens.length;
-    //        
-    //        for (String eToken : eTokens) {
-    //          if (env.getPostingsList(eToken) != null) {
-    //            //              phraseTranslationsArr.put(splitProb);
-    //            //              phraseTranslationsArr.put(eToken);
-    //            probDistBigram.put(eToken, splitProb);
-    //          }
-    //        }
-    //      }
-    //      
-    //      // replace distribution with modified one
-    //      probDist = probDistBigram;
-    //    }
-
     return probDist;
-
   }
 }

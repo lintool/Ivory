@@ -1,28 +1,27 @@
 package ivory.sqe.querygenerator;
 
-import java.io.IOException;
-
 import ivory.core.tokenize.BigramChineseTokenizer;
 import ivory.core.tokenize.GalagoTokenizer;
 import ivory.core.tokenize.Tokenizer;
 import ivory.core.tokenize.TokenizerFactory;
 import ivory.sqe.retrieval.Constants;
+import ivory.sqe.retrieval.StructuredQuery;
+
+import java.io.IOException;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
-public class DefaultBagOfWordQueryGenerator implements QueryGenerator {
-  private static final Logger LOG = Logger.getLogger(CLWordQueryGenerator.class);
+import com.google.gson.JsonObject;
+
+public class BagOfWordsQueryGenerator implements QueryGenerator {
+  private static final Logger LOG = Logger.getLogger(ProbabilisticStructuredQueryGenerator.class);
   Tokenizer tokenizer;
-  int length;
   
-  public DefaultBagOfWordQueryGenerator() {
+  public BagOfWordsQueryGenerator() {
 	  super();
   }
 
@@ -55,26 +54,13 @@ public class DefaultBagOfWordQueryGenerator implements QueryGenerator {
 	}
 	
   @Override
-  public void init(Configuration conf) throws IOException {
-    // TODO Auto-generated method stub
-    
-  }
-  
-  public JSONObject parseQuery(String query){
-	  String[] tokens = tokenizer.processContent(query.trim());
-	  length = tokens.length;
+  public StructuredQuery parseQuery(String query) {
+    String[] tokens = tokenizer.processContent(query.trim());
+    int length = tokens.length;
 
-	  JSONObject queryJson = new JSONObject();
-	  try {
-		  queryJson.put("#combine", new JSONArray(tokens));
-	  } catch (JSONException e) {
-		  e.printStackTrace();
-	  }
-	  return queryJson;
- }
-  
-  public int getQueryLength(){
-	return length;  
-  }
+    JsonObject queryJson = new JsonObject();
+    queryJson.add("#combine", Utils.createJsonArray(tokens));
 
+    return new StructuredQuery(queryJson, length);
+  }
 }

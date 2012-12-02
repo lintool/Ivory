@@ -1,9 +1,8 @@
 <parameters>
-<!--<qrels_path>data/en-ar.trec02/qrels.en-ar.trec02.txt</qrels_path>-->
 
      <run>en-ar.token</run>
      <query_type>clir</query_type>
-     <index>/scratch0/fture/indexes/trec2001-03_cleaned+nodups+notags.ar-nostop.index</index>
+     <index>/scratch0/indexes/clir/trec2001-03_cleaned+nodups+notags.ar-nostop.index</index>
      <doc_lang>ar</doc_lang>
      <query_lang>en</query_lang>
      <doc_tokenizer>data/tokenizer/ar-token.bin</doc_tokenizer>
