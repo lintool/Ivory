@@ -4,6 +4,7 @@ import ivory.core.tokenize.Tokenizer;
 import ivory.core.tokenize.TokenizerFactory;
 import ivory.sqe.retrieval.Constants;
 import ivory.sqe.retrieval.PairOfFloatMap;
+import ivory.sqe.retrieval.StructuredQuery;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -54,15 +55,6 @@ public class MtNQueryGenerator implements QueryGenerator {
   }
 
   @Override
-  public void init(Configuration conf) throws IOException {
-    mtWeight = conf.getFloat(Constants.MTWeight, 1f);
-    bitextWeight = conf.getFloat(Constants.BitextWeight, 0f);
-    scfgWeight = conf.getFloat(Constants.SCFGWeight, 0f);
-    LOG.info(conf.get(Constants.MTWeight));
-    LOG.info(conf.get(Constants.BitextWeight));
-    LOG.info(conf.get(Constants.SCFGWeight));
-  }
-
   public void init(FileSystem fs, Configuration conf) throws IOException {
     if (conf.getBoolean(Constants.Quiet, false)) {
       LOG.setLevel(Level.OFF);
@@ -85,7 +77,13 @@ public class MtNQueryGenerator implements QueryGenerator {
     kBest = conf.getInt(Constants.KBest, 1); 
     LOG.info("K = " + kBest);
 
-    init(conf);
+    mtWeight = conf.getFloat(Constants.MTWeight, 1f);
+    bitextWeight = conf.getFloat(Constants.BitextWeight, 0f);
+    scfgWeight = conf.getFloat(Constants.SCFGWeight, 0f);
+    LOG.info(conf.get(Constants.MTWeight));
+    LOG.info(conf.get(Constants.BitextWeight));
+    LOG.info(conf.get(Constants.SCFGWeight));
+
     queryLangTokenizer = TokenizerFactory.createTokenizer(fs, conf, queryLang, queryTokenizerPath, false, null, null, null);
     queryLangTokenizerWithStemming = TokenizerFactory.createTokenizer(fs, conf, queryLang, queryTokenizerPath, true, null, conf.get(Constants.StemmedStopwordListQ), null);
     docLangTokenizer = TokenizerFactory.createTokenizer(fs, conf, docLang, docTokenizerPath, true, null, conf.get(Constants.StemmedStopwordListD), null);
@@ -98,8 +96,7 @@ public class MtNQueryGenerator implements QueryGenerator {
   }
 
   @Override
-  public JsonObject parseQuery(String query){
-
+  public StructuredQuery parseQuery(String query){
     JsonObject queryJson = new JsonObject();
     JsonObject queryTJson = new JsonObject();
     JsonObject queryPJson = new JsonObject();
@@ -296,14 +293,12 @@ public class MtNQueryGenerator implements QueryGenerator {
 
             // Pr{bitext}
             HMapSFW bitextDist = clGenerator.getTranslations(srcToken, stemmed2Stemmed);
-            //          LOG.info("bitext: "+bitextDist+"\n"+bitextWeight);
             if (bitextDist != null && !bitextDist.isEmpty() && bitextWeight > 0) {
               tokenRepresentationList.add(new PairOfFloatMap(bitextDist, bitextWeight));
             }
 
             // Pr{scfg}
             HMapSFW scfgDist = scfgGenerator.getTranslations(srcToken, stemmed2Stemmed);
-            //          LOG.info("scfg: "+scfgDist+"\n"+scfgWeight);
             if (scfgDist != null && !scfgDist.isEmpty() && scfgWeight > 0) {
               tokenRepresentationList.add(new PairOfFloatMap(scfgDist, scfgWeight));
             }
@@ -354,11 +349,7 @@ public class MtNQueryGenerator implements QueryGenerator {
         }
         queryJson.add("#combweight", queryJsonArr);
       }
-    return queryJson;
-  }
 
-  public int getQueryLength(){
-    return length;  
+    return new StructuredQuery(queryJson, length);
   }
-
 }

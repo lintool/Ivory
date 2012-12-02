@@ -29,7 +29,6 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import com.google.common.collect.Maps;
-import com.google.gson.JsonObject;
 
 import edu.umd.cloud9.collection.DocnoMapping;
 
@@ -80,15 +79,6 @@ public class QueryEngine {
       e.printStackTrace();
       throw new RuntimeException(e);
     } catch (ConfigurationException e) {
-      e.printStackTrace();
-      throw new RuntimeException(e);
-    }
-  }
-
-  public void init(Configuration conf){
-    try {
-      generator.init(conf);
-    } catch (IOException e) {
       e.printStackTrace();
       throw new RuntimeException(e);
     }
@@ -165,14 +155,14 @@ public class QueryEngine {
         String query = queries.get(qid);
 
         long start = System.currentTimeMillis();
-        JsonObject structuredQuery = generator.parseQuery(query);
+        StructuredQuery structuredQuery = generator.parseQuery(query);
         long end = System.currentTimeMillis();
         LOG.info("Generating " + qid + ": " + ( end - start) + "ms");
         generateTime += ( end - start ) ;
-        LOG.info("<Processed>:::" + runName + ":::" + qid + ":::" + structuredQuery);
+        LOG.info("<Processed>:::" + runName + ":::" + qid + ":::" + structuredQuery.getQuery());
 
         start = System.currentTimeMillis();
-        ranker.rank(qid, structuredQuery, generator.getQueryLength());
+        ranker.rank(qid, structuredQuery.getQuery(), structuredQuery.getQueryLength());
         end = System.currentTimeMillis();
         LOG.info("Ranking " + qid + ": " + ( end - start) + "ms");
         rankTime += ( end - start ) ;
@@ -195,10 +185,8 @@ public class QueryEngine {
   public DocnoMapping getDocnoMapping() {
     return mapping;
   }
-
   
   public Set<String> getModels() {
     return modelSet;
   }
-
 }

@@ -5,6 +5,7 @@ import ivory.core.RetrievalEnvironment;
 import ivory.core.tokenize.Tokenizer;
 import ivory.core.tokenize.TokenizerFactory;
 import ivory.sqe.retrieval.Constants;
+import ivory.sqe.retrieval.StructuredQuery;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -57,8 +58,6 @@ public class ProbabilisticStructuredQueryGenerator implements QueryGenerator {
   }
 
   @Override
-  public void init(Configuration conf) throws IOException {     }
-
   public void init(FileSystem fs, Configuration conf) throws IOException {
     if (conf.getBoolean(Constants.Quiet, false)) {
       LOG.setLevel(Level.OFF);
@@ -104,7 +103,7 @@ public class ProbabilisticStructuredQueryGenerator implements QueryGenerator {
   }
 
   @Override
-  public JsonObject parseQuery(String query) {
+  public StructuredQuery parseQuery(String query) {
     JsonObject queryJson = new JsonObject();
 
     String origQuery = query.trim().split(";")[1].trim();
@@ -143,13 +142,12 @@ public class ProbabilisticStructuredQueryGenerator implements QueryGenerator {
       }
     }
     queryJson.add("#combine", tokenTranslations);
-    return queryJson;
+    return new StructuredQuery(queryJson, length);
   }
 
   protected String getBestTranslation(String token) {
     int f = fVocab_f2e.get(token);
     if (f <= 0) {
-      //      LOG.info("OOV "+token);
       // heuristic: if no translation found, include itself as only translation
       return null;
     }
@@ -215,7 +213,6 @@ public class ProbabilisticStructuredQueryGenerator implements QueryGenerator {
           }
         }
         numTrans++;
-        //          LOG.info("adding "+eTerm+","+probEF+","+sumProbEF);
       }else{
         LOG.info("Skipped target stopword/OOV " + eTerm);
       }
@@ -242,14 +239,12 @@ public class ProbabilisticStructuredQueryGenerator implements QueryGenerator {
       reader = new BufferedReader(new InputStreamReader(new FileInputStream(grammarFile), "UTF-8"));
       String rule = null;
       while ((rule = reader.readLine())!=null) {
-        //      LOG.info("SCFG rule = " + rule);
         String[] parts = rule.split("\\|\\|\\|");
         String[] lhs = parts[1].trim().split(" ");
         String[] rhs = parts[2].trim().split(" ");;
         for (String l : lhs) {
           for (String r : rhs) {
             pairsInSCFG.add(new PairOfStrings(l, r));
-            //            LOG.info("added "+l+"|||"+r);
           }
         }
       }
@@ -261,9 +256,4 @@ public class ProbabilisticStructuredQueryGenerator implements QueryGenerator {
       e.printStackTrace();
     }
   }
-
-  public int getQueryLength(){
-    return length;  
-  }
-
 }

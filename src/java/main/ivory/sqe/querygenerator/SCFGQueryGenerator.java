@@ -6,6 +6,7 @@ import ivory.core.tokenize.BigramChineseTokenizer;
 import ivory.core.tokenize.Tokenizer;
 import ivory.core.tokenize.TokenizerFactory;
 import ivory.sqe.retrieval.Constants;
+import ivory.sqe.retrieval.StructuredQuery;
 
 import java.io.IOException;
 import java.util.Map;
@@ -40,10 +41,6 @@ public class SCFGQueryGenerator implements QueryGenerator {
   }
 
   @Override
-  public void init(Configuration conf) throws IOException {
-
-  }
-
   public void init(FileSystem fs, Configuration conf) throws IOException {
     LOG.info(conf.get(Constants.DocLanguage));
     LOG.info(conf.get(Constants.DocTokenizerData));
@@ -88,7 +85,7 @@ public class SCFGQueryGenerator implements QueryGenerator {
   }
 
   @Override
-  public JsonObject parseQuery(String query) {
+  public StructuredQuery parseQuery(String query) {
     JsonObject queryJson = new JsonObject();
 
     String[] tokens = query.trim().split("\\s");
@@ -117,16 +114,13 @@ public class SCFGQueryGenerator implements QueryGenerator {
     }
     queryJson.add("#combine", tokenTranslations);
 
-    return queryJson;
+    return new StructuredQuery(queryJson, length);
   }
 
   private String getBestTranslation(String token) {
     HMapSFW probDist = probMap.get(token);
 
     if(probDist == null){
-      //      LOG.info("OOV: "+token);
-
-      // heuristic: if no translation found, include itself as only translation
       return token;
     }
 
@@ -141,16 +135,9 @@ public class SCFGQueryGenerator implements QueryGenerator {
     return maxProbTrans;
   }
 
-  public int getQueryLength(){
-    return length;  
-  }
-
   protected HMapSFW getTranslations(String token, Map<String, String> stemmed2Stemmed) {
     HMapSFW probDist = probMap.get(token);
-    //    LOG.info("Translations of "+token+"="+probDist);
     if(probDist == null){
-      //      LOG.info("OOV: "+token);
-
       // heuristic: if no translation found, include itself as only translation
       probDist = new HMapSFW();
       String targetStem = stemmed2Stemmed.get(token);
@@ -159,30 +146,6 @@ public class SCFGQueryGenerator implements QueryGenerator {
       return probDist;
     }
 
-    // // support for bigram segmentation
-    //    if (bigramSegment) {
-    //      HMapSFW probDistBigram = new HMapSFW();
-    //      for (String translation : probDist.keySet()) {
-    //        float prob = probDist.get(translation);
-    //
-    //        translation = translation.replaceAll(" ", "");
-    //        String[] eTokens = bigramTokenizer.processContent(translation);
-    //        float splitProb = prob / eTokens.length;
-    //        
-    //        for (String eToken : eTokens) {
-    //          if (env.getPostingsList(eToken) != null) {
-    //            //              phraseTranslationsArr.put(splitProb);
-    //            //              phraseTranslationsArr.put(eToken);
-    //            probDistBigram.put(eToken, splitProb);
-    //          }
-    //        }
-    //      }
-    //      
-    //      // replace distribution with modified one
-    //      probDist = probDistBigram;
-    //    }
-
     return probDist;
-
   }
 }

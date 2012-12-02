@@ -1,19 +1,19 @@
 package ivory.sqe.retrieval;
 
 public class TfDfWeight implements NodeWeight {
-  float tf, df;
-  int numDocs;
-  int docLen;
-  float avgDocLen;
+  private float tf, df;
+  private int docLen;
+  private int numDocs;
+  private float avgDocLen;
 
   public TfDfWeight() {
     tf = 0;
     df = 0;
   }
 
-  public TfDfWeight(float t, float d, int numDocs, int docLen, float avgDocLen) {
-    tf = t;
-    df = d;
+  public TfDfWeight(float tf, float df, int docLen, int numDocs, float avgDocLen) {
+    this.tf = tf;
+    this.df = df;
     this.numDocs = numDocs;
     this.docLen = docLen;
     this.avgDocLen = avgDocLen;
@@ -37,7 +37,7 @@ public class TfDfWeight implements NodeWeight {
   }
 
   public TfDfWeight multiply(float weight) {
-    return new TfDfWeight(tf * weight, df * weight, numDocs, docLen, avgDocLen);
+    return new TfDfWeight(tf * weight, df * weight, docLen, numDocs, avgDocLen);
   }
 
   public String toString() {

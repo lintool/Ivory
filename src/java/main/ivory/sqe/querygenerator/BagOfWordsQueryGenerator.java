@@ -5,6 +5,7 @@ import ivory.core.tokenize.GalagoTokenizer;
 import ivory.core.tokenize.Tokenizer;
 import ivory.core.tokenize.TokenizerFactory;
 import ivory.sqe.retrieval.Constants;
+import ivory.sqe.retrieval.StructuredQuery;
 
 import java.io.IOException;
 
@@ -14,14 +15,11 @@ import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 
 public class BagOfWordsQueryGenerator implements QueryGenerator {
   private static final Logger LOG = Logger.getLogger(ProbabilisticStructuredQueryGenerator.class);
   Tokenizer tokenizer;
-  int length;
   
   public BagOfWordsQueryGenerator() {
 	  super();
@@ -56,24 +54,13 @@ public class BagOfWordsQueryGenerator implements QueryGenerator {
 	}
 	
   @Override
-  public void init(Configuration conf) throws IOException {
-    // TODO Auto-generated method stub
-    
+  public StructuredQuery parseQuery(String query) {
+    String[] tokens = tokenizer.processContent(query.trim());
+    int length = tokens.length;
+
+    JsonObject queryJson = new JsonObject();
+    queryJson.add("#combine", Utils.createJsonArray(tokens));
+
+    return new StructuredQuery(queryJson, length);
   }
-
-  @Override
-  public JsonObject parseQuery(String query){
-	  String[] tokens = tokenizer.processContent(query.trim());
-	  length = tokens.length;
-
-	  JsonObject queryJson = new JsonObject();
-		queryJson.add("#combine", Utils.createJsonArray(tokens));
-		  
-	  return queryJson;
- }
-  
-  public int getQueryLength(){
-	return length;  
-  }
-
 }

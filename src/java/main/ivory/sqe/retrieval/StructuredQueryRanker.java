@@ -3,8 +3,6 @@ package ivory.sqe.retrieval;
 import ivory.core.ConfigurationException;
 import ivory.core.RetrievalEnvironment;
 import ivory.smrf.model.GlobalEvidence;
-import ivory.smrf.model.score.BM25ScoringFunction;
-import ivory.smrf.model.score.ScoringFunction;
 import ivory.smrf.retrieval.Accumulator;
 
 import java.io.IOException;
@@ -13,21 +11,16 @@ import java.util.Map;
 import java.util.PriorityQueue;
 
 import org.apache.hadoop.fs.FileSystem;
-import org.apache.log4j.Logger;
 
 import com.google.gson.JsonObject;
 
 import edu.umd.cloud9.collection.DocnoMapping;
 
 public class StructuredQueryRanker {
-  private static final Logger LOG = Logger.getLogger(StructuredQueryRanker.class);
-
   private RetrievalEnvironment env;
-  //  private Accumulator[] accumulators = null;
   private final PriorityQueue<Accumulator> sortedAccumulators = new PriorityQueue<Accumulator>();
   private final int numResults;
   private HashMap<String, Accumulator[]> results;
-  private DocnoMapping docnoMapping;
 
   public StructuredQueryRanker(String indexPath, FileSystem fs, int numResults) throws IOException,
   ConfigurationException {
@@ -36,15 +29,13 @@ public class StructuredQueryRanker {
 
     this.numResults = numResults;
     results = new HashMap<String, Accumulator[]>();
-    docnoMapping = getDocnoMapping();
   }
 
   public Accumulator[] rank(String qid, JsonObject query, int queryLength) {
     GlobalEvidence globalEvidence = new GlobalEvidence(env.getDocumentCount(), env.getCollectionSize(), queryLength);
 
     PostingsReaderWrapper structureReader;
-    ScoringFunction scoringFunction = new BM25ScoringFunction();
-    structureReader = new PostingsReaderWrapper(query, env, scoringFunction, globalEvidence);
+    structureReader = new PostingsReaderWrapper(query, env, globalEvidence);
 
     sortedAccumulators.clear();
     Accumulator a = new Accumulator(0, 0.0f);
@@ -57,21 +48,13 @@ public class StructuredQueryRanker {
     if(nextDocno < docno){
       docno = nextDocno;
     }
-    int cnt = 0;
     while (docno < Integer.MAX_VALUE) {
       float score = 0.0f;
 
       // Document-at-a-time scoring.
-      //      try {
-      //		LOG.info("Advance to docno " + docno+" => "+getDocnoMapping().getDocid(docno));
-      //      } catch (IOException e) {
-      //		e.printStackTrace();
-      //      }
-      NodeWeight sc = structureReader.computeScore(docno,0);
+      NodeWeight sc = structureReader.computeScore(docno);
       score = sc.getScore();
-//      LOG.info("Docno " + docno + ","+docnoMapping.getDocid(docno)+" scored: "+score);
 
-      cnt++;
       // Keep track of numResults best accumulators.
       if (score > scoreThreshold) {
         a.docno = docno;
@@ -98,7 +81,6 @@ public class StructuredQueryRanker {
     Accumulator[] accs = new Accumulator[Math.min(numResults, sortedAccumulators.size())];
     for (int i = 0; i < accs.length; i++) {
       Accumulator acc = sortedAccumulators.poll();
-      //	  LOG.info((accs.length - 1 - i)+"="+acc.docno+","+acc.score);
       accs[accs.length - 1 - i] = acc;
     }
 
@@ -118,6 +100,4 @@ public class StructuredQueryRanker {
   public Map<String, Accumulator[]> getResults() {
     return results;
   }
-
-
 }
