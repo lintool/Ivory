@@ -160,7 +160,7 @@ public class PostingsReaderWrapper {
         //LOG.info("@"+depth+" Child score: "+ scores[i]);
       }
       int docLen = env.getDocumentLength(curDocno);
-      float numDocs = (float) env.getDocumentCount();
+      int numDocs = (int) env.getDocumentCount();
       float avgDocLen = env.getCollectionSize() / numDocs;
 
       score = runOperator(scores, (int) numDocs, docLen, avgDocLen);
