@@ -8,14 +8,14 @@ import junit.framework.JUnit4TestAdapter;
 
 import org.junit.Test;
 
-public class VerifyLocalTrec45PositionalIndexLP  extends IntegrationTestBaseTrec45 {
+public class VerifyLocalCACMPositionalIndexIP extends IntegrationTestBaseCACM {
   private static final Random RANDOM = new Random();
 
   @Test
   public void runBuildIndex() throws Exception {
     String index = this.getClass().getCanonicalName() + "-index-" + RANDOM.nextInt(10000);
     String[] args = new String[] { 
-        "-" + BuildIndex.POSITIONAL_INDEX_LP,
+        "-" + BuildIndex.POSITIONAL_INDEX_IP,
         "-" + BuildIndex.INDEX_PATH, index,
         "-" + BuildIndex.INDEX_PARTITIONS, "1" };
 
@@ -23,6 +23,6 @@ public class VerifyLocalTrec45PositionalIndexLP  extends IntegrationTestBaseTrec
   }
 
   public static junit.framework.Test suite() {
-    return new JUnit4TestAdapter(VerifyLocalTrec45PositionalIndexLP.class);
+    return new JUnit4TestAdapter(VerifyLocalCACMPositionalIndexIP.class);
   }
 }

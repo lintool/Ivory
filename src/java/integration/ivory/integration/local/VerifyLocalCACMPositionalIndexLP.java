@@ -8,7 +8,7 @@ import junit.framework.JUnit4TestAdapter;
 
 import org.junit.Test;
 
-public class VerifyLocalTrec45PositionalIndexLP  extends IntegrationTestBaseTrec45 {
+public class VerifyLocalCACMPositionalIndexLP extends IntegrationTestBaseCACM {
   private static final Random RANDOM = new Random();
 
   @Test
@@ -23,6 +23,6 @@ public class VerifyLocalTrec45PositionalIndexLP  extends IntegrationTestBaseTrec
   }
 
   public static junit.framework.Test suite() {
-    return new JUnit4TestAdapter(VerifyLocalTrec45PositionalIndexLP.class);
+    return new JUnit4TestAdapter(VerifyLocalCACMPositionalIndexLP.class);
   }
 }
