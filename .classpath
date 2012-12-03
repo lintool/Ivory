@@ -75,9 +75,12 @@
 	<classpathentry kind="lib" path="lib/servlet-api-2.5-20081211.jar"/>
 	<classpathentry kind="lib" path="lib/tools-1.5.0-javadoc.jar"/>
 	<classpathentry kind="lib" path="lib/tools-1.5.0-sources.jar"/>
-	<classpathentry kind="lib" path="lib/cloud9-1.3.5-javadoc.jar"/>
-	<classpathentry kind="lib" path="lib/cloud9-1.3.5-sources.jar"/>
-	<classpathentry kind="lib" path="lib/cloud9-1.3.5.jar"/>
 	<classpathentry kind="lib" path="lib/stanford-chinese-segmenter-2011-09-14-ivory.jar"/>
+	<classpathentry kind="lib" path="lib/cloud9-1.3.6-javadoc.jar"/>
+	<classpathentry kind="lib" path="lib/cloud9-1.3.6-sources.jar"/>
+	<classpathentry kind="lib" path="lib/cloud9-1.3.6.jar"/>
+	<classpathentry kind="lib" path="lib/gson-2.2.2-javadoc.jar"/>
+	<classpathentry kind="lib" path="lib/gson-2.2.2-sources.jar"/>
+	<classpathentry kind="lib" path="lib/gson-2.2.2.jar"/>
 	<classpathentry kind="output" path="build"/>
 </classpath>
