@@ -62,8 +62,8 @@ public class BuildIndex extends Configured implements Tool {
 
     String indexPath = cmdline.getOptionValue(INDEX_PATH);
 
-    int indexPartitions = cmdline.hasOption(INDEX_PARTITIONS) ? Integer.parseInt(cmdline
-        .getOptionValue(INDEX_PARTITIONS)) : 64;
+    int indexPartitions = cmdline.hasOption(INDEX_PARTITIONS) ?
+        Integer.parseInt(cmdline.getOptionValue(INDEX_PARTITIONS)) : 64;
 
     Configuration conf = getConf();
 
@@ -80,7 +80,7 @@ public class BuildIndex extends Configured implements Tool {
 
       new BuildIPInvertedIndexDocSorted(conf).run();
       new BuildIntPostingsForwardIndex(conf).run();
-    } if (cmdline.hasOption(POSITIONAL_INDEX_LP)) {
+    } else if (cmdline.hasOption(POSITIONAL_INDEX_LP)) {
       LOG.info(String.format(" -%s", POSITIONAL_INDEX_LP));
       conf.set(Constants.IndexPath, indexPath);
       conf.setInt(Constants.NumReduceTasks, indexPartitions);
@@ -104,8 +104,8 @@ public class BuildIndex extends Configured implements Tool {
       new BuildIPInvertedIndexDocSorted(conf).run();
       new BuildIntPostingsForwardIndex(conf).run();
     } else {
-      LOG.info(String.format("Nothing to do: specify either %s or %s", POSITIONAL_INDEX_IP,
-          NONPOSITIONAL_INDEX_IP));
+      LOG.info(String.format("Nothing to do. Specify one of the following: %s, %s, %s",
+          POSITIONAL_INDEX_IP, POSITIONAL_INDEX_LP, NONPOSITIONAL_INDEX_IP));
     }
 
     return 0;

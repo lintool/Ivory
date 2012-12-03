@@ -9,6 +9,7 @@ import ivory.regression.basic.Web09catB_All;
 import ivory.smrf.retrieval.BatchQueryRunner;
 
 import java.util.List;
+import java.util.Random;
 
 import junit.framework.JUnit4TestAdapter;
 
@@ -23,10 +24,11 @@ import com.google.common.collect.Lists;
 
 public class VerifyCluePositionalIndexIP {
   private static final Logger LOG = Logger.getLogger(VerifyCluePositionalIndexIP.class);
+  private static final Random RANDOM = new Random();
 
   private Path collectionPath =
       new Path("/shared/collections/ClueWeb09/collection.compressed.block/en.01");
-  private String index = "/tmp/" + this.getClass().getCanonicalName() + "-index";
+  private String index = this.getClass().getCanonicalName() + "-index-" + RANDOM.nextInt(10000);
 
   @Test
   public void runBuildIndex() throws Exception {
