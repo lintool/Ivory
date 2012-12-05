@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Ivory: Experiments</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Le styles -->
+    <link href="assets/css/bootstrap.css" rel="stylesheet">
+    <link href="assets/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="assets/css/docs.css" rel="stylesheet">
+    <link href="assets/js/google-code-prettify/prettify.css" rel="stylesheet">
+
+  </head>
+
+  <body data-spy="scroll" data-target=".bs-docs-sidebar">
+
+    <!-- Navbar
+    ================================================== -->
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <div class="nav-collapse collapse">
+            <ul class="nav">
+              <li class="">
+                <a href="../index.html">Home</a>
+              </li>
+              <li class="">
+                <a href="./start.html">Get started</a>
+              </li>
+              <li class="">
+                <a href="./publications.html">Publications</a>
+              </li>
+              <li class="active">
+                <a href="./experiments.html">Experiments</a>
+              </li>
+              <li class="">
+                <a href="./team.html">Team</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+<!-- Subhead
+================================================== -->
+<header class="jumbotron subhead" id="overview">
+  <div class="container">
+    <h1>Ivory</h1>
+    <p class="lead">A Hadoop toolkit for web-scale information retrieval research</p>
+  </div>
+</header>
+
+  <div class="container">
+
+<div class="page-header">
+<h2>Experiments: TREC 2009 Web Track Category B</h2>
+</div>
+
+<h3>Baseline models</h3>
+
+<p>These are the same as our runs submitted to the TREC 2009 web
+track.</p>
+
+<pre class="code">
+# command-line 
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/clue/run.web09catB.xml data/clue/queries.web09.xml
+
+# evaluating effectiveness
+trec_eval data/clue/qrels.web09catB.txt ranking.web09catB-bm25.txt
+trec_eval data/clue/qrels.web09catB.txt ranking.web09catB-ql.txt
+
+# junit
+etc/junit.sh ivory.regression.basic.Web09catB_Baseline
+</pre>
+
+<table class="table" style="width: 700px;">
+<thead>
+<tr><td style="width: 375px;"><b>description</b></td>
+    <td style="width: 225px;"><b>tag</b></td>
+    <td style="width: 50px;"><b>MAP</b></td>
+    <td style="width: 50px;"><b>P10</b></td></tr></thead>
+
+<tr><td class="mycell">bm25</td>
+    <td class="mycell">UMHOO-BM25-catB</td>
+    <td class="mycell">0.2051</td>
+    <td class="mycell">0.3720</td></tr>
+
+<tr><td class="mycell">QL</td>
+    <td class="mycell">UMHOO-QL-catB</td>
+    <td class="mycell">0.1931</td>
+    <td class="mycell">0.3380</td></tr>
+
+</table>
+
+<p><b>Dependence Models</b></p>
+
+<p>These runs contrast baseline models with dependence models
+(Dirichlet vs. bm25 term weighting).  SD is Metzler and Croft's
+Sequential Dependence model (SIGIR 2005), and WSD is Bendersky et
+al.'s Weighted Sequential Dependence model (WSDM 2010).  Note that the
+SD model is not trained, since it has hard-coded parameters.  On the
+other hand, the WSD model is trained with all queries from TREC 2009
+(optimizing StatMAP), which makes the WSD figures unrealistically
+high, since we're testing on the training set.</p>
+
+<pre class="code">
+# command-line
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/clue/run.web09catB.all.xml data/clue/queries.web09.xml
+
+# evaluating effectiveness
+trec_eval data/clue/qrels.web09catB.txt ranking.web09catB.all.ql.base.txt
+trec_eval data/clue/qrels.web09catB.txt ranking.web09catB.all.ql.sd.txt
+trec_eval data/clue/qrels.web09catB.txt ranking.web09catB.all.ql.wsd.txt
+trec_eval data/clue/qrels.web09catB.txt ranking.web09catB.all.bm25.base.txt
+trec_eval data/clue/qrels.web09catB.txt ranking.web09catB.all.bm25.sd.txt
+trec_eval data/clue/qrels.web09catB.txt ranking.web09catB.all.bm25.wsd.txt
+
+# junit
+etc/junit.sh ivory.regression.basic.Web09catB_All
+</pre>
+
+<table class="table" style="width: 700px;">
+<thead>
+<tr><td style="width: 375px;"><b>description</b></td>
+    <td style="width: 225px;"><b>tag</b></td>
+    <td style="width: 50px;"><b>MAP</b></td>
+    <td style="width: 50px;"><b>P10</b></td></tr></thead>
+
+<tr><td>Dirichlet</td>
+    <td>ql-base</td>
+    <td>0.1931</td>
+    <td>0.3380</td></tr>
+
+<tr><td>Dirichlet + SD</td>
+    <td>ql-sd</td>
+    <td>0.2048</td>
+    <td>0.3620</td></tr>
+
+<tr><td>Dirichlet + WSD</td>
+    <td>ql-wsd</td>
+    <td>0.2120</td>
+    <td>0.3580</td></tr>
+
+<tr><td>bm25</td>
+    <td>bm25-base</td>
+    <td>0.2051</td>
+    <td>0.3720</td></tr>
+
+<tr><td>bm25 + SD</td>
+    <td>bm25-sd</td>
+    <td>0.2188</td>
+    <td>0.3920</td></tr>
+
+<tr><td>bm25 + WSD</td>
+    <td>bm25-wsd</td>
+    <td>0.2205</td>
+    <td>0.3940</td></tr>
+
+</table>
+
+<h3>Dependence Models + Waterloo spam scores</h3>
+
+<p>These runs are the same as the set above, except they include
+Waterloo spam scores.  Training process started with the above models,
+and then parameter space was explored for the spam weight.  Note that
+these figures are all unrealistically high, since we're testing on the
+training set.</p>
+
+<pre class="code">
+# command-line
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/clue/run.web09catB.all.spam.xml data/clue/queries.web09.xml
+
+# evaluating effectiveness
+trec_eval data/clue/qrels.web09catB.txt ranking.web09catB.spam.ql.base.txt
+trec_eval data/clue/qrels.web09catB.txt ranking.web09catB.spam.ql.sd.txt
+trec_eval data/clue/qrels.web09catB.txt ranking.web09catB.spam.ql.wsd.txt
+trec_eval data/clue/qrels.web09catB.txt ranking.web09catB.spam.bm25.base.txt
+trec_eval data/clue/qrels.web09catB.txt ranking.web09catB.spam.bm25.sd.txt
+trec_eval data/clue/qrels.web09catB.txt ranking.web09catB.spam.bm25.wsd.txt
+
+# junit
+etc/junit.sh ivory.regression.basic.Web09catB_All_Spam
+</pre>
+
+<table class="table" style="width: 700px;">
+<thead>
+<tr><td style="width: 375px;"><b>description</b></td>
+    <td style="width: 225px;"><b>tag</b></td>
+    <td style="width: 50px;"><b>MAP</b></td>
+    <td style="width: 50px;"><b>P10</b></td></tr></thead>
+
+<tr><td>Dirichlet</td>
+    <td>ql-base</td>
+    <td>0.2134</td>
+    <td>0.4540</td></tr>
+
+<tr><td>Dirichlet + SD</td>
+    <td>ql-sd</td>
+    <td>0.2223</td>
+    <td>0.4560</td></tr>
+
+<tr><td>Dirichlet + WSD</td>
+    <td>ql-wsd</td>
+    <td>0.2283</td>
+    <td>0.4160</td></tr>
+
+<tr><td>bm25</td>
+    <td>bm25-base</td>
+    <td>0.2167</td>
+    <td>0.4220</td></tr>
+
+<tr><td>bm25 + SD</td>
+    <td>bm25-sd</td>
+    <td>0.2280</td>
+    <td>0.4420</td></tr>
+
+<tr><td>bm25 + WSD</td>
+    <td>bm25-wsd</td>
+    <td>0.2290</td>
+    <td>0.4340</td></tr>
+
+</table>
+
+
+  </div>
+
+
+
+    <!-- Footer
+    ================================================== -->
+    <footer class="footer">
+      <div class="container">
+        <p class="pull-right"><a href="#">Back to top</a></p>
+        <p>Designed using <a href="http://twitter.github.com/bootstrap/">Bootstrap</a>.</p>
+        <p>Code licensed under <a href="http://www.apache.org/licenses/LICENSE-2.0" target="_blank">Apache License v2.0</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
+      </div>
+    </footer>
+
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="assets/js/jquery.js"></script>
+    <script src="assets/js/google-code-prettify/prettify.js"></script>
+    <script src="assets/js/bootstrap-transition.js"></script>
+    <script src="assets/js/bootstrap-alert.js"></script>
+    <script src="assets/js/bootstrap-modal.js"></script>
+    <script src="assets/js/bootstrap-dropdown.js"></script>
+    <script src="assets/js/bootstrap-scrollspy.js"></script>
+    <script src="assets/js/bootstrap-tab.js"></script>
+    <script src="assets/js/bootstrap-tooltip.js"></script>
+    <script src="assets/js/bootstrap-popover.js"></script>
+    <script src="assets/js/bootstrap-button.js"></script>
+    <script src="assets/js/bootstrap-collapse.js"></script>
+    <script src="assets/js/bootstrap-carousel.js"></script>
+    <script src="assets/js/bootstrap-typeahead.js"></script>
+    <script src="assets/js/bootstrap-affix.js"></script>
+
+  </body>
+</html>
+

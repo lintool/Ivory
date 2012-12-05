@@ -1,12 +1,12 @@
 package ivory.sqe.retrieval;
 
-import ivory.core.exception.ConfigurationException;
+import ivory.core.ConfigurationException;
 import ivory.core.util.ResultWriter;
 import ivory.core.util.XMLTools;
 import ivory.smrf.retrieval.Accumulator;
-import ivory.sqe.querygenerator.CLWordQueryGenerator;
-import ivory.sqe.querygenerator.DefaultBagOfWordQueryGenerator;
+import ivory.sqe.querygenerator.BagOfWordsQueryGenerator;
 import ivory.sqe.querygenerator.MtNQueryGenerator;
+import ivory.sqe.querygenerator.ProbabilisticStructuredQueryGenerator;
 import ivory.sqe.querygenerator.QueryGenerator;
 import ivory.sqe.querygenerator.Utils;
 
@@ -17,17 +17,19 @@ import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.json.JSONObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+
 import com.google.common.collect.Maps;
+
 import edu.umd.cloud9.collection.DocnoMapping;
 
 public class QueryEngine {
@@ -65,11 +67,11 @@ public class QueryEngine {
       mapping = ranker.getDocnoMapping();
       queries = parseQueries(conf.get(Constants.QueriesPath), fs);
       if (conf.get(Constants.QueryType).equals(Constants.CLIR)) {
-        generator = new CLWordQueryGenerator();
+        generator = new ProbabilisticStructuredQueryGenerator();
       }else if (conf.get(Constants.QueryType).equals(Constants.MTN)) {
         generator = new MtNQueryGenerator();
       }else {
-        generator = new DefaultBagOfWordQueryGenerator();
+        generator = new BagOfWordsQueryGenerator();
       }    
       generator.init(fs, conf);
 
@@ -77,15 +79,6 @@ public class QueryEngine {
       e.printStackTrace();
       throw new RuntimeException(e);
     } catch (ConfigurationException e) {
-      e.printStackTrace();
-      throw new RuntimeException(e);
-    }
-  }
-
-  public void init(Configuration conf){
-    try {
-      generator.init(conf);
-    } catch (IOException e) {
       e.printStackTrace();
       throw new RuntimeException(e);
     }
@@ -162,14 +155,14 @@ public class QueryEngine {
         String query = queries.get(qid);
 
         long start = System.currentTimeMillis();
-        JSONObject structuredQuery = generator.parseQuery(query);
+        StructuredQuery structuredQuery = generator.parseQuery(query);
         long end = System.currentTimeMillis();
         LOG.info("Generating " + qid + ": " + ( end - start) + "ms");
         generateTime += ( end - start ) ;
-        LOG.info("<Processed>:::" + runName + ":::" + qid + ":::" + structuredQuery);
+        LOG.info("<Processed>:::" + runName + ":::" + qid + ":::" + structuredQuery.getQuery());
 
         start = System.currentTimeMillis();
-        ranker.rank(qid, structuredQuery, generator.getQueryLength());
+        ranker.rank(qid, structuredQuery.getQuery(), structuredQuery.getQueryLength());
         end = System.currentTimeMillis();
         LOG.info("Ranking " + qid + ": " + ( end - start) + "ms");
         rankTime += ( end - start ) ;
@@ -192,10 +185,8 @@ public class QueryEngine {
   public DocnoMapping getDocnoMapping() {
     return mapping;
   }
-
   
   public Set<String> getModels() {
     return modelSet;
   }
-
 }

@@ -2,7 +2,7 @@
 
      <run>en-fr.phrase</run>
      <query_type>mtN</query_type>
-     <index>/scratch0/fture/indexes/clef_lemonde94-95_sda94-95_nostop-index.fr</index>
+     <index>/scratch0/indexes/clir/clef_lemonde94-95_sda94-95_nostop-index.fr</index>
      <doc_lang>fr</doc_lang>
      <query_lang>en</query_lang>
      <doc_tokenizer>data/tokenizer/fr-token.bin</doc_tokenizer>
@@ -20,9 +20,7 @@
      <scfg_path>data/en-fr.clef06/grammar.en-fr.clef06</scfg_path>
      <kBest>10</kBest>
 
-<doc_stemmed_stopwordlist>data/tokenizer/fr.stop.stemmed</doc_stemmed_stopwordlist>
-<query_stemmed_stopwordlist>data/tokenizer/en.stop.stemmed</query_stemmed_stopwordlist>
-<!--<qrels_path>data/en-fr.clef06/qrels.en-fr.clef06.txt</qrels_path>-->
-
+     <doc_stemmed_stopwordlist>data/tokenizer/fr.stop.stemmed</doc_stemmed_stopwordlist>
+     <query_stemmed_stopwordlist>data/tokenizer/en.stop.stemmed</query_stemmed_stopwordlist>
 
 </parameters>

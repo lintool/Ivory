@@ -1,6 +1,11 @@
 package ivory.core;
 
 public class Constants {
+  /**
+   * Maximum heap size passed to {@code mapred.child.java.opts} via JVM option {@code -Xmx}, in MB;
+   */
+  public static final String MaxHeap = "Ivory.MaxHeap";
+
   public static final String NumMapTasks = "Ivory.NumMapTasks";
   public static final String NumReduceTasks = "Ivory.NumReduceTasks";
   public static final String CollectionName = "Ivory.CollectionName";
@@ -30,4 +35,21 @@ public class Constants {
   public static final String TargetTokenizer = "Ivory.TargetTokenizer";
   public static final String TargetLanguage = "Ivory.TargetLang";
 
+  /**
+   * Memory threshold for the LP indexing algorithm: spill in the map phase after memory fills up to
+   * this fraction. Setting is a value between > 0.0 and < 1.0;
+   */
+  public static final String IndexingMapMemoryThreshold = "Ivory.IndexingMapMemoryThreshold";
+
+  /**
+   * Memory threshold for the LP indexing algorithm: spill in the reduce phase after memory fills up to
+   * this fraction. Setting is a value between > 0.0 and < 1.0;
+   */
+  public static final String IndexingReduceMemoryThreshold = "Ivory.IndexingReduceMemoryThreshold";
+
+  /**
+   * In the LP indexing algorithm, maximum number of documents to process before forcing a flush,
+   * regardless of available memory.
+   */
+  public static final String MaxNDocsBeforeFlush = "Ivory.MaxNDocsBeforeFlush";
 }

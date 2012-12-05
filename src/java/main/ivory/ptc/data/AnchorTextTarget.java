@@ -65,8 +65,8 @@ public class AnchorTextTarget implements WritableComparable<AnchorTextTarget>, I
   /**
    * Constructs a target object from scratch.
    *
-   * @param trget Document id of the target document.
-   * @param src Source documents that point to the target document.
+   * @param trgt Document id of the target document.
+   * @param srcs Source documents that point to the target document.
    * @param wt Weight for the target document.
    */
   public AnchorTextTarget(int trgt, ArrayListOfIntsWritable srcs, float wt) {

@@ -138,8 +138,7 @@ public class IntDocVectorsForwardIndex {
     reader.next(key, value);
 
     if (key.get() != docno) {
-      LOG.error("unable to doc vector for docno " + docno + ": found docno " + key
-          + " instead");
+      LOG.error("unable to doc vector for docno " + docno + ": found docno " + key + " instead");
       reader.close();
       return null;
     }

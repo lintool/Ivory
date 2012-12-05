@@ -14,7 +14,6 @@ import edu.umd.cloud9.mapred.NullInputFormat;
 import edu.umd.cloud9.mapred.NullMapper;
 import edu.umd.cloud9.mapred.NullOutputFormat;
 
-
 @SuppressWarnings({ "deprecation" })
 public class RunQueryEngineHDFS extends Configured implements Tool  {
 
@@ -72,5 +71,4 @@ public class RunQueryEngineHDFS extends Configured implements Tool  {
 	public static void main(String[] args) throws Exception {
 		ToolRunner.run(new RunQueryEngineHDFS(), args);
 	}
-
 }

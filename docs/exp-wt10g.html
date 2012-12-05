@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Ivory: Experiments</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Le styles -->
+    <link href="assets/css/bootstrap.css" rel="stylesheet">
+    <link href="assets/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="assets/css/docs.css" rel="stylesheet">
+    <link href="assets/js/google-code-prettify/prettify.css" rel="stylesheet">
+
+  </head>
+
+  <body data-spy="scroll" data-target=".bs-docs-sidebar">
+
+    <!-- Navbar
+    ================================================== -->
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <div class="nav-collapse collapse">
+            <ul class="nav">
+              <li class="">
+                <a href="../index.html">Home</a>
+              </li>
+              <li class="">
+                <a href="./start.html">Get started</a>
+              </li>
+              <li class="">
+                <a href="./publications.html">Publications</a>
+              </li>
+              <li class="active">
+                <a href="./experiments.html">Experiments</a>
+              </li>
+              <li class="">
+                <a href="./team.html">Team</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+<!-- Subhead
+================================================== -->
+<header class="jumbotron subhead" id="overview">
+  <div class="container">
+    <h1>Ivory</h1>
+    <p class="lead">A Hadoop toolkit for web-scale information retrieval research</p>
+  </div>
+</header>
+
+  <div class="container">
+
+<div class="page-header">
+<h2>Experiments: Wt10g</h2>
+</div>
+
+<p>This tutorial provides a guide to batch retrieval with Ivory on
+<a href="http://ir.dcs.gla.ac.uk/test_collections/wt10g.html">Wt10g</a>,
+a document collection which is distributed by the
+<a href="http://www.gla.ac.uk/">University of Glasgow</a> and used in
+many <a href="http://trec.nist.gov/">Text Retrieval Conferences</a>
+(TRECs).  The collection is somewhat dated and small, by web collection
+standards, but is still useful for experimentation.  For newer, larger
+Web data sets, please see the guides for getting started
+with <a href="gov2.html">Gov2</a> and <a href="clue.html">ClueWeb</a>.
+This guide will cover both indexing the collection and performing retrieval
+runs with queries from the 2000 and 2001 TREC Web tracks</p>
+
+<table><tr><td valign="top"><span class="label label-info">Info</span></td>
+<td style="padding-left: 10px">The procedures for preparing the Wt10g
+collection is quite similar to working with TREC disks 4-5, which is
+described in <a href="exp-trec45.html">a separate tutorial</a>, so
+that might be a good starting point.</td></tr></table>
+
+<h3>Prerequisites</h3>
+
+<p>The first task is to obtain the collection (from the <a
+href="http://ir.dcs.gla.ac.uk/test_collections/access_to_data.html">University
+of Glasgow</a>). There are a total of 1,692,096 documents in the
+collection. The data is distributed in 104 directories (WTX001 to
+WTX104), with each directory, except for the last, consisting of 50
+files (B01.gz to B50.gz). The last directory consists of just 7 files
+(B01.gz to B07.gz). Therefore, there are a total of 5,157 input
+files. Each file consists of multiple of Web pages stored in an SGML
+format known as TREC Web format.  In Hadoop it's easiest to work with
+the collection as block-uncompressed SequenceFiles, so you'll want to
+first repack the original Wt10g files.  See <a
+href="http://lintool.github.com/Cloud9/docs/content/clue.html">this
+guide</a> for more information.</p>
+
+<p>There's a program in <a
+href="http://cloud9lib.org/">Cloud<sup><small>9</small></sup></a> for
+repacking the collection:</p>
+
+<pre class="code">
+hadoop jar cloud9.jar edu.umd.cloud9.collection.trecweb.RepackWt10gDocuments \
+  /shared/wt10g/ /shared/wt10g-repacked/ block
+</pre>
+
+<p>The first command-line argument is the base path of your Wt10g
+distribution; the second is the output path; the third is "block" to
+specify block-level compression.</p>
+
+<p>To demonstrate batch retrieval, we're going to use topics from the
+2000 and 2001 TREC Web tracks.  In the <code>data/wt10g/</code>
+directory, you'll find the following data:</p>
+
+<ul>
+
+  <li><code><a href="../data/wt10g/run.wt10g.basic.xml">data/wt10g/run.wt10g.basic.xml</a></code>:
+  retrieval models and parameters</li>
+
+  <li><code><a href="../data/wt10g/queries.wt10g.451-500.xml">data/wt10g/queries.wt10g.451-500.xml</a></code>:
+  queries (TREC 2000 Web track)</li>
+
+  <li><code><a href="../data/wt10g/queries.wt10g.501-550.xml">data/wt10g/queries.wt10g.501-550.xml</a></code>:
+  queries (TREC 2001 Web track)</li>
+
+  <li><code><a href="../data/wt10g/qrels.wt10g.all">data/wt10g/qrels.wt10g.all</a></code>:
+  document relevance information (qrels).</li>
+</ul>
+
+<p>The first configuration file specifies six different models:</p>
+
+<ul>
+
+  <li><b>wt10g-dir-base</b>: language modeling framework, Dirichlet
+  prior, simple query likelihood.</li>
+
+  <li><b>wt10g-dir-sd</b>: language modeling framework, Dirichlet
+  prior, sequential dependence model using MRFs.</li>
+
+  <li><b>wt10g-dir-fd</b>: language modeling framework, Dirichlet
+  prior, full dependence model using MRFs.</li>
+
+  <li><b>wt10g-bm25-base</b>: <i>bm25</i> term weighting, simple
+  bag-of-words queries.</li>
+
+  <li><b>wt10g-bm25-sd</b>: sequential dependence model using MRFs,
+  with <i>bm25</i> term weighting.</li>
+
+  <li><b>wt10g-bm25-fd</b>: full dependence models using MRFs,
+  with <i>bm25</i> term weighting.</li>
+
+</ul>
+
+<hr/>
+<table><tr><td valign="top"><span class="label label-info">Info</span></td>
+<td style="padding-left: 10px">Before running
+the following experiments, make sure you've built
+the <code>trec_eval</code> evaluation package
+from <a href="http://trec.nist.gov/trec_eval/">NIST</a>. For your
+convenience, v9.0 is included
+in <code>etc/trec_eval.9.0.tar.gz</code>. Build the package
+by <code>make</code> and place the executable at <code>etc/trec_eval</code>.</td></tr></table>
+
+<table><tr><td valign="top"><span class="label label-info">Info</span></td>
+<td style="padding-left: 10px">Before running
+the following experiments, make sure to change the index location in
+<code><a href="../data/wt10g/run.wt10g.basic.xml">data/wt10g/run.wt10g.basic.xml</a></code>
+to the actual index path (under the
+<code>&lt;index&gt;</code> attribute).</td></tr></table>
+
+<hr/>
+
+<p>Here are the command-line invocations for running and evaluating
+the models:</p>
+
+<pre class="code">
+# command-line
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal \
+  data/wt10g/run.wt10g.basic.xml data/wt10g/queries.wt10g.451-500.xml data/wt10g/queries.wt10g.501-550.xml
+
+# evaluating effectiveness
+trec_eval data/wt10g/qrels.wt10g.all ranking.wt10g-dir-base.txt
+trec_eval data/wt10g/qrels.wt10g.all ranking.wt10g-dir-sd.txt
+trec_eval data/wt10g/qrels.wt10g.all ranking.wt10g-dir-fd.txt
+trec_eval data/wt10g/qrels.wt10g.all ranking.wt10g-bm25-base.txt
+trec_eval data/wt10g/qrels.wt10g.all ranking.wt10g-bm25-sd.txt
+trec_eval data/wt10g/qrels.wt10g.all ranking.wt10g-bm25-fd.txt
+
+# junit
+etc/junit.sh ivory.regression.basic.Wt10g_Basic
+</pre>
+
+<table class="table" style="width: 700px;">
+<thead>
+<tr><td style="width: 375px;"><b>description</b></td>
+    <td style="width: 225px;"><b>tag</b></td>
+    <td style="width: 50px;"><b>MAP</b></td>
+    <td style="width: 50px;"><b>P10</b></td></tr></thead>
+
+<tr><td>Dirichlet, full independence</td>
+    <td>wt10g-dir-base</td>
+    <td>0.2093</td>
+    <td>0.3131</td></tr>
+
+<tr><td>Dirichlet, sequential dependence</td>
+    <td>wt10g-dir-sd</td>
+    <td>0.2187</td>
+    <td>0.3192</td></tr>
+
+<tr><td>Dirichlet, full dependence</td>
+    <td>wt10g-dir-fd</td>
+    <td>0.2205</td>
+    <td>0.3242</td></tr>
+
+<tr><td>bm25, full independence</td>
+    <td>wt10g-bm25-base</td>
+    <td>0.2105</td>
+    <td>0.3202</td></tr>
+
+<tr><td>bm25, sequential dependence</td>
+    <td>wt10g-bm25-sd</td>
+    <td>0.2248</td>
+    <td>0.3333</td></tr>
+
+<tr><td>bm25, full dependence</td>
+    <td>wt10g-bm25-fd</td>
+    <td>0.2226</td>
+    <td>0.3394</td></tr>
+
+</table>
+
+  </div>
+
+
+
+    <!-- Footer
+    ================================================== -->
+    <footer class="footer">
+      <div class="container">
+        <p class="pull-right"><a href="#">Back to top</a></p>
+        <p>Designed using <a href="http://twitter.github.com/bootstrap/">Bootstrap</a>.</p>
+        <p>Code licensed under <a href="http://www.apache.org/licenses/LICENSE-2.0" target="_blank">Apache License v2.0</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
+      </div>
+    </footer>
+
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="assets/js/jquery.js"></script>
+    <script src="assets/js/google-code-prettify/prettify.js"></script>
+    <script src="assets/js/bootstrap-transition.js"></script>
+    <script src="assets/js/bootstrap-alert.js"></script>
+    <script src="assets/js/bootstrap-modal.js"></script>
+    <script src="assets/js/bootstrap-dropdown.js"></script>
+    <script src="assets/js/bootstrap-scrollspy.js"></script>
+    <script src="assets/js/bootstrap-tab.js"></script>
+    <script src="assets/js/bootstrap-tooltip.js"></script>
+    <script src="assets/js/bootstrap-popover.js"></script>
+    <script src="assets/js/bootstrap-button.js"></script>
+    <script src="assets/js/bootstrap-collapse.js"></script>
+    <script src="assets/js/bootstrap-carousel.js"></script>
+    <script src="assets/js/bootstrap-typeahead.js"></script>
+    <script src="assets/js/bootstrap-affix.js"></script>
+
+  </body>
+</html>
+

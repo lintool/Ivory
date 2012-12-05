@@ -1,8 +1,8 @@
 package ivory.sqe.retrieval;
 
+import ivory.core.ConfigurationException;
 import ivory.core.eval.Qrels;
 import ivory.core.eval.RankedListEvaluator;
-import ivory.core.exception.ConfigurationException;
 import ivory.smrf.retrieval.Accumulator;
 import ivory.sqe.querygenerator.Utils;
 
@@ -30,11 +30,8 @@ import org.xml.sax.SAXException;
 
 import edu.umd.cloud9.collection.DocnoMapping;
 
-
 public class RunQueryEngine {
-
   private static final Logger LOG = Logger.getLogger(RunQueryEngine.class);
-  FileSystem fs;
 
   public static void main(String[] args) throws Exception {
     Configuration conf = parseArgs(args);
@@ -65,7 +62,7 @@ public class RunQueryEngine {
           LOG.info("Best = "+MAP+"\t"+1+"\t"+0);
         }
 
-      }else {
+      } else {
         // do a grid search on (lambda1,lambda2)
         gridSearch(qe, conf);
       }
@@ -74,7 +71,7 @@ public class RunQueryEngine {
     }
   }
 
-  private static void gridSearch(QueryEngine qe, Configuration conf) {
+  private static void gridSearch(QueryEngine qe, Configuration conf) throws IOException {
     long start, end;
     float bestMAP=0, bestLambda1=0, bestLambda2=0;
     for (float lambda1 = 0f; lambda1 <= 1.01f; lambda1=lambda1+0.1f) {
@@ -84,7 +81,8 @@ public class RunQueryEngine {
         conf.setFloat(Constants.MTWeight, lambda1);
         conf.setFloat(Constants.BitextWeight, lambda2);
         conf.setFloat(Constants.SCFGWeight, 1-lambda1-lambda2);
-        qe.init(conf);    // set three weights
+
+        qe.init(conf, FileSystem.get(conf));    // set three weights
 
         LOG.info("Running the queries ...");
         start = System.currentTimeMillis();

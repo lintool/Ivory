@@ -12,7 +12,6 @@ ivory.core.data.index
 ivory.core.data.stat
 ivory.core.driver
 ivory.core.eval
-ivory.core.exception
 ivory.core.index
 ivory.core.preprocess
 ivory.core.tokenize

@@ -3,8 +3,8 @@ package ivory.sqe.querygenerator;
 import ivory.core.tokenize.Tokenizer;
 import ivory.sqe.retrieval.Constants;
 import ivory.sqe.retrieval.PairOfFloatMap;
+
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -15,13 +15,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
-import org.json.JSONArray;
-import org.json.JSONException;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonPrimitive;
+
 import edu.umd.cloud9.io.map.HMapSFW;
 import edu.umd.cloud9.io.pair.PairOfStringFloat;
 import edu.umd.cloud9.util.array.ArrayListOfInts;
@@ -104,7 +107,6 @@ public class Utils {
   /**
    * For a 1-to-many alignment, check if the source token is aligned to a consecutive sequence of target tokens 
    * @param lst
-   * @return
    */
   private static boolean isConsecutive(ArrayListOfInts lst) {
     int prev = -1;
@@ -123,7 +125,6 @@ public class Utils {
    *    read grammar file from Configuration object
    * @param docLangTokenizer
    *    to check for stopwords on RHS
-   * @return
    */
   public static Map<String, HMapSFW> generateTranslationTable(FileSystem fs, Configuration conf, Tokenizer docLangTokenizer) {
     String grammarFile = readConf(conf);
@@ -267,34 +268,11 @@ public class Utils {
   }
 
   /**
-   * Convert prob. distribution to JSONArray in which float at position 2k corresponds to probabilities of term at position 2k+1, k=0...(n/2-1)
-   * @param probMap
-   * @return
-   */
-  public static JSONArray probMap2JSON(HMapSFW probMap) {
-    if (probMap == null) {
-      return null;
-    }
-
-    JSONArray arr = new JSONArray();
-    try {
-      for(Entry<String> entry : probMap.entrySet()) {
-        arr.put(entry.getValue());
-        arr.put(entry.getKey());
-      }
-    } catch (JSONException e) {
-      e.printStackTrace();
-    }
-    return arr;
-  }
-
-  /**
    * Scale a probability distribution (multiply each entry with <i>scale</i>), then filter out entries below <i>threshold</i>
    * 
    * @param threshold
    * @param scale
    * @param probMap
-   * @return
    */
   public static HMapSFW scaleProbMap(float threshold, float scale, HMapSFW probMap) {
     HMapSFW scaledProbMap = new HMapSFW();
@@ -316,7 +294,6 @@ public class Utils {
    *    value between 0 and 1 that determines total probability in final distribution (e.g., 0.2 scale will scale [0.8 0.1 0.1] into [0.16 0.02 0.02])
    * @param probMaps
    *    list of probability distributions
-   * @return
    */
   public static HMapSFW combineProbMaps(float threshold, float scale, List<PairOfFloatMap> probMaps) {
     HMapSFW combinedProbMap = new HMapSFW();
@@ -416,7 +393,6 @@ public class Utils {
    *    no stopword removal, stemming enabled  
    * @param docLangTokenizer
    *    no stopword removal, stemming enabled
-   * @return
    */
   public static Map<String, String> getStemMapping(String origQuery, Tokenizer queryLangTokenizer, Tokenizer queryLangTokenizerWithStemming, Tokenizer docLangTokenizer) {
     Map<String, String> map = new HashMap<String, String>();
@@ -441,4 +417,30 @@ public class Utils {
           "-" + (int) (100*conf.getFloat(Constants.BitextWeight, 0))+ 
           "-" + (int) (100*conf.getFloat(Constants.TokenWeight, 0));
   }
+
+  public static JsonArray createJsonArray(String[] elements) {
+    JsonArray arr = new JsonArray();
+    for (String s: elements) {
+      arr.add(new JsonPrimitive(s));
+    }
+    return arr;
+  }
+
+  /**
+   * Convert prob. distribution to JSONArray in which float at position 2k corresponds to probabilities of term at position 2k+1, k=0...(n/2-1)
+   * @param probMap
+   */
+  public static JsonArray createJsonArrayFromProbabilities(HMapSFW probMap) {
+    if (probMap == null) {
+      return null;
+    }
+
+    JsonArray arr = new JsonArray();
+    for(Entry<String> entry : probMap.entrySet()) {
+      arr.add(new JsonPrimitive(entry.getValue()));
+      arr.add(new JsonPrimitive(entry.getKey()));
+    }
+    return arr;
+  }
+
 }
