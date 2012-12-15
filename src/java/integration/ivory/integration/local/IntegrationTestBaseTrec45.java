@@ -1,9 +1,7 @@
 package ivory.integration.local;
 
 import static org.junit.Assert.assertTrue;
-import ivory.app.BuildIndex;
 import ivory.app.PreprocessCollection;
-import ivory.app.PreprocessTrec45;
 import ivory.core.eval.Qrels;
 import ivory.integration.IntegrationUtils;
 import ivory.regression.basic.Robust04_Basic;
@@ -21,7 +19,7 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
 public class IntegrationTestBaseTrec45 {
-  private static final Logger LOG = Logger.getLogger(VerifyLocalTrec45PositionalIndexIP.class);
+  private static final Logger LOG = Logger.getLogger(IntegrationTestBaseTrec45.class);
   private static final Path collectionPath = new Path("/scratch0/collections/trec/trec4-5_noCRFR.xml");
 
   public void runBuildIndex(String index, String[] args) throws Exception {
@@ -35,7 +33,6 @@ public class IntegrationTestBaseTrec45 {
     List<String> jars = Lists.newArrayList();
     jars.add(IntegrationUtils.getJar("lib", "cloud9"));
     jars.add(IntegrationUtils.getJar("lib", "guava-13"));
-    jars.add(IntegrationUtils.getJar("lib", "guava-r09"));
     jars.add(IntegrationUtils.getJar("lib", "dsiutils"));
     jars.add(IntegrationUtils.getJar("lib", "fastutil"));
     jars.add(IntegrationUtils.getJar("lib", "jsap"));
@@ -46,12 +43,19 @@ public class IntegrationTestBaseTrec45 {
 
     String libjars = String.format("-libjars=%s", Joiner.on(",").join(jars));
 
-    PreprocessTrec45.main(new String[] { libjars,
-        IntegrationUtils.D_JT_LOCAL, IntegrationUtils.D_NN_LOCAL,
+    String[] cmdArgs = new String[] { "hadoop --config . jar",
+        IntegrationUtils.getJar("dist", "ivory"),
+        ivory.app.PreprocessTrec45.class.getCanonicalName(), libjars,
         "-" + PreprocessCollection.COLLECTION_PATH, collectionPath.toString(),
-        "-" + PreprocessCollection.INDEX_PATH, index });
-    BuildIndex.main((String[]) ArrayUtils.addAll(new String[] { libjars,
-        IntegrationUtils.D_JT_LOCAL, IntegrationUtils.D_NN_LOCAL }, args));
+        "-" + PreprocessCollection.INDEX_PATH, index };
+
+    IntegrationUtils.exec(Joiner.on(" ").join(cmdArgs));
+
+    cmdArgs = (String[]) ArrayUtils.addAll(new String[] { 
+        "hadoop --config . jar", IntegrationUtils.getJar("dist", "ivory"),
+        ivory.app.BuildIndex.class.getCanonicalName(), libjars, }, args);
+
+    IntegrationUtils.exec(Joiner.on(" ").join(cmdArgs));
 
     // Done with indexing, now do retrieval run.
     String[] params = new String[] {

@@ -45,6 +45,6 @@ public class PreprocessTrecCollection extends PreprocessCollection {
       s.add(e.getValue());
     }
 
-    ToolRunner.run(new PreprocessTrec45(), s.toArray(new String[s.size()]));
+    ToolRunner.run(new PreprocessTrecCollection(), s.toArray(new String[s.size()]));
   }
 }
