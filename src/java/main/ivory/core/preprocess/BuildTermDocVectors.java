@@ -359,8 +359,11 @@ public class BuildTermDocVectors extends PowerTool {
     env.writeTokenizerClass(tokenizer);
     env.writeDocnoOffset(docnoOffset);
 
-    conf.set("mapred.child.java.opts", "-Xmx2048m");
-    conf.set("mapred.task.timeout", "6000000");			// needed for stragglers (e.g., very long documents in Wikipedia)
+    //conf.set("mapred.child.java.opts", "-Xmx2048m");
+    //conf.set("mapred.task.timeout", "6000000");			// needed for stragglers (e.g., very long documents in Wikipedia)
+
+    conf.set("mapreduce.map.memory.mb", "2048");
+    conf.set("mapreduce.map.java.opts", "-Xmx2048m");
 
     Job job1 = new Job(conf,
         BuildTermDocVectors.class.getSimpleName() + ":" + collectionName);

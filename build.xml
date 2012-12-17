@@ -287,6 +287,9 @@
 			<equals arg1="${platform}" arg2="windows" />
 		</condition>
 
+		<echo file="./etc/run-integration.${suffix}" message="${script_prefix}" />
+		<echo file="./etc/run-integration.${suffix}" message="${line.separator}ant clean${line.separator}ant${line.separator}ant -lib etc/mail.jar integration${line.separator}" append="true" />
+
 		<echo file="./etc/junit.${suffix}" message="${script_prefix}" />
 		<echo file="./etc/junit.${suffix}" message="${java_command} org.junit.runner.JUnitCore " append="true" />
 		<echo file="./etc/junit.${suffix}" message="${param_prefix}1" append="true" />

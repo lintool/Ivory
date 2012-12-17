@@ -51,6 +51,7 @@ public class VerifyClefFrenchPositionalIndexIP {
     jars.add(IntegrationUtils.getJar("lib", "commons-lang"));
     jars.add(IntegrationUtils.getJar("lib", "commons-cli"));
     jars.add(IntegrationUtils.getJar("lib", "bliki-core"));
+    jars.add(IntegrationUtils.getJar("dist", "ivory"));
 
     String libjars = String.format("-libjars=%s", Joiner.on(",").join(jars));
 

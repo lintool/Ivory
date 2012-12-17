@@ -102,6 +102,12 @@ public class BuildWeightedTermDocVectors extends PowerTool {
         dfFile = env.getDfByIntData();
         dlFile = env.getDoclengthsData().toString();
 
+        termsFile = termsFile.substring(termsFile.lastIndexOf("/") + 1);
+        termidsFile = termidsFile.substring(termidsFile.lastIndexOf("/") + 1);
+        idToTermFile = idToTermFile.substring(idToTermFile.lastIndexOf("/") + 1);
+        dfFile = dfFile.substring(dfFile.lastIndexOf("/") + 1);
+        dlFile = dlFile.substring(dlFile.lastIndexOf("/") + 1);
+
         // We need to figure out which file in the DistributeCache is which...
         localFiles = DistributedCache.getLocalCacheFiles(conf);
         for (Path p : localFiles) {

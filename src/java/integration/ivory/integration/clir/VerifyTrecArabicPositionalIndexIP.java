@@ -46,7 +46,8 @@ public class VerifyTrecArabicPositionalIndexIP {
     jars.add(IntegrationUtils.getJar("lib", "commons-collections"));
     jars.add(IntegrationUtils.getJar("lib", "lucene-analyzers"));
     jars.add(IntegrationUtils.getJar("lib", "lucene-core"));
-    
+    jars.add(IntegrationUtils.getJar("dist", "ivory"));
+
     String libjars = String.format("-libjars=%s", Joiner.on(",").join(jars));
 
     fs.copyFromLocalFile(false, true, new Path("data/vocab/vocab.en-ar.en"),

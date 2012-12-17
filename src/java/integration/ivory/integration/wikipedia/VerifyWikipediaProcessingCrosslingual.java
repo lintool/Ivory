@@ -112,6 +112,7 @@ public class VerifyWikipediaProcessingCrosslingual {
     jars.add(IntegrationUtils.getJar("lib", "maxent"));
     jars.add(IntegrationUtils.getJar("lib", "lucene-analyzers"));
     jars.add(IntegrationUtils.getJar("lib", "lucene-core"));
+    jars.add(IntegrationUtils.getJar("dist", "ivory"));
 
     String libjars = String.format("-libjars=%s", Joiner.on(",").join(jars));
 
@@ -189,6 +190,7 @@ public class VerifyWikipediaProcessingCrosslingual {
     jars.add(IntegrationUtils.getJar("lib", "maxent"));
     jars.add(IntegrationUtils.getJar("lib", "lucene-analyzers"));
     jars.add(IntegrationUtils.getJar("lib", "lucene-core"));
+    jars.add(IntegrationUtils.getJar("dist", "ivory"));
 
     String libjars = String.format("-libjars=%s", Joiner.on(",").join(jars));
 
