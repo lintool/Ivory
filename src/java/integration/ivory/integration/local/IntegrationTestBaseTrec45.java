@@ -43,17 +43,18 @@ public class IntegrationTestBaseTrec45 {
 
     String libjars = String.format("-libjars=%s", Joiner.on(",").join(jars));
 
-    String[] cmdArgs = new String[] { "hadoop --config . jar",
+    String[] cmdArgs = new String[] { "hadoop jar",
         IntegrationUtils.getJar("dist", "ivory"),
-        ivory.app.PreprocessTrec45.class.getCanonicalName(), libjars,
+        ivory.app.PreprocessTrec45.class.getCanonicalName(),
+        IntegrationUtils.LOCAL_ARGS, libjars,
         "-" + PreprocessCollection.COLLECTION_PATH, collectionPath.toString(),
         "-" + PreprocessCollection.INDEX_PATH, index };
 
     IntegrationUtils.exec(Joiner.on(" ").join(cmdArgs));
 
     cmdArgs = (String[]) ArrayUtils.addAll(new String[] { 
-        "hadoop --config . jar", IntegrationUtils.getJar("dist", "ivory"),
-        ivory.app.BuildIndex.class.getCanonicalName(), libjars, }, args);
+        "hadoop jar", IntegrationUtils.getJar("dist", "ivory"),
+        ivory.app.BuildIndex.class.getCanonicalName(), IntegrationUtils.LOCAL_ARGS, libjars }, args);
 
     IntegrationUtils.exec(Joiner.on(" ").join(cmdArgs));
 

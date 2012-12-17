@@ -44,7 +44,6 @@ public class VerifyClefFrenchPositionalIndexIP {
     jars.add(IntegrationUtils.getJar("lib", "jsap"));
     jars.add(IntegrationUtils.getJar("lib", "sux4j"));
     jars.add(IntegrationUtils.getJar("lib", "commons-collections"));
-    jars.add(IntegrationUtils.getJar("dist", "ivory"));
     jars.add(IntegrationUtils.getJar("lib", "lucene-analyzers"));
     jars.add(IntegrationUtils.getJar("lib", "lucene-core"));
     jars.add(IntegrationUtils.getJar("lib", "tools"));

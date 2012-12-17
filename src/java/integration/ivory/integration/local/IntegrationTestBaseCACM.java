@@ -50,9 +50,9 @@ public abstract class IntegrationTestBaseCACM {
 
     String libjars = String.format("-libjars=%s", Joiner.on(",").join(jars));
 
-    String[] cmdArgs = new String[] { "hadoop --config . jar",
-        IntegrationUtils.getJar("dist", "ivory"),
-        ivory.app.PreprocessTrecCollection.class.getCanonicalName(), libjars,
+    String[] cmdArgs = new String[] { "hadoop jar", IntegrationUtils.getJar("dist", "ivory"),
+        ivory.app.PreprocessTrecCollection.class.getCanonicalName(),
+        IntegrationUtils.LOCAL_ARGS, libjars,
         "-" + PreprocessCollection.COLLECTION_NAME, "CACM",
         "-" + PreprocessCollection.COLLECTION_PATH, collectionPath.toString(),
         "-" + PreprocessCollection.INDEX_PATH, index };
@@ -60,8 +60,8 @@ public abstract class IntegrationTestBaseCACM {
     IntegrationUtils.exec(Joiner.on(" ").join(cmdArgs));
 
     cmdArgs = (String[]) ArrayUtils.addAll(new String[] { 
-        "hadoop --config . jar", IntegrationUtils.getJar("dist", "ivory"),
-        ivory.app.BuildIndex.class.getCanonicalName(), libjars, }, args);
+        "hadoop jar", IntegrationUtils.getJar("dist", "ivory"),
+        ivory.app.BuildIndex.class.getCanonicalName(), IntegrationUtils.LOCAL_ARGS, libjars}, args);
 
     IntegrationUtils.exec(Joiner.on(" ").join(cmdArgs));
 
