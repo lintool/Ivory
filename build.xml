@@ -26,11 +26,13 @@
     <path location="${build.dir}" />
   </path>
   <path id="libjars.path.id">
+    <fileset dir="${dist.dir}/" includes="ivory*.jar"/>
     <fileset dir="${lib.dir}/" includes="cloud9*.jar"/>
     <fileset dir="${lib.dir}/" includes="guava*.jar"/>
     <fileset dir="${lib.dir}/" includes="dsi*.jar"/>
     <fileset dir="${lib.dir}/" includes="fastutil*.jar"/>
     <fileset dir="${lib.dir}/" includes="sux4j*.jar"/>
+    <fileset dir="${lib.dir}/" includes="jsap*.jar"/>
     <fileset dir="${lib.dir}/" includes="commons-collections*.jar"/>
   </path>
 
@@ -257,7 +259,7 @@
 	<target name="scripts" depends="jar">
 		<pathconvert property="run.path.id" refid="run.path.id" targetos="${platform}" />
 		<pathconvert property="lib.path.id" refid="lib.path.id" targetos="${platform}" />
-		<pathconvert property="libjars.path.id" refid="libjars.path.id" targetos="${platform}" />
+		<pathconvert property="libjars.path.id" refid="libjars.path.id" targetos="${platform}" pathsep="," />
 
 		<condition property="suffix" value="sh">
 			<equals arg1="${platform}" arg2="unix" />
