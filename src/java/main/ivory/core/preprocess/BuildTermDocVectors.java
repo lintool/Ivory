@@ -365,7 +365,7 @@ public class BuildTermDocVectors extends PowerTool {
     conf.set("mapreduce.map.memory.mb", "2048");
     conf.set("mapreduce.map.java.opts", "-Xmx2048m");
 
-    Job job1 = new Job(conf,
+    Job job1 = Job.getInstance(conf,
         BuildTermDocVectors.class.getSimpleName() + ":" + collectionName);
     job1.setJarByClass(BuildTermDocVectors.class);
 
@@ -414,7 +414,7 @@ public class BuildTermDocVectors extends PowerTool {
 
     LOG.info("Writing doc length data to " + dlFile + "...");
 
-    Job job2 = new Job(conf, "DocLengthTable:" + collectionName);
+    Job job2 = Job.getInstance(conf, "DocLengthTable:" + collectionName);
     job2.setJarByClass(BuildTermDocVectors.class);
 
     job2.setNumReduceTasks(0);

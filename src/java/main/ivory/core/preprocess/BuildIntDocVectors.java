@@ -182,7 +182,8 @@ public class BuildIntDocVectors extends PowerTool {
     conf.set("mapreduce.reduce.memory.mb", "2048");
     conf.set("mapreduce.reduce.java.opts", "-Xmx2048m");
 
-    Job job = new Job(conf, BuildIntDocVectors.class.getSimpleName() + ":" + collectionName);
+    Job job = Job.getInstance(conf,
+        BuildIntDocVectors.class.getSimpleName() + ":" + collectionName);
     job.setJarByClass(BuildIntDocVectors.class);
 
     job.setNumReduceTasks(0);
