@@ -77,6 +77,7 @@ public class BigramChineseTokenizer extends Tokenizer {
       out.write(s+"\n");
     }
     out.close();
+    in.close();
   }
 
   @Override

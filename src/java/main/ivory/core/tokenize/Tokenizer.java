@@ -277,6 +277,7 @@ public abstract class Tokenizer {
           s += token+" ";
         }
         out.write(s+"\n");
+        in.close();
       }
       out.close();
 

@@ -63,7 +63,7 @@ public class TokenizerFactory {
       conf.set(Constants.Language, lang);
       conf.set(Constants.TokenizerData, modelPath);
       
-      Class tokenizerClass = getTokenizerClass(lang);
+      Class<? extends Tokenizer> tokenizerClass = getTokenizerClass(lang);
       Tokenizer tokenizer = (Tokenizer) tokenizerClass.newInstance();
 //      if(lang.equals("zh")){
 //        tokenizer = new StanfordChineseTokenizer();
@@ -87,7 +87,7 @@ public class TokenizerFactory {
     }
   }
 
-  public static Class getTokenizerClass(String lang) {
+  public static Class<? extends Tokenizer> getTokenizerClass(String lang) {
     if (lang.equals("zh")) {
       return StanfordChineseTokenizer.class;
     }else if(lang.equals("de") || lang.equals("en") || lang.equals("fr")) {

@@ -1,15 +1,14 @@
 package ivory.core.tokenize;
 
 import ivory.core.Constants;
-import java.io.BufferedReader;
-import java.io.FileInputStream;
+
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.HashSet;
 import java.util.Set;
+
 import opennlp.tools.tokenize.Tokenizer;
 import opennlp.tools.tokenize.TokenizerME;
 import opennlp.tools.tokenize.TokenizerModel;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
@@ -18,6 +17,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.mortbay.log.Log;
 import org.tartarus.snowball.SnowballStemmer;
+
 import edu.umd.hooka.VocabularyWritable;
 import edu.umd.hooka.alignment.HadoopAlign;
 
@@ -113,10 +113,10 @@ public class OpenNLPTokenizer extends ivory.core.tokenize.Tokenizer {
     }else{
       sLogger.warn("Language not recognized, setting to English!");
     }
-    Class stemClass;
+    Class<? extends SnowballStemmer> stemClass;
     try {
-      stemClass = Class.forName("org.tartarus.snowball.ext." +
-          languages[lang] + "Stemmer");
+      stemClass = (Class<? extends SnowballStemmer>)
+          Class.forName("org.tartarus.snowball.ext." + languages[lang] + "Stemmer");
       stemmer = (SnowballStemmer) stemClass.newInstance();
     } catch (ClassNotFoundException e) {
       sLogger.warn("Stemmer class not recognized!\n"+"org.tartarus.snowball.ext." +

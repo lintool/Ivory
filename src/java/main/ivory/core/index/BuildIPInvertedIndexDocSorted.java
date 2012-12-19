@@ -247,7 +247,7 @@ public class BuildIPInvertedIndexDocSorted extends PowerTool {
     int reduceTasks = conf.getInt(Constants.NumReduceTasks, 0);
     int minSplitSize = conf.getInt(Constants.MinSplitSize, 0);
     int collectionDocCnt = env.readCollectionDocumentCount();
-    int maxHeap = conf.getInt(Constants.MaxHeap, 2048);
+    //int maxHeap = conf.getInt(Constants.MaxHeap, 2048);
 
     String postingsType = conf.get(Constants.PostingsListsType,
         PostingsListDocSortedPositional.class.getCanonicalName());
