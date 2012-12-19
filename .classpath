@@ -15,9 +15,6 @@
 	<classpathentry kind="lib" path="lib/avro-1.7.1.cloudera.2.jar"/>
 	<classpathentry kind="lib" path="lib/bliki-core-3.0.16.jar"/>
 	<classpathentry kind="lib" path="lib/cglib-2.2.1-v20090111.jar"/>
-	<classpathentry kind="lib" path="lib/cloud9-1.3.6-javadoc.jar"/>
-	<classpathentry kind="lib" path="lib/cloud9-1.3.6-sources.jar"/>
-	<classpathentry kind="lib" path="lib/cloud9-1.3.6.jar"/>
 	<classpathentry kind="lib" path="lib/collections-generic-4.01.jar"/>
 	<classpathentry kind="lib" path="lib/colt-1.2.0.jar"/>
 	<classpathentry kind="lib" path="lib/commons-beanutils-1.7.0.jar"/>
@@ -42,11 +39,7 @@
 	<classpathentry kind="lib" path="lib/core-3.1.1.jar"/>
 	<classpathentry kind="lib" path="lib/dsiutils-1.0.12.jar"/>
 	<classpathentry kind="lib" path="lib/fastutil-6.0.0.jar"/>
-	<classpathentry kind="lib" path="lib/gson-2.2.2-javadoc.jar"/>
-	<classpathentry kind="lib" path="lib/gson-2.2.2-sources.jar"/>
 	<classpathentry kind="lib" path="lib/gson-2.2.2.jar"/>
-	<classpathentry kind="lib" path="lib/guava-13.0.1-javadoc.jar"/>
-	<classpathentry kind="lib" path="lib/guava-13.0.1-sources.jar"/>
 	<classpathentry kind="lib" path="lib/guava-13.0.1.jar"/>
 	<classpathentry kind="lib" path="lib/guice-3.0.jar"/>
 	<classpathentry kind="lib" path="lib/guice-servlet-3.0.jar"/>
@@ -123,7 +116,6 @@
 	<classpathentry kind="lib" path="lib/mail-1.4.1-sources.jar"/>
 	<classpathentry kind="lib" path="lib/mail-1.4.1.jar"/>
 	<classpathentry kind="lib" path="lib/maxent-3.0.0.jar"/>
-	<classpathentry kind="lib" path="lib/memcached-2.2.jar"/>
 	<classpathentry kind="lib" path="lib/mockito-all-1.8.5.jar"/>
 	<classpathentry kind="lib" path="lib/mrunit-0.8.0-incubating.jar"/>
 	<classpathentry kind="lib" path="lib/netty-3.2.4.Final.jar"/>
@@ -143,7 +135,6 @@
 	<classpathentry kind="lib" path="lib/slf4j-api-1.6.1.jar"/>
 	<classpathentry kind="lib" path="lib/slf4j-log4j12-1.6.1.jar"/>
 	<classpathentry kind="lib" path="lib/snappy-java-1.0.4.1.jar"/>
-	<classpathentry kind="lib" path="lib/spy-2.4.jar"/>
 	<classpathentry kind="lib" path="lib/stanford-chinese-segmenter-2011-09-14-ivory.jar"/>
 	<classpathentry kind="lib" path="lib/stax-api-1.0.1.jar"/>
 	<classpathentry kind="lib" path="lib/sux4j-2.0.1.jar"/>
@@ -154,5 +145,8 @@
 	<classpathentry kind="lib" path="lib/xml-apis-1.3.04.jar"/>
 	<classpathentry kind="lib" path="lib/xml-resolver-1.2.jar"/>
 	<classpathentry kind="lib" path="lib/xmlenc-0.52.jar"/>
+	<classpathentry kind="lib" path="lib/cloud9-1.4.0-javadoc.jar"/>
+	<classpathentry kind="lib" path="lib/cloud9-1.4.0-sources.jar"/>
+	<classpathentry kind="lib" path="lib/cloud9-1.4.0.jar"/>
 	<classpathentry kind="output" path="build"/>
 </classpath>
