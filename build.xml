@@ -25,6 +25,14 @@
     <path refid="lib.path.id" />
     <path location="${build.dir}" />
   </path>
+  <path id="libjars.path.id">
+    <fileset dir="${lib.dir}/" includes="cloud9*.jar"/>
+    <fileset dir="${lib.dir}/" includes="guava*.jar"/>
+    <fileset dir="${lib.dir}/" includes="dsi*.jar"/>
+    <fileset dir="${lib.dir}/" includes="fastutil*.jar"/>
+    <fileset dir="${lib.dir}/" includes="sux4j*.jar"/>
+    <fileset dir="${lib.dir}/" includes="commons-collections*.jar"/>
+  </path>
 
   <property name="ivy.install.version" value="2.2.0"/>
   <property name="ivy.jar.dir" value="${basedir}/ivy"/>
@@ -249,6 +257,7 @@
 	<target name="scripts" depends="jar">
 		<pathconvert property="run.path.id" refid="run.path.id" targetos="${platform}" />
 		<pathconvert property="lib.path.id" refid="lib.path.id" targetos="${platform}" />
+		<pathconvert property="libjars.path.id" refid="libjars.path.id" targetos="${platform}" />
 
 		<condition property="suffix" value="sh">
 			<equals arg1="${platform}" arg2="unix" />
@@ -300,6 +309,9 @@
 
 		<echo file="./etc/hadoop-local.${suffix}" message="${script_prefix}" />
 		<echo file="./etc/hadoop-local.${suffix}" message="hadoop jar ${dist.dir}/${artifactId}-${version}.jar ${param_prefix}1 -D mapreduce.framework.name=local -D mapreduce.jobtracker.address=local -D fs.default.name=file:/// -D mapreduce.cluster.local.dir=/tmp/mapred/local -D mapreduce.cluster.temp.dir=/tmp/mapred/temp -D mapreduce.jobtracker.staging.root.dir=/tmp/mapred/staging -D mapreduce.jobtracker.system.dir=/tmp/mapred/system ${param_prefix}2 ${param_prefix}3 ${param_prefix}4 ${param_prefix}5 ${param_prefix}6 ${param_prefix}7 ${param_prefix}8 ${param_prefix}9${line.separator}" append="true" />
+
+		<echo file="./etc/hadoop-cluster.${suffix}" message="${script_prefix}" />
+		<echo file="./etc/hadoop-cluster.${suffix}" message="hadoop jar ${dist.dir}/${artifactId}-${version}.jar ${param_prefix}1 -libjars ${libjars.path.id} ${param_prefix}2 ${param_prefix}3 ${param_prefix}4 ${param_prefix}5 ${param_prefix}6 ${param_prefix}7 ${param_prefix}8 ${param_prefix}9${line.separator}" append="true" />
 
 	</target>
 
