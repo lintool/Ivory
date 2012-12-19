@@ -403,7 +403,12 @@ public class BuildTermDocVectors extends PowerTool {
     conf.set(InputPath, env.getDoclengthsDirectory().toString());
     conf.set(DocLengthDataFile, dlFile.toString());
 
-    conf.set("mapred.child.java.opts", "-Xmx2048m");
+    //conf.set("mapred.child.java.opts", "-Xmx2048m");
+    conf.set("mapreduce.map.memory.mb", "2048");
+    conf.set("mapreduce.map.java.opts", "-Xmx2048m");
+    conf.set("mapreduce.reduce.memory.mb", "2048");
+    conf.set("mapreduce.reduce.java.opts", "-Xmx2048m");
+
     conf.setBoolean("mapred.map.tasks.speculative.execution", false);
     conf.setBoolean("mapred.reduce.tasks.speculative.execution", false);
 
