@@ -245,7 +245,10 @@ public class BuildDictionary extends PowerTool {
     }
 
     conf.setInt(Constants.CollectionTermCount, (int) env.readCollectionTermCount());
-    conf.set("mapred.child.java.opts", "-Xmx2048m");
+    conf.set("mapreduce.map.memory.mb", "2048");
+    conf.set("mapreduce.map.java.opts", "-Xmx2048m");
+    conf.set("mapreduce.reduce.memory.mb", "2048");
+    conf.set("mapreduce.reduce.java.opts", "-Xmx2048m");
 
     Path tmpPath = new Path(env.getTempDirectory());
     fs.delete(tmpPath, true);
