@@ -180,7 +180,11 @@ public class BuildTermDocVectorsForwardIndex extends PowerTool {
     FileInputFormat.setInputPaths(job, new Path(env.getTermDocVectorsDirectory()));
     job.setNumReduceTasks(1);
 
-    job.getConfiguration().set("mapred.child.java.opts", "-Xmx2048m");
+    //job.getConfiguration().set("mapred.child.java.opts", "-Xmx2048m");
+    job.getConfiguration().set("mapreduce.map.memory.mb", "2048");
+    job.getConfiguration().set("mapreduce.map.java.opts", "-Xmx2048m");
+    job.getConfiguration().set("mapreduce.reduce.memory.mb", "2048");
+    job.getConfiguration().set("mapreduce.reduce.java.opts", "-Xmx2048m");
 
     job.setInputFormatClass(SequenceFileInputFormat.class);
     job.setMapOutputKeyClass(IntWritable.class);

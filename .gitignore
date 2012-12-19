@@ -5,6 +5,7 @@ dist/
 etc/junit.sh
 etc/run.sh
 etc/hadoop-local.sh
+etc/run-integration.sh
 ivy/ivy.jar
 lib/
 ranking.*

@@ -1,6 +1,6 @@
 package ivory.sqe.retrieval;
 
-import org.apache.hadoop.thirdparty.guava.common.base.Preconditions;
+import com.google.common.base.Preconditions;
 
 import com.google.gson.JsonObject;
 

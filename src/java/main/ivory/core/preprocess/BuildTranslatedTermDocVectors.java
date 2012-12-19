@@ -78,7 +78,11 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
     int MIN_SIZE = 0;	// minimum document size, to avoid noise in Wikipedia due to stubs/very short articles etc. this is set via Conf object
     DefaultFrequencySortedDictionary dict;
     DfTableArray dfTable; 
-    
+
+    private String getFilename(String s) {
+      return s.substring(s.lastIndexOf("/") + 1);
+    }
+
     public void configure(JobConf conf) {
       String termsFile, termidsFile, idToTermFile, dfFile;
       numDocs = conf.getInt("Ivory.CollectionDocumentCount", -1);
@@ -96,10 +100,11 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
 
         FileSystem remoteFS = FileSystem.get(conf);
         RetrievalEnvironment targetEnv = new RetrievalEnvironment(conf.get(Constants.TargetIndexPath), remoteFS);
-        termsFile = targetEnv.getIndexTermsData();
-        termidsFile = targetEnv.getIndexTermIdsData();
-        idToTermFile = targetEnv.getIndexTermIdMappingData();
-        dfFile = targetEnv.getDfByIntData();
+
+        termsFile = getFilename(targetEnv.getIndexTermsData());
+        termidsFile = getFilename(targetEnv.getIndexTermIdsData());
+        idToTermFile = getFilename(targetEnv.getIndexTermIdMappingData());
+        dfFile = getFilename(targetEnv.getDfByIntData());
         
         FileSystem fs = FileSystem.getLocal(conf);
         Map<String, Path> pathMapping = Maps.newHashMap();
@@ -116,28 +121,28 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
             pathMapping.put(idToTermFile, p);
           } else if (p.toString().contains(dfFile)) {
             pathMapping.put(dfFile, p);
-          } else if (p.toString().contains(conf.get("Ivory.E_Vocab_F2E"))) {
+          } else if (p.toString().contains(getFilename(conf.get("Ivory.E_Vocab_F2E")))) {
             pathMapping.put("Ivory.E_Vocab_F2E", p);
             LOG.info("Ivory.E_Vocab_F2E -> " + p);
-          } else if (p.toString().contains(conf.get("Ivory.F_Vocab_F2E"))) {
+          } else if (p.toString().contains(getFilename(conf.get("Ivory.F_Vocab_F2E")))) {
             pathMapping.put("Ivory.F_Vocab_F2E", p);
             LOG.info("Ivory.F_Vocab_F2E -> " + p);
-          }  else if (p.toString().contains(conf.get("Ivory.TTable_F2E"))) {
+          }  else if (p.toString().contains(getFilename(conf.get("Ivory.TTable_F2E")))) {
             pathMapping.put("Ivory.TTable_F2E", p);
             LOG.info("Ivory.TTable_F2E -> " + p);
-          } else if (p.toString().contains(conf.get("Ivory.E_Vocab_E2F"))) {
+          } else if (p.toString().contains(getFilename(conf.get("Ivory.E_Vocab_E2F")))) {
             pathMapping.put("Ivory.E_Vocab_E2F", p);
             LOG.info("Ivory.E_Vocab_E2F -> " + p);
-          } else if (p.toString().contains(conf.get("Ivory.F_Vocab_E2F"))) {
+          } else if (p.toString().contains(getFilename(conf.get("Ivory.F_Vocab_E2F")))) {
             pathMapping.put("Ivory.F_Vocab_E2F", p);
             LOG.info("Ivory.F_Vocab_E2Ff -> " + p);
-          } else if (p.toString().contains(conf.get("Ivory.TTable_E2F"))) {
+          } else if (p.toString().contains(getFilename(conf.get("Ivory.TTable_E2F")))) {
             pathMapping.put("Ivory.TTable_E2F", p);
             LOG.info("Ivory.TTable_E2F -> " + p);
-          } else if (p.toString().contains(conf.get(Constants.TargetStopwordList))) {
+          } else if (p.toString().contains(getFilename(conf.get(Constants.TargetStopwordList)))) {
             pathMapping.put(Constants.TargetStopwordList, p);
             LOG.info(Constants.TargetStopwordList + " -> " + p);
-          } else if (p.toString().contains(conf.get(Constants.TargetTokenizer))) {
+          } else if (p.toString().contains(getFilename(conf.get(Constants.TargetTokenizer)))) {
             pathMapping.put(Constants.TargetTokenizer, p);
             LOG.info(Constants.TargetTokenizer + " -> " + p);
           }

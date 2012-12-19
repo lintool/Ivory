@@ -2,9 +2,7 @@ package ivory.integration.local;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import ivory.app.BuildIndex;
 import ivory.app.PreprocessCollection;
-import ivory.app.PreprocessTrecCollection;
 import ivory.core.eval.Qrels;
 import ivory.core.eval.RankedListEvaluator;
 import ivory.integration.IntegrationUtils;
@@ -43,24 +41,29 @@ public abstract class IntegrationTestBaseCACM {
     List<String> jars = Lists.newArrayList();
     jars.add(IntegrationUtils.getJar("lib", "cloud9"));
     jars.add(IntegrationUtils.getJar("lib", "guava-13"));
-    jars.add(IntegrationUtils.getJar("lib", "guava-r09"));
     jars.add(IntegrationUtils.getJar("lib", "dsiutils"));
     jars.add(IntegrationUtils.getJar("lib", "fastutil"));
     jars.add(IntegrationUtils.getJar("lib", "jsap"));
     jars.add(IntegrationUtils.getJar("lib", "sux4j"));
     jars.add(IntegrationUtils.getJar("lib", "commons-collections"));
     jars.add(IntegrationUtils.getJar("lib", "kamikaze"));
-    jars.add(IntegrationUtils.getJar("dist", "ivory"));
 
     String libjars = String.format("-libjars=%s", Joiner.on(",").join(jars));
 
-    PreprocessTrecCollection.main(new String[] { libjars,
-        IntegrationUtils.D_JT_LOCAL, IntegrationUtils.D_NN_LOCAL,
+    String[] cmdArgs = new String[] { "hadoop jar", IntegrationUtils.getJar("dist", "ivory"),
+        ivory.app.PreprocessTrecCollection.class.getCanonicalName(),
+        IntegrationUtils.LOCAL_ARGS, libjars,
         "-" + PreprocessCollection.COLLECTION_NAME, "CACM",
         "-" + PreprocessCollection.COLLECTION_PATH, collectionPath.toString(),
-        "-" + PreprocessCollection.INDEX_PATH, index });
-    BuildIndex.main((String[]) ArrayUtils.addAll(new String[] { libjars,
-        IntegrationUtils.D_JT_LOCAL, IntegrationUtils.D_NN_LOCAL }, args));
+        "-" + PreprocessCollection.INDEX_PATH, index };
+
+    IntegrationUtils.exec(Joiner.on(" ").join(cmdArgs));
+
+    cmdArgs = (String[]) ArrayUtils.addAll(new String[] { 
+        "hadoop jar", IntegrationUtils.getJar("dist", "ivory"),
+        ivory.app.BuildIndex.class.getCanonicalName(), IntegrationUtils.LOCAL_ARGS, libjars}, args);
+
+    IntegrationUtils.exec(Joiner.on(" ").join(cmdArgs));
 
     // Done with indexing, now do retrieval run.
     String[] params = new String[] {

@@ -2,15 +2,17 @@ package ivory.integration.wikipedia;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import ivory.app.PreprocessWikipedia;
 import ivory.core.data.document.WeightedIntDocVector;
 import ivory.integration.IntegrationUtils;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+
 import junit.framework.Assert;
 import junit.framework.JUnit4TestAdapter;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
@@ -18,9 +20,11 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.SequenceFile;
 import org.junit.Test;
+
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+
 import edu.umd.cloud9.io.map.HMapSFW;
 
 public class VerifyWikipediaProcessingCrosslingual {
@@ -98,7 +102,6 @@ public class VerifyWikipediaProcessingCrosslingual {
     jars.add(IntegrationUtils.getJar("lib", "cloud9"));
     jars.add(IntegrationUtils.getJar("lib", "bliki-core"));
     jars.add(IntegrationUtils.getJar("lib", "guava-13"));
-    jars.add(IntegrationUtils.getJar("lib", "guava-r09"));
     jars.add(IntegrationUtils.getJar("lib", "dsiutils"));
     jars.add(IntegrationUtils.getJar("lib", "fastutil"));
     jars.add(IntegrationUtils.getJar("lib", "jsap"));
@@ -107,18 +110,25 @@ public class VerifyWikipediaProcessingCrosslingual {
     jars.add(IntegrationUtils.getJar("lib", "commons-lang"));
     jars.add(IntegrationUtils.getJar("lib", "tools"));
     jars.add(IntegrationUtils.getJar("lib", "maxent"));
-    jars.add(IntegrationUtils.getJar("dist", "ivory"));
     jars.add(IntegrationUtils.getJar("lib", "lucene-analyzers"));
     jars.add(IntegrationUtils.getJar("lib", "lucene-core"));
+    jars.add(IntegrationUtils.getJar("dist", "ivory"));
 
     String libjars = String.format("-libjars=%s", Joiner.on(",").join(jars));
 
-    PreprocessWikipedia.main(new String[] { libjars,
-        IntegrationUtils.D_JT, IntegrationUtils.D_NN,
-        "-index="+enwikiEn, "-xml="+enwikiPath, "-compressed="+enwikiRepacked,
-        "tokenizerclass="+ivory.core.tokenize.OpenNLPTokenizer.class.getCanonicalName(), "-lang=en",
-        "-tokenizermodel="+tokenizerPath + "/en-token.bin",	"-collectionvocab="+vocabPath + "/vocab.de-en.en", 
-        "-mode=crosslingE", "-e_stopword=" + tokenizerPath + "/en.stop.stemmed",});
+    String[] args = new String[] { "hadoop jar", IntegrationUtils.getJar("dist", "ivory"),
+        ivory.app.PreprocessWikipedia.class.getCanonicalName(), libjars,
+        "-index=" + enwikiEn,
+        "-xml=" + enwikiPath,
+        "-compressed=" + enwikiRepacked,
+        "tokenizerclass=" + ivory.core.tokenize.OpenNLPTokenizer.class.getCanonicalName(),
+        "-lang=en",
+        "-tokenizermodel=" + tokenizerPath + "/en-token.bin",
+        "-collectionvocab=" + vocabPath + "/vocab.de-en.en", 
+        "-mode=crosslingE",
+        "-e_stopword=" + tokenizerPath + "/en.stop.stemmed"};
+
+    IntegrationUtils.exec(Joiner.on(" ").join(args));
   }
 
   @Test
@@ -170,7 +180,6 @@ public class VerifyWikipediaProcessingCrosslingual {
     jars.add(IntegrationUtils.getJar("lib", "cloud9"));
     jars.add(IntegrationUtils.getJar("lib", "bliki-core"));
     jars.add(IntegrationUtils.getJar("lib", "guava-13"));
-    jars.add(IntegrationUtils.getJar("lib", "guava-r09"));
     jars.add(IntegrationUtils.getJar("lib", "dsiutils"));
     jars.add(IntegrationUtils.getJar("lib", "fastutil"));
     jars.add(IntegrationUtils.getJar("lib", "jsap"));
@@ -179,23 +188,35 @@ public class VerifyWikipediaProcessingCrosslingual {
     jars.add(IntegrationUtils.getJar("lib", "commons-lang"));
     jars.add(IntegrationUtils.getJar("lib", "tools"));
     jars.add(IntegrationUtils.getJar("lib", "maxent"));
-    jars.add(IntegrationUtils.getJar("dist", "ivory"));
     jars.add(IntegrationUtils.getJar("lib", "lucene-analyzers"));
     jars.add(IntegrationUtils.getJar("lib", "lucene-core"));
+    jars.add(IntegrationUtils.getJar("dist", "ivory"));
 
     String libjars = String.format("-libjars=%s", Joiner.on(",").join(jars));
 
-    PreprocessWikipedia.main(new String[] { libjars,
-        IntegrationUtils.D_JT, IntegrationUtils.D_NN,
-        "-index="+dewikiEn, "-xml="+dewikiPath, "-compressed="+dewikiRepacked,
-        "tokenizerclass="+ivory.core.tokenize.OpenNLPTokenizer.class.getCanonicalName(), "-lang=de",
-        "-tokenizermodel="+tokenizerPath + "/de-token.bin", "-e_e2f_vocab="+vocabPath + "/vocab.en-de.en",
-        "-f_e2f_vocab="+vocabPath + "/vocab.en-de.de", "-f_f2e_vocab="+vocabPath + "/vocab.de-en.de",
-        "-e_f2e_vocab="+vocabPath + "/vocab.de-en.en", "-f2e_ttable="+vocabPath + "/ttable.de-en",   
-        "-e2f_ttable="+vocabPath + "/ttable.en-de", "-collectionvocab="+vocabPath + "/vocab.de-en.en", 
-        "-mode=crosslingF", "-targetindex="+enwikiEn, "-e_stopword=" + tokenizerPath + "/en.stop.stemmed", 
-        "-f_stopword=" + tokenizerPath + "/de.stop.stemmed", "-e_tokenizermodel=" + tokenizerPath + "/en-token.bin",
-    "-target_lang=en"});
+    String[] args = new String[] { "hadoop jar", IntegrationUtils.getJar("dist", "ivory"),
+        ivory.app.PreprocessWikipedia.class.getCanonicalName(), libjars,
+        "-index=" + dewikiEn,
+        "-xml=" + dewikiPath,
+        "-compressed=" + dewikiRepacked,
+        "tokenizerclass=" + ivory.core.tokenize.OpenNLPTokenizer.class.getCanonicalName(),
+        "-lang=de",
+        "-tokenizermodel=" + tokenizerPath + "/de-token.bin",
+        "-e_e2f_vocab=" + vocabPath + "/vocab.en-de.en",
+        "-f_e2f_vocab=" + vocabPath + "/vocab.en-de.de",
+        "-f_f2e_vocab=" + vocabPath + "/vocab.de-en.de",
+        "-e_f2e_vocab=" + vocabPath + "/vocab.de-en.en",
+        "-f2e_ttable=" + vocabPath + "/ttable.de-en",   
+        "-e2f_ttable=" + vocabPath + "/ttable.en-de",
+        "-collectionvocab=" + vocabPath + "/vocab.de-en.en", 
+        "-mode=crosslingF",
+        "-targetindex=" + enwikiEn,
+        "-e_stopword=" + tokenizerPath + "/en.stop.stemmed", 
+        "-f_stopword=" + tokenizerPath + "/de.stop.stemmed",
+        "-e_tokenizermodel=" + tokenizerPath + "/en-token.bin",
+        "-target_lang=en"};
+
+    IntegrationUtils.exec(Joiner.on(" ").join(args));
   }
 
   @Test
@@ -260,13 +281,17 @@ public class VerifyWikipediaProcessingCrosslingual {
         
         System.err.println("Reading " + path.getPath().getName());
         key.set(0);
-        reader = new SequenceFile.Reader(fs, path.getPath(), fs.getConf());
+        reader = new SequenceFile.Reader(fs.getConf(), SequenceFile.Reader.file(path.getPath()));
         while (key.get() < docno) {
           reader.next(key, value);
         }
-        if (key.get() == docno)   return value;
+        if (key.get() == docno) {
+          reader.close();
+          return value;
+        }
         System.err.println("key:"+key.get()+" != docno:"+docno);
         startFrom++;
+        reader.close();
       }
     } catch (IOException e) {
       Assert.fail("Error: reading term doc vectors from + " + dir + ", docno = " + docno);
@@ -290,12 +315,16 @@ public class VerifyWikipediaProcessingCrosslingual {
         
         System.err.println("Reading " + path.getPath().getName());
         key.set(0);
-        reader = new SequenceFile.Reader(fs, path.getPath(), fs.getConf());
+        reader = new SequenceFile.Reader(fs.getConf(), SequenceFile.Reader.file(path.getPath()));
         while (key.get() < docno) {
           reader.next(key, value);
         }
-        if (key.get() == docno)   return value;
+        if (key.get() == docno) {
+          reader.close();
+          return value;
+        }
         startFrom++;
+        reader.close();
       }
     } catch (IOException e) {
       Assert.fail("Error: reading int doc vectors from + " + dir + ", docno = " + docno);

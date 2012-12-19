@@ -71,6 +71,11 @@ public class BuildIntDocVectors extends PowerTool {
         String termidsFile = env.getIndexTermIdsData();
         String idToTermFile = env.getIndexTermIdMappingData();
 
+        termsFile = termsFile.substring(termsFile.lastIndexOf("/") + 1);
+        termidsFile = termidsFile.substring(termidsFile.lastIndexOf("/") + 1);
+        idToTermFile = idToTermFile.substring(idToTermFile.lastIndexOf("/") + 1);
+
+        LOG.info("Looking for the following files in dcache: " + termsFile + ", " + termidsFile + ", " + idToTermFile);
         // Take a different code path if we're in standalone mode.
         if (conf.get("mapred.job.tracker").equals("local")) {
           dictionary = new DefaultFrequencySortedDictionary(new Path(termsFile),
@@ -94,9 +99,14 @@ public class BuildIntDocVectors extends PowerTool {
           LOG.info(" - id: " + pathMapping.get(termidsFile));
           LOG.info(" - idToTerms: " + pathMapping.get(idToTermFile));
 
+	  String s = localFiles.length + " " + localFiles[0].toString() + " " + localFiles[1].toString() + " " + localFiles[2].toString();
+	  if (pathMapping.get(termsFile) == null ) {
+
+	      throw new RuntimeException(s);
+	  }
+
           dictionary = new DefaultFrequencySortedDictionary(pathMapping.get(termsFile),
-              pathMapping.get(termidsFile), pathMapping.get(idToTermFile),
-              FileSystem.getLocal(context.getConfiguration()));
+              pathMapping.get(termidsFile), pathMapping.get(idToTermFile), FileSystem.getLocal(conf));
         }
       } catch (Exception e) {
         e.printStackTrace();
@@ -166,7 +176,11 @@ public class BuildIntDocVectors extends PowerTool {
     DistributedCache.addCacheFile(new URI(termIDsFile), conf);
     DistributedCache.addCacheFile(new URI(idToTermFile), conf);
 
-    conf.set("mapred.child.java.opts", "-Xmx2048m");
+    //conf.set("mapred.child.java.opts", "-Xmx2048m");
+    conf.set("mapreduce.map.memory.mb", "2048");
+    conf.set("mapreduce.map.java.opts", "-Xmx2048m");
+    conf.set("mapreduce.reduce.memory.mb", "2048");
+    conf.set("mapreduce.reduce.java.opts", "-Xmx2048m");
 
     Job job = new Job(conf, BuildIntDocVectors.class.getSimpleName() + ":" + collectionName);
     job.setJarByClass(BuildIntDocVectors.class);
