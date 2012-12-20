@@ -13,7 +13,6 @@
 	<classpathentry kind="lib" path="lib/avro-1.7.1.cloudera.2.jar"/>
 	<classpathentry kind="lib" path="lib/bliki-core-3.0.16.jar"/>
 	<classpathentry kind="lib" path="lib/cglib-2.2.1-v20090111.jar"/>
-	<classpathentry kind="lib" path="lib/cloud9-1.4.0.jar"/>
 	<classpathentry kind="lib" path="lib/collections-generic-4.01.jar"/>
 	<classpathentry kind="lib" path="lib/colt-1.2.0.jar"/>
 	<classpathentry kind="lib" path="lib/commons-beanutils-1.7.0.jar"/>
@@ -111,5 +110,6 @@
 	<classpathentry kind="lib" path="lib/sux4j-2.0.1.jar"/>
 	<classpathentry kind="lib" path="lib/tools-1.5.0.jar"/>
 	<classpathentry kind="lib" path="lib/xmlenc-0.52.jar"/>
+	<classpathentry kind="lib" path="lib/cloud9-1.4.1.jar"/>
 	<classpathentry kind="output" path="build"/>
 </classpath>

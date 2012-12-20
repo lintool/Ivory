@@ -3,7 +3,6 @@ package ivory.lsh.bitext;
 import ivory.core.RetrievalEnvironment;
 import ivory.core.data.dictionary.DefaultFrequencySortedDictionary;
 import ivory.core.data.stat.DfTableArray;
-import ivory.core.data.stat.PrefixEncodedGlobalStats;
 import ivory.core.tokenize.Tokenizer;
 import ivory.core.tokenize.TokenizerFactory;
 import ivory.core.util.CLIRUtils;
