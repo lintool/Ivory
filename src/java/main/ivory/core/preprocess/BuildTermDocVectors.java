@@ -325,7 +325,7 @@ public class BuildTermDocVectors extends PowerTool {
     int docnoOffset = conf.getInt(Constants.DocnoOffset, 0);
     int numReducers = conf.getInt(Constants.TermDocVectorSegments, 0);
 
-    LOG.info("PowerTool: " + BuildTermDocVectors.class.getCanonicalName());
+    LOG.info("PowerTool: " + BuildTermDocVectors.class.getSimpleName());
     LOG.info(String.format(" - %s: %s", Constants.IndexPath, indexPath));
     LOG.info(String.format(" - %s: %s", Constants.CollectionName, collectionName));
     LOG.info(String.format(" - %s: %s", Constants.CollectionPath, collectionPath));

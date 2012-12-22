@@ -115,7 +115,7 @@ follows a procedure very similar to the TREC collection:</p>
 
 <pre class="code">
 etc/hadoop-cluster.sh ivory.app.PreprocessClueWebEnglish \
-  clueweb09catB index-clueweb09catB 1
+  -collection clueweb09catB -index index-clueweb09catB -segment 1
 
 etc/hadoop-cluster.sh ivory.app.BuildIndex \
   -index index-clueweb09catB -indexPartitions 200 -positionalIndexIP

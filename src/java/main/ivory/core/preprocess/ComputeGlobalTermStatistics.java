@@ -150,7 +150,7 @@ public class ComputeGlobalTermStatistics extends PowerTool {
       return 0;
     }
 
-    LOG.info("PowerTool: " + ComputeGlobalTermStatistics.class.getCanonicalName());
+    LOG.info("PowerTool: " + ComputeGlobalTermStatistics.class.getSimpleName());
     LOG.info(String.format(" - %s: %s", Constants.CollectionName, collectionName));
     LOG.info(String.format(" - %s: %s", Constants.IndexPath, indexPath));
     LOG.info(String.format(" - %s: %s", Constants.NumReduceTasks, reduceTasks));

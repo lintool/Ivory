@@ -154,7 +154,7 @@ public class BuildIntDocVectorsForwardIndex extends PowerTool {
     RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fs);
     String collectionName = env.readCollectionName();
 
-    LOG.info("Tool: " + BuildIntDocVectorsForwardIndex.class.getCanonicalName());
+    LOG.info("Tool: " + BuildIntDocVectorsForwardIndex.class.getSimpleName());
     LOG.info(String.format(" - %s: %s", Constants.CollectionName, collectionName));
     LOG.info(String.format(" - %s: %s", Constants.IndexPath, indexPath));
 

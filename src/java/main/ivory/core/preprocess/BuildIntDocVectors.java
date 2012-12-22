@@ -150,7 +150,7 @@ public class BuildIntDocVectors extends PowerTool {
     RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fs);
     String collectionName = env.readCollectionName();
 
-    LOG.info("PowerTool: " + BuildIntDocVectors.class.getCanonicalName());
+    LOG.info("PowerTool: " + BuildIntDocVectors.class.getSimpleName());
     LOG.info(String.format(" - %s: %s", Constants.CollectionName, collectionName));
     LOG.info(String.format(" - %s: %s", Constants.IndexPath, indexPath));
 

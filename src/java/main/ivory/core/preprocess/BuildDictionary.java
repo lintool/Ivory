@@ -223,7 +223,7 @@ public class BuildDictionary extends PowerTool {
     String indexPath = conf.get(Constants.IndexPath);
     String collectionName = conf.get(Constants.CollectionName);
 
-    LOG.info("PowerTool: " + BuildDictionary.class.getCanonicalName());
+    LOG.info("PowerTool: " + BuildDictionary.class.getSimpleName());
     LOG.info(String.format(" - %s: %s", Constants.CollectionName, collectionName));
     LOG.info(String.format(" - %s: %s", Constants.IndexPath, indexPath));
 

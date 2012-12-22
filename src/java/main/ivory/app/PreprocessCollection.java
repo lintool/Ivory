@@ -58,13 +58,11 @@ public class PreprocessCollection extends Configured implements Tool {
   public static final String INPUTFORMAT = "inputFormat";
   public static final String TOKENIZER = "tokenizer";
   public static final String DOCNO_MAPPING = "docnoMapping";
+  public static final String DOCNO_OFFSET = "docnoOffset";
   public static final String MIN_DF = "minDf";
 
-  /**
-   * Runs this tool.
-   */
-  @SuppressWarnings({"static-access"}) @Override
-  public int run(String[] args) throws Exception {
+  @SuppressWarnings({ "static-access" })
+  protected static Options createOptions() {
     Options options = new Options();
 
     options.addOption(OptionBuilder.withArgName("path").hasArg()
@@ -77,14 +75,23 @@ public class PreprocessCollection extends Configured implements Tool {
         .withDescription("(required) fully-qualified DocnoMapping").create(DOCNO_MAPPING));
 
     options.addOption(OptionBuilder.withArgName("class").hasArg()
-        .withDescription("(optional) fully-qualified Hadoop InputFormat: SequenceFileInputFormat default")
-        .create(INPUTFORMAT));
+        .withDescription("(optional) fully-qualified Hadoop InputFormat: SequenceFileInputFormat default").create(INPUTFORMAT));
     options.addOption(OptionBuilder.withArgName("class").hasArg()
-        .withDescription("(optional) fully-qualified Tokenizer: GalagoTokenizer default")
-        .create(TOKENIZER));
+        .withDescription("(optional) fully-qualified Tokenizer: GalagoTokenizer default").create(TOKENIZER));
     options.addOption(OptionBuilder.withArgName("num").hasArg()
-        .withDescription("(optional) min Df")
-        .create(MIN_DF));
+        .withDescription("(optional) min Df").create(MIN_DF));
+    options.addOption(OptionBuilder.withArgName("num").hasArg()
+        .withDescription("(optional) docno offset").create(DOCNO_OFFSET));
+
+    return options;
+  }
+
+  /**
+   * Runs this tool.
+   */
+  @Override
+  public int run(String[] args) throws Exception {
+    Options options = createOptions();
 
     CommandLine cmdline;
     CommandLineParser parser = new GnuParser();
@@ -109,6 +116,11 @@ public class PreprocessCollection extends Configured implements Tool {
     String collection = cmdline.getOptionValue(COLLECTION_PATH);
     String collectionName = cmdline.getOptionValue(COLLECTION_NAME);
     String indexPath = cmdline.getOptionValue(INDEX_PATH);
+    int docnoOffset = 0;
+
+    if (cmdline.hasOption(DOCNO_OFFSET)) {
+      docnoOffset = Integer.parseInt(cmdline.getOptionValue(DOCNO_OFFSET));
+    }
 
     Class<? extends DocnoMapping> docnoMappingClass = null;
     try {
@@ -176,7 +188,7 @@ public class PreprocessCollection extends Configured implements Tool {
     conf.set(Constants.DocnoMappingClass, docnoMappingClass.getCanonicalName());
     conf.set(Constants.DocnoMappingFile, env.getDocnoMappingData().toString());
 
-    conf.setInt(Constants.DocnoOffset, 0); // Assume docnos start at 1
+    conf.setInt(Constants.DocnoOffset, docnoOffset);
     conf.setInt(Constants.MinDf, minDf);
     conf.setInt(Constants.MaxDf, Integer.MAX_VALUE);
 
