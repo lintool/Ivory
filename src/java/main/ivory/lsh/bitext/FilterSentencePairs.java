@@ -117,11 +117,11 @@ public class FilterSentencePairs extends Configured implements Tool {
 
       sLogger.debug("-------------\n"+fSent+"\n"+eSent+"\n----\n"+fVector+"\n"+fSrcTfs+"\n"+eVector+"\n"+fLen+","+eLen+"\n------------");
 
-      String[] instance = CLIRUtils.computeFeaturesF3(eSrcTfs, eVector, fSrcTfs, fVector, eLen, fLen, 
-          helper.getESrc(), helper.getETrg(), helper.getFSrc(), helper.getFTrg(), helper.getE2F(), helper.getF2E(), sLogger);
+      String[] instance = CLIRUtils.computeFeaturesF2(eSrcTfs, eVector, fSrcTfs, fVector, eLen, fLen, 
+          helper.getESrc(), helper.getETrg(), helper.getFSrc(), helper.getFTrg(), helper.getE2F(), helper.getF2E());
       
-//      String[] instance = CLIRUtils.computeFeaturesF4(eSent, eSrcTfs, eVector, fSent, fSrcTfs, fVector, eLen, fLen, 
-//          helper.getESrc(), helper.getETrg(), helper.getFSrc(), helper.getFTrg(), helper.getE2F(), helper.getF2E(), sLogger);
+//      String[] instance = CLIRUtils.computeFeaturesF3(eSent, eSrcTfs, eVector, fSent, fSrcTfs, fVector, eLen, fLen, 
+//          helper.getESrc(), helper.getETrg(), helper.getFSrc(), helper.getFTrg(), helper.getE2F(), helper.getF2E());
       String s ="";
       for (String feat : instance) {
         s+=feat+" ";

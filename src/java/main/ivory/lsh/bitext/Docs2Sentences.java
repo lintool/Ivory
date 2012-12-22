@@ -137,7 +137,6 @@ public class Docs2Sentences extends Configured implements Tool {
       }   
 
       for (int i = 0; i < sentences.size(); i++) {
-        float inVocabRate = 0;
         if (langID == CLIRUtils.E) {
           if (helper.getEInVocabRate(sentences.get(i).toString()) < minInVocabRate ) {
             reporter.incrCounter(Sentences.OOV, 1);
