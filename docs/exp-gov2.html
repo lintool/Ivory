@@ -147,10 +147,10 @@ data:</p>
   <li><code><a href="../data/gov2/run.gov2.basic.xml">data/gov2/run.gov2.basic.xml</a></code>:
   retrieval models and parameters</li>
 
-  <li><code><a href="../data/gov2/gov2.title.701-775">data/gov2/gov2.title.701-775</a></code>:
+  <li><code><a href="../data/gov2/queries.gov2.title.701-775.xml">data/gov2/queries.gov2.title.701-775.xml</a></code>:
   queries (topics 701-750 from TREC 2004 and topics 751-775 from TREC 2005)</li>
 
-  <li><code><a href="../data/gov2/gov2.title.776-850">data/gov2/gov2.title.776-850</a></code>:
+  <li><code><a href="../data/gov2/queries.gov2.title.776-850.xml">data/gov2/queries.gov2.title.776-850.xml</a></code>:
   queries (topics 776-800 from TREC 2005 and topics 801-850 from TREC 2006)</li>
 
   <li><code><a href="../data/gov2/qrels.gov2.all">data/gov2/qrels.gov2.all</a></code>:
@@ -205,7 +205,7 @@ the models:</p>
 
 <pre class="code">
 # command-line
-etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/gov2/run.gov2.basic.xml data/gov2/gov2.title.701-775 data/gov2/gov2.title.776-850
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/gov2/run.gov2.basic.xml data/gov2/queries.gov2.title.701-775.xml data/gov2/queries.gov2.title.776-850.xml
 
 # evaluating effectiveness
 etc/trec_eval data/gov2/qrels.gov2.all ranking.gov2-dir-base.txt

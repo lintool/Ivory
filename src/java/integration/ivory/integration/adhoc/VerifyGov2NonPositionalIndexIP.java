@@ -68,15 +68,15 @@ public class VerifyGov2NonPositionalIndexIP {
     // Done with indexing, now do retrieval run.
     fs.copyFromLocalFile(false, true, new Path("data/gov2/run.gov2.nonpositional.baselines.xml"),
         new Path(index + "/" + "run.gov2.nonpositional.baselines.xml"));
-    fs.copyFromLocalFile(false, true, new Path("data/gov2/gov2.title.701-775"),
-        new Path(index + "/" + "gov2.title.701-775"));
-    fs.copyFromLocalFile(false, true, new Path("data/gov2/gov2.title.776-850"),
-        new Path(index + "/" + "gov2.title.776-850"));
+    fs.copyFromLocalFile(false, true, new Path("data/gov2/queries.gov2.title.701-775.xml"),
+        new Path(index + "/" + "queries.gov2.title.701-775.xml"));
+    fs.copyFromLocalFile(false, true, new Path("data/gov2/queries.gov2.title.776-850.xml"),
+        new Path(index + "/" + "queries.gov2.title.776-850.xml"));
 
     String[] params = new String[] {
             index + "/run.gov2.nonpositional.baselines.xml",
-            index + "/gov2.title.701-775",
-            index + "/gov2.title.776-850"};
+            index + "/queries.gov2.title.701-775.xml",
+            index + "/queries.gov2.title.776-850.xml"};
 
     BatchQueryRunner qr = new BatchQueryRunner(params, fs, index);
 

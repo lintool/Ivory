@@ -80,9 +80,9 @@ represent results in Tables 5 and 6 of the paper.</p>
 etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/wt10g/run.wt10g.SIGIR2010.xml data/wt10g/queries.wt10g.501-550.xml
 
 # evaluating effectiveness
-trec_eval data/wt10g/qrels.wt10g.all ranking.sigir2010-wt10g-ql.txt
-trec_eval data/wt10g/qrels.wt10g.all ranking.sigir2010-wt10g-sd.txt
-trec_eval data/wt10g/qrels.wt10g.all ranking.sigir2010-wt10g-wsd-sd.txt
+etc/trec_eval data/wt10g/qrels.wt10g.all ranking.sigir2010-wt10g-ql.txt
+etc/trec_eval data/wt10g/qrels.wt10g.all ranking.sigir2010-wt10g-sd.txt
+etc/trec_eval data/wt10g/qrels.wt10g.all ranking.sigir2010-wt10g-wsd-sd.txt
 
 # junit
 etc/junit.sh ivory.regression.sigir2010.Wt10g_ESD
@@ -116,12 +116,12 @@ etc/junit.sh ivory.regression.sigir2010.Wt10g_ESD
     
 <pre class="code">
 # command-line
-etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/gov2/run.gov2.SIGIR2010.xml data/gov2/gov2.title.776-850
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/gov2/run.gov2.SIGIR2010.xml data/gov2/queries.gov2.title.776-850.xml
     
 # evaluating effectiveness
-trec_eval data/gov2/qrels.gov2.all ranking.sigir2010-gov2-ql.txt
-trec_eval data/gov2/qrels.gov2.all ranking.sigir2010-gov2-sd.txt
-trec_eval data/gov2/qrels.gov2.all ranking.sigir2010-gov2-wsd-sd.txt
+etc/trec_eval data/gov2/qrels.gov2.all ranking.sigir2010-gov2-ql.txt
+etc/trec_eval data/gov2/qrels.gov2.all ranking.sigir2010-gov2-sd.txt
+etc/trec_eval data/gov2/qrels.gov2.all ranking.sigir2010-gov2-wsd-sd.txt
     
 # junit
 etc/junit.sh ivory.regression.sigir2010.Gov2_ESD
@@ -158,9 +158,9 @@ etc/junit.sh ivory.regression.sigir2010.Gov2_ESD
 etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/clue/run.web09catB.SIGIR2010.xml data/clue/queries.web09.26-50.xml
 
 # evaluating effectiveness
-trec_eval data/clue/qrels.web09catB.txt ranking.sigir2010-web09catB-ql.txt
-trec_eval data/clue/qrels.web09catB.txt ranking.sigir2010-web09catB-sd.txt
-trec_eval data/clue/qrels.web09catB.txt ranking.sigir2010-web09catB-wsd-sd.txt
+etc/trec_eval data/clue/qrels.web09catB.txt ranking.sigir2010-web09catB-ql.txt
+etc/trec_eval data/clue/qrels.web09catB.txt ranking.sigir2010-web09catB-sd.txt
+etc/trec_eval data/clue/qrels.web09catB.txt ranking.sigir2010-web09catB-wsd-sd.txt
 
 perl etc/statAP_MQ_eval_v3.pl data/clue/prels.web09catB.txt ranking.sigir2010-web09catB-ql.txt
 perl etc/statAP_MQ_eval_v3.pl data/clue/prels.web09catB.txt ranking.sigir2010-web09catB-sd.txt

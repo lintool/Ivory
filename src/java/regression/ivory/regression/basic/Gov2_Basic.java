@@ -411,8 +411,8 @@ public class Gov2_Basic {
   public void runRegression() throws Exception {
     String[] params = new String[] {
         "data/gov2/run.gov2.basic.xml",
-        "data/gov2/gov2.title.701-775",
-        "data/gov2/gov2.title.776-850" };
+        "data/gov2/queries.gov2.title.701-775.xml",
+        "data/gov2/queries.gov2.title.776-850.xml" };
 
     FileSystem fs = FileSystem.getLocal(new Configuration());
 
