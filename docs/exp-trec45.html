@@ -70,15 +70,14 @@
 <h2>Experiments: TREC Disks 4-5</h2>
 </div>
 
-<p>This tutorial provides a guide to batch and interactive retrieval
-with Ivory on the venerable TREC disks 4 and 5 document collection,
-which is distributed by <a href="http://www.nist.gov/">NIST</a> and
-used in many <a href="http://trec.nist.gov/">Text Retrieval
-Conferences</a> (TRECs).  Although the collection is over a decade
-old, it is still used as a starting point for information retrieval
-research.  This guide will cover both indexing the collection,
-performing retrieval runs with queries from the TREC 2004 robust
-track, and interactive querying.</p>
+<p>This tutorial provides a guide to batch retrieval with Ivory on the
+venerable TREC disks 4 and 5 document collection, which is distributed
+by <a href="http://www.nist.gov/">NIST</a> and used in
+many <a href="http://trec.nist.gov/">Text Retrieval Conferences</a>
+(TRECs).  Although the collection is over a decade old, it is still
+used as a starting point for information retrieval research.  This
+guide will cover both indexing the collection and performing retrieval
+runs with queries from the TREC 2004 robust track.</p>
 
 <h3>Getting the Collection</h3>
 
@@ -96,6 +95,80 @@ Perl or Python script.  See
 this <a href="../data/trec/cat_all_docs.pl">simple Perl script</a>,
 but it should be very easy to write your own.</p>
 
+<h3>Building the Index</h3>
+
+<p>Assuming you've completed the <a href="start.html">getting
+started</a> tutorial, building the TREC 45 index is pretty
+straightforward. In fact, the collection is small enough that building
+an index in Hadoop local mode takes only a short while:</p>
+
+<pre class="code">
+etc/hadoop-local.sh ivory.app.PreprocessTrec45 \
+  -collection /shared/collections/trec/trec4-5_noCRFR.xml -index index-trec
+
+etc/hadoop-local.sh ivory.app.BuildIndex \
+  -index index-trec -indexPartitions 1 -positionalIndexIP
+</pre>
+
+<p>On a 2012 15&quot; Retina Display MacBook Pro (2.7 GHz Intel Core
+i7), it takes about 25 minutes for the preprocessing and 10 minutes for
+the actual inverted indexing.</p>
+
+<p>Alternatively, you can build the index on a real Hadoop cluster:</p>
+
+<pre class="code">
+etc/hadoop-cluster.sh ivory.app.PreprocessTrec45 \
+  -collection /shared/collections/trec/trec4-5_noCRFR.xml -index index-trec
+
+etc/hadoop-cluster.sh ivory.app.BuildIndex \
+  -index index-trec -indexPartitions 1 -positionalIndexIP
+</pre>
+
+<p>After building the index, you should
+be able to run the retrieval experiments described below and replicate
+our results.</p>
+
+<h3>Basic MRF models</h3>
+
+<p>To demonstrate batch retrieval, we're going to use topics from the
+TREC 2004 robust track. In the <code>data/trec/</code>
+directory, you'll find the following data:</p>
+
+<ul>
+
+  <li><code><a href="../data/trec/run.robust04.basic.xml">data/trec/run.robust04.basic.xml</a></code>:
+  retrieval models and parameters</li>
+
+  <li><code><a href="../data/trec/queries.robust04.xml">data/trec/queries.robust04.xml</a></code>:
+  queries (TREC 2004 robust track)</li>
+
+</ul>
+
+<p>The first configuration file specifies six different models:</p>
+
+<ul>
+
+  <li><b>robust04-dir-base</b>: language modeling framework, Dirichlet
+  prior, simple query likelihood.</li>
+
+  <li><b>robust04-dir-sd</b>: language modeling framework, Dirichlet
+  prior, sequential dependence model using MRFs.</li>
+
+  <li><b>robust04-dir-fd</b>: language modeling framework, Dirichlet
+  prior, full dependence model using MRFs.</li>
+
+  <li><b>robust04-bm25-base</b>: <i>bm25</i> term weighting, simple
+  bag-of-words queries.</li>
+
+  <li><b>robust04-bm25-sd</b>: sequential dependence model using MRFs,
+  with <i>bm25</i> term weighting.</li>
+
+  <li><b>robust04-bm25-fd</b>: full dependence model using MRFs,
+  with <i>bm25</i> term weighting.</li>
+
+</ul>
+
+<hr/>
 <table><tr><td valign="top"><span class="label label-info">Info</span></td>
 <td style="padding-left: 10px">Before running
 the following experiments, make sure you've built
@@ -106,16 +179,16 @@ in <code>etc/trec_eval.9.0.tar.gz</code>. Build the package
 by <code>make</code> and place the executable at <code>etc/trec_eval</code>.</td></tr></table>
 
 <table><tr><td valign="top"><span class="label label-info">Info</span></td>
-<td style="padding-left: 10px">Before running
-the following experiments, make sure to change the index location in the
+<td style="padding-left: 10px">Before running the following
+experiments, you have to copy the indexes out of HDFS (if you built
+the indexes using distributed Hadoop and not Hadoop local). Also make
+sure to change the index location in the
 <code>run.xml</code> files to the actual index path (under the
 <code>&lt;index&gt;</code> attribute).</td></tr></table>
+<hr/>
 
-<h3>Basic MRF models</h3>
-
-<p>Retrieval using basic Markov Random Field (MRF) models: full
-independence ("bag of words"), sequential dependence, full
-dependence:</p>
+<p>Here are the command-line invocations for running and evaluating
+the models:</p>
 
 <pre class="code">
 # command-line

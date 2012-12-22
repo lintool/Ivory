@@ -72,15 +72,15 @@
 
 <p>Ivory is designed to work with Hadoop YARN and has been tested
 against Cloudera CDH 4.1.2 (on both Mac and Linux). It should work
-with other Hadoop distributions with minor modifications; however,
-switching to a non-YARN version of Hadoop will requiring recompiling
-the jars. In this tutorial, we'll take you through the process of
-building an inverted index on a toy collection and running retrieval
-experiments. First, we'll use Hadoop local mode. Running in local
-model, as the name suggests, does not require setting up a cluster,
-but of course, you won't get the benefits of distributed processing
-either. Next, we'll run Hadoop on the single virtual node Hadoop
-cluster provided by Cloudera.</p>
+with other Hadoop distributions or on other platforms with only minor
+modifications; however, switching to a non-YARN version of Hadoop will
+requiring recompiling the jars. In this tutorial, we'll take you
+through the process of building an inverted index on a toy collection
+and running retrieval experiments. First, we'll use Hadoop local
+mode. Running in local model, as the name suggests, does not require
+setting up a cluster, but of course, you won't get the benefits of
+distributed processing either. Next, we'll run Hadoop on the single
+node virtual Hadoop cluster provided by Cloudera.</p>
 
 <h3>Download and Install Hadoop</h3>
 
@@ -88,7 +88,7 @@ cluster provided by Cloudera.</p>
 4.1.2 <a href="https://ccp.cloudera.com/display/SUPPORT/CDH+Downloads">here</a>. The
 easiest way is to download the tarball and unpack on your local
 machine. Make sure
-<code>PATH_TO_HADOOP/bin</code> is part of your path. Verify that Hadoop is running
+<code>PATH_TO_HADOOP/bin</code> is on your path. Verify that Hadoop is running
 with the pi example. In a shell, run the following command:</p>
 
 <pre class="code">
@@ -107,8 +107,7 @@ downloaded the tarball straight from the site above. This is just in
 case you have Hadoop set up already.</p>
 
 <p>After the above Hadoop local job finishes, you should see the
-computed value of pi... or at least something that's reasonably closer
-to 3.14.</p>
+computed value of pi... something that's reasonably closer to 3.14.</p>
 
 <h3>Clone the Ivory Repo</h3>
 
@@ -119,10 +118,10 @@ git clone git://github.com/lintool/Ivory.git
 </pre>
 
 <p>Go into the <code>Ivory/</code> directory and build with ant by
-typing <code>ant</code>.</p>
+typing <code>ant</code>. The build should complete without error.</p>
 
 <p>You should then be able to run one of the integration JUnit test
-cases that builds an index on the CACM collection, runs retrieval
+cases that builds an inverted index on the CACM collection, runs retrieval
 experiments, and verifies the results:</p>
 
 <pre class="code">
@@ -140,7 +139,7 @@ congratulations, you've gotten Ivory to work without a hitch.</p>
 
 <h3>Building an Index</h3>
 
-<p>Next, we'll run through the about integration test step by step to
+<p>Next, we'll run through the above integration test step by step to
 see what it's doing. Let's look at the collection first:</p>
 
 <pre class="code">
@@ -216,7 +215,7 @@ etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/cacm/run.cacm.xml data/cacm/q
 <p>If you see warnings about not being able to find terms, that's
 okay. After the program finishes you should see two files:
 <code>ranking.cacm-dir-base.txt</code>, <code>ranking.cacm-bm25-base.txt</code>. These
-are the retrieval runs, containing the top 1000 hits per topic.</p>
+are the retrieval results, the files containing the top 1000 hits per topic.</p>
 
 <p>Finally, let's evaluate the ranked list to see how well our
 retrieval models perform. Before doing so, make sure you've built
@@ -243,7 +242,7 @@ and a <code>P_10</code> of 0.2885.</p>
 <p>The next step is to run Ivory on an actual Hadoop cluster. How to
 set up a Hadoop cluster is beyond the scope of this tutorial, but the
 next best thing is to use Cloudera's virtual machine images, which
-comes with pre-configured single-node cluster. The images can be
+come with pre-configured single-node cluster. The images can be
 downloaded <a href="https://ccp.cloudera.com/display/SUPPORT/Cloudera%27s+Hadoop+Demo+VM+for+CDH4">here</a>.
 </p>
 
@@ -270,7 +269,8 @@ finish, click "Create". Back in the main window, the VM should have
 been added. Select it and click "Start" in the toolbar. That'll boot
 up the image.</p>
 
-<table><tr><td valign="top"><span class="label label-info">Info</span></td>
+<table style="margin-top: 15px; margin-bottom: 15px;">
+<tr><td valign="top"><span class="label label-info">Info</span></td>
 <td style="padding-left: 10px">On Mac, if you get the error "<code>Failed to
 load VMMR0.r0 (VERR_SUPLIB_WORLD_WRITABLE)</code>" when booting up, it's
 complaining because the directory <code>/Application</code> is world
@@ -287,7 +287,7 @@ sudo yum install ant
 sudo yum install gcc
 </pre>
 
-<p>From within a shell, clone the Ivory github repo:</p>
+<p>Open up a shell and clone the Ivory github repo:</p>
 
 <pre class="code">
 git clone git://github.com/lintool/Ivory.git
@@ -335,7 +335,7 @@ hadoop fs -ls index-cacm
 <p>Now copy the indexes from HDFS onto the local disk:</P>
 
 <pre class="code">
-hadoop fs -get index-cacm
+hadoop fs -get index-cacm .
 </pre>
 
 <p>From here, you should be able to run the retrieval experiments above.</p>
