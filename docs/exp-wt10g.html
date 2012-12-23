@@ -77,12 +77,12 @@ with <a href="exp-gov2.html">Gov2</a> and <a href="exp-clueweb09catB.html">ClueW
 This guide will cover both indexing the collection and performing retrieval
 runs with queries from the 2000 and 2001 TREC Web tracks</p>
 
-<table><tr><td valign="top"><span class="label label-info">Info</span></td>
-<td style="padding-left: 10px">The procedures for preparing and
-indexing the Wt10g collection is quite similar to working with TREC
-disks 4-5, which is described in <a href="exp-trec45.html">a separate
-tutorial</a>, so that might be a good starting
-point.</td></tr></table>
+<table><tr><td valign="top"><span class="label label-info">Tip</span></td>
+<td style="padding-left: 10px">The procedure for preparing and
+indexing the Wt10g collection is similar to those of TREC disks 4-5,
+which is described in <a href="exp-trec45.html">a separate
+tutorial</a>, so it might be a good idea to complete that
+first.</td></tr></table>
 
 <h3>Building the Index</h3>
 
@@ -120,8 +120,9 @@ specifies where the repacked output
 goes. The <code>-compressionType</code> option specifies compression
 type, block compression in this case.</p>
 
-<p>Once the collection has be repacked, building the inverted index
-follows a procedure very similar to the TREC collection:</p>
+<p>Once the collection has been repacked, building the inverted index
+follows a procedure very similar to TREC and all other
+collections:</p>
 
 <pre class="code">
 etc/hadoop-cluster.sh ivory.app.PreprocessWt10g \
@@ -191,7 +192,7 @@ by <code>make</code> and place the executable at <code>etc/trec_eval</code>.</td
 the following experiments, you have to
 copy the indexes out of HDFS. Also make sure to change the index location in
 <code><a href="../data/wt10g/run.wt10g.basic.xml">data/wt10g/run.wt10g.basic.xml</a></code>
-to the actual index path (under the
+and other model specification files to the actual index path (under the
 <code>&lt;index&gt;</code> attribute).</td></tr></table>
 
 <hr/>
