@@ -1115,6 +1115,9 @@ public class CLIRUtils extends Configured {
     table.set(curIndex, new IndexedFloatArray(indices, probs, true));
   }
 
+  /**
+   * A work in progress: can we use bidirectional translation probabilities to improve the translation table and vocabularies?
+   */
   private static void combineTTables(String ttableFile, String srcEVocabFile, String trgFVocabFile, String ttableE2FFile, String srcFVocabFile, String trgEVocabFile, String ttableF2EFile){
     TTable_monolithic_IFAs table = new TTable_monolithic_IFAs();
     Configuration conf = new Configuration();
@@ -1165,35 +1168,37 @@ public class CLIRUtils extends Configured {
    */
   //
   public static String[] computeFeaturesF1(HMapSFW eVector, HMapSFW translatedFVector, float eSentLength, float fSentLength) {
-    return computeFeatures(1, null, null, eVector, null, null, translatedFVector, eSentLength, fSentLength, null, null, null, null, null, null);
+    return computeFeatures(1, null, null, eVector, null, null, translatedFVector, eSentLength, fSentLength, null, null, null, null, null, null, 0);
   }
 
 
   public static String[] computeFeaturesF2(HMapSIW eSrcTfs, HMapSFW eVector, HMapSIW fSrcTfs, HMapSFW translatedFVector, float eSentLength, float fSentLength,
-      Vocab eVocabSrc, Vocab eVocabTrg, Vocab fVocabSrc, Vocab fVocabTrg, TTable_monolithic_IFAs e2f_Probs, TTable_monolithic_IFAs f2e_Probs){
-    return computeFeatures(2, null, eSrcTfs, eVector, null, fSrcTfs, translatedFVector, eSentLength, fSentLength, eVocabSrc, eVocabTrg, fVocabSrc, fVocabTrg, e2f_Probs, f2e_Probs); 
+      Vocab eVocabSrc, Vocab eVocabTrg, Vocab fVocabSrc, Vocab fVocabTrg, TTable_monolithic_IFAs e2f_Probs, TTable_monolithic_IFAs f2e_Probs, float prob){
+    return computeFeatures(2, null, eSrcTfs, eVector, null, fSrcTfs, translatedFVector, 
+        eSentLength, fSentLength, eVocabSrc, eVocabTrg, fVocabSrc, fVocabTrg, e2f_Probs, f2e_Probs, prob); 
   }
 
   public static String[] computeFeaturesF3(String eSentence, HMapSIW eSrcTfs, HMapSFW eVector, String fSentence, HMapSIW fSrcTfs, HMapSFW translatedFVector, float eSentLength, float fSentLength,
-      Vocab eVocabSrc, Vocab eVocabTrg, Vocab fVocabSrc, Vocab fVocabTrg, TTable_monolithic_IFAs e2f_Probs, TTable_monolithic_IFAs f2e_Probs){
-    return computeFeatures(3, eSentence, eSrcTfs, eVector, fSentence, fSrcTfs, translatedFVector, eSentLength, fSentLength, eVocabSrc, eVocabTrg, fVocabSrc, fVocabTrg, e2f_Probs, f2e_Probs); 
+      Vocab eVocabSrc, Vocab eVocabTrg, Vocab fVocabSrc, Vocab fVocabTrg, TTable_monolithic_IFAs e2f_Probs, TTable_monolithic_IFAs f2e_Probs, float prob){
+    return computeFeatures(3, eSentence, eSrcTfs, eVector, fSentence, fSrcTfs, translatedFVector, 
+        eSentLength, fSentLength, eVocabSrc, eVocabTrg, fVocabSrc, fVocabTrg, e2f_Probs, f2e_Probs, prob); 
   }
 
   public static String[] computeFeatures(int featSet, String eSentence, HMapSIW eSrcTfs, HMapSFW eVector, String fSentence, HMapSIW fSrcTfs, HMapSFW translatedFVector, float eSentLength, float fSentLength,
-      Vocab eVocabSrc, Vocab eVocabTrg, Vocab fVocabSrc, Vocab fVocabTrg, TTable_monolithic_IFAs e2f_Probs, TTable_monolithic_IFAs f2e_Probs){
-    return computeFeatures(featSet, eSentence, eSrcTfs, eVector, fSentence, fSrcTfs, translatedFVector, eSentLength, fSentLength, eVocabSrc, eVocabTrg, fVocabSrc, fVocabTrg, e2f_Probs, f2e_Probs, logger);
+      Vocab eVocabSrc, Vocab eVocabTrg, Vocab fVocabSrc, Vocab fVocabTrg, TTable_monolithic_IFAs e2f_Probs, TTable_monolithic_IFAs f2e_Probs, float prob){
+    return computeFeatures(featSet, eSentence, eSrcTfs, eVector, fSentence, fSrcTfs, translatedFVector, 
+        eSentLength, fSentLength, eVocabSrc, eVocabTrg, fVocabSrc, fVocabTrg, e2f_Probs, f2e_Probs, prob, logger);
   }
 
   public static String[] computeFeatures(int featSet, String eSentence, HMapSIW eSrcTfs, HMapSFW eVector, String fSentence, HMapSIW fSrcTfs, HMapSFW translatedFVector, float eSentLength, float fSentLength,
-      Vocab eVocabSrc, Vocab eVocabTrg, Vocab fVocabSrc, Vocab fVocabTrg, TTable_monolithic_IFAs e2f_Probs, TTable_monolithic_IFAs f2e_Probs, Logger sLogger) {
+      Vocab eVocabSrc, Vocab eVocabTrg, Vocab fVocabSrc, Vocab fVocabTrg, TTable_monolithic_IFAs e2f_Probs, TTable_monolithic_IFAs f2e_Probs, float prob, Logger sLogger) {
     List<String> features = new ArrayList<String>();
 
     if(fSentLength == 0 || eSentLength == 0){
       return null;
     }
-
-    float cosine = CLIRUtils.cosineNormalized(eVector, translatedFVector);
-    features.add("cosine="+cosine);    
+    
+    features.add("cosine=" + CLIRUtils.cosineNormalized(eVector, translatedFVector));    
 
     ////////////////////////////////////////////////
 
@@ -1204,76 +1209,9 @@ public class CLIRUtils extends Configured {
       features.add("lengthratio1="+lengthratio1);
       features.add("lengthratio2="+lengthratio2);       
 
-      // if there are k occurences of a term w on source side, and m occurrences of a possible translation of w on target side, 
-      // instead of saying that w has a translation on target side, we say w has max(1,m/k) translations to downweight cases where m<k
-
-      int cntFVectPos = 0, cntEVectPos = 0, cntFSentPos = 0, cntESentPos = 0;
-      float cntFVectAll = 0, cntFSentAll = 0, cntEVectAll = 0, cntESentAll = 0, transratioFSent = 0.0f, transratioESent = 0.0f;
-
-      // src-->trg term translation ratio 
-      for(String fTerm : fSrcTfs.keySet()){
-        int f = fVocabSrc.get(fTerm);
-        int srcCnt = fSrcTfs.get(fTerm);
-        cntFSentAll += srcCnt;      // consider OOVs as well since they are part of the sentence
-
-        //      if(f < 0 || fTerm.matches("\\d+")){     // only non-number terms since numbers might have noisy translation prob.s
-        if(f < 0){
-          continue;
-        }
-        int[] eS = f2e_Probs.get(f).getTranslations(0.0f);
-
-        int trgCnt = 0;
-        for(int e : eS){
-          String eTerm = eVocabTrg.get(e);
-          if(eSrcTfs.containsKey(eTerm)){
-            sLogger.debug("f2e:"+fTerm+"-->"+eTerm);
-            trgCnt += eSrcTfs.get(eTerm);
-            cntFVectPos++;
-
-            if (trgCnt >= srcCnt) break;
-          }
-        }
-        cntFSentPos += trgCnt >= srcCnt ? srcCnt : trgCnt;
-        cntFVectAll++;
-      }
-
-      // trg-->src term translation ratio 
-      for(String eTerm : eSrcTfs.keySet()){
-        int e = eVocabSrc.get(eTerm);
-        int srcCnt = eSrcTfs.get(eTerm);
-        cntESentAll += srcCnt;      // consider OOVs as well since they are part of the sentence
-
-        //      if(e < 0 || eTerm.matches("\\d+")){   // only non-number terms since numbers might have noisy translation prob.s
-        if(e < 0){
-          continue;
-        }
-
-        int[] fS = e2f_Probs.get(e).getTranslations(0.0f);
-
-        int trgCnt = 0;
-        for(int f : fS){
-          String fTerm = fVocabTrg.get(f);
-          if(fSrcTfs.containsKey(fTerm)){
-            sLogger.debug("e2f:"+eTerm+"-->"+fTerm);
-            trgCnt += fSrcTfs.get(fTerm);
-            cntEVectPos++;
-
-            if (trgCnt >= srcCnt) break;
-          }
-        }
-        cntESentPos += trgCnt >= srcCnt ? srcCnt : trgCnt;
-        cntEVectAll++;
-      }
-      //when there are terms in fSent but none of them has a translation or vocab entry, set trans ratio to 0
-      if (cntFSentAll != 0) {
-        transratioFSent = cntFSentPos/cntFSentAll;
-      }     
-      if (cntESentAll != 0) {
-        transratioESent = cntESentPos/cntESentAll;
-      }
-
-      features.add("wordtransratio1="+transratioFSent);
-      features.add("wordtransratio2="+transratioESent);
+      // src-->trg and trg-->src token translation ratio
+      features.add("wordtransratio1=" + getWordTransRatio(fSrcTfs, eSrcTfs, fVocabSrc, eVocabTrg, f2e_Probs, prob) );
+      features.add("wordtransratio2=" + getWordTransRatio(eSrcTfs, fSrcTfs, eVocabSrc, fVocabTrg, e2f_Probs, prob) );
     }
 
     ////////////////////////////////////
@@ -1282,114 +1220,81 @@ public class CLIRUtils extends Configured {
 
       // uppercase token matching features : find uppercased tokens that exactly appear on both sides
       // lack of this evidence does not imply anything, but its existence might indicate parallel
-
       fSentence.replaceAll("([',:;.?%!])", " $1 ");
       eSentence.replaceAll("([',:;.?%!])", " $1 ");
-
-      List<String> fTokens = Arrays.asList(fSentence.split("\\s+"));
-      List<String> eTokens = Arrays.asList(eSentence.split("\\s+"));
-      Set<String> fEntities = new HashSet<String>();
-      boolean matchedEntity = false;
-
-      float cntFUppercase = 0, cntUppercaseMatched = 0, cntEUppercase = 0;
-      for (int i=1; i < fTokens.size(); i++) {
-        String fToken = fTokens.get(i);
-        String prevToken = fTokens.get(i-1);
-        if (Character.isUpperCase(fToken.charAt(0))) {
-          cntFUppercase++;
-          if (eTokens.contains(fToken)) {
-            cntUppercaseMatched++;
-          }
-          if (Character.isUpperCase(prevToken.charAt(0))) {
-            fEntities.add(prevToken+" "+fToken);
-          }
-        }
-      }
-
-      for (int i=1; i < eTokens.size(); i++) {
-        String eToken = eTokens.get(i);
-        String prevToken = eTokens.get(i-1);
-        if (Character.isUpperCase(eToken.charAt(0))) {
-          // we only need to count matched tokens once
-          cntEUppercase++;
-          if (Character.isUpperCase(prevToken.charAt(0))) {
-            if (fEntities.contains(prevToken+ " "+ eToken)) {
-              matchedEntity = true;
-            }
-          }
-        }
-      }
-
-      float cntUppercaseMin = Math.min(cntFUppercase, cntEUppercase);   
-      float cntUppercaseMax = Math.max(cntFUppercase, cntEUppercase);   
-      float uppercaseRatioMin = cntUppercaseMin==0 ? 0 : (cntUppercaseMatched/cntUppercaseMin);
-      float uppercaseRatioMax = cntUppercaseMin==0 ? 0 : (cntUppercaseMatched/cntUppercaseMax);
-
-      features.add("uppercaseratio="+(matchedEntity ? 1 :0));
-      features.add("uppercaseratio2="+uppercaseRatioMin);
-      features.add("uppercaseratio3="+uppercaseRatioMax);
+      features.add("uppercaseratio1=" + getUppercaseRatio(fSentence, eSentence) );
+      features.add("uppercaseratio2=" + getUppercaseRatio(eSentence, fSentence) );
     }
-    
+
     if (featSet > 3) {
       // future work
     }
-    
-    return (String[]) features.toArray();
+
+    return features.toArray(new String[features.size()]);
   }
 
-  public static boolean isUpperBigramMatch(String fSentence, String eSentence) {
-    fSentence.replaceAll("([',:;.?%!])", " $1 ");
-    eSentence.replaceAll("([',:;.?%!])", " $1 ");
+  private static float getWordTransRatio(HMapSIW eSrcTfs, HMapSIW fSrcTfs, Vocab eVocabSrc, Vocab fVocabTrg, TTable_monolithic_IFAs e2fProbs, float probThreshold) {
+    // if there are k occurences of a term w on source side, and m occurrences of a possible translation of w on target side, 
+    // instead of saying that w has a translation on target side, we say w has max(1,m/k) translations to downweight cases where m<k
+    float cntAll = 0, cntMatch = 0, cntAltAll = 0, cntAltMatch = 0;
+    // trg-->src term translation ratio 
+    for(String eTerm : eSrcTfs.keySet()){
+      int e = eVocabSrc.get(eTerm);
+      int srcCnt = eSrcTfs.get(eTerm);
+      cntAll += srcCnt;      // consider OOVs as well since they are part of the sentence
 
-    List<String> fTokens = Arrays.asList(fSentence.split("\\s+"));
-    List<String> eTokens = Arrays.asList(eSentence.split("\\s+"));
-    Set<String> fEntities = new HashSet<String>();
-    boolean matchedEntity = false;
+      //      if(e < 0 || eTerm.matches("\\d+")){   // only non-number terms since numbers might have noisy translation prob.s
+      if(e < 0){
+        continue;
+      }
 
-    float cntFUppercase = 0, cntUppercaseMatched = 0, cntEUppercase = 0;
-    for (int i=1; i < fTokens.size(); i++) {
-      String fToken = fTokens.get(i);
-      String prevToken = fTokens.get(i-1);
-      if (Character.isUpperCase(fToken.charAt(0))) {
-        cntFUppercase++;
-        if (eTokens.contains(fToken)) {
-          cntUppercaseMatched++;
-        }
-        if (Character.isUpperCase(prevToken.charAt(0))) {
-          fEntities.add(prevToken+" "+fToken);
+      int[] fS = e2fProbs.get(e).getTranslations(probThreshold);
+
+      int trgCnt = 0;
+      for(int f : fS){
+        String fTerm = fVocabTrg.get(f);
+        if(fSrcTfs.containsKey(fTerm)){
+          trgCnt += fSrcTfs.get(fTerm);
+          cntAltMatch++;
+
+          if (trgCnt >= srcCnt) break;
         }
       }
+      cntMatch += trgCnt >= srcCnt ? srcCnt : trgCnt;
+      cntAltAll++;
     }
+    //when there are terms in fSent but none of them has a translation or vocab entry, set trans ratio to 0
+    return cntAll == 0 ? 0 : cntMatch/cntAll;
+  }
 
-    for (int i=1; i < eTokens.size(); i++) {
-      String eToken = eTokens.get(i);
-      String prevToken = eTokens.get(i-1);
-      if (Character.isUpperCase(eToken.charAt(0))) {
-        // we only need to count matched tokens once
-        cntEUppercase++;
-        if (Character.isUpperCase(prevToken.charAt(0))) {
-          if (fEntities.contains(prevToken+ " "+ eToken)) {
-            matchedEntity = true;
+  private static float getUppercaseRatio(String sentence1, String sentence2) {
+    float cntUpperMatch = 0, cntUpperTotal = 0;
+    StringBuilder uppercaseEntity = new StringBuilder();
+    List<String> tokens = Arrays.asList(sentence1.split("\\s+"));
+
+    for (int i=0; i < tokens.size(); i++) {
+      String token = tokens.get(i);
+      // discard single-char upper-case tokens
+      if (token.length() > 0 && Character.isUpperCase(token.charAt(0))) {
+        uppercaseEntity.append(token + " ");
+      }else {
+        if (!uppercaseEntity.equals("")) {
+          if (sentence2.contains(uppercaseEntity.toString().trim())) {
+            cntUpperMatch++;
           }
+          cntUpperTotal++;
+          uppercaseEntity.delete(0, uppercaseEntity.length());    // clear buffer
         }
       }
+    } 
+    if (!uppercaseEntity.equals("")) {
+      if (sentence2.contains(uppercaseEntity.toString().trim())) {
+        cntUpperMatch++;
+      }
+      cntUpperTotal++;
     }
-
-    // uppercase token matching features : find uppercased tokens that exactly appear on both sides
-    // lack of this evidence does not imply anything, but its existence might indicate parallel
-
-    //    float cntUppercaseMin = Math.min(cntFUppercase, cntEUppercase);   
-    //    float cntUppercaseMax = Math.max(cntFUppercase, cntEUppercase);   
-    //    float uppercaseRatioMin = cntUppercaseMin==0 ? 0 : (cntUppercaseMatched/cntUppercaseMin);
-    //    float uppercaseRatioMax = cntUppercaseMin==0 ? 0 : (cntUppercaseMatched/cntUppercaseMax);
-
-    //    features[5] = "uppercaseratio="+(matchedEntity ? 1 :0);
-    //    features[6] = "uppercaseratio2="+uppercaseRatioMin;
-    //    features[7] = "uppercaseratio3="+uppercaseRatioMax;
-
-    return matchedEntity;
+    return cntUpperTotal==0 ? 0 : cntUpperMatch/cntUpperTotal;
   }
-
 
   private static int printUsage() {
     System.out.println("usage: [input-lexicalprob-file_f2e] [input-lexicalprob-file_e2f] [type=giza|berkeley] [src-vocab_f] [trg-vocab_e] [prob-table_f-->e] [src-vocab_e] [trg-vocab_f] [prob-table_e-->f] ([cumulative-prob-threshold]) ([num-max-entries-per-word])" +
