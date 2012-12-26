@@ -7,16 +7,13 @@ import ivory.core.data.document.TermDocVector;
 import ivory.core.data.stat.DfTableArray;
 import ivory.core.data.stat.DocLengthTable;
 import ivory.core.data.stat.DocLengthTable4B;
-import ivory.core.tokenize.OpenNLPTokenizer;
 import ivory.core.tokenize.Tokenizer;
 import ivory.core.tokenize.TokenizerFactory;
 import ivory.core.util.CLIRUtils;
 import ivory.pwsim.score.ScoringModel;
-
 import java.io.IOException;
 import java.net.URI;
 import java.util.Map;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.filecache.DistributedCache;
 import org.apache.hadoop.fs.FileSystem;
@@ -36,9 +33,7 @@ import org.apache.hadoop.mapred.SequenceFileInputFormat;
 import org.apache.hadoop.mapred.SequenceFileOutputFormat;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-
 import com.google.common.collect.Maps;
-
 import edu.umd.cloud9.io.map.HMapIFW;
 import edu.umd.cloud9.io.map.HMapSFW;
 import edu.umd.cloud9.mapred.NullInputFormat;
@@ -51,8 +46,8 @@ import edu.umd.hooka.alignment.HadoopAlign;
 import edu.umd.hooka.ttables.TTable_monolithic_IFAs;
 
 /**
- * Translates term doc vectors in foreign language (e.g. German) into target language (e.g. English) using the CLIR technique discussed in Combining Bidirectional Translation and Synonymy
-for Cross-Language Information Retrieval, SIGIR'06, Jianqiang Wang and Douglas W. Oard.
+ * Translates term doc vectors in foreign language (e.g. German) into target language (e.g. English) using the CLIR technique discussed in Probabilistic Structured
+Query Methods, SIGIR'03, Kareem Darwish and Douglas W. Oard.
 
  * @author ferhanture
  *
