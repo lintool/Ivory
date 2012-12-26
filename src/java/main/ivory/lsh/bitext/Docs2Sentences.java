@@ -3,6 +3,14 @@ package ivory.lsh.bitext;
 import ivory.core.util.CLIRUtils;
 import ivory.lsh.data.WikiSentenceInfo;
 import java.io.IOException;
+
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.GnuParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
@@ -50,6 +58,14 @@ public class Docs2Sentences extends Configured implements Tool {
     EEmpty, FEmpty, E, F;
   }
 
+  private static Options options;
+  
+  private static void printUsage() {
+    HelpFormatter formatter = new HelpFormatter();
+    formatter.printHelp( "Docs2Sentences", options );
+    System.exit(-1);    
+  }
+  
   public Docs2Sentences() {
   }
 
@@ -182,9 +198,14 @@ public class Docs2Sentences extends Configured implements Tool {
   public int run(String[] args) throws Exception {
     JobConf conf = new JobConf(getConf(), Docs2Sentences.class);
 
-    String eCollectionPath = args[0];
-    String fCollectionPath = args[1];
-    String sentsPath = args[2];
+    // Read commandline arguments
+    CommandLine cmdline = parseArgs(args);
+    if (cmdline == null) {
+      printUsage();
+    }
+    String eCollectionPath = cmdline.getOptionValue(ECOLLECTION_OPTION);
+    String fCollectionPath = cmdline.getOptionValue(FCOLLECTION_OPTION);
+    String sentsPath = cmdline.getOptionValue(SENTENCES_OPTION);
 
     conf.setJobName("Docs2Sentences_"+conf.get("fLang")+"-"+conf.get("eLang"));  
 
@@ -204,7 +225,6 @@ public class Docs2Sentences extends Configured implements Tool {
 
     conf.setInputFormat(SequenceFileInputFormat.class);
     conf.setOutputFormat(SequenceFileOutputFormat.class);
-//    conf.setOutputFormat(TextOutputFormat.class);
     conf.setMapOutputKeyClass(PairOfInts.class);
     conf.setMapOutputValueClass(WikiSentenceInfo.class);
     conf.setOutputKeyClass(PairOfInts.class);
@@ -237,6 +257,50 @@ public class Docs2Sentences extends Configured implements Tool {
     sLogger.info("<STATS> Average num of tokens per " + conf.get("fLang") + " sentence = " + sumSentLengthsF + "," + (sumSentLengthsF+0.0f)/numSentsF);
 
     return 0;
+  }
+  
+  private static final String FCOLLECTION_OPTION = "f_collection";
+  private static final String ECOLLECTION_OPTION = "e_collection";
+  private static final String FLANG_OPTION = "f_lang";
+  private static final String ELANG_OPTION = "e_lang";
+  private static final String FINDEX_OPTION = "f_index";
+  private static final String EINDEX_OPTION = "e_index";
+  private static final String BITEXTNAME_OPTION = "name";
+  private static final String SENTENCES_OPTION = "sentences";
+  private static final String BITEXT_OPTION = "bitext";
+  private static final String DATADIR_OPTION = "data";
+  private static final String PWSIM_OPTION = "pwsim_output";
+  private static final String CLASSIFIERID_OPTION = "classifier_id";
+  private static final String CLASSIFIERTHRESHOLD_OPTION = "threshold";
+  private static final String LIBJARS_OPTION = "libjars";
+
+  @SuppressWarnings("static-access")
+  private CommandLine parseArgs(String[] args) throws Exception {
+    options.addOption(OptionBuilder.withDescription("source-side raw collection path").withArgName("path").hasArg().isRequired().create(FCOLLECTION_OPTION));
+    options.addOption(OptionBuilder.withDescription("target-side raw collection path").withArgName("path").hasArg().isRequired().create(ECOLLECTION_OPTION));
+    options.addOption(OptionBuilder.withDescription("two-letter code for f-language").withArgName("en|de|tr|cs|zh|ar|es").hasArg().isRequired().create(FLANG_OPTION));
+    options.addOption(OptionBuilder.withDescription("two-letter code for e-language").withArgName("en|de|tr|cs|zh|ar|es").hasArg().isRequired().create(ELANG_OPTION));
+    options.addOption(OptionBuilder.withDescription("source-side index path").withArgName("path").hasArg().isRequired().create(FINDEX_OPTION));
+    options.addOption(OptionBuilder.withDescription("target-side index path").withArgName("path").hasArg().isRequired().create(EINDEX_OPTION));
+    options.addOption(OptionBuilder.withDescription("name of bitext").withArgName("string").hasArg().isRequired().create(BITEXTNAME_OPTION));
+    options.addOption(OptionBuilder.withDescription("path to data files on HDFS").withArgName("path").hasArg().isRequired().create(DATADIR_OPTION));
+    options.addOption(OptionBuilder.withDescription("path to output of pwsim algorithm").withArgName("path").hasArg().isRequired().create(PWSIM_OPTION));
+    options.addOption(OptionBuilder.withDescription("classifier id to retrieve P('PARALLEL'|instance)").withArgName("0 or 1").hasArg().isRequired().create(CLASSIFIERID_OPTION));
+    options.addOption(OptionBuilder.withDescription("target vocabulary (e-side) of P(e|f)").withArgName("0-1").hasArg().isRequired().create(CLASSIFIERTHRESHOLD_OPTION));
+    options.addOption(OptionBuilder.withDescription("path to collection sentences").withArgName("path").hasArg().isRequired().create(SENTENCES_OPTION));
+    options.addOption(OptionBuilder.withDescription("path to output bitext").withArgName("path").hasArg().isRequired().create(BITEXT_OPTION));
+    options.addOption(OptionBuilder.withDescription("Hadoop option to load external jars").withArgName("jar packages").hasArg().create(LIBJARS_OPTION));
+    
+    CommandLine cmdline;
+    CommandLineParser parser = new GnuParser();
+    try {
+      cmdline = parser.parse(options, args);
+    } catch (ParseException exp) {
+      System.err.println("Error parsing command line: " + exp.getMessage());
+      return null;
+    }
+
+    return cmdline;
   }
 
   /**

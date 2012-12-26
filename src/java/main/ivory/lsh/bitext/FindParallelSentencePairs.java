@@ -8,6 +8,14 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Iterator;
 import opennlp.model.RealValueFileEventStream;
+
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.GnuParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.filecache.DistributedCache;
 import org.apache.hadoop.fs.FileSystem;
@@ -40,7 +48,7 @@ import edu.umd.cloud9.util.map.HMapIV;
 
 /**
   Step 1 of the bitext extraction algorithm.
-  
+
  * @author ferhanture
  * 
  */
@@ -56,6 +64,8 @@ public class FindParallelSentencePairs extends Configured implements Tool {
     E, F, pairsE, pairsF, pairsProcessed, pairsCandidate, pairsFilteredByVectorSize, pairsFilteredBySentRatio, parallel 
   }
 
+  private static Options options;
+
   //AssertTrue
   //pairsCandidate=sum(pairsProcessed, pairsFilteredBySentRatio)
 
@@ -65,10 +75,10 @@ public class FindParallelSentencePairs extends Configured implements Tool {
   public FindParallelSentencePairs() {
   }
 
-  private static int printUsage() {
-    sLogger.info("usage: [e-collection-path] [f-collection-path] [sentences-path] [cl-pwsim-output-path] [bitext-path] [e-dir] [f-dir] [vocab-dir] [e-lang] [f-lang] [bitext-name] [threshold] [classifier parallel-label id]");
-    ToolRunner.printGenericCommandUsage(System.out);
-    return -1;
+  private static void printUsage() {
+    HelpFormatter formatter = new HelpFormatter();
+    formatter.printHelp( "FindParallelSentencePairs", options );
+    System.exit(-1);    
   }
 
   /**
@@ -91,9 +101,9 @@ public class FindParallelSentencePairs extends Configured implements Tool {
     private PairOfInts keyOut;
     private JobConf mJob;
     private ArrayListOfIntsWritable similarDocnos;
-    
+
     public void configure(JobConf job) {
-//      sLogger.setLevel(Level.DEBUG);
+      //      sLogger.setLevel(Level.DEBUG);
       mJob = job;
       pwsimMapping = new HMapIV<ArrayListOfIntsWritable>();
       keyOut = new PairOfInts();
@@ -153,14 +163,14 @@ public class FindParallelSentencePairs extends Configured implements Tool {
     public void map(PairOfInts sentenceId, WikiSentenceInfo sentenceInfo, OutputCollector<PairOfInts, WikiSentenceInfo> output, Reporter reporter) throws IOException {
       int docno = sentenceId.getLeftElement();
       int langID = sentenceInfo.getLangID();
-                    
+
       // we only load the mapping once, during the first map() call of a mapper. 
       // this works b/c all input kv pairs of a given mapper will have same lang id (reason explained above)
       if (pwsimMapping.isEmpty()) {
         loadPairs(pwsimMapping, langID, mJob, reporter);
         sLogger.info("Mapping loaded: "+pwsimMapping.size());
       }
-      
+
       // if no similar docs for docno, return
       if (pwsimMapping.containsKey(docno)) {
         similarDocnos = pwsimMapping.get(docno);  
@@ -175,7 +185,7 @@ public class FindParallelSentencePairs extends Configured implements Tool {
         reporter.incrCounter(Sentences.F, 1);        
         reporter.incrCounter(Sentences.pairsF, similarDocnos.size());
       }
-        
+
       for (int similarDocno : similarDocnos) {
         if (langID == CLIRUtils.E) {
           keyOut.set(similarDocno, docno);
@@ -206,7 +216,7 @@ public class FindParallelSentencePairs extends Configured implements Tool {
     private Text emptyValue = new Text();
 
     public void configure(JobConf job) {
-//      sLogger.setLevel(Level.DEBUG);
+      //      sLogger.setLevel(Level.DEBUG);
 
       try {
         helper = new PreprocessHelper(CLIRUtils.MinVectorTerms, CLIRUtils.MinSentenceLength, job);
@@ -222,7 +232,7 @@ public class FindParallelSentencePairs extends Configured implements Tool {
       if (classifierThreshold > 1f) {
         throw new RuntimeException("Classifier confidence threshold > 1, provide value in [0,1]: "+classifierThreshold);        
       }
-      
+
       eVectors = new ArrayListWritable<HMapSFW>();
       fVectors = new ArrayListWritable<HMapSFW>();
       eSentences = new ArrayListWritable<Text>();
@@ -238,7 +248,7 @@ public class FindParallelSentencePairs extends Configured implements Tool {
 
       fDocno = docnoPair.getLeftElement();
       eDocno = docnoPair.getRightElement();
-            
+
       // parse WikiDocInfo object into sentences and vectors, based on the language id
       WikiSentenceInfo sentenceInfo;
       int eCnt = 0, fCnt = 0;
@@ -279,18 +289,18 @@ public class FindParallelSentencePairs extends Configured implements Tool {
       reporter.incrCounter(Sentences.pairsCandidate, fVectors.size() * eVectors.size());
       int numProcessed = 0;
       long time = 0;
-     
-sLogger.debug(fSentences.size()+","+eSentences.size());
+
+      sLogger.debug(fSentences.size()+","+eSentences.size());
 
       // classify each e-f sentence pair in the candidate set
       for (int f = 0; f < fVectors.size(); f++) {
         HMapSFW fVector = fVectors.get(f);
         int fSentLength = fSentences.get(f).getLength();
-                      
+
         for (int e = 0; e < eVectors.size(); e++) {
           HMapSFW eVector = eVectors.get(e);
           int eSentLength = eSentences.get(e).getLength();
-          
+
           if (eSentLength > 2 * fSentLength || fSentLength > 2 * eSentLength) {
             // sLogger.debug("length filter");
             reporter.incrCounter(Sentences.pairsFilteredBySentRatio, 1);
@@ -299,15 +309,12 @@ sLogger.debug(fSentences.size()+","+eSentences.size());
 
           reporter.incrCounter(Sentences.pairsProcessed, 1);        
           numProcessed++;      
-            
-          sLogger.debug(fSentences.get(f));
-          sLogger.debug(eSentences.get(e));
-            
+
           // compute features
           long start = System.currentTimeMillis();
           String[] instance = CLIRUtils.computeFeaturesF1(eVector, fVector, eSentLength, fSentLength);
           time += (System.currentTimeMillis()-start);
-          
+
           // classify w/ maxent model
           // emit if labeled parallel
           if (instance == null) {
@@ -334,29 +341,14 @@ sLogger.debug(fSentences.size()+","+eSentences.size());
    */
 
   public int run(String[] args) throws Exception {
-    if (args.length != 13) {
-      printUsage();
-      return -1;
-    }
     JobConf conf = new JobConf(getConf(), FindParallelSentencePairs.class);
 
     // Read commandline argument
-    
-    String sentsPath = args[2];    
-    String bitextPath = args[4];
-    setupConf(conf, args);
-
-    if (!FileSystem.get(conf).exists(new Path(sentsPath))) {
-      Docs2Sentences docs2sentencesJob = new Docs2Sentences(conf);
-      int exitCode = docs2sentencesJob.run(args);
-      if (exitCode == -1) {
-        sLogger.info("Job " + docs2sentencesJob.toString() + " exited with errors. Terminating...");
-        return -1;
-      }
-    }    
-
-    FileInputFormat.addInputPaths(conf, sentsPath);
-    FileOutputFormat.setOutputPath(conf, new Path(bitextPath));
+    conf = setupConf(conf, args);
+    if (conf == null) {
+      printUsage();
+      return -1;
+    }
 
     conf.setInt("mapred.task.timeout", 60000000);
     conf.set("mapred.child.java.opts", "-Xmx2000m");
@@ -367,7 +359,7 @@ sLogger.debug(fSentences.size()+","+eSentences.size());
     conf.setNumReduceTasks(50);
     conf.setInt("mapred.min.split.size", 2000000000);
     conf.setFloat("mapred.reduce.slowstart.completed.maps", 0.9f);
-    
+
     conf.setInputFormat(SequenceFileInputFormat.class);
     conf.setOutputFormat(TextOutputFormat.class);
     conf.setMapOutputKeyClass(PairOfInts.class);
@@ -381,22 +373,72 @@ sLogger.debug(fSentences.size()+","+eSentences.size());
     return 0;
   }
 
+  private static final String FCOLLECTION_OPTION = "f_collection";
+  private static final String ECOLLECTION_OPTION = "e_collection";
+  private static final String FLANG_OPTION = "f_lang";
+  private static final String ELANG_OPTION = "e_lang";
+  private static final String FINDEX_OPTION = "f_index";
+  private static final String EINDEX_OPTION = "e_index";
+  private static final String BITEXTNAME_OPTION = "name";
+  private static final String SENTENCES_OPTION = "sentences";
+  private static final String BITEXT_OPTION = "bitext";
+  private static final String DATADIR_OPTION = "data";
+  private static final String PWSIM_OPTION = "pwsim_output";
+  private static final String CLASSIFIERID_OPTION = "classifier_id";
+  private static final String CLASSIFIERTHRESHOLD_OPTION = "threshold";
+  private static final String LIBJARS_OPTION = "libjars";
 
-  private void setupConf(JobConf conf, String[] args) throws URISyntaxException, IOException {
-    String pwsimPairsPath = args[3];
-    String eDir = args[5];
-    String fDir = args[6];
-    String dataDir = args[7];
-    String eLang = args[8];
-    String fLang = args[9];
-    String bitextName = args[10];
-  
+  @SuppressWarnings("static-access")
+  private JobConf setupConf(JobConf conf, String[] args) throws Exception {
+    options.addOption(OptionBuilder.withDescription("source-side raw collection path").withArgName("path").hasArg().isRequired().create(FCOLLECTION_OPTION));
+    options.addOption(OptionBuilder.withDescription("target-side raw collection path").withArgName("path").hasArg().isRequired().create(ECOLLECTION_OPTION));
+    options.addOption(OptionBuilder.withDescription("two-letter code for f-language").withArgName("en|de|tr|cs|zh|ar|es").hasArg().isRequired().create(FLANG_OPTION));
+    options.addOption(OptionBuilder.withDescription("two-letter code for e-language").withArgName("en|de|tr|cs|zh|ar|es").hasArg().isRequired().create(ELANG_OPTION));
+    options.addOption(OptionBuilder.withDescription("source-side index path").withArgName("path").hasArg().isRequired().create(FINDEX_OPTION));
+    options.addOption(OptionBuilder.withDescription("target-side index path").withArgName("path").hasArg().isRequired().create(EINDEX_OPTION));
+    options.addOption(OptionBuilder.withDescription("name of bitext").withArgName("string").hasArg().isRequired().create(BITEXTNAME_OPTION));
+    options.addOption(OptionBuilder.withDescription("path to data files on HDFS").withArgName("path").hasArg().isRequired().create(DATADIR_OPTION));
+    options.addOption(OptionBuilder.withDescription("path to output of pwsim algorithm").withArgName("path").hasArg().isRequired().create(PWSIM_OPTION));
+    options.addOption(OptionBuilder.withDescription("classifier id to retrieve P('PARALLEL'|instance)").withArgName("0 or 1").hasArg().isRequired().create(CLASSIFIERID_OPTION));
+    options.addOption(OptionBuilder.withDescription("target vocabulary (e-side) of P(e|f)").withArgName("0-1").hasArg().isRequired().create(CLASSIFIERTHRESHOLD_OPTION));
+    options.addOption(OptionBuilder.withDescription("path to collection sentences").withArgName("path").hasArg().isRequired().create(SENTENCES_OPTION));
+    options.addOption(OptionBuilder.withDescription("path to output bitext").withArgName("path").hasArg().isRequired().create(BITEXT_OPTION));
+    options.addOption(OptionBuilder.withDescription("Hadoop option to load external jars").withArgName("jar packages").hasArg().create(LIBJARS_OPTION));
+
+    CommandLine cmdline;
+    CommandLineParser parser = new GnuParser();
+    try {
+      cmdline = parser.parse(options, args);
+    } catch (ParseException exp) {
+      System.err.println("Error parsing command line: " + exp.getMessage());
+      return null;
+    }
+
+    String pwsimPairsPath = cmdline.getOptionValue(PWSIM_OPTION);
+    String eDir = cmdline.getOptionValue(EINDEX_OPTION);
+    String fDir = cmdline.getOptionValue(FINDEX_OPTION);
+    String dataDir = cmdline.getOptionValue(DATADIR_OPTION);
+    String eLang = cmdline.getOptionValue(ELANG_OPTION);
+    String fLang = cmdline.getOptionValue(FLANG_OPTION);
+    String bitextName = cmdline.getOptionValue(BITEXTNAME_OPTION);
+    float classifierThreshold = Float.parseFloat(cmdline.getOptionValue(CLASSIFIERTHRESHOLD_OPTION));
+    int classifierId = Integer.parseInt(cmdline.getOptionValue(CLASSIFIERID_OPTION));
+
+    String sentsPath = cmdline.getOptionValue(SENTENCES_OPTION);
+
+    if (!FileSystem.get(conf).exists(new Path(sentsPath))) {
+      Docs2Sentences docs2sentencesJob = new Docs2Sentences(conf);
+      int exitCode = docs2sentencesJob.run(args);
+      if (exitCode == -1) {
+        sLogger.info("Job " + docs2sentencesJob.toString() + " exited with errors. Terminating...");
+        return null;
+      }
+    }
+
+    FileInputFormat.addInputPaths(conf, sentsPath);
+    FileOutputFormat.setOutputPath(conf, new Path(cmdline.getOptionValue(BITEXT_OPTION)));
+
     RetrievalEnvironment eEnv = new RetrievalEnvironment(eDir, FileSystem.get(conf));
-
-    float classifierThreshold = Float.parseFloat(args[11]);
-    int classifierId = Integer.parseInt(args[12]);
-  
-    float minInVocabRate = args.length > 13 ? Float.parseFloat(args[13]) : 0.5f;
 
     String eSentDetect = dataDir+"/sent/"+eLang+"-sent.bin";
     String eTokenizer = dataDir+"/token/"+eLang+"-token.bin";
@@ -414,7 +456,7 @@ sLogger.debug(fSentences.size()+","+eSentences.size());
     String e2f_ttableFile = dataDir+"/"+bitextName+"/ttable."+eLang+"-"+fLang;
 
     String classifierFile = dataDir+"/"+bitextName+"/classifier-simple."+fLang+"-"+eLang;
-    
+
     conf.setJobName("FindParallelSentences_" + fLang +"-" + eLang +"_F1="+classifierThreshold+"["+classifierId+"]");
 
     conf.set("eDir", eDir);
@@ -425,7 +467,6 @@ sLogger.debug(fSentences.size()+","+eSentences.size());
     conf.setInt("ClassifierId", classifierId);
     conf.set("fTokenizer", fTokenizer);
     conf.set("eTokenizer", eTokenizer);
-    conf.setFloat("MinInVocabRate", minInVocabRate);
     conf.set("eStopword", eStopwords);
     conf.set("fStopword", fStopwords);
 
@@ -440,10 +481,10 @@ sLogger.debug(fSentences.size()+","+eSentences.size());
     DistributedCache.addCacheFile(new URI(eVocabTrg), conf);
 
     //f-files
-    
+
     sLogger.info("caching files...5,6,7,8");
 
-//    DistributedCache.addCacheFile(new URI(fDir+"/transDf.dat"), conf);
+    //    DistributedCache.addCacheFile(new URI(fDir+"/transDf.dat"), conf);
     DistributedCache.addCacheFile(new URI(fSentDetect), conf);
     DistributedCache.addCacheFile(new URI(fTokenizer), conf);
     DistributedCache.addCacheFile(new URI(fVocabSrc), conf);
@@ -458,6 +499,8 @@ sLogger.debug(fSentences.size()+","+eSentences.size());
     DistributedCache.addCacheFile(new URI(eEnv.getIndexTermsData()), conf);
     DistributedCache.addCacheFile(new URI(classifierFile), conf);
     DistributedCache.addCacheFile(new URI(pwsimPairsPath), conf);    
+
+    return conf;
   }
 
   /**

@@ -7,6 +7,14 @@ import ivory.lsh.data.WikiSentenceInfo;
 import java.io.IOException;
 import java.net.URI;
 import opennlp.model.RealValueFileEventStream;
+
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.GnuParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.filecache.DistributedCache;
 import org.apache.hadoop.fs.FileSystem;
@@ -48,13 +56,15 @@ public class FilterSentencePairs extends Configured implements Tool {
     parallel, ignored, dbg, OOV
   }
 
+  private static Options options;
+
   public FilterSentencePairs() {
   }
 
-  private static int printUsage() {
-    sLogger.info("usage: [bitext-input-path] [filtered-output-path] [e-dir] [f-dir] [vocab-dir] [e-lang] [f-lang] [bitext-name] [classifier-threshold] [classifier-idOfPositiveClass] ([min in-Vocab term/sentence-rate])");
-    ToolRunner.printGenericCommandUsage(System.out);
-    return -1;
+  private static void printUsage() {
+    HelpFormatter formatter = new HelpFormatter();
+    formatter.printHelp( "FilterSentencePairs", options );
+    System.exit(-1);    
   }
 
   //	Map: (eSent, fSent) --> (eSent, fSent)
@@ -118,7 +128,7 @@ public class FilterSentencePairs extends Configured implements Tool {
       sLogger.debug("-------------\n"+fSent+"\n"+eSent+"\n----\n"+fVector+"\n"+fSrcTfs+"\n"+eVector+"\n"+fLen+","+eLen+"\n------------");
 
       String[] instance = CLIRUtils.computeFeaturesF2(eSrcTfs, eVector, fSrcTfs, fVector, eLen, fLen, 
-          helper.getESrc(), helper.getETrg(), helper.getFSrc(), helper.getFTrg(), helper.getE2F(), helper.getF2E());
+          helper.getESrc(), helper.getETrg(), helper.getFSrc(), helper.getFTrg(), helper.getE2F(), helper.getF2E(), 0.1f);
       
 //      String[] instance = CLIRUtils.computeFeaturesF3(eSent, eSrcTfs, eVector, fSent, fSrcTfs, fVector, eLen, fLen, 
 //          helper.getESrc(), helper.getETrg(), helper.getFSrc(), helper.getFTrg(), helper.getE2F(), helper.getF2E());
@@ -155,27 +165,25 @@ public class FilterSentencePairs extends Configured implements Tool {
    */
 
   public int run(String[] args) throws Exception {
-    if (args.length < 10) {
-      printUsage();
-      return -1;
-    }
     JobConf conf = new JobConf(getConf(), FilterSentencePairs.class);
 
-    // Read commandline argument
-    String inputPath = args[0];
-    String outputPath = args[1];
-
-    String eDir = args[2];
-    String fDir = args[3];
+    // Read commandline arguments
+    CommandLine cmdline = parseArgs(args);
+    if (cmdline == null) {
+      printUsage();
+    }
+    String inputPath = cmdline.getOptionValue(INPUT_OPTION);
+    String outputPath = cmdline.getOptionValue(OUTPUT_OPTION);
+    String eDir = cmdline.getOptionValue(EINDEX_OPTION);
+    String fDir = cmdline.getOptionValue(FINDEX_OPTION);
+    String dataDir = cmdline.getOptionValue(DATADIR_OPTION);
+    String eLang = cmdline.getOptionValue(ELANG_OPTION);
+    String fLang = cmdline.getOptionValue(FLANG_OPTION);
+    String bitextName = cmdline.getOptionValue(BITEXTNAME_OPTION);
+    float classifierThreshold = Float.parseFloat(cmdline.getOptionValue(CLASSIFIERTHRESHOLD_OPTION));
+    int classifierId = Integer.parseInt(cmdline.getOptionValue(CLASSIFIERID_OPTION));
 
     RetrievalEnvironment eEnv = new RetrievalEnvironment(eDir, FileSystem.get(conf));
-
-    String dataDir = args[4];
-    String eLang = args[5];
-    String fLang = args[6];
-    String bitextName = args[7];
-    float classifierThreshold = Float.parseFloat(args[8]);
-    int classifierId = Integer.parseInt(args[9]);
 
     String eSentDetect = dataDir+"/sent/"+eLang+"-sent.bin";
     String eTokenizer = dataDir+"/token/"+eLang+"-token.bin";
@@ -259,6 +267,43 @@ public class FilterSentencePairs extends Configured implements Tool {
     return 0;
   }
 
+  private static final String FLANG_OPTION = "f_lang";
+  private static final String ELANG_OPTION = "e_lang";
+  private static final String FINDEX_OPTION = "f_index";
+  private static final String EINDEX_OPTION = "e_index";
+  private static final String BITEXTNAME_OPTION = "name";
+  private static final String INPUT_OPTION = "input";
+  private static final String OUTPUT_OPTION = "output";
+  private static final String DATADIR_OPTION = "data";
+  private static final String PWSIM_OPTION = "pwsim_output";
+  private static final String CLASSIFIERID_OPTION = "classifier_id";
+  private static final String CLASSIFIERTHRESHOLD_OPTION = "threshold";
+  private static final String LIBJARS_OPTION = "libjars";
+
+  @SuppressWarnings("static-access")
+  private CommandLine parseArgs(String[] args) throws Exception {
+    options.addOption(OptionBuilder.withDescription("two-letter code for f-language").withArgName("en|de|tr|cs|zh|ar|es").hasArg().isRequired().create(FLANG_OPTION));
+    options.addOption(OptionBuilder.withDescription("two-letter code for e-language").withArgName("en|de|tr|cs|zh|ar|es").hasArg().isRequired().create(ELANG_OPTION));
+    options.addOption(OptionBuilder.withDescription("source-side index path").withArgName("path").hasArg().isRequired().create(FINDEX_OPTION));
+    options.addOption(OptionBuilder.withDescription("target-side index path").withArgName("path").hasArg().isRequired().create(EINDEX_OPTION));
+    options.addOption(OptionBuilder.withDescription("name of bitext").withArgName("string").hasArg().isRequired().create(BITEXTNAME_OPTION));
+    options.addOption(OptionBuilder.withDescription("path to data files on HDFS").withArgName("path").hasArg().isRequired().create(DATADIR_OPTION));
+    options.addOption(OptionBuilder.withDescription("path to output of pwsim algorithm").withArgName("path").hasArg().isRequired().create(PWSIM_OPTION));
+    options.addOption(OptionBuilder.withDescription("classifier id to retrieve P('PARALLEL'|instance)").withArgName("0 or 1").hasArg().isRequired().create(CLASSIFIERID_OPTION));
+    options.addOption(OptionBuilder.withDescription("target vocabulary (e-side) of P(e|f)").withArgName("0-1").hasArg().isRequired().create(CLASSIFIERTHRESHOLD_OPTION));
+    options.addOption(OptionBuilder.withDescription("Hadoop option to load external jars").withArgName("jar packages").hasArg().create(LIBJARS_OPTION));
+
+    CommandLine cmdline;
+    CommandLineParser parser = new GnuParser();
+    try {
+      cmdline = parser.parse(options, args);
+    } catch (ParseException exp) {
+      System.err.println("Error parsing command line: " + exp.getMessage());
+      return null;
+    }
+
+    return cmdline;
+  }
 
   /**
    * Dispatches command-line arguments to the tool via the
