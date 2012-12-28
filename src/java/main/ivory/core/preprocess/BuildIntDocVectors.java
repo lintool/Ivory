@@ -150,7 +150,7 @@ public class BuildIntDocVectors extends PowerTool {
     RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fs);
     String collectionName = env.readCollectionName();
 
-    LOG.info("PowerTool: " + BuildIntDocVectors.class.getCanonicalName());
+    LOG.info("PowerTool: " + BuildIntDocVectors.class.getSimpleName());
     LOG.info(String.format(" - %s: %s", Constants.CollectionName, collectionName));
     LOG.info(String.format(" - %s: %s", Constants.IndexPath, indexPath));
 
@@ -182,7 +182,8 @@ public class BuildIntDocVectors extends PowerTool {
     conf.set("mapreduce.reduce.memory.mb", "2048");
     conf.set("mapreduce.reduce.java.opts", "-Xmx2048m");
 
-    Job job = new Job(conf, BuildIntDocVectors.class.getSimpleName() + ":" + collectionName);
+    Job job = Job.getInstance(conf,
+        BuildIntDocVectors.class.getSimpleName() + ":" + collectionName);
     job.setJarByClass(BuildIntDocVectors.class);
 
     job.setNumReduceTasks(0);

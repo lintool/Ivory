@@ -196,7 +196,7 @@ public class Gov2_Desc_Indep {
 
     String[] params = new String[] {
             "data/gov2/run.gov2.CIKM2010.desc.indep.xml",
-            "data/gov2/gov2.desc.776-850" };
+            "data/gov2/queries.gov2.desc.776-850.xml" };
 
 		FileSystem fs = FileSystem.getLocal(new Configuration());
 

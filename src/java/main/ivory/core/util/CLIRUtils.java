@@ -3,7 +3,6 @@ package ivory.core.util;
 import ivory.core.data.dictionary.FrequencySortedDictionary;
 import ivory.core.data.document.TermDocVector;
 import ivory.core.data.stat.DfTableArray;
-import ivory.core.data.stat.PrefixEncodedGlobalStats;
 import ivory.core.tokenize.Tokenizer;
 import ivory.pwsim.score.Bm25;
 import ivory.pwsim.score.ScoringModel;
@@ -652,6 +651,7 @@ public class CLIRUtils extends Configured {
   /**
    * Uses old globalStats code, which is not supported anymore. Only here for backward compatibility
    */
+  /*
   @Deprecated
   public static HMapSFW createTermDocVector(int docLen, HMapSIW tfTable, Vocab eVocabSrc, ScoringModel scoringModel, PrefixEncodedGlobalStats globalStats, boolean isNormalize, Logger sLogger) {
     if(sLogger == null){
@@ -690,7 +690,7 @@ public class CLIRUtils extends Configured {
     }
     return v;
   }
-
+*/
 
   /***
    * 

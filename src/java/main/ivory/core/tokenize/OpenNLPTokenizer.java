@@ -108,10 +108,10 @@ public class OpenNLPTokenizer extends ivory.core.tokenize.Tokenizer {
     }else{
       sLogger.warn("Language not recognized, setting to English!");
     }
-    Class stemClass;
+    Class<? extends SnowballStemmer> stemClass;
     try {
-      stemClass = Class.forName("org.tartarus.snowball.ext." +
-          languages[lang] + "Stemmer");
+      stemClass = (Class<? extends SnowballStemmer>)
+          Class.forName("org.tartarus.snowball.ext." + languages[lang] + "Stemmer");
       stemmer = (SnowballStemmer) stemClass.newInstance();
     } catch (ClassNotFoundException e) {
       sLogger.warn("Stemmer class not recognized!\n"+"org.tartarus.snowball.ext." +

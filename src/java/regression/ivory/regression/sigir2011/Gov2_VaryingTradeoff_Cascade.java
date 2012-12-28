@@ -118,7 +118,7 @@ public class Gov2_VaryingTradeoff_Cascade {
 
     String[] params = new String[] {
         "data/gov2/run.gov2.SIGIR2011.varying.tradeoff.cascade.xml",
-        "data/gov2/gov2.title.776-850" };
+        "data/gov2/queries.gov2.title.776-850.xml" };
 
     FileSystem fs = FileSystem.getLocal(new Configuration());
     CascadeBatchQueryRunner qr = new CascadeBatchQueryRunner(params, fs);

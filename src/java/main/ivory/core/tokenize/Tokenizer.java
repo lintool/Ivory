@@ -305,6 +305,7 @@ public abstract class Tokenizer {
         }
         out.write(s.trim() + "\n");
       }
+      in.close();
       out.close();
 
     } catch (Exception exp) {
