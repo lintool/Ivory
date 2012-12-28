@@ -5,10 +5,8 @@ import ivory.core.util.CLIRUtils;
 import ivory.lsh.data.WikiSentenceInfo;
 import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Iterator;
 import opennlp.model.RealValueFileEventStream;
-
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
@@ -36,14 +34,11 @@ import org.apache.hadoop.mapred.SequenceFileInputFormat;
 import org.apache.hadoop.mapred.TextOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
-import org.apache.log4j.Appender;
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import edu.umd.cloud9.io.array.ArrayListOfIntsWritable;
 import edu.umd.cloud9.io.array.ArrayListWritable;
 import edu.umd.cloud9.io.map.HMapSFW;
 import edu.umd.cloud9.io.pair.PairOfInts;
-import edu.umd.cloud9.util.array.ArrayListOfInts;
 import edu.umd.cloud9.util.map.HMapIV;
 
 /**
@@ -445,12 +440,14 @@ public class FindParallelSentencePairs extends Configured implements Tool {
     String eVocabSrc = dataDir+"/"+bitextName+"/vocab."+eLang+"-"+fLang+"."+eLang;
     String eStopwords = dataDir+"/token/"+eLang+".stop";
     String eVocabTrg = dataDir+"/"+bitextName+"/vocab."+fLang+"-"+eLang+"."+eLang;
+    String eStemmedStopwords = dataDir+"/token/"+eLang+".stop.stemmed";
 
     String fSentDetect = dataDir+"/sent/"+fLang+"-sent.bin";
     String fTokenizer = dataDir+"/token/"+fLang+"-token.bin";
     String fVocabSrc = dataDir+"/"+bitextName+"/vocab."+fLang+"-"+eLang+"."+fLang;
     String fStopwords = dataDir+"/token/"+fLang+".stop";
     String fVocabTrg = dataDir+"/"+bitextName+"/vocab."+eLang+"-"+fLang+"."+fLang;
+    String fStemmedStopwords = dataDir+"/token/"+fLang+".stop.stemmed";
 
     String f2e_ttableFile = dataDir+"/"+bitextName+"/ttable."+fLang+"-"+eLang;
     String e2f_ttableFile = dataDir+"/"+bitextName+"/ttable."+eLang+"-"+fLang;
@@ -469,7 +466,8 @@ public class FindParallelSentencePairs extends Configured implements Tool {
     conf.set("eTokenizer", eTokenizer);
     conf.set("eStopword", eStopwords);
     conf.set("fStopword", fStopwords);
-
+    conf.get("eStemmedStopword", eStemmedStopwords);
+    conf.get("fStemmedStopword", fStemmedStopwords);
     //e-files
 
     sLogger.info("caching files...0,1,2,3,4");

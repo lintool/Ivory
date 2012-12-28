@@ -7,7 +7,6 @@ import ivory.core.data.stat.PrefixEncodedGlobalStats;
 import ivory.core.tokenize.Tokenizer;
 import ivory.pwsim.score.Bm25;
 import ivory.pwsim.score.ScoringModel;
-
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -19,13 +18,10 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
@@ -35,7 +31,6 @@ import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.SequenceFile;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-
 import edu.umd.cloud9.io.map.HMapIFW;
 import edu.umd.cloud9.io.map.HMapSFW;
 import edu.umd.cloud9.io.map.HMapSIW;
@@ -1197,7 +1192,7 @@ public class CLIRUtils extends Configured {
     if(fSentLength == 0 || eSentLength == 0){
       return null;
     }
-    
+
     features.add("cosine=" + CLIRUtils.cosineNormalized(eVector, translatedFVector));    
 
     ////////////////////////////////////////////////
@@ -1224,6 +1219,12 @@ public class CLIRUtils extends Configured {
       eSentence.replaceAll("([',:;.?%!])", " $1 ");
       features.add("uppercaseratio1=" + getUppercaseRatio(fSentence, eSentence) );
       features.add("uppercaseratio2=" + getUppercaseRatio(eSentence, fSentence) );
+
+      if ( getUppercaseRatio(fSentence, eSentence) > 0f || getUppercaseRatio(eSentence, fSentence) > 0f ) {
+//        if (CLIRUtils.cosineNormalized(eVector, translatedFVector) < 0.1f) {
+//          System.out.println("DEBUG;" + fSentence +";"+ eSentence);
+//        }
+      }
     }
 
     if (featSet > 3) {
@@ -1269,26 +1270,41 @@ public class CLIRUtils extends Configured {
 
   private static float getUppercaseRatio(String sentence1, String sentence2) {
     float cntUpperMatch = 0, cntUpperTotal = 0;
-    StringBuilder uppercaseEntity = new StringBuilder();
-    List<String> tokens = Arrays.asList(sentence1.split("\\s+"));
 
+    // to make sure we don't miss actual matches due to irregular spacing in between tokens, we normalize spacing in both sentences
+    StringBuilder buffer2 = new StringBuilder(" ");
+    List<String> tokens2 = Arrays.asList(sentence2.split("\\s+"));
+    for (int i=0; i < tokens2.size(); i++) {
+      buffer2.append(tokens2.get(i).trim() + " ");
+    }
+    sentence2 = buffer2.toString();
+    
+    // now, read tokens in first sentence and keep track of sequences of uppercased tokens
+    StringBuilder buffer = new StringBuilder(" ");
+    List<String> tokens = Arrays.asList(sentence1.split("\\s+"));
+    String uppercaseEntity = "";
     for (int i=0; i < tokens.size(); i++) {
-      String token = tokens.get(i);
+      String token = tokens.get(i).trim();
       // discard single-char upper-case tokens
       if (token.length() > 0 && Character.isUpperCase(token.charAt(0))) {
-        uppercaseEntity.append(token + " ");
+        buffer.append(token + " ");
       }else {
-        if (!uppercaseEntity.equals("")) {
-          if (sentence2.contains(uppercaseEntity.toString().trim())) {
+        uppercaseEntity = buffer.toString();
+        if (!uppercaseEntity.trim().equals("") && uppercaseEntity.length() > 2) {
+          if (sentence2.contains(uppercaseEntity)) {
+//            System.out.println("DEBUG["+uppercaseEntity+"]");
             cntUpperMatch++;
           }
           cntUpperTotal++;
-          uppercaseEntity.delete(0, uppercaseEntity.length());    // clear buffer
+          buffer.delete(1, buffer.length());    // clear buffer
         }
       }
     } 
-    if (!uppercaseEntity.equals("")) {
-      if (sentence2.contains(uppercaseEntity.toString().trim())) {
+    
+    // compare last part of buffer
+    uppercaseEntity = buffer.toString();
+    if (!uppercaseEntity.trim().equals("")) {
+      if (sentence2.contains(uppercaseEntity)) {
         cntUpperMatch++;
       }
       cntUpperTotal++;

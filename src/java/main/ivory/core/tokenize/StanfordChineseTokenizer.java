@@ -63,7 +63,7 @@ public class StanfordChineseTokenizer extends Tokenizer {
   public String[] processContent(String text) {
     String[] tokens = null;
     try {
-      text = text.toLowerCase();      // for non-Chinese characters
+      text = postNormalize(preNormalize(text).toLowerCase());      // normalization for non-Chinese characters
       tokens = classifier.classifyStringAndReturnAnswers(text, readerWriter);
     } catch (IOException e) {
       sLogger.info("Problem in tokenizing Chinese");
@@ -72,18 +72,13 @@ public class StanfordChineseTokenizer extends Tokenizer {
     if (vocab == null) {
       return tokens;
     } else {
-      String tokenized = "";
+      StringBuilder finalTokenized = new StringBuilder();
       for (String token : tokens) {
         if ( vocab.get(token) <= 0) { continue; }
-        tokenized += ( token + " " );
+        finalTokenized.append( token + " " );
       }
-      return tokenized.trim().split("\\s+");
+      return finalTokenized.toString().trim().split("\\s+");
     }
-  }
-
-  @Override
-  public int getNumberTokens(String text){
-    return processContent(text).length;
   }
 
   @Override

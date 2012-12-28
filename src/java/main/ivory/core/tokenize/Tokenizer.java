@@ -25,22 +25,23 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.HashSet;
 import java.util.Set;
-
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
+import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.mortbay.log.Log;
-
+import org.apache.log4j.Logger;
+import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import edu.umd.hooka.VocabularyWritable;
 
 public abstract class Tokenizer {
+  private static final Logger LOG = Logger.getLogger(Tokenizer.class);
   public abstract void configure(Configuration conf);
   public abstract String[] processContent(String text);
   protected static String delims = "`~!@#^&*()-_=+]}[{\\|'\";:/?.>,<";
@@ -51,11 +52,11 @@ public abstract class Tokenizer {
   public void setStopwordRemoval(boolean b) {
     isStopwordRemoval = b;
   }
-  
+
   public boolean getStopwordRemoval() {
     return isStopwordRemoval;
   }
-    
+
   /**
    * Discard tokens not in the provided vocabulary.
    * 
@@ -65,15 +66,15 @@ public abstract class Tokenizer {
   public void setVocab(VocabularyWritable v){
     vocab = v;
   }
-  
+
   public VocabularyWritable getVocab(){
     return vocab;
   }
-  
+
   protected Set<String> readInput(FileSystem fs, String file) {
     Set<String> lines = new HashSet<String>();
     try {
-      Log.warn("File " + file + " exists? " + fs.exists(new Path(file)) + ", fs: "+fs);
+      LOG.warn("File " + file + " exists? " + fs.exists(new Path(file)) + ", fs: "+fs);
       FSDataInputStream fis = fs.open(new Path(file));
       InputStreamReader isr = new InputStreamReader(fis, "UTF8");
       BufferedReader in = new BufferedReader(isr);
@@ -85,30 +86,30 @@ public abstract class Tokenizer {
       in.close();
       return lines;
     } catch (Exception e) {
-      Log.warn("Problem reading stopwords from " + file);
+      LOG.warn("Problem reading stopwords from " + file);
       return lines;
     }
   }
-  
+
   /**
    * Method to return number of tokens in text. Subclasses may override for more efficient implementations.
    * 
    * @param text
-   * 		text to be processed.
+   *    text to be processed.
    * @return
-   * 		number of tokens in text.
+   *    number of tokens in text.
    */
   public int getNumberTokens(String text){
-    return text.split("\\s+").length;
+    return processContent(text).length;
   }
 
   /**
    * Method to remove non-unicode characters from token, to prevent errors in the preprocessing pipeline. Such cases exist in German Wikipedia. 
    * 
    * @param token
-   * 		token to check for non-unicode character
+   *    token to check for non-unicode character
    * @return
-   * 		token without the non-unicode characters
+   *    token without the non-unicode characters
    */
   public String removeNonUnicodeChars(String token) {
     StringBuffer fixedToken = new StringBuffer();
@@ -147,9 +148,8 @@ public abstract class Tokenizer {
    * @return
    *    normalized text, ready to be run through tokenizer   
    */
-  public String preNormalize(String text) {
-//    return text.replaceAll("’", "'").replaceAll("`", "'").replaceAll("“", "\"").replaceAll("”", "\"").replaceAll("‘", "'").replaceAll("\u2019", "'");
-    return text.replaceAll("\u2018", "'").replaceAll("\u2060", "'").replaceAll("\u201C", "\"").replaceAll("\u201D", "\"").replaceAll("\u00B4", "'").replaceAll("\u2019", "'").replaceAll("\u0060", "'");
+  protected String preNormalize(String text) {
+    return text.replaceAll("\u2018", "'").replaceAll("\u2060", "'").replaceAll("\u201C", "\"").replaceAll("\u201D", "\"").replaceAll("\u201B", "'").replaceAll("\u201F", "\"").replaceAll("\u201E", "\"").replaceAll("\u00B4", "'").replaceAll("\u301F", "\"").replaceAll("\u2019", "'").replaceAll("\u0060", "'");
   }
 
   /**
@@ -160,10 +160,32 @@ public abstract class Tokenizer {
    * @return
    *    text, after fixing possible errors
    */
-  public String postNormalize(String text) {
-    return text.replaceAll("\\((\\S)", "( $1").replaceAll("(\\S)\\)", "$1 )").replaceAll("(\\S)-(\\S)", "$1 - $2")
-    .replaceAll("‑", "-").replaceAll("—", "——").replaceAll(" ' s ", " 's ").replaceAll(" l ' ", " l' ")
+  protected String postNormalize(String text) {
+    return text.replaceAll("\\((\\S)", "( $1").replaceAll("(\\S)\\)", "$1 )").replaceAll("''(\\S)", "'' $1").replaceAll("–", "-")
+    .replaceAll("‑", "-").replaceAll("(\\S)-(\\S)", "$1 - $2").replaceAll("—", "——").replaceAll(" ' s ", " 's ").replaceAll(" l ' ", " l' ")
     .replaceAll("\"(\\S)", "\" $1").replaceAll("(\\S)\"", "$1 \"");
+  }
+
+  /**
+   * Convert tokenStream object into a string.
+   * 
+   * @param tokenStream
+   *    object returned by Lucene tokenizer
+   * @return
+   *    String corresponding to the tokens output by tokenStream
+   */
+  protected String streamToString(TokenStream tokenStream) {
+    CharTermAttribute termAtt = tokenStream.getAttribute(CharTermAttribute.class);
+    tokenStream.clearAttributes();
+    StringBuilder tokenized = new StringBuilder();
+    try {
+      while (tokenStream.incrementToken()) {
+        tokenized.append( termAtt.toString() + " " );
+      }
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return tokenized.toString().trim();
   }
 
   /**
@@ -176,7 +198,7 @@ public abstract class Tokenizer {
   public boolean isStopWord(String token) {
     return delims.contains(token);
   }
-  
+
   /**
    * Overrided by applicable implementing classes.
    * @param 
@@ -188,6 +210,10 @@ public abstract class Tokenizer {
     return isStopWord(token);
   }
   
+  protected boolean isDiscard(String token) {
+    return ( token.length() < MIN_LENGTH || token.length() > MAX_LENGTH || isStopWord(token) );
+  }
+
   /**
    * Remove stop words from text that has been tokenized. Useful when postprocessing output of MT system, which is tokenized but not stopword'ed.
    *  
@@ -212,18 +238,18 @@ public abstract class Tokenizer {
         break;
       }
     }
-    
+
     String output = "";
     for (int i = start; i <= end; i++) {
       output += ( tokens[i] + " " );
     }
     return output.trim();
   }
-  
+
   public String stem(String token) {
     return token;
   }
-  
+
   public String getUTF8(String token) {
     String utf8 = "";
     for (int i = 0; i < token.length(); i++){
@@ -235,15 +261,16 @@ public abstract class Tokenizer {
   public abstract void configure(Configuration mJobConf, FileSystem fs);
 
   @SuppressWarnings("static-access")
-  public static void main(String[] args) throws IOException, ClassNotFoundException, InstantiationException, IllegalAccessException{
+  public static void main(String[] args) {
     Options options = new Options();
-    options.addOption(OptionBuilder.withArgName("full path to model file or directory").hasArg().withDescription("model file").create("model"));
-    options.addOption(OptionBuilder.withArgName("full path to input file").hasArg().withDescription("input file").create("input"));
-    options.addOption(OptionBuilder.withArgName("full path to output file").hasArg().withDescription("output file").create("output"));
-    options.addOption(OptionBuilder.withArgName("en | zh | de | fr | ar | tr | es").hasArg().withDescription("2-character language code").create("lang"));
+    options.addOption(OptionBuilder.withArgName("full path to model file or directory").hasArg().withDescription("model file").isRequired().create("model"));
+    options.addOption(OptionBuilder.withArgName("full path to input file").hasArg().withDescription("input file").isRequired().create("input"));
+    options.addOption(OptionBuilder.withArgName("full path to output file").hasArg().withDescription("output file").isRequired().create("output"));
+    options.addOption(OptionBuilder.withArgName("en | zh | de | fr | ar | tr | es").hasArg().withDescription("2-character language code").isRequired().create("lang"));
     options.addOption(OptionBuilder.withArgName("path to stopwords list").hasArg().withDescription("one stopword per line").create("stopword"));
     options.addOption(OptionBuilder.withArgName("path to stemmed stopwords list").hasArg().withDescription("one stemmed stopword per line").create("stemmed_stopword"));
     options.addOption(OptionBuilder.withArgName("true|false").hasArg().withDescription("turn on/off stemming").create("stem"));
+    options.addOption(OptionBuilder.withDescription("Hadoop option to load external jars").withArgName("jar packages").hasArg().create("libjars"));
 
     CommandLine cmdline;
     CommandLineParser parser = new GnuParser();
@@ -276,13 +303,14 @@ public abstract class Tokenizer {
         for (String token : tokens) {
           s += token+" ";
         }
-        out.write(s+"\n");
+        out.write(s.trim() + "\n");
       }
       out.close();
 
-    } catch (ParseException exp) {
-      System.err.println("Error parsing command line: " + exp.getMessage());
-      System.exit(-1);
+    } catch (Exception exp) {
+      HelpFormatter formatter = new HelpFormatter();
+      formatter.printHelp( "Tokenizer", options );
+      System.exit(-1);   
     }
   }
 }

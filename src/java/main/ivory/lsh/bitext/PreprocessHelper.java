@@ -44,21 +44,22 @@ public class PreprocessHelper {
   private TTable_monolithic_IFAs f2e_Probs;
   private TTable_monolithic_IFAs e2f_Probs;
   private ScoringModel fScoreFn, eScoreFn;
-  //  private HMapIFW transDfTable;
   private MaxentModel classifier;
-  //  private PrefixEncodedGlobalStats globalStatsMap;  // for backward compatibility
   private DfTableArray dfTable;
   private DefaultFrequencySortedDictionary dict;
   private final Logger sLogger = Logger.getLogger(PreprocessHelper.class);
   private static final HMapSIW lang2AvgSentLen = new HMapSIW();
   static {
-    lang2AvgSentLen.put("en",20);       // took average # of tokens per sentence in de-en.wmt12 train data
-    lang2AvgSentLen.put("de",17);       // took average # of tokens per sentence in de-en.wmt12 train data
-    lang2AvgSentLen.put("zh",27);       // took average # of tokens per sentence in zh-en.fbis train data
-    lang2AvgSentLen.put("fr",18);       // took average # of tokens per sentence in fr-en.wmt12 train data
-    lang2AvgSentLen.put("tr",21);       // took average # of tokens per sentence in tr-en.oflazer train data
-    lang2AvgSentLen.put("ar",17);       // took average # of tokens per sentence in ar-en.galep5oct train data
-    lang2AvgSentLen.put("es",18);       // set to same as fr for now (no data yet)
+    // took average # of tokens per sentence in Wikipedia data
+    lang2AvgSentLen.put("en",21);       
+    lang2AvgSentLen.put("de",16);     
+    lang2AvgSentLen.put("zh",27);       
+    lang2AvgSentLen.put("fr",18);     
+    lang2AvgSentLen.put("tr",12);    
+    lang2AvgSentLen.put("ar",22);  
+    lang2AvgSentLen.put("es",19);     
+    // set to same as fr for now (no data yet)
+    lang2AvgSentLen.put("cs",18);       
 };
 
   /**
@@ -97,6 +98,7 @@ public class PreprocessHelper {
     loadEModels(job);
   }
 
+  @SuppressWarnings("deprecation")
   private void loadFModels(JobConf conf) throws Exception {
     sLogger.info("Loading models for " + fLang + " ...");
 
@@ -157,7 +159,7 @@ public class PreprocessHelper {
 
     // tokenizer file not read from cache, since it might be a directory (e.g. Chinese segmenter)
     String tokenizerFile = conf.get("fTokenizer");
-    fTok = TokenizerFactory.createTokenizer(fs, fLang, tokenizerFile, true, conf.get("fStopword"), null, null);
+    fTok = TokenizerFactory.createTokenizer(fs, fLang, tokenizerFile, true, conf.get("fStopword"), conf.get("fStemmedStopword"), null);
     sLogger.info("Tokenizer and vocabs created successfully.");
 
     // average sentence length = just a heuristic derived from sample text
@@ -197,7 +199,7 @@ public class PreprocessHelper {
     sLogger.info("Environment created successfully.");
 
     String tokenizerFile = conf.get("eTokenizer");
-    eTok = TokenizerFactory.createTokenizer(fs, eLang, tokenizerFile, true, conf.get("eStopword"), null, null);
+    eTok = TokenizerFactory.createTokenizer(fs, eLang, tokenizerFile, true, conf.get("eStopword"), conf.get("eStemmedStopword"), null);
     sLogger.info("Tokenizer and vocabs created successfully.");
 
     eScoreFn = (ScoringModel) new Bm25();
@@ -206,14 +208,6 @@ public class PreprocessHelper {
 
     dict = new DefaultFrequencySortedDictionary(new Path(env.getIndexTermsData()), new Path(env.getIndexTermIdsData()), new Path(env.getIndexTermIdMappingData()), fs);
     dfTable = new DfTableArray(new Path(env.getDfByTermData()), fs);
-
-    //for backward compatibility
-    //    String indexTermsFile = localFiles[12].toString();
-    //    String dfTableFile = localFiles[0].toString();
-
-    //for backward compatibility
-    //    globalStatsMap = new PrefixEncodedGlobalStats(new Path(indexTermsFile), localFs);
-    //    globalStatsMap.loadDFStats(new Path(dfTableFile));
   }
 
   public HMapSFW createFDocVector(String sentence) {
@@ -265,9 +259,6 @@ public class PreprocessHelper {
     }
     
     weightedVector = CLIRUtils.createTermDocVector(terms.length, term2Tf, eScoreFn, dict, dfTable, true, sLogger);
-    //for backward compatibility
-    //    weightedVector = CLIRUtils.createTermDocVector(terms.length, term2Tf, eVocabSrc, eScoreFn, globalStatsMap, true, sLogger);  
-
     // don't count numbers for the min #terms constraint since Wikipedia has "sentences" full of numbers that doesn't make any sense
     int numNonNumbers = 0;
     for(String term : weightedVector.keySet()){      

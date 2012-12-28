@@ -45,7 +45,6 @@ import edu.umd.cloud9.io.pair.PairOfInts;
  * @author ferhanture
  * 
  */
-@SuppressWarnings("deprecation")
 public class Docs2Sentences extends Configured implements Tool {
 
   private static final Logger sLogger = Logger.getLogger(Docs2Sentences.class);

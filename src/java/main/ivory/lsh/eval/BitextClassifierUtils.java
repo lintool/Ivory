@@ -15,7 +15,6 @@ import java.io.UnsupportedEncodingException;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
@@ -84,7 +83,7 @@ public class BitextClassifierUtils {
       int docLen = 0;
       try {
         docLen = CLIRUtils.translateTFs(deDoc, tfS, eVocabSrc, eVocabTrg, fVocabSrc,
-            fVocabTrg, e2f_Probs, f2e_Probs, new OpenNLPTokenizer(), null);		// tokenizer just for stopword list
+            fVocabTrg, e2f_Probs, f2e_Probs, new OpenNLPTokenizer(), null);   // tokenizer just for stopword list
       } catch (IOException e) {
         e.printStackTrace();
       }
@@ -107,8 +106,8 @@ public class BitextClassifierUtils {
     FileInputStream fis1 = null, fis2 = null;
     BufferedReader dis1 = null, dis2 = null;
 
-    Tokenizer eTokenizer = TokenizerFactory.createTokenizer(eLang, eToken, null);
-    Tokenizer fTokenizer = TokenizerFactory.createTokenizer(fLang, fToken, null);
+    Tokenizer eTokenizer = TokenizerFactory.createTokenizer(eLang, eToken, false, null, null, null);
+    Tokenizer fTokenizer = TokenizerFactory.createTokenizer(fLang, fToken, false, null, null, null);
 
     float sumFLengs = 0, sumELengs = 0;
 

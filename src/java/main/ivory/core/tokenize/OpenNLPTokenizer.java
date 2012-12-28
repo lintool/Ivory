@@ -1,11 +1,7 @@
 package ivory.core.tokenize;
 
 import ivory.core.Constants;
-import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.HashSet;
 import java.util.Set;
 import opennlp.tools.tokenize.Tokenizer;
 import opennlp.tools.tokenize.TokenizerME;
@@ -16,7 +12,6 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.mortbay.log.Log;
 import org.tartarus.snowball.SnowballStemmer;
 import edu.umd.hooka.VocabularyWritable;
 import edu.umd.hooka.alignment.HadoopAlign;
@@ -180,13 +175,6 @@ public class OpenNLPTokenizer extends ivory.core.tokenize.Tokenizer {
     return tokenizer.tokenize(string).length;
   }
 
-  private boolean isDiscard(String token) {
-    // remove characters that may cause problems when processing further
-    //    token = removeNonUnicodeChars(token);
-
-    return ( token.length() < MIN_LENGTH || token.length() > MAX_LENGTH || delims.contains(token) || stopwords.contains(token) );
-  }
-
   @Override
   public String stem(String token) {
     token = postNormalize(preNormalize(token)).toLowerCase();
@@ -205,7 +193,7 @@ public class OpenNLPTokenizer extends ivory.core.tokenize.Tokenizer {
   @Override
   public boolean isStopWord(String token) {
     if (stopwords == null) {
-      Log.warn("Tokenizer does not have stopwords loaded!");
+      sLogger.warn("Tokenizer does not have stopwords loaded!");
       return false;
     }else {
       return ( stopwords.contains(token) || delims.contains(token) );
@@ -215,7 +203,7 @@ public class OpenNLPTokenizer extends ivory.core.tokenize.Tokenizer {
   @Override
   public boolean isStemmedStopWord(String token) {
     if (stemmedStopwords == null) {
-      Log.warn("Tokenizer does not have stopwords loaded!");
+      sLogger.warn("Tokenizer does not have stopwords loaded!");
       return false;
     }else {
       return ( stemmedStopwords.contains(token) || delims.contains(token) );

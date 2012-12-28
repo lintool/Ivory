@@ -3,11 +3,9 @@ package ivory.lsh.bitext;
 import ivory.core.RetrievalEnvironment;
 import ivory.core.tokenize.Tokenizer;
 import ivory.core.util.CLIRUtils;
-import ivory.lsh.data.WikiSentenceInfo;
 import java.io.IOException;
 import java.net.URI;
 import opennlp.model.RealValueFileEventStream;
-
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
@@ -28,7 +26,6 @@ import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.MapReduceBase;
 import org.apache.hadoop.mapred.Mapper;
 import org.apache.hadoop.mapred.OutputCollector;
-import org.apache.hadoop.mapred.Reducer;
 import org.apache.hadoop.mapred.Reporter;
 import org.apache.hadoop.mapred.TextInputFormat;
 import org.apache.hadoop.mapred.TextOutputFormat;
@@ -39,7 +36,6 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import edu.umd.cloud9.io.map.HMapSFW;
 import edu.umd.cloud9.io.map.HMapSIW;
-import edu.umd.cloud9.io.pair.PairOfInts;
 
 /**
   Step 2 of the bitext extraction algorithm.
@@ -189,12 +185,16 @@ public class FilterSentencePairs extends Configured implements Tool {
     String eTokenizer = dataDir+"/token/"+eLang+"-token.bin";
     String eVocabSrc = dataDir+"/"+bitextName+"/vocab."+eLang+"-"+fLang+"."+eLang;
     String eVocabTrg = dataDir+"/"+bitextName+"/vocab."+fLang+"-"+eLang+"."+eLang;
-
+    String eStopwords = dataDir+"/token/"+eLang+".stop";
+    String eStemmedStopwords = dataDir+"/token/"+eLang+".stop.stemmed";
+    
     String fSentDetect = dataDir+"/sent/"+fLang+"-sent.bin";
     String fTokenizer = dataDir+"/token/"+fLang+"-token.bin";
     String fVocabSrc = dataDir+"/"+bitextName+"/vocab."+fLang+"-"+eLang+"."+fLang;
     String fVocabTrg = dataDir+"/"+bitextName+"/vocab."+eLang+"-"+fLang+"."+fLang;
-
+    String fStopwords = dataDir+"/token/"+fLang+".stop";
+    String fStemmedStopwords = dataDir+"/token/"+fLang+".stop.stemmed";
+    
     String f2e_ttableFile = dataDir+"/"+bitextName+"/ttable."+fLang+"-"+eLang;
     String e2f_ttableFile = dataDir+"/"+bitextName+"/ttable."+eLang+"-"+fLang;
 
@@ -212,7 +212,11 @@ public class FilterSentencePairs extends Configured implements Tool {
     conf.setInt("ClassifierId", classifierId);
     conf.set("fTokenizer", fTokenizer);
     conf.set("eTokenizer", eTokenizer);
-
+    conf.set("eStopword", eStopwords);
+    conf.set("fStopword", fStopwords);
+    conf.get("eStemmedStopword", eStemmedStopwords);
+    conf.get("fStemmedStopword", fStemmedStopwords);
+    
     sLogger.info("caching files...");
 
     /////en-files

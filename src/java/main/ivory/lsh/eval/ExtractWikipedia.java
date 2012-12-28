@@ -47,7 +47,6 @@ import edu.umd.cloud9.io.map.HMapIIW;
  * 
  * 
  */
-@SuppressWarnings("deprecation")
 public class ExtractWikipedia extends Configured implements Tool {
 
   public static final String[] RequiredParameters = {};

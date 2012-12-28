@@ -8,11 +8,8 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.apache.lucene.analysis.CharArraySet;
 import org.apache.lucene.analysis.LowerCaseFilter;
-import org.apache.lucene.analysis.StopFilter;
 import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.ar.ArabicAnalyzer;
 import org.apache.lucene.analysis.ar.ArabicNormalizationFilter;
 import org.apache.lucene.analysis.ar.ArabicStemFilter;
 import org.apache.lucene.analysis.standard.StandardTokenizer;
@@ -44,65 +41,73 @@ public class LuceneArabicAnalyzer extends ivory.core.tokenize.Tokenizer {
     isStopwordRemoval = !stopwords.isEmpty();
 
     isStemming = conf.getBoolean(Constants.Stemming, true);
-    
+
     LOG.warn("Stemming is " + isStemming + "; Stopword removal is " + isStopwordRemoval +"; number of stopwords: " + stopwords.size() +"; stemmed: " + stemmedStopwords.size());
   }
-  
+
   @Override
   public String[] processContent(String text) {   
+    text = preNormalize(text);
     tokenizer = new StandardTokenizer(Version.LUCENE_35, new StringReader(text));
     TokenStream tokenStream = new LowerCaseFilter(Version.LUCENE_35, tokenizer);
-    if (isStopwordRemoval) {
-      tokenStream = new StopFilter( Version.LUCENE_35, tokenStream, (CharArraySet) ArabicAnalyzer.getDefaultStopSet());
-    }
-    tokenStream = new ArabicNormalizationFilter(tokenStream);
-    if (isStemming) {
-      tokenStream = new ArabicStemFilter(tokenStream);
-    }
+    String tokenized = postNormalize(streamToString(tokenStream));
+    StringBuilder finalTokenized = new StringBuilder();
 
-    CharTermAttribute termAtt = tokenStream.getAttribute(CharTermAttribute.class);
-    tokenStream.clearAttributes();
-    String tokenized = "";
     try {
-      while (tokenStream.incrementToken()) {
-        String token = termAtt.toString();
-        if ( vocab != null && vocab.get(token) <= 0) {
+      for (String token : tokenized.split(" ")) {
+        if ( isStopwordRemoval && isDiscard(token) ) {
           continue;
         }
-        tokenized += ( token + " " );
+        finalTokenized.append( token + " " );
+      }
+      if (isStemming) {
+        // then, run the Lucene normalization and stemming on the stopword-removed text
+        tokenizer = new StandardTokenizer(Version.LUCENE_35, new StringReader(finalTokenized.toString().trim()));
+        TokenStream tokenStream2 = new ArabicStemFilter( new ArabicNormalizationFilter(tokenizer) );
+        CharTermAttribute termAtt = tokenStream2.getAttribute(CharTermAttribute.class);
+        tokenStream2.clearAttributes();
+        // clear buffer
+        finalTokenized.delete(0, finalTokenized.length());
+        while (tokenStream2.incrementToken()) {
+          String token = termAtt.toString();
+          if ( vocab != null && vocab.get(token) <= 0) {
+            continue;
+          }
+          finalTokenized.append( token + " " );
+        }
       }
     } catch (IOException e) {
       e.printStackTrace();
     }
-    return tokenized.trim().split("\\s+");
+    return finalTokenized.toString().trim().split(" ");
   }
 
-  @Override
-  public boolean isStopWord(String token) {
-    return stopwords.contains(token) || delims.contains(token) || token.length()==1;
-  }
-
-  @Override
-  public String stem(String token) {
-    tokenizer = new StandardTokenizer(Version.LUCENE_35, new StringReader(token));
-    TokenStream tokenStream = new LowerCaseFilter(Version.LUCENE_35, tokenizer);
-    tokenStream = new ArabicNormalizationFilter(tokenStream);
-    tokenStream = new ArabicStemFilter(tokenStream);
-
-    CharTermAttribute termAtt = tokenStream.getAttribute(CharTermAttribute.class);
-    tokenStream.clearAttributes();
-    try {
-      while (tokenStream.incrementToken()) {
-        return termAtt.toString();
-      }
-    }catch (IOException e) {
-      e.printStackTrace();
+    @Override
+    public boolean isStopWord(String token) {
+      return stopwords.contains(token) || delims.contains(token);
     }
-    return token;
-  }
 
-  @Override
-  public boolean isStemmedStopWord(String token) {
-    return stemmedStopwords.contains(token) || delims.contains(token) || token.length()==1;
+    @Override
+    public boolean isStemmedStopWord(String token) {
+      return stemmedStopwords.contains(token) || delims.contains(token) || token.length() == 1;
+    }
+
+    @Override
+    public String stem(String token) {
+      tokenizer = new StandardTokenizer(Version.LUCENE_35, new StringReader(token));
+      TokenStream tokenStream = new LowerCaseFilter(Version.LUCENE_35, tokenizer);
+      tokenStream = new ArabicNormalizationFilter(tokenStream);
+      tokenStream = new ArabicStemFilter(tokenStream);
+
+      CharTermAttribute termAtt = tokenStream.getAttribute(CharTermAttribute.class);
+      tokenStream.clearAttributes();
+      try {
+        while (tokenStream.incrementToken()) {
+          return termAtt.toString();
+        }
+      }catch (IOException e) {
+        e.printStackTrace();
+      }
+      return token;
+    }
   }
-}
