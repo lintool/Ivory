@@ -10,6 +10,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
 import edu.stanford.nlp.ie.crf.CRFClassifier;
 import edu.stanford.nlp.sequences.DocumentReaderAndWriter;
+import edu.umd.hooka.VocabularyWritable;
 
 public class StanfordChineseTokenizer extends Tokenizer {
   private static final Logger LOG = Logger.getLogger(StanfordChineseTokenizer.class);
@@ -49,6 +50,7 @@ public class StanfordChineseTokenizer extends Tokenizer {
       readerWriter = classifier.makeReaderAndWriter(inDict);
     } catch (Exception e) {
       e.printStackTrace();
+      throw new RuntimeException("Tokenizer not configured properly!");
     }
   }
 
@@ -77,5 +79,10 @@ public class StanfordChineseTokenizer extends Tokenizer {
   @Override
   public String removeBorderStopWords(String tokenizedText) {
     return tokenizedText;
+  }
+
+  @Override
+  public boolean isStopWord(String token) {
+    return false;
   }
 }

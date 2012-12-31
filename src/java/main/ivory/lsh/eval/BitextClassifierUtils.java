@@ -67,7 +67,7 @@ public class BitextClassifierUtils {
   static TTable_monolithic_IFAs f2e_Probs, e2f_Probs;
   private static Options options;
 
-  private List<HMapSFW> translateDocVectors(List<HMapSIW> docs, HMapSIW transDfTable) {
+  private List<HMapSFW> translateDocVectors(String eLang, String eStopwordsFile, List<HMapSIW> docs, HMapSIW transDfTable) {
     Bm25 mModel = new Bm25();
     // set number of docs
     mModel.setDocCount(docs.size());
@@ -82,8 +82,9 @@ public class BitextClassifierUtils {
       HMapIFW tfS = new HMapIFW();
       int docLen = 0;
       try {
+        Tokenizer tokenizer = TokenizerFactory.createTokenizer(eLang, null, true, eStopwordsFile, eStopwordsFile + ".stemmed", null);
         docLen = CLIRUtils.translateTFs(deDoc, tfS, eVocabSrc, eVocabTrg, fVocabSrc,
-            fVocabTrg, e2f_Probs, f2e_Probs, new OpenNLPTokenizer(), null);   // tokenizer just for stopword list
+            fVocabTrg, e2f_Probs, f2e_Probs, tokenizer , null);   // tokenizer just for stopword list
       } catch (IOException e) {
         e.printStackTrace();
       }
@@ -98,7 +99,7 @@ public class BitextClassifierUtils {
 
   // regular 1 sentence per line format
   private void readSentences(String eReadFile, String fReadFile, String eLang, String fLang,
-      Vocab eVocab, Vocab fVocab, String fToken, String eToken) throws IOException,
+      Vocab eVocab, Vocab fVocab, String fToken, String eToken, String fStopwordsFile, String eStopwordsFile) throws IOException,
       ClassNotFoundException, InstantiationException, IllegalAccessException {
     File eFile = new File(eReadFile);
     File fFile = new File(fReadFile);
@@ -106,8 +107,8 @@ public class BitextClassifierUtils {
     FileInputStream fis1 = null, fis2 = null;
     BufferedReader dis1 = null, dis2 = null;
 
-    Tokenizer eTokenizer = TokenizerFactory.createTokenizer(eLang, eToken, false, null, null, null);
-    Tokenizer fTokenizer = TokenizerFactory.createTokenizer(fLang, fToken, false, null, null, null);
+    Tokenizer eTokenizer = TokenizerFactory.createTokenizer(eLang, eToken, true, eStopwordsFile, eStopwordsFile + ".stemmed", null);
+    Tokenizer fTokenizer = TokenizerFactory.createTokenizer(fLang, fToken, true, fStopwordsFile, fStopwordsFile + ".stemmed", null);
 
     float sumFLengs = 0, sumELengs = 0;
 
@@ -305,7 +306,7 @@ public class BitextClassifierUtils {
    *            can be used to generate additional features
    */
   public void runPrepareSentenceExtractionData(String fLang, String eLang, String fName,
-      String eName, String fVocabSrcFile, String eVocabTrgFile, String eVocabSrcFile,
+      String eName, String fStopwordsFile, String eStopwordsFile, String fVocabSrcFile, String eVocabTrgFile, String eVocabSrcFile,
       String fVocabTrgFile, String probTablef2eFile, String probTablee2fFile,
       String fTokenFile, String eTokenFile, int featureSet, float prob, String alignmentFileName) {
     FileSystem localFs = null;
@@ -322,12 +323,12 @@ public class BitextClassifierUtils {
       f2e_Probs = new TTable_monolithic_IFAs(localFs, new Path(probTablef2eFile), true);
       e2f_Probs = new TTable_monolithic_IFAs(localFs, new Path(probTablee2fFile), true);
 
-      readSentences(eName, fName, eLang, fLang, eVocabTrg, fVocabSrc, fTokenFile, eTokenFile);
+      readSentences(eName, fName, eLang, fLang, eVocabTrg, fVocabSrc, fTokenFile, eTokenFile, fStopwordsFile, eStopwordsFile);
 
       System.out.println(fSentTfs.size()+"="+eSentTfs.size());
 
       List<HMapSFW> eSentVectors = buildDocVectors(eSentTfs, avgEnDocLeng, dfE);
-      List<HMapSFW> fSentVectors = translateDocVectors(fSentTfs, dfE);
+      List<HMapSFW> fSentVectors = translateDocVectors(eLang, eStopwordsFile, fSentTfs, dfE);
 
       System.out.println(fSentVectors.size()+"="+eSentVectors.size());
 
@@ -353,7 +354,8 @@ public class BitextClassifierUtils {
     numSentencesPerDocE = new HMapSIW();
     numSentencesPerDocF = new HMapSIW();
     dt.runPrepareSentenceExtractionData(cmdline.getOptionValue(FLANG_OPTION), cmdline.getOptionValue(ELANG_OPTION),
-        cmdline.getOptionValue(FBITEXT_OPTION), cmdline.getOptionValue(EBITEXT_OPTION), cmdline.getOptionValue(FSRC_OPTION),
+        cmdline.getOptionValue(FBITEXT_OPTION), cmdline.getOptionValue(EBITEXT_OPTION), cmdline.getOptionValue(FSTOP_OPTION),
+        cmdline.getOptionValue(ESTOP_OPTION), cmdline.getOptionValue(FSRC_OPTION),
         cmdline.getOptionValue(ETRG_OPTION), cmdline.getOptionValue(ESRC_OPTION), cmdline.getOptionValue(FTRG_OPTION),
         cmdline.getOptionValue(F2E_OPTION), cmdline.getOptionValue(E2F_OPTION), cmdline.getOptionValue(FTOK_OPTION),
         cmdline.getOptionValue(ETOK_OPTION), Integer.parseInt(cmdline.getOptionValue(FEAT_OPTION)), (cmdline.hasOption(PROB_OPTION) ? Float.parseFloat(cmdline.getOptionValue(PROB_OPTION)) : 0), null);
@@ -388,6 +390,8 @@ public class BitextClassifierUtils {
   private static final String E2F_OPTION = "e2f_ttable";
   private static final String ETOK_OPTION = "e_tokenizer";
   private static final String FTOK_OPTION = "f_tokenizer";
+  private static final String ESTOP_OPTION = "e_stopwords";
+  private static final String FSTOP_OPTION = "f_stopwords";
   private static final String FEAT_OPTION = "feature";
   private static final String PROB_OPTION = "prob";
   private static final String LIBJARS_OPTION = "libjars";
@@ -407,6 +411,8 @@ public class BitextClassifierUtils {
     options.addOption(OptionBuilder.withDescription("translation table P(f|e)").withArgName("path to TTable object").hasArg().isRequired().create(E2F_OPTION));
     options.addOption(OptionBuilder.withDescription("tokenizer model for f-language").withArgName("path to Tokenizer object").hasArg().isRequired().create(FTOK_OPTION));
     options.addOption(OptionBuilder.withDescription("tokenizer model for e-language").withArgName("path to Tokenizer object").hasArg().isRequired().create(ETOK_OPTION));
+    options.addOption(OptionBuilder.withDescription("stopwords for f-language").withArgName("path to stopword list").hasArg().isRequired().create(FSTOP_OPTION));
+    options.addOption(OptionBuilder.withDescription("stopwords for e-language").withArgName("path to stopword list").hasArg().isRequired().create(ESTOP_OPTION));
     options.addOption(OptionBuilder.withDescription("id of feature set to be used").withArgName("1|2|3").hasArg().isRequired().create(FEAT_OPTION));
     options.addOption(OptionBuilder.withDescription("lower threshold for token translation probability").withArgName("0-1").hasArg().create(PROB_OPTION));
     options.addOption(OptionBuilder.withDescription("Hadoop option to load external jars").withArgName("jar packages").hasArg().create(LIBJARS_OPTION));

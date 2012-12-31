@@ -286,7 +286,7 @@ public class CLIRUtils extends Configured {
     for(int e : eS){
       float probEF;
       String eTerm = eVocabTrg.get(e);
-      if (tokenizer.isStopWord(eTerm)) continue;
+      if (tokenizer.isDiscard(eTerm)) continue;
 
       probEF = f2eProbs.get(f, e);
       sLogger.debug("Prob(" + eTerm + " | " + fTerm + ") = " + probEF);
@@ -355,7 +355,7 @@ public class CLIRUtils extends Configured {
           continue;
         }
         String eTerm = eVocabTrg.get(e);
-        if (tokenizer.isStopWord(eTerm))  continue;
+        if (tokenizer.isDiscard(eTerm))  continue;
 
         float probEF = f2eProbs.get(f, e);
         if(probEF > 0){

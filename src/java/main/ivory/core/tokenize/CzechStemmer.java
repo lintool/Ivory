@@ -7,7 +7,7 @@ package ivory.core.tokenize;
  * endings from names
  * and takes care of palatalisation 
  */
-public class CzechStemmer {
+public class CzechStemmer implements Stemmer {
 
   /**
    * A buffer of the current word being stemmed
@@ -228,7 +228,9 @@ public class CzechStemmer {
     }//len>3
   }
 
-
-
-
+  @Override
+  public String toStem(String token) {
+    return stem(token);
+  }
+  
 }//CzechStemmer_1

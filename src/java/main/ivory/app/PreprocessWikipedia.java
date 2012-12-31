@@ -96,6 +96,7 @@ public class PreprocessWikipedia extends Configured implements Tool {
     }
 
     conf.set(Constants.Language, collectionLang);
+    conf.setBoolean(Constants.Stemming, true);     // default behavior of tokenizer is currently to stem, but we shouldnt rely on that
     if (tokenizerModel != null) {
       conf.set(Constants.TokenizerData, tokenizerModel);
     }
@@ -104,11 +105,13 @@ public class PreprocessWikipedia extends Configured implements Tool {
     }
     if (e_stopwordList != null) {
       conf.set(Constants.StopwordList, e_stopwordList);
+      conf.set(Constants.StemmedStopwordList, e_stopwordList + ".stemmed");
     }
     // CROSS-LINGUAL CASE
     if (mode == CROSS_LINGUAL_E){		   // English side
       conf.set("Ivory.FinalVocab", collectionVocab);        // vocabulary to map terms to integers in BuildTargetLang...
       conf.set(Constants.StopwordList, e_stopwordList);
+      conf.set(Constants.StemmedStopwordList, e_stopwordList + ".stemmed");
     }
 
     if (mode == CROSS_LINGUAL_F) {			// non-English side, needs to be translated
@@ -121,7 +124,9 @@ public class PreprocessWikipedia extends Configured implements Tool {
       conf.set("Ivory.TTable_E2F", ttable_e2f);
       conf.set("Ivory.FinalVocab", eVocab_f2e);            // vocabulary to map terms to integers in BuildTargetLang...
       conf.set(Constants.StopwordList, f_stopwordList);
+      conf.set(Constants.StemmedStopwordList, f_stopwordList + ".stemmed");
       conf.set(Constants.TargetStopwordList, e_stopwordList);
+      conf.set(Constants.TargetStemmedStopwordList, e_stopwordList + ".stemmed");
       conf.set(Constants.TargetTokenizer, e_tokenizerModel);
       conf.set(Constants.TargetLanguage, targetLang);
     }
@@ -154,6 +159,7 @@ public class PreprocessWikipedia extends Configured implements Tool {
         LOG.info(" - Target vocab file: " + fVocab_e2f);
         LOG.info(" - Source stopwords file: " + f_stopwordList);
         LOG.info(" - Target stopwords file: " + e_stopwordList);
+        LOG.info(" - Target stemmed stopwords file: " + conf.get(Constants.TargetStemmedStopwordList));
         LOG.info(" - Target tokenizer path: " + e_tokenizerModel);
       }
     }

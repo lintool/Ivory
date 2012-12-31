@@ -61,7 +61,7 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
   protected static enum DF { TransDf, NoDf }
 
   private static class MyMapperTrans extends MapReduceBase implements
-      Mapper<IntWritable, TermDocVector, IntWritable, HMapSFW> {
+    Mapper<IntWritable, TermDocVector, IntWritable, HMapSFW> {
 
     private ScoringModel model;
     // eVocabSrc is the English vocabulary for probability table e2f_Probs.
@@ -105,7 +105,7 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
         termidsFile = getFilename(targetEnv.getIndexTermIdsData());
         idToTermFile = getFilename(targetEnv.getIndexTermIdMappingData());
         dfFile = getFilename(targetEnv.getDfByIntData());
-        
+
         FileSystem fs = FileSystem.getLocal(conf);
         Map<String, Path> pathMapping = Maps.newHashMap();
 
@@ -139,6 +139,9 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
           } else if (p.toString().contains(getFilename(conf.get("Ivory.TTable_E2F")))) {
             pathMapping.put("Ivory.TTable_E2F", p);
             LOG.info("Ivory.TTable_E2F -> " + p);
+          } else if (p.toString().contains(getFilename(conf.get(Constants.TargetStemmedStopwordList)))) {
+            pathMapping.put(Constants.TargetStemmedStopwordList, p);
+            LOG.info(Constants.TargetStemmedStopwordList + " -> " + p);
           } else if (p.toString().contains(getFilename(conf.get(Constants.TargetStopwordList)))) {
             pathMapping.put(Constants.TargetStopwordList, p);
             LOG.info(Constants.TargetStopwordList + " -> " + p);
@@ -148,7 +151,6 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
           }
         }
 
-//        transDfTable = CLIRUtils.readTransDfTable(pathMapping.get("transDf"), fs);
         LOG.info(" - terms: " + pathMapping.get(termsFile));
         LOG.info(" - id: " + pathMapping.get(termidsFile));
         LOG.info(" - idToTerms: " + pathMapping.get(idToTermFile));
@@ -162,7 +164,7 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
           e.printStackTrace();
           throw new RuntimeException("Error loading Terms File for dictionary from "+localFiles[0]);
         }     
-        
+
         eVocabTrg = HadoopAlign.loadVocab(pathMapping.get("Ivory.E_Vocab_F2E"), fs);
         fVocabSrc = HadoopAlign.loadVocab(pathMapping.get("Ivory.F_Vocab_F2E"), fs);
         f2e_Probs = new TTable_monolithic_IFAs(fs, pathMapping.get("Ivory.TTable_F2E"), true);
@@ -170,8 +172,14 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
         eVocabSrc = HadoopAlign.loadVocab(pathMapping.get("Ivory.E_Vocab_E2F"), fs);
         fVocabTrg = HadoopAlign.loadVocab(pathMapping.get("Ivory.F_Vocab_E2F"), fs);
         e2f_Probs = new TTable_monolithic_IFAs(fs, pathMapping.get("Ivory.TTable_E2F"), true);
-      
-        tokenizer = TokenizerFactory.createTokenizer(fs, conf.get(Constants.TargetLanguage), pathMapping.get(Constants.TargetTokenizer).toString(), false, pathMapping.get(Constants.TargetStopwordList).toString(), null, null);   // just for stopword removal in translateTFs
+
+        String tokenizerModel = pathMapping.get(Constants.TargetTokenizer).toString();
+        String stopwordsFile = pathMapping.get(Constants.TargetStopwordList).toString();
+        String stemmedStopwordsFile = pathMapping.get(Constants.TargetStemmedStopwordList).toString();       
+        tokenizer = TokenizerFactory.createTokenizer(fs, conf.get(Constants.TargetLanguage), 
+            tokenizerModel, true, 
+            stopwordsFile, 
+            stemmedStopwordsFile, null);   // just for stopword removal in translateTFs
       } catch (IOException e) {
         throw new RuntimeException ("Local cache files not read properly.");
       }
@@ -224,9 +232,7 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
       // length is unlikely to change significantly (not worth complicating the pipeline)
       int docLen = CLIRUtils.translateTFs(doc, tfS, eVocabSrc, eVocabTrg, fVocabSrc, fVocabTrg,
           e2f_Probs, f2e_Probs, tokenizer, LOG);
-            
-//      HMapSFW v = CLIRUtils.createTermDocVector(docLen, tfS, eVocabSrc, model, dict, dfTable,
-//          isNormalize, LOG);
+
       HMapSFW v = CLIRUtils.createTermDocVector(docLen, tfS, eVocabTrg, model, dict, dfTable,
           isNormalize, LOG);
 
@@ -258,25 +264,24 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
 
     RetrievalEnvironment env = new RetrievalEnvironment(indexPath, FileSystem.get(getConf()));    
     String outputPath = env.getWeightedTermDocVectorsDirectory();
-//    String transDfFile = indexPath + "/transDf.dat";
     String fVocab_f2e= getConf().get("Ivory.F_Vocab_F2E");   // fVocab from P(e|f)
     String eVocab_f2e = getConf().get("Ivory.E_Vocab_F2E");  // eVocab from P(e|f)
     String ttable_f2e = getConf().get("Ivory.TTable_F2E");   // P(e|f)
     String eVocab_e2f = getConf().get("Ivory.E_Vocab_E2F");  // eVocab from P(f|e)
     String fVocab_e2f = getConf().get("Ivory.F_Vocab_E2F");  // fVocab from P(f|e)
     String ttable_e2f = getConf().get("Ivory.TTable_E2F");   // P(f|e)
-    
+
     String eStopwords = getConf().get(Constants.TargetStopwordList); 
+    String eStemmedStopwords = getConf().get(Constants.TargetStemmedStopwordList); 
     String eTokenizerModel = getConf().get(Constants.TargetTokenizer); 
 
-//    createTranslatedDFFile(transDfFile);
     String targetIndexPath = getConf().get(Constants.TargetIndexPath);
     RetrievalEnvironment targetEnv = new RetrievalEnvironment(targetIndexPath, FileSystem.get(getConf()));
     String termsFilePath = targetEnv.getIndexTermsData();
     String termsIdsFilePath = targetEnv.getIndexTermIdsData();
     String termIdMappingFilePath = targetEnv.getIndexTermIdMappingData();
     String dfByIntFilePath = targetEnv.getDfByIntData();
-    
+
     JobConf conf = new JobConf(getConf(), BuildTranslatedTermDocVectors.class);
     conf.setJobName("BuildTranslatedTermDocVectors");
     FileSystem fs = FileSystem.get(conf);
@@ -293,6 +298,9 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
     LOG.info("Document vectors to be stored in " + outputPath);
     LOG.info("CollectionName: " + collectionName);
     LOG.info("Input path: " + inputPath);
+    LOG.info("Target-language stopwords: " + eStopwords);
+    LOG.info("Target-language stemmed stopwords: " + eStemmedStopwords);
+    LOG.info("Target-language tokenizer model: " + eTokenizerModel);
 
     DocLengthTable mDLTable;
     try {
@@ -334,6 +342,7 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
     DistributedCache.addCacheFile(new URI(ttable_e2f), conf);
     DistributedCache.addCacheFile(new URI(ttable_e2f), conf);
     DistributedCache.addCacheFile(new URI(eStopwords), conf);
+    DistributedCache.addCacheFile(new URI(eStemmedStopwords), conf);
     DistributedCache.addCacheFile(new URI(eTokenizerModel), conf);
 
     FileInputFormat.setInputPaths(conf, new Path(inputPath));

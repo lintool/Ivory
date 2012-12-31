@@ -35,6 +35,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
@@ -42,18 +43,23 @@ import edu.umd.hooka.VocabularyWritable;
 
 public abstract class Tokenizer {
   private static final Logger LOG = Logger.getLogger(Tokenizer.class);
+  static{
+    LOG.setLevel(Level.INFO);
+  }
   public abstract void configure(Configuration conf);
   public abstract String[] processContent(String text);
   protected static String delims = "`~!@#^&*()-_=+]}[{\\|'\";:/?.>,<";
   protected static int MIN_LENGTH = 2, MAX_LENGTH = 50;
   protected VocabularyWritable vocab;
-  protected boolean isStopwordRemoval;  
+  protected boolean isStopwordRemoval = false, isStemming = false;  
+  protected Set<String> stopwords;
+  protected Set<String> stemmedStopwords;
 
-  public void setStopwordRemoval(boolean b) {
-    isStopwordRemoval = b;
+  public boolean isStemming() {
+    return isStemming;
   }
 
-  public boolean getStopwordRemoval() {
+  public boolean isStopwordRemoval() {
     return isStopwordRemoval;
   }
 
@@ -74,7 +80,10 @@ public abstract class Tokenizer {
   protected Set<String> readInput(FileSystem fs, String file) {
     Set<String> lines = new HashSet<String>();
     try {
-      LOG.warn("File " + file + " exists? " + fs.exists(new Path(file)) + ", fs: "+fs);
+      if (file == null) {
+        return lines;
+      }
+      LOG.info("File " + file + " exists? " + fs.exists(new Path(file)) + ", fs: "+fs);
       FSDataInputStream fis = fs.open(new Path(file));
       InputStreamReader isr = new InputStreamReader(fis, "UTF8");
       BufferedReader in = new BufferedReader(isr);
@@ -87,7 +96,7 @@ public abstract class Tokenizer {
       return lines;
     } catch (Exception e) {
       LOG.warn("Problem reading stopwords from " + file);
-      return lines;
+      throw new RuntimeException("Problem reading stopwords from " + file);
     }
   }
 
@@ -103,6 +112,17 @@ public abstract class Tokenizer {
     return processContent(text).length;
   }
 
+  public float getOOVRate(String text, VocabularyWritable vocab) {
+    int countOOV = 0, countAll = 0;
+    for (String token : processContent(text)) {
+      countAll++;
+      if ( vocab != null && vocab.get(token) <= 0) {
+        countOOV++;
+      } 
+    }
+    return (countOOV / (float)countAll);
+  }
+
   /**
    * Method to remove non-unicode characters from token, to prevent errors in the preprocessing pipeline. Such cases exist in German Wikipedia. 
    * 
@@ -111,8 +131,8 @@ public abstract class Tokenizer {
    * @return
    *    token without the non-unicode characters
    */
-  public String removeNonUnicodeChars(String token) {
-    StringBuffer fixedToken = new StringBuffer();
+  public static String removeNonUnicodeChars(String token) {
+    StringBuilder fixedToken = new StringBuilder();
     for (int i = 0; i < token.length(); i++) {
       char c = token.charAt(i);
       if (Character.getNumericValue(c) >= -1) {
@@ -122,14 +142,13 @@ public abstract class Tokenizer {
     return fixedToken.toString();
   }
 
-
   /**
    * Check for the character (looks like reversed `) and normalize it to standard apostrophe
    * @param text French text
    * @return fixed version of the text 
    */
   public static String normalizeFrench(String text) {
-    StringBuffer out = new StringBuffer();
+    StringBuilder out = new StringBuilder();
     for (int i=0; i<text.length(); i++) {
       if (String.format("%04x", (int)text.charAt(i)).equals("2019")) {    // 
         out.append("' ");
@@ -148,7 +167,7 @@ public abstract class Tokenizer {
    * @return
    *    normalized text, ready to be run through tokenizer   
    */
-  protected String preNormalize(String text) {
+  protected static String preNormalize(String text) {
     return text.replaceAll("\u2018", "'").replaceAll("\u2060", "'").replaceAll("\u201C", "\"").replaceAll("\u201D", "\"").replaceAll("\u201B", "'").replaceAll("\u201F", "\"").replaceAll("\u201E", "\"").replaceAll("\u00B4", "'").replaceAll("\u301F", "\"").replaceAll("\u2019", "'").replaceAll("\u0060", "'");
   }
 
@@ -160,7 +179,7 @@ public abstract class Tokenizer {
    * @return
    *    text, after fixing possible errors
    */
-  protected String postNormalize(String text) {
+  protected static String postNormalize(String text) {
     return text.replaceAll("\\((\\S)", "( $1").replaceAll("(\\S)\\)", "$1 )").replaceAll("''(\\S)", "'' $1").replaceAll("–", "-")
     .replaceAll("‑", "-").replaceAll("(\\S)-(\\S)", "$1 - $2").replaceAll("—", "——").replaceAll(" ' s ", " 's ").replaceAll(" l ' ", " l' ")
     .replaceAll("\"(\\S)", "\" $1").replaceAll("(\\S)\"", "$1 \"");
@@ -174,7 +193,7 @@ public abstract class Tokenizer {
    * @return
    *    String corresponding to the tokens output by tokenStream
    */
-  protected String streamToString(TokenStream tokenStream) {
+  protected static String streamToString(TokenStream tokenStream) {
     CharTermAttribute termAtt = tokenStream.getAttribute(CharTermAttribute.class);
     tokenStream.clearAttributes();
     StringBuilder tokenized = new StringBuilder();
@@ -196,22 +215,26 @@ public abstract class Tokenizer {
    *    true if parameter is a stopword, false otherwise
    */
   public boolean isStopWord(String token) {
-    return delims.contains(token);
+    return delims.contains(token) || (isStemming() && stemmedStopwords.contains(token)) || (!isStemming() && stopwords.contains(token));
   }
-
   /**
    * Overrided by applicable implementing classes.
-   * @param 
-   *    token
+   * @param isStemmed
+   *    true if token has been stemmed, false otherwise
+   * @param token
    * @return
-   *    true if parameter is a stemmed version of stopword, false otherwise
+   *    true if token is a stopword, false otherwise
    */
-  public boolean isStemmedStopWord(String token) {
-    return isStopWord(token);
+  public boolean isStopWord(boolean isStemmed, String token) {
+    return delims.contains(token) || (isStemmed && stemmedStopwords.contains(token)) || (!isStemmed && stopwords.contains(token));
   }
-  
-  protected boolean isDiscard(String token) {
+
+  public boolean isDiscard(String token) {
     return ( token.length() < MIN_LENGTH || token.length() > MAX_LENGTH || isStopWord(token) );
+  }
+
+  public boolean isDiscard(boolean isStemmed, String token) {
+    return ( token.length() < MIN_LENGTH || token.length() > MAX_LENGTH || isStopWord(isStemmed, token) );
   }
 
   /**

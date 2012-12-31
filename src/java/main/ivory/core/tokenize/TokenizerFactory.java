@@ -86,12 +86,8 @@ public class TokenizerFactory {
       return OpenNLPTokenizer.class;
     }else if(lang.equals("ar")) {
       return LuceneArabicAnalyzer.class;
-    }else if(lang.equals("tr")) {
-      return LuceneTurkishAnalyzer.class;
-    }else if(lang.equals("es")) {
-      return LuceneSpanishAnalyzer.class;
-    }else if(lang.equals("cs")) {
-      return LuceneCzechAnalyzer.class;
+    }else if(lang.equals("tr") || lang.equals("es") || lang.equals("cs")) {
+      return LuceneAnalyzer.class;
     }else {
       Log.info("Unknown class for language: " + lang);
       throw new RuntimeException("Unknown class for language: " + lang);

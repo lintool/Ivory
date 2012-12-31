@@ -1,7 +1,6 @@
 package ivory.core.tokenize;
 
 import ivory.core.Constants;
-import java.io.IOException;
 import java.io.StringReader;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
@@ -10,37 +9,48 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.LowerCaseFilter;
 import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.ar.ArabicNormalizationFilter;
-import org.apache.lucene.analysis.ar.ArabicStemFilter;
+import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.analysis.standard.StandardFilter;
 import org.apache.lucene.analysis.standard.StandardTokenizer;
-import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.util.Version;
 import edu.umd.hooka.VocabularyWritable;
 import edu.umd.hooka.alignment.HadoopAlign;
 
-public class LuceneArabicAnalyzer extends ivory.core.tokenize.Tokenizer {
-  private static final Logger LOG = Logger.getLogger(LuceneArabicAnalyzer.class);
+public class LuceneAnalyzer extends ivory.core.tokenize.Tokenizer {
+  private static final Logger LOG = Logger.getLogger(LuceneAnalyzer.class);
   static{
     LOG.setLevel(Level.WARN);
   }
-  private org.apache.lucene.analysis.Tokenizer tokenizer;
-
+  private Tokenizer tokenizer;
+  private Stemmer stemmer;
+  private int lang;
+  private static final int SPANISH = 0, TURKISH = 1, CZECH = 2;
+  private static final String[] classes = {
+    "org.tartarus.snowball.ext.spanishStemmer", 
+    "org.tartarus.snowball.ext.turkishStemmer", 
+    "ivory.core.tokenize.CzechStemmer"};
+  
   @Override
   public void configure(Configuration conf) {
     configure(conf, null);
   }
 
   @Override
-  public void configure(Configuration conf, FileSystem fs) {    
+  public void configure(Configuration conf, FileSystem fs) {
+    if (conf.getBoolean(Constants.Stemming, true)) {
+      setLanguageAndStemmer(conf.get(Constants.Language));
+      isStemming = true;
+    }else {
+      setLanguage(conf.get(Constants.Language));
+    }
+    
     // read stopwords from file (stopwords will be empty set if file does not exist or is empty)
     String stopwordsFile = conf.get(Constants.StopwordList);
     stopwords = readInput(fs, stopwordsFile);      
     String stemmedStopwordsFile = conf.get(Constants.StemmedStopwordList);
     stemmedStopwords = readInput(fs, stemmedStopwordsFile);
     isStopwordRemoval = !stopwords.isEmpty();
-    isStemming = conf.getBoolean(Constants.Stemming, true);
-
+    
     VocabularyWritable vocab;
     try {
       vocab = (VocabularyWritable) HadoopAlign.loadVocab(new Path(conf.get(Constants.CollectionVocab)), fs);
@@ -49,57 +59,41 @@ public class LuceneArabicAnalyzer extends ivory.core.tokenize.Tokenizer {
       LOG.warn("No vocabulary provided to tokenizer.");
       vocab = null;
     }
-
+    
     LOG.warn("Stemming is " + isStemming + "; Stopword removal is " + isStopwordRemoval +"; number of stopwords: " + stopwords.size() +"; stemmed: " + stemmedStopwords.size());
   }
-
-  @Override
-  public String[] processContent(String text) {   
-    text = preNormalize(text);
-    tokenizer = new StandardTokenizer(Version.LUCENE_35, new StringReader(text));
-    TokenStream tokenStream = new LowerCaseFilter(Version.LUCENE_35, tokenizer);
-    String tokenized = postNormalize(streamToString(tokenStream));
-
-    StringBuilder finalTokenized = new StringBuilder();
-    for (String token : tokenized.split(" ")) {
-      if ( isStopwordRemoval() && isDiscard(false, token) ) {
-        continue;
-      }
-      finalTokenized.append( token + " " );
+  
+  public void setLanguage(String l){
+    if(l.equalsIgnoreCase("spanish") || l.equalsIgnoreCase("es")){
+      lang = SPANISH;
+    }else if(l.equalsIgnoreCase("turkish") || l.equalsIgnoreCase("tr")){
+      lang = TURKISH;
+    }else if(l.equalsIgnoreCase("czech") || l.equalsIgnoreCase("cs") || l.equalsIgnoreCase("cz")){
+      lang = CZECH;
+    }else{
+      LOG.warn("Language not recognized, setting to English!");
     }
-    String stemmedTokenized = finalTokenized.toString().trim();
-    if (isStemming()) {
-      // then, run the Lucene normalization and stemming on the stopword-removed text
-      stemmedTokenized = stem(stemmedTokenized);       
-    }
-    return stemmedTokenized.split(" ");
   }
 
-
-  @Override
-  public String stem(String token) {
-    tokenizer = new StandardTokenizer(Version.LUCENE_35, new StringReader(token));
-    TokenStream tokenStream = new ArabicStemFilter(new ArabicNormalizationFilter(tokenizer));
-    CharTermAttribute termAtt = tokenStream.getAttribute(CharTermAttribute.class);
-    tokenStream.clearAttributes();
-    StringBuilder stemmed = new StringBuilder();
+  @SuppressWarnings("unchecked")
+  public void setLanguageAndStemmer(String l){
+    setLanguage(l);
+    Class<? extends Stemmer> stemClass;
     try {
-      while (tokenStream.incrementToken()) {
-        String curToken = termAtt.toString();
-        if ( vocab != null && vocab.get(curToken) <= 0) {
-          continue;
-        }
-        stemmed.append( curToken + " " );
-      }
-    }catch (IOException e) {
+      stemClass = (Class<? extends Stemmer>) Class.forName(classes[lang]);
+      stemmer = (Stemmer) stemClass.newInstance();
+    } catch (ClassNotFoundException e) {
+      LOG.warn("Stemmer class not recognized!\n" + classes[lang]);
+      stemmer = null;
+      return;
+    } catch (Exception e) {
       e.printStackTrace();
-    }
-    return stemmed.toString().trim();
+      throw new RuntimeException(e);
+    } 
   }
-
+  
   @Override
-  public float getOOVRate(String text, VocabularyWritable vocab) {
-    int countOOV = 0, countAll = 0;
+  public String[] processContent(String text) {  
     tokenizer = new StandardTokenizer(Version.LUCENE_35, new StringReader(text));
     TokenStream tokenStream = new StandardFilter(Version.LUCENE_35, tokenizer);
     tokenStream = new LowerCaseFilter(Version.LUCENE_35, tokenStream);
@@ -110,32 +104,43 @@ public class LuceneArabicAnalyzer extends ivory.core.tokenize.Tokenizer {
       if ( isStopwordRemoval() && isDiscard(false, token) ) {
         continue;
       }
-      if (!isStemming()) {
-        if ( vocab != null && vocab.get(token) <= 0) {
-          countOOV++;
-        }
-        countAll++;
-      }else {
-        finalTokenized.append( token + " " );
-      }
+      String stemmedToken = stem(token);
+      
+      if ( vocab != null && vocab.get(stemmedToken) <= 0) {
+        continue;
+      } 
+      finalTokenized.append(stemmedToken + " ");
     }
-    
-    if (isStemming()) {
-      tokenizer = new StandardTokenizer(Version.LUCENE_35, new StringReader(finalTokenized.toString().trim()));
-      tokenStream = new ArabicStemFilter(new ArabicNormalizationFilter(tokenizer));
-      CharTermAttribute termAtt = tokenStream.getAttribute(CharTermAttribute.class);
-      tokenStream.clearAttributes();
-      try {
-        while (tokenStream.incrementToken()) {
-          String curToken = termAtt.toString();
-          if ( vocab != null && vocab.get(curToken) <= 0) {
-            countOOV++;
-          }
-          countAll++;
-        }
-      } catch (IOException e) {
-        e.printStackTrace();
+    return finalTokenized.toString().trim().split(" ");
+  }
+
+  @Override
+  public String stem(String token) {
+    if ( stemmer != null ) {
+      return stemmer.toStem(token);
+    }else {
+      return token;
+    }
+  }
+
+  @Override
+  public float getOOVRate(String text, VocabularyWritable vocab) {
+    int countOOV = 0, countAll = 0;
+    tokenizer = new StandardTokenizer(Version.LUCENE_35, new StringReader(text));
+    TokenStream tokenStream = new StandardFilter(Version.LUCENE_35, tokenizer);
+    tokenStream = new LowerCaseFilter(Version.LUCENE_35, tokenStream);
+    String tokenized = postNormalize(streamToString(tokenStream));
+
+    for (String token : tokenized.split(" ")) {
+      if ( isStopwordRemoval() && isDiscard(false, token) ) {
+        continue;
       }
+      String stemmedToken = stem(token);
+      
+      if ( vocab != null && vocab.get(stemmedToken) <= 0) {
+        countOOV++;
+      } 
+      countAll++;
     }
     return (countOOV / (float) countAll);
   }

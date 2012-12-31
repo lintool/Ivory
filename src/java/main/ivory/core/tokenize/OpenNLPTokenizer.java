@@ -2,7 +2,6 @@ package ivory.core.tokenize;
 
 import ivory.core.Constants;
 import java.io.IOException;
-import java.util.Set;
 import opennlp.tools.tokenize.Tokenizer;
 import opennlp.tools.tokenize.TokenizerME;
 import opennlp.tools.tokenize.TokenizerModel;
@@ -19,15 +18,16 @@ import edu.umd.hooka.alignment.HadoopAlign;
 public class OpenNLPTokenizer extends ivory.core.tokenize.Tokenizer {
   private static final Logger sLogger = Logger.getLogger(OpenNLPTokenizer.class);
   static{
-    sLogger.setLevel(Level.WARN);
+    sLogger.setLevel(Level.INFO);
   }
   private Tokenizer tokenizer;
   private SnowballStemmer stemmer;
   private int lang;
   private static final int ENGLISH = 0, FRENCH = 1, GERMAN = 2;
-  private static final String[] languages = {"english", "french", "german"};
-  private Set<String> stopwords;
-  private Set<String> stemmedStopwords;
+  private static final String[] classes = {
+    "org.tartarus.snowball.ext.englishStemmer", 
+    "org.tartarus.snowball.ext.frenchStemmer", 
+    "org.tartarus.snowball.ext.germanStemmer"};
 
   public OpenNLPTokenizer(){
     super();
@@ -46,31 +46,32 @@ public class OpenNLPTokenizer extends ivory.core.tokenize.Tokenizer {
   }
 
   @Override
-  public void configure(Configuration mJobConf, FileSystem fs){
-    setTokenizer(fs, new Path(mJobConf.get(Constants.TokenizerData)));
-    if (mJobConf.getBoolean(Constants.Stemming, true)) {
-      setLanguageAndStemmer(mJobConf.get(Constants.Language));
+  public void configure(Configuration conf, FileSystem fs){
+    setTokenizer(fs, new Path(conf.get(Constants.TokenizerData)));
+    if (conf.getBoolean(Constants.Stemming, true)) {
+      setLanguageAndStemmer(conf.get(Constants.Language));
+      isStemming = true;
     }else {
-      setLanguage(mJobConf.get(Constants.Language));
+      setLanguage(conf.get(Constants.Language));
     }
 
     // read stopwords from file (stopwords will be empty set if file does not exist or is empty)
-    String stopwordsFile = mJobConf.get(Constants.StopwordList);
+    String stopwordsFile = conf.get(Constants.StopwordList);
     stopwords = readInput(fs, stopwordsFile);      
-    String stemmedStopwordsFile = mJobConf.get(Constants.StemmedStopwordList);
+    String stemmedStopwordsFile = conf.get(Constants.StemmedStopwordList);
     stemmedStopwords = readInput(fs, stemmedStopwordsFile);
 
     VocabularyWritable vocab;
     try {
-      vocab = (VocabularyWritable) HadoopAlign.loadVocab(new Path(mJobConf.get(Constants.CollectionVocab)), fs);
+      vocab = (VocabularyWritable) HadoopAlign.loadVocab(new Path(conf.get(Constants.CollectionVocab)), fs);
       setVocab(vocab);
     } catch (Exception e) {
       sLogger.warn("No vocabulary provided to tokenizer.");
       vocab = null;
     }
     isStopwordRemoval = !stopwords.isEmpty();
-  
-    sLogger.warn("Stemmer: " + stemmer + "\nStopword removal is " + isStopwordRemoval +"; number of stopwords: " + stopwords.size() +"; stemmed: " + stemmedStopwords.size());
+
+    sLogger.info("Stemmer: " + stemmer + "\nStopword removal is " + isStopwordRemoval +"; number of stopwords: " + stopwords.size() +"; stemmed: " + stemmedStopwords.size());
   }
 
   public void setTokenizer(FileSystem fs, Path p){
@@ -99,23 +100,13 @@ public class OpenNLPTokenizer extends ivory.core.tokenize.Tokenizer {
 
   @SuppressWarnings("unchecked")
   public void setLanguageAndStemmer(String l){
-    if(l.startsWith("en")){
-      lang = ENGLISH;//"english";
-    }else if(l.startsWith("fr")){
-      lang = FRENCH;//"french";
-    }else if(l.equals("german") || l.startsWith("de")){
-      lang = GERMAN;//"german";
-    }else{
-      sLogger.warn("Language not recognized, setting to English!");
-    }
+    setLanguage(l);
     Class<? extends SnowballStemmer> stemClass;
     try {
-      stemClass = (Class<? extends SnowballStemmer>)
-          Class.forName("org.tartarus.snowball.ext." + languages[lang] + "Stemmer");
+      stemClass = (Class<? extends SnowballStemmer>) Class.forName(classes[lang]);
       stemmer = (SnowballStemmer) stemClass.newInstance();
     } catch (ClassNotFoundException e) {
-      sLogger.warn("Stemmer class not recognized!\n"+"org.tartarus.snowball.ext." +
-          languages[lang] + "Stemmer");
+      sLogger.warn("Stemmer class not recognized!\n" + classes[lang]);
       stemmer = null;
       return;
     } catch (Exception e) {
@@ -132,42 +123,33 @@ public class OpenNLPTokenizer extends ivory.core.tokenize.Tokenizer {
     }
 
     String[] tokens = tokenizer.tokenize(text);
-    String tokenizedText = "";
+    StringBuilder tokenized = new StringBuilder();
     for ( String token : tokens ){
-      tokenizedText += token + " ";
+      tokenized.append(token + " ");
     }
 
     // do post-normalizations before any stemming or stopword removal 
-    String[] normalizedTokens = postNormalize(tokenizedText).split(" ");
-    tokenizedText = "";
+    String[] normalizedTokens = postNormalize(tokenized.toString().trim()).split(" ");
+    tokenized.delete(0, tokenized.length());
     for ( int i = 0; i < normalizedTokens.length; i++ ){
       String token = normalizedTokens[i].toLowerCase();
-      if ( isStopwordRemoval && isDiscard(token) ) {
-//        sLogger.warn("Discarded stopword "+token);
+      if ( isStopwordRemoval() && isDiscard(false, token) ) {
+        //        sLogger.warn("Discarded stopword "+token);
         continue;
       }
 
       //apply stemming on token
-      String stemmedToken = token;
-      if ( stemmer!=null ) {
-        stemmer.setCurrent(token);
-        stemmer.stem();
-        stemmedToken = stemmer.getCurrent();
-      }
+      String stemmedToken = stem(token);
 
       //skip if out of vocab
       if ( vocab != null && vocab.get(stemmedToken) <= 0) {
         //        sLogger.warn("Discarded OOV "+token);
         continue;
       }
-      tokenizedText += (stemmedToken + " ");
+      tokenized.append( stemmedToken + " " );
     }
 
-    return tokenizedText.trim().split(" ");
-  }
-
-  public String getLanguage() {
-    return languages[lang];
+    return tokenized.toString().trim().split(" ");
   }
 
   @Override
@@ -177,8 +159,7 @@ public class OpenNLPTokenizer extends ivory.core.tokenize.Tokenizer {
 
   @Override
   public String stem(String token) {
-    token = postNormalize(preNormalize(token)).toLowerCase();
-    if ( stemmer!=null ) {
+    if ( stemmer != null ) {
       stemmer.setCurrent(token);
       stemmer.stem();
       return stemmer.getCurrent();
@@ -187,27 +168,31 @@ public class OpenNLPTokenizer extends ivory.core.tokenize.Tokenizer {
     }
   }
 
-  /* 
-   * For external use. returns true if token is a Galago stopword or a delimiter: `~!@#$%^&*()-_=+]}[{\\|'\";:/?.>,<
-   */
   @Override
-  public boolean isStopWord(String token) {
-    if (stopwords == null) {
-      sLogger.warn("Tokenizer does not have stopwords loaded!");
-      return false;
-    }else {
-      return ( stopwords.contains(token) || delims.contains(token) );
+  public float getOOVRate(String text, VocabularyWritable vocab) {
+    int countOOV = 0, countAll = 0;
+    text = preNormalize(text);
+    String[] tokens = tokenizer.tokenize(text);
+    StringBuilder tokenized = new StringBuilder();
+    for ( String token : tokens ){
+      tokenized.append(token + " ");
     }
-  }
+    
+    String[] normalizedTokens = postNormalize(tokenized.toString().trim()).split(" ");
+    for ( int i = 0; i < normalizedTokens.length; i++ ){
+      String token = normalizedTokens[i].toLowerCase();
+      if ( isStopwordRemoval() && isDiscard(false, token) ) {
+        continue;
+      }
 
-  @Override
-  public boolean isStemmedStopWord(String token) {
-    if (stemmedStopwords == null) {
-      sLogger.warn("Tokenizer does not have stopwords loaded!");
-      return false;
-    }else {
-      return ( stemmedStopwords.contains(token) || delims.contains(token) );
+      //apply stemming on token
+      String stemmedToken = stem(token);
+     
+      if ( vocab != null && vocab.get(stemmedToken) <= 0) {
+        countOOV++;
+      } 
+      countAll++;
     }
+    return (countOOV / (float) countAll);
   }
-
 }

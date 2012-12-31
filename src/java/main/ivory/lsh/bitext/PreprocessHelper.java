@@ -476,55 +476,11 @@ public class PreprocessHelper {
     dfTable = new DfTableArray(new Path(env.getDfByTermData()), localFs);
   }
 
-  /**
-   * Load from local FS instead of HDFS
-   */
   public float getFInVocabRate(String fSent) {
-    // temporarily disable stopword removal and vocabulary filtering
-    VocabularyWritable v = fTok.getVocab();
-    boolean isStopwordRemoval = fTok.getStopwordRemoval();
-    fTok.setVocab(null);
-    fTok.setStopwordRemoval(false);
-
-    String[] fTokens = fTok.processContent(fSent);
-    float oov = 0, total = fTokens.length;
-    for (String fToken : fTokens) {
-      if (fVocabSrc.get(fToken) <= 0 && fVocabTrg.get(fToken) <= 0) {
-        oov++;
-        sLogger.debug(fToken+" --> OOV");
-      }else {
-        sLogger.debug(fToken+" --> in vocab");
-      }
-    }
-
-    // revert to original settings 
-    fTok.setVocab(v);
-    fTok.setStopwordRemoval(isStopwordRemoval);
-    return (total-oov) / total;
+    return 1.0f-fTok.getOOVRate(fSent, fVocabSrc);
   }
 
   public float getEInVocabRate(String eSent) {
-    // temporarily disable stopword removal and vocabulary filtering
-    VocabularyWritable v = eTok.getVocab();
-    boolean isStopwordRemoval = eTok.getStopwordRemoval();
-    eTok.setVocab(null);
-    eTok.setStopwordRemoval(false);
-    
-    String[] eTokens = eTok.processContent(eSent);
-    float oov = 0, total = eTokens.length;
-    for (String eToken : eTokens) {
-      if (eVocabSrc.get(eToken) <= 0 && eVocabTrg.get(eToken) <= 0) {
-        oov++;
-        sLogger.debug(eToken+" --> OOV");
-      }else {
-        sLogger.debug(eToken+" --> in vocab");
-      }
-    }
-
-    // revert to original settings 
-    eTok.setVocab(v);
-    eTok.setStopwordRemoval(isStopwordRemoval);
-    sLogger.debug(oov / total);
-    return (total-oov) / total;
+    return 1.0f-eTok.getOOVRate(eSent, eVocabSrc);
   }
 }

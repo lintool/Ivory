@@ -102,7 +102,7 @@ public class BuildTermDocVectors extends PowerTool {
         tokenizer.configure(conf);
       } catch (Exception e) {
         e.printStackTrace();
-        throw new RuntimeException("Error initializing tokenizer!");
+        throw new RuntimeException("Error initializing tokenizer: " + e.getMessage());
       }
     }
 

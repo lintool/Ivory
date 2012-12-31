@@ -174,7 +174,7 @@ public class Utils {
             if (ids == null || ids.size() != 1) continue;
             for (int e : ids) {
               String eTerm = rhs[e];
-              if (docLangTokenizer.isStemmedStopWord(eTerm))  continue;
+              if (docLangTokenizer.isStopWord(eTerm))  continue;
               if (scfgDist.containsKey(fTerm)) {
                 HMapSFW eToken2Prob = scfgDist.get(fTerm);
                 if(eToken2Prob.containsKey(eTerm)) {
