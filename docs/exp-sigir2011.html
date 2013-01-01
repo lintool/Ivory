@@ -38,7 +38,7 @@
                 <a href="../index.html">Home</a>
               </li>
               <li class="">
-                <a href="./start.html">Get started</a>
+                <a href="./start.html">Getting Started</a>
               </li>
               <li class="">
                 <a href="./publications.html">Publications</a>
@@ -81,10 +81,10 @@
 etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/wt10g/run.wt10g.SIGIR2011.xml data/wt10g/queries.wt10g.501-550.xml
 
 # evaluating effectiveness
-trec_eval data/wt10g/qrels.wt10g.all ranking.SIGIR2011-Wt10g-QL.txt
-trec_eval data/wt10g/qrels.wt10g.all ranking.SIGIR2011-Wt10g-AdaRank.txt
-trec_eval data/wt10g/qrels.wt10g.all ranking.SIGIR2011-Wt10g-FeaturePrune.txt
-trec_eval data/wt10g/qrels.wt10g.all ranking.SIGIR2011-Wt10g-Cascade.txt
+etc/trec_eval data/wt10g/qrels.wt10g.all ranking.SIGIR2011-Wt10g-QL.txt
+etc/trec_eval data/wt10g/qrels.wt10g.all ranking.SIGIR2011-Wt10g-AdaRank.txt
+etc/trec_eval data/wt10g/qrels.wt10g.all ranking.SIGIR2011-Wt10g-FeaturePrune.txt
+etc/trec_eval data/wt10g/qrels.wt10g.all ranking.SIGIR2011-Wt10g-Cascade.txt
 
 # junit
 etc/junit.sh ivory.regression.sigir2011.Wt10g_Cascade
@@ -137,13 +137,13 @@ etc/junit.sh ivory.regression.sigir2011.Wt10g_VaryingTradeoff_Cascade
 
 <pre class="code">
 # command-line
-etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/gov2/run.gov2.SIGIR2011.xml data/gov2/gov2.title.776-850
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/gov2/run.gov2.SIGIR2011.xml data/gov2/queries.gov2.title.776-850.xml
 
 # evaluating effectiveness
-trec_eval data/gov2/qrels.gov2.all ranking.SIGIR2011-Gov2-QL.txt
-trec_eval data/gov2/qrels.gov2.all ranking.SIGIR2011-Gov2-AdaRank.txt
-trec_eval data/gov2/qrels.gov2.all ranking.SIGIR2011-Gov2-FeaturePrune.txt
-trec_eval data/gov2/qrels.gov2.all ranking.SIGIR2011-Gov2-Cascade.txt
+etc/trec_eval data/gov2/qrels.gov2.all ranking.SIGIR2011-Gov2-QL.txt
+etc/trec_eval data/gov2/qrels.gov2.all ranking.SIGIR2011-Gov2-AdaRank.txt
+etc/trec_eval data/gov2/qrels.gov2.all ranking.SIGIR2011-Gov2-FeaturePrune.txt
+etc/trec_eval data/gov2/qrels.gov2.all ranking.SIGIR2011-Gov2-Cascade.txt
 
 # junit
 etc/junit.sh ivory.regression.sigir2011.Gov2_Cascade
@@ -182,15 +182,15 @@ etc/junit.sh ivory.regression.sigir2011.Gov2_Cascade
 
 <pre class="code">
 # command-line
-etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/gov2/run.gov2.SIGIR2011.varying.tradeoff.featureprune.xml data/gov2/gov2.title.776-850
-etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/gov2/run.gov2.SIGIR2011.varying.tradeoff.cascade.xml data/gov2/gov2.title.776-850
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/gov2/run.gov2.SIGIR2011.varying.tradeoff.featureprune.xml data/gov2/queries.gov2.title.776-850.xml
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/gov2/run.gov2.SIGIR2011.varying.tradeoff.cascade.xml data/gov2/queries.gov2.title.776-850.xml
 
 # junit
 etc/junit.sh ivory.regression.sigir2011.Gov2_VaryingTradeoff_FeaturePrune
 etc/junit.sh ivory.regression.sigir2011.Gov2_VaryingTradeoff_Cascade
 </pre>
 
-<h3>Web09 category B results (i.e. Clue)</h3>
+<h3>Clue results</h3>
 
 <p>Main results in Table 2:</p>
 
@@ -199,10 +199,10 @@ etc/junit.sh ivory.regression.sigir2011.Gov2_VaryingTradeoff_Cascade
 etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/clue/run.clue.SIGIR2011.xml data/clue/queries.web09.26-50.xml
 
 # evaluating effectiveness
-trec_eval data/clue/qrels.web09catB.txt ranking.SIGIR2011-Clue-QL.txt
-trec_eval data/clue/qrels.web09catB.txt ranking.SIGIR2011-Clue-AdaRank.txt
-trec_eval data/clue/qrels.web09catB.txt ranking.SIGIR2011-Clue-FeaturePrune.txt
-trec_eval data/clue/qrels.web09catB.txt ranking.SIGIR2011-Clue-Cascade.txt
+etc/trec_eval data/clue/qrels.web09catB.txt ranking.SIGIR2011-Clue-QL.txt
+etc/trec_eval data/clue/qrels.web09catB.txt ranking.SIGIR2011-Clue-AdaRank.txt
+etc/trec_eval data/clue/qrels.web09catB.txt ranking.SIGIR2011-Clue-FeaturePrune.txt
+etc/trec_eval data/clue/qrels.web09catB.txt ranking.SIGIR2011-Clue-Cascade.txt
 
 # junit
 etc/junit.sh ivory.regression.sigir2011.Clue_Cascade

@@ -12,6 +12,7 @@ import edu.umd.hooka.VocabularyWritable;
 public class TokenizerFactory {
   private static final Map<String, Integer> acceptedLanguages = new HashMap<String, Integer>();
   static {
+    acceptedLanguages.put("cs", 1);
     acceptedLanguages.put("zh", 1);
     acceptedLanguages.put("en", 1);
     acceptedLanguages.put("es", 1);
@@ -63,17 +64,8 @@ public class TokenizerFactory {
       conf.set(Constants.Language, lang);
       conf.set(Constants.TokenizerData, modelPath);
       
-      Class tokenizerClass = getTokenizerClass(lang);
+      Class<? extends Tokenizer> tokenizerClass = getTokenizerClass(lang);
       Tokenizer tokenizer = (Tokenizer) tokenizerClass.newInstance();
-//      if(lang.equals("zh")){
-//        tokenizer = new StanfordChineseTokenizer();
-//      }else if(lang.equals("de") || lang.equals("en") || lang.equals("fr")){
-//        tokenizer = new OpenNLPTokenizer();
-//      }else if(lang.equals("ar")){
-//        tokenizer = new LuceneArabicAnalyzer();
-//      }else if(lang.equals("tr")){
-//        tokenizer = new LuceneTurkishAnalyzer();
-//      }
       
       if (vocab != null) {
         tokenizer.setVocab(vocab);
@@ -87,17 +79,15 @@ public class TokenizerFactory {
     }
   }
 
-  public static Class getTokenizerClass(String lang) {
+  public static Class<? extends Tokenizer> getTokenizerClass(String lang) {
     if (lang.equals("zh")) {
       return StanfordChineseTokenizer.class;
     }else if(lang.equals("de") || lang.equals("en") || lang.equals("fr")) {
       return OpenNLPTokenizer.class;
     }else if(lang.equals("ar")) {
       return LuceneArabicAnalyzer.class;
-    }else if(lang.equals("tr")) {
-      return LuceneTurkishAnalyzer.class;
-    }else if(lang.equals("es")) {
-      return LuceneSpanishAnalyzer.class;
+    }else if(lang.equals("tr") || lang.equals("es") || lang.equals("cs")) {
+      return LuceneAnalyzer.class;
     }else {
       Log.info("Unknown class for language: " + lang);
       throw new RuntimeException("Unknown class for language: " + lang);

@@ -54,7 +54,6 @@ public class TermDocVectorsForwardIndex {
   // this value, which seems safe, at least for a while... :)
   public static final long BigNumber = 1000000000000000L;
 
-  private final FileSystem fs;
   private final Configuration conf;
   private final long[] positions;
   private final String path;
@@ -70,7 +69,8 @@ public class TermDocVectorsForwardIndex {
    */
   public TermDocVectorsForwardIndex(String indexPath, FileSystem fs) throws IOException {
     Preconditions.checkNotNull(indexPath);
-    this.fs = Preconditions.checkNotNull(fs);
+    Preconditions.checkNotNull(fs);
+
     conf = fs.getConf();
 
     RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fs);
@@ -105,12 +105,12 @@ public class TermDocVectorsForwardIndex {
 
     SequenceFile.Reader reader = null;
     try {
-      reader = new SequenceFile.Reader(fs,
-          new Path(path + "/part-m-" + FORMAT.format(fileNo)), conf);
+      reader = new SequenceFile.Reader(conf,
+          SequenceFile.Reader.file(new Path(path + "/part-m-" + FORMAT.format(fileNo))));
     } catch (IOException e) {
       // Try alternative naming scheme for output of old API.
-      reader = new SequenceFile.Reader(fs,
-          new Path(path + "/part-" + FORMAT.format(fileNo)), conf);
+      reader = new SequenceFile.Reader(conf,
+          SequenceFile.Reader.file(new Path(path + "/part-" + FORMAT.format(fileNo))));
     }
 
     IntWritable key = new IntWritable();

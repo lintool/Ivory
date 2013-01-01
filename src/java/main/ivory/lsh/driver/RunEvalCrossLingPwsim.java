@@ -233,6 +233,7 @@ public class RunEvalCrossLingPwsim extends PwsimEnvironment implements Tool {
   private static final String THRESHOLD_OPTION = "T";
   private static final String SAMPLESIZE_OPTION = "sample";
   private static final String MODE_OPTION = "mode";
+  private static final String LIBJARS_OPTION = "libjars";
 
   @SuppressWarnings("static-access")
   private int parseArgs(String[] args) {
@@ -248,6 +249,7 @@ public class RunEvalCrossLingPwsim extends PwsimEnvironment implements Tool {
     options.addOption(OptionBuilder.withDescription("number of sampled pairs from source collection").withArgName("sample size").hasArg().create(SAMPLESIZE_OPTION));
     // not required (default=window size)
     options.addOption(OptionBuilder.withDescription("size of overlap between chunks (default: window size)").withArgName("overlap size").hasArg().create(OVERLAPSIZE_OPTION));
+    options.addOption(OptionBuilder.withDescription("Hadoop option to load external jars").withArgName("jar packages").hasArg().create(LIBJARS_OPTION));
 
     CommandLine cmdline;
     CommandLineParser parser = new GnuParser();

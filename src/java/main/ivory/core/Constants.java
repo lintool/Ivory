@@ -32,6 +32,7 @@ public class Constants {
   public static final String StopwordList = "Ivory.Stopwordlist";
   public static final String StemmedStopwordList = "Ivory.StemmedStopwordlist";
   public static final String TargetStopwordList = "Ivory.TargetStopwordlist";
+  public static final String TargetStemmedStopwordList = "Ivory.TargetStemmedStopwordlist";
   public static final String TargetTokenizer = "Ivory.TargetTokenizer";
   public static final String TargetLanguage = "Ivory.TargetLang";
 

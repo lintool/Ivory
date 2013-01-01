@@ -3,7 +3,6 @@ package ivory.lsh.bitext;
 import ivory.core.RetrievalEnvironment;
 import ivory.core.data.dictionary.DefaultFrequencySortedDictionary;
 import ivory.core.data.stat.DfTableArray;
-import ivory.core.data.stat.PrefixEncodedGlobalStats;
 import ivory.core.tokenize.Tokenizer;
 import ivory.core.tokenize.TokenizerFactory;
 import ivory.core.util.CLIRUtils;
@@ -12,12 +11,10 @@ import ivory.pwsim.score.ScoringModel;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
-
 import opennlp.model.MaxentModel;
 import ivory.lsh.bitext.MoreGenericModelReader;
 import opennlp.tools.sentdetect.SentenceDetectorME;
 import opennlp.tools.sentdetect.SentenceModel;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.filecache.DistributedCache;
 import org.apache.hadoop.fs.FileSystem;
@@ -26,9 +23,7 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-
 import com.google.common.collect.Maps;
-
 import edu.umd.cloud9.io.array.ArrayListOfIntsWritable;
 import edu.umd.cloud9.io.array.ArrayListWritable;
 import edu.umd.cloud9.io.map.HMapIFW;
@@ -40,7 +35,6 @@ import edu.umd.hooka.VocabularyWritable;
 import edu.umd.hooka.alignment.HadoopAlign;
 import edu.umd.hooka.ttables.TTable_monolithic_IFAs;
 
-@SuppressWarnings("deprecation")
 public class PreprocessHelper {
   private String eLang, fLang, eDir;
   private int MinVectorTerms, MinSentenceLength;
@@ -50,21 +44,22 @@ public class PreprocessHelper {
   private TTable_monolithic_IFAs f2e_Probs;
   private TTable_monolithic_IFAs e2f_Probs;
   private ScoringModel fScoreFn, eScoreFn;
-  //  private HMapIFW transDfTable;
   private MaxentModel classifier;
-  //  private PrefixEncodedGlobalStats globalStatsMap;  // for backward compatibility
   private DfTableArray dfTable;
   private DefaultFrequencySortedDictionary dict;
   private final Logger sLogger = Logger.getLogger(PreprocessHelper.class);
   private static final HMapSIW lang2AvgSentLen = new HMapSIW();
   static {
-    lang2AvgSentLen.put("en",20);       // took average # of tokens per sentence in de-en.wmt12 train data
-    lang2AvgSentLen.put("de",17);       // took average # of tokens per sentence in de-en.wmt12 train data
-    lang2AvgSentLen.put("zh",27);       // took average # of tokens per sentence in zh-en.fbis train data
-    lang2AvgSentLen.put("fr",18);       // took average # of tokens per sentence in fr-en.wmt12 train data
-    lang2AvgSentLen.put("tr",21);       // took average # of tokens per sentence in tr-en.oflazer train data
-    lang2AvgSentLen.put("ar",17);       // took average # of tokens per sentence in ar-en.galep5oct train data
-    lang2AvgSentLen.put("es",18);       // set to same as fr for now (no data yet)
+    // took average # of tokens per sentence in Wikipedia data
+    lang2AvgSentLen.put("en",21);       
+    lang2AvgSentLen.put("de",16);     
+    lang2AvgSentLen.put("zh",27);       
+    lang2AvgSentLen.put("fr",18);     
+    lang2AvgSentLen.put("tr",12);    
+    lang2AvgSentLen.put("ar",22);  
+    lang2AvgSentLen.put("es",19);     
+    // set to same as fr for now (no data yet)
+    lang2AvgSentLen.put("cs",18);       
 };
 
   /**
@@ -103,6 +98,7 @@ public class PreprocessHelper {
     loadEModels(job);
   }
 
+  @SuppressWarnings("deprecation")
   private void loadFModels(JobConf conf) throws Exception {
     sLogger.info("Loading models for " + fLang + " ...");
 
@@ -163,7 +159,7 @@ public class PreprocessHelper {
 
     // tokenizer file not read from cache, since it might be a directory (e.g. Chinese segmenter)
     String tokenizerFile = conf.get("fTokenizer");
-    fTok = TokenizerFactory.createTokenizer(fs, fLang, tokenizerFile, null);
+    fTok = TokenizerFactory.createTokenizer(fs, fLang, tokenizerFile, true, conf.get("fStopword"), conf.get("fStemmedStopword"), null);
     sLogger.info("Tokenizer and vocabs created successfully.");
 
     // average sentence length = just a heuristic derived from sample text
@@ -203,7 +199,7 @@ public class PreprocessHelper {
     sLogger.info("Environment created successfully.");
 
     String tokenizerFile = conf.get("eTokenizer");
-    eTok = TokenizerFactory.createTokenizer(fs, eLang, tokenizerFile, null);
+    eTok = TokenizerFactory.createTokenizer(fs, eLang, tokenizerFile, true, conf.get("eStopword"), conf.get("eStemmedStopword"), null);
     sLogger.info("Tokenizer and vocabs created successfully.");
 
     eScoreFn = (ScoringModel) new Bm25();
@@ -212,14 +208,6 @@ public class PreprocessHelper {
 
     dict = new DefaultFrequencySortedDictionary(new Path(env.getIndexTermsData()), new Path(env.getIndexTermIdsData()), new Path(env.getIndexTermIdMappingData()), fs);
     dfTable = new DfTableArray(new Path(env.getDfByTermData()), fs);
-
-    //for backward compatibility
-    //    String indexTermsFile = localFiles[12].toString();
-    //    String dfTableFile = localFiles[0].toString();
-
-    //for backward compatibility
-    //    globalStatsMap = new PrefixEncodedGlobalStats(new Path(indexTermsFile), localFs);
-    //    globalStatsMap.loadDFStats(new Path(dfTableFile));
   }
 
   public HMapSFW createFDocVector(String sentence) {
@@ -271,9 +259,6 @@ public class PreprocessHelper {
     }
     
     weightedVector = CLIRUtils.createTermDocVector(terms.length, term2Tf, eScoreFn, dict, dfTable, true, sLogger);
-    //for backward compatibility
-    //    weightedVector = CLIRUtils.createTermDocVector(terms.length, term2Tf, eVocabSrc, eScoreFn, globalStatsMap, true, sLogger);  
-
     // don't count numbers for the min #terms constraint since Wikipedia has "sentences" full of numbers that doesn't make any sense
     int numNonNumbers = 0;
     for(String term : weightedVector.keySet()){      
@@ -430,6 +415,9 @@ public class PreprocessHelper {
     return eModel;
   }
 
+  /**
+   * Load from local FS instead of HDFS
+   */
   private void loadFModels(Configuration conf) throws Exception {
     sLogger.info("Loading models for " + fLang + " ...");
     //    FileSystem fs = FileSystem.get(conf);
@@ -449,7 +437,7 @@ public class PreprocessHelper {
 
     // tokenizer file not read from cache, since it might be a directory (e.g. Chinese segmenter)
     String tokenizerFile = conf.get("fTokenizer");
-    fTok = TokenizerFactory.createTokenizer(localFs, fLang, tokenizerFile, fVocabSrc);
+    fTok = TokenizerFactory.createTokenizer(localFs, fLang, tokenizerFile, true, conf.get("fStopword"), null, null);
     sLogger.info("Tokenizer and vocabs created successfully.");
 
     // average sentence length = just a heuristic derived from sample text
@@ -477,7 +465,7 @@ public class PreprocessHelper {
     sLogger.info("Environment created successfully.");
 
     String tokenizerFile = conf.get("eTokenizer");
-    eTok = TokenizerFactory.createTokenizer(localFs, eLang, tokenizerFile, eVocabTrg);
+    eTok = TokenizerFactory.createTokenizer(localFs, eLang, tokenizerFile, true, conf.get("eStopword"), null, null);
     sLogger.info("Tokenizer and vocabs created successfully.");
 
     eScoreFn = (ScoringModel) new Bm25();
@@ -489,51 +477,10 @@ public class PreprocessHelper {
   }
 
   public float getFInVocabRate(String fSent) {
-    // temporarily disable stopword removal and vocabulary filtering
-    VocabularyWritable v = fTok.getVocab();
-    boolean isStopwordRemoval = fTok.getStopwordRemoval();
-    fTok.setVocab(null);
-    fTok.setStopwordRemoval(false);
-
-    String[] fTokens = fTok.processContent(fSent);
-    float oov = 0, total = fTokens.length;
-    for (String fToken : fTokens) {
-      if (fVocabSrc.get(fToken) <= 0 && fVocabTrg.get(fToken) <= 0) {
-        oov++;
-        sLogger.debug(fToken+" --> OOV");
-      }else {
-        sLogger.debug(fToken+" --> in vocab");
-      }
-    }
-
-    // revert to original settings 
-    fTok.setVocab(v);
-    fTok.setStopwordRemoval(isStopwordRemoval);
-    return (total-oov) / total;
+    return 1.0f-fTok.getOOVRate(fSent, fVocabSrc);
   }
 
   public float getEInVocabRate(String eSent) {
-    // temporarily disable stopword removal and vocabulary filtering
-    VocabularyWritable v = eTok.getVocab();
-    boolean isStopwordRemoval = eTok.getStopwordRemoval();
-    eTok.setVocab(null);
-    eTok.setStopwordRemoval(false);
-    
-    String[] eTokens = eTok.processContent(eSent);
-    float oov = 0, total = eTokens.length;
-    for (String eToken : eTokens) {
-      if (eVocabSrc.get(eToken) <= 0 && eVocabTrg.get(eToken) <= 0) {
-        oov++;
-        sLogger.debug(eToken+" --> OOV");
-      }else {
-        sLogger.debug(eToken+" --> in vocab");
-      }
-    }
-
-    // revert to original settings 
-    eTok.setVocab(v);
-    eTok.setStopwordRemoval(isStopwordRemoval);
-    sLogger.debug(oov / total);
-    return (total-oov) / total;
+    return 1.0f-eTok.getOOVRate(eSent, eVocabSrc);
   }
 }

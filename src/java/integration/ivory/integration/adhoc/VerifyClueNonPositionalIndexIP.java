@@ -2,6 +2,8 @@ package ivory.integration.adhoc;
 
 import static org.junit.Assert.assertTrue;
 import ivory.app.BuildIndex;
+import ivory.app.PreprocessClueWebEnglish;
+import ivory.app.PreprocessCollection;
 import ivory.core.eval.Qrels;
 import ivory.integration.IntegrationUtils;
 import ivory.regression.basic.Web09catB_All;
@@ -52,7 +54,9 @@ public class VerifyClueNonPositionalIndexIP {
 
     String[] args = new String[] { "hadoop jar", IntegrationUtils.getJar("dist", "ivory"),
         ivory.app.PreprocessClueWebEnglish.class.getCanonicalName(), libjars,
-        collectionPath.toString(), index, "1" };
+        "-" + PreprocessCollection.COLLECTION_PATH, collectionPath.toString(),
+        "-" + PreprocessCollection.INDEX_PATH, index,
+        "-" + PreprocessClueWebEnglish.SEGMENT, "1"};
 
     IntegrationUtils.exec(Joiner.on(" ").join(args));
 

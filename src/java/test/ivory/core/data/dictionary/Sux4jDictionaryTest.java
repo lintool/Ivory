@@ -91,6 +91,6 @@ public class Sux4jDictionaryTest extends TestCase {
   }
 
   public static junit.framework.Test suite() {
-    return new JUnit4TestAdapter(PrefixEncodedLexicographicallySortedDictionaryTest.class);
+    return new JUnit4TestAdapter(Sux4jDictionaryTest.class);
   }
 }

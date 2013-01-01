@@ -3,31 +3,28 @@ package ivory.core.tokenize;
 import ivory.core.Constants;
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.Set;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.apache.lucene.analysis.CharArraySet;
 import org.apache.lucene.analysis.LowerCaseFilter;
-import org.apache.lucene.analysis.StopFilter;
 import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.ar.ArabicAnalyzer;
 import org.apache.lucene.analysis.ar.ArabicNormalizationFilter;
 import org.apache.lucene.analysis.ar.ArabicStemFilter;
+import org.apache.lucene.analysis.standard.StandardFilter;
 import org.apache.lucene.analysis.standard.StandardTokenizer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.util.Version;
+import edu.umd.hooka.VocabularyWritable;
+import edu.umd.hooka.alignment.HadoopAlign;
 
 public class LuceneArabicAnalyzer extends ivory.core.tokenize.Tokenizer {
   private static final Logger LOG = Logger.getLogger(LuceneArabicAnalyzer.class);
   static{
     LOG.setLevel(Level.WARN);
   }
-  private boolean isStemming;
   private org.apache.lucene.analysis.Tokenizer tokenizer;
-  private Set<String> stopwords;
-  private Set<String> stemmedStopwords;
 
   @Override
   public void configure(Configuration conf) {
@@ -42,67 +39,104 @@ public class LuceneArabicAnalyzer extends ivory.core.tokenize.Tokenizer {
     String stemmedStopwordsFile = conf.get(Constants.StemmedStopwordList);
     stemmedStopwords = readInput(fs, stemmedStopwordsFile);
     isStopwordRemoval = !stopwords.isEmpty();
-
     isStemming = conf.getBoolean(Constants.Stemming, true);
-    
+
+    VocabularyWritable vocab;
+    try {
+      vocab = (VocabularyWritable) HadoopAlign.loadVocab(new Path(conf.get(Constants.CollectionVocab)), fs);
+      setVocab(vocab);
+    } catch (Exception e) {
+      LOG.warn("No vocabulary provided to tokenizer.");
+      vocab = null;
+    }
+
     LOG.warn("Stemming is " + isStemming + "; Stopword removal is " + isStopwordRemoval +"; number of stopwords: " + stopwords.size() +"; stemmed: " + stemmedStopwords.size());
   }
-  
+
   @Override
   public String[] processContent(String text) {   
+    text = preNormalize(text);
     tokenizer = new StandardTokenizer(Version.LUCENE_35, new StringReader(text));
     TokenStream tokenStream = new LowerCaseFilter(Version.LUCENE_35, tokenizer);
-    if (isStopwordRemoval) {
-      tokenStream = new StopFilter( Version.LUCENE_35, tokenStream, (CharArraySet) ArabicAnalyzer.getDefaultStopSet());
-    }
-    tokenStream = new ArabicNormalizationFilter(tokenStream);
-    if (isStemming) {
-      tokenStream = new ArabicStemFilter(tokenStream);
-    }
+    String tokenized = postNormalize(streamToString(tokenStream));
 
-    CharTermAttribute termAtt = tokenStream.getAttribute(CharTermAttribute.class);
-    tokenStream.clearAttributes();
-    String tokenized = "";
-    try {
-      while (tokenStream.incrementToken()) {
-        String token = termAtt.toString();
-        if ( vocab != null && vocab.get(token) <= 0) {
-          continue;
-        }
-        tokenized += ( token + " " );
+    StringBuilder finalTokenized = new StringBuilder();
+    for (String token : tokenized.split(" ")) {
+      if ( isStopwordRemoval() && isDiscard(false, token) ) {
+        continue;
       }
-    } catch (IOException e) {
-      e.printStackTrace();
+      finalTokenized.append( token + " " );
     }
-    return tokenized.trim().split("\\s+");
+    String stemmedTokenized = finalTokenized.toString().trim();
+    if (isStemming()) {
+      // then, run the Lucene normalization and stemming on the stopword-removed text
+      stemmedTokenized = stem(stemmedTokenized);       
+    }
+    return stemmedTokenized.split(" ");
   }
 
-  @Override
-  public boolean isStopWord(String token) {
-    return stopwords.contains(token) || delims.contains(token) || token.length()==1;
-  }
 
   @Override
   public String stem(String token) {
     tokenizer = new StandardTokenizer(Version.LUCENE_35, new StringReader(token));
-    TokenStream tokenStream = new LowerCaseFilter(Version.LUCENE_35, tokenizer);
-    tokenStream = new ArabicNormalizationFilter(tokenStream);
-    tokenStream = new ArabicStemFilter(tokenStream);
-
+    TokenStream tokenStream = new ArabicStemFilter(new ArabicNormalizationFilter(tokenizer));
     CharTermAttribute termAtt = tokenStream.getAttribute(CharTermAttribute.class);
     tokenStream.clearAttributes();
+    StringBuilder stemmed = new StringBuilder();
     try {
       while (tokenStream.incrementToken()) {
-        return termAtt.toString();
+        String curToken = termAtt.toString();
+        if ( vocab != null && vocab.get(curToken) <= 0) {
+          continue;
+        }
+        stemmed.append( curToken + " " );
       }
     }catch (IOException e) {
       e.printStackTrace();
     }
-    return token;
+    return stemmed.toString().trim();
   }
 
   @Override
-  public boolean isStemmedStopWord(String token) {
-    return stemmedStopwords.contains(token) || delims.contains(token) || token.length()==1;
+  public float getOOVRate(String text, VocabularyWritable vocab) {
+    int countOOV = 0, countAll = 0;
+    tokenizer = new StandardTokenizer(Version.LUCENE_35, new StringReader(text));
+    TokenStream tokenStream = new StandardFilter(Version.LUCENE_35, tokenizer);
+    tokenStream = new LowerCaseFilter(Version.LUCENE_35, tokenStream);
+    String tokenized = postNormalize(streamToString(tokenStream));
+
+    StringBuilder finalTokenized = new StringBuilder();
+    for (String token : tokenized.split(" ")) {
+      if ( isStopwordRemoval() && isDiscard(false, token) ) {
+        continue;
+      }
+      if (!isStemming()) {
+        if ( vocab != null && vocab.get(token) <= 0) {
+          countOOV++;
+        }
+        countAll++;
+      }else {
+        finalTokenized.append( token + " " );
+      }
+    }
+    
+    if (isStemming()) {
+      tokenizer = new StandardTokenizer(Version.LUCENE_35, new StringReader(finalTokenized.toString().trim()));
+      tokenStream = new ArabicStemFilter(new ArabicNormalizationFilter(tokenizer));
+      CharTermAttribute termAtt = tokenStream.getAttribute(CharTermAttribute.class);
+      tokenStream.clearAttributes();
+      try {
+        while (tokenStream.incrementToken()) {
+          String curToken = termAtt.toString();
+          if ( vocab != null && vocab.get(curToken) <= 0) {
+            countOOV++;
+          }
+          countAll++;
+        }
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+    return (countOOV / (float) countAll);
   }
 }

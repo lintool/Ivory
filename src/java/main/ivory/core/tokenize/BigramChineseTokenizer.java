@@ -1,12 +1,5 @@
 package ivory.core.tokenize;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.hadoop.conf.Configuration;
@@ -56,27 +49,6 @@ public class BigramChineseTokenizer extends Tokenizer {
 
     String[] tokensArr = new String[numTokens];
     return tokens.toArray(tokensArr); 
-  }
-
-  public static void main(String[] args) throws IOException, ClassNotFoundException, InstantiationException, IllegalAccessException{
-    if(args.length < 2){
-      System.err.println("usage: [input] [output-file]");
-      System.exit(-1);
-    }
-    Tokenizer tokenizer = new BigramChineseTokenizer();
-    BufferedWriter out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(args[1]), "UTF8"));
-    BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(args[0]), "UTF8"));
-
-    String line = null;
-    while((line = in.readLine()) != null){
-      String[] tokens = tokenizer.processContent(line);
-      String s = "";
-      for (String token : tokens) {
-        s += token+" ";
-      }
-      out.write(s+"\n");
-    }
-    out.close();
   }
 
   @Override

@@ -153,7 +153,7 @@ public class MtNQueryGenerator implements QueryGenerator {
               target = stemmed2Stemmed.get(target);
             }
 
-            if (target != null && !queryLangTokenizerWithStemming.isStemmedStopWord(source) && !source.equals("NULL") && !docLangTokenizer.isStemmedStopWord(target)) {
+            if (target != null && !queryLangTokenizerWithStemming.isStopWord(source) && !source.equals("NULL") && !docLangTokenizer.isStopWord(target)) {
               tokensBOW.add(target);
             }
           }
@@ -227,7 +227,7 @@ public class MtNQueryGenerator implements QueryGenerator {
               }
 
               //              LOG.info("assign:{"+source+"}->["+target+"]="+transProb);
-              if (target == null || queryLangTokenizerWithStemming.isStemmedStopWord(source) || source.equals("NULL") || docLangTokenizer.isStemmedStopWord(target)) {
+              if (target == null || queryLangTokenizerWithStemming.isStopWord(source) || source.equals("NULL") || docLangTokenizer.isStopWord(target)) {
                 continue;
               }
 
@@ -266,7 +266,7 @@ public class MtNQueryGenerator implements QueryGenerator {
             HMapSFW nbestDist = src2trg2weight.get(srcToken);
 
             // skip stop words among source query words
-            if (queryLangTokenizerWithStemming.isStemmedStopWord(srcToken)){
+            if (queryLangTokenizerWithStemming.isStopWord(srcToken)){
               LOG.info("Skipped stopword "+srcToken);
               continue;
             }
