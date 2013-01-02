@@ -116,7 +116,7 @@ public class ProbabilisticStructuredQueryGenerator implements QueryGenerator {
     JsonArray tokenTranslations = new JsonArray();
     for (String token : tokens) {
       LOG.info("Processing token " + token);
-      if (queryLangTokenizerWithStem.isStemmedStopWord(token))
+      if (queryLangTokenizerWithStem.isStopWord(token))
         continue;
       LOG.info("not stopword");
 
@@ -188,7 +188,7 @@ public class ProbabilisticStructuredQueryGenerator implements QueryGenerator {
 
       //      LOG.info("Pr("+eTerm+"|"+token+")="+probEF);
 
-      if (probEF > 0 && e > 0 && !docLangTokenizer.isStemmedStopWord(eTerm) && (pairsInSCFG == null || pairsInSCFG.contains(new PairOfStrings(token,eTerm)))) {      
+      if (probEF > 0 && e > 0 && !docLangTokenizer.isStopWord(eTerm) && (pairsInSCFG == null || pairsInSCFG.contains(new PairOfStrings(token,eTerm)))) {      
         // assuming our bilingual dictionary is learned from normally segmented text, but we want to use bigram tokenizer for CLIR purposes
         // then we need to convert the translations of each source token into a sequence of bigrams
         // we can distribute the translation probability equally to the each bigram

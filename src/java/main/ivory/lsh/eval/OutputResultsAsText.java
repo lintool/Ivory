@@ -24,7 +24,6 @@ import edu.umd.cloud9.io.pair.PairOfInts;
  * @author ferhanture
  * 
  */
-@SuppressWarnings("deprecation")
 public class OutputResultsAsText extends Configured implements Tool {
   public static final String[] RequiredParameters = {};
   private static final Logger sLogger = Logger.getLogger(OutputResultsAsText.class);
