@@ -1,5 +1,5 @@
 <project name="ivory" default="scripts" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant" xmlns:artifact="antlib:org.apache.maven.artifact.ant">
-  <description>Ivory: A Hadoop toolkit for web-scale information retrieval</description>
+  <description>Ivory: A Hadoop toolkit for web-scale information retrieval research</description>
 
   <presetdef name="javac">
     <javac includeantruntime="false" />
@@ -15,7 +15,7 @@
   <property name="regression.dir" location="${test.dir}/regression" />
   <property name="integration.dir" location="${test.dir}/integration" />
 
-  <property name="version" value="0.8.0"/>
+  <property name="version" value="0.8.1"/>
 
   <!-- paths used for compilation and run  -->
   <path id="lib.path.id">

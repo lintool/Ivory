@@ -12,8 +12,8 @@
   <artifactId>ivory</artifactId>
   <packaging>jar</packaging>
   <name>Ivory</name>
-  <version>0.8.0</version>
-  <description>A Hadoop toolkit for web-scale information retrieval</description>
+  <version>0.8.1</version>
+  <description>A Hadoop toolkit for web-scale information retrieval research</description>
   <url>http://ivory.cc</url>
   <licenses>
     <license>

@@ -10,7 +10,6 @@ ivory.core.data.dictionary
 ivory.core.data.document
 ivory.core.data.index
 ivory.core.data.stat
-ivory.core.driver
 ivory.core.eval
 ivory.core.index
 ivory.core.preprocess
