@@ -385,6 +385,7 @@ public class FindParallelSentencePairs extends Configured implements Tool {
 
   @SuppressWarnings("static-access")
   private JobConf setupConf(JobConf conf, String[] args) throws Exception {
+    options = new Options();
     options.addOption(OptionBuilder.withDescription("source-side raw collection path").withArgName("path").hasArg().isRequired().create(FCOLLECTION_OPTION));
     options.addOption(OptionBuilder.withDescription("target-side raw collection path").withArgName("path").hasArg().isRequired().create(ECOLLECTION_OPTION));
     options.addOption(OptionBuilder.withDescription("two-letter code for f-language").withArgName("en|de|tr|cs|zh|ar|es").hasArg().isRequired().create(FLANG_OPTION));
