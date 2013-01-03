@@ -111,8 +111,6 @@ public class WriteRandomVectors extends PowerTool {
     String indexPath = getConf().get("Ivory.IndexPath");
 
     JobConf job = new JobConf(getConf(), WriteRandomVectors.class);
-    // job.set("mapred.job.tracker", "local");
-    // job.set("fs.default.name", "file:///");
     FileSystem fs = FileSystem.get(job);
     RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fs);
     K = (int) env.readCollectionTermCount();

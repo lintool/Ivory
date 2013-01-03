@@ -50,7 +50,7 @@ public class RunComputeSignatures extends PwsimEnvironment implements Tool {
     signatureType = cmdline.getOptionValue(TYPE_OPTION).toLowerCase();
     String dir = cmdline.getOptionValue(INDEX_OPTION);
 
-    Configuration config = new Configuration();
+    Configuration config = getConf();
     FileSystem fs = FileSystem.get(config);
 
     config.set("Ivory.IndexPath", dir);
