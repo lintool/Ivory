@@ -247,7 +247,7 @@ public class BuildIPInvertedIndexDocSorted extends PowerTool {
     int reduceTasks = conf.getInt(Constants.NumReduceTasks, 0);
     int minSplitSize = conf.getInt(Constants.MinSplitSize, 0);
     int collectionDocCnt = env.readCollectionDocumentCount();
-    int maxHeap = conf.getInt(Constants.MaxHeap, 2048);
+    //int maxHeap = conf.getInt(Constants.MaxHeap, 2048);
 
     String postingsType = conf.get(Constants.PostingsListsType,
         PostingsListDocSortedPositional.class.getCanonicalName());
@@ -278,9 +278,14 @@ public class BuildIPInvertedIndexDocSorted extends PowerTool {
     conf.setInt(Constants.CollectionDocumentCount, collectionDocCnt);
 
     conf.setInt("mapred.min.split.size", minSplitSize);
-    conf.set("mapred.child.java.opts", "-Xmx" + maxHeap + "m");
+    //conf.set("mapred.child.java.opts", "-Xmx" + maxHeap + "m");
+    conf.set("mapreduce.map.memory.mb", "2048");
+    conf.set("mapreduce.map.java.opts", "-Xmx2048m");
+    conf.set("mapreduce.reduce.memory.mb", "2048");
+    conf.set("mapreduce.reduce.java.opts", "-Xmx2048m");
 
-    Job job = new Job(conf, BuildIPInvertedIndexDocSorted.class.getSimpleName() + ":" + collectionName);
+    Job job = Job.getInstance(conf,
+        BuildIPInvertedIndexDocSorted.class.getSimpleName() + ":" + collectionName);
     job.setJarByClass(BuildIPInvertedIndexDocSorted.class);
 
     job.setNumReduceTasks(reduceTasks);

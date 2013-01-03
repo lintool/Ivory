@@ -38,7 +38,7 @@
                 <a href="../index.html">Home</a>
               </li>
               <li class="">
-                <a href="./start.html">Get started</a>
+                <a href="./start.html">Getting Started</a>
               </li>
               <li class="">
                 <a href="./publications.html">Publications</a>
@@ -69,7 +69,7 @@
 <div class="page-header">
 <h2>Experiments: ESD Model from SIGIR 2010</h2>
 </div>
-<p>These regression runs represent experiments presented in Wang et al.'s SIGIR 2010 paper on <a href="publications/Wang_etal_SIGIR2010.pdf">Learning to Efficiently Rank</a></b>. Note that Bendersky et al.'s WSD model (WSDM 2010) is a special
+<p>These regression runs represent experiments presented in Wang et al.'s SIGIR 2010 paper on <b><a href="publications/Wang_etal_SIGIR2010.pdf">Learning to Efficiently Rank</a></b>. Note that Bendersky et al.'s WSD model (WSDM 2010) is a special
 case of the ESD model (without any time constraints).  These runs
 represent results in Tables 5 and 6 of the paper.</p>
 
@@ -80,9 +80,9 @@ represent results in Tables 5 and 6 of the paper.</p>
 etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/wt10g/run.wt10g.SIGIR2010.xml data/wt10g/queries.wt10g.501-550.xml
 
 # evaluating effectiveness
-trec_eval data/wt10g/qrels.wt10g.all ranking.sigir2010-wt10g-ql.txt
-trec_eval data/wt10g/qrels.wt10g.all ranking.sigir2010-wt10g-sd.txt
-trec_eval data/wt10g/qrels.wt10g.all ranking.sigir2010-wt10g-wsd-sd.txt
+etc/trec_eval data/wt10g/qrels.wt10g.all ranking.sigir2010-wt10g-ql.txt
+etc/trec_eval data/wt10g/qrels.wt10g.all ranking.sigir2010-wt10g-sd.txt
+etc/trec_eval data/wt10g/qrels.wt10g.all ranking.sigir2010-wt10g-wsd-sd.txt
 
 # junit
 etc/junit.sh ivory.regression.sigir2010.Wt10g_ESD
@@ -116,12 +116,12 @@ etc/junit.sh ivory.regression.sigir2010.Wt10g_ESD
     
 <pre class="code">
 # command-line
-etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/gov2/run.gov2.SIGIR2010.xml data/gov2/gov2.title.776-850
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/gov2/run.gov2.SIGIR2010.xml data/gov2/queries.gov2.title.776-850.xml
     
 # evaluating effectiveness
-trec_eval data/gov2/qrels.gov2.all ranking.sigir2010-gov2-ql.txt
-trec_eval data/gov2/qrels.gov2.all ranking.sigir2010-gov2-sd.txt
-trec_eval data/gov2/qrels.gov2.all ranking.sigir2010-gov2-wsd-sd.txt
+etc/trec_eval data/gov2/qrels.gov2.all ranking.sigir2010-gov2-ql.txt
+etc/trec_eval data/gov2/qrels.gov2.all ranking.sigir2010-gov2-sd.txt
+etc/trec_eval data/gov2/qrels.gov2.all ranking.sigir2010-gov2-wsd-sd.txt
     
 # junit
 etc/junit.sh ivory.regression.sigir2010.Gov2_ESD
@@ -158,9 +158,9 @@ etc/junit.sh ivory.regression.sigir2010.Gov2_ESD
 etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/clue/run.web09catB.SIGIR2010.xml data/clue/queries.web09.26-50.xml
 
 # evaluating effectiveness
-trec_eval data/clue/qrels.web09catB.txt ranking.sigir2010-web09catB-ql.txt
-trec_eval data/clue/qrels.web09catB.txt ranking.sigir2010-web09catB-sd.txt
-trec_eval data/clue/qrels.web09catB.txt ranking.sigir2010-web09catB-wsd-sd.txt
+etc/trec_eval data/clue/qrels.web09catB.txt ranking.sigir2010-web09catB-ql.txt
+etc/trec_eval data/clue/qrels.web09catB.txt ranking.sigir2010-web09catB-sd.txt
+etc/trec_eval data/clue/qrels.web09catB.txt ranking.sigir2010-web09catB-wsd-sd.txt
 
 perl etc/statAP_MQ_eval_v3.pl data/clue/prels.web09catB.txt ranking.sigir2010-web09catB-ql.txt
 perl etc/statAP_MQ_eval_v3.pl data/clue/prels.web09catB.txt ranking.sigir2010-web09catB-sd.txt

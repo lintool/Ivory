@@ -66,9 +66,9 @@ public class PreprocessWikipedia extends Configured implements Tool {
   private static final boolean IsNormalized = true;
   private static int MONO_LINGUAL = 0, CROSS_LINGUAL_E = 1, CROSS_LINGUAL_F = 2;
   private String indexRootPath, rawCollection, seqCollection, tokenizerClass, f_stopwordList, 
-      e_stopwordList, e_tokenizerModel, targetLang;  
+  e_stopwordList, e_tokenizerModel, targetLang;  
   private String collectionLang = null, tokenizerModel = null, collectionVocab = null, targetIndexPath = null, 
-      fVocab_f2e = null, eVocab_f2e = null, fVocab_e2f, eVocab_e2f = null, ttable_f2e = null, ttable_e2f = null;
+  fVocab_f2e = null, eVocab_f2e = null, fVocab_e2f, eVocab_e2f = null, ttable_f2e = null, ttable_e2f = null;
   private int mode;
   private Options options;
 
@@ -96,6 +96,7 @@ public class PreprocessWikipedia extends Configured implements Tool {
     }
 
     conf.set(Constants.Language, collectionLang);
+    conf.setBoolean(Constants.Stemming, true);     // default behavior of tokenizer is currently to stem, but we shouldnt rely on that
     if (tokenizerModel != null) {
       conf.set(Constants.TokenizerData, tokenizerModel);
     }
@@ -104,11 +105,13 @@ public class PreprocessWikipedia extends Configured implements Tool {
     }
     if (e_stopwordList != null) {
       conf.set(Constants.StopwordList, e_stopwordList);
+      conf.set(Constants.StemmedStopwordList, e_stopwordList + ".stemmed");
     }
     // CROSS-LINGUAL CASE
     if (mode == CROSS_LINGUAL_E){		   // English side
       conf.set("Ivory.FinalVocab", collectionVocab);        // vocabulary to map terms to integers in BuildTargetLang...
       conf.set(Constants.StopwordList, e_stopwordList);
+      conf.set(Constants.StemmedStopwordList, e_stopwordList + ".stemmed");
     }
 
     if (mode == CROSS_LINGUAL_F) {			// non-English side, needs to be translated
@@ -121,7 +124,9 @@ public class PreprocessWikipedia extends Configured implements Tool {
       conf.set("Ivory.TTable_E2F", ttable_e2f);
       conf.set("Ivory.FinalVocab", eVocab_f2e);            // vocabulary to map terms to integers in BuildTargetLang...
       conf.set(Constants.StopwordList, f_stopwordList);
+      conf.set(Constants.StemmedStopwordList, f_stopwordList + ".stemmed");
       conf.set(Constants.TargetStopwordList, e_stopwordList);
+      conf.set(Constants.TargetStemmedStopwordList, e_stopwordList + ".stemmed");
       conf.set(Constants.TargetTokenizer, e_tokenizerModel);
       conf.set(Constants.TargetLanguage, targetLang);
     }
@@ -150,9 +155,11 @@ public class PreprocessWikipedia extends Configured implements Tool {
         LOG.info(" - Source vocab file: " + fVocab_f2e);
         LOG.info(" - Target vocab file: " + eVocab_f2e);
         LOG.info(" - TTable file " + targetLang + " --> " + collectionLang+" : " + ttable_e2f);
-        LOG.info(" - Source vocab file: " + fVocab_f2e);
-        LOG.info(" - Target vocab file: " + eVocab_f2e);
+        LOG.info(" - Source vocab file: " + eVocab_e2f);
+        LOG.info(" - Target vocab file: " + fVocab_e2f);
+        LOG.info(" - Source stopwords file: " + f_stopwordList);
         LOG.info(" - Target stopwords file: " + e_stopwordList);
+        LOG.info(" - Target stemmed stopwords file: " + conf.get(Constants.TargetStemmedStopwordList));
         LOG.info(" - Target tokenizer path: " + e_tokenizerModel);
       }
     }
@@ -173,7 +180,8 @@ public class PreprocessWikipedia extends Configured implements Tool {
       String[] arr = new String[] {
           "-input=" + rawCollection,
           "-output_path=" + indexRootPath + "/wiki-docid-tmp",
-          "-output_file=" + mappingFile.toString() };
+          "-output_file=" + mappingFile.toString(),
+          "-lang=" + collectionLang };
       LOG.info("Running BuildWikipediaDocnoMapping with args " + Arrays.toString(arr));
 
       BuildWikipediaDocnoMapping tool = new BuildWikipediaDocnoMapping();
@@ -330,6 +338,7 @@ public class PreprocessWikipedia extends Configured implements Tool {
   private static final String TTABLE_F2E_OPTION = "f2e_ttable";
   private static final String TTABLE_E2F_OPTION = "e2f_ttable";
   private static final String E_TOKENIZER_MODEL_OPTION = "e_tokenizermodel";
+  private static final String LIBJARS_OPTION = "libjars";
 
   @SuppressWarnings("static-access")
   private int parseArgs(String[] args) {
@@ -353,6 +362,7 @@ public class PreprocessWikipedia extends Configured implements Tool {
     options.addOption(OptionBuilder.withDescription("path to e-side vocab file of e-to-f translation table").withArgName("path").hasArg().create(EVOCAB_E2F_OPTION));
     options.addOption(OptionBuilder.withDescription("path to f-to-e translation table").withArgName("path").hasArg().create(TTABLE_F2E_OPTION));
     options.addOption(OptionBuilder.withDescription("path to e-to-f translation table").withArgName("path").hasArg().create(TTABLE_E2F_OPTION));
+    options.addOption(OptionBuilder.withDescription("Hadoop option to load external jars").withArgName("jar packages").hasArg().create(LIBJARS_OPTION));
 
     CommandLine cmdline;
     CommandLineParser parser = new GnuParser();
@@ -402,7 +412,7 @@ public class PreprocessWikipedia extends Configured implements Tool {
     ttable_e2f = cmdline.getOptionValue(TTABLE_E2F_OPTION);
     e_tokenizerModel = cmdline.getOptionValue(E_TOKENIZER_MODEL_OPTION);
     targetLang = cmdline.getOptionValue(E_LANGUAGE_OPTION);
-    
+
     return 1;
   }
 

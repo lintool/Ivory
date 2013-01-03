@@ -1,9 +1,6 @@
 package ivory.integration.clir;
 
 import static org.junit.Assert.assertTrue;
-
-import ivory.app.BuildIndex;
-import ivory.app.PreprocessTrecForeign;
 import ivory.core.eval.Qrels;
 import ivory.core.tokenize.StanfordChineseTokenizer;
 import ivory.integration.IntegrationUtils;
@@ -42,7 +39,6 @@ public class VerifyNtcirChinesePositionalIndexIP {
     List<String> jars = Lists.newArrayList();
     jars.add(IntegrationUtils.getJar("lib", "cloud9"));
     jars.add(IntegrationUtils.getJar("lib", "guava-13"));
-    jars.add(IntegrationUtils.getJar("lib", "guava-r09"));
     jars.add(IntegrationUtils.getJar("lib", "dsiutils"));
     jars.add(IntegrationUtils.getJar("lib", "fastutil"));
     jars.add(IntegrationUtils.getJar("lib", "jsap"));
@@ -78,14 +74,19 @@ public class VerifyNtcirChinesePositionalIndexIP {
     fs.copyFromLocalFile(false, true, new Path("data/tokenizer/en.stop.stemmed"),
         new Path(index + "/en.stop.stemmed"));
 
-    PreprocessTrecForeign.main(new String[] { libjars, IntegrationUtils.D_JT, IntegrationUtils.D_NN,
+    String[] args = new String[] { "hadoop jar", IntegrationUtils.getJar("dist", "ivory"),
+        ivory.app.PreprocessTrecForeign.class.getCanonicalName(), libjars,
         "-input=" + collectionPath.toString(), "-index=" + index, 
         "-lang=zh" , "-tokenizerclass=" + StanfordChineseTokenizer.class.getCanonicalName(),
-        "-tokenizermodel=" + index + "/zh-token.bin", "-name=NTCIR8.Chinese"
-    });
+        "-tokenizermodel=" + index + "/zh-token.bin", "-name=NTCIR8.Chinese"};
 
-    BuildIndex.main(new String[] { libjars, IntegrationUtils.D_JT, IntegrationUtils.D_NN,
-        "-index=" + index, "-indexPartitions=10", "-positionalIndexIP" });
+    IntegrationUtils.exec(Joiner.on(" ").join(args));
+
+    args = new String[] { "hadoop jar", IntegrationUtils.getJar("dist", "ivory"),
+        ivory.app.BuildIndex.class.getCanonicalName(), libjars,
+        "-index=" + index, "-indexPartitions=10", "-positionalIndexIP" };
+
+    IntegrationUtils.exec(Joiner.on(" ").join(args));
 
     conf = RunQueryEngine.parseArgs(new String[] {
         "-index=" + index,

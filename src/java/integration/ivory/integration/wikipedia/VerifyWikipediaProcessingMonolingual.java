@@ -2,10 +2,8 @@ package ivory.integration.wikipedia;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import ivory.app.PreprocessWikipedia;
 import ivory.core.data.document.WeightedIntDocVector;
 import ivory.integration.IntegrationUtils;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -16,11 +14,9 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.SequenceFile;
 import org.junit.Test;
-
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-
 import edu.umd.cloud9.io.map.HMapSFW;
 
 public class VerifyWikipediaProcessingMonolingual {
@@ -28,45 +24,53 @@ public class VerifyWikipediaProcessingMonolingual {
   private static final String tmp = "tmp-" + VerifyWikipediaProcessingMonolingual.class.getSimpleName() + rand.nextInt(10000);
 
   private static final String collectionPath = 
-    "/shared/collections/wikipedia/raw/enwiki-20110115-pages-articles.xml";
-  private static final String collectionRepacked = tmp + "/enwiki-20110115.repacked";
+    "/shared/collections/wikipedia/raw/enwiki-20121201-pages-articles.xml";
+  private static final String collectionRepacked = tmp + "/enwiki-20121201.repacked";
   private static final String galagoIndex = tmp + "/enwiki.galago";
 
-  // Galago: part 00000, key = 91805
-  private ImmutableMap<String, Float> galagoTermDocVector1 = ImmutableMap.of(
-      "theori", 0.05498378f, "extern", 0.0021626172f, "refer", -0.01075585f, "50", 0.056969844f);
-
   // Galago: part 00010, key = 34096
-  private ImmutableMap<String, Float> galagoTermDocVector2 = ImmutableMap.of(
-      "extern", 0.005528182f, "librari", 0.12763943f, "film", 0.104365f, "cultur", 0.10795438f);
+  private int galagoTermDocVector1Id = 34096;
+  private ImmutableMap<String, Float> galagoTermDocVector1 = ImmutableMap.of(
+      "beneventum", 0.19515267f, "pre", 0.06326606f, "egypt", 0.08399084f, "coloni", 0.070443f);
 
-  // Galago: part 00002, key = 100585
-  private ImmutableMap<Integer, Float> galagoIntDocVector1 =
-    ImmutableMap.of(5, 0.016333312f, 1660, 0.07839933f, 7889, 0.120369025f, 3792, 0.09966967f);
+  // Galago: part 00000, key = 91805
+  private int galagoTermDocVector2Id = 91805;
+  private ImmutableMap<String, Float> galagoTermDocVector2 = ImmutableMap.of(
+      "entir", 0.012336632f, "91", 0.027462268f, "pollak", 0.09643835f, "found", 0.006558274f);
 
   // Galago: part 00011, key = 34096
+  private int galagoIntDocVector1Id = 34096;
+  private ImmutableMap<Integer, Float> galagoIntDocVector1 =
+    ImmutableMap.of(1, -0.0206428f, 756, 0.059395142f, 51217, 0.18819067f, 982, 0.063754365f);
+
+  // Galago: part 00002, key = 100585
+  private int galagoIntDocVector2Id = 100585;
   private ImmutableMap<Integer, Float> galagoIntDocVector2 =
-    ImmutableMap.of(2, 0.0037445724f, 521, 0.11334762f, 2430, 0.17121725f, 421, 0.10686168f);
+    ImmutableMap.of(5, 0.01021795f, 585, 0.028274508f, 45242, 0.13892333f, 3414, 0.045721285f);
 
   private static final String opennlpIndex = tmp + "/enwiki.opennlp";
   private static final String vocabPath = tmp + "/vocab";
   private static final String tokenizerPath = tmp + "/tokenizer";
 
   // Opennlp: part 00000, key = 91805
+  private int opennlpTermDocVector1Id = 91805;
   private ImmutableMap<String, Float> opennlpTermDocVector1 = ImmutableMap.of(
-      "extern", 0.0031357605f, "zero", 0.101532206f, "theorem", 0.1276031f, "prime", 0.08161251f);
+      "clutter", 0.043639377f, "zoom", 0.060861073f, "portray", 0.022965258f, "refer", -0.0062234555f);
 
   // Opennlp: part 00010, key = 137938
+  private int opennlpTermDocVector2Id = 137938;
   private ImmutableMap<String, Float> opennlpTermDocVector2 = ImmutableMap.of(
-      "cycl", 0.092633486f, "scholar", 0.085225f, "problem", 0.06802353f, "opinion", 0.09402901f);
+      "histor", 0.018175913f, "vigilant", 0.11764987f, "augment", 0.04146363f, "time", 0.01755069f);
 
   // Opennlp: part 00002, key = 4764
+  private int opennlpIntDocVector1Id = 4764;
   private ImmutableMap<Integer, Float> opennlpIntDocVector1 =
-    ImmutableMap.of(5, 0.03059925f, 11206, 0.20217548f, 23, 0.041687272f, 879, 0.11775808f);
+    ImmutableMap.of(4, 0.019955039f, 8, 0.027558785f, 2066, 0.12415717f, 1072, 0.12747908f);
 
   // Opennlp: part 00011, key = 148600
+  private int opennlpIntDocVector2Id = 148600;
   private ImmutableMap<Integer, Float> opennlpIntDocVector2 =
-    ImmutableMap.of(1, -0.0068670297f, 4868, 0.05292152f, 3248, 0.046914175f, 2177, 0.0760979f);
+    ImmutableMap.of(1, -0.02064175f, 9783, 0.1542827f, 1103, 0.06609425f, 5468, 0.1312336f);
 
   @Test
   public void runBuildIndexGalago() throws Exception {
@@ -88,7 +92,6 @@ public class VerifyWikipediaProcessingMonolingual {
     jars.add(IntegrationUtils.getJar("lib", "cloud9"));
     jars.add(IntegrationUtils.getJar("lib", "bliki-core"));
     jars.add(IntegrationUtils.getJar("lib", "guava-13"));
-    jars.add(IntegrationUtils.getJar("lib", "guava-r09"));
     jars.add(IntegrationUtils.getJar("lib", "dsiutils"));
     jars.add(IntegrationUtils.getJar("lib", "fastutil"));
     jars.add(IntegrationUtils.getJar("lib", "jsap"));
@@ -97,17 +100,38 @@ public class VerifyWikipediaProcessingMonolingual {
     jars.add(IntegrationUtils.getJar("lib", "commons-lang"));
     jars.add(IntegrationUtils.getJar("lib", "tools"));
     jars.add(IntegrationUtils.getJar("lib", "maxent"));
-    jars.add(IntegrationUtils.getJar("dist", "ivory"));
     jars.add(IntegrationUtils.getJar("lib", "lucene-analyzers"));
     jars.add(IntegrationUtils.getJar("lib", "lucene-core"));
+    jars.add(IntegrationUtils.getJar("dist", "ivory"));
 
     String libjars = String.format("-libjars=%s", Joiner.on(",").join(jars));
 
-    PreprocessWikipedia.main(new String[] { libjars,
-        IntegrationUtils.D_JT, IntegrationUtils.D_NN,
-        "-mode=mono", "-index="+galagoIndex, "-xml="+collectionPath, "-compressed="+collectionRepacked,
-        "-tokenizerclass="+ivory.core.tokenize.GalagoTokenizer.class.getCanonicalName(), "-lang=en",
-        "-tokenizermodel="+tokenizerPath + "/en-token.bin"});
+    String[] args = new String[] { "hadoop jar", IntegrationUtils.getJar("dist", "ivory"),
+        ivory.app.PreprocessWikipedia.class.getCanonicalName(), libjars,
+        "-mode=mono",
+        "-index=" + galagoIndex,
+        "-xml=" + collectionPath,
+        "-compressed=" + collectionRepacked,
+        "-tokenizerclass=" + ivory.core.tokenize.GalagoTokenizer.class.getCanonicalName(),
+        "-lang=en",
+        "-tokenizermodel=" + tokenizerPath + "/en-token.bin"};
+    IntegrationUtils.exec(Joiner.on(" ").join(args));
+
+    args = new String[] { "hadoop jar", IntegrationUtils.getJar("dist", "ivory"),
+        ivory.integration.wikipedia.SearchSequenceFiles.class.getCanonicalName(), libjars,
+        "-input=" + galagoIndex + "/wt-term-doc-vectors", 
+        "-output=" + galagoIndex + "/test_wt-term-doc-vectors", 
+        "-keys=" + galagoTermDocVector1Id + "," + galagoTermDocVector2Id, 
+    "-valueclass=edu.umd.cloud9.io.map.HMapSFW"};
+    IntegrationUtils.exec(Joiner.on(" ").join(args));
+
+    args = new String[] { "hadoop jar", IntegrationUtils.getJar("dist", "ivory"),
+        ivory.integration.wikipedia.SearchSequenceFiles.class.getCanonicalName(), libjars,
+        "-input=" + galagoIndex + "/wt-int-doc-vectors", 
+        "-output=" + galagoIndex + "/test_wt-int-doc-vectors", 
+        "-keys=" + galagoIntDocVector1Id + "," + galagoIntDocVector2Id, 
+    "-valueclass=ivory.core.data.document.WeightedIntDocVector"};
+    IntegrationUtils.exec(Joiner.on(" ").join(args));
   }
 
   @Test
@@ -120,15 +144,15 @@ public class VerifyWikipediaProcessingMonolingual {
     IntWritable key = new IntWritable();
     HMapSFW value = new HMapSFW();
 
-    reader = new SequenceFile.Reader(fs,
-        new Path(galagoIndex + "/wt-term-doc-vectors/part-00000"), fs.getConf());
+    reader = new SequenceFile.Reader(fs.getConf(),
+        SequenceFile.Reader.file(new Path(galagoIndex + "/test_wt-term-doc-vectors/part-00000")));
     reader.next(key, value);
+    System.out.println("galagoTerm1\n"+key+";"+value);
     verifyTermDocVector(galagoTermDocVector1, value);
-
-    reader = new SequenceFile.Reader(fs,
-        new Path(galagoIndex + "/wt-term-doc-vectors/part-00010"), fs.getConf());
     reader.next(key, value);
+    System.out.println("galagoTerm2\n"+key+";"+value);
     verifyTermDocVector(galagoTermDocVector2, value);
+    reader.close();
   }
 
   @Test
@@ -141,15 +165,15 @@ public class VerifyWikipediaProcessingMonolingual {
     IntWritable key = new IntWritable();
     WeightedIntDocVector value = new WeightedIntDocVector();
 
-    reader = new SequenceFile.Reader(fs,
-        new Path(galagoIndex + "/wt-int-doc-vectors/part-00002"), fs.getConf());
+    reader = new SequenceFile.Reader(fs.getConf(),
+        SequenceFile.Reader.file(new Path(galagoIndex + "/test_wt-int-doc-vectors/part-00000")));
     reader.next(key, value);
+    System.out.println("galagoInt1\n"+key+";"+value);
     verifyIntDocVector(galagoIntDocVector1, value);
-
-    reader = new SequenceFile.Reader(fs,
-        new Path(galagoIndex + "/wt-int-doc-vectors/part-00011"), fs.getConf());
     reader.next(key, value);
+    System.out.println("galagoInt2\n"+key+";"+value);
     verifyIntDocVector(galagoIntDocVector2, value);
+    reader.close();
   }
 
   @Test
@@ -171,7 +195,6 @@ public class VerifyWikipediaProcessingMonolingual {
     jars.add(IntegrationUtils.getJar("lib", "cloud9"));
     jars.add(IntegrationUtils.getJar("lib", "bliki-core"));
     jars.add(IntegrationUtils.getJar("lib", "guava-13"));
-    jars.add(IntegrationUtils.getJar("lib", "guava-r09"));
     jars.add(IntegrationUtils.getJar("lib", "dsiutils"));
     jars.add(IntegrationUtils.getJar("lib", "fastutil"));
     jars.add(IntegrationUtils.getJar("lib", "jsap"));
@@ -180,17 +203,40 @@ public class VerifyWikipediaProcessingMonolingual {
     jars.add(IntegrationUtils.getJar("lib", "commons-lang"));
     jars.add(IntegrationUtils.getJar("lib", "tools"));
     jars.add(IntegrationUtils.getJar("lib", "maxent"));
-    jars.add(IntegrationUtils.getJar("dist", "ivory"));
     jars.add(IntegrationUtils.getJar("lib", "lucene-analyzers"));
     jars.add(IntegrationUtils.getJar("lib", "lucene-core"));
+    jars.add(IntegrationUtils.getJar("dist", "ivory"));
 
     String libjars = String.format("-libjars=%s", Joiner.on(",").join(jars));
 
-    PreprocessWikipedia.main(new String[] { libjars,
-        IntegrationUtils.D_JT, IntegrationUtils.D_NN,
-        "-mode=mono", "-index="+opennlpIndex, "-xml="+collectionPath, "-compressed="+collectionRepacked,
-        "-tokenizerclass=" + ivory.core.tokenize.OpenNLPTokenizer.class.getCanonicalName(), "-lang=en",
-        "-tokenizermodel=" + tokenizerPath + "/en-token.bin", "-collectionvocab=" + vocabPath + "/vocab.de-en.en", "-e_stopword=" + tokenizerPath + "/en.stop.stemmed"});
+    String[] args = new String[] { "hadoop jar", IntegrationUtils.getJar("dist", "ivory"),
+        ivory.app.PreprocessWikipedia.class.getCanonicalName(), libjars,
+        "-mode=mono",
+        "-index=" + opennlpIndex,
+        "-xml=" + collectionPath,
+        "-compressed=" + collectionRepacked,
+        "-tokenizerclass=" + ivory.core.tokenize.OpenNLPTokenizer.class.getCanonicalName(),
+        "-lang=en",
+        "-tokenizermodel=" + tokenizerPath + "/en-token.bin",
+        "-collectionvocab=" + vocabPath + "/vocab.de-en.en",
+        "-e_stopword=" + tokenizerPath + "/en.stop"};
+    IntegrationUtils.exec(Joiner.on(" ").join(args));
+
+    args = new String[] { "hadoop jar", IntegrationUtils.getJar("dist", "ivory"),
+        ivory.integration.wikipedia.SearchSequenceFiles.class.getCanonicalName(), libjars,
+        "-input=" + opennlpIndex + "/wt-term-doc-vectors", 
+        "-output=" + opennlpIndex + "/test_wt-term-doc-vectors", 
+        "-keys=" + opennlpTermDocVector1Id + "," + opennlpTermDocVector2Id, 
+    "-valueclass=edu.umd.cloud9.io.map.HMapSFW"};
+    IntegrationUtils.exec(Joiner.on(" ").join(args));
+
+    args = new String[] { "hadoop jar", IntegrationUtils.getJar("dist", "ivory"),
+        ivory.integration.wikipedia.SearchSequenceFiles.class.getCanonicalName(), libjars,
+        "-input=" + opennlpIndex + "/wt-int-doc-vectors", 
+        "-output=" + opennlpIndex + "/test_wt-int-doc-vectors", 
+        "-keys=" + opennlpIntDocVector1Id + "," + opennlpIntDocVector2Id, 
+    "-valueclass=ivory.core.data.document.WeightedIntDocVector"};
+    IntegrationUtils.exec(Joiner.on(" ").join(args));
   }
 
   @Test
@@ -203,17 +249,15 @@ public class VerifyWikipediaProcessingMonolingual {
     IntWritable key = new IntWritable();
     HMapSFW value = new HMapSFW();
 
-    reader = new SequenceFile.Reader(fs,
-        new Path(opennlpIndex + "/wt-term-doc-vectors/part-00000"), fs.getConf());
+    reader = new SequenceFile.Reader(fs.getConf(),
+        SequenceFile.Reader.file(new Path(opennlpIndex + "/test_wt-term-doc-vectors/part-00000")));
     reader.next(key, value);
-    System.out.println("opennlpterm1\n"+value);
+    System.out.println("opennlpterm1\n"+key+";"+value);
     verifyTermDocVector(opennlpTermDocVector1, value);
-
-    reader = new SequenceFile.Reader(fs,
-        new Path(opennlpIndex + "/wt-term-doc-vectors/part-00010"), fs.getConf());
     reader.next(key, value);
-    System.out.println("opennlpterm2\n"+value);
+    System.out.println("opennlpterm2\n"+key+";"+value);
     verifyTermDocVector(opennlpTermDocVector2, value);
+    reader.close();
   }
 
   @Test
@@ -226,27 +270,27 @@ public class VerifyWikipediaProcessingMonolingual {
     IntWritable key = new IntWritable();
     WeightedIntDocVector value = new WeightedIntDocVector();
 
-    reader = new SequenceFile.Reader(fs,
-        new Path(opennlpIndex + "/wt-int-doc-vectors/part-00002"), fs.getConf());
+    reader = new SequenceFile.Reader(fs.getConf(),
+        SequenceFile.Reader.file(new Path(opennlpIndex + "/test_wt-int-doc-vectors/part-00000")));
     reader.next(key, value);
-    System.out.println("opennlpInt1\n"+value);
+    System.out.println("opennlpInt1\n"+key+";"+value);
     verifyIntDocVector(opennlpIntDocVector1, value);
-
-    reader = new SequenceFile.Reader(fs,
-        new Path(opennlpIndex + "/wt-int-doc-vectors/part-00011"), fs.getConf());
     reader.next(key, value);
-    System.out.println("opennlpInt2\n"+value);
+    System.out.println("opennlpInt2\n"+key+";"+value);
     verifyIntDocVector(opennlpIntDocVector2, value);
+    reader.close();
   }
 
   private void verifyTermDocVector(Map<String, Float> doc, HMapSFW value) {
+    assertTrue(value != null);
     for (Map.Entry<String, Float> entry : doc.entrySet()) {
-     assertTrue(value.containsKey(entry.getKey()));
-     assertEquals(entry.getValue(), value.get(entry.getKey()), 10e-6);
+      assertTrue(value.containsKey(entry.getKey()));
+      assertEquals(entry.getValue(), value.get(entry.getKey()), 10e-6);
     }
   }
 
   private void verifyIntDocVector(Map<Integer, Float> doc, WeightedIntDocVector value) {
+    assertTrue(value != null);
     for (Map.Entry<Integer, Float> entry : doc.entrySet()) {
       assertTrue(value.containsTerm(entry.getKey()));
       assertEquals(entry.getValue(), value.getWeight(entry.getKey()), 10e-6);

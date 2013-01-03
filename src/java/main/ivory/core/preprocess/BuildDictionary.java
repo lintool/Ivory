@@ -223,7 +223,7 @@ public class BuildDictionary extends PowerTool {
     String indexPath = conf.get(Constants.IndexPath);
     String collectionName = conf.get(Constants.CollectionName);
 
-    LOG.info("PowerTool: " + BuildDictionary.class.getCanonicalName());
+    LOG.info("PowerTool: " + BuildDictionary.class.getSimpleName());
     LOG.info(String.format(" - %s: %s", Constants.CollectionName, collectionName));
     LOG.info(String.format(" - %s: %s", Constants.IndexPath, indexPath));
 
@@ -245,12 +245,15 @@ public class BuildDictionary extends PowerTool {
     }
 
     conf.setInt(Constants.CollectionTermCount, (int) env.readCollectionTermCount());
-    conf.set("mapred.child.java.opts", "-Xmx2048m");
+    conf.set("mapreduce.map.memory.mb", "2048");
+    conf.set("mapreduce.map.java.opts", "-Xmx2048m");
+    conf.set("mapreduce.reduce.memory.mb", "2048");
+    conf.set("mapreduce.reduce.java.opts", "-Xmx2048m");
 
     Path tmpPath = new Path(env.getTempDirectory());
     fs.delete(tmpPath, true);
 
-    Job job = new Job(conf,
+    Job job = Job.getInstance(conf,
         BuildDictionary.class.getSimpleName() + ":" + collectionName);
 
     job.setJarByClass(BuildDictionary.class);

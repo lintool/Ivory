@@ -102,7 +102,7 @@ public class BuildTermDocVectors extends PowerTool {
         tokenizer.configure(conf);
       } catch (Exception e) {
         e.printStackTrace();
-        throw new RuntimeException("Error initializing tokenizer!");
+        throw new RuntimeException("Error initializing tokenizer: " + e.getMessage());
       }
     }
 
@@ -325,7 +325,7 @@ public class BuildTermDocVectors extends PowerTool {
     int docnoOffset = conf.getInt(Constants.DocnoOffset, 0);
     int numReducers = conf.getInt(Constants.TermDocVectorSegments, 0);
 
-    LOG.info("PowerTool: " + BuildTermDocVectors.class.getCanonicalName());
+    LOG.info("PowerTool: " + BuildTermDocVectors.class.getSimpleName());
     LOG.info(String.format(" - %s: %s", Constants.IndexPath, indexPath));
     LOG.info(String.format(" - %s: %s", Constants.CollectionName, collectionName));
     LOG.info(String.format(" - %s: %s", Constants.CollectionPath, collectionPath));
@@ -359,10 +359,13 @@ public class BuildTermDocVectors extends PowerTool {
     env.writeTokenizerClass(tokenizer);
     env.writeDocnoOffset(docnoOffset);
 
-    conf.set("mapred.child.java.opts", "-Xmx2048m");
-    conf.set("mapred.task.timeout", "6000000");			// needed for stragglers (e.g., very long documents in Wikipedia)
+    //conf.set("mapred.child.java.opts", "-Xmx2048m");
+    //conf.set("mapred.task.timeout", "6000000");			// needed for stragglers (e.g., very long documents in Wikipedia)
 
-    Job job1 = new Job(conf,
+    conf.set("mapreduce.map.memory.mb", "2048");
+    conf.set("mapreduce.map.java.opts", "-Xmx2048m");
+
+    Job job1 = Job.getInstance(conf,
         BuildTermDocVectors.class.getSimpleName() + ":" + collectionName);
     job1.setJarByClass(BuildTermDocVectors.class);
 
@@ -400,13 +403,18 @@ public class BuildTermDocVectors extends PowerTool {
     conf.set(InputPath, env.getDoclengthsDirectory().toString());
     conf.set(DocLengthDataFile, dlFile.toString());
 
-    conf.set("mapred.child.java.opts", "-Xmx2048m");
+    //conf.set("mapred.child.java.opts", "-Xmx2048m");
+    conf.set("mapreduce.map.memory.mb", "2048");
+    conf.set("mapreduce.map.java.opts", "-Xmx2048m");
+    conf.set("mapreduce.reduce.memory.mb", "2048");
+    conf.set("mapreduce.reduce.java.opts", "-Xmx2048m");
+
     conf.setBoolean("mapred.map.tasks.speculative.execution", false);
     conf.setBoolean("mapred.reduce.tasks.speculative.execution", false);
 
     LOG.info("Writing doc length data to " + dlFile + "...");
 
-    Job job2 = new Job(conf, "DocLengthTable:" + collectionName);
+    Job job2 = Job.getInstance(conf, "DocLengthTable:" + collectionName);
     job2.setJarByClass(BuildTermDocVectors.class);
 
     job2.setNumReduceTasks(0);

@@ -4,19 +4,24 @@ import ivory.core.tokenize.Tokenizer;
 import ivory.core.tokenize.TokenizerFactory;
 import ivory.sqe.retrieval.Constants;
 import ivory.sqe.retrieval.PairOfFloatMap;
+import ivory.sqe.retrieval.StructuredQuery;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.tartarus.snowball.SnowballStemmer;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
+
 import edu.umd.cloud9.io.map.HMapSFW;
 import edu.umd.cloud9.util.map.HMapKI;
 import edu.umd.cloud9.util.map.MapKF.Entry;
@@ -39,7 +44,7 @@ public class MtNQueryGenerator implements QueryGenerator {
   int length;
   private int kBest;
   boolean bigramSegment = false;
-  private CLWordQueryGenerator clGenerator;
+  private ProbabilisticStructuredQueryGenerator clGenerator;
   private SCFGQueryGenerator scfgGenerator;
   private float mtWeight, bitextWeight,scfgWeight, tokenWeight, phraseWeight, alpha, lexProbThreshold;
   private String queryLang, docLang;
@@ -50,15 +55,6 @@ public class MtNQueryGenerator implements QueryGenerator {
   }
 
   @Override
-  public void init(Configuration conf) throws IOException {
-    mtWeight = conf.getFloat(Constants.MTWeight, 1f);
-    bitextWeight = conf.getFloat(Constants.BitextWeight, 0f);
-    scfgWeight = conf.getFloat(Constants.SCFGWeight, 0f);
-    LOG.info(conf.get(Constants.MTWeight));
-    LOG.info(conf.get(Constants.BitextWeight));
-    LOG.info(conf.get(Constants.SCFGWeight));
-  }
-
   public void init(FileSystem fs, Configuration conf) throws IOException {
     if (conf.getBoolean(Constants.Quiet, false)) {
       LOG.setLevel(Level.OFF);
@@ -81,24 +77,30 @@ public class MtNQueryGenerator implements QueryGenerator {
     kBest = conf.getInt(Constants.KBest, 1); 
     LOG.info("K = " + kBest);
 
-    init(conf);
+    mtWeight = conf.getFloat(Constants.MTWeight, 1f);
+    bitextWeight = conf.getFloat(Constants.BitextWeight, 0f);
+    scfgWeight = conf.getFloat(Constants.SCFGWeight, 0f);
+    LOG.info(conf.get(Constants.MTWeight));
+    LOG.info(conf.get(Constants.BitextWeight));
+    LOG.info(conf.get(Constants.SCFGWeight));
+
     queryLangTokenizer = TokenizerFactory.createTokenizer(fs, conf, queryLang, queryTokenizerPath, false, null, null, null);
     queryLangTokenizerWithStemming = TokenizerFactory.createTokenizer(fs, conf, queryLang, queryTokenizerPath, true, null, conf.get(Constants.StemmedStopwordListQ), null);
     docLangTokenizer = TokenizerFactory.createTokenizer(fs, conf, docLang, docTokenizerPath, true, null, conf.get(Constants.StemmedStopwordListD), null);
 
-    clGenerator = new CLWordQueryGenerator();
+    clGenerator = new ProbabilisticStructuredQueryGenerator();
     clGenerator.init(fs, conf);
 
     scfgGenerator = new SCFGQueryGenerator();
     scfgGenerator.init(fs, conf);
   }
 
-  public JSONObject parseQuery(String query){
+  @Override
+  public StructuredQuery parseQuery(String query){
+    JsonObject queryJson = new JsonObject();
+    JsonObject queryTJson = new JsonObject();
+    JsonObject queryPJson = new JsonObject();
 
-    JSONObject queryJson = new JSONObject();
-    JSONObject queryTJson = new JSONObject();
-    JSONObject queryPJson = new JSONObject();
-    try {
       List<String> tokensBOW = new ArrayList<String>(), tokensBOP = new ArrayList<String>();
       Map<String, HMapSFW> src2trg2weight = new HashMap<String, HMapSFW>();
       Map<String,String> target2source = new HashMap<String,String>(); 
@@ -151,7 +153,7 @@ public class MtNQueryGenerator implements QueryGenerator {
               target = stemmed2Stemmed.get(target);
             }
 
-            if (target != null && !queryLangTokenizerWithStemming.isStemmedStopWord(source) && !source.equals("NULL") && !docLangTokenizer.isStemmedStopWord(target)) {
+            if (target != null && !queryLangTokenizerWithStemming.isStopWord(source) && !source.equals("NULL") && !docLangTokenizer.isStopWord(target)) {
               tokensBOW.add(target);
             }
           }
@@ -159,22 +161,22 @@ public class MtNQueryGenerator implements QueryGenerator {
 
         String[] bopArr = new String[tokensBOP.size()];
         bopArr = tokensBOP.toArray(bopArr);
-        JSONArray bop = new JSONArray(bopArr);
-        JSONObject bopJson = new JSONObject();
-        bopJson.put("#combine", bop);
+        JsonArray bop = Utils.createJsonArray(bopArr);
+        JsonObject bopJson = new JsonObject();
+        bopJson.add("#combine", bop);
 
         String[] bowArr = new String[tokensBOW.size()];
         bowArr = tokensBOW.toArray(bowArr);
-        JSONArray bow = new JSONArray(bowArr);
-        JSONObject bowJson = new JSONObject();
-        bowJson.put("#combine", bow);
+        JsonArray bow = Utils.createJsonArray(bowArr);
+        JsonObject bowJson = new JsonObject();
+        bowJson.add("#combine", bow);
 
-        JSONArray weightedQuery = new JSONArray();
-        weightedQuery.put(tokenWeight);
-        weightedQuery.put(bowJson);
-        weightedQuery.put(phraseWeight);
-        weightedQuery.put(bopJson);
-        queryJson.put("#weight", weightedQuery);
+        JsonArray weightedQuery = new JsonArray();
+        weightedQuery.add(new JsonPrimitive(tokenWeight));
+        weightedQuery.add(bowJson);
+        weightedQuery.add(new JsonPrimitive(phraseWeight));
+        weightedQuery.add(bopJson);
+        queryJson.add("#weight", weightedQuery);
       }else {     // k > 1
 
         // apply discount on logprobs to avoid floating point errors
@@ -225,7 +227,7 @@ public class MtNQueryGenerator implements QueryGenerator {
               }
 
               //              LOG.info("assign:{"+source+"}->["+target+"]="+transProb);
-              if (target == null || queryLangTokenizerWithStemming.isStemmedStopWord(source) || source.equals("NULL") || docLangTokenizer.isStemmedStopWord(target)) {
+              if (target == null || queryLangTokenizerWithStemming.isStopWord(source) || source.equals("NULL") || docLangTokenizer.isStopWord(target)) {
                 continue;
               }
 
@@ -253,22 +255,22 @@ public class MtNQueryGenerator implements QueryGenerator {
 
         // add phrase translations into a #weight array structure
         if (phraseWeight > 0) {
-          JSONArray pArr = Utils.probMap2JSON(Utils.scaleProbMap(lexProbThreshold, 1/cumPhraseProbs, phrase2weight));
-          queryPJson.put("#weight", pArr);
+          JsonArray pArr = Utils.createJsonArrayFromProbabilities(Utils.scaleProbMap(lexProbThreshold, 1/cumPhraseProbs, phrase2weight));
+          queryPJson.add("#weight", pArr);
         }
 
         // add token translations into a #combine of #weight array structures
-        JSONArray tokensArr = new JSONArray();
+        JsonArray tokensArr = new JsonArray();
         if (tokenWeight > 0) {
           for (String srcToken : stemmedSourceTokens) {
             HMapSFW nbestDist = src2trg2weight.get(srcToken);
 
             // skip stop words among source query words
-            if (queryLangTokenizerWithStemming.isStemmedStopWord(srcToken)){
+            if (queryLangTokenizerWithStemming.isStopWord(srcToken)){
               LOG.info("Skipped stopword "+srcToken);
               continue;
             }
-            JSONObject tokenWeightedArr = new JSONObject();
+            JsonObject tokenWeightedArr = new JsonObject();
             LOG.info("Processing "+srcToken);
 
             // skip stop words among source query words
@@ -291,14 +293,12 @@ public class MtNQueryGenerator implements QueryGenerator {
 
             // Pr{bitext}
             HMapSFW bitextDist = clGenerator.getTranslations(srcToken, stemmed2Stemmed);
-            //          LOG.info("bitext: "+bitextDist+"\n"+bitextWeight);
             if (bitextDist != null && !bitextDist.isEmpty() && bitextWeight > 0) {
               tokenRepresentationList.add(new PairOfFloatMap(bitextDist, bitextWeight));
             }
 
             // Pr{scfg}
             HMapSFW scfgDist = scfgGenerator.getTranslations(srcToken, stemmed2Stemmed);
-            //          LOG.info("scfg: "+scfgDist+"\n"+scfgWeight);
             if (scfgDist != null && !scfgDist.isEmpty() && scfgWeight > 0) {
               tokenRepresentationList.add(new PairOfFloatMap(scfgDist, scfgWeight));
             }
@@ -308,7 +308,7 @@ public class MtNQueryGenerator implements QueryGenerator {
               tokenRepresentationList.add(new PairOfFloatMap(nbestDist, mtWeight));
             }
 
-            JSONArray combinedArr;
+            JsonArray combinedArr;
             float scale = 1;
             if (scaling) {
               scale = scale * tokenCount.get(srcToken)/((float) kbestTranslations.length);
@@ -316,47 +316,40 @@ public class MtNQueryGenerator implements QueryGenerator {
             if(tokenRepresentationList.size() == 0) {
               continue;       // if empty distr., do not represent this source token in query
             } else if(tokenRepresentationList.size() == 1) {
-              combinedArr = Utils.probMap2JSON(Utils.scaleProbMap(lexProbThreshold, scale, tokenRepresentationList.get(0).getMap()));
+              combinedArr = Utils.createJsonArrayFromProbabilities(Utils.scaleProbMap(lexProbThreshold, scale, tokenRepresentationList.get(0).getMap()));
             } else {
-              combinedArr = Utils.probMap2JSON(Utils.combineProbMaps(lexProbThreshold, scale, tokenRepresentationList));
+              combinedArr = Utils.createJsonArrayFromProbabilities(Utils.combineProbMaps(lexProbThreshold, scale, tokenRepresentationList));
             }
 
-            tokenWeightedArr.put("#weight", combinedArr);
+            tokenWeightedArr.add("#weight", combinedArr);
 
             // optional: if this source token has occurred more than once per query, reflect this in the representation
             //  for (int i = 0; i < Math.ceil(tokenCount.get(srcToken)/(float)kBest); i++) {
             //    tokensArr.put(tokenWeightedArr);
             //  }
-            tokensArr.put(tokenWeightedArr);
+            tokensArr.add(tokenWeightedArr);
           }
-          queryTJson.put("#combine", tokensArr);
+          queryTJson.add("#combine", tokensArr);
         }
 
         // combine the token-based and phrase-based representations into a #combweight structure
-        JSONArray queryJsonArr = new JSONArray();
+        JsonArray queryJsonArr = new JsonArray();
 
         HMapSFW normalizedPhrase2Weight = null;
         if (phraseWeight > 0) {
           normalizedPhrase2Weight = Utils.scaleProbMap(lexProbThreshold, phraseWeight/cumPhraseProbs, phrase2weight);      
           for (String phrase : normalizedPhrase2Weight.keySet()) {
-            queryJsonArr.put(normalizedPhrase2Weight.get(phrase));
-            queryJsonArr.put(phrase);
+            queryJsonArr.add(new JsonPrimitive(normalizedPhrase2Weight.get(phrase)));
+            queryJsonArr.add(new JsonPrimitive(phrase));
           }
         }
         if (tokenWeight > 0) {
-          queryJsonArr.put(tokenWeight);
-          queryJsonArr.put(queryTJson);
+          queryJsonArr.add(new JsonPrimitive(tokenWeight));
+          queryJsonArr.add(queryTJson);
         }
-        queryJson.put("#combweight", queryJsonArr);
+        queryJson.add("#combweight", queryJsonArr);
       }
-    } catch (JSONException e) {
-      e.printStackTrace();
-    }
-    return queryJson;
-  }
 
-  public int getQueryLength(){
-    return length;  
+    return new StructuredQuery(queryJson, length);
   }
-
 }

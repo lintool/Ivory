@@ -16,97 +16,36 @@
 
 package ivory.app;
 
-import ivory.core.Constants;
-import ivory.core.RetrievalEnvironment;
-import ivory.core.preprocess.BuildDictionary;
-import ivory.core.preprocess.BuildIntDocVectors;
-import ivory.core.preprocess.BuildIntDocVectorsForwardIndex;
-import ivory.core.preprocess.BuildTermDocVectors;
-import ivory.core.preprocess.BuildTermDocVectorsForwardIndex;
-import ivory.core.preprocess.ComputeGlobalTermStatistics;
 import ivory.core.tokenize.GalagoTokenizer;
 
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.conf.Configured;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.util.Tool;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.hadoop.util.ToolRunner;
-import org.apache.log4j.Logger;
+
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 
 import edu.umd.cloud9.collection.medline.MedlineCitationInputFormat;
 import edu.umd.cloud9.collection.medline.MedlineDocnoMapping;
-import edu.umd.cloud9.collection.medline.MedlineDocnoMappingBuilder;
 
-public class PreprocessMedline extends Configured implements Tool {
-  private static final Logger LOG = Logger.getLogger(PreprocessMedline.class);
-
-  private static int printUsage() {
-    System.out.println("usage: [input-path] [index-path]");
-    ToolRunner.printGenericCommandUsage(System.out);
-    return -1;
-  }
-
-  /**
-   * Runs this tool.
-   */
-  public int run(String[] args) throws Exception {
-    if (args.length != 2) {
-      printUsage();
-      return -1;
-    }
-
-    String collection = args[0];
-    String indexPath = args[1];
-
-    LOG.info("Tool name: ProcessMedline");
-    LOG.info(" - Collection path: " + collection);
-    LOG.info(" - Index path: " + indexPath);
-
-    Configuration conf = getConf();
-    FileSystem fs = FileSystem.get(conf);
-
-    // Create the index directory if it doesn't already exist.
-    Path p = new Path(indexPath);
-    if (!fs.exists(p)) {
-      LOG.info("index path doesn't exist, creating...");
-      fs.mkdirs(p);
-    } else {
-      LOG.info("Index directory " + p + " already exists!");
-      return -1;
-    }
-
-    RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fs);
-    Path mappingFile = env.getDocnoMappingData();
-    new MedlineDocnoMappingBuilder().build(new Path(collection), mappingFile, conf);
-
-    conf.set(Constants.CollectionName, "Medline");
-    conf.set(Constants.CollectionPath, collection);
-    conf.set(Constants.IndexPath, indexPath);
-    conf.set(Constants.InputFormat, MedlineCitationInputFormat.class.getCanonicalName());
-    conf.set(Constants.Tokenizer, GalagoTokenizer.class.getCanonicalName());
-    conf.set(Constants.DocnoMappingClass, MedlineDocnoMapping.class.getCanonicalName());
-    conf.set(Constants.DocnoMappingFile, env.getDocnoMappingData().toString());
-
-    conf.setInt(Constants.DocnoOffset, 0); // docnos start at 1
-    conf.setInt(Constants.MinDf, 2); // toss away singleton terms
-    conf.setInt(Constants.MaxDf, Integer.MAX_VALUE);
-
-    new BuildTermDocVectors(conf).run();
-    new ComputeGlobalTermStatistics(conf).run();
-    new BuildDictionary(conf).run();
-    new BuildIntDocVectors(conf).run();
-
-    new BuildIntDocVectorsForwardIndex(conf).run();
-    new BuildTermDocVectorsForwardIndex(conf).run();
-
-    return 0;
-  }
-
-  /**
-   * Dispatches command-line arguments to the tool via the {@code ToolRunner}.
-   */
+public class PreprocessMedline extends PreprocessCollection {
+  // Append a few hard-coded arguments and then dispatch to generic superclass.
   public static void main(String[] args) throws Exception {
-    ToolRunner.run(new Configuration(), new PreprocessMedline(), args);
+    Map<String, String> map = new ImmutableMap.Builder<String, String>()
+        .put(PreprocessCollection.COLLECTION_NAME, "Medline")
+        .put(PreprocessCollection.DOCNO_MAPPING, MedlineDocnoMapping.class.getCanonicalName())
+        .put(PreprocessCollection.INPUTFORMAT, MedlineCitationInputFormat.class.getCanonicalName())
+        .put(PreprocessCollection.TOKENIZER, GalagoTokenizer.class.getCanonicalName())
+        .put(PreprocessCollection.MIN_DF, "2")
+        .build();
+    
+    List<String> s = Lists.newArrayList(args);
+    for (Map.Entry<String, String> e : map.entrySet()) {
+      s.add("-" + e.getKey());
+      s.add(e.getValue());
+    }
+
+    ToolRunner.run(new PreprocessMedline(), s.toArray(new String[s.size()]));
   }
 }

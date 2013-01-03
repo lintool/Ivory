@@ -150,7 +150,7 @@ public class ComputeGlobalTermStatistics extends PowerTool {
       return 0;
     }
 
-    LOG.info("PowerTool: " + ComputeGlobalTermStatistics.class.getCanonicalName());
+    LOG.info("PowerTool: " + ComputeGlobalTermStatistics.class.getSimpleName());
     LOG.info(String.format(" - %s: %s", Constants.CollectionName, collectionName));
     LOG.info(String.format(" - %s: %s", Constants.IndexPath, indexPath));
     LOG.info(String.format(" - %s: %s", Constants.NumReduceTasks, reduceTasks));
@@ -161,8 +161,8 @@ public class ComputeGlobalTermStatistics extends PowerTool {
       return 0;
     }
 
-    Job job = new Job(getConf(), ComputeGlobalTermStatistics.class.getSimpleName() + ":"
-        + collectionName);
+    Job job = Job.getInstance(getConf(),
+        ComputeGlobalTermStatistics.class.getSimpleName() + ":" + collectionName);
     job.setJarByClass(ComputeGlobalTermStatistics.class);
 
     job.setNumReduceTasks(reduceTasks);

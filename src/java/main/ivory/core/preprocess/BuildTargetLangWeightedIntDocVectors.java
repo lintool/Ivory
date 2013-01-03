@@ -85,6 +85,8 @@ public class BuildTargetLangWeightedIntDocVectors extends PowerTool {
         Path[] localFiles = DistributedCache.getLocalCacheFiles(conf);
 
         String vocabFile = conf.get("Ivory.FinalVocab");
+        vocabFile = vocabFile.substring(vocabFile.lastIndexOf("/") + 1);
+
         for (Path p : localFiles) {
           if (p.toString().contains(vocabFile)) {
             engVocabH = HadoopAlign.loadVocab(p, FileSystem.getLocal(conf));
