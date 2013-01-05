@@ -265,13 +265,7 @@
     <property name="param_prefix" value="$" />
     <property name="cp_sep" value=":" />
     <property name="java_command" value="java -Xmx4g -classpath &quot;${run.path.id}&quot;" />
-
-    <condition property="script_prefix" value="#!/bin/sh${line.separator}export HADOOP_CLASSPATH=&quot;${run.path.id}:$HADOOP_CLASSPATH&quot;${line.separator}">
-      <equals arg1="${platform}" arg2="unix" />
-    </condition>
-    <condition property="script_prefix" value="">
-      <equals arg1="${platform}" arg2="windows" />
-    </condition>
+    <property name="script_prefix" value="#!/bin/sh${line.separator}export HADOOP_CLASSPATH=&quot;${run.path.id}:$HADOOP_CLASSPATH&quot;${line.separator}" />
 
     <echo file="./etc/run-integration.${suffix}" message="${script_prefix}" />
     <echo file="./etc/run-integration.${suffix}" message="${line.separator}ant clean${line.separator}ant${line.separator}ant -lib etc/mail.jar integration${line.separator}" append="true" />
