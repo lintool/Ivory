@@ -261,19 +261,10 @@
     <pathconvert property="lib.path.id" refid="lib.path.id" targetos="${platform}" />
     <pathconvert property="libjars.path.id" refid="libjars.path.id" targetos="${platform}" pathsep="," />
 
-    <condition property="suffix" value="sh"><equals arg1="${platform}" arg2="unix" /></condition>
-    <condition property="suffix" value="bat"><equals arg1="${platform}" arg2="windows" /></condition>
-
-    <condition property="param_prefix" value="$"><equals arg1="${platform}" arg2="unix" /></condition>
-    <condition property="param_prefix" value="%"><equals arg1="${platform}" arg2="windows" /></condition>
-
-    <condition property="java" value="java"><equals arg1="${platform}" arg2="unix" /></condition>
-    <condition property="java" value="java"><equals arg1="${platform}" arg2="windows" /></condition>
-
-    <condition property="cp_sep" value=":"><equals arg1="${platform}" arg2="unix" /></condition>
-    <condition property="cp_sep" value=";"><equals arg1="${platform}" arg2="windows" /></condition>
-
-    <property name="java_command" value="${java} -Xmx4g -classpath &quot;${run.path.id}&quot;" />
+    <property name="suffix" value="sh" />
+    <property name="param_prefix" value="$" />
+    <property name="cp_sep" value=":" />
+    <property name="java_command" value="java -Xmx4g -classpath &quot;${run.path.id}&quot;" />
 
     <condition property="script_prefix" value="#!/bin/sh${line.separator}export HADOOP_CLASSPATH=&quot;${run.path.id}:$HADOOP_CLASSPATH&quot;${line.separator}">
       <equals arg1="${platform}" arg2="unix" />
