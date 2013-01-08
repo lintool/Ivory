@@ -516,6 +516,10 @@ public class RetrievalEnvironment {
 		return appendPath(indexPath, "term-df-cf/");
 	}
 
+	public static Path getTermDfCfDirectory(String indexPath) {
+    return new Path(appendPath(indexPath, "term-df-cf/"));
+	}
+
 	/**
 	 * Returns file that contains the list of terms in the collection. The file
 	 * consists of a stream of bytes, read into an array, representing the

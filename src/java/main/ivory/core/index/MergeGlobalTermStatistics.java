@@ -14,22 +14,19 @@
  * permissions and limitations under the License.
  */
 
-package ivory.core.preprocess;
+package ivory.core.index;
 
 import ivory.core.Constants;
 import ivory.core.RetrievalEnvironment;
-import ivory.core.data.document.TermDocVector;
 
 import java.io.IOException;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Counters;
 import org.apache.hadoop.mapreduce.Job;
-import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
@@ -40,41 +37,17 @@ import org.apache.log4j.Logger;
 import edu.umd.cloud9.io.pair.PairOfIntLong;
 import edu.umd.cloud9.util.PowerTool;
 
-public class ComputeGlobalTermStatistics extends PowerTool {
-  private static final Logger LOG = Logger.getLogger(ComputeGlobalTermStatistics.class);
+public class MergeGlobalTermStatistics extends PowerTool {
+  private static final Logger LOG = Logger.getLogger(MergeGlobalTermStatistics.class);
 
-  protected static enum Statistics {
-    Docs, Terms, SumOfDocLengths
-  }
-
-  private static class MyMapper extends Mapper<IntWritable, TermDocVector, Text, PairOfIntLong> {
-    private static final Text TERM = new Text();
-    private static final PairOfIntLong PAIR = new PairOfIntLong();
-
-    @Override
-    public void map(IntWritable key, TermDocVector doc, Context context)
-    throws IOException, InterruptedException {
-      TermDocVector.Reader r = doc.getReader();
-      int dl = 0, tf = 0;
-      while (r.hasMoreTerms()) {
-        TERM.set(r.nextTerm());
-        tf = r.getTf();
-        dl += tf;
-        PAIR.set(1, tf);
-        context.write(TERM, PAIR);
-      }
-
-      context.getCounter(Statistics.Docs).increment(1);
-      context.getCounter(Statistics.SumOfDocLengths).increment(dl);
-    }
-  }
+  protected static enum Statistics { Terms }
 
   private static class MyCombiner extends Reducer<Text, PairOfIntLong, Text, PairOfIntLong> {
     private static final PairOfIntLong PAIR = new PairOfIntLong();
 
     @Override
     public void reduce(Text key, Iterable<PairOfIntLong> values, Context context)
-    throws IOException, InterruptedException {
+        throws IOException, InterruptedException {
       int df = 0;
       long cf = 0;
       for (PairOfIntLong pair : values) {
@@ -89,12 +62,11 @@ public class ComputeGlobalTermStatistics extends PowerTool {
 
   private static class MyReducer extends Reducer<Text, PairOfIntLong, Text, PairOfIntLong> {
     private static final PairOfIntLong PAIR = new PairOfIntLong();
-    private int minDf, maxDf;
+    private int minDf;
 
     @Override
     public void setup(Reducer<Text, PairOfIntLong, Text, PairOfIntLong>.Context context) {
       minDf = context.getConfiguration().getInt(Constants.MinDf, 2);
-      maxDf = context.getConfiguration().getInt(Constants.MaxDf, Integer.MAX_VALUE);
     }
 
     @Override
@@ -106,7 +78,7 @@ public class ComputeGlobalTermStatistics extends PowerTool {
         df += pair.getLeftElement();
         cf += pair.getRightElement();
       }
-      if (df < minDf || df > maxDf) {
+      if (df < minDf) {
         return;
       }
       context.getCounter(Statistics.Terms).increment(1);
@@ -115,60 +87,54 @@ public class ComputeGlobalTermStatistics extends PowerTool {
     }
   }
 
-  public static final String[] RequiredParameters = {
-    Constants.CollectionName, Constants.IndexPath, Constants.MinDf, Constants.MaxDf };
+  public static final String[] RequiredParameters = { Constants.CollectionName, Constants.MinDf,
+      "Ivory.IndexPaths", "Ivory.DictionaryOutputPath" };
 
   public String[] getRequiredParameters() {
     return RequiredParameters;
   }
 
-  public ComputeGlobalTermStatistics(Configuration conf) {
+  public MergeGlobalTermStatistics(Configuration conf) {
     super(conf);
   }
 
   public int runTool() throws Exception {
     Configuration conf = getConf();
 
-    FileSystem fs = FileSystem.get(conf);
+    String collectionName = conf.get(Constants.CollectionName);
+    int dfThreshold = conf.getInt(Constants.MinDf, 2);
+    String indexPaths = conf.get("Ivory.IndexPaths");
+    String outputPath = conf.get("Ivory.DictionaryOutputPath");
 
-    String indexPath = conf.get(Constants.IndexPath);
-    RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fs);
-
-    int reduceTasks = 10;
-
-    String collectionName = env.readCollectionName();
-    String termDocVectorsPath = env.getTermDocVectorsDirectory();
-    String termDfCfPath = env.getTermDfCfDirectory();
-
-    if (!fs.exists(new Path(indexPath))) {
-      LOG.info("index path doesn't existing: skipping!");
-      return 0;
-    }
-
-    if (!fs.exists(new Path(termDocVectorsPath))) {
-      LOG.info("term doc vectors path doesn't existing: skipping!");
-      return 0;
-    }
-
-    LOG.info("PowerTool: " + ComputeGlobalTermStatistics.class.getSimpleName());
+    LOG.info("Tool: " + MergeGlobalTermStatistics.class.getCanonicalName());
     LOG.info(String.format(" - %s: %s", Constants.CollectionName, collectionName));
-    LOG.info(String.format(" - %s: %s", Constants.IndexPath, indexPath));
-    LOG.info(String.format(" - %s: %s", Constants.NumReduceTasks, reduceTasks));
+    LOG.info(String.format(" - %s: %d", Constants.MinDf, dfThreshold));
+    LOG.info(String.format(" - %s: %s", "Ivory.IndexPaths", indexPaths));
+    LOG.info(String.format(" - %s: %s", "Ivory.DictionaryOutputPath", outputPath));
 
-    Path outputPath = new Path(termDfCfPath);
-    if (fs.exists(outputPath)) {
-      LOG.info("TermDfCf directory exist: skipping!");
-      return 0;
+    FileSystem fs = FileSystem.get(conf);
+    fs.mkdirs(new Path(outputPath));
+    RetrievalEnvironment env = new RetrievalEnvironment(outputPath, fs);
+
+    Job job = Job.getInstance(conf,
+        MergeGlobalTermStatistics.class.getSimpleName() + ":" + collectionName);
+
+    job.setJarByClass(MergeGlobalTermStatistics.class);
+    job.setNumReduceTasks(1);
+
+    long collectionLength = 0;
+    int docCount = 0;
+
+    for (String index : indexPaths.split(",")) {
+      RetrievalEnvironment shardEnv = new RetrievalEnvironment(index, fs);
+      collectionLength += shardEnv.readCollectionLength();
+      docCount += shardEnv.readCollectionDocumentCount();
+
+      Path p = RetrievalEnvironment.getTermDfCfDirectory(index);
+      LOG.info("Adding shard term statistics at " + p);
+      FileInputFormat.addInputPath(job, p);
     }
-
-    Job job = Job.getInstance(getConf(),
-        ComputeGlobalTermStatistics.class.getSimpleName() + ":" + collectionName);
-    job.setJarByClass(ComputeGlobalTermStatistics.class);
-
-    job.setNumReduceTasks(reduceTasks);
-
-    FileInputFormat.setInputPaths(job, new Path(termDocVectorsPath));
-    FileOutputFormat.setOutputPath(job, outputPath);
+    FileOutputFormat.setOutputPath(job, RetrievalEnvironment.getTermDfCfDirectory(outputPath));
 
     job.setInputFormatClass(SequenceFileInputFormat.class);
     job.setOutputFormatClass(SequenceFileOutputFormat.class);
@@ -178,22 +144,29 @@ public class ComputeGlobalTermStatistics extends PowerTool {
     job.setOutputKeyClass(Text.class);
     job.setOutputValueClass(PairOfIntLong.class);
 
-    job.setMapperClass(MyMapper.class);
     job.setCombinerClass(MyCombiner.class);
     job.setReducerClass(MyReducer.class);
-    job.setJarByClass(ComputeGlobalTermStatistics.class);
-    
+
     long startTime = System.currentTimeMillis();
     job.waitForCompletion(true);
     LOG.info("Job Finished in " + (System.currentTimeMillis() - startTime) / 1000.0 + " seconds");
 
     Counters counters = job.getCounters();
-    // Write out number of postings. NOTE: this value is not the same as
-    // number of postings, because postings for non-English terms are
-    // discarded, or as result of df cut.
-    env.writeCollectionTermCount((int) counters.findCounter(Statistics.Terms).getValue());
 
-    env.writeCollectionLength(counters.findCounter(Statistics.SumOfDocLengths).getValue());
+    int numTerms = (int) counters.findCounter(Statistics.Terms).getValue();
+    LOG.info("Number of unique terms in collection: " + numTerms);
+    env.writeCollectionTermCount(numTerms);
+
+    LOG.info("Collection length: " + collectionLength);
+    env.writeCollectionLength(collectionLength);
+
+    LOG.info("Collection document count: " + docCount);
+    env.writeCollectionDocumentCount(docCount);
+
+    float avgDl = (float) collectionLength / docCount;
+    LOG.info("Average document length: " + avgDl);
+    env.writeCollectionAverageDocumentLength(avgDl);
+ 
     return 0;
   }
 }

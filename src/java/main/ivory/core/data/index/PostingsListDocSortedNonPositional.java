@@ -261,6 +261,13 @@ public class PostingsListDocSortedNonPositional implements PostingsList {
         new ByteArrayInputStream(bytes)));
   }
 
+  @Override
+  public String toString() {
+    return String.format("[%s df=%d cf=%d numPostings=%d]",
+        PostingsListDocSortedNonPositional.class.getSimpleName(), getDf(), getCf(),
+        getNumberOfPostings());
+  }
+
   /**
    * {@code PostingsReader} for {@code PostingsListDocSortedNonPositional}.
    * 

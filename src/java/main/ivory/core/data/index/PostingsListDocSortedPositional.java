@@ -322,6 +322,13 @@ public class PostingsListDocSortedPositional implements PostingsList {
         new DataInputStream(new ByteArrayInputStream(bytes)));
   }
 
+  @Override
+  public String toString() {
+    return String.format("[%s df=%d cf=%d numPostings=%d]",
+        PostingsListDocSortedPositional.class.getSimpleName(), getDf(), getCf(),
+        getNumberOfPostings());
+  }
+
   /**
    * {@code PostingsReader} for {@code PostingsListDocSortedPositional}.
    *

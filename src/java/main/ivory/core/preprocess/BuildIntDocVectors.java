@@ -99,12 +99,6 @@ public class BuildIntDocVectors extends PowerTool {
           LOG.info(" - id: " + pathMapping.get(termidsFile));
           LOG.info(" - idToTerms: " + pathMapping.get(idToTermFile));
 
-	  String s = localFiles.length + " " + localFiles[0].toString() + " " + localFiles[1].toString() + " " + localFiles[2].toString();
-	  if (pathMapping.get(termsFile) == null ) {
-
-	      throw new RuntimeException(s);
-	  }
-
           dictionary = new DefaultFrequencySortedDictionary(pathMapping.get(termsFile),
               pathMapping.get(termidsFile), pathMapping.get(idToTermFile), FileSystem.getLocal(conf));
         }

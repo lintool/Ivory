@@ -3,6 +3,7 @@ package ivory.integration.shard;
 import static org.junit.Assert.assertTrue;
 import ivory.app.BuildIndex;
 import ivory.app.PreprocessCollection;
+import ivory.core.tokenize.GalagoTokenizer;
 import ivory.integration.IntegrationUtils;
 
 import java.util.List;
@@ -20,6 +21,9 @@ import org.junit.Test;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+
+import edu.umd.cloud9.collection.medline.MedlineCitationInputFormat;
+import edu.umd.cloud9.collection.medline.MedlineDocnoMapping;
 
 public class VerifyGenomics05ShardedIndex {
   private static final Logger LOG = Logger.getLogger(VerifyGenomics05ShardedIndex.class);
@@ -71,7 +75,12 @@ public class VerifyGenomics05ShardedIndex {
     String libjars = String.format("-libjars=%s", Joiner.on(",").join(jars));
 
     String[] args = new String[] { "hadoop jar", IntegrationUtils.getJar("dist", "ivory"),
-        ivory.app.PreprocessMedline.class.getCanonicalName(), libjars,
+        ivory.app.PreprocessCollection.class.getCanonicalName(), libjars,
+        "-" + PreprocessCollection.COLLECTION_NAME, "Medline-shard",
+        "-" + PreprocessCollection.DOCNO_MAPPING, MedlineDocnoMapping.class.getCanonicalName(),
+        "-" + PreprocessCollection.INPUTFORMAT, MedlineCitationInputFormat.class.getCanonicalName(),
+        "-" + PreprocessCollection.TOKENIZER, GalagoTokenizer.class.getCanonicalName(),
+        "-" + PreprocessCollection.MIN_DF, "1",
         "-" + PreprocessCollection.COLLECTION_PATH, collectionPath,
         "-" + PreprocessCollection.INDEX_PATH, indexPath };
 
