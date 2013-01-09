@@ -1359,7 +1359,9 @@ public class CLIRUtils extends Configured {
         Vocab srcVocab = HadoopAlign.loadVocab(new Path(args[2]), localFS);
         Vocab trgVocab = HadoopAlign.loadVocab(new Path(args[3]), localFS);
         TTable_monolithic_IFAs src2trgProbs = new TTable_monolithic_IFAs(localFS, new Path(args[4]), true);
-
+        System.out.println("Source vocab size: " + srcVocab.size());
+        System.out.println("Target vocab size: " + trgVocab.size());
+        
         if (trgTerm.equals("ALL")) {
           int[] trgs = src2trgProbs.get(srcVocab.get(srcTerm)).getTranslations(0.0f);
           System.out.println(srcTerm + " has "+ trgs.length + " translations:");

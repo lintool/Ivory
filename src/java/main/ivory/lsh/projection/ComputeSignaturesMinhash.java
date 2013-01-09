@@ -79,12 +79,16 @@ public class ComputeSignaturesMinhash extends PowerTool {
    * 
    */
   public static class MyMapper extends MapReduceBase implements
-      Mapper<IntWritable, WeightedIntDocVector, IntWritable, MinhashSignature> {
+  Mapper<IntWritable, WeightedIntDocVector, IntWritable, MinhashSignature> {
 
     static Path[] localFiles;
     static int D;
     static MinhashSignature signature;
     static List<Writable> randomOrderings;
+
+    private String getFilename(String s) {
+      return s.substring(s.lastIndexOf("/") + 1);
+    }
 
     public void configure(JobConf job) {
       // sLogger.setLevel(Level.DEBUG);
@@ -93,37 +97,29 @@ public class ComputeSignaturesMinhash extends PowerTool {
         throw new RuntimeException("Could not read parameters!");
       }
 
-      if (PwsimEnvironment.cluster) {
-        try {
-          localFiles = DistributedCache.getLocalCacheFiles(job);
-          randomOrderings = SequenceFileUtils.readValues(localFiles[0], FileSystem.getLocal(job));
-        } catch (Exception e) {
-          throw new RuntimeException("Error reading random vectors!");
+      String inCacheFile = job.get("InCache");
+      try {
+        inCacheFile = getFilename(inCacheFile);
+        localFiles = DistributedCache.getLocalCacheFiles(job);
+        for (Path localFile : localFiles) {
+          if (localFile.toString().contains(inCacheFile)) {            
+            randomOrderings = SequenceFileUtils.readValues(localFile, FileSystem.getLocal(job));
+          }
         }
-      } else {
-        try {
-          randomOrderings = SequenceFileUtils.readValues(new Path(job.get("Ivory.IndexPath")
-              + "/random-perms-bit_D=39869_Q=2"), FileSystem.getLocal(job));
-        } catch (Exception e) {
-          // TODO Auto-generated catch block
-          e.printStackTrace();
-        }
+        if (randomOrderings == null)  throw new RuntimeException("File not found in local cache: " + inCacheFile);
+      } catch (Exception e) {
+        throw new RuntimeException("Error reading random orderings from " + inCacheFile);
       }
 
-      if (randomOrderings.size() != D) {
-        throw new RuntimeException("No of random orderings not correct. Something is wrong!"); // CODE
-                                                                                               // SHOULD
-                                                                                               // NOT
-                                                                                               // COME
-                                                                                               // HERE
+      if (randomOrderings == null || randomOrderings.size() != D) {
+        throw new RuntimeException("No of random orderings not correct. Something is wrong!"); 
       }
       signature = new MinhashSignature(D);
-
     }
 
     public void map(IntWritable docno, WeightedIntDocVector docvectorIn,
         OutputCollector<IntWritable, MinhashSignature> output, Reporter reporter)
-        throws IOException {
+    throws IOException {
       HMapIFW docvector = docvectorIn.getWeightedTerms();
       signature.clear();
 
@@ -143,8 +139,8 @@ public class ComputeSignaturesMinhash extends PowerTool {
           return term;
         }
       }
-      throw new RuntimeException("No terms in doc vector. Something is wrong!"); // CODE SHOULD NOT
-                                                                                 // COME HERE
+      throw new RuntimeException("No terms in doc vector. Something is wrong!"); 
+      // CODE SHOULD NOT COME HERE
     }
   }
 
@@ -158,32 +154,21 @@ public class ComputeSignaturesMinhash extends PowerTool {
       throw new RuntimeException("Parameters not read properly! Quitting...");
     }
     JobConf job = new JobConf(conf, ComputeSignaturesMinhash.class);
-    // job.set("mapred.job.tracker", "local");
-    // job.set("fs.default.name", "file:///");
     FileSystem fs = FileSystem.get(job);
     RetrievalEnvironment env = new RetrievalEnvironment(dir, fs);
     int vocabSize = (int) env.readCollectionTermCount();
 
-    job.setJobName("ComputeSignatures_minhash");// +"_D="+D+"_"+RetrievalEnvironment.readCollectionName(fs,
-                                                // dir));
+    job.setJobName("ComputeSignatures_minhash");
 
-    String inputPath = PwsimEnvironment.getFileNameWithPars(dir, "IntDocs");
-    String outputPath = PwsimEnvironment.getFileNameWithPars(dir, "SignaturesMinhash");
+    String inputPath = PwsimEnvironment.getIntDocvectorsFile(dir, fs);
+    String outputPath = PwsimEnvironment.getSignaturesDir(dir, numInts, "minhash");   
     int numMappers = 300;
     if (fs.exists(new Path(outputPath))) {
       sLogger.info("Signatures output path already exists! Quitting...");
       return 0;
     }
 
-    // if doesn't exist, create Q permutations of bit positions [1..D]
-
-    // to make the file path correct:
-    PwsimEnvironment.numOfBits = vocabSize;
-    PwsimEnvironment.numOfPermutations = numInts;
-    String randomPermFile = PwsimEnvironment.getFileNameWithPars(dir, "Permsbit");
-    // fix them back
-    PwsimEnvironment.numOfBits = numInts;
-    PwsimEnvironment.numOfPermutations = 0; // doesn't matter. not used to compute signatures
+    String randomPermFile = PwsimEnvironment.getPermutationsFile(dir, fs, vocabSize, numInts);
 
     if (fs.exists(new Path(randomPermFile))) {
       sLogger.info("Random permutations output path already exists!");

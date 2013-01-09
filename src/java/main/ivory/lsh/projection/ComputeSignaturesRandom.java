@@ -13,7 +13,6 @@ import org.apache.hadoop.filecache.DistributedCache;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
-import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapred.FileInputFormat;
 import org.apache.hadoop.mapred.FileOutputFormat;
@@ -26,7 +25,6 @@ import org.apache.hadoop.mapred.Reporter;
 import org.apache.hadoop.mapred.SequenceFileInputFormat;
 import org.apache.hadoop.mapred.SequenceFileOutputFormat;
 import org.apache.hadoop.mapred.lib.IdentityReducer;
-import org.apache.hadoop.util.LineReader;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import edu.umd.cloud9.io.SequenceFileUtils;
@@ -61,6 +59,7 @@ public class ComputeSignaturesRandom extends PowerTool {
     ALL, ONES, ZEROS, EMPTY
   };
 
+
   /**
    * Convert int doc vectors into NBitSignature objects using LSH.
    * 
@@ -68,13 +67,17 @@ public class ComputeSignaturesRandom extends PowerTool {
    * 
    */
   public static class MyMapper extends MapReduceBase implements
-      Mapper<IntWritable, WeightedIntDocVector, IntWritable, NBitSignature> {
+  Mapper<IntWritable, WeightedIntDocVector, IntWritable, NBitSignature> {
 
     static Path[] localFiles;
     static List<Writable> randomUnitVectors;
     static int D;
     static NBitSignature signature;
     static float[] dotProductThresholds;
+
+    private String getFilename(String s) {
+      return s.substring(s.lastIndexOf("/") + 1);
+    }
 
     @SuppressWarnings("deprecation")
     public void configure(JobConf job) {
@@ -84,42 +87,21 @@ public class ComputeSignaturesRandom extends PowerTool {
         throw new RuntimeException("Could not read parameters!");
       }
 
-      if (PwsimEnvironment.cluster) {
-        try {
-          localFiles = DistributedCache.getLocalCacheFiles(job);
-          randomUnitVectors = SequenceFileUtils.readValues(localFiles[0], FileSystem.getLocal(job));
-        } catch (Exception e) {
-          throw new RuntimeException("Error reading random vectors!");
+      String inCacheFile = job.get("InCache");
+      try {
+        inCacheFile = getFilename(inCacheFile);
+        localFiles = DistributedCache.getLocalCacheFiles(job);
+        for (Path localFile : localFiles) {
+          sLogger.info("in cache " + localFile);
+          if (localFile.toString().contains(inCacheFile)) {            
+            randomUnitVectors = SequenceFileUtils.readValues(localFile, FileSystem.getLocal(job));
+          }
         }
-      } else {
-        try {
-          randomUnitVectors = SequenceFileUtils.readValues(new Path(PwsimEnvironment
-              .getFileNameWithPars(job.get("Ivory.IndexPath"), "RandomVectors")
-              + "/part-00000"), FileSystem.getLocal(job));
-        } catch (Exception e) {
-          e.printStackTrace();
-        }
+        if (randomUnitVectors == null)  throw new RuntimeException("File not found in local cache: " + inCacheFile);
+      } catch (Exception e) {
+        throw new RuntimeException("Error reading random vectors!\n" + e.getMessage());
       }
       signature = new NBitSignature(D);
-
-      if (localFiles.length > 1) {
-        dotProductThresholds = new float[D];
-        int i = 0;
-        try {
-          LineReader reader = new LineReader(FileSystem.getLocal(job).open(localFiles[1]));
-          Text t = new Text();
-          while (reader.readLine(t) != 0) {
-            float val = Float.parseFloat(t.toString());
-            sLogger.debug(i + " --> " + val);
-            dotProductThresholds[i] = val;
-          }
-          reader.close();
-        } catch (IOException e1) {
-        }
-        sLogger.info("Dot product thresholds read");
-      } else {
-        sLogger.info("Dot product thresholds file not specified in option Ivory.DotProdThreshFile");
-      }
     }
 
     static public double dotProduct(HMapIFW docvector, FloatAsBytesWritable vector) {
@@ -160,31 +142,27 @@ public class ComputeSignaturesRandom extends PowerTool {
     }
   }
 
+  @SuppressWarnings("deprecation")
   public int runTool() throws Exception {
-    Configuration conf = getConf();
-    int D = conf.getInt("Ivory.NumOfBits", -1);
-    int numBatchFiles = conf.getInt("NumBatch", 0);
+    int D = getConf().getInt("Ivory.NumOfBits", -1);
+    int numBatchFiles = getConf().getInt("NumBatch", 0);
     boolean isBatch = (numBatchFiles != 0);
-    String dir = conf.get("Ivory.IndexPath");
+    String dir = getConf().get("Ivory.IndexPath");
     if (D < 0 || numBatchFiles < 0) {
       throw new RuntimeException("Parameters not read properly! Quitting...");
     }
-    JobConf job = new JobConf(conf, ComputeSignaturesRandom.class);
+    JobConf job = new JobConf(getConf(), ComputeSignaturesRandom.class);
     FileSystem fs = FileSystem.get(job);
 
     RetrievalEnvironment re = new RetrievalEnvironment(dir, fs);
     job.setJobName("ComputeSignatures_random_D=" + D + ":" + re.readCollectionName());
 
-    String inputPath = PwsimEnvironment.getFileNameWithPars(dir, "IntDocs");
-    String outputPath = PwsimEnvironment.getFileNameWithPars(dir, "SignaturesRandom");
-    String randomVectorFile = PwsimEnvironment.getFileNameWithPars(dir, "RandomVectors")
-        + "/part-00000";
+    String inputPath = PwsimEnvironment.getIntDocvectorsFile(dir, fs);
+    String outputPath = PwsimEnvironment.getSignaturesDir(dir, D, "random"); 
+    String randomVectorFile = PwsimEnvironment.getRandomVectorsDir(dir, D) + "/part-00000";
+
+    job.set("InCache", randomVectorFile);
     DistributedCache.addCacheFile(new URI(randomVectorFile), job);
-    String dotProdThreshFile = job.get("Ivory.DotProdThreshFile");
-    if (dotProdThreshFile != null) { // if provided by user, use these threshold values instead of
-                                     // [0,0,...,0]
-      DistributedCache.addCacheFile(new URI(dotProdThreshFile), job);
-    }
 
     int numMappers = 300;
     if (fs.exists(new Path(outputPath))) {
