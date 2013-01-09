@@ -21,6 +21,7 @@ import ivory.core.RetrievalEnvironment;
 import ivory.core.data.document.IntDocVector;
 import ivory.core.data.document.IntDocVector.Reader;
 import ivory.core.data.index.PostingsList;
+import ivory.core.data.index.PostingsListDocSortedPositional;
 import ivory.core.data.index.TermPositions;
 
 import java.io.IOException;
@@ -224,8 +225,7 @@ public class BuildIPInvertedIndexDocSorted extends PowerTool {
     }
   }
 
-  public static final String[] RequiredParameters = {
-          Constants.NumReduceTasks, Constants.IndexPath };
+  public static final String[] RequiredParameters = { Constants.NumReduceTasks, Constants.IndexPath };
 
   public String[] getRequiredParameters() {
     return RequiredParameters;
@@ -247,14 +247,15 @@ public class BuildIPInvertedIndexDocSorted extends PowerTool {
     int reduceTasks = conf.getInt(Constants.NumReduceTasks, 0);
     int minSplitSize = conf.getInt(Constants.MinSplitSize, 0);
     int collectionDocCnt = env.readCollectionDocumentCount();
+    //int maxHeap = conf.getInt(Constants.MaxHeap, 2048);
 
     String postingsType = conf.get(Constants.PostingsListsType,
-        ivory.core.data.index.PostingsListDocSortedPositional.class.getCanonicalName());
+        PostingsListDocSortedPositional.class.getCanonicalName());
     @SuppressWarnings("unchecked")
     Class<? extends PostingsList> postingsClass =
         (Class<? extends PostingsList>) Class.forName(postingsType);
 
-    LOG.info("PowerTool: " + BuildIPInvertedIndexDocSorted.class.getCanonicalName());
+    LOG.info("PowerTool: " + BuildIPInvertedIndexDocSorted.class.getSimpleName());
     LOG.info(String.format(" - %s: %s", Constants.IndexPath, indexPath));
     LOG.info(String.format(" - %s: %s", Constants.CollectionName, collectionName));
     LOG.info(String.format(" - %s: %s", Constants.CollectionDocumentCount, collectionDocCnt));
@@ -277,9 +278,13 @@ public class BuildIPInvertedIndexDocSorted extends PowerTool {
     conf.setInt(Constants.CollectionDocumentCount, collectionDocCnt);
 
     conf.setInt("mapred.min.split.size", minSplitSize);
-    conf.set("mapred.child.java.opts", "-Xmx2048m");
+    //conf.set("mapred.child.java.opts", "-Xmx" + maxHeap + "m");
+    conf.set("mapreduce.map.memory.mb", "2048");
+    conf.set("mapreduce.map.java.opts", "-Xmx2048m");
+    conf.set("mapreduce.reduce.memory.mb", "2048");
+    conf.set("mapreduce.reduce.java.opts", "-Xmx2048m");
 
-    Job job = new Job(conf,
+    Job job = Job.getInstance(conf,
         BuildIPInvertedIndexDocSorted.class.getSimpleName() + ":" + collectionName);
     job.setJarByClass(BuildIPInvertedIndexDocSorted.class);
 

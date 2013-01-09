@@ -16,8 +16,8 @@
 
 package ivory.cascade.model.builder;
 
+import ivory.core.ConfigurationException;
 import ivory.core.RetrievalEnvironment;
-import ivory.core.exception.ConfigurationException;
 import ivory.core.util.XMLTools;
 import ivory.smrf.model.Clique;
 

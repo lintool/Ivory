@@ -16,14 +16,17 @@ import org.apache.log4j.Logger;
 public class MoreGenericModelReader {
   private static final Logger sLogger = Logger.getLogger(MoreGenericModelReader.class);
 
-  @SuppressWarnings("unused")
   private AbstractModelReader delegateModelReader;
 
   public MoreGenericModelReader(String f, FileSystem localFs) throws IOException {
+    this(new Path(f), localFs);
+  }
+  
+  public MoreGenericModelReader(Path f, FileSystem localFs) throws IOException {
     sLogger.setLevel(Level.DEBUG);
     
     sLogger.debug(f);
-    InputStream modelIn = localFs.open(new Path(f));
+    InputStream modelIn = localFs.open(f);
     sLogger.debug("input stream created: "+modelIn);
     DataReader reader = new PlainTextFileDataReader(modelIn);
     String modelType = reader.readUTF();

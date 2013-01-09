@@ -16,10 +16,10 @@
 
 package ivory.smrf.model.expander;
 
+import ivory.core.ConfigurationException;
 import ivory.core.RetrievalEnvironment;
+import ivory.core.RetrievalException;
 import ivory.core.data.document.IntDocVector;
-import ivory.core.exception.ConfigurationException;
-import ivory.core.exception.RetrievalException;
 import ivory.smrf.model.Clique;
 import ivory.smrf.model.MarkovRandomField;
 import ivory.smrf.model.VocabFrequencyPair;

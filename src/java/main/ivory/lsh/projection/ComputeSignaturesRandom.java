@@ -5,11 +5,9 @@ import ivory.core.data.document.WeightedIntDocVector;
 import ivory.lsh.data.FloatAsBytesWritable;
 import ivory.lsh.data.NBitSignature;
 import ivory.lsh.driver.PwsimEnvironment;
-
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.filecache.DistributedCache;
 import org.apache.hadoop.fs.FileSystem;
@@ -31,7 +29,6 @@ import org.apache.hadoop.mapred.lib.IdentityReducer;
 import org.apache.hadoop.util.LineReader;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-
 import edu.umd.cloud9.io.SequenceFileUtils;
 import edu.umd.cloud9.io.array.ArrayListOfFloatsWritable;
 import edu.umd.cloud9.io.map.HMapIFW;
@@ -47,7 +44,6 @@ import edu.umd.cloud9.util.map.MapIF;
  * 
  * 
  */
-@SuppressWarnings("deprecation")
 public class ComputeSignaturesRandom extends PowerTool {
 
   public ComputeSignaturesRandom(Configuration conf) {
@@ -80,6 +76,7 @@ public class ComputeSignaturesRandom extends PowerTool {
     static NBitSignature signature;
     static float[] dotProductThresholds;
 
+    @SuppressWarnings("deprecation")
     public void configure(JobConf job) {
       // sLogger.setLevel(Level.DEBUG);
       D = job.getInt("Ivory.NumOfBits", -1);

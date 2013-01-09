@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Ivory: Experiments</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Le styles -->
+    <link href="assets/css/bootstrap.css" rel="stylesheet">
+    <link href="assets/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="assets/css/docs.css" rel="stylesheet">
+    <link href="assets/js/google-code-prettify/prettify.css" rel="stylesheet">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+  </head>
+
+  <body data-spy="scroll" data-target=".bs-docs-sidebar">
+
+    <!-- Navbar
+    ================================================== -->
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <div class="nav-collapse collapse">
+            <ul class="nav">
+              <li class="">
+                <a href="../index.html">Home</a>
+              </li>
+              <li class="">
+                <a href="./start.html">Getting Started</a>
+              </li>
+              <li class="">
+                <a href="./publications.html">Publications</a>
+              </li>
+              <li class="active">
+                <a href="./experiments.html">Experiments</a>
+              </li>
+              <li class="">
+                <a href="./team.html">Team</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+<!-- Subhead
+================================================== -->
+<header class="jumbotron subhead" id="overview">
+  <div class="container">
+    <h1>Ivory</h1>
+    <p class="lead">A Hadoop toolkit for web-scale information retrieval research</p>
+  </div>
+</header>
+
+  <div class="container">
+
+<div class="page-header">
+<h2>Experiments: TREC Disks 4-5</h2>
+</div>
+
+<p>This tutorial provides a guide to batch retrieval with Ivory on the
+venerable TREC disks 4 and 5 document collection, which is distributed
+by <a href="http://www.nist.gov/">NIST</a> and used in
+many <a href="http://trec.nist.gov/">Text Retrieval Conferences</a>
+(TRECs).  Although the collection is over a decade old, it is still
+used as a starting point for information retrieval research.  This
+guide will cover both indexing the collection and performing retrieval
+runs with queries from the TREC 2004 robust track.</p>
+
+<h3>Getting the Collection</h3>
+
+<p>The first task is to obtain the collection (from NIST).  We're
+assuming you have it in hand already.  A standard "view" of the disks
+is to ignore the Congressional Record (CR) and Federal Register (FR),
+so the collection is often written shorthand as TREC 45 (-CR,FR) or
+something similar. There are a total of 472,525 documents in the
+collection as described above, distributed in a number of files;
+see <a href="../data/trec/files.TREC45-noCRFR.txt">complete list of
+all files</a>.  Since Hadoop doesn't work well will lots of small
+files, the first step is to prepare the collection by concatenating
+all the documents into a large file.  This is most easily done with a
+Perl or Python script.  See
+this <a href="../data/trec/cat_all_docs.pl">simple Perl script</a>,
+but it should be very easy to write your own.</p>
+
+<h3>Building the Index</h3>
+
+<p>Assuming you've completed the <a href="start.html">getting
+started</a> tutorial, building the TREC 45 index is pretty
+straightforward. In fact, the collection is small enough that building
+an index in Hadoop local mode takes only a short while:</p>
+
+<pre class="code">
+etc/hadoop-local.sh ivory.app.PreprocessTrec45 \
+  -collection /shared/collections/trec/trec4-5_noCRFR.xml -index index-trec
+
+etc/hadoop-local.sh ivory.app.BuildIndex \
+  -index index-trec -indexPartitions 1 -positionalIndexIP
+</pre>
+
+<p>On a 2012 15&quot; Retina Display MacBook Pro (2.7 GHz Intel Core
+i7), it takes about 25 minutes for the preprocessing and 10 minutes for
+the actual inverted indexing.</p>
+
+<p>Alternatively, you can build the index on a real Hadoop cluster:</p>
+
+<pre class="code">
+etc/hadoop-cluster.sh ivory.app.PreprocessTrec45 \
+  -collection /shared/collections/trec/trec4-5_noCRFR.xml -index index-trec
+
+etc/hadoop-cluster.sh ivory.app.BuildIndex \
+  -index index-trec -indexPartitions 1 -positionalIndexIP
+</pre>
+
+<p>After building the index, you should
+be able to run the retrieval experiments described below and replicate
+our results.</p>
+
+<h3>Basic MRF models</h3>
+
+<p>To demonstrate batch retrieval, we're going to use topics from the
+TREC 2004 robust track. In the <code>data/trec/</code>
+directory, you'll find the following data:</p>
+
+<ul>
+
+  <li><code><a href="../data/trec/run.robust04.basic.xml">data/trec/run.robust04.basic.xml</a></code>:
+  retrieval models and parameters</li>
+
+  <li><code><a href="../data/trec/queries.robust04.xml">data/trec/queries.robust04.xml</a></code>:
+  queries (TREC 2004 robust track)</li>
+
+</ul>
+
+<p>The first configuration file specifies six different models:</p>
+
+<ul>
+
+  <li><b>robust04-dir-base</b>: language modeling framework, Dirichlet
+  prior, simple query likelihood.</li>
+
+  <li><b>robust04-dir-sd</b>: language modeling framework, Dirichlet
+  prior, sequential dependence model using MRFs.</li>
+
+  <li><b>robust04-dir-fd</b>: language modeling framework, Dirichlet
+  prior, full dependence model using MRFs.</li>
+
+  <li><b>robust04-bm25-base</b>: <i>bm25</i> term weighting, simple
+  bag-of-words queries.</li>
+
+  <li><b>robust04-bm25-sd</b>: sequential dependence model using MRFs,
+  with <i>bm25</i> term weighting.</li>
+
+  <li><b>robust04-bm25-fd</b>: full dependence model using MRFs,
+  with <i>bm25</i> term weighting.</li>
+
+</ul>
+
+<hr/>
+<table><tr><td valign="top"><span class="label label-info">Info</span></td>
+<td style="padding-left: 10px">Before running
+the following experiments, make sure you've built
+the <code>trec_eval</code> evaluation package
+from <a href="http://trec.nist.gov/trec_eval/">NIST</a>. For your
+convenience, v9.0 is included
+in <code>etc/trec_eval.9.0.tar.gz</code>. Build the package
+by <code>make</code> and place the executable at <code>etc/trec_eval</code>.</td></tr></table>
+
+<table><tr><td valign="top"><span class="label label-info">Info</span></td>
+<td style="padding-left: 10px">Before running the following
+experiments, you have to copy the indexes out of HDFS (if you built
+the indexes using distributed Hadoop and not Hadoop local). Also make
+sure to change the index location in the
+<code>run.xml</code> files to the actual index path (under the
+<code>&lt;index&gt;</code> attribute).</td></tr></table>
+<hr/>
+
+<p>Here are the command-line invocations for running and evaluating
+the models:</p>
+
+<pre class="code">
+# command-line
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/trec/run.robust04.basic.xml data/trec/queries.robust04.xml
+
+# evaluating effectiveness
+etc/trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-base.txt
+etc/trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-sd.txt
+etc/trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-fd.txt
+etc/trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-bm25-base.txt
+etc/trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-bm25-sd.txt
+etc/trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-bm25-fd.txt
+
+# junit
+etc/junit.sh ivory.regression.basic.Robust04_Basic
+</pre>
+
+<table class="table" style="width: 700px;">
+<thead>
+<tr><td style="width: 375px;"><b>description</b></td>
+    <td style="width: 225px;"><b>tag</b></td>
+    <td style="width: 50px;"><b>MAP</b></td>
+    <td style="width: 50px;"><b>P10</b></td></tr></thead>
+
+<tr><td>Dirichlet, full independence</td>
+    <td>robust04-dir-base</td>
+    <td>0.3063</td>
+    <td>0.4424</td></tr>
+
+<tr><td>Dirichlet, sequential dependence</td>
+    <td>robust04-dir-sd</td>
+    <td>0.3194</td>
+    <td>0.4485</td></tr>
+
+<tr><td>Dirichlet, full dependence</td>
+    <td>robust04-dir-fd</td>
+    <td>0.3253</td>
+    <td>0.4576</td></tr>
+
+<tr><td>bm25, full independence</td>
+    <td>robust04-bm25-base</td>
+    <td>0.3033</td>
+    <td>0.4283</td></tr>
+
+<tr><td>bm25, sequential dependence</td>
+    <td>robust04-bm25-sd</td>
+    <td>0.3212</td>
+    <td>0.4505</td></tr>
+
+<tr><td>bm25, full dependence</td>
+    <td>robust04-bm25-fd</td>
+    <td>0.3212</td>
+    <td>0.4545</td></tr>
+
+</table>
+
+<h3>WSD models</h3>
+
+<p>WSD refers to Bendersky et al.'s Weighted Sequential Dependence model (WSDM 2010).</p>
+
+<pre class="code">
+# command-line
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/trec/run.robust04.wsd.xml data/trec/queries.robust04.xml
+
+# evaluating effectiveness
+etc/trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-wsd-sd.txt
+etc/trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-wsd-fd.txt
+
+# junit
+etc/junit.sh ivory.regression.basic.Robust04_WSD
+</pre>
+
+<table class="table" style="width: 700px;">
+<thead>
+<tr><td style="width: 375px;"><b>description</b></td>
+    <td style="width: 225px;"><b>tag</b></td>
+    <td style="width: 50px;"><b>MAP</b></td>
+    <td style="width: 50px;"><b>P10</b></td></tr></thead>
+
+<tr><td>Dirichlet, WSD, sequential dependence</td>
+    <td>robust04-dir-wsd-sd</td>
+    <td>0.3246</td>
+    <td>0.4626</td></tr>
+
+<tr><td>Dirichlet, WSD, full dependence</td>
+    <td>robust04-dir-wsd-fd</td>
+    <td>0.3283</td>
+    <td>0.4667</td></tr>
+
+</table>
+
+<h3>Basic MRF + LCE models</h3>
+
+<p>LCE refers to Metzler et al.'s Latent Concept Expansion model (SIGIR 2007).</p>
+
+<pre class="code">
+# command-line
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/trec/run.robust04.basic.lce.xml data/trec/queries.robust04.xml
+
+# evaluating effectiveness
+etc/trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-rm3-f.txt
+etc/trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-rm3-s.txt
+etc/trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-sd-lce-f.txt
+etc/trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-sd-lce-s.txt
+etc/trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-sd-lce-bigram.txt
+
+# junit
+etc/junit.sh ivory.regression.basic.Robust04_Basic_LCE
+</pre>
+
+<table class="table" style="width: 700px;">
+<thead>
+<tr><td style="width: 375px;"><b>description</b></td>
+    <td style="width: 225px;"><b>tag</b></td>
+    <td style="width: 50px;"><b>MAP</b></td>
+    <td style="width: 50px;"><b>P10</b></td></tr></thead>
+
+<tr><td>Dir., full indep., LCE (unigrams) ["RM3"] (fast)</td>
+    <td>robust04-dir-rm3-f</td>
+    <td>0.3558</td>
+    <td>0.4596</td></tr>
+
+<tr><td>Dir., full indep., LCE (unigrams) ["RM3"] (slow)</td>
+    <td>robust04-dir-rm3-s</td>
+    <td>0.3557</td>
+    <td>0.4596</td></tr>
+
+
+<tr><td>Dir., SD, LCE (unigrams) (fast)</td>
+    <td>robust04-dir-sd-lce-f</td>
+    <td>0.3789</td>
+    <td>0.4808</td></tr>
+
+<tr><td>Dir., SD, LCE (unigrams) (slow)</td>
+    <td>robust04-dir-sd-lce-s</td>
+    <td>0.3753</td>
+    <td>0.4657</td></tr>
+
+<tr><td>Dir., SD, LCE (bigrams)</td>
+    <td>robust04-dir-sd-lce-bigram</td>
+    <td>0.3510</td>
+    <td>0.4535</td></tr>
+
+</table>
+
+<h3>WSD + LCE models</h3>
+
+<pre class="code">
+# command-line
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/trec/run.robust04.wsd.lce.xml data/trec/queries.robust04.xml
+
+# evaluating effectiveness
+etc/trec_eval data/trec/qrels.robust04.noCRFR.txt ranking.robust04-dir-wsd-lce.txt
+
+# junit
+etc/junit.sh ivory.regression.basic.Robust04_WSD_LCE
+</pre>
+
+<table class="table" style="width: 700px;">
+<thead>
+<tr><td style="width: 375px;"><b>description</b></td>
+    <td style="width: 225px;"><b>tag</b></td>
+    <td style="width: 50px;"><b>MAP</b></td>
+    <td style="width: 50px;"><b>P10</b></td></tr></thead>
+
+<tr><td>Dir., WSD, LCE (unigrams) (fast)</td>
+    <td>robust04-dir-wsd-lce</td>
+    <td>0.3941</td>
+    <td>0.4980</td></tr>
+
+</table>
+
+  </div>
+
+
+
+    <!-- Footer
+    ================================================== -->
+    <footer class="footer">
+      <div class="container">
+        <p class="pull-right"><a href="#">Back to top</a></p>
+        <p>Designed using <a href="http://twitter.github.com/bootstrap/">Bootstrap</a>.</p>
+        <p>Code licensed under <a href="http://www.apache.org/licenses/LICENSE-2.0" target="_blank">Apache License v2.0</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
+      </div>
+    </footer>
+
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="assets/js/jquery.js"></script>
+    <script src="assets/js/google-code-prettify/prettify.js"></script>
+    <script src="assets/js/bootstrap-transition.js"></script>
+    <script src="assets/js/bootstrap-alert.js"></script>
+    <script src="assets/js/bootstrap-modal.js"></script>
+    <script src="assets/js/bootstrap-dropdown.js"></script>
+    <script src="assets/js/bootstrap-scrollspy.js"></script>
+    <script src="assets/js/bootstrap-tab.js"></script>
+    <script src="assets/js/bootstrap-tooltip.js"></script>
+    <script src="assets/js/bootstrap-popover.js"></script>
+    <script src="assets/js/bootstrap-button.js"></script>
+    <script src="assets/js/bootstrap-collapse.js"></script>
+    <script src="assets/js/bootstrap-carousel.js"></script>
+    <script src="assets/js/bootstrap-typeahead.js"></script>
+    <script src="assets/js/bootstrap-affix.js"></script>
+
+  </body>
+</html>
+

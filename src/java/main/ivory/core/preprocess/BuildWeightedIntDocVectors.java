@@ -96,6 +96,10 @@ public class BuildWeightedIntDocVectors extends PowerTool {
         cfFile = env.getCfByIntData();
         dlFile = env.getDoclengthsData().toString();
 
+        dfFile = dfFile.substring(dfFile.lastIndexOf("/") + 1);
+        cfFile = cfFile.substring(cfFile.lastIndexOf("/") + 1);
+        dlFile = dlFile.substring(dlFile.lastIndexOf("/") + 1);
+
         // We need to figure out which file in the DistributeCache is which...
         localFiles = DistributedCache.getLocalCacheFiles(conf);
         for (Path p : localFiles) {

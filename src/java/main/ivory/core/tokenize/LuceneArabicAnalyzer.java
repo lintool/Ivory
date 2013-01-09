@@ -1,76 +1,142 @@
 package ivory.core.tokenize;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import ivory.core.Constants;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.List;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.apache.lucene.analysis.LowerCaseFilter;
 import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.ar.ArabicAnalyzer;
+import org.apache.lucene.analysis.ar.ArabicNormalizationFilter;
+import org.apache.lucene.analysis.ar.ArabicStemFilter;
+import org.apache.lucene.analysis.standard.StandardFilter;
+import org.apache.lucene.analysis.standard.StandardTokenizer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.util.Version;
+import edu.umd.hooka.VocabularyWritable;
+import edu.umd.hooka.alignment.HadoopAlign;
 
-public class LuceneArabicAnalyzer extends Tokenizer {
-  private ArabicAnalyzer analyzer;
-  private TokenStream tokenStream;
-  
+public class LuceneArabicAnalyzer extends ivory.core.tokenize.Tokenizer {
+  private static final Logger LOG = Logger.getLogger(LuceneArabicAnalyzer.class);
+  static{
+    LOG.setLevel(Level.WARN);
+  }
+  private org.apache.lucene.analysis.Tokenizer tokenizer;
+
   @Override
   public void configure(Configuration conf) {
-    analyzer = new ArabicAnalyzer(Version.LUCENE_35);
+    configure(conf, null);
   }
 
   @Override
-  public void configure(Configuration mJobConf, FileSystem fs) {
-    analyzer = new ArabicAnalyzer(Version.LUCENE_35);
-  }
+  public void configure(Configuration conf, FileSystem fs) {    
+    // read stopwords from file (stopwords will be empty set if file does not exist or is empty)
+    String stopwordsFile = conf.get(Constants.StopwordList);
+    stopwords = readInput(fs, stopwordsFile);      
+    String stemmedStopwordsFile = conf.get(Constants.StemmedStopwordList);
+    stemmedStopwords = readInput(fs, stemmedStopwordsFile);
+    isStopwordRemoval = !stopwords.isEmpty();
+    isStemming = conf.getBoolean(Constants.Stemming, true);
 
-  @Override
-  public String[] processContent(String text) {
-    List<String> tokens = new ArrayList<String>();
+    VocabularyWritable vocab;
     try {
-      tokenStream = analyzer.tokenStream("dummy", new StringReader(text));
-      CharTermAttribute termAtt = tokenStream.getAttribute(CharTermAttribute.class);
-      tokenStream.clearAttributes();
-      while (tokenStream.incrementToken()) {
-        tokens.add(termAtt.toString());
+      vocab = (VocabularyWritable) HadoopAlign.loadVocab(new Path(conf.get(Constants.CollectionVocab)), fs);
+      setVocab(vocab);
+    } catch (Exception e) {
+      LOG.warn("No vocabulary provided to tokenizer.");
+      vocab = null;
+    }
+
+    LOG.warn("Stemming is " + isStemming + "; Stopword removal is " + isStopwordRemoval +"; number of stopwords: " + stopwords.size() +"; stemmed: " + stemmedStopwords.size());
+  }
+
+  @Override
+  public String[] processContent(String text) {   
+    text = preNormalize(text);
+    tokenizer = new StandardTokenizer(Version.LUCENE_35, new StringReader(text));
+    TokenStream tokenStream = new LowerCaseFilter(Version.LUCENE_35, tokenizer);
+    String tokenized = postNormalize(streamToString(tokenStream));
+
+    StringBuilder finalTokenized = new StringBuilder();
+    for (String token : tokenized.split(" ")) {
+      if ( isStopwordRemoval() && isDiscard(false, token) ) {
+        continue;
       }
-    } catch (IOException e) {
+      finalTokenized.append( token + " " );
+    }
+    String stemmedTokenized = finalTokenized.toString().trim();
+    if (isStemming()) {
+      // then, run the Lucene normalization and stemming on the stopword-removed text
+      stemmedTokenized = stem(stemmedTokenized);       
+    }
+    return stemmedTokenized.split(" ");
+  }
+
+
+  @Override
+  public String stem(String token) {
+    tokenizer = new StandardTokenizer(Version.LUCENE_35, new StringReader(token));
+    TokenStream tokenStream = new ArabicStemFilter(new ArabicNormalizationFilter(tokenizer));
+    CharTermAttribute termAtt = tokenStream.getAttribute(CharTermAttribute.class);
+    tokenStream.clearAttributes();
+    StringBuilder stemmed = new StringBuilder();
+    try {
+      while (tokenStream.incrementToken()) {
+        String curToken = termAtt.toString();
+        if ( vocab != null && vocab.get(curToken) <= 0) {
+          continue;
+        }
+        stemmed.append( curToken + " " );
+      }
+    }catch (IOException e) {
       e.printStackTrace();
     }
-    String[] arr = new String[tokens.size()];
-    return tokens.toArray(arr);
+    return stemmed.toString().trim();
   }
-  
-  public static void main(String[] args) throws IOException, ClassNotFoundException, InstantiationException, IllegalAccessException{
-    if(args.length < 2){
-      System.err.println("usage: [input] [output-file]");
-      System.exit(-1);
-    }
-//    ivory.core.tokenize.Tokenizer tokenizer = TokenizerFactory.createTokenizer(args[1], args[2], null);
-    ivory.core.tokenize.Tokenizer tokenizer = new LuceneArabicAnalyzer();
-    tokenizer.configure(null);
-    BufferedWriter out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(args[1]), "UTF8"));
-    BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(args[0]), "UTF8"));
 
-    //    DataInput in = new DataInputStream(new BufferedInputStream(FileSystem.getLocal(new Configuration()).open(new Path(args[0]))));
-    String line = null;
-    while((line = in.readLine()) != null){
-      String[] tokens = tokenizer.processContent(line);
-      System.out.println("Found "+tokens.length+" tokens:");
-      String s = "";
-      for (String token : tokens) {
-        s += token+"||";
+  @Override
+  public float getOOVRate(String text, VocabularyWritable vocab) {
+    int countOOV = 0, countAll = 0;
+    tokenizer = new StandardTokenizer(Version.LUCENE_35, new StringReader(text));
+    TokenStream tokenStream = new StandardFilter(Version.LUCENE_35, tokenizer);
+    tokenStream = new LowerCaseFilter(Version.LUCENE_35, tokenStream);
+    String tokenized = postNormalize(streamToString(tokenStream));
+
+    StringBuilder finalTokenized = new StringBuilder();
+    for (String token : tokenized.split(" ")) {
+      if ( isStopwordRemoval() && isDiscard(false, token) ) {
+        continue;
       }
-      out.write(s+"\n");
+      if (!isStemming()) {
+        if ( vocab != null && vocab.get(token) <= 0) {
+          countOOV++;
+        }
+        countAll++;
+      }else {
+        finalTokenized.append( token + " " );
+      }
     }
-    out.close();
+    
+    if (isStemming()) {
+      tokenizer = new StandardTokenizer(Version.LUCENE_35, new StringReader(finalTokenized.toString().trim()));
+      tokenStream = new ArabicStemFilter(new ArabicNormalizationFilter(tokenizer));
+      CharTermAttribute termAtt = tokenStream.getAttribute(CharTermAttribute.class);
+      tokenStream.clearAttributes();
+      try {
+        while (tokenStream.incrementToken()) {
+          String curToken = termAtt.toString();
+          if ( vocab != null && vocab.get(curToken) <= 0) {
+            countOOV++;
+          }
+          countAll++;
+        }
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+    return (countOOV / (float) countAll);
   }
-
 }

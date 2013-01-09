@@ -16,7 +16,7 @@
 
 package ivory.smrf.retrieval;
 
-import ivory.core.exception.ConfigurationException;
+import ivory.core.ConfigurationException;
 import ivory.smrf.model.MarkovRandomField;
 import ivory.smrf.model.builder.MRFBuilder;
 import ivory.smrf.model.expander.MRFExpander;
@@ -58,7 +58,7 @@ public class ThreadedQueryRunner implements QueryRunner {
   }
 
   /**
-   * Runs a query asynchronously. Results can be fetched using {@link getResults}.
+   * Runs a query asynchronously. Results can be fetched using {@link #getResults}.
    */
   public void runQuery(String qid, String[] query) {
     Preconditions.checkNotNull(qid);

@@ -1,19 +1,19 @@
 package ivory.core.preprocess;
 
+import ivory.core.Constants;
 import ivory.core.RetrievalEnvironment;
 import ivory.core.data.dictionary.DefaultFrequencySortedDictionary;
 import ivory.core.data.document.TermDocVector;
 import ivory.core.data.stat.DfTableArray;
 import ivory.core.data.stat.DocLengthTable;
 import ivory.core.data.stat.DocLengthTable4B;
-import ivory.core.tokenize.OpenNLPTokenizer;
+import ivory.core.tokenize.Tokenizer;
+import ivory.core.tokenize.TokenizerFactory;
 import ivory.core.util.CLIRUtils;
 import ivory.pwsim.score.ScoringModel;
-
 import java.io.IOException;
 import java.net.URI;
 import java.util.Map;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.filecache.DistributedCache;
 import org.apache.hadoop.fs.FileSystem;
@@ -33,9 +33,7 @@ import org.apache.hadoop.mapred.SequenceFileInputFormat;
 import org.apache.hadoop.mapred.SequenceFileOutputFormat;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-
 import com.google.common.collect.Maps;
-
 import edu.umd.cloud9.io.map.HMapIFW;
 import edu.umd.cloud9.io.map.HMapSFW;
 import edu.umd.cloud9.mapred.NullInputFormat;
@@ -48,8 +46,8 @@ import edu.umd.hooka.alignment.HadoopAlign;
 import edu.umd.hooka.ttables.TTable_monolithic_IFAs;
 
 /**
- * Translates term doc vectors in foreign language (e.g. German) into target language (e.g. English) using the CLIR technique discussed in Combining Bidirectional Translation and Synonymy
-for Cross-Language Information Retrieval, SIGIR'06, Jianqiang Wang and Douglas W. Oard.
+ * Translates term doc vectors in foreign language (e.g. German) into target language (e.g. English) using the CLIR technique discussed in Probabilistic Structured
+Query Methods, SIGIR'03, Kareem Darwish and Douglas W. Oard.
 
  * @author ferhanture
  *
@@ -59,73 +57,114 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
   private static final Logger LOG = Logger.getLogger(BuildTranslatedTermDocVectors.class);
   private static int SAMPLING = 1;
 
-  protected static enum Docs { ZERO, SHORT, Total };
+  protected static enum Docs { DBG, ZERO, SHORT, Total };
   protected static enum DF { TransDf, NoDf }
 
   private static class MyMapperTrans extends MapReduceBase implements
-      Mapper<IntWritable, TermDocVector, IntWritable, HMapSFW> {
+    Mapper<IntWritable, TermDocVector, IntWritable, HMapSFW> {
 
     private ScoringModel model;
-    private HMapIFW transDfTable;
     // eVocabSrc is the English vocabulary for probability table e2f_Probs.
     // engVocabTrgis the English vocabulary for probability table f2e_Probs.
     // fVocabSrc is the German vocabulary for probability table f2e_Probs.
     // fVocabTrg is the German vocabulary for probability table e2f_Probs.	
     static Vocab eVocabSrc, fVocabSrc, fVocabTrg, eVocabTrg;
     static TTable_monolithic_IFAs f2e_Probs, e2f_Probs;
-    private OpenNLPTokenizer tokenizer;
+    private Tokenizer tokenizer;
     static float avgDocLen;
     static int numDocs;
     static boolean isNormalize;
     private String language;
     int MIN_SIZE = 0;	// minimum document size, to avoid noise in Wikipedia due to stubs/very short articles etc. this is set via Conf object
+    DefaultFrequencySortedDictionary dict;
+    DfTableArray dfTable; 
 
-    public void configure(JobConf job) {
-      numDocs = job.getInt("Ivory.CollectionDocumentCount", -1);
-      avgDocLen = job.getFloat("Ivory.AvgDocLen", -1);
-      isNormalize = job.getBoolean("Ivory.Normalize", false);
-      language = job.get("Ivory.Lang");
+    private String getFilename(String s) {
+      return s.substring(s.lastIndexOf("/") + 1);
+    }
+
+    public void configure(JobConf conf) {
+      String termsFile, termidsFile, idToTermFile, dfFile;
+      numDocs = conf.getInt("Ivory.CollectionDocumentCount", -1);
+      avgDocLen = conf.getFloat("Ivory.AvgDocLen", -1);
+      isNormalize = conf.getBoolean("Ivory.Normalize", false);
+      language = conf.get("Ivory.Lang");
       LOG.debug(numDocs + " " + avgDocLen);
-      MIN_SIZE = job.getInt("Ivory.MinNumTerms", 0);
+      MIN_SIZE = conf.getInt("Ivory.MinNumTerms", 0);
 
       try {
-        if (job.get ("mapred.job.tracker").equals ("local")) {
+        if (conf.get ("mapred.job.tracker").equals ("local")) {
           // Explicitly not support local mode.
           throw new RuntimeException("Local mode not supported!");
         }
 
-        FileSystem fs = FileSystem.getLocal(job);
+        FileSystem remoteFS = FileSystem.get(conf);
+        RetrievalEnvironment targetEnv = new RetrievalEnvironment(conf.get(Constants.TargetIndexPath), remoteFS);
+
+        termsFile = getFilename(targetEnv.getIndexTermsData());
+        termidsFile = getFilename(targetEnv.getIndexTermIdsData());
+        idToTermFile = getFilename(targetEnv.getIndexTermIdMappingData());
+        dfFile = getFilename(targetEnv.getDfByIntData());
+
+        FileSystem fs = FileSystem.getLocal(conf);
         Map<String, Path> pathMapping = Maps.newHashMap();
 
         // We need to figure out which file in the DistributeCache is which...
-        Path[] localFiles = DistributedCache.getLocalCacheFiles(job);
+        Path[] localFiles = DistributedCache.getLocalCacheFiles(conf);
         for (Path p : localFiles) {
           LOG.info("In DistributedCache: " + p);
-          if (p.toString().contains("transDf")) {
-            pathMapping.put("transDf", p);
-            LOG.info("transDf -> " + p);
-          } else if (p.toString().contains(job.get("Ivory.E_Vocab_F2E"))) {
+          if (p.toString().contains(termsFile)) {
+            pathMapping.put(termsFile, p);
+          } else if (p.toString().contains(termidsFile)) {
+            pathMapping.put(termidsFile, p);
+          } else if (p.toString().contains(idToTermFile)) {
+            pathMapping.put(idToTermFile, p);
+          } else if (p.toString().contains(dfFile)) {
+            pathMapping.put(dfFile, p);
+          } else if (p.toString().contains(getFilename(conf.get("Ivory.E_Vocab_F2E")))) {
             pathMapping.put("Ivory.E_Vocab_F2E", p);
             LOG.info("Ivory.E_Vocab_F2E -> " + p);
-          } else if (p.toString().contains(job.get("Ivory.F_Vocab_F2E"))) {
+          } else if (p.toString().contains(getFilename(conf.get("Ivory.F_Vocab_F2E")))) {
             pathMapping.put("Ivory.F_Vocab_F2E", p);
             LOG.info("Ivory.F_Vocab_F2E -> " + p);
-          }  else if (p.toString().contains(job.get("Ivory.TTable_F2E"))) {
+          }  else if (p.toString().contains(getFilename(conf.get("Ivory.TTable_F2E")))) {
             pathMapping.put("Ivory.TTable_F2E", p);
             LOG.info("Ivory.TTable_F2E -> " + p);
-          } else if (p.toString().contains(job.get("Ivory.E_Vocab_E2F"))) {
+          } else if (p.toString().contains(getFilename(conf.get("Ivory.E_Vocab_E2F")))) {
             pathMapping.put("Ivory.E_Vocab_E2F", p);
             LOG.info("Ivory.E_Vocab_E2F -> " + p);
-          } else if (p.toString().contains(job.get("Ivory.F_Vocab_E2F"))) {
+          } else if (p.toString().contains(getFilename(conf.get("Ivory.F_Vocab_E2F")))) {
             pathMapping.put("Ivory.F_Vocab_E2F", p);
             LOG.info("Ivory.F_Vocab_E2Ff -> " + p);
-          } else if (p.toString().contains(job.get("Ivory.TTable_E2F"))) {
+          } else if (p.toString().contains(getFilename(conf.get("Ivory.TTable_E2F")))) {
             pathMapping.put("Ivory.TTable_E2F", p);
             LOG.info("Ivory.TTable_E2F -> " + p);
+          } else if (p.toString().contains(getFilename(conf.get(Constants.TargetStemmedStopwordList)))) {
+            pathMapping.put(Constants.TargetStemmedStopwordList, p);
+            LOG.info(Constants.TargetStemmedStopwordList + " -> " + p);
+          } else if (p.toString().contains(getFilename(conf.get(Constants.TargetStopwordList)))) {
+            pathMapping.put(Constants.TargetStopwordList, p);
+            LOG.info(Constants.TargetStopwordList + " -> " + p);
+          } else if (p.toString().contains(getFilename(conf.get(Constants.TargetTokenizer)))) {
+            pathMapping.put(Constants.TargetTokenizer, p);
+            LOG.info(Constants.TargetTokenizer + " -> " + p);
           }
         }
 
-        transDfTable = CLIRUtils.readTransDfTable(pathMapping.get("transDf"), fs);
+        LOG.info(" - terms: " + pathMapping.get(termsFile));
+        LOG.info(" - id: " + pathMapping.get(termidsFile));
+        LOG.info(" - idToTerms: " + pathMapping.get(idToTermFile));
+        LOG.info(" - df data: " + pathMapping.get(dfFile));
+
+        try{
+          dict = new DefaultFrequencySortedDictionary(pathMapping.get(termsFile),
+              pathMapping.get(termidsFile), pathMapping.get(idToTermFile), FileSystem.getLocal(conf));
+          dfTable = new DfTableArray(pathMapping.get(dfFile), FileSystem.getLocal(conf));
+        } catch (Exception e) {
+          e.printStackTrace();
+          throw new RuntimeException("Error loading Terms File for dictionary from "+localFiles[0]);
+        }     
+
         eVocabTrg = HadoopAlign.loadVocab(pathMapping.get("Ivory.E_Vocab_F2E"), fs);
         fVocabSrc = HadoopAlign.loadVocab(pathMapping.get("Ivory.F_Vocab_F2E"), fs);
         f2e_Probs = new TTable_monolithic_IFAs(fs, pathMapping.get("Ivory.TTable_F2E"), true);
@@ -133,12 +172,20 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
         eVocabSrc = HadoopAlign.loadVocab(pathMapping.get("Ivory.E_Vocab_E2F"), fs);
         fVocabTrg = HadoopAlign.loadVocab(pathMapping.get("Ivory.F_Vocab_E2F"), fs);
         e2f_Probs = new TTable_monolithic_IFAs(fs, pathMapping.get("Ivory.TTable_E2F"), true);
+
+        String tokenizerModel = pathMapping.get(Constants.TargetTokenizer).toString();
+        String stopwordsFile = pathMapping.get(Constants.TargetStopwordList).toString();
+        String stemmedStopwordsFile = pathMapping.get(Constants.TargetStemmedStopwordList).toString();       
+        tokenizer = TokenizerFactory.createTokenizer(fs, conf.get(Constants.TargetLanguage), 
+            tokenizerModel, true, 
+            stopwordsFile, 
+            stemmedStopwordsFile, null);   // just for stopword removal in translateTFs
       } catch (IOException e) {
         throw new RuntimeException ("Local cache files not read properly.");
       }
 
       try {
-        model = (ScoringModel) Class.forName(job.get("Ivory.ScoringModel")).newInstance();
+        model = (ScoringModel) Class.forName(conf.get("Ivory.ScoringModel")).newInstance();
       } catch (Exception e) {
         throw new RuntimeException("Error initializing Ivory.ScoringModel!");
       }
@@ -148,18 +195,17 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
       model.setAvgDocLength(avgDocLen);
 
       try {
-        tokenizer = new OpenNLPTokenizer();		// just for stopword removal in translateTFs
       } catch (Exception e) {
         e.printStackTrace();
         throw new RuntimeException("Error initializing tokenizer!");
       }
 
-      if (job.get("debug") != null) {
+      if (conf.get("debug") != null) {
         LOG.setLevel(Level.DEBUG);
       }
-      LOG.debug(numDocs);
-      LOG.debug(avgDocLen);
-      LOG.debug("---------");
+      LOG.info("# docs in collection = "+numDocs);
+      LOG.info("avg doc len = "+avgDocLen);
+      LOG.info("---------");
     }
 
     public void map(IntWritable docno, TermDocVector doc,
@@ -174,21 +220,26 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
       }
 
       // Translate doc vector.
-      HMapIFW tfS = new HMapIFW();
+      TermDocVector.Reader reader = doc.getReader();
+      int numTerms = reader.getNumberOfTerms(); 
+      if (numTerms < MIN_SIZE) {
+        reporter.incrCounter(Docs.SHORT, 1);
+        return;
+      }
 
+      HMapIFW tfS = new HMapIFW();
       // We simply use the source-language doc length since the ratio of doc length to average doc
       // length is unlikely to change significantly (not worth complicating the pipeline)
       int docLen = CLIRUtils.translateTFs(doc, tfS, eVocabSrc, eVocabTrg, fVocabSrc, fVocabTrg,
           e2f_Probs, f2e_Probs, tokenizer, LOG);
-      HMapSFW v = CLIRUtils.createTermDocVector(docLen, tfS, eVocabSrc, model, transDfTable,
+
+      HMapSFW v = CLIRUtils.createTermDocVector(docLen, tfS, eVocabTrg, model, dict, dfTable,
           isNormalize, LOG);
 
       // If no translation of any word is in the target vocab, remove document i.e., our model
       // wasn't capable of translating it.
       if (v.isEmpty()) {
         reporter.incrCounter(Docs.ZERO, 1);
-      } else if (v.size() < MIN_SIZE) {
-        reporter.incrCounter(Docs.SHORT, 1);
       } else {
         reporter.incrCounter(Docs.Total, 1);
         output.collect(docno, v);
@@ -200,7 +251,7 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
     super(conf);
   }
 
-  public static final String[] RequiredParameters = { "Ivory.IndexPath", "Ivory.ScoringModel" };
+  public static final String[] RequiredParameters = { Constants.IndexPath, Constants.TargetIndexPath, "Ivory.ScoringModel" };
 
   public String[] getRequiredParameters() {
     return RequiredParameters;
@@ -208,21 +259,28 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
 
   @Override
   public int runTool() throws Exception {
-    String indexPath = getConf().get("Ivory.IndexPath");
+    String indexPath = getConf().get(Constants.IndexPath);
     String scoringModel = getConf().get("Ivory.ScoringModel");
 
-    RetrievalEnvironment env = new RetrievalEnvironment(indexPath, FileSystem.get(getConf()));
-
+    RetrievalEnvironment env = new RetrievalEnvironment(indexPath, FileSystem.get(getConf()));    
     String outputPath = env.getWeightedTermDocVectorsDirectory();
-    String transDfFile = indexPath + "/transDf.dat";
-    String fVocab_f2e= getConf().get("Ivory.F_Vocab_F2E");   // de from P(e|f)
-    String eVocab_f2e = getConf().get("Ivory.E_Vocab_F2E");  // en from P(e|f)
+    String fVocab_f2e= getConf().get("Ivory.F_Vocab_F2E");   // fVocab from P(e|f)
+    String eVocab_f2e = getConf().get("Ivory.E_Vocab_F2E");  // eVocab from P(e|f)
     String ttable_f2e = getConf().get("Ivory.TTable_F2E");   // P(e|f)
-    String eVocab_e2f = getConf().get("Ivory.E_Vocab_E2F");  // en from P(f|e)
-    String fVocab_e2f = getConf().get("Ivory.F_Vocab_E2F");  // de from P(f|e)
+    String eVocab_e2f = getConf().get("Ivory.E_Vocab_E2F");  // eVocab from P(f|e)
+    String fVocab_e2f = getConf().get("Ivory.F_Vocab_E2F");  // fVocab from P(f|e)
     String ttable_e2f = getConf().get("Ivory.TTable_E2F");   // P(f|e)
 
-    createTranslatedDFFile(transDfFile);
+    String eStopwords = getConf().get(Constants.TargetStopwordList); 
+    String eStemmedStopwords = getConf().get(Constants.TargetStemmedStopwordList); 
+    String eTokenizerModel = getConf().get(Constants.TargetTokenizer); 
+
+    String targetIndexPath = getConf().get(Constants.TargetIndexPath);
+    RetrievalEnvironment targetEnv = new RetrievalEnvironment(targetIndexPath, FileSystem.get(getConf()));
+    String termsFilePath = targetEnv.getIndexTermsData();
+    String termsIdsFilePath = targetEnv.getIndexTermIdsData();
+    String termIdMappingFilePath = targetEnv.getIndexTermIdMappingData();
+    String dfByIntFilePath = targetEnv.getDfByIntData();
 
     JobConf conf = new JobConf(getConf(), BuildTranslatedTermDocVectors.class);
     conf.setJobName("BuildTranslatedTermDocVectors");
@@ -240,6 +298,9 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
     LOG.info("Document vectors to be stored in " + outputPath);
     LOG.info("CollectionName: " + collectionName);
     LOG.info("Input path: " + inputPath);
+    LOG.info("Target-language stopwords: " + eStopwords);
+    LOG.info("Target-language stemmed stopwords: " + eStemmedStopwords);
+    LOG.info("Target-language tokenizer model: " + eTokenizerModel);
 
     DocLengthTable mDLTable;
     try {
@@ -247,16 +308,16 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
     } catch (IOException e1) {
       throw new RuntimeException("Error initializing Doclengths file");
     }
-    LOG.info(mDLTable.getAvgDocLength()+" is average doc len.");
-    LOG.info(mDLTable.getDocCount()+" is num docs.");
+    LOG.info(mDLTable.getAvgDocLength()+" is average source-language document length.");
+    LOG.info(targetEnv.readCollectionDocumentCount()+" is number of target-language docs. We use the target-side DF table so we set #docs to this value in our scoring model.");
 
     /////// Configuration setup
 
-    conf.set("Ivory.IndexPath", indexPath);
+    conf.set(Constants.IndexPath, indexPath);
     conf.set("Ivory.ScoringModel", scoringModel);
     conf.setFloat("Ivory.AvgDocLen", mDLTable.getAvgDocLength());
-    conf.setInt("Ivory.CollectionDocumentCount", env.readCollectionDocumentCount());
-    conf.set("Ivory.Lang", getConf().get("Ivory.Lang"));
+    conf.setInt(Constants.CollectionDocumentCount, targetEnv.readCollectionDocumentCount());
+    conf.set(Constants.Language, getConf().get("Ivory.Lang"));
     conf.set("Ivory.Normalize", getConf().get("Ivory.Normalize"));
     conf.set("Ivory.MinNumTerms", getConf().get("Ivory.MinNumTerms"));
 
@@ -269,13 +330,20 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
 
     //////// Cache files
 
-    DistributedCache.addCacheFile(new URI(transDfFile), conf);
+    DistributedCache.addCacheFile(new URI(termsFilePath), conf);
+    DistributedCache.addCacheFile(new URI(termsIdsFilePath), conf);
+    DistributedCache.addCacheFile(new URI(termIdMappingFilePath), conf);
+    DistributedCache.addCacheFile(new URI(dfByIntFilePath), conf);
     DistributedCache.addCacheFile(new URI(eVocab_f2e), conf);
     DistributedCache.addCacheFile(new URI(fVocab_f2e), conf);
     DistributedCache.addCacheFile(new URI(ttable_f2e), conf);
     DistributedCache.addCacheFile(new URI(eVocab_e2f), conf);
     DistributedCache.addCacheFile(new URI(fVocab_e2f), conf);
     DistributedCache.addCacheFile(new URI(ttable_e2f), conf);
+    DistributedCache.addCacheFile(new URI(ttable_e2f), conf);
+    DistributedCache.addCacheFile(new URI(eStopwords), conf);
+    DistributedCache.addCacheFile(new URI(eStemmedStopwords), conf);
+    DistributedCache.addCacheFile(new URI(eTokenizerModel), conf);
 
     FileInputFormat.setInputPaths(conf, new Path(inputPath));
     FileOutputFormat.setOutputPath(conf, new Path(outputPath));
@@ -318,7 +386,7 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
         conf2.setOutputFormat(NullOutputFormat.class);
         conf2.setMapperClass(DataWriterMapper.class);
         JobClient.runJob(conf2);
-        LOG.info("Done");
+        LOG.info("Translating DF table done.");
       }
     } catch (IOException e) {
       e.printStackTrace();
@@ -330,7 +398,7 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
       Logger sLogger = Logger.getLogger(DataWriterMapper.class);
       sLogger.setLevel(Level.DEBUG);
 
-      String indexPath = conf.get("Ivory.IndexPath");
+      String indexPath = conf.get(Constants.IndexPath);
       FileSystem fs2  = FileSystem.get(conf);
 
       RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fs2);

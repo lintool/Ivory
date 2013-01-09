@@ -16,8 +16,8 @@
 
 package ivory.cascade.retrieval;
 
+import ivory.core.ConfigurationException;
 import ivory.core.RetrievalEnvironment;
-import ivory.core.exception.ConfigurationException;
 import ivory.smrf.model.MarkovRandomField;
 import ivory.smrf.model.builder.MRFBuilder;
 import ivory.smrf.model.expander.MRFExpander;
@@ -73,7 +73,7 @@ public class CascadeThreadedQueryRunner implements CascadeQueryRunner {
 
 	/**
 	 * Runs a query asynchronously. Results can be fetched using
-	 * {@link getResults}.
+	 * {@link #getResults}.
 	 */
 	public void runQuery(String qid, String[] query) {
 		Preconditions.checkNotNull(qid);

@@ -34,7 +34,6 @@ import edu.umd.cloud9.debug.MemoryUsageUtils;
  * for lookup.
  * </p>
  * 
- * @see ExtractDfFromPostings
  * @author Jimmy Lin
  * 
  */

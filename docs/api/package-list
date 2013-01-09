@@ -1,3 +1,4 @@
+ivory.app
 ivory.cascade.model
 ivory.cascade.model.builder
 ivory.cascade.model.potential
@@ -9,13 +10,12 @@ ivory.core.data.dictionary
 ivory.core.data.document
 ivory.core.data.index
 ivory.core.data.stat
-ivory.core.driver
 ivory.core.eval
-ivory.core.exception
 ivory.core.index
 ivory.core.preprocess
 ivory.core.tokenize
 ivory.core.util
+ivory.lsh.bitext
 ivory.lsh.data
 ivory.lsh.driver
 ivory.lsh.eval
@@ -23,6 +23,7 @@ ivory.lsh.projection
 ivory.lsh.pwsim
 ivory.lsh.pwsim.cl
 ivory.ltr
+ivory.ltr.operator
 ivory.ptc
 ivory.ptc.data
 ivory.ptc.driver
@@ -32,7 +33,6 @@ ivory.ptc.sampling
 ivory.ptc.scorer
 ivory.pwsim
 ivory.pwsim.score
-ivory.server
 ivory.smrf.model
 ivory.smrf.model.builder
 ivory.smrf.model.constrained
@@ -41,3 +41,6 @@ ivory.smrf.model.importance
 ivory.smrf.model.potential
 ivory.smrf.model.score
 ivory.smrf.retrieval
+ivory.smrf.retrieval.distributed
+ivory.sqe.querygenerator
+ivory.sqe.retrieval

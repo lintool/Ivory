@@ -35,7 +35,7 @@ import org.apache.hadoop.io.WritableUtils;
 /**
  * Implementation of {@link IntDocVector} that lazily decodes term and
  * positional information on demand.
- * 
+ *
  * @author Tamer Elsayed
  * @author Jimmy Lin
  */
