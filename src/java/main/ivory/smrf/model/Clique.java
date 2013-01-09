@@ -16,7 +16,7 @@
 
 package ivory.smrf.model;
 
-import ivory.core.exception.ConfigurationException;
+import ivory.core.ConfigurationException;
 import ivory.smrf.model.potential.PotentialFunction;
 
 import java.util.Comparator;

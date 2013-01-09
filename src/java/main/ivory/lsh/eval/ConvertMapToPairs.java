@@ -33,7 +33,6 @@ import edu.umd.cloud9.util.map.MapIF.Entry;
  * @author ferhanture
  * 
  */
-@SuppressWarnings("deprecation")
 public class ConvertMapToPairs extends PowerTool {
   public static final String[] RequiredParameters = {};
   private static final Logger sLogger = Logger.getLogger(ConvertMapToPairs.class);

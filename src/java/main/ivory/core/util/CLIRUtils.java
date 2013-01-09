@@ -3,11 +3,9 @@ package ivory.core.util;
 import ivory.core.data.dictionary.FrequencySortedDictionary;
 import ivory.core.data.document.TermDocVector;
 import ivory.core.data.stat.DfTableArray;
-import ivory.core.data.stat.PrefixEncodedGlobalStats;
 import ivory.core.tokenize.Tokenizer;
 import ivory.pwsim.score.Bm25;
 import ivory.pwsim.score.ScoringModel;
-
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -17,12 +15,12 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
@@ -32,7 +30,6 @@ import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.SequenceFile;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-
 import edu.umd.cloud9.io.map.HMapIFW;
 import edu.umd.cloud9.io.map.HMapSFW;
 import edu.umd.cloud9.io.map.HMapSIW;
@@ -64,6 +61,11 @@ import edu.umd.hooka.ttables.TTable_monolithic_IFAs;
  */
 public class CLIRUtils extends Configured {
   private static final Logger logger = Logger.getLogger(CLIRUtils.class);
+  private static final String delims = "`~!@#^&*()-_=+]}[{\\|'\";:/?.>,<";
+  public static final String BitextSeparator = "<F2ELANG>";
+  public static final int MinVectorTerms = 3;
+  public static final int MinSentenceLength = 5;
+  public static final int E = -1, F = 1;
 
   /**
    * Read df mapping from file.
@@ -172,18 +174,6 @@ public class CLIRUtils extends Configured {
     return sum;
   }
 
-  public static float cosineNormalized2(HMapSFW vectorA, HMapSFW vectorB) {
-    float sum = 0;
-    for(edu.umd.cloud9.util.map.MapKF.Entry<String> e : vectorA.entrySet()){
-      float value = e.getValue();
-      if(vectorB.containsKey(e.getKey())){
-        sum+= value*vectorB.get(e.getKey());
-      }
-    }
-    return sum;
-  }
-
-
   /**
    * Given a mapping from F-terms to their df values, compute a df value for each E-term using the CLIR algorithm: df(e) = sum_f{df(f)*prob(f|e)}
    * 
@@ -193,8 +183,6 @@ public class CLIRUtils extends Configured {
    * 		target-side vocabulary of the ttable E-->F (i.e., Pr(f|e))
    * @param e2f_probs
    * 		ttable E-->F (i.e., Pr(f|e))
-   * @param globalStatsMap
-   * 		contains mapping from F-terms to their df values
    * @return
    * 		mapping from E-terms to their computed df values
    */
@@ -211,7 +199,7 @@ public class CLIRUtils extends Configured {
           float df_f = dfTable.getDf(id);				
           df += (probEF*df_f);
         }else{
-          logger.info(fTerm+" not in dict");
+          logger.debug(fTerm+" not in dict");
         }
       }
       transDfTable.put(e, df);
@@ -258,7 +246,7 @@ public class CLIRUtils extends Configured {
   }
 
   /**
-   * Given a term in a document in F, and its tf value, update the computed tf value for each term in E using the CLIR algorithm: tf(e) = sum_f{tf(f)*prob(f|e)} <p>
+   * Given a term in a document in F, and its tf value, update the computed tf value for each term in E using the CLIR algorithm: tf(e) = sum_f{tf(f)*prob(e|f)} <p>
    * Calling this method computes a single summand of the above equation.
    * 
    * @param fTerm
@@ -285,38 +273,28 @@ public class CLIRUtils extends Configured {
    * 		updated mapping from E-term ids to tf values
    * @throws IOException
    */
-  public static HMapIFW updateTFsByTerm(String fTerm, int tf, HMapIFW tfTable, Vocab eVocabSrc, Vocab eVocabTrg, Vocab fVocabSrc, Vocab fVocabTrg, TTable_monolithic_IFAs e2fProbs, TTable_monolithic_IFAs f2eProbs, Logger sLogger){
+  public static HMapIFW updateTFsByTerm(String fTerm, int tf, HMapIFW tfTable, Vocab eVocabSrc, Vocab eVocabTrg, Vocab fVocabSrc, Vocab fVocabTrg, 
+      TTable_monolithic_IFAs e2fProbs, TTable_monolithic_IFAs f2eProbs, Tokenizer tokenizer, Logger sLogger){
     int f = fVocabSrc.get(fTerm);
     if(f <= 0){
-      //			sLogger.warn(f+","+fTerm+" word not in aligner's vocab (foreign side of f2e)");
       return tfTable;
     }
 
     int[] eS = f2eProbs.get(f).getTranslations(0.0f);
 
-    int f2 = fVocabTrg.get(fTerm);		//convert between two F vocabs  (different ids)
-    if(f2 <= 0){
-      //			sLogger.warn(fTerm+" word not in aligner's vocab (foreign side of e2f)");
-      return tfTable;
-    }
-    //tf(e) = sum_f{tf(f)*prob(f|e)}
+    // tf(e) = sum_f{tf(f)*prob(e|f)}
     for(int e : eS){
       float probEF;
       String eTerm = eVocabTrg.get(e);
-      int e2 = eVocabSrc.get(eTerm);		//convert between two E vocabs (different ids)
-      if(e2 <= 0){
-        //				sLogger.warn(eTerm+" word not in aligner's vocab (english side of e2f)");
-        continue;
-      }
-      probEF = e2fProbs.get(e2, f2);
+      if (tokenizer.isDiscard(eTerm)) continue;
 
+      probEF = f2eProbs.get(f, e);
+      sLogger.debug("Prob(" + eTerm + " | " + fTerm + ") = " + probEF);
       if(probEF > 0){
-        //				sLogger.debug(eVocabSrc.get(e2)+" ==> "+probEF);
-
-        if(tfTable.containsKey(e2)){
-          tfTable.put(e2, tfTable.get(e2)+tf*probEF);
+        if(tfTable.containsKey(e)){
+          tfTable.put(e, tfTable.get(e)+tf*probEF);
         }else{
-          tfTable.put(e2, tf*probEF);
+          tfTable.put(e, tf*probEF);
         }
       }
     }
@@ -324,7 +302,7 @@ public class CLIRUtils extends Configured {
   }
 
   /**
-   * Given a document in F, and its tf mapping, compute a tf value for each term in E using the CLIR algorithm: tf(e) = sum_f{tf(f)*prob(f|e)}
+   * Given a document in F, and its tf mapping, compute a tf value for each term in E using the CLIR algorithm: tf(e) = sum_f{tf(f)*prob(e|f)}
    * 
    * @param doc
    *	 	mapping from F-term strings to tf values
@@ -344,13 +322,16 @@ public class CLIRUtils extends Configured {
    * 		ttable F-->E (i.e., Pr(e|f))
    * @param sLogger
    * 		Logger object for log output
-   * @return
    * @throws IOException
    */
-  public static int translateTFs(TermDocVector doc, HMapIFW tfTable, Vocab eVocabSrc, Vocab eVocabTrg, Vocab fVocabSrc, Vocab fVocabTrg, TTable_monolithic_IFAs e2fProbs, TTable_monolithic_IFAs f2eProbs, Tokenizer tokenizer, Logger sLogger) throws IOException{
+  public static int translateTFs(TermDocVector doc, HMapIFW tfTable, Vocab eVocabSrc, Vocab eVocabTrg, Vocab fVocabSrc, Vocab fVocabTrg, 
+      TTable_monolithic_IFAs e2fProbs, TTable_monolithic_IFAs f2eProbs, Tokenizer tokenizer, Logger sLogger) throws IOException{
     if(sLogger == null){
       sLogger = logger;
     }
+
+    //sLogger.setLevel(Level.DEBUG);
+
     //translate doc vector		
     TermDocVector.Reader reader = doc.getReader();
     int docLen = 0;
@@ -359,7 +340,7 @@ public class CLIRUtils extends Configured {
       int tf = reader.getTf();
       docLen+=tf;
 
-//      sLogger.debug("Read "+fTerm+","+tf);
+      sLogger.debug("Read "+fTerm+","+tf);
 
       int f = fVocabSrc.get(fTerm);
       if(f <= 0){
@@ -368,32 +349,19 @@ public class CLIRUtils extends Configured {
       }
       int[] eS = f2eProbs.get(f).getTranslations(0.0f);
 
-      int f2 = fVocabTrg.get(fTerm);		//convert between two F vocabs (different ids)
-      if(f2 <= 0){
-        sLogger.debug("Warning: "+fTerm+": word not in aligner's vocab (target side of e2f)");
-        continue;
-      }
-      //tf(e) = sum_f{tf(f)*prob(f|e)}
+      // tf(e) = sum_f{tf(f)*prob(e|f)}
       for(int e : eS){
         if(e<=0){		//if eTerm is NULL, that means there were cases where fTerm was unaligned in a sentence pair. Just skip these cases, since the word NULL is not in our target vocab.
           continue;
         }
-        float probEF;
         String eTerm = eVocabTrg.get(e);
-        if(tokenizer.isStopWord(eTerm)){
-          sLogger.warn("Discarded: "+eTerm+" is a stopword!");
-          continue;
-        }
-        int e2 = eVocabSrc.get(eTerm);		//convert between two E vocabs (different ids)
-        if(e2 <= 0){
-          sLogger.warn("Warning: "+eTerm+": word not in aligner's final vocab (source side of e2f)");
-          continue;
-        }
-        probEF = e2fProbs.get(e2, f2);
+        if (tokenizer.isDiscard(eTerm))  continue;
+
+        float probEF = f2eProbs.get(f, e);
         if(probEF > 0){
-//          sLogger.debug(eTerm+" ==> "+probEF);
-          tfTable.increment(e2, tf*probEF);
-//          sLogger.debug("updated weight to "+tfTable.get(e2));
+          //          sLogger.debug(eTerm+" ==> "+probEF);
+          tfTable.increment(e, tf*probEF);
+          //          sLogger.debug("updated weight to "+tfTable.get(e));
         }
       }
     }
@@ -401,9 +369,8 @@ public class CLIRUtils extends Configured {
     return docLen;
   }
 
-
   /**
-   * Given a document in F, and its tf mapping, compute a tf value for each term in E using the CLIR algorithm: tf(e) = sum_f{tf(f)*prob(f|e)}
+   * Given a document in F, and its tf mapping, compute a tf value for each term in E using the CLIR algorithm: tf(e) = sum_f{tf(f)*prob(e|f)}
    * 
    * @param doc
    *	 	mapping from F-term strings to tf values
@@ -423,10 +390,10 @@ public class CLIRUtils extends Configured {
    * 		ttable F-->E (i.e., Pr(e|f))
    * @param sLogger
    * 		Logger object for log output
-   * @return
    * @throws IOException
    */
-  public static int translateTFs(HMapSIW doc, HMapIFW tfTable, Vocab eVocabSrc, Vocab eVocabTrg, Vocab fVocabSrc, Vocab fVocabTrg, TTable_monolithic_IFAs e2fProbs, TTable_monolithic_IFAs f2eProbs, Logger sLogger) throws IOException{
+  public static int translateTFs(HMapSIW doc, HMapIFW tfTable, Vocab eVocabSrc, Vocab eVocabTrg, Vocab fVocabSrc, Vocab fVocabTrg, 
+      TTable_monolithic_IFAs e2fProbs, TTable_monolithic_IFAs f2eProbs, Tokenizer tokenizer, Logger sLogger) throws IOException{
     if(sLogger == null){
       sLogger = logger;
     }
@@ -442,28 +409,22 @@ public class CLIRUtils extends Configured {
         continue;
       }
       int[] eS = f2eProbs.get(f).getTranslations(0.0f);
+      sLogger.debug(fTerm+" has "+eS.length+" translations");
 
-      int f2 = fVocabTrg.get(fTerm);		//convert between two F vocabs (different ids)
-      if(f2 <= 0){
-        //				sLogger.warn(fTerm+": word not in aligner's vocab (target side of e2f)");
-        continue;
-      }
-      //tf(e) = sum_f{tf(f)*prob(f|e)}
+      // tf(e) = sum_f{tf(f)*prob(e|f)}
       float prob;
-      for(int e : eS){
+      for (int e : eS) {
         String eTerm = eVocabTrg.get(e);
-        int e2 = eVocabSrc.get(eTerm);		//convert between two E vocabs (different ids)
-        if(e2 <= 0){
-          //					sLogger.debug(eTerm+": word not in aligner's final vocab (source side of e2f)");
-          continue;
-        }
-        prob = e2fProbs.get(e2, f2);
+        if (tokenizer.isStopWord(eTerm))  continue;
+
+        prob = f2eProbs.get(f, e);
+        //              sLogger.info(eTerm+" --> "+prob+","+f2eProbs.get(f, e));
         if(prob > 0){
-          //					sLogger.debug(eVocabSrc.get(e2)+" ==> "+prob);
-          tfTable.increment(e2, tf*prob);
+          tfTable.increment(e, tf*prob);
         }
       }
     }
+
 
     return docLen;
   }
@@ -475,9 +436,9 @@ public class CLIRUtils extends Configured {
    * 		doc length
    * @param tfTable
    * 		mapping from term id to tf values
-   * @param eVocabSrc
+   * @param eVocab
    * 		vocabulary object for final doc vector language
-   * @param scoring model
+   * @param scoringModel model
    * @param dfTable
    * 		mapping from term id to df values
    * @param isNormalize
@@ -487,22 +448,127 @@ public class CLIRUtils extends Configured {
    * @return
    * 		Term doc vector representing the document
    */
-  public static HMapSFW createTermDocVector(int docLen, HMapIFW tfTable, Vocab eVocabSrc, ScoringModel scoringModel, HMapIFW dfTable, boolean isNormalize, Logger sLogger) {
+  public static HMapSFW createTermDocVector(int docLen, HMapIFW tfTable, Vocab eVocab, ScoringModel scoringModel, HMapIFW dfTable, boolean isNormalize, Logger sLogger) {
     if(sLogger == null){
       sLogger = logger;
     }
+
+    //sLogger.setLevel(Level.DEBUG);
+
     HMapSFW v = new HMapSFW();
     float normalization=0;
     for(int e : tfTable.keySet()){
       // retrieve term string, tf and df
-      String eTerm = eVocabSrc.get(e);
+      String eTerm = eVocab.get(e);
       float tf = tfTable.get(e);
       float df = dfTable.get(e);
 
       // compute score via scoring model
       float score = ((Bm25) scoringModel).computeDocumentWeight(tf, df, docLen);
 
-//      sLogger.debug(eTerm+" "+tf+" "+df+" "+score);
+      sLogger.debug(eTerm+" "+tf+" "+df+" "+score);
+      if(score>0){
+        v.put(eTerm, score);
+        if(isNormalize){
+          normalization+=Math.pow(score, 2);
+        }		
+      }
+    }
+
+    // length-normalize doc vector
+    if(isNormalize){
+      normalization = (float) Math.sqrt(normalization);
+      for(Entry<String> e : v.entrySet()){
+        v.put(e.getKey(), e.getValue()/normalization);
+      }
+    }
+    return v;
+  }
+
+  /** 
+   * called by BitextClassifierUtils
+   **/
+  public static HMapSFW createTermDocVector(int docLen, HMapIFW tfTable, Vocab eVocab, ScoringModel scoringModel, HMapSIW dfTable, boolean isNormalize, Logger sLogger) {
+    if(sLogger == null){
+      sLogger = logger;
+    }
+
+    //sLogger.setLevel(Level.DEBUG);
+
+    HMapSFW v = new HMapSFW();
+    float normalization=0;
+    for(int e : tfTable.keySet()){
+      // retrieve term string, tf and df
+      String eTerm = eVocab.get(e);
+      float tf = tfTable.get(e);
+      float df = dfTable.get(eTerm);
+
+      // compute score via scoring model
+      float score = ((Bm25) scoringModel).computeDocumentWeight(tf, df, docLen);
+
+      sLogger.debug(eTerm+" "+tf+" "+df+" "+score);
+      if(score>0){
+        v.put(eTerm, score);
+        if(isNormalize){
+          normalization+=Math.pow(score, 2);
+        }   
+      }
+    }
+
+    // length-normalize doc vector
+    if(isNormalize){
+      normalization = (float) Math.sqrt(normalization);
+      for(Entry<String> e : v.entrySet()){
+        v.put(e.getKey(), e.getValue()/normalization);
+      }
+    }
+    return v;
+  }
+
+  /**
+   * Given the TF, DF values, doc length, scoring model, this method creates the term doc vector for a document.
+   * 
+   * @param docLen
+   * 		doc length
+   * @param tfTable
+   * 		mapping from term id to tf values
+   * @param eVocab
+   * 		vocabulary object for final doc vector language
+   * @param scoringModel model
+   * @param dfTable
+   * 		mapping from term id to df values
+   * @param isNormalize
+   * 		indicating whether to normalize the doc vector weights or not
+   * @param sLogger
+   * 		Logger object for log output
+   * @return term doc vector representing the document
+   */
+  public static HMapSFW createTermDocVector(int docLen, HMapIFW tfTable, Vocab eVocab, ScoringModel scoringModel, FrequencySortedDictionary dict, DfTableArray dfTable, boolean isNormalize, Logger sLogger) {
+    if(sLogger == null){
+      sLogger = logger;
+    }
+
+    //    sLogger.setLevel(Level.DEBUG);
+
+    HMapSFW v = new HMapSFW();
+    float normalization=0;
+    for(edu.umd.cloud9.util.map.MapIF.Entry entry : tfTable.entrySet()){
+      // retrieve term string, tf and df
+      String eTerm = eVocab.get(entry.getKey());
+      float tf = entry.getValue();
+      int eId = dict.getId(eTerm);
+      if(eId < 1){		//OOV
+        continue;
+      }
+      int df = dfTable.getDf(eId);
+      // compute score via scoring model
+      float score = ((Bm25) scoringModel).computeDocumentWeight(tf, df, docLen);
+      if(df<1){
+        sLogger.warn("Suspicious DF WARNING = "+eTerm+" "+tf+" "+df+" "+score);
+      }
+
+      sLogger.debug(eTerm+" "+tf+" "+df+" "+score);
+
       if(score>0){
         v.put(eTerm, score);
         if(isNormalize){
@@ -525,34 +591,34 @@ public class CLIRUtils extends Configured {
    * Given the TF, DF values, doc length, scoring model, this method creates the term doc vector for a document.
    * 
    * @param docLen
-   * 		doc length
+   *    doc length
    * @param tfTable
-   * 		mapping from term id to tf values
-   * @param eVocabSrc
-   * 		vocabulary object for final doc vector language
-   * @param scoring model
+   *    mapping from term string to tf values
+   * @param scoringModel model
    * @param dfTable
-   * 		mapping from term id to df values
+   *    mapping from term id to df values
    * @param isNormalize
-   * 		indicating whether to normalize the doc vector weights or not
+   *    indicating whether to normalize the doc vector weights or not
    * @param sLogger
-   * 		Logger object for log output
+   *    Logger object for log output
    * @return
-   * 		Term doc vector representing the document
+   *    Term doc vector representing the document
    */
-  public static HMapSFW createTermDocVector(int docLen, HMapSIW tfTable, Vocab eVocabSrc, ScoringModel scoringModel, FrequencySortedDictionary dict, DfTableArray dfTable, boolean isNormalize, Logger sLogger) {
+  public static HMapSFW createTermDocVector(int docLen, HMapSIW tfTable, ScoringModel scoringModel, FrequencySortedDictionary dict, DfTableArray dfTable, boolean isNormalize, Logger sLogger) {
     if(sLogger == null){
       sLogger = logger;
     }
+
+    //    sLogger.setLevel(Level.DEBUG);
 
     HMapSFW v = new HMapSFW();
     float normalization=0;
     for(edu.umd.cloud9.util.map.MapKI.Entry<String> entry : tfTable.entrySet()){
       // retrieve term string, tf and df
       String eTerm = entry.getKey();
-      int tf = entry.getValue();
+      float tf = entry.getValue();
       int eId = dict.getId(eTerm);
-      if(eId < 1){		//OOV
+      if(eId < 1){    //OOV
         continue;
       }
       int df = dfTable.getDf(eId);
@@ -561,11 +627,14 @@ public class CLIRUtils extends Configured {
       if(df<1){
         sLogger.warn("Suspicious DF WARNING = "+eTerm+" "+tf+" "+df+" "+score);
       }
+
+      sLogger.debug(eTerm+" "+tf+" "+df+" "+score);
+
       if(score>0){
         v.put(eTerm, score);
         if(isNormalize){
           normalization+=Math.pow(score, 2);
-        }		
+        }   
       }
     }
 
@@ -582,6 +651,7 @@ public class CLIRUtils extends Configured {
   /**
    * Uses old globalStats code, which is not supported anymore. Only here for backward compatibility
    */
+  /*
   @Deprecated
   public static HMapSFW createTermDocVector(int docLen, HMapSIW tfTable, Vocab eVocabSrc, ScoringModel scoringModel, PrefixEncodedGlobalStats globalStats, boolean isNormalize, Logger sLogger) {
     if(sLogger == null){
@@ -620,15 +690,15 @@ public class CLIRUtils extends Configured {
     }
     return v;
   }
+*/
 
-  
   /***
    * 
    * Hooka helper functions
    * 
    */
-  
-  
+
+
   /**
    * This method converts the output of BerkeleyAligner into a TTable_monolithic_IFAs object. 
    * For each source language term, top numTrans entries (with highest translation probability) are kept, unless the top K < numTrans entries have a cumulatite probability above PROB_THRESHOLD.
@@ -657,8 +727,10 @@ public class CLIRUtils extends Configured {
     File file = new File(inputFile);
     FileInputStream fis = null;
     BufferedReader bis = null;
-    int cntLongTail = 0, cntShortTail = 0, sumShortTail = 0, cnt = 0;		// for statistical purposes only
-    float sumCumProbs = 0f;											// for statistical purposes only
+    //    int cntLongTail = 0, cntShortTail = 0, sumShortTail = 0
+    int cnt = 0;		// for statistical purposes only
+    //    float sumCumProbs = 0f;											// for statistical purposes only
+    HookaStats stats = new HookaStats(numTrans, probThreshold);
 
     //In BerkeleyAligner output, dictionary entries of each source term are already sorted by prob. value. 
     try {
@@ -705,23 +777,25 @@ public class CLIRUtils extends Configured {
                 //								logger.debug("FFFF"+line);
               }else{
                 String term = m2.group(1);
-                float prob = Float.parseFloat(m2.group(2));
-                int engIndex = trgVocab.addOrGet(term);
-                logger.debug("Added: "+term+" with index: "+engIndex+" and prob:"+prob);
-                indexProbPairs.add(new PairOfIntFloat(engIndex, prob));
-                sumOfProbs+=prob;
+                if (!term.equals("NULL")) {
+                  float prob = Float.parseFloat(m2.group(2));
+                  int engIndex = trgVocab.addOrGet(term);
+                  logger.debug("Added: "+term+" with index: "+engIndex+" and prob:"+prob);
+                  indexProbPairs.add(new PairOfIntFloat(engIndex, prob));
+                  sumOfProbs+=prob;
+                }
               }
             }
             if(sumOfProbs > probThreshold){
-              cntShortTail++;		// for statistical purposes only
-              sumShortTail += (i+1);	// for statistical purposes only
+              stats.incCntShortTail(1);
+              stats.incSumShortTail(i+1);
               break;
             }
           }
           if(sumOfProbs <= probThreshold){
             // early termination
-            cntLongTail++;		// for statistical purposes only
-            sumCumProbs += sumOfProbs;
+            stats.incCntLongTail(1);
+            stats.incSumCumProbs(sumOfProbs);
           }
 
           // to enable faster access with binary search, we sort entries by vocabulary index.
@@ -750,10 +824,7 @@ public class CLIRUtils extends Configured {
     logger.info("File "+inputFile+": read "+cnt+" lines");
     logger.info("Vocabulary Target: "+trgVocab.size()+" elements");
     logger.info("Vocabulary Source: "+srcVocab.size()+" elements");
-    logger.info("# source terms with > "+probThreshold+" probability covered: "+cntShortTail+" and average translations per term: "+(sumShortTail/(cntShortTail+0.0f)));
-    logger.info("# source terms with <= "+probThreshold+" probability covered: "+cntLongTail+" (each have "+ numTrans +" translations). Average coverage is: "+(sumCumProbs/cntLongTail));
-    logger.info("Size (total number of dictionary entries) = "+(sumShortTail + cntLongTail*numTrans));
-
+    logger.info(stats);
 
     DataOutputStream dos = new DataOutputStream(new BufferedOutputStream
         (fs.create(new Path(trgVocabFile))));
@@ -774,7 +845,7 @@ public class CLIRUtils extends Configured {
    * This method converts the output of GIZA into a TTable_monolithic_IFAs object. 
    * For each source language term, top numTrans entries (with highest translation probability) are kept, unless the top K < numTrans entries have a cumulatite probability above probThreshold.
    * 
-   * @param inputFile
+   * @param filename
    * 		output of GIZA (probability values from source language to target language. In GIZA, format of each line should be: 
    * 			[target-word1] [source-word] [prob1]
    * 			[target-word2] [source-word] [prob2]
@@ -809,8 +880,9 @@ public class CLIRUtils extends Configured {
       TreeSet<PairOfFloatString> topTrans = new TreeSet<PairOfFloatString>();
       String line = "";
       boolean earlyTerminate = false, skipTerm = false;
-      float sumOfProbs = 0.0f, prob, sumCumProbs = 0;
-      int cntLongTail = 0, cntShortTail = 0, sumShortTail = 0;		// for statistical purposes only
+      float sumOfProbs = 0.0f, prob;//, sumCumProbs = 0;
+      //      int cntLongTail = 0, cntShortTail = 0, sumShortTail = 0;		// for statistical purposes only
+      HookaStats stats = new HookaStats(numTrans, probThreshold);
 
       while (true) {	
         line = bis.readLine();
@@ -823,67 +895,65 @@ public class CLIRUtils extends Configured {
         trgTerm = parts[0];
         srcTerm = parts[1];
         prob = Float.parseFloat(parts[2]);
-        if(prev==null || !srcTerm.equals(prev)){
+
+        if (trgTerm.equals("NULL")) {
+          continue;   // skip alignments to imaginary NULL word
+        }
+
+        // new source term (ignore punctuation)
+        if ((prev==null || !srcTerm.equals(prev)) && !delims.contains(srcTerm)){
           if(topTrans.size() > 0){
-            //store previous term's top translations to ttable
-            int finalNumTrans = addToTable(curIndex, topTrans, sumOfProbs, table, trgVocab);
-            if(finalNumTrans < numTrans){
-              cntShortTail++;
-              sumShortTail += finalNumTrans;
-            }else{
-              cntLongTail++;
-              sumCumProbs += sumOfProbs;
-            }
+            // store previous term's top translations to ttable
+            addToTable(curIndex, topTrans, sumOfProbs, table, trgVocab, probThreshold, stats);
           }
+
           logger.debug("Line:"+line);
 
-          //initialize this term
+          // initialize the translation distribution of the source term
           sumOfProbs = 0.0f;
           topTrans.clear();
-          earlyTerminate = false;		//reset status
+          earlyTerminate = false;		// reset status
           skipTerm = false;
           prev = srcTerm;
           int prevIndex = curIndex;
           curIndex = srcVocab.addOrGet(srcTerm);
           if(curIndex <= prevIndex){
-            //we've seen this foreign term before. probably due to tokenization or sorting error in aligner. just ignore.
-            curIndex = prevIndex;		//revert curIndex value since we're skipping this one
+            // we've seen this foreign term before. probably due to tokenization or sorting error in aligner. just ignore.
+            logger.debug("FLAG: "+line);
+            curIndex = prevIndex;		// revert curIndex value since we're skipping this one
             skipTerm = true;
             continue;
           }
           logger.debug("Processing: "+srcTerm+" with index: "+curIndex);			
           topTrans.add(new PairOfFloatString(prob, trgTerm));
           sumOfProbs += prob;
-        }else if(!earlyTerminate && !skipTerm){	//continue adding translation term,prob pairs (except if early termination is ON)
+          logger.debug("Added to queue: "+trgTerm+" with prob: "+prob+" (sum: "+sumOfProbs+")");      
+        }else if(!earlyTerminate && !skipTerm && !delims.contains(srcTerm)){	//continue adding translation term,prob pairs (except if early termination is ON)
           topTrans.add(new PairOfFloatString(prob, trgTerm));
+          sumOfProbs += prob;
+          logger.debug("Added to queue: "+trgTerm+" with prob: "+prob+" (sum: "+sumOfProbs+")");      
 
           // keep top numTrans translations
           if(topTrans.size() > numTrans){
-            float removedProb = topTrans.pollFirst().getLeftElement();
+            PairOfFloatString pair = topTrans.pollFirst();
+            float removedProb = pair.getLeftElement();
             sumOfProbs -= removedProb;
+            logger.debug("Removed from queue: "+pair.getRightElement()+" (sum: "+sumOfProbs+")");      
           }
-          sumOfProbs += prob;
         }else{
-          logger.debug("Skipped");
+          logger.debug("Skipped line: "+line);
         }
-        if(sumOfProbs > probThreshold){
-          earlyTerminate = true;
-          logger.debug("Sum of probs > "+probThreshold+", early termination.");
-        }
+        //        // line processed: check if early terminate
+        //        if(sumOfProbs > probThreshold){
+        //          earlyTerminate = true;
+        //          logger.debug("Sum of probs > "+probThreshold+", early termination.");
+        //        }
       }
 
       //last one
       if(topTrans.size()>0){
         //store previous term's top translations to ttable
-        int finalNumTrans = addToTable(curIndex, topTrans, sumOfProbs, table, trgVocab);
-        if(finalNumTrans < numTrans){
-          cntShortTail++;
-          sumShortTail += finalNumTrans;
-        }else{
-          // early termination: <numTrans> elements did not cover <probThreshold> probability
-          cntLongTail++;
-          sumCumProbs += sumOfProbs;
-        }
+        addToTable(curIndex, topTrans, sumOfProbs, table, trgVocab, probThreshold, stats);
       }
 
       // dispose all the resources after using them.
@@ -892,9 +962,7 @@ public class CLIRUtils extends Configured {
       logger.info("File "+filename+": read "+cnt+" lines");
       logger.info("Vocabulary Target: "+trgVocab.size()+" elements");
       logger.info("Vocabulary Source: "+srcVocab.size()+" elements");
-      logger.info("# source terms with > "+probThreshold+" probability covered: "+cntShortTail+" and average translations per term: "+(sumShortTail/(cntShortTail+0.0f)));
-      logger.info("# source terms with <= "+probThreshold+" probability covered: "+cntLongTail+" (each have "+ numTrans +" translations). Average coverage is: "+(sumCumProbs/cntLongTail));
-      logger.info("Size (total number of dictionary entries) = "+(sumShortTail + cntLongTail*numTrans));
+      logger.info(stats);
     }catch (FileNotFoundException e) {
       e.printStackTrace();
     } catch (IOException e) {
@@ -946,8 +1014,9 @@ public class CLIRUtils extends Configured {
     String srcTerm = null, trgTerm = null;
     int curIndex = -1;
     TreeSet<PairOfFloatString> topTrans = new TreeSet<PairOfFloatString>();
-    float sumOfProbs = 0.0f, prob, sumCumProbs = 0f;
-    int cntLongTail = 0, cntShortTail = 0, sumShortTail = 0;		// for statistical purposes only
+    float sumOfProbs = 0.0f, prob;
+    //    int cntLongTail = 0, cntShortTail = 0, sumShortTail = 0;		// for statistical purposes only
+    HookaStats stats = new HookaStats(numTrans, probThreshold);
 
     //modify current ttable wrt foll. criteria: top numTrans translations per source term, unless cumulative prob. distr. exceeds probThreshold before that.
     for(int srcIndex=1; srcIndex<srcVocab.size(); srcIndex++){
@@ -986,24 +1055,12 @@ public class CLIRUtils extends Configured {
 
       //store previous term's top translations to ttable
       if(topTrans.size() > 0){
-        int finalNumTrans = addToTable(curIndex, topTrans, sumOfProbs, finalTTable, finalTrgVocab);
-      
-        if(finalNumTrans < numTrans){
-          // <numTrans> elements covered more than <probThreshold> probability, so we terminated early
-          cntShortTail++;
-          sumShortTail += finalNumTrans;
-        }else{
-          // <numTrans> elements did not cover <probThreshold> probability, do not add any more as an efficiency heuristic
-          cntLongTail++;
-          sumCumProbs += sumOfProbs;
-        }
+        addToTable(curIndex, topTrans, sumOfProbs, finalTTable, finalTrgVocab, probThreshold, stats);
       }
     }
     logger.info("Vocabulary Target: "+finalTrgVocab.size()+" elements");
     logger.info("Vocabulary Source: "+finalSrcVocab.size()+" elements");
-    logger.info("# source terms with > "+probThreshold+" probability covered: "+cntShortTail+" and average translations per term: "+(sumShortTail/(cntShortTail+0.0f)));
-    logger.info("# source terms with <= "+probThreshold+" probability covered: "+cntLongTail+" (each have "+ numTrans +" translations). Average coverage is: "+(sumCumProbs/cntLongTail));
-    logger.info("Size (total number of dictionary entries) = "+(sumShortTail + cntLongTail*numTrans));
+    logger.info(stats);
 
     DataOutputStream dos = new DataOutputStream(new BufferedOutputStream(fs.create(new Path(finalTrgVocabFile))));
     ((VocabularyWritable) finalTrgVocab).write(dos);
@@ -1015,20 +1072,21 @@ public class CLIRUtils extends Configured {
     finalTTable.write(dos3);
     dos3.close();
   }
-  
- 
-  public static int addToTable(int curIndex, TreeSet<PairOfFloatString> topTrans, float cumProb, TTable_monolithic_IFAs table, Vocab trgVocab) {
+
+
+  public static void addToTable(int curIndex, TreeSet<PairOfFloatString> topTrans, float cumProb, TTable_monolithic_IFAs table, Vocab trgVocab, 
+      float cumProbThreshold, HookaStats stats) {
     List<Integer> sortedIndices = new ArrayList<Integer>();
     HMapIF index2ProbMap = new HMapIF();
 
     float sumOfProbs = 0.0f;    //only extract the top K<15 if the mass prob. exceeds MAX_probThreshold
-    while(!topTrans.isEmpty()){
+    while(!topTrans.isEmpty() && sumOfProbs < cumProbThreshold){
       PairOfFloatString e = topTrans.pollLast();
       String term = e.getRightElement();
-      float pr = e.getLeftElement()/cumProb;
+      float pr = e.getLeftElement()/cumProb;    // normalize
+      logger.debug(term+"-->"+pr);
       int trgIndex = trgVocab.addOrGet(term);
-      sumOfProbs += pr;
-
+      sumOfProbs += e.getLeftElement();         // keep track of unnormalized cumulative prob for determining cutoff
       sortedIndices.add(trgIndex);
       index2ProbMap.put(trgIndex, pr);
     }
@@ -1036,128 +1094,241 @@ public class CLIRUtils extends Configured {
     // to enable faster access with binary search, we sort entries by vocabulary index.
     Collections.sort(sortedIndices);
     int numEntries = sortedIndices.size();
+
+    // for statistics only
+    stats.update(numEntries, sumOfProbs);
+
+    // write translation list to TTable object
     int[] indices = new int[numEntries];
     float[] probs = new float[numEntries];
     int i=0;
     for(int sortedIndex : sortedIndices){
       indices[i]=sortedIndex;
       probs[i]=index2ProbMap.get(sortedIndex);
-      logger.debug("Added: "+indices[i]+" with prob: "+probs[i]);
       i++;
-    }
+    }      
     table.set(curIndex, new IndexedFloatArray(indices, probs, true));
-    logger.debug(table.get(curIndex));
-
-    return indices.length;
   }
-  
-  
+
+  /**
+   * A work in progress: can we use bidirectional translation probabilities to improve the translation table and vocabularies?
+   */
+  private static void combineTTables(String ttableFile, String srcEVocabFile, String trgFVocabFile, String ttableE2FFile, String srcFVocabFile, String trgEVocabFile, String ttableF2EFile){
+    TTable_monolithic_IFAs table = new TTable_monolithic_IFAs();
+    Configuration conf = new Configuration();
+    HookaStats stats = new HookaStats(-1, -1);
+    try {
+      FileSystem fs = FileSystem.get(conf);
+      Vocab eVocabTrg = HadoopAlign.loadVocab(new Path(trgEVocabFile), conf);
+      Vocab fVocabSrc = HadoopAlign.loadVocab(new Path(srcFVocabFile), conf);
+      TTable_monolithic_IFAs f2e_Probs = new TTable_monolithic_IFAs(fs, new Path(ttableF2EFile), true);
+      Vocab eVocabSrc = HadoopAlign.loadVocab(new Path(srcEVocabFile), conf);
+      Vocab fVocabTrg = HadoopAlign.loadVocab(new Path(trgFVocabFile), conf);
+      TTable_monolithic_IFAs e2f_Probs = new TTable_monolithic_IFAs(fs, new Path(ttableE2FFile), true);
+
+      TreeSet<PairOfFloatString> topTrans = new TreeSet<PairOfFloatString>();
+      for (int e1 = 1; e1 < eVocabSrc.size(); e1++) {
+        String eTerm = eVocabSrc.get(e1);
+
+        float sumOfProbs = 0;
+        int[] fS = e2f_Probs.get(e1).getTranslations(0.0f);
+        for (int f1 : fS) {
+          float prob1 = e2f_Probs.get(e1, f1);
+
+          String fTerm = fVocabTrg.get(f1);         
+          int f2 = fVocabSrc.get(fTerm);
+          int e2 = eVocabTrg.get(eTerm);         
+
+          float prob2 = f2e_Probs.get(f2, e2);
+          float prob = prob1*prob2;
+          sumOfProbs += prob;
+          topTrans.add(new PairOfFloatString(prob, fTerm));
+        }
+        logger.info("Adding "+eTerm);
+        addToTable(e1, topTrans, sumOfProbs, table, fVocabTrg, 1.0f, stats);      
+      }
+      logger.info(stats);
+      DataOutputStream dos = new DataOutputStream(new BufferedOutputStream(fs.create(new Path(ttableFile))));
+      table.write(dos);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+
+
   /***
    * 
    * Bitext extraction helper functions
    * 
    */
-   
-
-  public static String[] computeFeaturesF1(HMapSFW eVector, HMapSFW fVector, float eSentLength, float fSentLength) {
-    String[] features = new String[1];
-
-    if(fSentLength == 0 || eSentLength == 0){
-      return null;
-    }
-    float cosine = CLIRUtils.cosineNormalized(eVector, fVector);
-    features[0] = "cosine="+cosine;
-    return features;
+  //
+  public static String[] computeFeaturesF1(HMapSFW eVector, HMapSFW translatedFVector, float eSentLength, float fSentLength) {
+    return computeFeatures(1, null, null, eVector, null, null, translatedFVector, eSentLength, fSentLength, null, null, null, null, null, null, 0);
   }
 
-  public static String[] computeFeaturesF2(HMapSFW eVector, HMapSFW fVector, float eSentLength, float fSentLength) {
-    String[] features = new String[3];
 
-    if(fSentLength == 0 || eSentLength == 0){
-      return null;
-    }
-
-    float cosine = CLIRUtils.cosineNormalized(eVector, fVector);
-    features[0] = "cosine="+cosine;
-    float lengthratio1, lengthratio2;
-    lengthratio1 = eSentLength/fSentLength;
-    lengthratio2 = fSentLength/eSentLength;
-    features[1] = "lengthratio1="+lengthratio1;
-    features[2] = "lengthratio2="+lengthratio2;		
-    return features;
+  public static String[] computeFeaturesF2(HMapSIW eSrcTfs, HMapSFW eVector, HMapSIW fSrcTfs, HMapSFW translatedFVector, float eSentLength, float fSentLength,
+      Vocab eVocabSrc, Vocab eVocabTrg, Vocab fVocabSrc, Vocab fVocabTrg, TTable_monolithic_IFAs e2f_Probs, TTable_monolithic_IFAs f2e_Probs, float prob){
+    return computeFeatures(2, null, eSrcTfs, eVector, null, fSrcTfs, translatedFVector, 
+        eSentLength, fSentLength, eVocabSrc, eVocabTrg, fVocabSrc, fVocabTrg, e2f_Probs, f2e_Probs, prob); 
   }
 
-  public static String[] computeFeaturesF3(HMapSFW eVector, HMapSIW fSrcTfs, HMapSFW fVector, float eSentLength, float fSentLength,
-      Vocab eVocabSrc, Vocab eVocabTrg, Vocab fVocabSrc, Vocab fVocabTrg, TTable_monolithic_IFAs e2f_Probs, TTable_monolithic_IFAs f2e_Probs) {
-    String[] features = new String[5];
+  public static String[] computeFeaturesF3(String eSentence, HMapSIW eSrcTfs, HMapSFW eVector, String fSentence, HMapSIW fSrcTfs, HMapSFW translatedFVector, float eSentLength, float fSentLength,
+      Vocab eVocabSrc, Vocab eVocabTrg, Vocab fVocabSrc, Vocab fVocabTrg, TTable_monolithic_IFAs e2f_Probs, TTable_monolithic_IFAs f2e_Probs, float prob){
+    return computeFeatures(3, eSentence, eSrcTfs, eVector, fSentence, fSrcTfs, translatedFVector, 
+        eSentLength, fSentLength, eVocabSrc, eVocabTrg, fVocabSrc, fVocabTrg, e2f_Probs, f2e_Probs, prob); 
+  }
+
+  public static String[] computeFeatures(int featSet, String eSentence, HMapSIW eSrcTfs, HMapSFW eVector, String fSentence, HMapSIW fSrcTfs, HMapSFW translatedFVector, float eSentLength, float fSentLength,
+      Vocab eVocabSrc, Vocab eVocabTrg, Vocab fVocabSrc, Vocab fVocabTrg, TTable_monolithic_IFAs e2f_Probs, TTable_monolithic_IFAs f2e_Probs, float prob){
+    return computeFeatures(featSet, eSentence, eSrcTfs, eVector, fSentence, fSrcTfs, translatedFVector, 
+        eSentLength, fSentLength, eVocabSrc, eVocabTrg, fVocabSrc, fVocabTrg, e2f_Probs, f2e_Probs, prob, logger);
+  }
+
+  public static String[] computeFeatures(int featSet, String eSentence, HMapSIW eSrcTfs, HMapSFW eVector, String fSentence, HMapSIW fSrcTfs, HMapSFW translatedFVector, float eSentLength, float fSentLength,
+      Vocab eVocabSrc, Vocab eVocabTrg, Vocab fVocabSrc, Vocab fVocabTrg, TTable_monolithic_IFAs e2f_Probs, TTable_monolithic_IFAs f2e_Probs, float prob, Logger sLogger) {
+    List<String> features = new ArrayList<String>();
 
     if(fSentLength == 0 || eSentLength == 0){
       return null;
     }
 
-    float cosine = CLIRUtils.cosineNormalized(eVector, fVector);
-    features[0] = "cosine="+cosine;
-    float lengthratio1, lengthratio2;
-    lengthratio1 = eSentLength/fSentLength;
-    lengthratio2 = fSentLength/eSentLength;
-    features[1] = "lengthratio1="+lengthratio1;
-    features[2] = "lengthratio2="+lengthratio2;				
-    int cntTrans = 0, cntTrans2 = 0;
-    float cnt = 0, transratio = 0.0f, cnt2 = 0, transratio2 = 0.0f;
-    for(String fTerm : fSrcTfs.keySet()){
-      int f = fVocabSrc.get(fTerm);
-      if(f < 0){
-        continue;
-      }
-      int[] eS = f2e_Probs.get(f).getTranslations(0.0f);
-      for(int e : eS){
-        String eTerm = eVocabTrg.get(e);
-        if(eVector.containsKey(eTerm)){
-          cntTrans++;
-          break;
-        }
-      }
-      cnt++;
+    features.add("cosine=" + CLIRUtils.cosineNormalized(eVector, translatedFVector));    
+
+    ////////////////////////////////////////////////
+
+    if (featSet > 1) {
+      float lengthratio1, lengthratio2;
+      lengthratio1 = eSentLength/fSentLength;
+      lengthratio2 = fSentLength/eSentLength;
+      features.add("lengthratio1="+lengthratio1);
+      features.add("lengthratio2="+lengthratio2);       
+
+      // src-->trg and trg-->src token translation ratio
+      features.add("wordtransratio1=" + getWordTransRatio(fSrcTfs, eSrcTfs, fVocabSrc, eVocabTrg, f2e_Probs, prob) );
+      features.add("wordtransratio2=" + getWordTransRatio(eSrcTfs, fSrcTfs, eVocabSrc, fVocabTrg, e2f_Probs, prob) );
     }
-    for(String eTerm : eVector.keySet()){
+
+    ////////////////////////////////////
+
+    if (featSet > 2) {
+
+      // uppercase token matching features : find uppercased tokens that exactly appear on both sides
+      // lack of this evidence does not imply anything, but its existence might indicate parallel
+      fSentence.replaceAll("([',:;.?%!])", " $1 ");
+      eSentence.replaceAll("([',:;.?%!])", " $1 ");
+      features.add("uppercaseratio1=" + getUppercaseRatio(fSentence, eSentence) );
+      features.add("uppercaseratio2=" + getUppercaseRatio(eSentence, fSentence) );
+
+      if ( getUppercaseRatio(fSentence, eSentence) > 0f || getUppercaseRatio(eSentence, fSentence) > 0f ) {
+//        if (CLIRUtils.cosineNormalized(eVector, translatedFVector) < 0.1f) {
+//          System.out.println("DEBUG;" + fSentence +";"+ eSentence);
+//        }
+      }
+    }
+
+    if (featSet > 3) {
+      // future work
+    }
+
+    return features.toArray(new String[features.size()]);
+  }
+
+  private static float getWordTransRatio(HMapSIW eSrcTfs, HMapSIW fSrcTfs, Vocab eVocabSrc, Vocab fVocabTrg, TTable_monolithic_IFAs e2fProbs, float probThreshold) {
+    // if there are k occurences of a term w on source side, and m occurrences of a possible translation of w on target side, 
+    // instead of saying that w has a translation on target side, we say w has max(1,m/k) translations to downweight cases where m<k
+    float cntAll = 0, cntMatch = 0, cntAltAll = 0, cntAltMatch = 0;
+    // trg-->src term translation ratio 
+    for(String eTerm : eSrcTfs.keySet()){
       int e = eVocabSrc.get(eTerm);
+      int srcCnt = eSrcTfs.get(eTerm);
+      cntAll += srcCnt;      // consider OOVs as well since they are part of the sentence
+
+      //      if(e < 0 || eTerm.matches("\\d+")){   // only non-number terms since numbers might have noisy translation prob.s
       if(e < 0){
         continue;
       }
-      int[] fS = e2f_Probs.get(e).getTranslations(0.0f);
+
+      int[] fS = e2fProbs.get(e).getTranslations(probThreshold);
+
+      int trgCnt = 0;
       for(int f : fS){
         String fTerm = fVocabTrg.get(f);
-        if(fVector.containsKey(fTerm)){
-          cntTrans2++;
-          break;
+        if(fSrcTfs.containsKey(fTerm)){
+          trgCnt += fSrcTfs.get(fTerm);
+          cntAltMatch++;
+
+          if (trgCnt >= srcCnt) break;
         }
       }
-      cnt2++;
+      cntMatch += trgCnt >= srcCnt ? srcCnt : trgCnt;
+      cntAltAll++;
     }
     //when there are terms in fSent but none of them has a translation or vocab entry, set trans ratio to 0
-    if(cnt!=0){
-      transratio = cntTrans/cnt;
-    }			
-    if(cnt2!=0){
-      transratio2 = cntTrans2/cnt2;
-    }
-    features[3] ="wordtransratio1="+transratio;
-    features[4] ="wordtransratio2="+transratio2;
-    return features;
+    return cntAll == 0 ? 0 : cntMatch/cntAll;
   }
 
+  private static float getUppercaseRatio(String sentence1, String sentence2) {
+    float cntUpperMatch = 0, cntUpperTotal = 0;
+
+    // to make sure we don't miss actual matches due to irregular spacing in between tokens, we normalize spacing in both sentences
+    StringBuilder buffer2 = new StringBuilder(" ");
+    List<String> tokens2 = Arrays.asList(sentence2.split("\\s+"));
+    for (int i=0; i < tokens2.size(); i++) {
+      buffer2.append(tokens2.get(i).trim() + " ");
+    }
+    sentence2 = buffer2.toString();
+    
+    // now, read tokens in first sentence and keep track of sequences of uppercased tokens
+    StringBuilder buffer = new StringBuilder(" ");
+    List<String> tokens = Arrays.asList(sentence1.split("\\s+"));
+    String uppercaseEntity = "";
+    for (int i=0; i < tokens.size(); i++) {
+      String token = tokens.get(i).trim();
+      // discard single-char upper-case tokens
+      if (token.length() > 0 && Character.isUpperCase(token.charAt(0))) {
+        buffer.append(token + " ");
+      }else {
+        uppercaseEntity = buffer.toString();
+        if (!uppercaseEntity.trim().equals("") && uppercaseEntity.length() > 2) {
+          if (sentence2.contains(uppercaseEntity)) {
+//            System.out.println("DEBUG["+uppercaseEntity+"]");
+            cntUpperMatch++;
+          }
+          cntUpperTotal++;
+          buffer.delete(1, buffer.length());    // clear buffer
+        }
+      }
+    } 
+    
+    // compare last part of buffer
+    uppercaseEntity = buffer.toString();
+    if (!uppercaseEntity.trim().equals("")) {
+      if (sentence2.contains(uppercaseEntity)) {
+        cntUpperMatch++;
+      }
+      cntUpperTotal++;
+    }
+    return cntUpperTotal==0 ? 0 : cntUpperMatch/cntUpperTotal;
+  }
 
   private static int printUsage() {
-    System.out.println("usage: [input-lexicalprob-file_f2e] [input-lexicalprob-file_e2f] [type=giza|berkeley] [src-vocab_f] [trg-vocab_e] [prob-table_f-->e] [src-vocab_e] [trg-vocab_f] [prob-table_e-->f] ([cumulative-prob-threshold]) ([num-max-entries-per-word])");
+    System.out.println("usage: [input-lexicalprob-file_f2e] [input-lexicalprob-file_e2f] [type=giza|berkeley] [src-vocab_f] [trg-vocab_e] [prob-table_f-->e] [src-vocab_e] [trg-vocab_f] [prob-table_e-->f] ([cumulative-prob-threshold]) ([num-max-entries-per-word])" +
+    "\nFor each lexicalprob file, the format should be 'target/TAB/source/TAB/prob', sorted by source token.\n");
 
     return -1;
   }
 
-
   public static void main(String args[]){
-    if(args.length < 9){
+    if(args.length != 10 && args.length != 11 && args.length != 5 && args.length != 7){
       printUsage();
     }
+
+    if(args.length == 7){
+      CLIRUtils.combineTTables(args[0], args[1], args[2], args[3], args[4], args[5], args[6]);//, Float.parseFloat(args[7]), Integer.parseInt(args[8]));
+      return;
+    }
+
 
     // Read parameters
     float probThreshold = 0.9f;
@@ -1169,6 +1340,7 @@ public class CLIRUtils extends Configured {
         e.printStackTrace();
       }
     }
+
     if(args.length >= 11){
       try {
         numTrans = Integer.parseInt(args[10]);
@@ -1177,13 +1349,35 @@ public class CLIRUtils extends Configured {
       }
     }
 
-    String lex_f2e = args[0];
-    String lex_e2f = args[1];
-    String type = args[2];
-    Configuration conf = new Configuration();
-    logger.info("Type of input:" + type);
     try {
+      Configuration conf = new Configuration();
       FileSystem localFS = FileSystem.getLocal(conf);
+
+      // query mode
+      if (args.length == 5) {
+        String srcTerm = args[0], trgTerm = args[1];
+        Vocab srcVocab = HadoopAlign.loadVocab(new Path(args[2]), localFS);
+        Vocab trgVocab = HadoopAlign.loadVocab(new Path(args[3]), localFS);
+        TTable_monolithic_IFAs src2trgProbs = new TTable_monolithic_IFAs(localFS, new Path(args[4]), true);
+
+        if (trgTerm.equals("ALL")) {
+          int[] trgs = src2trgProbs.get(srcVocab.get(srcTerm)).getTranslations(0.0f);
+          System.out.println(srcTerm + " has "+ trgs.length + " translations:");
+          for (int i = 0; i < trgs.length; i++) {
+            trgTerm = trgVocab.get(trgs[i]);
+            System.out.println("Prob("+trgTerm+"|"+srcTerm+")="+src2trgProbs.get(srcVocab.get(srcTerm), trgVocab.get(trgTerm)));
+          }
+        }else {
+          System.out.println("Prob("+trgTerm+"|"+srcTerm+")="+src2trgProbs.get(srcVocab.get(srcTerm), trgVocab.get(trgTerm)));
+        }
+        return;
+      }
+
+      // create mode
+      String lex_f2e = args[0];
+      String lex_e2f = args[1];
+      String type = args[2];
+      logger.info("Type of input:" + type);
       if(type.equals("giza")){
         CLIRUtils.createTTableFromGIZA(lex_f2e, args[3], args[4], args[5], probThreshold, numTrans, localFS);
         CLIRUtils.createTTableFromGIZA(lex_e2f, args[6], args[7], args[8], probThreshold, numTrans, localFS);
@@ -1193,29 +1387,8 @@ public class CLIRUtils extends Configured {
       }else{
         printUsage();
       }
-
-      //debugging
-
-      //			TTable_monolithic_IFAs de2EnProbs = new TTable_monolithic_IFAs(localFS, new Path(args[5]), true);
-      //			TTable_monolithic_IFAs en2DeProbs = new TTable_monolithic_IFAs(localFS, new Path(args[8]), true);
-      //			
-      //			Vocab enSrc = HadoopAlign.loadVocab(new Path(args[6]), conf);
-      //			Vocab zhTrg = HadoopAlign.loadVocab(new Path(args[7]), conf);
-      //
-      //			int[] fS = en2DeProbs.get(enSrc.get("princess")).getTranslations(0.0f);
-      //			System.out.println(fS.length);
-      //
-      //			for(int f : fS){
-      //				String fTerm =  zhTrg.get(f);
-      //				System.out.println(fTerm+","+de2EnProbs.get(enSrc.get("princess"), f));		
-      //			}
-
     } catch (IOException e) {
       e.printStackTrace();
     }
-
-
-
   }
-
 }

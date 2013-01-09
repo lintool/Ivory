@@ -16,11 +16,11 @@
 
 package ivory.smrf.model.potential;
 
+import ivory.core.ConfigurationException;
 import ivory.core.RetrievalEnvironment;
 import ivory.core.data.index.Posting;
 import ivory.core.data.index.PostingsReader;
 import ivory.core.data.index.ProximityPostingsReader;
-import ivory.core.exception.ConfigurationException;
 import ivory.core.util.XMLTools;
 import ivory.smrf.model.DocumentNode;
 import ivory.smrf.model.GlobalEvidence;

@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Ivory: Experiments</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Le styles -->
+    <link href="assets/css/bootstrap.css" rel="stylesheet">
+    <link href="assets/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="assets/css/docs.css" rel="stylesheet">
+    <link href="assets/js/google-code-prettify/prettify.css" rel="stylesheet">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+  </head>
+
+  <body data-spy="scroll" data-target=".bs-docs-sidebar">
+
+    <!-- Navbar
+    ================================================== -->
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <div class="nav-collapse collapse">
+            <ul class="nav">
+              <li class="">
+                <a href="../index.html">Home</a>
+              </li>
+              <li class="">
+                <a href="./start.html">Getting Started</a>
+              </li>
+              <li class="">
+                <a href="./publications.html">Publications</a>
+              </li>
+              <li class="active">
+                <a href="./experiments.html">Experiments</a>
+              </li>
+              <li class="">
+                <a href="./team.html">Team</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+<!-- Subhead
+================================================== -->
+<header class="jumbotron subhead" id="overview">
+  <div class="container">
+    <h1>Ivory</h1>
+    <p class="lead">A Hadoop toolkit for web-scale information retrieval research</p>
+  </div>
+</header>
+
+  <div class="container">
+
+<div class="page-header">
+<h2>Experiments: ESD Model from SIGIR 2010</h2>
+</div>
+<p>These regression runs represent experiments presented in Wang et al.'s SIGIR 2010 paper on <b><a href="publications/Wang_etal_SIGIR2010.pdf">Learning to Efficiently Rank</a></b>. Note that Bendersky et al.'s WSD model (WSDM 2010) is a special
+case of the ESD model (without any time constraints).  These runs
+represent results in Tables 5 and 6 of the paper.</p>
+
+<h3>Wt10g results</h3>
+
+<pre class="code">
+# command-line
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/wt10g/run.wt10g.SIGIR2010.xml data/wt10g/queries.wt10g.501-550.xml
+
+# evaluating effectiveness
+etc/trec_eval data/wt10g/qrels.wt10g.all ranking.sigir2010-wt10g-ql.txt
+etc/trec_eval data/wt10g/qrels.wt10g.all ranking.sigir2010-wt10g-sd.txt
+etc/trec_eval data/wt10g/qrels.wt10g.all ranking.sigir2010-wt10g-wsd-sd.txt
+
+# junit
+etc/junit.sh ivory.regression.sigir2010.Wt10g_ESD
+</pre>
+
+<table class="table" style="width: 700px;">
+<thead>
+<tr><td style="width: 375px;"><b>description</b></td>
+    <td style="width: 225px;"><b>tag</b></td>
+    <td style="width: 50px;"><b>MAP</b></td>
+    <td style="width: 50px;"><b>P10</b></td></tr></thead>
+
+<tr><td>Dirichlet, full independence</td>
+    <td>wt10g-ql</td>
+    <td>0.2151</td>
+    <td>0.3560</td></tr>
+
+<tr><td>Dirichlet, sequential dependence</td>
+    <td>wt10g-dir-sd</td>
+    <td>0.2242</td>
+    <td>0.3640</td></tr>
+
+<tr><td>Dirichlet, ESD, no time constraints (=WSD)</td>
+    <td>wt10g-wsd-sd</td>
+    <td>0.2411</td>
+    <td>0.3820</td></tr>
+
+</table>
+
+<h3>Gov2 results</h3>
+    
+<pre class="code">
+# command-line
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/gov2/run.gov2.SIGIR2010.xml data/gov2/queries.gov2.title.776-850.xml
+    
+# evaluating effectiveness
+etc/trec_eval data/gov2/qrels.gov2.all ranking.sigir2010-gov2-ql.txt
+etc/trec_eval data/gov2/qrels.gov2.all ranking.sigir2010-gov2-sd.txt
+etc/trec_eval data/gov2/qrels.gov2.all ranking.sigir2010-gov2-wsd-sd.txt
+    
+# junit
+etc/junit.sh ivory.regression.sigir2010.Gov2_ESD
+</pre>
+        
+<table class="table" style="width: 700px;">
+<thead>
+<tr><td style="width: 375px;"><b>description</b></td>
+    <td style="width: 225px;"><b>tag</b></td>
+    <td style="width: 50px;"><b>MAP</b></td>
+    <td style="width: 50px;"><b>P10</b></td></tr></thead>
+
+<tr><td>Dirichlet, full independence</td>
+    <td>gov2-ql</td>
+    <td>0.3195</td>
+    <td>0.5573</td></tr>
+
+<tr><td>Dirichlet, sequential dependence</td>
+    <td>gov2-dir-sd</td>
+    <td>0.3357</td>
+    <td>0.5813</td></tr>
+
+<tr><td>Dirichlet, ESD, no time constraints (=WSD)</td>
+    <td>gov2-wsd-sd</td>
+    <td>0.3435</td>
+    <td>0.5827</td></tr>
+
+</table>
+
+<h3>Web09 category B results</h3>
+
+<pre class="code">
+# command-line
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/clue/run.web09catB.SIGIR2010.xml data/clue/queries.web09.26-50.xml
+
+# evaluating effectiveness
+etc/trec_eval data/clue/qrels.web09catB.txt ranking.sigir2010-web09catB-ql.txt
+etc/trec_eval data/clue/qrels.web09catB.txt ranking.sigir2010-web09catB-sd.txt
+etc/trec_eval data/clue/qrels.web09catB.txt ranking.sigir2010-web09catB-wsd-sd.txt
+
+perl etc/statAP_MQ_eval_v3.pl data/clue/prels.web09catB.txt ranking.sigir2010-web09catB-ql.txt
+perl etc/statAP_MQ_eval_v3.pl data/clue/prels.web09catB.txt ranking.sigir2010-web09catB-sd.txt
+perl etc/statAP_MQ_eval_v3.pl data/clue/prels.web09catB.txt ranking.sigir2010-web09catB-wsd-sd.txt
+
+# junit
+etc/junit.sh ivory.regression.sigir2010.Clue_ESD
+</pre>
+
+<table class="table" style="width: 700px;">
+<thead>
+<tr><td style="width: 375px;"><b>description</b></td>
+    <td style="width: 225px;"><b>tag</b></td>
+    <td style="width: 50px;"><b>MAP</b></td>
+    <td style="width: 50px;"><b>P10</b></td></tr></thead>
+
+<tr><td>Dirichlet, full independence</td>
+    <td>clue-ql</td>
+    <td>0.2098</td>
+    <td>0.2075</td></tr>
+
+<tr><td>Dirichlet, sequential dependence</td>
+    <td>clue-sd</td>
+    <td>0.2208</td>
+    <td>0.2168</td></tr>
+
+<tr><td>Dirichlet, ESD, no time constraints (=WSD)</td>
+    <td>clue-wsd-sd</td>
+    <td>0.2212</td>
+    <td>0.2243</td></tr>
+
+</table>
+
+<p>(Note that results reported in the SIGIR 2010 paper are StatMAP values, not standard MAP values.)</p>
+
+
+  </div>
+
+
+
+    <!-- Footer
+    ================================================== -->
+    <footer class="footer">
+      <div class="container">
+        <p class="pull-right"><a href="#">Back to top</a></p>
+        <p>Designed using <a href="http://twitter.github.com/bootstrap/">Bootstrap</a>.</p>
+        <p>Code licensed under <a href="http://www.apache.org/licenses/LICENSE-2.0" target="_blank">Apache License v2.0</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
+      </div>
+    </footer>
+
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="assets/js/jquery.js"></script>
+    <script src="assets/js/google-code-prettify/prettify.js"></script>
+    <script src="assets/js/bootstrap-transition.js"></script>
+    <script src="assets/js/bootstrap-alert.js"></script>
+    <script src="assets/js/bootstrap-modal.js"></script>
+    <script src="assets/js/bootstrap-dropdown.js"></script>
+    <script src="assets/js/bootstrap-scrollspy.js"></script>
+    <script src="assets/js/bootstrap-tab.js"></script>
+    <script src="assets/js/bootstrap-tooltip.js"></script>
+    <script src="assets/js/bootstrap-popover.js"></script>
+    <script src="assets/js/bootstrap-button.js"></script>
+    <script src="assets/js/bootstrap-collapse.js"></script>
+    <script src="assets/js/bootstrap-carousel.js"></script>
+    <script src="assets/js/bootstrap-typeahead.js"></script>
+    <script src="assets/js/bootstrap-affix.js"></script>
+
+  </body>
+</html>
+

@@ -1,7 +1,13 @@
 
 package org.tartarus.snowball;
-import java.lang.reflect.InvocationTargetException;
 
-public abstract class SnowballStemmer extends SnowballProgram {
-    public abstract boolean stem();
-};
+import ivory.core.tokenize.Stemmer;
+
+public abstract class SnowballStemmer extends SnowballProgram implements Stemmer {
+  public abstract boolean stem();
+  public String toStem(String token){
+    setCurrent(token);
+    stem();
+    return getCurrent();
+  }
+}

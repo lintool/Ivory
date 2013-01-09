@@ -3,10 +3,9 @@ package ivory.lsh;
 import static org.junit.Assert.assertTrue;
 import ivory.lsh.data.FloatAsBytesWritable;
 import ivory.lsh.projection.WriteRandomVectors;
-
 import java.io.IOException;
 import java.util.List;
-
+import junit.framework.JUnit4TestAdapter;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -15,7 +14,6 @@ import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.io.WritableComparable;
 import org.junit.Test;
-
 import edu.umd.cloud9.io.SequenceFileUtils;
 import edu.umd.cloud9.io.array.ArrayListOfFloatsWritable;
 import edu.umd.cloud9.io.pair.PairOfWritables;
@@ -65,5 +63,9 @@ public class WriteRandomVectorsTest {
       float g2 = a2.getAsFloat(i);
       assertTrue(f2 == g2);
     }
+  }
+  
+  public static junit.framework.Test suite() {
+    return new JUnit4TestAdapter(WriteRandomVectorsTest.class);
   }
 }

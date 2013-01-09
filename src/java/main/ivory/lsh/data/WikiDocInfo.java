@@ -31,14 +31,14 @@ public class WikiDocInfo implements Writable {
 			langID = in.readInt();
 		} catch (IOException e1) {
 			e1.printStackTrace();
-			throw new RuntimeException("Could not read integer in WikiDocInfoSentence");
+			throw new RuntimeException("Could not read integer in WikiDocInfo");
 		}
 		
 		try {
 			vectors.readFields(in);
 			sentences.readFields(in);
 		} catch (IOException e) {
-			throw new RuntimeException("Could not read vectors/sentlengths in WikiDocInfoSentence");
+			throw new RuntimeException("Could not read vectors/sentlengths in WikiDocInfo");
 		}
 	}
 	

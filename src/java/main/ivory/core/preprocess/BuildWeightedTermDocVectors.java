@@ -71,6 +71,9 @@ public class BuildWeightedTermDocVectors extends PowerTool {
     private boolean normalize = false;
     DefaultFrequencySortedDictionary dict;
     DfTableArray dfTable; 
+    HMapSFW weightedVector = new HMapSFW();
+    String term;
+    float wt, sum2;
 
     public void configure(JobConf conf){
       normalize = conf.getBoolean("Ivory.Normalize", false);
@@ -98,6 +101,12 @@ public class BuildWeightedTermDocVectors extends PowerTool {
         idToTermFile = env.getIndexTermIdMappingData();
         dfFile = env.getDfByIntData();
         dlFile = env.getDoclengthsData().toString();
+
+        termsFile = termsFile.substring(termsFile.lastIndexOf("/") + 1);
+        termidsFile = termidsFile.substring(termidsFile.lastIndexOf("/") + 1);
+        idToTermFile = idToTermFile.substring(idToTermFile.lastIndexOf("/") + 1);
+        dfFile = dfFile.substring(dfFile.lastIndexOf("/") + 1);
+        dlFile = dlFile.substring(dlFile.lastIndexOf("/") + 1);
 
         // We need to figure out which file in the DistributeCache is which...
         localFiles = DistributedCache.getLocalCacheFiles(conf);
@@ -155,18 +164,13 @@ public class BuildWeightedTermDocVectors extends PowerTool {
         throw new RuntimeException("Error initializing Ivory.ScoringModel from "+conf.get("Ivory.ScoringModel"));
       }
     }
-
-
-    HMapSFW weightedVector = new HMapSFW();
-
-    String term;
-    float wt, sum2;
+    
     public void map(IntWritable docno, LazyTermDocVector doc,
         OutputCollector<IntWritable, HMapSFW> output, Reporter reporter)
-    throws IOException {
+    throws IOException {      
       mDocno.set(docno.get());
       int docLen = mDLTable.getDocLength(mDocno.get());
-
+      
       weightedVector.clear();
       TermDocVector.Reader r = doc.getReader();			
 

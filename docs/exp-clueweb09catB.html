@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Ivory: Experiments</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Le styles -->
+    <link href="assets/css/bootstrap.css" rel="stylesheet">
+    <link href="assets/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="assets/css/docs.css" rel="stylesheet">
+    <link href="assets/js/google-code-prettify/prettify.css" rel="stylesheet">
+
+  </head>
+
+  <body data-spy="scroll" data-target=".bs-docs-sidebar">
+
+    <!-- Navbar
+    ================================================== -->
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <div class="nav-collapse collapse">
+            <ul class="nav">
+              <li class="">
+                <a href="../index.html">Home</a>
+              </li>
+              <li class="">
+                <a href="./start.html">Getting Started</a>
+              </li>
+              <li class="">
+                <a href="./publications.html">Publications</a>
+              </li>
+              <li class="active">
+                <a href="./experiments.html">Experiments</a>
+              </li>
+              <li class="">
+                <a href="./team.html">Team</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+<!-- Subhead
+================================================== -->
+<header class="jumbotron subhead" id="overview">
+  <div class="container">
+    <h1>Ivory</h1>
+    <p class="lead">A Hadoop toolkit for web-scale information retrieval research</p>
+  </div>
+</header>
+
+  <div class="container">
+
+<div class="page-header">
+<h2>Experiments: ClueWeb09 Category B</h2>
+</div>
+
+<p>This tutorial provides a guide to batch retrieval with Ivory on the
+first English segment of the 
+<a href="http://www.lemurproject.org/clueweb09.php">ClueWeb09</a>
+collection, a modern web collection distributed
+by <a href="http://www.cmu.edu/index.shtml">Carnegie Mellon
+University</a> and used in many <a href="http://trec.nist.gov/">Text
+Retrieval Conferences</a> (TRECs). This guide will cover both indexing
+the collection and performing retrieval runs with queries from the
+2009 web track.</p>
+
+<table><tr><td valign="top"><span class="label label-info">Tip</span></td>
+<td style="padding-left: 10px">The procedure for preparing and
+indexing the ClueWeb collection is similar to those of the Gov2
+collection, which is described in <a href="exp-gov2.html">a separate
+tutorial</a>, so it might be a good idea to complete that
+first.</td></tr></table>
+
+<h3>Building the Index</h3>
+
+<p>In total, there are 503,903,810 pages in the English portion of the
+ClueWeb09 collection. The English data is distributed in ten parts
+(called segments), each corresponding to a directory. The first
+segment is commonly-known as "category B", and corresponds to the
+contents of directory <code>ClueWeb09_English_1/</code>. There are a
+total of 1492 files, with 50,220,423 web pages.</p>
+
+<p>It's easiest to work with the collection as block-compressed
+<code>SequenceFile</code>s, so you'll want to first repack the
+distribution WARC files.  There's a program
+in <a href="http://cloud9lib.org/">Cloud<sup><small>9</small></sup></a>
+for repacking the collection:</p>
+
+<pre class="code">
+hadoop jar lib/cloud9-X.X.X.jar edu.umd.cloud9.collection.clue.RepackClueWarcRecords \
+  -libjars lib/guava-X.X.X.jar \
+  /shared/collections/ClueWeb09/collection.raw clueweb09catB 1 docno-mapping.dat block
+</pre>
+
+<p>Replace the <code>X.X.X</code> with the actual latest version of
+the jars. The first command-line argument is the base path of your
+ClueWeb09 distribution; the second is the output path; the third is
+the segment number; the fourth is the docno mapping data file, which
+is <a href="../data/clue/clueweb09-docno-mapping.dat">here</a> (put it
+on HDFS); the fifth is "block" to specify block-level compression.</p>
+
+<p>Once the collection has been repacked, building the inverted index
+follows a procedure very similar to TREC and all other
+collections:</p>
+
+<pre class="code">
+etc/hadoop-cluster.sh ivory.app.PreprocessClueWebEnglish \
+  -collection clueweb09catB -index index-clueweb09catB -segment 1
+
+etc/hadoop-cluster.sh ivory.app.BuildIndex \
+  -index index-clueweb09catB -indexPartitions 200 -positionalIndexIP
+</pre>
+
+<hr/>
+<table><tr><td valign="top"><span class="label label-info">Info</span></td>
+<td style="padding-left: 10px">Before running
+the following experiments, make sure you've built
+the <code>trec_eval</code> evaluation package
+from <a href="http://trec.nist.gov/trec_eval/">NIST</a>. For your
+convenience, v9.0 is included
+in <code>etc/trec_eval.9.0.tar.gz</code>. Build the package
+by <code>make</code> and place the executable at <code>etc/trec_eval</code>.</td></tr></table>
+
+<table><tr><td valign="top"><span class="label label-info">Info</span></td>
+<td style="padding-left: 10px">Before running
+the following experiments, you have to
+copy the indexes out of HDFS. Also make sure to change the index location in
+<code><a href="../data/clue/run.web09catB.xml">data/clue/run.web09catB.xml</a></code>
+and other model specification files to the actual index path (under the
+<code>&lt;index&gt;</code> attribute).</td></tr></table>
+<hr/>
+
+<h3>Baseline models</h3>
+
+<p>To demonstrate batch retrieval, we're going to use topics from the
+2009 TREC web track. The two retrieval models are <i>bm25</i> and
+query likelihood (from language modeling) with Dirichlet scores. Here
+are the command-line invocations for running and evaluating the
+models:</p>
+
+<pre class="code">
+# command-line 
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/clue/run.web09catB.xml data/clue/queries.web09.xml
+
+# evaluating effectiveness
+etc/trec_eval data/clue/qrels.web09catB.txt ranking.web09catB-bm25.txt
+etc/trec_eval data/clue/qrels.web09catB.txt ranking.web09catB-ql.txt
+
+# junit
+etc/junit.sh ivory.regression.basic.Web09catB_Baseline
+</pre>
+
+<table class="table" style="width: 700px;">
+<thead>
+<tr><td style="width: 375px;"><b>description</b></td>
+    <td style="width: 225px;"><b>tag</b></td>
+    <td style="width: 50px;"><b>MAP</b></td>
+    <td style="width: 50px;"><b>P10</b></td></tr></thead>
+
+<tr><td class="mycell">bm25</td>
+    <td class="mycell">UMHOO-BM25-catB</td>
+    <td class="mycell">0.2051</td>
+    <td class="mycell">0.3720</td></tr>
+
+<tr><td class="mycell">QL</td>
+    <td class="mycell">UMHOO-QL-catB</td>
+    <td class="mycell">0.1931</td>
+    <td class="mycell">0.3380</td></tr>
+
+</table>
+
+<p><b>Dependence Models</b></p>
+
+<p>These runs contrast baseline models with dependence models
+(Dirichlet vs. <i>bm25</i> term weighting).  SD is Metzler and Croft's
+Sequential Dependence model (SIGIR 2005), and WSD is Bendersky et
+al.'s Weighted Sequential Dependence model (WSDM 2010).  Note that the
+SD model is not trained, since it has hard-coded parameters.  On the
+other hand, the WSD model is trained with all queries from TREC 2009
+(optimizing StatMAP), which makes the WSD figures unrealistically
+high, since we're testing on the training set.</p>
+
+<pre class="code">
+# command-line
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/clue/run.web09catB.all.xml data/clue/queries.web09.xml
+
+# evaluating effectiveness
+etc/trec_eval data/clue/qrels.web09catB.txt ranking.web09catB.all.ql.base.txt
+etc/trec_eval data/clue/qrels.web09catB.txt ranking.web09catB.all.ql.sd.txt
+etc/trec_eval data/clue/qrels.web09catB.txt ranking.web09catB.all.ql.wsd.txt
+etc/trec_eval data/clue/qrels.web09catB.txt ranking.web09catB.all.bm25.base.txt
+etc/trec_eval data/clue/qrels.web09catB.txt ranking.web09catB.all.bm25.sd.txt
+etc/trec_eval data/clue/qrels.web09catB.txt ranking.web09catB.all.bm25.wsd.txt
+
+# junit
+etc/junit.sh ivory.regression.basic.Web09catB_All
+</pre>
+
+<table class="table" style="width: 700px;">
+<thead>
+<tr><td style="width: 375px;"><b>description</b></td>
+    <td style="width: 225px;"><b>tag</b></td>
+    <td style="width: 50px;"><b>MAP</b></td>
+    <td style="width: 50px;"><b>P10</b></td></tr></thead>
+
+<tr><td>Dirichlet</td>
+    <td>ql-base</td>
+    <td>0.1931</td>
+    <td>0.3380</td></tr>
+
+<tr><td>Dirichlet + SD</td>
+    <td>ql-sd</td>
+    <td>0.2048</td>
+    <td>0.3620</td></tr>
+
+<tr><td>Dirichlet + WSD</td>
+    <td>ql-wsd</td>
+    <td>0.2120</td>
+    <td>0.3580</td></tr>
+
+<tr><td>bm25</td>
+    <td>bm25-base</td>
+    <td>0.2051</td>
+    <td>0.3720</td></tr>
+
+<tr><td>bm25 + SD</td>
+    <td>bm25-sd</td>
+    <td>0.2188</td>
+    <td>0.3920</td></tr>
+
+<tr><td>bm25 + WSD</td>
+    <td>bm25-wsd</td>
+    <td>0.2205</td>
+    <td>0.3940</td></tr>
+
+</table>
+
+<h3>Dependence Models + Waterloo spam scores</h3>
+
+<p>These runs are the same as the set above, except they also take
+advantage of Waterloo spam scores (simple linear interpolation). The
+training process started with the above models, and then the spam
+weight was tuned. Note that these figures are all unrealistically
+high, since we're testing on the training set.</p>
+
+<p>Running these models will require the Waterloo spam scores, packed
+in a manner usable by Ivory. They can be
+found <a href="https://github.com/lintool/Ivory-data">here</a>.</p>
+
+<pre class="code">
+# command-line
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/clue/run.web09catB.all.spam.xml data/clue/queries.web09.xml
+
+# evaluating effectiveness
+etc/trec_eval data/clue/qrels.web09catB.txt ranking.web09catB.spam.ql.base.txt
+etc/trec_eval data/clue/qrels.web09catB.txt ranking.web09catB.spam.ql.sd.txt
+etc/trec_eval data/clue/qrels.web09catB.txt ranking.web09catB.spam.ql.wsd.txt
+etc/trec_eval data/clue/qrels.web09catB.txt ranking.web09catB.spam.bm25.base.txt
+etc/trec_eval data/clue/qrels.web09catB.txt ranking.web09catB.spam.bm25.sd.txt
+etc/trec_eval data/clue/qrels.web09catB.txt ranking.web09catB.spam.bm25.wsd.txt
+
+# junit
+etc/junit.sh ivory.regression.basic.Web09catB_All_Spam
+</pre>
+
+<table class="table" style="width: 700px;">
+<thead>
+<tr><td style="width: 375px;"><b>description</b></td>
+    <td style="width: 225px;"><b>tag</b></td>
+    <td style="width: 50px;"><b>MAP</b></td>
+    <td style="width: 50px;"><b>P10</b></td></tr></thead>
+
+<tr><td>Dirichlet</td>
+    <td>ql-base</td>
+    <td>0.2134</td>
+    <td>0.4540</td></tr>
+
+<tr><td>Dirichlet + SD</td>
+    <td>ql-sd</td>
+    <td>0.2223</td>
+    <td>0.4560</td></tr>
+
+<tr><td>Dirichlet + WSD</td>
+    <td>ql-wsd</td>
+    <td>0.2283</td>
+    <td>0.4160</td></tr>
+
+<tr><td>bm25</td>
+    <td>bm25-base</td>
+    <td>0.2167</td>
+    <td>0.4220</td></tr>
+
+<tr><td>bm25 + SD</td>
+    <td>bm25-sd</td>
+    <td>0.2280</td>
+    <td>0.4420</td></tr>
+
+<tr><td>bm25 + WSD</td>
+    <td>bm25-wsd</td>
+    <td>0.2290</td>
+    <td>0.4340</td></tr>
+
+</table>
+
+
+  </div>
+
+
+
+    <!-- Footer
+    ================================================== -->
+    <footer class="footer">
+      <div class="container">
+        <p class="pull-right"><a href="#">Back to top</a></p>
+        <p>Designed using <a href="http://twitter.github.com/bootstrap/">Bootstrap</a>.</p>
+        <p>Code licensed under <a href="http://www.apache.org/licenses/LICENSE-2.0" target="_blank">Apache License v2.0</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
+      </div>
+    </footer>
+
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="assets/js/jquery.js"></script>
+    <script src="assets/js/google-code-prettify/prettify.js"></script>
+    <script src="assets/js/bootstrap-transition.js"></script>
+    <script src="assets/js/bootstrap-alert.js"></script>
+    <script src="assets/js/bootstrap-modal.js"></script>
+    <script src="assets/js/bootstrap-dropdown.js"></script>
+    <script src="assets/js/bootstrap-scrollspy.js"></script>
+    <script src="assets/js/bootstrap-tab.js"></script>
+    <script src="assets/js/bootstrap-tooltip.js"></script>
+    <script src="assets/js/bootstrap-popover.js"></script>
+    <script src="assets/js/bootstrap-button.js"></script>
+    <script src="assets/js/bootstrap-collapse.js"></script>
+    <script src="assets/js/bootstrap-carousel.js"></script>
+    <script src="assets/js/bootstrap-typeahead.js"></script>
+    <script src="assets/js/bootstrap-affix.js"></script>
+
+  </body>
+</html>
+

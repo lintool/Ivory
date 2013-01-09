@@ -1,5 +1,9 @@
 <project name="ivory" default="scripts" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant" xmlns:artifact="antlib:org.apache.maven.artifact.ant">
-  <description>Ivory: A Hadoop toolkit for web-scale information retrieval</description>
+  <description>Ivory: A Hadoop toolkit for web-scale information retrieval research</description>
+
+  <presetdef name="javac">
+    <javac includeantruntime="false" />
+  </presetdef>
 
   <property name="lib.dir" value="lib" />
   <property name="build.dir" value="build"/>
@@ -8,11 +12,10 @@
   <property name="javadoc.dir" location="docs/api/" />
   <property name="test.dir" value="test"/>
   <property name="test.junit.dir" location="${test.dir}/junit" />
-  <property name="regression.complete.dir" location="${test.dir}/regression.complete" />
-  <property name="regression.quick.dir" location="${test.dir}/regression.quick" />
+  <property name="regression.dir" location="${test.dir}/regression" />
   <property name="integration.dir" location="${test.dir}/integration" />
 
-  <property name="version" value="0.6.0"/>
+  <property name="version" value="0.8.1"/>
 
   <!-- paths used for compilation and run  -->
   <path id="lib.path.id">
@@ -21,6 +24,16 @@
   <path id="run.path.id">
     <path refid="lib.path.id" />
     <path location="${build.dir}" />
+  </path>
+  <path id="libjars.path.id">
+    <fileset dir="${dist.dir}/" includes="ivory*.jar"/>
+    <fileset dir="${lib.dir}/" includes="cloud9*.jar"/>
+    <fileset dir="${lib.dir}/" includes="guava*.jar"/>
+    <fileset dir="${lib.dir}/" includes="dsi*.jar"/>
+    <fileset dir="${lib.dir}/" includes="fastutil*.jar"/>
+    <fileset dir="${lib.dir}/" includes="sux4j*.jar"/>
+    <fileset dir="${lib.dir}/" includes="jsap*.jar"/>
+    <fileset dir="${lib.dir}/" includes="commons-collections*.jar"/>
   </path>
 
   <property name="ivy.install.version" value="2.2.0"/>
@@ -151,7 +164,7 @@
 
 	<target name="test" depends="jar" description="Execute Unit Tests">
 		<mkdir dir="${test.junit.dir}" />
-		<junit printsummary="yes" fork="yes" maxmemory="2048m">
+		<junit printsummary="yes" fork="yes" maxmemory="4096m">
 			<sysproperty key="java.library.path" path="${lib.dir}" />
 			<sysproperty key="org.xml.sax.driver" value="org.apache.xerces.parsers.SAXParser" />
 			<classpath refid="run.path.id" />
@@ -173,48 +186,15 @@
 		</junitreport>
 	</target>
 
-	<target name="regression-quick" depends="jar" description="Run regression tests">
-		<mkdir dir="${regression.quick.dir}" />
-		<junit printsummary="yes" fork="yes" maxmemory="2048m">
+	<target name="regression" depends="jar" description="Run regression tests">
+		<mkdir dir="${regression.dir}" />
+		<junit printsummary="yes" fork="yes" maxmemory="4096m">
 			<sysproperty key="java.library.path" path="${lib.dir}" />
 			<sysproperty key="org.xml.sax.driver" value="org.apache.xerces.parsers.SAXParser" />
 			<classpath refid="run.path.id" />
 
 			<formatter type="xml" />
-			<batchtest todir="${regression.quick.dir}">
-				<fileset dir="${build.dir}">
-					<include name="ivory/regression/basic/Robust04_Basic.class" />
-					<include name="ivory/regression/basic/Robust04_WSD.class" />
-					<include name="ivory/regression/basic/Wt10g_Basic.class" />
-					<include name="ivory/regression/basic/Gov2_Basic.class" />
-					<include name="ivory/regression/basic/Web09catB_All.class" />
-					<include name="ivory/regression/sigir2011/Clue_Cascade.class" />
-					<include name="ivory/regression/sigir2011/Gov2_Cascade.class" />
-					<include name="ivory/regression/sigir2011/Wt10g_Cascade.class" />
-				</fileset>
-			</batchtest>
-		</junit>
-
-		<junitreport todir="${regression.quick.dir}">
-			<fileset dir="${regression.quick.dir}">
-				<include name="TEST-*.xml" />
-			</fileset>
-			<report format="noframes" styledir="etc/" todir="${regression.quick.dir}" />
-		</junitreport>
-
-                <mail messageMimeType="text/html" messageFile="${regression.quick.dir}/junit-noframes.html" tolist="umd-ivory@googlegroups.com" subject="Ivory regression test results (quick)" mailhost="smtp.umiacs.umd.edu" from="jimmylin@umd.edu" />
-
-	</target>
-
-	<target name="regression-complete" depends="jar" description="Run regression tests">
-		<mkdir dir="${regression.complete.dir}" />
-		<junit printsummary="yes" fork="yes" maxmemory="2048m">
-			<sysproperty key="java.library.path" path="${lib.dir}" />
-			<sysproperty key="org.xml.sax.driver" value="org.apache.xerces.parsers.SAXParser" />
-			<classpath refid="run.path.id" />
-
-			<formatter type="xml" />
-			<batchtest todir="${regression.complete.dir}">
+			<batchtest todir="${regression.dir}">
 				<fileset dir="${build.dir}">
                                         <include name="ivory/regression/**/*.class" />
                                         <exclude name="ivory/regression/GroundTruth*.class" />
@@ -223,20 +203,20 @@
 			</batchtest>
 		</junit>
 
-		<junitreport todir="${regression.complete.dir}">
-			<fileset dir="${regression.complete.dir}">
+		<junitreport todir="${regression.dir}">
+			<fileset dir="${regression.dir}">
 				<include name="TEST-*.xml" />
 			</fileset>
-			<report format="noframes" styledir="etc/" todir="${regression.complete.dir}" />
+			<report format="noframes" styledir="etc/" todir="${regression.dir}" />
 		</junitreport>
 
-                <mail messageMimeType="text/html" messageFile="${regression.complete.dir}/junit-noframes.html" tolist="umd-ivory@googlegroups.com" subject="Ivory regression test results (complete)" mailhost="smtp.umiacs.umd.edu" from="jimmylin@umd.edu" />
+                <mail messageMimeType="text/html" messageFile="${regression.dir}/junit-noframes.html" tolist="umd-ivory@googlegroups.com" subject="Ivory regression test results (complete)" mailhost="smtp.umiacs.umd.edu" from="jimmylin@umd.edu" />
 
 	</target>
 
 	<target name="integration" depends="jar" description="Run integration tests">
 		<mkdir dir="${integration.dir}" />
-		<junit printsummary="yes" fork="yes" maxmemory="2048m">
+		<junit printsummary="yes" fork="yes" maxmemory="4096m">
 			<sysproperty key="java.library.path" path="${lib.dir}" />
 			<sysproperty key="org.xml.sax.driver" value="org.apache.xerces.parsers.SAXParser" />
 			<classpath refid="run.path.id" />
@@ -272,12 +252,14 @@
 			</fileset>
 			<link href="http://download.oracle.com/javase/6/docs/api/" />
 			<link href="http://hadoop.apache.org/common/docs/current/api/" />
-			<link href="http://www.umiacs.umd.edu/~jimmylin/Cloud9/docs/api//" />
+			<link href="http://lintool.github.com/Cloud9/docs/api/" />
 		</javadoc>
 	</target>
 
 	<target name="scripts" depends="jar">
 		<pathconvert property="run.path.id" refid="run.path.id" targetos="${platform}" />
+		<pathconvert property="lib.path.id" refid="lib.path.id" targetos="${platform}" />
+		<pathconvert property="libjars.path.id" refid="libjars.path.id" targetos="${platform}" pathsep="," />
 
 		<condition property="suffix" value="sh">
 			<equals arg1="${platform}" arg2="unix" />
@@ -307,14 +289,17 @@
 			<equals arg1="${platform}" arg2="windows" />
 		</condition>
 
-		<property name="java_command" value="${java} -Xmx2g -classpath &quot;${run.path.id}&quot;" />
+		<property name="java_command" value="${java} -Xmx4g -classpath &quot;${run.path.id}&quot;" />
 
-		<condition property="script_prefix" value="#!/bin/sh${line.separator}if test -s ~/.bashrc${line.separator}then${line.separator}source ~/.bashrc${line.separator}fi${line.separator}">
+		<condition property="script_prefix" value="#!/bin/sh${line.separator}export HADOOP_CLASSPATH=&quot;${run.path.id}:$HADOOP_CLASSPATH&quot;${line.separator}if test -s ~/.bashrc${line.separator}then${line.separator}source ~/.bashrc${line.separator}fi${line.separator}">
 			<equals arg1="${platform}" arg2="unix" />
 		</condition>
 		<condition property="script_prefix" value="">
 			<equals arg1="${platform}" arg2="windows" />
 		</condition>
+
+		<echo file="./etc/run-integration.${suffix}" message="${script_prefix}" />
+		<echo file="./etc/run-integration.${suffix}" message="${line.separator}ant clean${line.separator}ant${line.separator}ant -lib etc/mail.jar integration${line.separator}" append="true" />
 
 		<echo file="./etc/junit.${suffix}" message="${script_prefix}" />
 		<echo file="./etc/junit.${suffix}" message="${java_command} org.junit.runner.JUnitCore " append="true" />
@@ -323,6 +308,12 @@
 		<echo file="./etc/run.${suffix}" message="${script_prefix}" />
 		<echo file="./etc/run.${suffix}" message="${java_command} " append="true" />
 		<echo file="./etc/run.${suffix}" message="${param_prefix}1 ${param_prefix}2 ${param_prefix}3 ${param_prefix}4 ${param_prefix}5 ${param_prefix}6 ${param_prefix}7 ${param_prefix}8 ${param_prefix}9" append="true" />
+
+		<echo file="./etc/hadoop-local.${suffix}" message="${script_prefix}" />
+		<echo file="./etc/hadoop-local.${suffix}" message="hadoop jar ${dist.dir}/${artifactId}-${version}.jar ${param_prefix}1 -D mapreduce.framework.name=local -D mapreduce.jobtracker.address=local -D fs.default.name=file:/// -D mapreduce.cluster.local.dir=/tmp/mapred/local -D mapreduce.cluster.temp.dir=/tmp/mapred/temp -D mapreduce.jobtracker.staging.root.dir=/tmp/mapred/staging -D mapreduce.jobtracker.system.dir=/tmp/mapred/system ${param_prefix}2 ${param_prefix}3 ${param_prefix}4 ${param_prefix}5 ${param_prefix}6 ${param_prefix}7 ${param_prefix}8 ${param_prefix}9${line.separator}" append="true" />
+
+		<echo file="./etc/hadoop-cluster.${suffix}" message="${script_prefix}" />
+		<echo file="./etc/hadoop-cluster.${suffix}" message="hadoop jar ${dist.dir}/${artifactId}-${version}.jar ${param_prefix}1 -libjars ${libjars.path.id} ${param_prefix}2 ${param_prefix}3 ${param_prefix}4 ${param_prefix}5 ${param_prefix}6 ${param_prefix}7 ${param_prefix}8 ${param_prefix}9${line.separator}" append="true" />
 
 	</target>
 

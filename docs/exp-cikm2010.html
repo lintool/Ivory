@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Ivory: Experiments</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Le styles -->
+    <link href="assets/css/bootstrap.css" rel="stylesheet">
+    <link href="assets/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="assets/css/docs.css" rel="stylesheet">
+    <link href="assets/js/google-code-prettify/prettify.css" rel="stylesheet">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+  </head>
+
+  <body data-spy="scroll" data-target=".bs-docs-sidebar">
+
+    <!-- Navbar
+    ================================================== -->
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <div class="nav-collapse collapse">
+            <ul class="nav">
+              <li class="">
+                <a href="../index.html">Home</a>
+              </li>
+              <li class="">
+                <a href="./start.html">Getting Started</a>
+              </li>
+              <li class="">
+                <a href="./publications.html">Publications</a>
+              </li>
+              <li class="active">
+                <a href="./experiments.html">Experiments</a>
+              </li>
+              <li class="">
+                <a href="./team.html">Team</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+<!-- Subhead
+================================================== -->
+<header class="jumbotron subhead" id="overview">
+  <div class="container">
+    <h1>Ivory</h1>
+    <p class="lead">A Hadoop toolkit for web-scale information retrieval research</p>
+  </div>
+</header>
+
+  <div class="container">
+
+<div class="page-header">
+<h2>Experiments: RTC Model from CIKM 2010</h2>
+</div>
+
+<p>These regression runs represent experiments presented in Wang et al.'s CIKM 2010 paper <b><a href="publications/Wang_etal_CIKM2010.pdf">Ranking under Temporal Constraints</a></b>.</p>
+
+<h3>Wt10g results</h3>
+
+<pre class="code">
+# command-line
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/wt10g/run.wt10g.CIKM2010.title.indep.xml data/wt10g/wt10g_queries_501-550.xml
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/wt10g/run.wt10g.CIKM2010.title.joint.xml data/wt10g/wt10g_queries_501-550.xml
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/wt10g/run.wt10g.CIKM2010.desc.indep.xml data/wt10g/wt10g_queries_501-550_desc.xml
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/wt10g/run.wt10g.CIKM2010.desc.joint.xml data/wt10g/wt10g_queries_501-550_desc.xml
+ 
+# evaluating effectiveness
+etc/trec_eval data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-title-indep-x1.0.txt
+etc/trec_eval data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-title-indep-x1.5.txt
+etc/trec_eval data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-title-indep-x2.0.txt
+etc/trec_eval data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-title-indep-x2.5.txt
+etc/trec_eval data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-title-indep-x3.0.txt
+etc/trec_eval data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-title-indep-x3.5.txt
+etc/trec_eval data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-title-indep-x4.0.txt
+etc/trec_eval data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-title-indep-x4.5.txt
+etc/trec_eval data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-title-indep-x5.0.txt
+
+etc/trec_eval data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-title-joint-x1.0.txt
+etc/trec_eval data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-title-joint-x1.5.txt
+etc/trec_eval data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-title-joint-x2.0.txt
+etc/trec_eval data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-title-joint-x2.5.txt
+etc/trec_eval data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-title-joint-x3.0.txt
+etc/trec_eval data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-title-joint-x3.5.txt
+etc/trec_eval data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-title-joint-x4.0.txt
+etc/trec_eval data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-title-joint-x4.5.txt
+etc/trec_eval data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-title-joint-x5.0.txt
+
+etc/trec_eval data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-desc-indep-x1.0.txt
+etc/trec_eval data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-desc-indep-x1.5.txt
+etc/trec_eval data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-desc-indep-x2.0.txt
+etc/trec_eval data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-desc-indep-x2.5.txt
+etc/trec_eval data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-desc-indep-x3.0.txt
+etc/trec_eval data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-desc-indep-x3.5.txt
+etc/trec_eval data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-desc-indep-x4.0.txt
+etc/trec_eval data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-desc-indep-x4.5.txt
+etc/trec_eval data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-desc-indep-x5.0.txt
+
+etc/trec_eval data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-desc-joint-x1.0.txt
+etc/trec_eval data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-desc-joint-x1.5.txt
+etc/trec_eval data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-desc-joint-x2.0.txt
+etc/trec_eval data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-desc-joint-x2.5.txt
+etc/trec_eval data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-desc-joint-x3.0.txt
+etc/trec_eval data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-desc-joint-x3.5.txt
+etc/trec_eval data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-desc-joint-x4.0.txt
+etc/trec_eval data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-desc-joint-x4.5.txt
+etc/trec_eval data/wt10g/qrels.wt10g ranking.cikm2010-wt10g-desc-joint-x5.0.txt
+
+# junit
+etc/junit.sh ivory.regression.cikm2010.Wt10g_Title_Indep
+etc/junit.sh ivory.regression.cikm2010.Wt10g_Title_Joint
+etc/junit.sh ivory.regression.cikm2010.Wt10g_Desc_Indep
+etc/junit.sh ivory.regression.cikm2010.Wt10g_Desc_Joint
+</pre>
+
+<table class="table" style="width: 375px;">
+<thead>
+<tr><td style="width: 175x;"></td>
+    <td style="width: 100px;" colspan="2"><b>Title</b></td>
+    <td style="width: 100px;" colspan="2"><b>Description</b></td></tr>
+<tr><td><b>Condition</b></td>
+    <td><b>Indep</b></td>
+    <td><b>Joint</b></td>
+    <td><b>Indep</b></td>
+    <td><b>Joint</b></td></tr>
+</thead>
+
+<tr><td>QL x 1.0</td>
+    <td>0.1695</td><td>0.2200</td>
+    <td>0.1753</td><td>0.1778</td></tr>
+
+<tr><td>QL x 1.5</td>
+    <td>0.2143</td><td>0.2230</td>
+    <td>0.1859</td><td>0.1937</td></tr>
+
+<tr><td>QL x 2.0</td>
+    <td>0.2292</td><td>0.2325</td>
+    <td>0.1957</td><td>0.2048</td></tr>
+
+<tr><td>QL x 2.5</td>
+    <td>0.2299</td><td>0.2275</td>
+    <td>0.2048</td><td>0.2136</td></tr>
+
+<tr><td>QL x 3.0</td>
+    <td>0.2333</td><td>0.2307</td>
+    <td>0.2094</td><td>0.2126</td></tr>
+
+<tr><td>QL x 3.5</td>
+    <td>0.2323</td><td>0.2358</td>
+    <td>0.2101</td><td>0.2133</td></tr>
+
+<tr><td>QL x 4.0</td>
+    <td>0.2366</td><td>0.2366</td>
+    <td>0.2155</td><td>0.2201</td></tr>
+
+<tr><td>QL x 4.5</td>
+    <td>0.2413</td><td>0.2378</td>
+    <td>0.2178</td><td>0.2226</td></tr>
+
+<tr><td>QL x 5.0</td>
+    <td>0.2422</td><td>0.2387</td>
+    <td>0.2173</td><td>0.2175</td></tr>
+
+</table>
+
+<h3>Gov2 results</h3>
+
+<pre class="code">
+# command-line
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/gov2/run.gov2.CIKM2010.title.indep.xml data/gov2/queries.gov2.title.776-850.xml
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/gov2/run.gov2.CIKM2010.title.joint.xml data/gov2/queries.gov2.title.776-850.xml
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/gov2/run.gov2.CIKM2010.desc.indep.xml data/gov2/queries.gov2.desc.776-850.xml
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/gov2/run.gov2.CIKM2010.desc.joint.xml data/gov2/queries.gov2.desc.776-850.xml
+
+# evaluating effectiveness
+etc/trec_eval data/gov2/qrels.gov2.all ranking.cikm2010-gov2-title-indep-x1.0.txt
+etc/trec_eval data/gov2/qrels.gov2.all ranking.cikm2010-gov2-title-indep-x1.5.txt
+etc/trec_eval data/gov2/qrels.gov2.all ranking.cikm2010-gov2-title-indep-x2.0.txt
+etc/trec_eval data/gov2/qrels.gov2.all ranking.cikm2010-gov2-title-indep-x2.5.txt
+etc/trec_eval data/gov2/qrels.gov2.all ranking.cikm2010-gov2-title-indep-x3.0.txt
+etc/trec_eval data/gov2/qrels.gov2.all ranking.cikm2010-gov2-title-indep-x3.5.txt
+etc/trec_eval data/gov2/qrels.gov2.all ranking.cikm2010-gov2-title-indep-x4.0.txt
+etc/trec_eval data/gov2/qrels.gov2.all ranking.cikm2010-gov2-title-indep-x4.5.txt
+etc/trec_eval data/gov2/qrels.gov2.all ranking.cikm2010-gov2-title-indep-x5.0.txt
+
+etc/trec_eval data/gov2/qrels.gov2.all ranking.cikm2010-gov2-title-joint-x1.0.txt
+etc/trec_eval data/gov2/qrels.gov2.all ranking.cikm2010-gov2-title-joint-x1.5.txt
+etc/trec_eval data/gov2/qrels.gov2.all ranking.cikm2010-gov2-title-joint-x2.0.txt
+etc/trec_eval data/gov2/qrels.gov2.all ranking.cikm2010-gov2-title-joint-x2.5.txt
+etc/trec_eval data/gov2/qrels.gov2.all ranking.cikm2010-gov2-title-joint-x3.0.txt
+etc/trec_eval data/gov2/qrels.gov2.all ranking.cikm2010-gov2-title-joint-x3.5.txt
+etc/trec_eval data/gov2/qrels.gov2.all ranking.cikm2010-gov2-title-joint-x4.0.txt
+etc/trec_eval data/gov2/qrels.gov2.all ranking.cikm2010-gov2-title-joint-x4.5.txt
+etc/trec_eval data/gov2/qrels.gov2.all ranking.cikm2010-gov2-title-joint-x5.0.txt
+
+etc/trec_eval data/gov2/qrels.gov2.all ranking.cikm2010-gov2-desc-indep-x1.0.txt
+etc/trec_eval data/gov2/qrels.gov2.all ranking.cikm2010-gov2-desc-indep-x1.5.txt
+etc/trec_eval data/gov2/qrels.gov2.all ranking.cikm2010-gov2-desc-indep-x2.0.txt
+etc/trec_eval data/gov2/qrels.gov2.all ranking.cikm2010-gov2-desc-indep-x2.5.txt
+etc/trec_eval data/gov2/qrels.gov2.all ranking.cikm2010-gov2-desc-indep-x3.0.txt
+etc/trec_eval data/gov2/qrels.gov2.all ranking.cikm2010-gov2-desc-indep-x3.5.txt
+etc/trec_eval data/gov2/qrels.gov2.all ranking.cikm2010-gov2-desc-indep-x4.0.txt
+etc/trec_eval data/gov2/qrels.gov2.all ranking.cikm2010-gov2-desc-indep-x4.5.txt
+etc/trec_eval data/gov2/qrels.gov2.all ranking.cikm2010-gov2-desc-indep-x5.0.txt
+
+etc/trec_eval data/gov2/qrels.gov2.all ranking.cikm2010-gov2-desc-joint-x1.0.txt
+etc/trec_eval data/gov2/qrels.gov2.all ranking.cikm2010-gov2-desc-joint-x1.5.txt
+etc/trec_eval data/gov2/qrels.gov2.all ranking.cikm2010-gov2-desc-joint-x2.0.txt
+etc/trec_eval data/gov2/qrels.gov2.all ranking.cikm2010-gov2-desc-joint-x2.5.txt
+etc/trec_eval data/gov2/qrels.gov2.all ranking.cikm2010-gov2-desc-joint-x3.0.txt
+etc/trec_eval data/gov2/qrels.gov2.all ranking.cikm2010-gov2-desc-joint-x3.5.txt
+etc/trec_eval data/gov2/qrels.gov2.all ranking.cikm2010-gov2-desc-joint-x4.0.txt
+etc/trec_eval data/gov2/qrels.gov2.all ranking.cikm2010-gov2-desc-joint-x4.5.txt
+etc/trec_eval data/gov2/qrels.gov2.all ranking.cikm2010-gov2-desc-joint-x5.0.txt
+
+# junit
+etc/junit.sh ivory.regression.cikm2010.Gov2_Title_Indep
+etc/junit.sh ivory.regression.cikm2010.Gov2_Title_Joint
+etc/junit.sh ivory.regression.cikm2010.Gov2_Desc_Indep
+etc/junit.sh ivory.regression.cikm2010.Gov2_Desc_Joint
+</pre>
+
+
+<table class="table" style="width: 375px;">
+<thead>
+<tr><td style="width: 175x;"></td>
+    <td style="width: 100px;" colspan="2"><b>Title</b></td>
+    <td style="width: 100px;" colspan="2"><b>Description</b></td></tr>
+<tr><td><b>Condition</b></td>
+    <td><b>Indep</b></td>
+    <td><b>Joint</b></td>
+    <td><b>Indep</b></td>
+    <td><b>Joint</b></td></tr>
+</thead>
+
+<tr><td>QL x 1.0</td>
+    <td>0.1761</td><td>0.3174</td>
+    <td>0.2505</td><td>0.3067</td></tr>
+
+<tr><td>QL x 1.5</td>
+    <td>0.2724</td><td>0.3201</td>
+    <td>0.2889</td><td>0.3089</td></tr>
+
+<tr><td>QL x 2.0</td>
+    <td>0.3296</td><td>0.3361</td>
+    <td>0.3028</td><td>0.3115</td></tr>
+
+<tr><td>QL x 2.5</td>
+    <td>0.3325</td><td>0.3364</td>
+    <td>0.3104</td><td>0.3104</td></tr>
+
+<tr><td>QL x 3.0</td>
+    <td>0.3379</td><td>0.3506</td>
+    <td>0.3161</td><td>0.3277</td></tr>
+
+<tr><td>QL x 3.5</td>
+    <td>0.3421</td><td>0.3522</td>
+    <td>0.3211</td><td>0.3260</td></tr>
+
+<tr><td>QL x 4.0</td>
+    <td>0.3512</td><td>0.3524</td>
+    <td>0.3238</td><td>0.3335</td></tr>
+
+<tr><td>QL x 4.5</td>
+    <td>0.3540</td><td>0.3524</td>
+    <td>0.3263</td><td>0.3302</td></tr>
+
+<tr><td>QL x 5.0</td>
+    <td>0.3550</td><td>0.3524</td>
+    <td>0.3285</td><td>0.3294</td></tr>
+
+</table>
+
+<h3>Clue results</h3>
+
+<pre class="code">
+# command-line
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/clue/run.clue.CIKM2010.title.indep.xml data/clue/queries.web09.26-50.xml
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/clue/run.clue.CIKM2010.title.joint.xml data/clue/queries.web09.26-50.xml
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/clue/run.clue.CIKM2010.desc.indep.xml data/clue/queries.web09.26-50.desc.xml
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/clue/run.clue.CIKM2010.desc.joint.xml data/clue/queries.web09.26-50.desc.xml
+
+# evaluating effectiveness
+etc/trec_eval data/clue/qrels.web09catB.txt ranking.cikm2010-clue-title-indep-x1.0.txt
+etc/trec_eval data/clue/qrels.web09catB.txt ranking.cikm2010-clue-title-indep-x1.5.txt
+etc/trec_eval data/clue/qrels.web09catB.txt ranking.cikm2010-clue-title-indep-x2.0.txt
+etc/trec_eval data/clue/qrels.web09catB.txt ranking.cikm2010-clue-title-indep-x2.5.txt
+etc/trec_eval data/clue/qrels.web09catB.txt ranking.cikm2010-clue-title-indep-x3.0.txt
+etc/trec_eval data/clue/qrels.web09catB.txt ranking.cikm2010-clue-title-indep-x3.5.txt
+etc/trec_eval data/clue/qrels.web09catB.txt ranking.cikm2010-clue-title-indep-x4.0.txt
+etc/trec_eval data/clue/qrels.web09catB.txt ranking.cikm2010-clue-title-indep-x4.5.txt
+etc/trec_eval data/clue/qrels.web09catB.txt ranking.cikm2010-clue-title-indep-x5.0.txt
+
+etc/trec_eval data/clue/qrels.web09catB.txt ranking.cikm2010-clue-title-joint-x1.0.txt
+etc/trec_eval data/clue/qrels.web09catB.txt ranking.cikm2010-clue-title-joint-x1.5.txt
+etc/trec_eval data/clue/qrels.web09catB.txt ranking.cikm2010-clue-title-joint-x2.0.txt
+etc/trec_eval data/clue/qrels.web09catB.txt ranking.cikm2010-clue-title-joint-x2.5.txt
+etc/trec_eval data/clue/qrels.web09catB.txt ranking.cikm2010-clue-title-joint-x3.0.txt
+etc/trec_eval data/clue/qrels.web09catB.txt ranking.cikm2010-clue-title-joint-x3.5.txt
+etc/trec_eval data/clue/qrels.web09catB.txt ranking.cikm2010-clue-title-joint-x4.0.txt
+etc/trec_eval data/clue/qrels.web09catB.txt ranking.cikm2010-clue-title-joint-x4.5.txt
+etc/trec_eval data/clue/qrels.web09catB.txt ranking.cikm2010-clue-title-joint-x5.0.txt
+
+etc/trec_eval data/clue/qrels.web09catB.txt ranking.cikm2010-clue-desc-indep-x1.0.txt
+etc/trec_eval data/clue/qrels.web09catB.txt ranking.cikm2010-clue-desc-indep-x1.5.txt
+etc/trec_eval data/clue/qrels.web09catB.txt ranking.cikm2010-clue-desc-indep-x2.0.txt
+etc/trec_eval data/clue/qrels.web09catB.txt ranking.cikm2010-clue-desc-indep-x2.5.txt
+etc/trec_eval data/clue/qrels.web09catB.txt ranking.cikm2010-clue-desc-indep-x3.0.txt
+etc/trec_eval data/clue/qrels.web09catB.txt ranking.cikm2010-clue-desc-indep-x3.5.txt
+etc/trec_eval data/clue/qrels.web09catB.txt ranking.cikm2010-clue-desc-indep-x4.0.txt
+etc/trec_eval data/clue/qrels.web09catB.txt ranking.cikm2010-clue-desc-indep-x4.5.txt
+etc/trec_eval data/clue/qrels.web09catB.txt ranking.cikm2010-clue-desc-indep-x5.0.txt
+
+etc/trec_eval data/clue/qrels.web09catB.txt ranking.cikm2010-clue-desc-joint-x1.0.txt
+etc/trec_eval data/clue/qrels.web09catB.txt ranking.cikm2010-clue-desc-joint-x1.5.txt
+etc/trec_eval data/clue/qrels.web09catB.txt ranking.cikm2010-clue-desc-joint-x2.0.txt
+etc/trec_eval data/clue/qrels.web09catB.txt ranking.cikm2010-clue-desc-joint-x2.5.txt
+etc/trec_eval data/clue/qrels.web09catB.txt ranking.cikm2010-clue-desc-joint-x3.0.txt
+etc/trec_eval data/clue/qrels.web09catB.txt ranking.cikm2010-clue-desc-joint-x3.5.txt
+etc/trec_eval data/clue/qrels.web09catB.txt ranking.cikm2010-clue-desc-joint-x4.0.txt
+etc/trec_eval data/clue/qrels.web09catB.txt ranking.cikm2010-clue-desc-joint-x4.5.txt
+etc/trec_eval data/clue/qrels.web09catB.txt ranking.cikm2010-clue-desc-joint-x5.0.txt
+
+# junit
+etc/junit.sh ivory.regression.cikm2010.Web09catB_Title_Indep
+etc/junit.sh ivory.regression.cikm2010.Web09catB_Title_Joint
+etc/junit.sh ivory.regression.cikm2010.Web09catB_Desc_Indep
+etc/junit.sh ivory.regression.cikm2010.Web09catB_Desc_Joint
+</pre>  
+
+
+<table class="table" style="width: 375px;">
+<thead>
+<tr><td style="width: 175x;"></td>
+    <td style="width: 100px;" colspan="2"><b>Title</b></td>
+    <td style="width: 100px;" colspan="2"><b>Description</b></td></tr>
+<tr><td><b>Condition</b></td>
+    <td><b>Indep</b></td>
+    <td><b>Joint</b></td>
+    <td><b>Indep</b></td>
+    <td><b>Joint</b></td></tr>
+</thead>
+
+<tr><td>QL x 1.0</td>
+    <td>0.1134</td><td>0.2256</td>
+    <td>0.1393</td><td>0.1683</td></tr>
+
+<tr><td>QL x 1.5</td>
+    <td>0.1916</td><td>0.2256</td>
+    <td>0.1625</td><td>0.1563</td></tr>
+
+<tr><td>QL x 2.0</td>
+    <td>0.2097</td><td>0.2306</td>
+    <td>0.1446</td><td>0.1573</td></tr>
+
+<tr><td>QL x 2.5</td>
+    <td>0.2118</td><td>0.2315</td>
+    <td>0.1434</td><td>0.1558</td></tr>
+
+<tr><td>QL x 3.0</td>
+    <td>0.2159</td><td>0.2324</td>
+    <td>0.1461</td><td>0.1561</td></tr>
+
+<tr><td>QL x 3.5</td>
+    <td>0.2152</td><td>0.2348</td>
+    <td>0.1502</td><td>0.1567</td></tr>
+
+<tr><td>QL x 4.0</td>
+    <td>0.2218</td><td>0.2360</td>
+    <td>0.1499</td><td>0.1587</td></tr>
+
+<tr><td>QL x 4.5</td>
+    <td>0.2248</td><td>0.2360</td>
+    <td>0.1492</td><td>0.1567</td></tr>
+
+<tr><td>QL x 5.0</td>
+    <td>0.2250</td><td>0.2360</td>
+    <td>0.1496</td><td>0.1561</td></tr>
+
+</table>
+
+<p>(Note that results reported in the CIKM 2010 paper are StatMAP
+values, not standard MAP values reported in the table above.)</p>
+
+
+  </div>
+
+
+
+    <!-- Footer
+    ================================================== -->
+    <footer class="footer">
+      <div class="container">
+        <p class="pull-right"><a href="#">Back to top</a></p>
+        <p>Designed using <a href="http://twitter.github.com/bootstrap/">Bootstrap</a>.</p>
+        <p>Code licensed under <a href="http://www.apache.org/licenses/LICENSE-2.0" target="_blank">Apache License v2.0</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
+      </div>
+    </footer>
+
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="assets/js/jquery.js"></script>
+    <script src="assets/js/google-code-prettify/prettify.js"></script>
+    <script src="assets/js/bootstrap-transition.js"></script>
+    <script src="assets/js/bootstrap-alert.js"></script>
+    <script src="assets/js/bootstrap-modal.js"></script>
+    <script src="assets/js/bootstrap-dropdown.js"></script>
+    <script src="assets/js/bootstrap-scrollspy.js"></script>
+    <script src="assets/js/bootstrap-tab.js"></script>
+    <script src="assets/js/bootstrap-tooltip.js"></script>
+    <script src="assets/js/bootstrap-popover.js"></script>
+    <script src="assets/js/bootstrap-button.js"></script>
+    <script src="assets/js/bootstrap-collapse.js"></script>
+    <script src="assets/js/bootstrap-carousel.js"></script>
+    <script src="assets/js/bootstrap-typeahead.js"></script>
+    <script src="assets/js/bootstrap-affix.js"></script>
+
+  </body>
+</html>
+

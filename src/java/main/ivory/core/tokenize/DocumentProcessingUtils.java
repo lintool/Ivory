@@ -74,7 +74,7 @@ public class DocumentProcessingUtils {
 
     for (int i = 0; i < terms.length; i++) {
       String term = terms[i];
-
+      
       // Guard against bad tokenization
       if (term.length() == 0 || term.length() >= Byte.MAX_VALUE) {
         continue;

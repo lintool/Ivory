@@ -47,7 +47,6 @@ import edu.umd.cloud9.io.map.HMapIIW;
  * 
  * 
  */
-@SuppressWarnings("deprecation")
 public class ExtractWikipedia extends Configured implements Tool {
 
   public static final String[] RequiredParameters = {};
@@ -155,7 +154,12 @@ public class ExtractWikipedia extends Configured implements Tool {
 
     public void configure(JobConf job) {
       sLogger.setLevel(Level.DEBUG);
-      title2Docno = SequenceFileUtils.readFileIntoMap(new Path(job.get("TitleDocnoFile")));
+      try {
+        title2Docno = SequenceFileUtils.readFileIntoMap(new Path(job.get("TitleDocnoFile")));
+      } catch (IOException e2) {
+        // TODO Auto-generated catch block
+        e2.printStackTrace();
+      }
       sampleDocnosFile = job.get("SampleDocnosFile");
       if (sampleDocnosFile != null) {
         samplesMap = new HMapIIW();

@@ -32,6 +32,8 @@ import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.SequenceFile;
 import org.apache.log4j.Logger;
 
+import com.google.common.base.Preconditions;
+
 import edu.umd.cloud9.debug.MemoryUsageUtils;
 
 public class IntPostingsForwardIndex {
@@ -44,11 +46,12 @@ public class IntPostingsForwardIndex {
 
   private final long[] positions;
   private final String postingsPath;
-  private final FileSystem fs;
   private final Configuration conf;
 
   public IntPostingsForwardIndex(String indexPath, FileSystem fs) throws IOException {
-    this.fs = fs;
+    Preconditions.checkNotNull(indexPath);
+    Preconditions.checkNotNull(fs);
+
     this.conf = fs.getConf();
     RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fs);
     postingsPath = env.getPostingsDirectory();
@@ -74,12 +77,12 @@ public class IntPostingsForwardIndex {
     // Open up the SequenceFile.
     SequenceFile.Reader reader = null;
     try {
-      reader = new SequenceFile.Reader(fs,
-          new Path(postingsPath + "/part-" + FORMAT.format(fileNo)), conf);
+      reader = new SequenceFile.Reader(conf,
+          SequenceFile.Reader.file(new Path(postingsPath + "/part-" + FORMAT.format(fileNo))));
     } catch (IOException e) {
       // Try alternative naming scheme for output of new API.
-      reader = new SequenceFile.Reader(fs,
-          new Path(postingsPath + "/part-r-" + FORMAT.format(fileNo)), conf);
+      reader = new SequenceFile.Reader(conf,
+          SequenceFile.Reader.file(new Path(postingsPath + "/part-r-" + FORMAT.format(fileNo))));
     }
 
     IntWritable key = new IntWritable();
@@ -88,6 +91,7 @@ public class IntPostingsForwardIndex {
       value = (PostingsList) Class.forName(reader.getValueClassName()).newInstance();
     } catch (Exception e) {
       e.printStackTrace();
+      reader.close();
       return null;
     }
 
@@ -97,6 +101,7 @@ public class IntPostingsForwardIndex {
     if (key.get() != termid) {
       LOG.error("unable to fetch postings for term \"" + termid + "\": found key \""
           + key + "\" instead");
+      reader.close();
       return null;
     }
 

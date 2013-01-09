@@ -238,7 +238,7 @@ public class RankedListEvaluator {
 	    double [] ratings = new double[reldocs.size()];
 	    double [] ratings_2 = new double[docs.length];
 
-	    HashMap doc_to_rating = new HashMap();
+	    HashMap<String, String> doc_to_rating = new HashMap<String, String>();
 	    
 	    int cnt = 0;
 	    int [] order = new int[reldocs.size()];

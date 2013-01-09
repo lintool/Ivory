@@ -12,8 +12,8 @@
   <artifactId>ivory</artifactId>
   <packaging>jar</packaging>
   <name>Ivory</name>
-  <version>0.6.0</version>
-  <description>A Hadoop toolkit for web-scale information retrieval</description>
+  <version>0.8.1</version>
+  <description>A Hadoop toolkit for web-scale information retrieval research</description>
   <url>http://ivory.cc</url>
   <licenses>
     <license>
@@ -37,14 +37,62 @@
   <dependencies>
     <dependency>
       <groupId>org.apache.hadoop</groupId>
-      <artifactId>hadoop-core</artifactId>
-      <version>0.20.2-cdh3u1</version>
+      <artifactId>hadoop-common</artifactId>
+      <version>2.0.0-cdh4.1.2</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.hadoop</groupId>
+      <artifactId>hadoop-yarn-api</artifactId>
+      <version>2.0.0-cdh4.1.2</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.hadoop</groupId>
+      <artifactId>hadoop-yarn-common</artifactId>
+      <version>2.0.0-cdh4.1.2</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.hadoop</groupId>
+      <artifactId>hadoop-yarn-server-common</artifactId>
+      <version>2.0.0-cdh4.1.2</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.hadoop</groupId>
+      <artifactId>hadoop-yarn-server-nodemanager</artifactId>
+      <version>2.0.0-cdh4.1.2</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.hadoop</groupId>
+      <artifactId>hadoop-yarn-server-resourcemanager</artifactId>
+      <version>2.0.0-cdh4.1.2</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.hadoop</groupId>
+      <artifactId>hadoop-hdfs</artifactId>
+      <version>2.0.0-cdh4.1.2</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.hadoop</groupId>
+      <artifactId>hadoop-mapreduce-client-core</artifactId>
+      <version>2.0.0-cdh4.1.2</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.pig</groupId>
+      <artifactId>pig</artifactId>
+      <version>0.10.0</version>
       <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>edu.umd</groupId>
       <artifactId>cloud9</artifactId>
-      <version>1.2.5</version>
+      <version>1.4.0</version>
       <optional>true</optional>
     </dependency>
     <dependency>
@@ -81,6 +129,24 @@
       <groupId>opennlp</groupId>
       <artifactId>maxent</artifactId>
       <version>3.0.0</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.lucene</groupId>
+      <artifactId>lucene-core</artifactId>
+      <version>3.5.0</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.lucene</groupId>
+      <artifactId>lucene-analyzers</artifactId>
+      <version>3.5.0</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>com.sna-projects.kamikaze</groupId>
+      <artifactId>kamikaze</artifactId>
+      <version>3.0.3</version>
       <optional>true</optional>
     </dependency>
   </dependencies>

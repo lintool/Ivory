@@ -16,8 +16,8 @@
 
 package ivory.smrf.model.potential;
 
+import ivory.core.ConfigurationException;
 import ivory.core.RetrievalEnvironment;
-import ivory.core.exception.ConfigurationException;
 import ivory.core.util.XMLTools;
 import ivory.smrf.model.DocumentNode;
 import ivory.smrf.model.GlobalEvidence;

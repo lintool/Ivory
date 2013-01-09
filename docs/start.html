@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Ivory: Getting Started</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Le styles -->
+    <link href="assets/css/bootstrap.css" rel="stylesheet">
+    <link href="assets/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="assets/css/docs.css" rel="stylesheet">
+    <link href="assets/js/google-code-prettify/prettify.css" rel="stylesheet">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+  </head>
+
+  <body data-spy="scroll" data-target=".bs-docs-sidebar">
+
+    <!-- Navbar
+    ================================================== -->
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <div class="nav-collapse collapse">
+            <ul class="nav">
+              <li class="">
+                <a href="../index.html">Home</a>
+              </li>
+              <li class="active">
+                <a href="./start.html">Getting Started</a>
+              </li>
+              <li class="">
+                <a href="./publications.html">Publications</a>
+              </li>
+              <li class="">
+                <a href="./experiments.html">Experiments</a>
+              </li>
+              <li class="">
+                <a href="./team.html">Team</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+<!-- Subhead
+================================================== -->
+<header class="jumbotron subhead" id="overview">
+  <div class="container">
+    <h1>Ivory</h1>
+    <p class="lead">A Hadoop toolkit for web-scale information retrieval research</p>
+  </div>
+</header>
+
+  <div class="container">
+
+<div class="page-header">
+<h2>Getting Started</h2>
+</div>
+
+<p>Ivory is designed to work with Hadoop YARN and has been tested
+against Cloudera CDH 4.1.2 (on both Mac and Linux). It should work
+with other Hadoop distributions or on other platforms with only minor
+modifications; however, switching to a non-YARN version of Hadoop will
+requiring recompiling the jars. In this tutorial, we'll take you
+through the process of building an inverted index on a toy collection
+and running retrieval experiments. First, we'll use Hadoop local
+mode. Running in local model, as the name suggests, does not require
+setting up a cluster, but of course, you won't get the benefits of
+distributed processing either. Next, we'll run Hadoop on the single
+node virtual Hadoop cluster provided by Cloudera.</p>
+
+<h3>Download and Install Hadoop</h3>
+
+<p>Download Cloudera CDH
+4.1.2 <a href="https://ccp.cloudera.com/display/SUPPORT/CDH+Downloads">here</a>. The
+easiest way is to download the tarball and unpack on your local
+machine. Make sure
+<code>PATH_TO_HADOOP/bin</code> is on your path. Verify that Hadoop is running
+with the pi example. In a shell, run the following command:</p>
+
+<pre class="code">
+hadoop jar PATH_TO_HADOOP/share/hadoop/mapreduce/hadoop-mapreduce-examples-2.0.0-cdh4.1.2.jar pi \
+  -D mapreduce.framework.name=local -D mapreduce.jobtracker.address=local -D fs.default.name=file:/// \
+  -D mapreduce.cluster.local.dir=/tmp/mapred/local \
+  -D mapreduce.cluster.temp.dir=/tmp/mapred/temp\
+  -D mapreduce.jobtracker.staging.root.dir=/tmp/mapred/staging \
+  -D mapreduce.jobtracker.system.dir=/tmp/mapred/system \
+  100 100000
+</pre>
+
+<p>Note that the multitude of <code>-D</code> options overrides the
+Hadoop config and forces local mode. It isn't necessary if you just
+downloaded the tarball straight from the site above. This is just in
+case you have Hadoop set up already.</p>
+
+<p>After the above Hadoop local job finishes, you should see the
+computed value of pi... something that's reasonably closer to 3.14.</p>
+
+<h3>Clone the Ivory Repo</h3>
+
+<p>Open up a shell and clone the Ivory github repo:</p>
+
+<pre class="code">
+git clone git://github.com/lintool/Ivory.git
+</pre>
+
+<p>Go into the <code>Ivory/</code> directory and build with ant by
+typing <code>ant</code>. The build should complete without error.</p>
+
+<p>You should then be able to run one of the integration JUnit test
+cases that builds an inverted index on the CACM collection, runs retrieval
+experiments, and verifies the results:</p>
+
+<pre class="code">
+etc/junit.sh ivory.integration.local.VerifyLocalCACMPositionalIndexIP
+</pre>
+
+<p>After the job finishes, you should see:</p>
+
+<pre class="code">
+OK (1 test)
+</pre>
+
+<p>This indicates that the test has passed. If you got this far,
+congratulations, you've gotten Ivory to work without a hitch.</p>
+
+<h3>Building an Index</h3>
+
+<p>Next, we'll run through the above integration test step by step to
+see what it's doing. Let's look at the collection first:</p>
+
+<pre class="code">
+gunzip -c data/cacm/cacm-collection.xml.gz | less
+</pre>
+
+<p>This is the collection of documents we're going to search against,
+in the standard "TREC format":</p>
+
+<pre class="code">
+&lt;DOC&gt;
+&lt;DOCNO&gt;CACM-0001&lt;/DOCNO&gt;
+...
+&lt;/DOC&gt;
+&lt;DOCNO&gt;CACM-0002&lt;/DOCNO&gt;
+...
+&lt;/DOC&gt;
+...
+</pre>
+
+<p>The <code>&lt;DOC&gt;</code> and <code>&lt;/DOC&gt;</code> tags
+denote documents. The <code>&lt;DOCNO&gt;</code>
+and <code>&lt;/DOCNO&gt;</code> tags surround the unique document
+identifier.</p>
+
+<p>This is the CACM collection, which contains abstracts from the
+Communications of the ACM from the late 1950's through the mid
+1960's. It's too small and too old to be useful for serious research
+today, but it works fine as a toy test collection.</p>
+
+<p>Let's build an inverted index. Ant should have automatically
+created a script for you located at <code>etc/hadoop-local.sh</code>
+for running Hadoop jobs in local mode. It conveniently sets up the
+environment, so you shouldn't have to worry about classpaths, libjars,
+etc. Building the index involves two separated commands:</p>
+
+<pre class="code">
+etc/hadoop-local.sh ivory.app.PreprocessTrecCollection \
+  -collectionName cacm -collection data/cacm/cacm-collection.xml.gz -index index-cacm
+
+etc/hadoop-local.sh ivory.app.BuildIndex \
+  -index index-cacm -indexPartitions 1 -positionalIndexIP
+</pre>
+
+<p>The first preprocesses the collection, while the second actually
+performs inverted index construction. The index should now be in
+<code>index-cacm/</code>.</p>
+
+<h3>Retrieval Experiments</h3>
+
+<p>Now let's run some retrieval experiments. To do so, we need
+"topics" (which is IR parlance for queries) and "qrels" (which is IR
+parlance for relevance judgments, or lists that tell us which
+documents are relevant with respect to which queries):</p>
+
+<ul>
+<li>qrels can be found <a href="../data/cacm/qrels.cacm.txt">here</a>.</li>
+<li>topics can be found <a href="../data/cacm/queries.cacm.xml ">here</a>.</li>
+</ul>
+
+<p>Next, take a look at the <a href="../data/cacm/run.cacm.xml ">model
+parameter settings</a>. It specifies the index location and two
+different retrieval models that we're going to run: one based on
+language modeling (with the Dirichlet score), and the second based on
+BM25.</p>
+
+<p>Now go ahead and do the experimental runs:</p>
+
+<pre class="code">
+etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/cacm/run.cacm.xml data/cacm/queries.cacm.xml
+</pre>
+
+<p>If you see warnings about not being able to find terms, that's
+okay. After the program finishes you should see two files:
+<code>ranking.cacm-dir-base.txt</code>, <code>ranking.cacm-bm25-base.txt</code>. These
+are the retrieval results, the files containing the top 1000 hits per topic.</p>
+
+<p>Finally, let's evaluate the ranked list to see how well our
+retrieval models perform. Before doing so, make sure you've built
+the <code>trec_eval</code> evaluation package
+from <a href="http://trec.nist.gov/trec_eval/">NIST</a>. For your
+convenience, v9.0 is included
+in <code>etc/trec_eval.9.0.tar.gz</code>. Build the package
+by <code>make</code> and place the executable at <code>etc/trec_eval</code>.</p>
+
+<p>You can then run run trec_eval:</p>
+
+<pre class="code">
+etc/trec_eval data/cacm/qrels.cacm.txt ranking.cacm-dir-base.txt
+etc/trec_eval data/cacm/qrels.cacm.txt ranking.cacm-bm25-base.txt
+</pre>
+
+<p>For the first, you should get a <code>map</code> (mean average
+precision) of 0.3032 and <code>P_10</code> (precision at 10) of
+0.3038. For the second, you should get a <code>map</code> of 0.2863
+and a <code>P_10</code> of 0.2885.</p>
+
+<h3>Running Ivory on a Single Node Virtual Cluster</h3>
+
+<p>The next step is to run Ivory on an actual Hadoop cluster. How to
+set up a Hadoop cluster is beyond the scope of this tutorial, but the
+next best thing is to use Cloudera's virtual machine images, which
+come with pre-configured single-node cluster. The images can be
+downloaded <a href="https://ccp.cloudera.com/display/SUPPORT/Cloudera%27s+Hadoop+Demo+VM+for+CDH4">here</a>.
+</p>
+
+<p>The latest available version is CDH 4.1.1: use the VirtualBox image,
+since VirtualBox is freely available across all major
+platforms. Download the image and unpack the tarball. VirtualBox
+itself can be
+download <a href="https://www.virtualbox.org/wiki/Downloads">here</a>.</p>
+
+<p>Install VirtualBox and open up the application. To install the
+Cloudera Hadoop image, click "New" on the tool bar. For "Name and
+operating system", put in the following information:</p>
+
+<ul>
+<li>Name: Cloudera CDH 4.1.1</li>
+<li>Type: Linux</li>
+<li>Version: Linux 2.6 (64 bit)</li>
+</ul>
+
+<p>Next, for "Memory size", put in as much as you can spare, with a
+minimum of 3GB. Next, "Hard drive", select "Use an existing virtual
+hard drive file" and select the VM image you downloaded from above. To
+finish, click "Create". Back in the main window, the VM should have
+been added. Select it and click "Start" in the toolbar. That'll boot
+up the image.</p>
+
+<table style="margin-top: 15px; margin-bottom: 15px;">
+<tr><td valign="top"><span class="label label-info">Info</span></td>
+<td style="padding-left: 10px">On Mac, if you get the error "<code>Failed to
+load VMMR0.r0 (VERR_SUPLIB_WORLD_WRITABLE)</code>" when booting up, it's
+complaining because the directory <code>/Application</code> is world
+writable. Apparently, that's bad practice, so change that: <code>chmod
+775</code> should do the trick.
+</td></tr></table>
+
+<p>The VM is missing a few packages that we need, so open up a shell
+and install from the command line:</p>
+
+<pre class="code">
+sudo yum install git 
+sudo yum install ant 
+sudo yum install gcc
+</pre>
+
+<p>Open up a shell and clone the Ivory github repo:</p>
+
+<pre class="code">
+git clone git://github.com/lintool/Ivory.git
+</pre>
+
+<p>As with before, go into the <code>Ivory/</code> directory and build
+with ant by typing <code>ant</code>.</p>
+
+<p>After that's done, we need to put the CACM collection onto HDFS,
+because we're no longer indexing on the local disk anymore:</p>
+
+<pre class="code">
+hadoop fs -put data/cacm/cacm-collection.xml.gz
+</pre>
+
+<p>You can verify that the file is there:</p>
+
+<pre class="code">
+hadoop fs -ls
+</pre>
+
+<p>Next, build the indexes using
+the <code>etc/hadoop-cluster.sh</code> script, as follows:</p>
+
+<pre class="code">
+etc/hadoop-cluster.sh ivory.app.PreprocessTrecCollection \
+  -collectionName cacm -collection cacm-collection.xml.gz -index index-cacm
+
+etc/hadoop-cluster.sh ivory.app.BuildIndex \
+  -index index-cacm -indexPartitions 1 -positionalIndexIP
+</pre>
+
+<p>The script is a wrapper around <code>hadoop</code> that sets up the
+environment, handles libjars, etc. If you're curious, <code>cat</code>
+it and you'll see. Note that the paths here are referencing HDFS
+paths, not local paths.</p>
+
+<p>After the indexing finishes, you should be able to see the indexes
+on HFS:</p>
+
+<pre class="code">
+hadoop fs -ls index-cacm
+</pre>
+
+<p>Now copy the indexes from HDFS onto the local disk:</P>
+
+<pre class="code">
+hadoop fs -get index-cacm .
+</pre>
+
+<p>From here, you should be able to run the retrieval experiments above.</p>
+
+<p>And that's it! Happy searching!</p>
+
+  </div>
+
+
+
+    <!-- Footer
+    ================================================== -->
+    <footer class="footer">
+      <div class="container">
+        <p class="pull-right"><a href="#">Back to top</a></p>
+        <p>Designed using <a href="http://twitter.github.com/bootstrap/">Bootstrap</a>.</p>
+        <p>Code licensed under <a href="http://www.apache.org/licenses/LICENSE-2.0" target="_blank">Apache License v2.0</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
+      </div>
+    </footer>
+
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="assets/js/jquery.js"></script>
+    <script src="assets/js/google-code-prettify/prettify.js"></script>
+    <script src="assets/js/bootstrap-transition.js"></script>
+    <script src="assets/js/bootstrap-alert.js"></script>
+    <script src="assets/js/bootstrap-modal.js"></script>
+    <script src="assets/js/bootstrap-dropdown.js"></script>
+    <script src="assets/js/bootstrap-scrollspy.js"></script>
+    <script src="assets/js/bootstrap-tab.js"></script>
+    <script src="assets/js/bootstrap-tooltip.js"></script>
+    <script src="assets/js/bootstrap-popover.js"></script>
+    <script src="assets/js/bootstrap-button.js"></script>
+    <script src="assets/js/bootstrap-collapse.js"></script>
+    <script src="assets/js/bootstrap-carousel.js"></script>
+    <script src="assets/js/bootstrap-typeahead.js"></script>
+    <script src="assets/js/bootstrap-affix.js"></script>
+
+  </body>
+</html>
+

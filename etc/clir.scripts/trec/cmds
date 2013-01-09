@@ -1,0 +1,3 @@
+zless /fs/clip-hadoop/fture/arabic_newswire_a_ldc2001t55/transcripts/*/*gz > ldc2001t55.raw
+
+cat ldc2001t55.raw | perl ../Ivory/etc/clir.scripts/trec/clean-collection-trec.pl | grep -v '<HEADLINE>|</HEADLINE>|<P>|</P>|<TEXT>|</TEXT>|<BODY>|</BODY>' > ldc2001t55.ar-cleaned.xml

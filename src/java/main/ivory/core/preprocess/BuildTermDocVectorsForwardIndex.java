@@ -159,7 +159,7 @@ public class BuildTermDocVectorsForwardIndex extends PowerTool {
     RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fs);
     String collectionName = env.readCollectionName();
 
-    LOG.info("Tool: " + BuildTermDocVectorsForwardIndex.class.getCanonicalName());
+    LOG.info("Tool: " + BuildTermDocVectorsForwardIndex.class.getSimpleName());
     LOG.info(String.format(" - %s: %s", Constants.CollectionName, collectionName));
     LOG.info(String.format(" - %s: %s", Constants.IndexPath, indexPath));
 
@@ -173,14 +173,18 @@ public class BuildTermDocVectorsForwardIndex extends PowerTool {
       return 0;
     }
 
-    Job job = new Job(conf,
+    Job job = Job.getInstance(conf,
         BuildTermDocVectorsForwardIndex.class.getSimpleName() + ":" + collectionName);
     job.setJarByClass(BuildTermDocVectorsForwardIndex.class);
 
     FileInputFormat.setInputPaths(job, new Path(env.getTermDocVectorsDirectory()));
     job.setNumReduceTasks(1);
 
-    job.getConfiguration().set("mapred.child.java.opts", "-Xmx2048m");
+    //job.getConfiguration().set("mapred.child.java.opts", "-Xmx2048m");
+    job.getConfiguration().set("mapreduce.map.memory.mb", "2048");
+    job.getConfiguration().set("mapreduce.map.java.opts", "-Xmx2048m");
+    job.getConfiguration().set("mapreduce.reduce.memory.mb", "2048");
+    job.getConfiguration().set("mapreduce.reduce.java.opts", "-Xmx2048m");
 
     job.setInputFormatClass(SequenceFileInputFormat.class);
     job.setMapOutputKeyClass(IntWritable.class);

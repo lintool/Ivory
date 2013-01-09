@@ -3,10 +3,9 @@ package ivory.lsh;
 import static org.junit.Assert.assertTrue;
 import ivory.lsh.data.MinhashSignature;
 import ivory.lsh.data.PermutationByBit;
-
 import java.io.IOException;
 import java.util.List;
-
+import junit.framework.JUnit4TestAdapter;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -15,7 +14,6 @@ import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.io.WritableComparable;
 import org.junit.Test;
-
 import edu.umd.cloud9.io.SequenceFileUtils;
 import edu.umd.cloud9.io.array.ArrayListOfIntsWritable;
 import edu.umd.cloud9.io.pair.PairOfWritables;
@@ -187,5 +185,9 @@ public class MinhashSignatureTest {
       assertTrue(s.toString().equals(slide.toString() + "," + slide2.toString()));
     }
     System.out.println("done");
+  }
+  
+  public static junit.framework.Test suite() {
+    return new JUnit4TestAdapter(MinhashSignatureTest.class);
   }
 }

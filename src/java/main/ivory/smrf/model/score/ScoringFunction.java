@@ -16,7 +16,7 @@
 
 package ivory.smrf.model.score;
 
-import ivory.core.exception.ConfigurationException;
+import ivory.core.ConfigurationException;
 import ivory.smrf.model.GlobalEvidence;
 import ivory.smrf.model.GlobalTermEvidence;
 

@@ -20,13 +20,11 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.galagosearch.core.parse.Document;
 import org.galagosearch.core.parse.TagTokenizer;
 import org.tartarus.snowball.ext.englishStemmer;
-
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -772,10 +770,21 @@ public class GalagoTokenizer extends Tokenizer {
   private final Map<String, String> cache = Maps.newHashMap();
   private final Set<String> stopwords = Sets.newHashSet(TERRIER_STOP_WORDS);
 
+  @Override
   public boolean isStopWord(String word) {
     return stopwords.contains(word);
   }
+  
+  @Override
+  public boolean isStemming() {
+    return true;
+  }
 
+  @Override
+  public boolean isStopwordRemoval() {
+    return true;
+  }
+  
   public String[] processContent(String text) {
     TagTokenizer tokenizer = new TagTokenizer();
     Document doc = null;
@@ -824,8 +833,11 @@ public class GalagoTokenizer extends Tokenizer {
   }
 
   @Override
-  public void configure(Configuration conf) {}
+  public void configure(Configuration conf) { }
 
+  @Override
+  public void configure(Configuration mJobConf, FileSystem fs) { }
+  
   public static void main(String[] args) {
     String text = " this is a the <test> for the teokenizer 101 546 345-543543545436-4656765865865 rgger <xml> ergtre 456435klj345lj34590";
 
@@ -839,8 +851,5 @@ public class GalagoTokenizer extends Tokenizer {
       System.out.println(t);
     }
   }
-
-@Override
-public void configure(Configuration mJobConf, FileSystem fs) {}
 
 }
