@@ -1,7 +1,9 @@
 package ivory.integration.wikipedia;
 
 import ivory.core.data.document.WeightedIntDocVector;
+
 import java.io.IOException;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
@@ -9,7 +11,6 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -21,7 +22,6 @@ import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.MapReduceBase;
 import org.apache.hadoop.mapred.Mapper;
 import org.apache.hadoop.mapred.OutputCollector;
-import org.apache.hadoop.mapred.Reducer;
 import org.apache.hadoop.mapred.Reporter;
 import org.apache.hadoop.mapred.SequenceFileInputFormat;
 import org.apache.hadoop.mapred.SequenceFileOutputFormat;
@@ -30,6 +30,7 @@ import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+
 import edu.umd.cloud9.io.map.HMapSFW;
 
 /**
@@ -67,31 +68,32 @@ public class SearchSequenceFiles extends Configured implements Tool {
 
     public void map(IntWritable key, HMapSFW value, OutputCollector<IntWritable, HMapSFW> output,
         Reporter reporter) throws IOException {
-        for (String compareKey : keys) {
-          int k = Integer.parseInt(compareKey);
-          if (k == key.get()) {
-            output.collect(key, value);
-          }
+      for (String compareKey : keys) {
+        int k = Integer.parseInt(compareKey);
+        if (k == key.get()) {
+          output.collect(key, value);
         }
+      }
     }
   }
   
   static class MyMapperInt extends MapReduceBase implements
-  Mapper<IntWritable, WeightedIntDocVector, IntWritable, WeightedIntDocVector> {
+      Mapper<IntWritable, WeightedIntDocVector, IntWritable, WeightedIntDocVector> {
     private String[] keys;
-    
+
     public void configure(JobConf job) {
       keys = job.get("keys").split(",");
     }
 
-    public void map(IntWritable key, WeightedIntDocVector value, OutputCollector<IntWritable, WeightedIntDocVector> output,
-        Reporter reporter) throws IOException {
-        for (String compareKey : keys) {
-          int k = Integer.parseInt(compareKey);
-          if (k == key.get()) {
-            output.collect(key, value);
-          }
+    public void map(IntWritable key, WeightedIntDocVector value,
+        OutputCollector<IntWritable, WeightedIntDocVector> output, Reporter reporter)
+        throws IOException {
+      for (String compareKey : keys) {
+        int k = Integer.parseInt(compareKey);
+        if (k == key.get()) {
+          output.collect(key, value);
         }
+      }
     }
   }
   
@@ -108,15 +110,6 @@ public class SearchSequenceFiles extends Configured implements Tool {
     
     JobConf job = new JobConf(getConf(), SearchSequenceFiles.class);
     job.setJobName("SearchSequenceFiles");
-
-//    Class<? extends Writable> keyClass, valueClass;
-//    try {
-//      valueClass = (Class<? extends Writable>) Class.forName(valueClassName);
-//    } catch (ClassNotFoundException e) {
-//      e.printStackTrace();
-//      throw new RuntimeException("Class not found: " + valueClassName);
-//    }
-    
      
     FileSystem.get(job).delete(new Path(outputPath), true);
     FileInputFormat.setInputPaths(job, inputPath);
@@ -140,7 +133,7 @@ public class SearchSequenceFiles extends Configured implements Tool {
       job.setMapperClass(MyMapperTerm.class);
       job.setMapOutputValueClass(HMapSFW.class);
       job.setOutputValueClass(HMapSFW.class);
-    }else {
+    } else {
       job.setMapperClass(MyMapperInt.class);      
       job.setMapOutputValueClass(WeightedIntDocVector.class);
       job.setOutputValueClass(WeightedIntDocVector.class);
@@ -184,8 +177,7 @@ public class SearchSequenceFiles extends Configured implements Tool {
   }
   
   public static void main(String[] args) throws Exception {
-    ToolRunner.run(new Configuration(), new SearchSequenceFiles(), args);
-    return;
+    ToolRunner.run(new SearchSequenceFiles(), args);
   }
 
 }
