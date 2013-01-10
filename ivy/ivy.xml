@@ -41,5 +41,6 @@
     <dependency org="org.apache.lucene" name="lucene-analyzers" rev="3.5.0" conf="*->*,!sources,!javadoc"/>
     <dependency org="com.sna-projects.kamikaze" name="kamikaze" rev="3.0.3" conf="*->*,!sources,!javadoc"/>
 
+    <dependency org="com.sna-projects.kamikaze" name="kamikaze" rev="3.0.3" />
   </dependencies>
 </ivy-module>
