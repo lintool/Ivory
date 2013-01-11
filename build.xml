@@ -197,6 +197,7 @@
 			<batchtest todir="${regression.dir}">
 				<fileset dir="${build.dir}">
                                         <include name="ivory/regression/**/*.class" />
+                                        <exclude name="ivory/regression/cikm2012/RelativeRecallUtil.class" />
                                         <exclude name="ivory/regression/GroundTruth*.class" />
                                         <exclude name="ivory/regression/RegressionUtils.class" />
 				</fileset>
