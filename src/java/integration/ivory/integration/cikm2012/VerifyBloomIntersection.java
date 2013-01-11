@@ -1,4 +1,4 @@
-package ivory.bloomir;
+package ivory.integration.cikm2012;
 
 import java.io.File;
 
@@ -19,8 +19,8 @@ import ivory.bloomir.preprocessing.GenerateCompressedPostings;
 import ivory.bloomir.ranker.BloomRanker;
 import ivory.bloomir.ranker.SmallAdaptiveRanker;
 
-public class Basic {
-  private static final Logger LOG = Logger.getLogger(Basic.class);
+public class VerifyBloomIntersection {
+  private static final Logger LOG = Logger.getLogger(VerifyBloomIntersection.class);
 
   private static final String[] EXACT_RETRIEVAL = {
     "clueweb09-en0000-18-04501",
@@ -285,14 +285,14 @@ public class Basic {
     File bloomOutput = File.createTempFile("bloomirBO", null);
 
     String[] paramsCompressedPostings = new String[] {
-      "-index", Basic.IVORY_INDEX_PATH,
-      "-spam", Basic.SPAM_PATH,
+      "-index", VerifyBloomIntersection.IVORY_INDEX_PATH,
+      "-spam", VerifyBloomIntersection.SPAM_PATH,
       "-output", postingIndex.getPath()
     };
 
     String[] paramsBloomFilters = new String[] {
-      "-index", Basic.IVORY_INDEX_PATH,
-      "-spam", Basic.SPAM_PATH,
+      "-index", VerifyBloomIntersection.IVORY_INDEX_PATH,
+      "-spam", VerifyBloomIntersection.SPAM_PATH,
       "-output", bloomIndex.getPath(),
       "-bpe", "8",
       "-nbHash", "1"
@@ -311,20 +311,20 @@ public class Basic {
     LOG.info("Total Bloom filter generation time: " + (end - start) + "ms");
 
     String[] paramsSARanker = new String[] {
-      "-index", Basic.IVORY_INDEX_PATH,
+      "-index", VerifyBloomIntersection.IVORY_INDEX_PATH,
       "-posting", postingIndex.getPath(),
       "-query", "data/clue/queries.web09.1-25.xml",
-      "-spam", Basic.SPAM_PATH,
+      "-spam", VerifyBloomIntersection.SPAM_PATH,
       "-output", postingOutput.getPath(),
       "-hits", "10"
     };
 
     String[] paramsBloomRanker = new String[] {
-      "-index", Basic.IVORY_INDEX_PATH,
+      "-index", VerifyBloomIntersection.IVORY_INDEX_PATH,
       "-posting", postingIndex.getPath(),
       "-bloom", bloomIndex.getPath(),
       "-query", "data/clue/queries.web09.1-25.xml",
-      "-spam", Basic.SPAM_PATH,
+      "-spam", VerifyBloomIntersection.SPAM_PATH,
       "-output", bloomOutput.getPath(),
       "-hits", "1000"
     };
@@ -375,6 +375,6 @@ public class Basic {
   }
 
   public static junit.framework.Test suite() {
-    return new JUnit4TestAdapter(Basic.class);
+    return new JUnit4TestAdapter(VerifyBloomIntersection.class);
   }
 }

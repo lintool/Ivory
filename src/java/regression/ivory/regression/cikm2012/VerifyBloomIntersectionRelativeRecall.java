@@ -1,39 +1,35 @@
-package ivory.bloomir;
+package ivory.regression.cikm2012;
 
-import java.io.File;
-import java.util.Set;
-import java.util.Map;
-
-import junit.framework.JUnit4TestAdapter;
-
-import com.google.common.io.Files;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.FSDataInputStream;
-import org.apache.hadoop.fs.Path;
-import org.apache.log4j.Logger;
 import static org.junit.Assert.assertEquals;
-import org.junit.Test;
-
 import ivory.bloomir.ranker.BloomRanker;
 import ivory.bloomir.ranker.SmallAdaptiveRanker;
 
-public class RelativeRecall {
-  private static final Logger LOG = Logger.getLogger(RelativeRecall.class);
+import java.io.File;
+import java.util.Map;
+import java.util.Set;
 
-  private static final int[] RELATIVE_RECALL = new int[] {74, 85, 89, //r=8
-                                                          84, 93, 97, //r=16
-                                                          93, 98, 99}; //r=24
+import junit.framework.JUnit4TestAdapter;
+
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FSDataInputStream;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
+import org.junit.Test;
+
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+
+public class VerifyBloomIntersectionRelativeRecall {
+  private static final int[] RELATIVE_RECALL = new int[] {74, 85, 89,  // r=8
+                                                          84, 93, 97,  // r=16
+                                                          93, 98, 99}; // r=24
 
   private static final String IVORY_INDEX_PATH = "/scratch0/indexes/clue.en.01.nopos/";
 
   // Index paths used in CIKM experiments
-  private static final String SPAM_PATH = "/scratch0/nima/CIKM2012/docscores-spam.dat.en.01";
-  private static final String CIKM_STANDARD_INDEX = "/scratch0/nima/CIKM2012/indexes/standard/";
-  private static final String CIKM_BLOOM_INDEX_BASE_PATH = "/scratch0/nima/CIKM2012/indexes/bloom-";
+  private static final String SPAM_PATH = "/scratch0/indexes/CIKM2012/docscores-spam.dat.en.01";
+  private static final String CIKM_STANDARD_INDEX = "/scratch0/indexes/CIKM2012/indexes/standard/";
+  private static final String CIKM_BLOOM_INDEX_BASE_PATH = "/scratch0/indexes/CIKM2012/indexes/bloom-";
   private static final String CIKM_QUERIES = "data/clue/queries.web09.xml";
   private static final String CIKM_QRELS = "data/clue/qrels.web09catB.txt";
 
@@ -66,10 +62,10 @@ public class RelativeRecall {
 
     // Run Small Adaptive baseline
     String[] paramsSARanker = new String[] {
-      "-index", RelativeRecall.IVORY_INDEX_PATH,
-      "-posting", RelativeRecall.CIKM_STANDARD_INDEX,
-      "-query", RelativeRecall.CIKM_QUERIES,
-      "-spam", RelativeRecall.SPAM_PATH,
+      "-index", VerifyBloomIntersectionRelativeRecall.IVORY_INDEX_PATH,
+      "-posting", VerifyBloomIntersectionRelativeRecall.CIKM_STANDARD_INDEX,
+      "-query", VerifyBloomIntersectionRelativeRecall.CIKM_QUERIES,
+      "-spam", VerifyBloomIntersectionRelativeRecall.SPAM_PATH,
       "-output", postingOutput.getPath(),
       "-hits", "10000"
     };
@@ -106,18 +102,18 @@ public class RelativeRecall {
 
     // Run retrieval using different Bloom filter indexes
     // and check results against Small Adaptive output
-    int[] paramR = new int[]{8, 16, 24}; //Bites per element
-    int[] paramK = new int[]{1, 2, 3}; //Number of Hash functions
+    int[] paramR = new int[] { 8, 16, 24 }; // Bites per element
+    int[] paramK = new int[] { 1, 2, 3 };   // Number of hash functions
 
     int index = 0;
     for(int r: paramR) {
       for(int k: paramK) {
         String[] paramsBloomRanker = new String[] {
-          "-index", RelativeRecall.IVORY_INDEX_PATH,
-          "-posting", RelativeRecall.CIKM_STANDARD_INDEX,
-          "-bloom", RelativeRecall.CIKM_BLOOM_INDEX_BASE_PATH + r + "-" + k + "/",
-          "-query", RelativeRecall.CIKM_QUERIES,
-          "-spam", RelativeRecall.SPAM_PATH,
+          "-index", VerifyBloomIntersectionRelativeRecall.IVORY_INDEX_PATH,
+          "-posting", VerifyBloomIntersectionRelativeRecall.CIKM_STANDARD_INDEX,
+          "-bloom", VerifyBloomIntersectionRelativeRecall.CIKM_BLOOM_INDEX_BASE_PATH + r + "-" + k + "/",
+          "-query", VerifyBloomIntersectionRelativeRecall.CIKM_QUERIES,
+          "-spam", VerifyBloomIntersectionRelativeRecall.SPAM_PATH,
           "-output", bloomOutput.getPath(),
           "-hits", "10000"
         };
@@ -155,7 +151,7 @@ public class RelativeRecall {
         }
         avg /= counter.size();
 
-        assertEquals(RelativeRecall.RELATIVE_RECALL[index++], (int) (avg * 100));
+        assertEquals(VerifyBloomIntersectionRelativeRecall.RELATIVE_RECALL[index++], (int) (avg * 100));
       }
     }
 
@@ -164,6 +160,6 @@ public class RelativeRecall {
   }
 
   public static junit.framework.Test suite() {
-    return new JUnit4TestAdapter(RelativeRecall.class);
+    return new JUnit4TestAdapter(VerifyBloomIntersectionRelativeRecall.class);
   }
 }
