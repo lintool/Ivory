@@ -1,3 +1,19 @@
+/*
+ * Ivory: A Hadoop toolkit for web-scale information retrieval research
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you
+ * may not use this file except in compliance with the License. You may
+ * obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+ * implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
+
 package ivory.regression.basic;
 
 import static org.junit.Assert.assertEquals;
@@ -24,7 +40,7 @@ import edu.umd.cloud9.collection.DocnoMapping;
 public class Robust04_Basic {
   private static final Logger LOG = Logger.getLogger(Robust04_Basic.class);
 
-  static final ImmutableMap<String, Float> DIR_BASE_AP = new ImmutableMap.Builder<String, Float>()
+  private static final ImmutableMap<String, Float> DIR_BASE_AP = new ImmutableMap.Builder<String, Float>()
       .put("601", 0.4648f).put("602", 0.2787f).put("603", 0.2931f).put("604", 0.8289f).put("605", 0.0758f)
       .put("606", 0.4768f).put("607", 0.2038f).put("608", 0.0548f).put("609", 0.3040f).put("610", 0.0245f)
       .put("611", 0.2730f).put("612", 0.4695f).put("613", 0.2278f).put("614", 0.2014f).put("615", 0.1071f)
@@ -47,7 +63,7 @@ public class Robust04_Basic {
       .put("696", 0.2975f).put("697", 0.1600f).put("698", 0.4824f).put("699", 0.4594f).put("700", 0.4381f)
       .build();
 
-  static final ImmutableMap<String, Float> DIR_BASE_P10 = new ImmutableMap.Builder<String, Float>()
+  private static final ImmutableMap<String, Float> DIR_BASE_P10 = new ImmutableMap.Builder<String, Float>()
       .put("601", 0.3000f).put("602", 0.3000f).put("603", 0.2000f).put("604", 0.6000f).put("605", 0.1000f)
       .put("606", 0.5000f).put("607", 0.3000f).put("608", 0.1000f).put("609", 0.6000f).put("610", 0.0000f)
       .put("611", 0.5000f).put("612", 0.7000f).put("613", 0.5000f).put("614", 0.2000f).put("615", 0.2000f)
@@ -70,7 +86,7 @@ public class Robust04_Basic {
       .put("696", 0.6000f).put("697", 0.3000f).put("698", 0.3000f).put("699", 0.7000f).put("700", 0.7000f)
       .build();
 
-  static final ImmutableMap<String, Float> DIR_SD_AP = new ImmutableMap.Builder<String, Float>()
+  private static final ImmutableMap<String, Float> DIR_SD_AP = new ImmutableMap.Builder<String, Float>()
       .put("601", 0.5135f).put("602", 0.2988f).put("603", 0.2670f).put("604", 0.8385f).put("605", 0.0657f)
       .put("606", 0.5350f).put("607", 0.2260f).put("608", 0.0721f).put("609", 0.3058f).put("610", 0.0293f)
       .put("611", 0.2704f).put("612", 0.4854f).put("613", 0.2473f).put("614", 0.2059f).put("615", 0.0774f)
@@ -93,7 +109,7 @@ public class Robust04_Basic {
       .put("696", 0.2945f).put("697", 0.1693f).put("698", 0.4848f).put("699", 0.5331f).put("700", 0.5569f)
       .build();
 
-  static final ImmutableMap<String, Float> DIR_SD_P10 = new ImmutableMap.Builder<String, Float>()
+  private static final ImmutableMap<String, Float> DIR_SD_P10 = new ImmutableMap.Builder<String, Float>()
       .put("601", 0.3000f).put("602", 0.3000f).put("603", 0.2000f).put("604", 0.6000f).put("605", 0.2000f)
       .put("606", 0.5000f).put("607", 0.3000f).put("608", 0.1000f).put("609", 0.6000f).put("610", 0.0000f)
       .put("611", 0.5000f).put("612", 0.6000f).put("613", 0.5000f).put("614", 0.3000f).put("615", 0.1000f)
@@ -116,7 +132,7 @@ public class Robust04_Basic {
       .put("696", 0.6000f).put("697", 0.3000f).put("698", 0.3000f).put("699", 0.7000f).put("700", 0.7000f)
       .build();
 
-  static final ImmutableMap<String, Float> DIR_FD_AP = new ImmutableMap.Builder<String, Float>()
+  private static final ImmutableMap<String, Float> DIR_FD_AP = new ImmutableMap.Builder<String, Float>()
       .put("601", 0.6646f).put("602", 0.2959f).put("603", 0.2887f).put("604", 0.8372f).put("605", 0.0675f)
       .put("606", 0.5663f).put("607", 0.2200f).put("608", 0.0918f).put("609", 0.3163f).put("610", 0.0249f)
       .put("611", 0.2672f).put("612", 0.4854f).put("613", 0.2481f).put("614", 0.2047f).put("615", 0.0611f)
@@ -139,7 +155,7 @@ public class Robust04_Basic {
       .put("696", 0.3029f).put("697", 0.1785f).put("698", 0.4851f).put("699", 0.5331f).put("700", 0.5569f)
       .build();
 
-  static final ImmutableMap<String, Float> DIR_FD_P10 = new ImmutableMap.Builder<String, Float>()
+  private static final ImmutableMap<String, Float> DIR_FD_P10 = new ImmutableMap.Builder<String, Float>()
       .put("601", 0.3000f).put("602", 0.2000f).put("603", 0.2000f).put("604", 0.6000f).put("605", 0.3000f)
       .put("606", 0.5000f).put("607", 0.3000f).put("608", 0.1000f).put("609", 0.6000f).put("610", 0.0000f)
       .put("611", 0.5000f).put("612", 0.6000f).put("613", 0.5000f).put("614", 0.3000f).put("615", 0.0000f)
@@ -162,7 +178,7 @@ public class Robust04_Basic {
       .put("696", 0.7000f).put("697", 0.3000f).put("698", 0.3000f).put("699", 0.7000f).put("700", 0.7000f)
       .build();
 
-  static final ImmutableMap<String, Float> BM25_BASE_AP = new ImmutableMap.Builder<String, Float>()
+  private static final ImmutableMap<String, Float> BM25_BASE_AP = new ImmutableMap.Builder<String, Float>()
       .put("601", 0.5441f).put("602", 0.2755f).put("603", 0.3273f).put("604", 0.8168f).put("605", 0.0713f)
       .put("606", 0.4982f).put("607", 0.1746f).put("608", 0.0645f).put("609", 0.3383f).put("610", 0.0170f)
       .put("611", 0.2175f).put("612", 0.5672f).put("613", 0.1909f).put("614", 0.1817f).put("615", 0.0715f)
@@ -185,7 +201,7 @@ public class Robust04_Basic {
       .put("696", 0.3306f).put("697", 0.1510f).put("698", 0.3768f).put("699", 0.4976f).put("700", 0.4617f)
       .build();
 
-  static final ImmutableMap<String, Float> BM25_BASE_P10 = new ImmutableMap.Builder<String, Float>()
+  private static final ImmutableMap<String, Float> BM25_BASE_P10 = new ImmutableMap.Builder<String, Float>()
       .put("601", 0.3000f).put("602", 0.3000f).put("603", 0.5000f).put("604", 0.6000f).put("605", 0.2000f)
       .put("606", 0.4000f).put("607", 0.3000f).put("608", 0.1000f).put("609", 0.6000f).put("610", 0.0000f)
       .put("611", 0.3000f).put("612", 0.7000f).put("613", 0.2000f).put("614", 0.1000f).put("615", 0.1000f)
@@ -208,7 +224,7 @@ public class Robust04_Basic {
       .put("696", 0.7000f).put("697", 0.3000f).put("698", 0.4000f).put("699", 0.7000f).put("700", 0.6000f)
       .build();
 
-  static final ImmutableMap<String, Float> BM25_SD_AP = new ImmutableMap.Builder<String, Float>()
+  private static final ImmutableMap<String, Float> BM25_SD_AP = new ImmutableMap.Builder<String, Float>()
       .put("601", 0.3367f).put("602", 0.2826f).put("603", 0.3152f).put("604", 0.8482f).put("605", 0.0688f)
       .put("606", 0.5647f).put("607", 0.2388f).put("608", 0.0832f).put("609", 0.3292f).put("610", 0.0262f)
       .put("611", 0.2474f).put("612", 0.5062f).put("613", 0.2137f).put("614", 0.1817f).put("615", 0.0556f)
@@ -231,7 +247,7 @@ public class Robust04_Basic {
       .put("696", 0.3198f).put("697", 0.1765f).put("698", 0.3823f).put("699", 0.5651f).put("700", 0.6554f)
       .build();
 
-  static final ImmutableMap<String, Float> BM25_SD_P10 = new ImmutableMap.Builder<String, Float>()
+  private static final ImmutableMap<String, Float> BM25_SD_P10 = new ImmutableMap.Builder<String, Float>()
       .put("601", 0.4000f).put("602", 0.3000f).put("603", 0.4000f).put("604", 0.6000f).put("605", 0.2000f)
       .put("606", 0.4000f).put("607", 0.4000f).put("608", 0.1000f).put("609", 0.6000f).put("610", 0.0000f)
       .put("611", 0.5000f).put("612", 0.6000f).put("613", 0.2000f).put("614", 0.1000f).put("615", 0.0000f)
@@ -254,7 +270,7 @@ public class Robust04_Basic {
       .put("696", 0.7000f).put("697", 0.3000f).put("698", 0.3000f).put("699", 0.7000f).put("700", 0.8000f)
       .build();
 
-  static final ImmutableMap<String, Float> BM25_FD_AP = new ImmutableMap.Builder<String, Float>()
+  private static final ImmutableMap<String, Float> BM25_FD_AP = new ImmutableMap.Builder<String, Float>()
       .put("601", 0.6167f).put("602", 0.2798f).put("603", 0.3230f).put("604", 0.8317f).put("605", 0.0778f)
       .put("606", 0.5517f).put("607", 0.2029f).put("608", 0.0973f).put("609", 0.3458f).put("610", 0.0204f)
       .put("611", 0.2237f).put("612", 0.5359f).put("613", 0.2087f).put("614", 0.1817f).put("615", 0.0593f)
@@ -277,7 +293,7 @@ public class Robust04_Basic {
       .put("696", 0.3306f).put("697", 0.1764f).put("698", 0.4343f).put("699", 0.5765f).put("700", 0.6037f)
       .build();
 
-  static final ImmutableMap<String, Float> BM25_FD_P10 = new ImmutableMap.Builder<String, Float>()
+  private static final ImmutableMap<String, Float> BM25_FD_P10 = new ImmutableMap.Builder<String, Float>()
       .put("601", 0.3000f).put("602", 0.1000f).put("603", 0.4000f).put("604", 0.6000f).put("605", 0.3000f)
       .put("606", 0.4000f).put("607", 0.4000f).put("608", 0.1000f).put("609", 0.6000f).put("610", 0.0000f)
       .put("611", 0.3000f).put("612", 0.8000f).put("613", 0.2000f).put("614", 0.1000f).put("615", 0.0000f)
