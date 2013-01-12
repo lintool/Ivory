@@ -87,6 +87,12 @@ public abstract class PwsimEnvironment extends Configured {
     String s = env.getWeightedIntDocVectorsDirectory();
     return s.substring(0, s.length()-1)+"_sample="+sampleSize;
   }
+  
+  public static String getTermDocvectorsFile (String dir, FileSystem fs, int sampleSize) throws IOException {
+    RetrievalEnvironment env = new RetrievalEnvironment(dir, fs);
+    String s = env.getWeightedTermDocVectorsDirectory();
+    return s.substring(0, s.length()-1)+"_sample="+sampleSize;
+  }
 
   public static String getPermutationsFile (String dir, FileSystem fs, int numOfBits, int numOfPermutations) throws IOException {
     return dir + "/random-perms-bit_D=" + numOfBits + "_Q=" + numOfPermutations;
