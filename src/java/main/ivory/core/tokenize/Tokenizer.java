@@ -47,6 +47,7 @@ public abstract class Tokenizer {
     LOG.setLevel(Level.INFO);
   }
   public abstract void configure(Configuration conf);
+  public abstract void configure(Configuration conf, FileSystem fs);
   public abstract String[] processContent(String text);
   protected static String delims = "`~!@#^&*()-_=+]}[{\\|'\";:/?.>,<";
   protected static int MIN_LENGTH = 2, MAX_LENGTH = 50;
@@ -280,9 +281,7 @@ public abstract class Tokenizer {
     }
     return utf8.trim();
   }
-
-  public abstract void configure(Configuration mJobConf, FileSystem fs);
-
+  
   @SuppressWarnings("static-access")
   public static void main(String[] args) {
     Options options = new Options();

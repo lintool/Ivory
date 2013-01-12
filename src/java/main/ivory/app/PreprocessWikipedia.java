@@ -122,7 +122,8 @@ public class PreprocessWikipedia extends Configured implements Tool {
       conf.set("Ivory.E_Vocab_E2F", eVocab_e2f);	
       conf.set("Ivory.F_Vocab_E2F", fVocab_e2f);	
       conf.set("Ivory.TTable_E2F", ttable_e2f);
-      conf.set("Ivory.FinalVocab", eVocab_f2e);            // vocabulary to map terms to integers in BuildTargetLang...
+      conf.set(Constants.CollectionVocab, fVocab_f2e);      // vocabulary to read collection from
+      conf.set("Ivory.FinalVocab", eVocab_f2e);             // vocabulary to map terms to integers in BuildTargetLang...
       conf.set(Constants.StopwordList, f_stopwordList);
       conf.set(Constants.StemmedStopwordList, f_stopwordList + ".stemmed");
       conf.set(Constants.TargetStopwordList, e_stopwordList);
@@ -147,7 +148,7 @@ public class PreprocessWikipedia extends Configured implements Tool {
 
     if (mode == CROSS_LINGUAL_E || mode == CROSS_LINGUAL_F) {
       LOG.info("Cross-lingual collection : Preprocessing "+collectionLang+" side.");
-      LOG.info(" - Collection vocab file: " + collectionVocab);
+      LOG.info(" - Collection vocab file: " + conf.get(Constants.CollectionVocab));
       LOG.info(" - Tokenizer model: " + tokenizerModel);
 
       if (mode == CROSS_LINGUAL_F) {
@@ -193,18 +194,20 @@ public class PreprocessWikipedia extends Configured implements Tool {
 
     // Repack Wikipedia into sequential compressed block
     p = new Path(seqCollection);
-    LOG.info(seqCollection + " doesn't exist, creating...");
-    String[] arr = new String[] { "-input=" + rawCollection,
-        "-output=" + seqCollection,
-        "-mapping_file=" + mappingFile.toString(),
-        "-compression_type=block",
-        "-wiki_language=" + collectionLang };
-    LOG.info("Running RepackWikipedia with args " + Arrays.toString(arr));
+    if (!fs.exists(p)) {
+      LOG.info(seqCollection + " doesn't exist, creating...");
+      String[] arr = new String[] { "-input=" + rawCollection,
+          "-output=" + seqCollection,
+          "-mapping_file=" + mappingFile.toString(),
+          "-compression_type=block",
+          "-wiki_language=" + collectionLang };
+      LOG.info("Running RepackWikipedia with args " + Arrays.toString(arr));
 
-    RepackWikipedia tool = new RepackWikipedia();
-    tool.setConf(conf);
-    tool.run(arr);
-
+      RepackWikipedia tool = new RepackWikipedia();
+      tool.setConf(conf);
+      tool.run(arr);
+    }
+    
     conf.set(Constants.CollectionName, "Wikipedia-"+collectionLang);
     conf.setInt(Constants.NumMapTasks, numMappers);
     conf.setInt(Constants.NumReduceTasks, numReducers);

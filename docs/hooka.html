@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Hooka: A framework for word alignment in MapReduce</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Le styles -->
+    <link href="assets/css/bootstrap.css" rel="stylesheet">
+    <link href="assets/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="assets/css/docs.css" rel="stylesheet">
+    <link href="assets/js/google-code-prettify/prettify.css" rel="stylesheet">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+  </head>
+
+  <body data-spy="scroll" data-target=".bs-docs-sidebar">
+
+    <!-- Navbar
+    ================================================== -->
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <div class="nav-collapse collapse">
+            <ul class="nav">
+              <li class="">
+                <a href="../index.html">Home</a>
+              </li>
+              <li class="active">
+                <a href="./start.html">Getting Started</a>
+              </li>
+              <li class="">
+                <a href="./publications.html">Publications</a>
+              </li>
+              <li class="">
+                <a href="./experiments.html">Experiments</a>
+              </li>
+              <li class="">
+                <a href="./team.html">Team</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+<!-- Subhead
+================================================== -->
+<header class="jumbotron subhead" id="overview">
+  <div class="container">
+    <h1>Ivory</h1>
+    <p class="lead">A Hadoop toolkit for web-scale information retrieval research</p>
+  </div>
+</header>
+
+  <div class="container">
+
+<div class="page-header">
+<h2>Hooka: A framework for word alignment in MapReduce</h2>
+</div>
+
+<p>Hooka is a MapReduce-based Expectation Maximization (EM) training framework for word alignment. 
+It accepts a sentence-aligned parallel corpus (each sentence in the corpus is written in two different languages) as 
+input and aligns each word in the source-language sentence to a word in the target-language sentence. 
+Parameters of the statistical models (e.g., IBM Model 1, HMM model) are learned using 
+a parallelized implementation of the Expectation Maximization (EM) process. Hooka can also be used for managing 
+vocabularies and word translation tables. Specialized data structures allow efficient storage and conversion from 
+popular word alignment tools, such as GIZA++ and BerkeleyAligner.</p>
+
+<h3>Input format</h3>
+
+<p>Hooka assumes an XML format for input, as shown below:</p>
+
+<pre class="code">
+&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF8&quot;?&gt;
+&lt;pdoc name=&quot;corpus.en&quot;&gt;
+&lt;pchunk name=&quot;europarl-v6.de-en_1&quot;&gt;
+&lt;s lang=&quot;en&quot;&gt;this person refer to histori clear prove the good that the european union repres for all european .&lt;/s&gt;
+&lt;s lang=&quot;de&quot;&gt;dies person hinweis auf die geschicht belegt ganz klar das gut , das die europa union fur all europa darstellt .&lt;/s&gt;
+&lt;/pchunk&gt;
+...
+&lt;/pdoc&gt;
+</pre>
+
+<p>where a single <i>pchunk</i> block contains the same sentence written in both languages, English and German in this case.
+Typically parallel corpora may not be already in this format, so we also provide a simple script that converts two text files 
+(each containing one sentence per line in their respective languages) into the above format.</p>
+
+<pre class="code">
+perl $cloud9/docs/content/plain2chunk.pl europarl-v6.de-en.de europarl-v6.de-en.en europarl-v6.de-en de en > europarl-v6.de-en.xml 
+</pre>
+
+<h3>Running Hooka</h3>
+
+<p>Once the XML-formatted parallel corpus is on HDFS, we can run word alignment as follows:</p>
+
+<pre class="code">
+$IVORYDIR/etc/hadoop-cluster.sh edu.umd.hooka.alignment.HadoopAlign \
+	-input=$datadir/europarl-v6.de-en.xml -workdir=hooka.de-en -src_lang=de -trg_lang=en -model1=5 -hmm=5 -use_truncate
+</pre>
+
+<p>The first argument is the HDFS path to the input data in XML format, as described above. The second argument is the HDFS path to the working directory, to which data is written. The next two arguments indicate the language code of source and target language. Fifth and sixth arguments show the number of EM iterations using IBM Model 1 and an HMM model, respectively. The last argument indicates whether truncation/stemming should be done.</p> 
+
+<table><tr><td valign="top"><span class="label label-info">Info</span></td>
+<td style="padding-left: 10px">
+If the input text is already tokenized and stemmed, then you can opt out of doing it here by 
+omitting option <code>-use_truncate</code>.<p>
+</td>
+</tr>
+</table>
+
+<p>The program starts by running a Hadoop job that preprocesses the dataset and performs tokenization/truncation. After preprocessing, the program runs the EM iterations, each consisting of an expected value computation step (E-step) and an aggregation and parameter re-computation step (M-step), in two separate Hadoop jobs.</p>
+
+<p>The output of the program consists of two vocabularies (source-side vocabulary <code>vocab.E</code>, target-side vocabulary <code>vocab.F</code>) and a lexical conditional probability table. Each vocabulary is represented by an instance of the <code>Vocab</code> class, as a mapping from terms in the language to a unique integer identifier. The translation table is represented by an instance of the <code>TTable_monolithic_IFAs</code> class (implements <code>TTable</code>), which contains all possible translations (with respective conditional probabilities) of each word in the target language (i.e., P(f|e) for all e in target vocabulary). In order to generate conditional probabilities in the other direction (i.e., P(e|f)) you should run Hooka with the language arguments swapped:</p>
+
+<pre class="code">
+$IVORYDIR/etc/hadoop-cluster.sh edu.umd.hooka.alignment.HadoopAlign \
+	-input=$datadir/europarl-v6.de-en.xml -workdir=hooka.en-de -src_lang=en -trg_lang=de -model1=5 -hmm=5 -use_truncate
+</pre>
+
+<p>Once the vocabulary and translation tables are written to disk, they can be loaded into memory and used for certain operations. 
+For instance, a <code>Vocab</code> object can be used to retrieve words as follows:</p>
+
+<pre class="code">
+Vocab engVocab = HadoopAlign.loadVocab(new Path(vocabHDFSPath), hdfsConf);
+int eId = engVocab.get("book");			// integer id of book
+String eString = engVocab.get(eId); 		// "book"
+</pre>
+
+<p>A <code>TTable</code> object can then be used to find conditional probabilities as follows:</p>
+
+<pre class="code">
+TTable_monolithic_IFAs ttable_en2de = new TTable_monolithic_IFAs(FileSystem.get(hdfsConf), new Path(ttableHDFSPath), true);
+float prob = ttable_en2de.get(eId,fId);
+
+// find all German translations of "book" above probability 0.1
+int[] fIdArray = ttable_en2de.get(eId).getTranslations(0.1f);	
+</pre>
+
+<p>We provide a convenient command-line option for querying the translation table:</p>
+
+<pre class="code">
+$IVORYDIR/etc/hadoop-cluster.sh ivory.core.util.CLIRUtils \
+	-f=buch -e=book -src_vocab=hooka.de-en/vocab.F -trg_vocab=hooka.de-en/vocab.E -ttable=hooka.de-en/tmp.ttable
+$IVORYDIR/etc/hadoop-cluster.sh ivory.core.util.CLIRUtils \
+	-f=buch -e=ALL -src_vocab=hooka.de-en/vocab.F -trg_vocab=hooka.de-en/vocab.E -ttable=hooka.de-en/tmp.ttable
+</pre>
+
+<p>
+The first command will compute <code>P(book|buch)</code>, whereas the second one will output <code>{(e,P(e|buch)) | P(e|f) > 0}</code>
+</p>
+
+<h3>Simplifying the Translation Table</h3>
+<p>Alignment tools use statistical smoothing techniques to distribute the probability mass more conservatively. 
+This results in hundreds or even thousands of translations per word in the vocabulary. However, for many applications, 
+one may only need the most probable few translations. This may reduce redundancy in the <code>TTable</code> object, 
+and also decrease noise in the word translation distributions. Our implementation allows two heuristics to address this issue: 
+Keep the most probable <code>k</code> translations of each source term, unless the total sum of probabilities exceed 
+<code>C</code> (as we accumulate starting from most probable). Various values for <code>k</code> and <code>C</code> can be 
+tested by passing it as an argument:
+</p>
+
+<pre class="code">
+$IVORYDIR/etc/hadoop-cluster.sh ivory.core.util.CLIRUtils \
+	-hooka_src_vocab=hooka.de-en/vocab.F -hooka_trg_vocab=hooka.de-en/vocab.E -hooka_ttable=hooka.de-en/tmp.ttable \
+	-src_vocab=hooka.de-en/vocab.de-en.de -trg_vocab=hooka.de-en/vocab.de-en.en -ttable=hooka.de-en/ttable.de-en -k=15 -C=0.95 -hdfs
+</pre>
+
+<table><tr><td valign="top"><span class="label label-info">Info</span></td>
+<td style="padding-left: 10px">
+If <code>k</code> and <code>C</code> are omitted, all translations will be kept.<p>
+</td>
+</tr>
+</table>
+
+<h3>Support for other word aligner tools</h3>
+
+<h4>1) GIZA++</h4>
+<p>
+The output of the GIZA++ word alignment tool consists of two files: <code>lex.f2e</code> contains probabilities from source language to target language, 
+and <code>lex.e2f</code> contains the opposite. Hooka requires that the GIZA++ output files are sorted by the second column, which is not the case
+for <code>lex.e2f</code>:
+</p>
+
+<pre class="code">
+sort -k2 giza.de-en/lex.e2f -o giza.de-en/lex.e2f.sorted
+</pre>
+
+<p>
+Both files should now have three items on each line: <code>[trg-word] [src-word] [Pr(trg-word|src-word)]</code>, and lines should be sorted by the source word.
+Now, Hooka can convert each of these two files into a <code>TTable</code> object and a pair of <code>Vocab</code> objects:
+</p>
+
+<pre class="code">
+$IVORYDIR/etc/hadoop-cluster.sh ivory.core.util.CLIRUtils \
+	-aligner_out=giza.de-en/lex.f2e -src_vocab=vocab.de -trg_vocab=vocab.en -ttable=ttable.de-en -type=giza -C=0.95 -k=15 
+$IVORYDIR/etc/hadoop-cluster.sh ivory.core.util.CLIRUtils \
+	-aligner_out=giza.de-en/lex.e2f.sorted -src_vocab=vocab.en -trg_vocab=vocab.de -ttable=ttable.en-de -type=giza -C=0.95 -k=15 
+</pre>
+
+<h4>2) BerkeleyAligner</h4>
+
+<p>
+The output of berkeleyAligner also consists of two output files, named <code>stage2.1.params.txt</code> and <code>stage2.2.params.txt</code>, 
+in the following format:
+</p>
+
+<pre class="code">
+book       entropy 0.314   nTrans 20       sum 1.000000
+  buch: 0.907941
+  heft: 0.090876
+  textbuch: 0.001183
+	...
+</pre>
+
+<p>
+All possible target-language translations follow each source word. No preprocessing is required for Hooka conversion:
+</p>
+
+<pre class="code">
+etc/hadoop-cluster.sh ivory.core.util.CLIRUtils \
+	-aligner_out=berkeley.de-en/stage2.2.params.txt -src_vocab=vocab.de -trg_vocab=vocab.en -ttable=ttable.en-de -type=berkeley -C=0.95 -k=15
+etc/hadoop-cluster.sh ivory.core.util.CLIRUtils \
+	-aligner_out=berkeley.de-en/stage2.1.params.txt -src_vocab=vocab.de -trg_vocab=vocab.en -ttable=ttable.en-de -type=berkeley -C=0.95 -k=15
+</pre>
+
+<table><tr><td valign="top"><span class="label label-info">Info</span></td>
+<td style="padding-left: 10px">
+If the GIZA++ or BerkeleyAligner files are on HDFS, include option <code>-hdfs</code> when running above commands.<p>
+</td>
+</tr>
+</table>
+
+<h3>Evaluation</h3>
+<p>
+We performed a preliminary evaluation of Hooka by comparing it to GIZA++ and berkeleyAligner. We designed an intrinsic evaluation to test the 
+quality of the translation probability values output by each system. We experimented with the German and English portions of the Europarl corpus, 
+which contains proceedings from the European Parliament. Documents were constructed artificially by concatenating every 10 consecutive sentences 
+into a single document. In this manner, we sampled 505 document pairs that are mutual translations of each other (and therefore semantically 
+similar by construction). This provides ground truth to evaluate the effectiveness of the three systems on the task of pairwise similarity. 
+</p>
+
+<p>
+We applied the standard CLIR approach to project document vectors from one language into the other, using the translation probabilities created by 
+either Hooka, GIZA++ or berkeleyAligner. For each tool, we aligned the corpus in both directions: German to English, English to German. 
+Cosine similarities computed with this approach are compared to a translation approach: An MT system (in this case, we used Google Translate) 
+is used to translate German documents into English, which are then processed into vector form:
+</p>
+<table class="table" style="width: 400px;">
+<thead>
+<tr><td style="width: 150px;"><b>Aligner</b></td>
+    <td style="width: 150px;"><b>Average cosine</b></td>
+    <td style="width: 100px;"><b>Std. Dev.</b></td>
+</tr>
+<tr><td>GIZA++</td>
+    <td>0.351</td>
+    <td>0.053</td>
+</tr>
+<tr><td>BerkeleyAligner</td>
+    <td>0.397</td>
+    <td>0.072</td>
+</tr>
+<tr><td>Hooka</td>
+    <td>0.302</td>
+    <td>0.055</td>
+</tr>
+<tr><td>Google Translate</td>
+    <td>0.449</td>
+    <td>0.114</td>
+</tr>
+</table>
+
+<p>
+Using probability values from BerkeleyAligner yielded the highest similarity values for parallel documents, 
+whereas Hooka produced the lowest scores. However, we should point out that this evaluation is biased, in
+the sense that we should also look at the similarity scores for non-parallel documents. The best approach
+should be able to distinguish parallel and non-parallel documents effectively.
+</p>
+
+<p>
+The greatest advantage of Hooka is its ability to arbitrarily parallelize computation; here are total running 
+times for aligning a dataset containing 1,079,017 sentence pairs. Hooka runs a 50-way parallelization, GIZA
+runs the two directions synchronously, and BerkeleyAligner is entirely sequential.
+</p>
+<table class="table" style="width: 400px;">
+<thead>
+<tr><td>GIZA++</td>
+    <td>13:04:57</td>
+</tr>
+<tr><td>BerkeleyAligner</td>
+    <td>44:41:03</td>
+</tr>
+<tr><td>Hooka</td>
+    <td>0:58:00</td>
+</tr>
+</table>
+
+  </div>
+
+
+
+    <!-- Footer
+    ================================================== -->
+    <footer class="footer">
+      <div class="container">
+        <p class="pull-right"><a href="#">Back to top</a></p>
+        <p>Designed using <a href="http://twitter.github.com/bootstrap/">Bootstrap</a>.</p>
+        <p>Code licensed under <a href="http://www.apache.org/licenses/LICENSE-2.0" target="_blank">Apache License v2.0</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
+      </div>
+    </footer>
+
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="assets/js/jquery.js"></script>
+    <script src="assets/js/google-code-prettify/prettify.js"></script>
+    <script src="assets/js/bootstrap-transition.js"></script>
+    <script src="assets/js/bootstrap-alert.js"></script>
+    <script src="assets/js/bootstrap-modal.js"></script>
+    <script src="assets/js/bootstrap-dropdown.js"></script>
+    <script src="assets/js/bootstrap-scrollspy.js"></script>
+    <script src="assets/js/bootstrap-tab.js"></script>
+    <script src="assets/js/bootstrap-tooltip.js"></script>
+    <script src="assets/js/bootstrap-popover.js"></script>
+    <script src="assets/js/bootstrap-button.js"></script>
+    <script src="assets/js/bootstrap-collapse.js"></script>
+    <script src="assets/js/bootstrap-carousel.js"></script>
+    <script src="assets/js/bootstrap-typeahead.js"></script>
+    <script src="assets/js/bootstrap-affix.js"></script>
+
+  </body>
+</html>
+

@@ -213,8 +213,7 @@ public class ComputeSignaturesMinhash extends PowerTool {
     }
     long startTime = System.currentTimeMillis();
     JobClient.runJob(job);
-    System.out.println("Job finished in " + (System.currentTimeMillis() - startTime)
-        + " milliseconds");
+    System.out.println("Job finished in " + (System.currentTimeMillis() - startTime) / 1000.0 + " seconds");
 
     return 0;
   }

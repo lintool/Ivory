@@ -61,7 +61,7 @@ public class RunComputeSignatures extends PwsimEnvironment implements Tool {
     String collName = env.readCollectionName();
     config.set("Ivory.CollectionName", collName);
 
-    PwsimEnvironment.setClassTypes(config);
+    PwsimEnvironment.setClassTypes(signatureType, config);
     int batchSize = -1;
     if (cmdline.hasOption(BATCH_OPTION)) {
       batchSize = Integer.parseInt(cmdline.getOptionValue(BATCH_OPTION));

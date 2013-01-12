@@ -122,8 +122,8 @@ public class WriteRandomVectors extends PowerTool {
 
     // Set parameters
     String inputPath = indexPath + "/files";
-    String outputPath = PwsimEnvironment.getFileNameWithPars(indexPath, "RandomVectors");
-
+    String outputPath = PwsimEnvironment.getRandomVectorsDir(indexPath, D);
+    
     if (fs.exists(new Path(outputPath))) {
       sLogger.info("Random vectors output path already exists! Quitting...");
       return 0;

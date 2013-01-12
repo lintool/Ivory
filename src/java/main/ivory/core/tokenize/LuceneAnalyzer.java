@@ -66,9 +66,9 @@ public class LuceneAnalyzer extends ivory.core.tokenize.Tokenizer {
   public void setLanguage(String l){
     if(l.equalsIgnoreCase("spanish") || l.equalsIgnoreCase("es")){
       lang = SPANISH;
-    }else if(l.equalsIgnoreCase("turkish") || l.equalsIgnoreCase("tr")){
+    }else if (l.equalsIgnoreCase("turkish") || l.equalsIgnoreCase("tr")){
       lang = TURKISH;
-    }else if(l.equalsIgnoreCase("czech") || l.equalsIgnoreCase("cs") || l.equalsIgnoreCase("cz")){
+    }else if (l.equalsIgnoreCase("czech") || l.equalsIgnoreCase("cs") || l.equalsIgnoreCase("cz")){
       lang = CZECH;
     }else{
       LOG.warn("Language not recognized, setting to English!");
