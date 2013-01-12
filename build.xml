@@ -188,7 +188,7 @@
 
 	<target name="regression" depends="jar" description="Run regression tests">
 		<mkdir dir="${regression.dir}" />
-		<junit printsummary="yes" fork="yes" maxmemory="4096m">
+		<junit printsummary="yes" fork="yes" maxmemory="98304m">
 			<sysproperty key="java.library.path" path="${lib.dir}" />
 			<sysproperty key="org.xml.sax.driver" value="org.apache.xerces.parsers.SAXParser" />
 			<classpath refid="run.path.id" />
@@ -217,7 +217,7 @@
 
 	<target name="integration" depends="jar" description="Run integration tests">
 		<mkdir dir="${integration.dir}" />
-		<junit printsummary="yes" fork="yes" maxmemory="4096m">
+		<junit printsummary="yes" fork="yes" maxmemory="98304m">
 			<sysproperty key="java.library.path" path="${lib.dir}" />
 			<sysproperty key="org.xml.sax.driver" value="org.apache.xerces.parsers.SAXParser" />
 			<classpath refid="run.path.id" />
@@ -265,7 +265,7 @@
     <property name="suffix" value="sh" />
     <property name="param_prefix" value="$" />
     <property name="cp_sep" value=":" />
-    <property name="java_command" value="java -Xmx4g -classpath &quot;${run.path.id}&quot;" />
+    <property name="java_command" value="java -Xmx96g -classpath &quot;${run.path.id}&quot;" />
     <property name="script_prefix" value="#!/bin/sh${line.separator}export HADOOP_CLASSPATH=&quot;${run.path.id}:$HADOOP_CLASSPATH&quot;${line.separator}" />
 
     <echo file="./etc/run-integration.${suffix}" message="${script_prefix}" />
