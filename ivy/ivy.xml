@@ -32,8 +32,10 @@
     <dependency org="com.martiansoftware" name="jsap" rev="2.1" conf="*->*,!sources,!javadoc"/>
 
     <!--dependency org="commons-collections" name="commons-collections" rev="3.2.1" conf="*->*,!sources,!javadoc"/>
-    <dependency org="xerces" name="xercesImpl" rev="2.9.1" conf="*->*,!sources,!javadoc"/>
-    <dependency org="javax.mail" name="mail" rev="1.4.1" conf="*->*,!sources,!javadoc"/ -->
+    <dependency org="xerces" name="xercesImpl" rev="2.9.1" conf="*->*,!sources,!javadoc"/-->
+
+    <!-- Needed for emailing JUnit test reports -->
+    <dependency org="javax.mail" name="mail" rev="1.4.5" conf="*->*,!sources,!javadoc"/>
 
     <dependency org="opennlp" name="tools" rev="1.5.0" conf="*->*,!sources,!javadoc"/>
     <dependency org="opennlp" name="maxent" rev="3.0.0" conf="*->*,!sources,!javadoc"/>
