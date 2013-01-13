@@ -16,7 +16,7 @@ import org.junit.Test;
 import edu.umd.hooka.VocabularyWritable;
 
 public class TokenizationTest {
-  private String dir = "/Users/ferhanture/Documents/workspace/ivory-github/Ivory/";
+  private String dir = "./";
   private String[] languages = {"ar", "tr", "cs", "es", "de", "fr", "en"};//, "zh"};
 
   private List<String> readInput(String file) {
