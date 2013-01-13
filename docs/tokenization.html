@@ -69,10 +69,21 @@
 <div class="page-header">
 <h2>Tokenization in Ivory</h2>
 <p>As of 1/12/2013, Ivory supports tokenization in the following languages: English, German, Spanish, Chinese, 
-Arabic, Czech, and Turkish. You can tokenize text in these languages using Ivory as follows:</p>
+French, Arabic, Czech, and Turkish. Tokenizer classes in Ivory are based on <a href="http://lucene.apache.org/">Lucene</a> 
+for Spanish, Arabic, Czech, and Turkish, <a href="http://opennlp.apache.org/">OpenNLP</a> for English, German, 
+and French, and <a href="http://nlp.stanford.edu/software/segmenter.shtml">Stanford Chinese Segmenter</a> for Chinese.</p>
+
+<p>Tokenizing text in Ivory is done as follows:</p>
 
 <pre class="code">
-$IVORYDIR/etc/run.sh ivory.core.tokenize.Tokenizer -input=text.$lang -output=text.$lang.tok -stem=false -lang=$lang -model=$IVORYDIR/data/tokenizer/$lang-token.bin
+$IVORYDIR/etc/run.sh ivory.core.tokenize.Tokenizer \
+	-input=text.$lang \
+	-output=text.$lang.tok \
+	-stem=false \
+	-lang=$lang \
+	-stopword=$IVORYDIR/data/tokenizer/$lang.stop \
+	-stemmed_stopword=$IVORYDIR/data/tokenizer/$lang.stop.stemmed \
+	-model=$IVORYDIR/data/tokenizer/$lang-token.bin
 </pre>
 
 <table><tr><td valign="top"><span class="label label-info">Info</span></td>
@@ -91,15 +102,24 @@ settings, so we require both files to be present.
 </tr>
 </table>
 
+<table><tr><td valign="top"><span class="label label-info">Info</span></td>
+<td style="padding-left: 10px">
+A tokenizer model path is required for certain classes, such as <code>OpenNLPTokenizer</code> or <code>StanfordChineseTokenizer</code>.
+The <code>-model</code> option can be omitted in other cases. If there is no model file and language is set to English, 
+a <a href="http://www.galagosearch.org/">Galago</a>-based tokenizer is used. 
+</td>
+</tr>
+</table>
+
 <h4>Adding a new language</h4>
 <p>In order to add support for a new language in Ivory, you can extend the <code>ivory.core.tokenize.Tokenizer</code> class. 
-Other changes to code:</p>
+A few other changes are required for full support:</p>
 
-<li> add average #tokens/sentence in <code>PreprocessHelper</code> (make a guess-timate for now, update as you run jobs later)
+<li> add average #tokens/sentence in <code>PreprocessHelper</code> (make a guess-timate for now, can be updated from data)
 <li> add to <code>acceptedLanguages</code> in <code>TokenizerFactory</code>
-<li> fix <code>getTokenizerClass</code> in <code>TokenizerFactory</code><p>
+<li> update <code>getTokenizerClass</code> method in <code>TokenizerFactory</code><p>
 
-<p>The following language-specific data are assumed to be present under $IVORYDIR/data/tokenizer:</p>
+<p>The following language-specific data are assumed to be present under <code>$IVORYDIR/data/tokenizer</code>:</p>
 
    <li>Tokenizer models for each language (dummy file even if model not required by Tokenizer class) named <code>$lang-token.bin</code>
    <li>Stopwords (one stopword per line in text format) under <code>$lang.stop</code><p>
@@ -107,17 +127,15 @@ Other changes to code:</p>
 <p>Also, we require the stemmed version of the stopwords file. Once the tokenizer is set up, it can be used to generate the stemmed stopwords file as follows:</p>
 <pre class="code">
 $IVORYDIR/etc/run.sh ivory.core.tokenize.Tokenizer \
-	-input=$IVORYDIR/data/tokenizer/$lang.stop -output=$IVORYDIR/data/tokenizer/$lang.stop.stemmed -stem=true -lang=$lang -model=$IVORYDIR/data/tokenizer/$lang-token.bin
+	-input=$IVORYDIR/data/tokenizer/$lang.stop \
+	-output=$IVORYDIR/data/tokenizer/$lang.stop.stemmed \
+	-stem=true -lang=$lang \
+	-model=$IVORYDIR/data/tokenizer/$lang-token.bin
 </pre>
 
 <p>Finally, if the language is going to be used in cross-lingual pairwise similarity, vocabulary and translation table files 
 are required in <a href="../docs/hooka.html">Hooka</a> format under the same folder (see <a href="../docs/pipeline.html">Hooka tutorial</a> 
 on how to create these files).</p>
-
-
-
-
-
 </div>
 
 </div>

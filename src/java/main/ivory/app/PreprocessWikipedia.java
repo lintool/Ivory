@@ -87,19 +87,21 @@ public class PreprocessWikipedia extends Configured implements Tool {
     }
     Configuration conf = getConf();
 
+    conf.set(Constants.Language, collectionLang);
+    conf.setBoolean(Constants.Stemming, true);     // default behavior of tokenizer is currently to stem, but we shouldnt rely on that
+    
+    if (tokenizerModel != null) {
+      conf.set(Constants.TokenizerData, tokenizerModel);
+    }
+    
     // user can either provide a tokenizer class as a program argument, 
     // or let the factory find an appropriate class based on language code
     try {
       Class.forName(tokenizerClass);
     } catch (Exception e) {
-      tokenizerClass = TokenizerFactory.getTokenizerClass(collectionLang).getCanonicalName();
+      tokenizerClass = TokenizerFactory.getTokenizerClass(collectionLang, tokenizerModel).getCanonicalName();
     }
 
-    conf.set(Constants.Language, collectionLang);
-    conf.setBoolean(Constants.Stemming, true);     // default behavior of tokenizer is currently to stem, but we shouldnt rely on that
-    if (tokenizerModel != null) {
-      conf.set(Constants.TokenizerData, tokenizerModel);
-    }
     if (collectionVocab != null) {
       conf.set(Constants.CollectionVocab, collectionVocab);   // vocabulary to read collection from
     }

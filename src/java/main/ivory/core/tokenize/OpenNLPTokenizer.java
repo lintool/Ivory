@@ -27,7 +27,7 @@ public class OpenNLPTokenizer extends ivory.core.tokenize.Tokenizer {
   private static final String[] classes = {
     "org.tartarus.snowball.ext.englishStemmer", 
     "org.tartarus.snowball.ext.frenchStemmer", 
-    "org.tartarus.snowball.ext.germanStemmer"};
+  "org.tartarus.snowball.ext.germanStemmer"};
 
   public OpenNLPTokenizer(){
     super();
@@ -80,9 +80,9 @@ public class OpenNLPTokenizer extends ivory.core.tokenize.Tokenizer {
       TokenizerModel model;
       model = new TokenizerModel(in);
       tokenizer = new TokenizerME(model);
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
+      throw new RuntimeException("OpenNLPTokenizer model not available at " + p); 
     }
   }
 
@@ -177,7 +177,7 @@ public class OpenNLPTokenizer extends ivory.core.tokenize.Tokenizer {
     for ( String token : tokens ){
       tokenized.append(token + " ");
     }
-    
+
     String[] normalizedTokens = postNormalize(tokenized.toString().trim()).split(" ");
     for ( int i = 0; i < normalizedTokens.length; i++ ){
       String token = normalizedTokens[i].toLowerCase();
@@ -187,7 +187,7 @@ public class OpenNLPTokenizer extends ivory.core.tokenize.Tokenizer {
 
       //apply stemming on token
       String stemmedToken = stem(token);
-     
+
       if ( vocab != null && vocab.get(stemmedToken) <= 0) {
         countOOV++;
       } 
