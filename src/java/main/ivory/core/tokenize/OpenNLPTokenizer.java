@@ -27,7 +27,7 @@ public class OpenNLPTokenizer extends ivory.core.tokenize.Tokenizer {
   private static final String[] classes = {
     "org.tartarus.snowball.ext.englishStemmer", 
     "org.tartarus.snowball.ext.frenchStemmer", 
-  "org.tartarus.snowball.ext.germanStemmer"};
+    "org.tartarus.snowball.ext.germanStemmer"};
 
   public OpenNLPTokenizer(){
     super();

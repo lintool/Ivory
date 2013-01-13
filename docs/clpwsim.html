@@ -137,7 +137,8 @@ hdfs dfs -put *wiki*pages-articles.xml $wiki/raw/
 <a href="../docs/pipeline.html">here</a>, where the goal is to represent 
 each document as a vector of term weights.</p>
 
-<p>THis pipeline requires data files for tokenization, so let's transfer these onto HDFS:</p>
+<p>For stop word removal and stemming, we need to set up data files 
+on HDFS for tokenizers to load:</p>
 
 <pre class="code">
 hdfs dfs -put $IVORYDIR/data/tokenizer/*de*stop* $datadir/
@@ -145,6 +146,16 @@ hdfs dfs -put $IVORYDIR/data/tokenizer/*en*stop* $datadir/
 hdfs dfs -put $IVORYDIR/data/tokenizer/de-token.bin $datadir/
 hdfs dfs -put $IVORYDIR/data/tokenizer/en-token.bin $datadir/
 </pre>
+
+<table><tr><td valign="top"><span class="label label-info">Tip</span></td>
+<td style="padding-left: 10px">
+For languages that do not require model files, there is no need
+to add the <code>*-token.bin</code> model file. See 
+<a href="../docs/tokenization.html">tokenization guide</a> for details.
+<p>
+</td>
+</tr>
+</table>
 
 <p>Since there are documents in two different languages in our case, we need to translate 
 the representations into the same language space for comparison. We use the cross-language 
@@ -432,7 +443,7 @@ $IVORYDIR/etc/hadoop-cluster.sh ivory.lsh.bitext.FindParallelSentencePairs -e_co
 $IVORYDIR/etc/hadoop-cluster.sh ivory.lsh.bitext.FilterSentencePairs -input=$bitext1output -output=$bitext2output -e_index=$edir -f_index=$fdir -data=$datadir -e_lang=$e -f_lang=$f -name=$f-$e.$name -threshold=0.$F3 -classifier_id=$id3 >& $bitextlog/bitext.$D-$Q-$B-$T.$F1-$F3.$efext.log
 </pre>
 
-<sup id="fn1">1. As of 1/7/2013, Ivory supports the following languages: English, German, Spanish, Chinese, 
+<sup id="fn1">1. As of 1/13/2013, Ivory supports the following languages: English, German, French, Spanish, Chinese, 
 Arabic, Czech, and Turkish. Everything should work out of the box for these languages. See 
 <a href="../docs/tokenization.html">tokenization guide</a> on how to add support for other languages.<a href="#ref1" title="Jump back to footnote 1 in the text.">↩</a></sup>
   </div>

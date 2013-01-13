@@ -89,11 +89,11 @@ public class PreprocessWikipedia extends Configured implements Tool {
 
     conf.set(Constants.Language, collectionLang);
     conf.setBoolean(Constants.Stemming, true);     // default behavior of tokenizer is currently to stem, but we shouldnt rely on that
-    
+
     if (tokenizerModel != null) {
       conf.set(Constants.TokenizerData, tokenizerModel);
     }
-    
+
     // user can either provide a tokenizer class as a program argument, 
     // or let the factory find an appropriate class based on language code
     try {
@@ -126,11 +126,17 @@ public class PreprocessWikipedia extends Configured implements Tool {
       conf.set("Ivory.TTable_E2F", ttable_e2f);
       conf.set(Constants.CollectionVocab, fVocab_f2e);      // vocabulary to read collection from
       conf.set("Ivory.FinalVocab", eVocab_f2e);             // vocabulary to map terms to integers in BuildTargetLang...
-      conf.set(Constants.StopwordList, f_stopwordList);
-      conf.set(Constants.StemmedStopwordList, f_stopwordList + ".stemmed");
-      conf.set(Constants.TargetStopwordList, e_stopwordList);
-      conf.set(Constants.TargetStemmedStopwordList, e_stopwordList + ".stemmed");
-      conf.set(Constants.TargetTokenizer, e_tokenizerModel);
+      if (f_stopwordList != null) {
+        conf.set(Constants.StopwordList, f_stopwordList);
+        conf.set(Constants.StemmedStopwordList, f_stopwordList + ".stemmed");
+      }
+      if (e_stopwordList != null) {
+        conf.set(Constants.TargetStopwordList, e_stopwordList);
+        conf.set(Constants.TargetStemmedStopwordList, e_stopwordList + ".stemmed");
+      }
+      if (e_tokenizerModel != null) {
+        conf.set(Constants.TargetTokenizer, e_tokenizerModel);
+      }
       conf.set(Constants.TargetLanguage, targetLang);
     }
 
@@ -209,7 +215,7 @@ public class PreprocessWikipedia extends Configured implements Tool {
       tool.setConf(conf);
       tool.run(arr);
     }
-    
+
     conf.set(Constants.CollectionName, "Wikipedia-"+collectionLang);
     conf.setInt(Constants.NumMapTasks, numMappers);
     conf.setInt(Constants.NumReduceTasks, numReducers);
@@ -383,7 +389,7 @@ public class PreprocessWikipedia extends Configured implements Tool {
     if (mode < 0) throw new RuntimeException("Incorrect mode selection!");
     if (mode == CROSS_LINGUAL_F) {
       if (!options.hasOption(FVOCAB_F2E_OPTION) || !options.hasOption(FVOCAB_E2F_OPTION) || !options.hasOption(EVOCAB_F2E_OPTION) || !options.hasOption(EVOCAB_E2F_OPTION)
-          || !options.hasOption(TTABLE_F2E_OPTION) || !options.hasOption(TTABLE_E2F_OPTION) || !options.hasOption(E_TOKENIZER_MODEL_OPTION) || !options.hasOption(E_LANGUAGE_OPTION)) {
+          || !options.hasOption(TTABLE_F2E_OPTION) || !options.hasOption(TTABLE_E2F_OPTION) || !options.hasOption(E_LANGUAGE_OPTION)) {
         System.err.println("Error, missing translation table arguments: " + FVOCAB_F2E_OPTION + "," + EVOCAB_F2E_OPTION + "," 
             + FVOCAB_E2F_OPTION + "," + EVOCAB_E2F_OPTION + "," + TTABLE_F2E_OPTION + "," + TTABLE_E2F_OPTION + "," + E_TOKENIZER_MODEL_OPTION + "," + E_LANGUAGE_OPTION);
         return -1;
