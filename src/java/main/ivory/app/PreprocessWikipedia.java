@@ -87,19 +87,21 @@ public class PreprocessWikipedia extends Configured implements Tool {
     }
     Configuration conf = getConf();
 
+    conf.set(Constants.Language, collectionLang);
+    conf.setBoolean(Constants.Stemming, true);     // default behavior of tokenizer is currently to stem, but we shouldnt rely on that
+
+    if (tokenizerModel != null) {
+      conf.set(Constants.TokenizerData, tokenizerModel);
+    }
+
     // user can either provide a tokenizer class as a program argument, 
     // or let the factory find an appropriate class based on language code
     try {
       Class.forName(tokenizerClass);
     } catch (Exception e) {
-      tokenizerClass = TokenizerFactory.getTokenizerClass(collectionLang).getCanonicalName();
+      tokenizerClass = TokenizerFactory.getTokenizerClass(collectionLang, tokenizerModel).getCanonicalName();
     }
 
-    conf.set(Constants.Language, collectionLang);
-    conf.setBoolean(Constants.Stemming, true);     // default behavior of tokenizer is currently to stem, but we shouldnt rely on that
-    if (tokenizerModel != null) {
-      conf.set(Constants.TokenizerData, tokenizerModel);
-    }
     if (collectionVocab != null) {
       conf.set(Constants.CollectionVocab, collectionVocab);   // vocabulary to read collection from
     }
@@ -122,12 +124,19 @@ public class PreprocessWikipedia extends Configured implements Tool {
       conf.set("Ivory.E_Vocab_E2F", eVocab_e2f);	
       conf.set("Ivory.F_Vocab_E2F", fVocab_e2f);	
       conf.set("Ivory.TTable_E2F", ttable_e2f);
-      conf.set("Ivory.FinalVocab", eVocab_f2e);            // vocabulary to map terms to integers in BuildTargetLang...
-      conf.set(Constants.StopwordList, f_stopwordList);
-      conf.set(Constants.StemmedStopwordList, f_stopwordList + ".stemmed");
-      conf.set(Constants.TargetStopwordList, e_stopwordList);
-      conf.set(Constants.TargetStemmedStopwordList, e_stopwordList + ".stemmed");
-      conf.set(Constants.TargetTokenizer, e_tokenizerModel);
+      conf.set(Constants.CollectionVocab, fVocab_f2e);      // vocabulary to read collection from
+      conf.set("Ivory.FinalVocab", eVocab_f2e);             // vocabulary to map terms to integers in BuildTargetLang...
+      if (f_stopwordList != null) {
+        conf.set(Constants.StopwordList, f_stopwordList);
+        conf.set(Constants.StemmedStopwordList, f_stopwordList + ".stemmed");
+      }
+      if (e_stopwordList != null) {
+        conf.set(Constants.TargetStopwordList, e_stopwordList);
+        conf.set(Constants.TargetStemmedStopwordList, e_stopwordList + ".stemmed");
+      }
+      if (e_tokenizerModel != null) {
+        conf.set(Constants.TargetTokenizer, e_tokenizerModel);
+      }
       conf.set(Constants.TargetLanguage, targetLang);
     }
 
@@ -147,7 +156,7 @@ public class PreprocessWikipedia extends Configured implements Tool {
 
     if (mode == CROSS_LINGUAL_E || mode == CROSS_LINGUAL_F) {
       LOG.info("Cross-lingual collection : Preprocessing "+collectionLang+" side.");
-      LOG.info(" - Collection vocab file: " + collectionVocab);
+      LOG.info(" - Collection vocab file: " + conf.get(Constants.CollectionVocab));
       LOG.info(" - Tokenizer model: " + tokenizerModel);
 
       if (mode == CROSS_LINGUAL_F) {
@@ -193,17 +202,19 @@ public class PreprocessWikipedia extends Configured implements Tool {
 
     // Repack Wikipedia into sequential compressed block
     p = new Path(seqCollection);
-    LOG.info(seqCollection + " doesn't exist, creating...");
-    String[] arr = new String[] { "-input=" + rawCollection,
-        "-output=" + seqCollection,
-        "-mapping_file=" + mappingFile.toString(),
-        "-compression_type=block",
-        "-wiki_language=" + collectionLang };
-    LOG.info("Running RepackWikipedia with args " + Arrays.toString(arr));
+    if (!fs.exists(p)) {
+      LOG.info(seqCollection + " doesn't exist, creating...");
+      String[] arr = new String[] { "-input=" + rawCollection,
+          "-output=" + seqCollection,
+          "-mapping_file=" + mappingFile.toString(),
+          "-compression_type=block",
+          "-wiki_language=" + collectionLang };
+      LOG.info("Running RepackWikipedia with args " + Arrays.toString(arr));
 
-    RepackWikipedia tool = new RepackWikipedia();
-    tool.setConf(conf);
-    tool.run(arr);
+      RepackWikipedia tool = new RepackWikipedia();
+      tool.setConf(conf);
+      tool.run(arr);
+    }
 
     conf.set(Constants.CollectionName, "Wikipedia-"+collectionLang);
     conf.setInt(Constants.NumMapTasks, numMappers);
@@ -378,7 +389,7 @@ public class PreprocessWikipedia extends Configured implements Tool {
     if (mode < 0) throw new RuntimeException("Incorrect mode selection!");
     if (mode == CROSS_LINGUAL_F) {
       if (!options.hasOption(FVOCAB_F2E_OPTION) || !options.hasOption(FVOCAB_E2F_OPTION) || !options.hasOption(EVOCAB_F2E_OPTION) || !options.hasOption(EVOCAB_E2F_OPTION)
-          || !options.hasOption(TTABLE_F2E_OPTION) || !options.hasOption(TTABLE_E2F_OPTION) || !options.hasOption(E_TOKENIZER_MODEL_OPTION) || !options.hasOption(E_LANGUAGE_OPTION)) {
+          || !options.hasOption(TTABLE_F2E_OPTION) || !options.hasOption(TTABLE_E2F_OPTION) || !options.hasOption(E_LANGUAGE_OPTION)) {
         System.err.println("Error, missing translation table arguments: " + FVOCAB_F2E_OPTION + "," + EVOCAB_F2E_OPTION + "," 
             + FVOCAB_E2F_OPTION + "," + EVOCAB_E2F_OPTION + "," + TTABLE_F2E_OPTION + "," + TTABLE_E2F_OPTION + "," + E_TOKENIZER_MODEL_OPTION + "," + E_LANGUAGE_OPTION);
         return -1;

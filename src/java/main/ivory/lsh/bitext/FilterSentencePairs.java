@@ -286,6 +286,7 @@ public class FilterSentencePairs extends Configured implements Tool {
 
   @SuppressWarnings("static-access")
   private CommandLine parseArgs(String[] args) throws Exception {
+    options = new Options();
     options.addOption(OptionBuilder.withDescription("two-letter code for f-language").withArgName("en|de|tr|cs|zh|ar|es").hasArg().isRequired().create(FLANG_OPTION));
     options.addOption(OptionBuilder.withDescription("two-letter code for e-language").withArgName("en|de|tr|cs|zh|ar|es").hasArg().isRequired().create(ELANG_OPTION));
     options.addOption(OptionBuilder.withDescription("source-side index path").withArgName("path").hasArg().isRequired().create(FINDEX_OPTION));

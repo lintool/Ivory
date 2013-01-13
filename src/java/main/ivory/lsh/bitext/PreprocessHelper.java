@@ -120,7 +120,7 @@ public class PreprocessHelper {
       sLogger.info("In DistributedCache: " + p);
       if (p.toString().contains(sentDetectorFile)) {
         pathMapping.put(sentDetectorFile, p);
-        sLogger.info("--> sentdector");
+        sLogger.info("--> sentdetector");
       } else if (p.toString().contains(eVocabSrcFile)) {
         pathMapping.put(eVocabSrcFile, p);
         sLogger.info("--> eVocabSrcFile");
@@ -148,7 +148,7 @@ public class PreprocessHelper {
     InputStream modelIn = localFs.open(pathMapping.get(sentDetectorFile));
     SentenceModel model = new SentenceModel(modelIn);
     fModel = new SentenceDetectorME(model);
-    sLogger.info("Sentence model created successfully.");
+    sLogger.info("Sentence model created successfully from " + pathMapping.get(sentDetectorFile));
 
     eVocabSrc = (VocabularyWritable) HadoopAlign.loadVocab(pathMapping.get(eVocabSrcFile), localFs);
     eVocabTrg = (VocabularyWritable) HadoopAlign.loadVocab(pathMapping.get(eVocabTrgFile), localFs);
@@ -160,8 +160,8 @@ public class PreprocessHelper {
     // tokenizer file not read from cache, since it might be a directory (e.g. Chinese segmenter)
     String tokenizerFile = conf.get("fTokenizer");
     fTok = TokenizerFactory.createTokenizer(fs, fLang, tokenizerFile, true, conf.get("fStopword"), conf.get("fStemmedStopword"), null);
-    sLogger.info("Tokenizer and vocabs created successfully.");
-
+    sLogger.info("Tokenizer and vocabs created successfully from " + fLang + " " + tokenizerFile + "," + conf.get("fStopword") + "," + conf.get("fStemmedStopword"));
+ 
     // average sentence length = just a heuristic derived from sample text
     fScoreFn = (ScoringModel) new Bm25();
     fScoreFn.setAvgDocLength(lang2AvgSentLen.get(fLang));         
@@ -171,7 +171,8 @@ public class PreprocessHelper {
     fScoreFn.setDocCount(eEnv.readCollectionDocumentCount());   
 
     classifier = new MoreGenericModelReader(pathMapping.get(modelFileName), localFs).constructModel();
-  }
+    sLogger.info("Bitext classifier created successfully from " + pathMapping.get(modelFileName));
+ }
 
   private void loadEModels(JobConf conf) throws Exception {
     sLogger.info("Loading models for " + eLang + " ...");
@@ -184,7 +185,7 @@ public class PreprocessHelper {
       sLogger.info("In DistributedCache: " + p);
       if (p.toString().contains(sentDetectorFile)) {
         pathMapping.put(sentDetectorFile, p);
-        sLogger.info("--> sentdector");
+        sLogger.info("--> sentdetector");
       } 
     }
 
@@ -196,11 +197,11 @@ public class PreprocessHelper {
 
     FileSystem fs = FileSystem.get(conf);   
     RetrievalEnvironment env = new RetrievalEnvironment(eDir, fs);
-    sLogger.info("Environment created successfully.");
+    sLogger.info("Environment created successfully at " + eDir);
 
     String tokenizerFile = conf.get("eTokenizer");
     eTok = TokenizerFactory.createTokenizer(fs, eLang, tokenizerFile, true, conf.get("eStopword"), conf.get("eStemmedStopword"), null);
-    sLogger.info("Tokenizer and vocabs created successfully.");
+    sLogger.info("Tokenizer and vocabs created successfully from " + eLang + " " + tokenizerFile + "," + conf.get("eStopword") + "," + conf.get("eStemmedStopword"));
 
     eScoreFn = (ScoringModel) new Bm25();
     eScoreFn.setAvgDocLength(lang2AvgSentLen.get(eLang));        //average sentence length = heuristic based on De-En data

@@ -59,21 +59,21 @@ public class VerifyWikipediaProcessingCrosslingual {
   // de side: part 00010, key = 1000010078
   private int deTermDocVector1Id = 1000010078;
   private ImmutableMap<String, Float> deTermDocVector1 = ImmutableMap.of(
-      "total", 0.0017987842f, "2008", 0.055485327f, "...", 0.028501455f, "hors", 0.0015559981f);
+      "total", 0.0029225545f, "2008", 0.032985184f, "...", 0.014565759f, "histor", 0.021209072f);
   // de side: part 00000, key = 1000960467
   private int deTermDocVector2Id = 1000960467;
   private ImmutableMap<String, Float> deTermDocVector2 = ImmutableMap.of(
-      "gruber", 0.20325612f, "dogma", 0.24263553f, "de", 0.096429504f, "1700", 0.22096133f);
+      "gruber", 0.14930366f, "dogma", 0.1760581f, "de", 0.06843835f, "1700", 0.15910314f);
 
   // de side: part 00002, key = 1000131394
   private int deIntDocVector1Id = 1000131394;
   private ImmutableMap<Integer, Float> deIntDocVector1 =
-    ImmutableMap.of(3281, 0.005872311f, 6585, 0.06110034f, 21, 0.02157203f, 3264, 0.0017137241f);
+    ImmutableMap.of(3281, 0.002396266f, 6585, 0.029588304f, 21, 0.009042849f, 3264, 0.0037004524f);
 
   // de side: part 00011, key = 1000210390
   private int deIntDocVector2Id = 1000210390;
   private ImmutableMap<Integer, Float> deIntDocVector2 =
-    ImmutableMap.of(6585, 0.009541978f, 1141, 0.07270247f, 2210, 0.016265253f, 11912, 0.12346363f);
+    ImmutableMap.of(6585, 0.005131551f, 1141, 0.043817703f, 2210, 0.0308043f, 11912, 0.07676228f);
 
   @Test
   public void runBuildIndexEnSide() throws Exception {
@@ -267,10 +267,10 @@ public class VerifyWikipediaProcessingCrosslingual {
         SequenceFile.Reader.file(new Path(dewikiEn + "/test_wt-term-doc-vectors/part-00000")));
     reader.next(key, value);
     verifyTermDocVector(deTermDocVector1, value);
-    System.out.println("deTermDocVector1\n"+value);
+    System.out.println("deTermDocVector1\n"+key+","+value);
     reader.next(key, value);
     verifyTermDocVector(deTermDocVector2, value);
-    System.out.println("deTermDocVector2\n"+value);
+    System.out.println("deTermDocVector2\n"+key+","+value);
     reader.close();
   }
 
@@ -288,10 +288,10 @@ public class VerifyWikipediaProcessingCrosslingual {
         SequenceFile.Reader.file(new Path(dewikiEn + "/test_wt-int-doc-vectors/part-00000")));
     reader.next(key, value);
     verifyIntDocVector(deIntDocVector1, value);
-    System.out.println("deIntDocVector1\n"+value);
+    System.out.println("deIntDocVector1\n"+key+","+value);
     reader.next(key, value);
     verifyIntDocVector(deIntDocVector2, value);
-    System.out.println("deIntDocVector2\n"+value);
+    System.out.println("deIntDocVector2\n"+key+","+value);
     reader.close();
   }
 
