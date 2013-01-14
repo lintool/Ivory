@@ -63,7 +63,7 @@ public class VerifyWikipediaProcessingCrosslingual {
   // de side: part 00000, key = 1000960467
   private int deTermDocVector2Id = 1000960467;
   private ImmutableMap<String, Float> deTermDocVector2 = ImmutableMap.of(
-      "gruber", 0.14930366f, "dogma", 0.1760581f, "de", 0.06843835f, "1700", 0.15910314f);
+      "profession", 0.020181179f, "role", 0.0075097345f, "seminar", 0.13284045f, "categori", 0.08937906f);
 
   // de side: part 00002, key = 1000131394
   private int deIntDocVector1Id = 1000131394;
