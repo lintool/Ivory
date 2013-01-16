@@ -20,8 +20,9 @@ import com.google.common.collect.Lists;
 import edu.umd.cloud9.io.map.HMapSFW;
 
 public class VerifyWikipediaProcessingCrosslingual {
-  private static final Random rand = new Random();
-  private static final String tmp = "tmp-" + VerifyWikipediaProcessingCrosslingual.class.getSimpleName() + rand.nextInt(10000);
+  private static final Random RAND = new Random();
+  private static final String tmp =
+      VerifyWikipediaProcessingCrosslingual.class.getCanonicalName() + RAND.nextInt(10000);
 
   private static final String vocabPath = tmp + "/vocab";
   private static final String tokenizerPath = tmp + "/tokenizer";
@@ -176,6 +177,7 @@ public class VerifyWikipediaProcessingCrosslingual {
     reader.next(key, value);
     verifyIntDocVector(enIntDocVector2, value);
     System.out.println("enIntDocVector2\n"+value);
+    reader.close();
   }
 
   @Test
@@ -269,6 +271,7 @@ public class VerifyWikipediaProcessingCrosslingual {
     reader.next(key, value);
     verifyTermDocVector(deTermDocVector2, value);
     System.out.println("deTermDocVector2\n"+key+","+value);
+    reader.close();
   }
 
   @Test
@@ -289,6 +292,7 @@ public class VerifyWikipediaProcessingCrosslingual {
     reader.next(key, value);
     verifyIntDocVector(deIntDocVector2, value);
     System.out.println("deIntDocVector2\n"+key+","+value);
+    reader.close();
   }
 
   private void verifyTermDocVector(Map<String, Float> doc, HMapSFW value) {

@@ -20,8 +20,9 @@ import com.google.common.collect.Lists;
 import edu.umd.cloud9.io.map.HMapSFW;
 
 public class VerifyWikipediaProcessingMonolingual {
-  private static final Random rand = new Random();
-  private static final String tmp = "tmp-" + VerifyWikipediaProcessingMonolingual.class.getSimpleName() + rand.nextInt(10000);
+  private static final Random RAND = new Random();
+  private static final String tmp =
+      VerifyWikipediaProcessingMonolingual.class.getCanonicalName() + RAND.nextInt(10000);
 
   private static final String collectionPath = 
     "/shared/collections/wikipedia/raw/enwiki-20121201-pages-articles.xml";
@@ -119,18 +120,18 @@ public class VerifyWikipediaProcessingMonolingual {
 
     args = new String[] { "hadoop jar", IntegrationUtils.getJar("dist", "ivory"),
         ivory.integration.wikipedia.SearchSequenceFiles.class.getCanonicalName(), libjars,
-        "-input=" + galagoIndex + "/wt-term-doc-vectors", 
-        "-output=" + galagoIndex + "/test_wt-term-doc-vectors", 
-        "-keys=" + galagoTermDocVector1Id + "," + galagoTermDocVector2Id, 
-    "-valueclass=edu.umd.cloud9.io.map.HMapSFW"};
+        "-input=" + galagoIndex + "/wt-term-doc-vectors",
+        "-output=" + galagoIndex + "/test_wt-term-doc-vectors",
+        "-keys=" + galagoTermDocVector1Id + "," + galagoTermDocVector2Id,
+        "-valueclass=" + edu.umd.cloud9.io.map.HMapSFW.class.getCanonicalName() };
     IntegrationUtils.exec(Joiner.on(" ").join(args));
 
     args = new String[] { "hadoop jar", IntegrationUtils.getJar("dist", "ivory"),
         ivory.integration.wikipedia.SearchSequenceFiles.class.getCanonicalName(), libjars,
-        "-input=" + galagoIndex + "/wt-int-doc-vectors", 
-        "-output=" + galagoIndex + "/test_wt-int-doc-vectors", 
-        "-keys=" + galagoIntDocVector1Id + "," + galagoIntDocVector2Id, 
-    "-valueclass=ivory.core.data.document.WeightedIntDocVector"};
+        "-input=" + galagoIndex + "/wt-int-doc-vectors",
+        "-output=" + galagoIndex + "/test_wt-int-doc-vectors",
+        "-keys=" + galagoIntDocVector1Id + "," + galagoIntDocVector2Id,
+        "-valueclass=" + ivory.core.data.document.WeightedIntDocVector.class.getCanonicalName() };
     IntegrationUtils.exec(Joiner.on(" ").join(args));
   }
 
@@ -224,18 +225,18 @@ public class VerifyWikipediaProcessingMonolingual {
 
     args = new String[] { "hadoop jar", IntegrationUtils.getJar("dist", "ivory"),
         ivory.integration.wikipedia.SearchSequenceFiles.class.getCanonicalName(), libjars,
-        "-input=" + opennlpIndex + "/wt-term-doc-vectors", 
-        "-output=" + opennlpIndex + "/test_wt-term-doc-vectors", 
-        "-keys=" + opennlpTermDocVector1Id + "," + opennlpTermDocVector2Id, 
-    "-valueclass=edu.umd.cloud9.io.map.HMapSFW"};
+        "-input=" + opennlpIndex + "/wt-term-doc-vectors",
+        "-output=" + opennlpIndex + "/test_wt-term-doc-vectors",
+        "-keys=" + opennlpTermDocVector1Id + "," + opennlpTermDocVector2Id,
+        "-valueclass=" + edu.umd.cloud9.io.map.HMapSFW.class.getCanonicalName() };
     IntegrationUtils.exec(Joiner.on(" ").join(args));
 
     args = new String[] { "hadoop jar", IntegrationUtils.getJar("dist", "ivory"),
         ivory.integration.wikipedia.SearchSequenceFiles.class.getCanonicalName(), libjars,
-        "-input=" + opennlpIndex + "/wt-int-doc-vectors", 
-        "-output=" + opennlpIndex + "/test_wt-int-doc-vectors", 
-        "-keys=" + opennlpIntDocVector1Id + "," + opennlpIntDocVector2Id, 
-    "-valueclass=ivory.core.data.document.WeightedIntDocVector"};
+        "-input=" + opennlpIndex + "/wt-int-doc-vectors",
+        "-output=" + opennlpIndex + "/test_wt-int-doc-vectors",
+        "-keys=" + opennlpIntDocVector1Id + "," + opennlpIntDocVector2Id,
+        "-valueclass=" + ivory.core.data.document.WeightedIntDocVector.class.getCanonicalName() };
     IntegrationUtils.exec(Joiner.on(" ").join(args));
   }
 
