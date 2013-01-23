@@ -77,9 +77,9 @@ modifications; however, switching to a non-YARN version of Hadoop will
 requiring recompiling the jars. In this tutorial, we'll take you
 through the process of building an inverted index on a toy collection
 and running retrieval experiments. First, we'll use Hadoop local
-mode. Running in local model, as the name suggests, does not require
+mode (also called standalone mode). Running in local model, as the name suggests, does not require
 setting up a cluster, but of course, you won't get the benefits of
-distributed processing either. Next, we'll run Hadoop on the single
+distributed processing either. Next, we'll run Ivory on the single
 node virtual Hadoop cluster provided by Cloudera.</p>
 
 <table><tr><td valign="top"><span class="label label-warning">Warning</span></td>
@@ -334,7 +334,7 @@ it and you'll see. Note that the paths here are referencing HDFS
 paths, not local paths.</p>
 
 <p>After the indexing finishes, you should be able to see the indexes
-on HFS:</p>
+on HDFS:</p>
 
 <pre class="code">
 hadoop fs -ls index-cacm
