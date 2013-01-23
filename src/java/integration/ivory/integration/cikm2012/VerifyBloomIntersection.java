@@ -275,7 +275,7 @@ public class VerifyBloomIntersection {
     "clueweb09-en0000-00-03043" };
 
   private static final String IVORY_INDEX_PATH = "/scratch0/indexes/clue.en.01.nopos/";
-  private static final String SPAM_PATH = "/scratch0/nima/CIKM2012/docscores-spam.dat.en.01";
+  private static final String SPAM_PATH = "/scratch0/indexes/CIKM2012/docscores-spam.dat.en.01";
 
   @Test public void runRegression() throws Exception {
     FileSystem fs = FileSystem.getLocal(new Configuration());
