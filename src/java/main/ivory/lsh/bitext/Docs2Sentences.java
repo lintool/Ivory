@@ -2,8 +2,8 @@ package ivory.lsh.bitext;
 
 import ivory.core.util.CLIRUtils;
 import ivory.lsh.data.WikiSentenceInfo;
+import ivory.lsh.driver.PwsimEnvironment;
 import java.io.IOException;
-
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
@@ -11,7 +11,6 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
@@ -58,18 +57,11 @@ public class Docs2Sentences extends Configured implements Tool {
   }
 
   private static Options options;
-  
+
   private static void printUsage() {
     HelpFormatter formatter = new HelpFormatter();
-    formatter.printHelp( "Docs2Sentences", options );
+    formatter.printHelp( Docs2Sentences.class.getCanonicalName(), options );
     System.exit(-1);    
-  }
-  
-  public Docs2Sentences() {
-  }
-
-  public Docs2Sentences(Configuration conf) {
-    super(conf);
   }
 
   /**
@@ -91,17 +83,17 @@ public class Docs2Sentences extends Configured implements Tool {
     private PairOfInts keyOut;
     private WikiSentenceInfo valOut;
     private PreprocessHelper helper;							// for modularity, helper provides methods to preprocess data
-    private float minInVocabRate;
+    private float maxOOVRate;
 
     public void configure(JobConf job) {
       sLogger.setLevel(Level.INFO);
-
-      minInVocabRate = job.getFloat("MinInVocabRate", 0.5f);    
+      maxOOVRate = job.getFloat("MaxOOVRate", 0.5f);    
 
       try {
         helper = new PreprocessHelper(CLIRUtils.MinVectorTerms, CLIRUtils.MinSentenceLength, job);
       } catch (Exception e) {
         e.printStackTrace();
+        throw new RuntimeException("Error in helper creation");
       }
       keyOut = new PairOfInts();
       valOut = new WikiSentenceInfo();
@@ -115,10 +107,10 @@ public class Docs2Sentences extends Configured implements Tool {
       ArrayListWritable<Text> sentences;
       ArrayListWritable<HMapSFW> vectors = new ArrayListWritable<HMapSFW>();
       ArrayListOfIntsWritable sentLengths = new ArrayListOfIntsWritable();
+      // identify sentences in document, filter out ones below MinSentLength threshold
+      // convert each sentence into a tf-idf vector, using general DF map for collection and a heuristic for avg. doc length
+      // filter out sentences for which the vector has less than MinVectorTerms terms
       try {
-        // identify sentences in document, filter out ones below MinSentLength threshold
-        // convert each sentence into a tf-idf vector, using general DF map for collection and a heuristic for avg. doc length
-        // filter out sentences for which the vector has less than MinVectorTerms terms
         String article = p.getContent();
         if (lang.equals("en")) {
           sentences = helper.getESentences(article, vectors, sentLengths);		
@@ -133,7 +125,7 @@ public class Docs2Sentences extends Configured implements Tool {
         }
       } catch (Exception e) {
         e.printStackTrace();
-        throw new RuntimeException(e);
+        throw new RuntimeException("Error in sentence detection for language: " + lang + ", helper: " + helper + " article title: " + p.getTitle());
       }
 
       // documents with no sentences (after we filter out some by length)
@@ -153,16 +145,16 @@ public class Docs2Sentences extends Configured implements Tool {
 
       for (int i = 0; i < sentences.size(); i++) {
         if (langID == CLIRUtils.E) {
-          if (helper.getEInVocabRate(sentences.get(i).toString()) < minInVocabRate ) {
+          if (helper.getEOOVRate(sentences.get(i).toString()) > maxOOVRate ) {
             reporter.incrCounter(Sentences.OOV, 1);
-            return;
+            continue;
           }          
           reporter.incrCounter(Sentences.ELength, sentLengths.get(i));
           reporter.incrCounter(Sentences.E, 1);    
         }else {
-          if (helper.getFInVocabRate(sentences.get(i).toString()) < minInVocabRate ) {
+          if (helper.getFOOVRate(sentences.get(i).toString()) > maxOOVRate ) {
             reporter.incrCounter(Sentences.OOV, 1);
-            return;
+            continue;
           }
           reporter.incrCounter(Sentences.FLength, sentLengths.get(i));
           reporter.incrCounter(Sentences.F, 1);    
@@ -198,22 +190,21 @@ public class Docs2Sentences extends Configured implements Tool {
     JobConf conf = new JobConf(getConf(), Docs2Sentences.class);
 
     // Read commandline arguments
-    CommandLine cmdline = parseArgs(args);
-    if (cmdline == null) {
+    conf = setupConf(conf, args);
+    if (conf == null) {
       printUsage();
+      return -1;
     }
-    String eCollectionPath = cmdline.getOptionValue(ECOLLECTION_OPTION);
-    String fCollectionPath = cmdline.getOptionValue(FCOLLECTION_OPTION);
-    String sentsPath = cmdline.getOptionValue(SENTENCES_OPTION);
 
-    conf.setJobName("Docs2Sentences_"+conf.get("fLang")+"-"+conf.get("eLang"));  
+    conf.setJobName("Docs2Sentences_" + fLang + "-" + eLang);  
 
     FileInputFormat.addInputPaths(conf, eCollectionPath);
     FileInputFormat.addInputPaths(conf, fCollectionPath);
     FileOutputFormat.setOutputPath(conf, new Path(sentsPath));
 
     conf.setInt("mapred.task.timeout", 60000000);
-    conf.set("mapred.child.java.opts", "-Xmx2000m");
+    conf.set("mapreduce.map.memory.mb", "2048");
+    conf.set("mapreduce.map.java.opts", "-Xmx2048m");
     conf.setBoolean("mapred.map.tasks.speculative.execution", false);
     conf.setBoolean("mapred.reduce.tasks.speculative.execution", false);
 
@@ -232,10 +223,15 @@ public class Docs2Sentences extends Configured implements Tool {
     conf.setReducerClass(IdentityReducer.class);
     conf.setPartitionerClass(MyPartitioner.class);
 
+    sLogger.info("Running job " + conf.getJobName());
+    sLogger.info("Input e-directory: " + eCollectionPath);
+    sLogger.info("Input f-directory: " + fCollectionPath);
+    sLogger.info("Output directory: " + sentsPath);
+
     long startTime = System.currentTimeMillis();
     RunningJob j = JobClient.runJob(conf);
-    System.out.println("Job finished in " + (System.currentTimeMillis() - startTime)
-        + " milliseconds");
+    System.out.println("Job finished in " + (System.currentTimeMillis() - startTime) / 1000.0 + " seconds");
+    
     Counters counters = j.getCounters();
     long sumSentLengthsE = (long) counters.findCounter(Sentences.ELength).getCounter();
     long sumSentLengthsF = (long) counters.findCounter(Sentences.FLength).getCounter();
@@ -257,24 +253,23 @@ public class Docs2Sentences extends Configured implements Tool {
 
     return 0;
   }
-  
+
+  private String eCollectionPath, fCollectionPath, sentsPath, eLang, fLang;
+  private float oovRatio;
   private static final String FCOLLECTION_OPTION = "f_collection";
   private static final String ECOLLECTION_OPTION = "e_collection";
   private static final String FLANG_OPTION = "f_lang";
   private static final String ELANG_OPTION = "e_lang";
+  private static final String SENTENCES_OPTION = "sentences";
   private static final String FINDEX_OPTION = "f_index";
   private static final String EINDEX_OPTION = "e_index";
   private static final String BITEXTNAME_OPTION = "name";
-  private static final String SENTENCES_OPTION = "sentences";
-  private static final String BITEXT_OPTION = "bitext";
+  private static final String OOV_OPTION = "oov_rate";
   private static final String DATADIR_OPTION = "data";
-  private static final String PWSIM_OPTION = "pwsim_output";
-  private static final String CLASSIFIERID_OPTION = "classifier_id";
-  private static final String CLASSIFIERTHRESHOLD_OPTION = "threshold";
   private static final String LIBJARS_OPTION = "libjars";
 
   @SuppressWarnings("static-access")
-  private CommandLine parseArgs(String[] args) throws Exception {
+  private JobConf setupConf(JobConf conf, String[] args) throws Exception {
     options = new Options();
     options.addOption(OptionBuilder.withDescription("source-side raw collection path").withArgName("path").hasArg().isRequired().create(FCOLLECTION_OPTION));
     options.addOption(OptionBuilder.withDescription("target-side raw collection path").withArgName("path").hasArg().isRequired().create(ECOLLECTION_OPTION));
@@ -282,15 +277,12 @@ public class Docs2Sentences extends Configured implements Tool {
     options.addOption(OptionBuilder.withDescription("two-letter code for e-language").withArgName("en|de|tr|cs|zh|ar|es").hasArg().isRequired().create(ELANG_OPTION));
     options.addOption(OptionBuilder.withDescription("source-side index path").withArgName("path").hasArg().isRequired().create(FINDEX_OPTION));
     options.addOption(OptionBuilder.withDescription("target-side index path").withArgName("path").hasArg().isRequired().create(EINDEX_OPTION));
-    options.addOption(OptionBuilder.withDescription("name of bitext").withArgName("string").hasArg().isRequired().create(BITEXTNAME_OPTION));
+    options.addOption(OptionBuilder.withDescription("maximum per-sentence #OOVs/#tokens ratio").withArgName("0-1").hasArg().create(OOV_OPTION));
+    options.addOption(OptionBuilder.withDescription("name of bitext").withArgName("string").hasArg().create(BITEXTNAME_OPTION));
     options.addOption(OptionBuilder.withDescription("path to data files on HDFS").withArgName("path").hasArg().isRequired().create(DATADIR_OPTION));
-    options.addOption(OptionBuilder.withDescription("path to output of pwsim algorithm").withArgName("path").hasArg().isRequired().create(PWSIM_OPTION));
-    options.addOption(OptionBuilder.withDescription("classifier id to retrieve P('PARALLEL'|instance)").withArgName("0 or 1").hasArg().isRequired().create(CLASSIFIERID_OPTION));
-    options.addOption(OptionBuilder.withDescription("target vocabulary (e-side) of P(e|f)").withArgName("0-1").hasArg().isRequired().create(CLASSIFIERTHRESHOLD_OPTION));
     options.addOption(OptionBuilder.withDescription("path to collection sentences").withArgName("path").hasArg().isRequired().create(SENTENCES_OPTION));
-    options.addOption(OptionBuilder.withDescription("path to output bitext").withArgName("path").hasArg().isRequired().create(BITEXT_OPTION));
     options.addOption(OptionBuilder.withDescription("Hadoop option to load external jars").withArgName("jar packages").hasArg().create(LIBJARS_OPTION));
-    
+
     CommandLine cmdline;
     CommandLineParser parser = new GnuParser();
     try {
@@ -300,7 +292,28 @@ public class Docs2Sentences extends Configured implements Tool {
       return null;
     }
 
-    return cmdline;
+    eCollectionPath = cmdline.getOptionValue(ECOLLECTION_OPTION);
+    fCollectionPath = cmdline.getOptionValue(FCOLLECTION_OPTION);
+    sentsPath = cmdline.getOptionValue(SENTENCES_OPTION);
+    String eDir = cmdline.getOptionValue(EINDEX_OPTION);
+    String fDir = cmdline.getOptionValue(FINDEX_OPTION);
+    String dataDir = cmdline.getOptionValue(DATADIR_OPTION);
+    String bitextName = cmdline.hasOption(BITEXTNAME_OPTION) ? cmdline.getOptionValue(BITEXTNAME_OPTION) : "";
+    eLang = cmdline.getOptionValue(ELANG_OPTION);
+    fLang = cmdline.getOptionValue(FLANG_OPTION);
+    
+    oovRatio = cmdline.hasOption(OOV_OPTION) ? Float.parseFloat(cmdline.getOptionValue(OOV_OPTION)) : 0.5f;
+    conf.setFloat("MaxOOVRate", oovRatio);
+    
+    try {
+      conf = PwsimEnvironment.setBitextPaths(conf, dataDir, eLang, fLang, bitextName, eDir, fDir);
+    } catch (Exception e) {
+      e.printStackTrace();
+      System.err.println("Error configuring paths: " + e.getMessage());
+      return null;
+    }
+
+    return conf;
   }
 
   /**

@@ -22,8 +22,20 @@ public class TokenizerFactory {
     acceptedLanguages.put("tr", 1);
   }
 
-  public static Tokenizer createTokenizer(String lang, String modelPath, VocabularyWritable vocab){
-    return createTokenizer(lang, modelPath, true, null, null, vocab);
+  public static Tokenizer createTokenizer(FileSystem fs, String lang, String modelPath, boolean isStemming){
+    return createTokenizer(fs, lang, modelPath, isStemming, null, null, null);
+  }
+  
+  public static Tokenizer createTokenizer(String lang, String modelPath, boolean isStemming){
+    return createTokenizer(lang, null, isStemming, null);
+  }
+  
+  public static Tokenizer createTokenizer(String lang, boolean isStemming, VocabularyWritable vocab){
+    return createTokenizer(lang, null, isStemming, vocab);
+  }
+  
+  public static Tokenizer createTokenizer(String lang, String modelPath, boolean isStemming, VocabularyWritable vocab){
+    return createTokenizer(lang, modelPath, isStemming, null, null, vocab);
   }
 
   public static Tokenizer createTokenizer(String lang, String modelPath, boolean isStemming, String stopwordFile, String stemmedStopwordFile, VocabularyWritable vocab){
@@ -35,9 +47,9 @@ public class TokenizerFactory {
     }
   }
 
-  public static Tokenizer createTokenizer(FileSystem fs, String lang, String modelPath, VocabularyWritable vocab){
-    return createTokenizer(fs, lang, modelPath, true, null, null, vocab);
-  }
+//  public static Tokenizer createTokenizer(FileSystem fs, String lang, String modelPath, VocabularyWritable vocab){
+//    return createTokenizer(fs, lang, modelPath, true, null, null, vocab);
+//  }
 
   public static Tokenizer createTokenizer(FileSystem fs, String lang, String modelPath, boolean isStemming, String stopwordFile, String stemmedStopwordFile, VocabularyWritable vocab){
     Configuration conf = new Configuration();
@@ -100,5 +112,43 @@ public class TokenizerFactory {
       Log.info("Unknown class for language: " + lang);
       throw new RuntimeException("Unknown class for language: " + lang);
     }
+  }
+  
+  public static int firstMissingPositive(int[] A) {
+    // Start typing your Java solution below
+    // DO NOT write main() function
+    if (A==null || A.length == 0) { return 1; }
+    byte[] map = new byte[1000];
+    
+    for (int i=0; i<A.length && A[i]>0; i++) {
+        
+        int byteIndex = (A[i]-1)/8;
+        int bitPos = (A[i]-1)%8;
+        byte mask = 1;
+        mask = (byte) (mask << (7-bitPos));
+        map[byteIndex] = (byte) (mask | map[byteIndex]);   
+    }
+    
+    for(int i=0; i<map.length; i++) {
+        if(map[i] < 255){
+            for(int k=0; k<7; k++){
+                if(!getMSBit(map[i], k)){
+                    return i*8+k+1;
+                }
+            }
+        }
+    }    
+    return -1;
+}
+
+private static boolean getMSBit(byte b, int pos) {
+    byte mask = 1;
+    mask = (byte) (mask << (7-pos));
+    return ((byte)(mask & b)) != 0;
+}
+
+  public static void main(String[] args ){
+    int[] arr = {0,1,2};
+    firstMissingPositive(arr);
   }
 }

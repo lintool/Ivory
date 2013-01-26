@@ -1,18 +1,14 @@
 package ivory.lsh.driver;
 
-
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-
 import ivory.core.RetrievalEnvironment;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.filecache.DistributedCache;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.mapred.JobConf;
-
 
 /**
  * Runner class for pairwise similarity algorithms.
@@ -122,7 +118,7 @@ public abstract class PwsimEnvironment extends Configured {
     return dir + "/signatures-" + type + "_D=" + numOfBits + "_batch=" + numBatch;
   }
 
-  public static JobConf setBitextPaths(JobConf conf, String dataDir, String eLang, String fLang, String bitextName, String eDir, String fDir, String classifierType) throws IOException, URISyntaxException {
+  public static JobConf setBitextPaths(JobConf conf, String dataDir, String eLang, String fLang, String bitextName, String eDir, String fDir) throws IOException, URISyntaxException {
     String eSentDetect = dataDir+"/sent/"+eLang+"-sent.bin";
     String eTokenizer = dataDir+"/token/"+eLang+"-token.bin";
     String eVocabSrc = dataDir+"/"+bitextName+"/vocab."+eLang+"-"+fLang+"."+eLang;
@@ -139,8 +135,6 @@ public abstract class PwsimEnvironment extends Configured {
 
     String f2e_ttableFile = dataDir+"/"+bitextName+"/ttable."+fLang+"-"+eLang;
     String e2f_ttableFile = dataDir+"/"+bitextName+"/ttable."+eLang+"-"+fLang;
-
-    String classifierFile = dataDir+"/"+bitextName+"/classifier-" + classifierType + "." + fLang + "-" + eLang;
 
     conf.set("eDir", eDir);
     conf.set("fDir", fDir);
@@ -175,13 +169,16 @@ public abstract class PwsimEnvironment extends Configured {
     DistributedCache.addCacheFile(new URI(f2e_ttableFile), conf);
     DistributedCache.addCacheFile(new URI(e2f_ttableFile), conf);
     DistributedCache.addCacheFile(new URI(eEnv.getIndexTermsData()), conf);
-    DistributedCache.addCacheFile(new URI(classifierFile), conf);
     
     return conf;    
   }
   
   public static JobConf setBitextPaths(JobConf conf, String dataDir, String eLang, String fLang, String bitextName, String eDir, String fDir, float classifierThreshold, int classifierId, String pwsimPairsPath, String classifierType) throws IOException, URISyntaxException {
-    conf = setBitextPaths(conf, dataDir, eLang, fLang, bitextName, eDir, fDir, classifierType);
+    conf = setBitextPaths(conf, dataDir, eLang, fLang, bitextName, eDir, fDir);
+   
+    String classifierFile = dataDir+"/"+bitextName+"/classifier-" + classifierType + "." + fLang + "-" + eLang;
+    DistributedCache.addCacheFile(new URI(classifierFile), conf);
+
     conf.setFloat("ClassifierThreshold", classifierThreshold);
     conf.setInt("ClassifierId", classifierId);
     if (pwsimPairsPath != null) {

@@ -190,7 +190,7 @@ public class PreprocessWikipedia extends Configured implements Tool {
           "-input=" + rawCollection,
           "-output_path=" + indexRootPath + "/wiki-docid-tmp",
           "-output_file=" + mappingFile.toString(),
-          "-lang=" + collectionLang };
+          "-wiki_language=" + collectionLang };
       LOG.info("Running BuildWikipediaDocnoMapping with args " + Arrays.toString(arr));
 
       BuildWikipediaDocnoMapping tool = new BuildWikipediaDocnoMapping();
