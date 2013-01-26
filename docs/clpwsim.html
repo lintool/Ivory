@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>Ivory: Running Cross-lingual Pairwise Similarity on Wikipedia</title>
+    <title>Ivory: Cross-Lingual Pairwise Similarity</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
@@ -67,21 +67,43 @@
   <div class="container">
 
 <div class="page-header">
-<h2>Cross-Lingual Pairwise Similarity in Ivory</h2>
+<h2>Cross-Lingual Pairwise Similarity</h2>
+<h4>A step-by-step tutorial for German and English Wikipedia</h4>
 </div>
 
 <p>Ivory can perform cross-lingual pairwise similarity on large collections. The
-underlying scalable approach was introduced in Ture et al.'s SIGIR'11 paper 
+underlying scalable approach is implemented as a two-phase pipeline.
+The first phase was introduced in Ture et al.'s SIGIR'11 paper 
 <b><a href="publications/Ture_etal_SIGIR2011.pdf">No Free Lunch: Brute Force vs 
-Locality-Sensitive Hashing for Cross-Lingual Pairwise Similarity</a></b>.
-In this tutorial, we'll take you
-through the process of preprocessing Wikipedia for Ivory and finding similar pairs of
-articles from two different Wikipedia collections.</p>
+Locality-Sensitive Hashing for Cross-Lingual Pairwise Similarity</a></b> and
+the second is described in Ture & Lin's NAACL'12 paper 
+<b><a href="publications/Ture_Lin_NAACL-HLT2012.pdf">
+Why Not Grab a Free Lunch? Mining Large Corpora for Parallel Sentences To Improve
+Translation Modeling</a></b>.<p>
+In this two-part tutorial, we'll take you through the entire process using Wikipedia as our corpus: 
+Starting from scratch, we first show how to find similar German-English article pairs
+(i.e., phase 1), and then illustrate how to extract German-English parallel text (i.e., phase 2). 
+The output of phase 1 is used in phase 2, so you can skip to the 
+<a href="docs/bitex-tutorial.html">second part of the tutorial</a>
+if you have already completed the first one.
+</p>
 
-<h3>Downloading Wikipedia</h3>
+<table><tr><td valign="top"><span class="label label-info">Tip</span></td>
+<td style="padding-left: 10px">
+Our approach can be applied to any collection format that is supported by
+<a href="http://lintool.github.com/Cloud9">Cloud<sup>9</sup></a>, and any
+language supported by Ivory. As of 1/13/2013, Ivory supports the following languages: English, German, French, Spanish, Chinese, 
+Arabic, Czech, and Turkish. Everything should work out of the box for these languages. See the
+<a href="../docs/tokenization.html">tokenization guide</a> on how to add support for other languages.
+<p>
+</td>
+</tr>
+</table>
+
+<h3>1. Downloading Wikipedia</h3>
 
 <p>Wikipedia articles can be downloaded in XML format from
-<a href="http://wikipedia.c3sl.ufpr.br/">here</a>. Wikipedia is offered in many languages,<sup><a href="#fn1" id="ref1">1</a></sup>
+<a href="http://wikipedia.c3sl.ufpr.br/">here</a>. Wikipedia is offered in many languages,
 and you can download the content in different granularities. However, we only need the main 
 article content to run our algorithm.</p> 
 
@@ -131,20 +153,21 @@ less dewiki-20121215-pages-articles.xml
 hdfs dfs -put *wiki*pages-articles.xml $wiki/raw/
 </pre>
 
-<h3>Preprocessing Wikipedia</h3>
+<h3>2. Preprocessing Wikipedia</h3>
 
 <p>The standard preprocessing pipeline of Ivory is shown in detail 
 <a href="../docs/pipeline.html">here</a>, where the goal is to represent 
 each document as a vector of term weights.</p>
 
-<p>For stop word removal and stemming, we need to set up data files 
-on HDFS for tokenizers to load:</p>
+<p>For stop word removal and stemming, we need to upload data files 
+to HDFS for tokenizers to load:</p>
 
 <pre class="code">
+hdfs dfs -mkdir $datadir
 hdfs dfs -put $IVORYDIR/data/tokenizer/*de*stop* $datadir/
 hdfs dfs -put $IVORYDIR/data/tokenizer/*en*stop* $datadir/
-hdfs dfs -put $IVORYDIR/data/tokenizer/de-token.bin $datadir/
-hdfs dfs -put $IVORYDIR/data/tokenizer/en-token.bin $datadir/
+hdfs dfs -put $IVORYDIR/data/tokenizer/de-token.bin $datadir/token/
+hdfs dfs -put $IVORYDIR/data/tokenizer/en-token.bin $datadir/token/
 </pre>
 
 <table><tr><td valign="top"><span class="label label-info">Tip</span></td>
@@ -173,10 +196,9 @@ hdfs dfs -ls $datadir/
 
 <pre class="code">
 Found 12 items
-851682 data/de-token.bin
+1 data/token
 1349 data/de.stop
 685 data/de.stop.stemmed
-439890 data/en-token.bin
 5301 data/en.stop
 3685 data/en.stop.stemmed
 10143994 data/ttable.de-en
@@ -196,7 +218,7 @@ $IVORYDIR/etc/hadoop-cluster.sh ivory.app.PreprocessWikipedia \
 	-xml=$wiki/raw/enwiki-20121201-pages-articles.xml \
 	-compressed=$wiki/compressed/enwiki-20121201.compressed \
 	-lang=en \
-	-tokenizermodel=$datadir/en-token.bin \
+	-tokenizermodel=$datadir/token/en-token.bin \
 	-collectionvocab=$datadir/vocab.de-en.en \
 	-e_stopword=$datadir/en.stop >& en.log &
 	
@@ -221,8 +243,8 @@ $IVORYDIR/etc/hadoop-cluster.sh ivory.app.PreprocessWikipedia \
 	-xml=$wiki/raw/dewiki-20121215-pages-articles.xml \
 	-compressed=$wiki/compressed/dewiki-20121215.compressed \
 	-lang=de -target_lang=en \
-	-tokenizermodel=$datadir/de-token.bin \
-	-e_tokenizermodel=$datadir/en-token.bin \
+	-tokenizermodel=$datadir/token/de-token.bin \
+	-e_tokenizermodel=$datadir/token/en-token.bin \
 	-f_f2e_vocab=$datadir/vocab.de-en.de \
 	-e_f2e_vocab=$datadir/vocab.de-en.en \
 	-f2e_ttable=$datadir/ttable.de-en \
@@ -285,7 +307,7 @@ VOCAB SIZE 80279
 </pre>
 
 
-<h3>Representing Documents as Signatures</h3>
+<h3>3. Representing Documents as Signatures</h3>
 <p>Since we are done with preprocessing, we can now play with the document representation. 
 It is possible to compress the content of a document vector substantially by computing
 a <i>signature</i>, a bit/int array representation. Three different signature approaches 
@@ -316,7 +338,7 @@ $IVORYDIR/etc/hadoop-cluster.sh ivory.lsh.driver.RunComputeSignatures -index=$ed
 
 As a result of these jobs, you should see a <code>signatures-random_D=1000</code> folder under each index directory.
 
-<h3>Finding Similar Document Pairs</h3>
+<h3>4. Finding Similar Document Pairs</h3>
 
 <p>
 In order to find similar Wikipedia articles, we will compare signatures by calculating the Hamming distance
@@ -345,7 +367,7 @@ you should see the output written to <code>$edir/similardocs_random_maxdst=400_D
 The number of similar article pairs output by the algorithm will vary from run to run due to the randomized nature, 
 but you may expect about 40 million German-English article pairs output (see <code>Reduce output records</code>) under these settings.
 
-<h3>Evaluation</h3>
+<h3>5. Evaluation</h3>
 <p>
 Ivory has many built-in functionalities for evaluation of pairwise similarity approaches. Let us describe the process
 of evaluating the sliding window algorithm's output by comparing it to the brute-force approach. 
@@ -400,8 +422,8 @@ perl etc/eval.pl ground_0.3 pwsim-filtered_400-1000-300-2000
 </pre>
 
 <p>
-Another useful tool is to convert the output of the sliding window algorithm (i.e., key: (fdocno,edocno), value: distance) to
-a more understandable format, such as key: German document title, value: English document title. 
+Another useful tool is to convert the output of the sliding window algorithm (i.e., [key: (German document id, English document id), value: distance]) to
+a more human-friendly format, such as [key: German document title, value: English document title]. 
 </p>
 
 <p>
@@ -410,14 +432,14 @@ into a single file for easy loading:
 </p>
 
 <pre class="code">
-$IVORYDIR/etc/hadoop-cluster.sh edu.umd.cloud9.util.CombineSequenceFiles $edir/similardocs_random_maxdst=400_D=1000_Q=300_B=2000 $edir/similardocs_random_maxdst=400_D=1000_Q=300_B=2000.single 100 1 edu.umd.cloud9.io.pair.PairOfInts org.apache.hadoop.io.IntWritable sequence
+$IVORYDIR/etc/hadoop-cluster.sh edu.umd.cloud9.util.CombineSequenceFiles $edir/similardocs_random_maxdst=400_D=1000_Q=300_B=2000 $pwsimdir/similardocs_random_maxdst=400_D=1000_Q=300_B=2000.single 100 1 edu.umd.cloud9.io.pair.PairOfInts org.apache.hadoop.io.IntWritable sequence
 </pre>
 
 <p>Now, we can convert the docno-based output format to title pairs:</p>
 <pre class="code">
 $IVORYDIR/etc/hadoop-cluster.sh ivory.lsh.eval.Docnos2Titles \
-	-pwsim_output=$edir/similardocs_random_maxdst=400_D=1000_Q=300_B=2000-filtered\
-	-output=$edir/similardocs_random_maxdst=400_D=1000_Q=300_B=2000-filtered.titles \
+	-pwsim_output=$pwsimdir/similardocs_random_maxdst=400_D=1000_Q=300_B=2000-filtered\
+	-output=$pwsimdir/similardocs_random_maxdst=400_D=1000_Q=300_B=2000-filtered.titles \
 	-e_collection=$wiki/compressed/enwiki-20121201.compressed \
 	-f_collection=$wiki/compressed/dewiki-20121215.compressed \
 	-f_lang=de -e_lang=en -docnos=$fdir/sample-docnos
@@ -429,23 +451,16 @@ $IVORYDIR/etc/hadoop-cluster.sh ivory.lsh.eval.Docnos2Titles \
 hdfs dfs -cat $edir/similardocs_random_maxdst=400_D=1000_Q=300_B=2000-filtered.titles/part-00000 | less
 </pre>
 
-Although most of the pairs should be about relevant topics, you'll probably notice that some of the pairs 
-look completely wrong. This is acceptable, and may be due to several reasons, analyzed in more detail 
-in <a href="publications/Ture_etal_SIGIR2011.pdf">Ture et al's SIGIR'11 paper</a>.
+<p>Although most of the pairs should be about relevant topics, you'll probably notice that some of the pairs 
+look wrong. This is expected, and may be due to several reasons, analyzed in more detail 
+in <a href="publications/Ture_etal_SIGIR2011.pdf">Ture et al's SIGIR'11 paper</a>.</p>
 
-<h3>Extracting Parallel Text</h3>
-
-<pre class="code">
-$IVORYDIR/etc/hadoop-cluster.sh ivory.lsh.bitext.Docs2Sentences -e_collection=collections/${e}wiki-$eversion.compressed -f_collection=collections/${f}wiki-$fversion.compressed -sentences=$sentenceoutput -e_index=$edir -f_index=$fdir -data=$datadir -e_lang=$e -f_lang=$f -name=$f-$e.$name >& $bitextlog/sentences.$D-$Q-$B-$T.$F1.$efext.log
-
-$IVORYDIR/etc/hadoop-cluster.sh ivory.lsh.bitext.FindParallelSentencePairs -e_collection=collections/${e}wiki-$eversion.compressed -f_collection=collections/${f}wiki-$fversion.compressed -sentences=$sentenceoutput -pwsim_output=$pwsimoutput.single/part-00000 -bitext=$bitext1output -e_index=$edir -f_index=$fdir -data=$datadir -e_lang=$e -f_lang=$f -name=$f-$e.$name -threshold=0.$F1 -classifier_id=$id1 >& $bitextlog/bitext.$D-$Q-$B-$T.$F1.$efext.log
-
-$IVORYDIR/etc/hadoop-cluster.sh ivory.lsh.bitext.FilterSentencePairs -input=$bitext1output -output=$bitext2output -e_index=$edir -f_index=$fdir -data=$datadir -e_lang=$e -f_lang=$f -name=$f-$e.$name -threshold=0.$F3 -classifier_id=$id3 >& $bitextlog/bitext.$D-$Q-$B-$T.$F1-$F3.$efext.log
-</pre>
-
-<sup id="fn1">1. As of 1/13/2013, Ivory supports the following languages: English, German, French, Spanish, Chinese, 
-Arabic, Czech, and Turkish. Everything should work out of the box for these languages. See 
-<a href="../docs/tokenization.html">tokenization guide</a> on how to add support for other languages.<a href="#ref1" title="Jump back to footnote 1 in the text.">↩</a></sup>
+Congratulations! You have completed the first phase of our cross-language similarity pipeline. 
+In the next phase, we show <a href="docs/bitext-tutorial.html">how to find parallel sentence pairs</a> 
+from the output of this phase. For any further questions and comments, feel free to 
+contact <a href="mailto:ferhan.ture@gmail.com">Ferhan Ture</a>.
+<p>
+<p>
   </div>
 
 

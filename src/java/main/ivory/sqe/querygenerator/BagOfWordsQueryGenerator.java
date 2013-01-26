@@ -37,16 +37,16 @@ public class BagOfWordsQueryGenerator implements QueryGenerator {
         LOG.info("Tokenizer path "+tokenizerPath+" doesn't exist -- using GalagoTokenizer");
         tokenizer = new GalagoTokenizer();    
       }else {
-        tokenizer = TokenizerFactory.createTokenizer(lang, tokenizerPath, null);
+        tokenizer = TokenizerFactory.createTokenizer(lang, tokenizerPath, true);
       }
     }else if (lang.equals(Constants.German)) {
-      tokenizer = TokenizerFactory.createTokenizer(conf.get(Constants.DocLanguage), conf.get(Constants.DocTokenizerData), null);
+      tokenizer = TokenizerFactory.createTokenizer(lang, tokenizerPath, true);
     }else if (lang.equals(Constants.Chinese)) {
       if (!fs.exists(new Path(tokenizerPath))) {
         LOG.info("Tokenizer path "+tokenizerPath+" doesn't exist -- using BigramChineseTokenizer");
         tokenizer = new BigramChineseTokenizer();
       }else {
-        tokenizer = TokenizerFactory.createTokenizer(conf.get(Constants.DocLanguage), conf.get(Constants.DocTokenizerData), null);
+        tokenizer = TokenizerFactory.createTokenizer(lang, tokenizerPath, true);
       }
     }else {
       throw new RuntimeException("DocLanguage code "+lang+ " not known");

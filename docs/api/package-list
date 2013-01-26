@@ -1,8 +1,4 @@
 ivory.app
-ivory.bloomir.data
-ivory.bloomir.preprocessing
-ivory.bloomir.ranker
-ivory.bloomir.util
 ivory.cascade.model
 ivory.cascade.model.builder
 ivory.cascade.model.potential
@@ -45,5 +41,6 @@ ivory.smrf.model.importance
 ivory.smrf.model.potential
 ivory.smrf.model.score
 ivory.smrf.retrieval
+ivory.smrf.retrieval.distributed
 ivory.sqe.querygenerator
 ivory.sqe.retrieval

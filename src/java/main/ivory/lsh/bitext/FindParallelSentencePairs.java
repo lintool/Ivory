@@ -1,10 +1,9 @@
 package ivory.lsh.bitext;
 
-import ivory.core.RetrievalEnvironment;
 import ivory.core.util.CLIRUtils;
 import ivory.lsh.data.WikiSentenceInfo;
+import ivory.lsh.driver.PwsimEnvironment;
 import java.io.IOException;
-import java.net.URI;
 import java.util.Iterator;
 import opennlp.model.RealValueFileEventStream;
 import org.apache.commons.cli.CommandLine;
@@ -59,8 +58,6 @@ public class FindParallelSentencePairs extends Configured implements Tool {
     E, F, pairsE, pairsF, pairsProcessed, pairsCandidate, pairsFilteredByVectorSize, pairsFilteredBySentRatio, parallel 
   }
 
-  private static Options options;
-
   //AssertTrue
   //pairsCandidate=sum(pairsProcessed, pairsFilteredBySentRatio)
 
@@ -104,6 +101,10 @@ public class FindParallelSentencePairs extends Configured implements Tool {
       keyOut = new PairOfInts();
     }
 
+    private static String getFilename(String s) {
+      return s.substring(s.lastIndexOf("/") + 1);
+    }
+    
     /**
      * if lang id points to foreign language, then load pwsim algorithm's output as mapping: {foreign docno N --> list<english docnos> associated with N}
      * otherwise, mapping is like:  {english docno N --> list<foreign docnos> associated with N}
@@ -122,34 +123,39 @@ public class FindParallelSentencePairs extends Configured implements Tool {
      */
     private static void loadPairs(HMapIV<ArrayListOfIntsWritable> pwsimMapping, int langID, JobConf job, Reporter reporter){
       try {
-        Path[] localFiles = null;
-        localFiles = DistributedCache.getLocalCacheFiles(job);
-
-        SequenceFile.Reader reader = new SequenceFile.Reader(FileSystem.getLocal(job), localFiles[13], job);
-
-        PairOfInts key = (PairOfInts) reader.getKeyClass().newInstance();
-        IntWritable value = (IntWritable) reader.getValueClass().newInstance();
-
-        while (reader.next(key, value)) {
-          int fDocno = key.getRightElement();
-          fDocno -= 1000000000; 
-          int eDocno = key.getLeftElement();
-          if(langID == CLIRUtils.E){
-            if(!pwsimMapping.containsKey(eDocno)){
-              pwsimMapping.put(eDocno, new ArrayListOfIntsWritable());
+        Path[] localFiles = DistributedCache.getLocalCacheFiles(job);
+        String pwsimFile = job.get("PwsimPairs");
+        for (Path localFile : localFiles) {
+          if (localFile.toString().contains(getFilename(pwsimFile))) {
+            SequenceFile.Reader reader = new SequenceFile.Reader(FileSystem.getLocal(job), localFile, job);
+            
+            PairOfInts key = (PairOfInts) reader.getKeyClass().newInstance();
+            IntWritable value = (IntWritable) reader.getValueClass().newInstance();
+            int cnt = 0;
+            while (reader.next(key, value)) {
+              int fDocno = key.getRightElement();
+//          fDocno -= 1000000000; 
+              int eDocno = key.getLeftElement();
+              if(langID == CLIRUtils.E){
+                if(!pwsimMapping.containsKey(eDocno)){
+                  pwsimMapping.put(eDocno, new ArrayListOfIntsWritable());
+                }
+                pwsimMapping.get(eDocno).add(fDocno);   // we add 1000000000 to foreign docnos to distinguish them during pwsim algo
+              }else{
+                if(!pwsimMapping.containsKey(fDocno)){
+                  pwsimMapping.put(fDocno, new ArrayListOfIntsWritable());
+                }
+                pwsimMapping.get(fDocno).add(eDocno);   // we add 1000000000 to foreign docnos to distinguish them during pwsim algo
+              }
+              cnt++;
+              key = (PairOfInts) reader.getKeyClass().newInstance();
+              value = (IntWritable) reader.getValueClass().newInstance();
             }
-            pwsimMapping.get(eDocno).add(fDocno);   // we add 1000000000 to foreign docnos to distinguish them during pwsim algo
-          }else{
-            if(!pwsimMapping.containsKey(fDocno)){
-              pwsimMapping.put(fDocno, new ArrayListOfIntsWritable());
-            }
-            pwsimMapping.get(fDocno).add(eDocno);   // we add 1000000000 to foreign docnos to distinguish them during pwsim algo
+            reader.close();
+            sLogger.info(pwsimMapping.size() + "," + cnt + " pairs loaded from " + localFile);
+            
           }
-          key = (PairOfInts) reader.getKeyClass().newInstance();
-          value = (IntWritable) reader.getValueClass().newInstance();
         }
-        reader.close();
-        sLogger.info(pwsimMapping.size()+" pairs loaded.");
       } catch (Exception e) {
         throw new RuntimeException(e);
       }
@@ -163,16 +169,20 @@ public class FindParallelSentencePairs extends Configured implements Tool {
       // this works b/c all input kv pairs of a given mapper will have same lang id (reason explained above)
       if (pwsimMapping.isEmpty()) {
         loadPairs(pwsimMapping, langID, mJob, reporter);
-        sLogger.info("Mapping loaded: "+pwsimMapping.size());
+        sLogger.info("Mapping loaded: " + pwsimMapping.size());
       }
 
+      if (langID == CLIRUtils.F) {
+        docno += 1000000000;
+      }
+      
       // if no similar docs for docno, return
       if (pwsimMapping.containsKey(docno)) {
         similarDocnos = pwsimMapping.get(docno);  
       }else{
         return;
       }
-
+      
       if (langID == CLIRUtils.E) {
         reporter.incrCounter(Sentences.E, 1);
         reporter.incrCounter(Sentences.pairsE, similarDocnos.size());
@@ -346,15 +356,16 @@ public class FindParallelSentencePairs extends Configured implements Tool {
     }
 
     conf.setInt("mapred.task.timeout", 60000000);
-    conf.set("mapred.child.java.opts", "-Xmx2000m");
+    conf.set("mapreduce.map.memory.mb", "3000");
+    conf.set("mapreduce.map.java.opts", "-Xmx3000m");
+    conf.set("mapreduce.reduce.memory.mb", "3000");
+    conf.set("mapreduce.reduce.java.opts", "-Xmx3000m");
     conf.setBoolean("mapred.map.tasks.speculative.execution", false);
     conf.setBoolean("mapred.reduce.tasks.speculative.execution", false);
-
     conf.setNumMapTasks(100);
     conf.setNumReduceTasks(50);
     conf.setInt("mapred.min.split.size", 2000000000);
     conf.setFloat("mapred.reduce.slowstart.completed.maps", 0.9f);
-
     conf.setInputFormat(SequenceFileInputFormat.class);
     conf.setOutputFormat(TextOutputFormat.class);
     conf.setMapOutputKeyClass(PairOfInts.class);
@@ -363,7 +374,10 @@ public class FindParallelSentencePairs extends Configured implements Tool {
     conf.setReducerClass(MyReducer.class);
     conf.setOutputKeyClass(Text.class);
     conf.setOutputValueClass(Text.class);
+    
+    long startTime = System.currentTimeMillis();
     JobClient.runJob(conf); 
+    sLogger.info("Job finished in " + (System.currentTimeMillis() - startTime) / 1000.0 + " seconds");
 
     return 0;
   }
@@ -383,8 +397,10 @@ public class FindParallelSentencePairs extends Configured implements Tool {
   private static final String CLASSIFIERTHRESHOLD_OPTION = "threshold";
   private static final String LIBJARS_OPTION = "libjars";
 
+  private static Options options;
+
   @SuppressWarnings("static-access")
-  private JobConf setupConf(JobConf conf, String[] args) throws Exception {
+  protected static JobConf setupConf(JobConf conf, String[] args) throws Exception {
     options = new Options();
     options.addOption(OptionBuilder.withDescription("source-side raw collection path").withArgName("path").hasArg().isRequired().create(FCOLLECTION_OPTION));
     options.addOption(OptionBuilder.withDescription("target-side raw collection path").withArgName("path").hasArg().isRequired().create(ECOLLECTION_OPTION));
@@ -416,88 +432,33 @@ public class FindParallelSentencePairs extends Configured implements Tool {
     String dataDir = cmdline.getOptionValue(DATADIR_OPTION);
     String eLang = cmdline.getOptionValue(ELANG_OPTION);
     String fLang = cmdline.getOptionValue(FLANG_OPTION);
-    String bitextName = cmdline.getOptionValue(BITEXTNAME_OPTION);
+    String bitextName = cmdline.hasOption(BITEXTNAME_OPTION) ? cmdline.getOptionValue(BITEXTNAME_OPTION) : "";
     float classifierThreshold = Float.parseFloat(cmdline.getOptionValue(CLASSIFIERTHRESHOLD_OPTION));
     int classifierId = Integer.parseInt(cmdline.getOptionValue(CLASSIFIERID_OPTION));
-
     String sentsPath = cmdline.getOptionValue(SENTENCES_OPTION);
+    String outputPath = cmdline.getOptionValue(BITEXT_OPTION);
 
     if (!FileSystem.get(conf).exists(new Path(sentsPath))) {
-      Docs2Sentences docs2sentencesJob = new Docs2Sentences(conf);
-      int exitCode = docs2sentencesJob.run(args);
-      if (exitCode == -1) {
-        sLogger.info("Job " + docs2sentencesJob.toString() + " exited with errors. Terminating...");
-        return null;
-      }
+      System.err.println("Input sentences does not exist at: " + sentsPath + ". Exiting...");
+      return null;
     }
-
+    
     FileInputFormat.addInputPaths(conf, sentsPath);
-    FileOutputFormat.setOutputPath(conf, new Path(cmdline.getOptionValue(BITEXT_OPTION)));
-
-    RetrievalEnvironment eEnv = new RetrievalEnvironment(eDir, FileSystem.get(conf));
-
-    String eSentDetect = dataDir+"/sent/"+eLang+"-sent.bin";
-    String eTokenizer = dataDir+"/token/"+eLang+"-token.bin";
-    String eVocabSrc = dataDir+"/"+bitextName+"/vocab."+eLang+"-"+fLang+"."+eLang;
-    String eStopwords = dataDir+"/token/"+eLang+".stop";
-    String eVocabTrg = dataDir+"/"+bitextName+"/vocab."+fLang+"-"+eLang+"."+eLang;
-    String eStemmedStopwords = dataDir+"/token/"+eLang+".stop.stemmed";
-
-    String fSentDetect = dataDir+"/sent/"+fLang+"-sent.bin";
-    String fTokenizer = dataDir+"/token/"+fLang+"-token.bin";
-    String fVocabSrc = dataDir+"/"+bitextName+"/vocab."+fLang+"-"+eLang+"."+fLang;
-    String fStopwords = dataDir+"/token/"+fLang+".stop";
-    String fVocabTrg = dataDir+"/"+bitextName+"/vocab."+eLang+"-"+fLang+"."+fLang;
-    String fStemmedStopwords = dataDir+"/token/"+fLang+".stop.stemmed";
-
-    String f2e_ttableFile = dataDir+"/"+bitextName+"/ttable."+fLang+"-"+eLang;
-    String e2f_ttableFile = dataDir+"/"+bitextName+"/ttable."+eLang+"-"+fLang;
-
-    String classifierFile = dataDir+"/"+bitextName+"/classifier-simple."+fLang+"-"+eLang;
-
+    FileOutputFormat.setOutputPath(conf, new Path(outputPath));
     conf.setJobName("FindParallelSentences_" + fLang +"-" + eLang +"_F1="+classifierThreshold+"["+classifierId+"]");
 
-    conf.set("eDir", eDir);
-    conf.set("fDir", fDir);
-    conf.set("eLang", eLang);
-    conf.set("fLang", fLang);
-    conf.setFloat("ClassifierThreshold", classifierThreshold);
-    conf.setInt("ClassifierId", classifierId);
-    conf.set("fTokenizer", fTokenizer);
-    conf.set("eTokenizer", eTokenizer);
-    conf.set("eStopword", eStopwords);
-    conf.set("fStopword", fStopwords);
-    conf.get("eStemmedStopword", eStemmedStopwords);
-    conf.get("fStemmedStopword", fStemmedStopwords);
-    //e-files
+    try {
+      conf = PwsimEnvironment.setBitextPaths(conf, dataDir, eLang, fLang, bitextName, eDir, fDir, classifierThreshold, classifierId, pwsimPairsPath, "simple");
+    } catch (Exception e) {
+      e.printStackTrace();
+      System.err.println("Error configuring paths: " + e.getMessage());
+      return null;
+    }
 
-    sLogger.info("caching files...0,1,2,3,4");
-
-    DistributedCache.addCacheFile(new URI(eEnv.getDfByTermData()), conf);
-    DistributedCache.addCacheFile(new URI(eSentDetect), conf);
-    DistributedCache.addCacheFile(new URI(eTokenizer), conf);
-    DistributedCache.addCacheFile(new URI(eVocabSrc), conf);
-    DistributedCache.addCacheFile(new URI(eVocabTrg), conf);
-
-    //f-files
-
-    sLogger.info("caching files...5,6,7,8");
-
-    //    DistributedCache.addCacheFile(new URI(fDir+"/transDf.dat"), conf);
-    DistributedCache.addCacheFile(new URI(fSentDetect), conf);
-    DistributedCache.addCacheFile(new URI(fTokenizer), conf);
-    DistributedCache.addCacheFile(new URI(fVocabSrc), conf);
-    DistributedCache.addCacheFile(new URI(fVocabTrg), conf);
-
-    /////cross-lang files
-
-    sLogger.info("caching files...9,10,11,12,13");
-
-    DistributedCache.addCacheFile(new URI(f2e_ttableFile), conf);
-    DistributedCache.addCacheFile(new URI(e2f_ttableFile), conf);
-    DistributedCache.addCacheFile(new URI(eEnv.getIndexTermsData()), conf);
-    DistributedCache.addCacheFile(new URI(classifierFile), conf);
-    DistributedCache.addCacheFile(new URI(pwsimPairsPath), conf);    
+    sLogger.info("Running job " + conf.getJobName());
+    sLogger.info("Pwsim output path: " + pwsimPairsPath);
+    sLogger.info("Sentences path: " + sentsPath);
+    sLogger.info("Output path: " + outputPath);
 
     return conf;
   }

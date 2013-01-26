@@ -370,6 +370,8 @@ public class GenerateChunkedPermutedTables extends Configured implements Tool {
     RetrievalEnvironment targetEnv = new RetrievalEnvironment(workDir, fs);
     RetrievalEnvironment srcEnv = new RetrievalEnvironment(srcWorkDir, fs);
     int collSize = targetEnv.readCollectionDocumentCount() + srcEnv.readCollectionDocumentCount();
+    
+    // split table into 10 chunks by default, limit chunk size to range (100k,2m)
     chunkSize = collSize / 10;
     if (chunkSize < 100000) { 
       chunkSize = 100000;

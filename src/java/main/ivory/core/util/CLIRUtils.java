@@ -18,7 +18,9 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -44,6 +46,7 @@ import edu.umd.cloud9.io.map.HMapIFW;
 import edu.umd.cloud9.io.map.HMapSFW;
 import edu.umd.cloud9.io.map.HMapSIW;
 import edu.umd.cloud9.io.pair.PairOfFloatString;
+import edu.umd.cloud9.io.pair.PairOfFloats;
 import edu.umd.cloud9.io.pair.PairOfIntFloat;
 import edu.umd.cloud9.util.map.HMapIF;
 import edu.umd.cloud9.util.map.MapKF.Entry;
@@ -76,6 +79,7 @@ public class CLIRUtils extends Configured {
   public static final int MinVectorTerms = 3;
   public static final int MinSentenceLength = 5;
   public static final int E = -1, F = 1;
+  public static Pattern isNumber = Pattern.compile("\\d+");
 
   /**
    * Read df mapping from file.
@@ -178,7 +182,7 @@ public class CLIRUtils extends Configured {
     for(edu.umd.cloud9.util.map.MapKF.Entry<String> e : vectorA.entrySet()){
       float value = e.getValue();
       if(vectorB.containsKey(e.getKey())){
-        sum+= value*vectorB.get(e.getKey());
+        sum += value*vectorB.get(e.getKey());
       }
     }
     return sum;
@@ -1123,28 +1127,31 @@ public class CLIRUtils extends Configured {
    */
 
   public static String[] computeFeaturesF1(HMapSFW eVector, HMapSFW translatedFVector, float eSentLength, float fSentLength) {
-    return computeFeatures(1, null, null, eVector, null, null, translatedFVector, eSentLength, fSentLength, null, null, null, null, null, null, 0);
+    return computeFeatures(1, null, null, null, null, null, eVector, null, translatedFVector, eSentLength, fSentLength, null, null, null, null, null, null, 0);
   }
 
   public static String[] computeFeaturesF2(HMapSIW eSrcTfs, HMapSFW eVector, HMapSIW fSrcTfs, HMapSFW translatedFVector, float eSentLength, float fSentLength,
       Vocab eVocabSrc, Vocab eVocabTrg, Vocab fVocabSrc, Vocab fVocabTrg, TTable_monolithic_IFAs e2f_Probs, TTable_monolithic_IFAs f2e_Probs, float prob){
-    return computeFeatures(2, null, eSrcTfs, eVector, null, fSrcTfs, translatedFVector, 
+    return computeFeatures(2, null, null, null, null, eSrcTfs, eVector, fSrcTfs, translatedFVector, 
         eSentLength, fSentLength, eVocabSrc, eVocabTrg, fVocabSrc, fVocabTrg, e2f_Probs, f2e_Probs, prob); 
   }
 
-  public static String[] computeFeaturesF3(String eSentence, HMapSIW eSrcTfs, HMapSFW eVector, String fSentence, HMapSIW fSrcTfs, HMapSFW translatedFVector, float eSentLength, float fSentLength,
+  public static String[] computeFeaturesF3(String fSentence, String eSentence, Tokenizer fTokenizer, Tokenizer eTokenizer, 
+      HMapSIW eSrcTfs, HMapSFW eVector, HMapSIW fSrcTfs, HMapSFW translatedFVector, float eSentLength, float fSentLength,
       Vocab eVocabSrc, Vocab eVocabTrg, Vocab fVocabSrc, Vocab fVocabTrg, TTable_monolithic_IFAs e2f_Probs, TTable_monolithic_IFAs f2e_Probs, float prob){
-    return computeFeatures(3, eSentence, eSrcTfs, eVector, fSentence, fSrcTfs, translatedFVector, 
+    return computeFeatures(3, fSentence, eSentence, fTokenizer, eTokenizer, eSrcTfs, eVector, fSrcTfs, translatedFVector, 
         eSentLength, fSentLength, eVocabSrc, eVocabTrg, fVocabSrc, fVocabTrg, e2f_Probs, f2e_Probs, prob); 
   }
 
-  public static String[] computeFeatures(int featSet, String eSentence, HMapSIW eSrcTfs, HMapSFW eVector, String fSentence, HMapSIW fSrcTfs, HMapSFW translatedFVector, float eSentLength, float fSentLength,
+  public static String[] computeFeatures(int featSet, String fSentence, String eSentence, Tokenizer fTokenizer, Tokenizer eTokenizer, 
+      HMapSIW eSrcTfs, HMapSFW eVector, HMapSIW fSrcTfs, HMapSFW translatedFVector, float eSentLength, float fSentLength,
       Vocab eVocabSrc, Vocab eVocabTrg, Vocab fVocabSrc, Vocab fVocabTrg, TTable_monolithic_IFAs e2f_Probs, TTable_monolithic_IFAs f2e_Probs, float prob){
-    return computeFeatures(featSet, eSentence, eSrcTfs, eVector, fSentence, fSrcTfs, translatedFVector, 
+    return computeFeatures(featSet, fSentence, eSentence, fTokenizer, eTokenizer, eSrcTfs, eVector, fSrcTfs, translatedFVector, 
         eSentLength, fSentLength, eVocabSrc, eVocabTrg, fVocabSrc, fVocabTrg, e2f_Probs, f2e_Probs, prob, logger);
   }
 
-  public static String[] computeFeatures(int featSet, String eSentence, HMapSIW eSrcTfs, HMapSFW eVector, String fSentence, HMapSIW fSrcTfs, HMapSFW translatedFVector, float eSentLength, float fSentLength,
+  public static String[] computeFeatures(int featSet, String fSentence, String eSentence, Tokenizer fTokenizer, Tokenizer eTokenizer,
+      HMapSIW eSrcTfs, HMapSFW eVector, HMapSIW fSrcTfs, HMapSFW translatedFVector, float eSentLength, float fSentLength,
       Vocab eVocabSrc, Vocab eVocabTrg, Vocab fVocabSrc, Vocab fVocabTrg, TTable_monolithic_IFAs e2f_Probs, TTable_monolithic_IFAs f2e_Probs, float prob, Logger sLogger) {
     List<String> features = new ArrayList<String>();
 
@@ -1171,23 +1178,18 @@ public class CLIRUtils extends Configured {
     ////////////////////////////////////
 
     if (featSet > 2) {
-
       // uppercase token matching features : find uppercased tokens that exactly appear on both sides
       // lack of this evidence does not imply anything, but its existence might indicate parallel
-      fSentence.replaceAll("([',:;.?%!])", " $1 ");
-      eSentence.replaceAll("([',:;.?%!])", " $1 ");
-      features.add("uppercaseratio1=" + getUppercaseRatio(fSentence, eSentence) );
-      features.add("uppercaseratio2=" + getUppercaseRatio(eSentence, fSentence) );
-
-      if ( getUppercaseRatio(fSentence, eSentence) > 0f || getUppercaseRatio(eSentence, fSentence) > 0f ) {
-        //        if (CLIRUtils.cosineNormalized(eVector, translatedFVector) < 0.1f) {
-        //          System.out.println("DEBUG;" + fSentence +";"+ eSentence);
-        //        }
-      }
+//      fSentence.replaceAll("([',:;.?%!])", " $1 ");
+//      eSentence.replaceAll("([',:;.?%!])", " $1 ");
+      PairOfFloats pair = getUppercaseRatio(fTokenizer.processContent(fSentence), eTokenizer.processContent(eSentence));
+      features.add("uppercaseratio1=" + pair.getLeftElement() );
+      features.add("uppercaseratio2=" + pair.getRightElement() );
     }
 
     if (featSet > 3) {
-      // future work
+      // future work = count number of single/double letter words in src and trg side
+
     }
 
     return features.toArray(new String[features.size()]);
@@ -1203,8 +1205,8 @@ public class CLIRUtils extends Configured {
       int srcCnt = eSrcTfs.get(eTerm);
       cntAll += srcCnt;      // consider OOVs as well since they are part of the sentence
 
-      //      if(e < 0 || eTerm.matches("\\d+")){   // only non-number terms since numbers might have noisy translation prob.s
-      if(e < 0){
+      Matcher m = isNumber.matcher(eTerm);
+      if(e < 0 || m.find()){   // only non-number terms since numbers might have noisy translation prob.s
         continue;
       }
 
@@ -1220,55 +1222,54 @@ public class CLIRUtils extends Configured {
           if (trgCnt >= srcCnt) break;
         }
       }
-      cntMatch += trgCnt >= srcCnt ? srcCnt : trgCnt;
+      cntMatch += (trgCnt >= srcCnt) ? srcCnt : trgCnt;
       cntAltAll++;
     }
     //when there are terms in fSent but none of them has a translation or vocab entry, set trans ratio to 0
     return cntAll == 0 ? 0 : cntMatch/cntAll;
   }
 
-  private static float getUppercaseRatio(String sentence1, String sentence2) {
-    float cntUpperMatch = 0, cntUpperTotal = 0;
+  private static PairOfFloats getUppercaseRatio(String[] tokens1, String[] tokens2) {
+    //ěáčé
+    // now, read tokens in first sentence and keep track of sequences of uppercased tokens in buffer
+    HashSet<String> upperCaseMap1 = getUppercaseParts(tokens1);
+    HashSet<String> upperCaseMap2 = getUppercaseParts(tokens2);
+    float cntUpperRatio1 = getRatio(upperCaseMap1, upperCaseMap2);
+    float cntUpperRatio2 = getRatio(upperCaseMap2, upperCaseMap1);
+    PairOfFloats result = new PairOfFloats(cntUpperRatio1, cntUpperRatio2);
+    return result;
+  }
 
-    // to make sure we don't miss actual matches due to irregular spacing in between tokens, we normalize spacing in both sentences
-    StringBuilder buffer2 = new StringBuilder(" ");
-    List<String> tokens2 = Arrays.asList(sentence2.split("\\s+"));
-    for (int i=0; i < tokens2.size(); i++) {
-      buffer2.append(tokens2.get(i).trim() + " ");
+  private static float getRatio(HashSet<String> upperCaseMap1, HashSet<String> upperCaseMap2) {
+    float cntUpperMatch = 0;
+    for (String uppercase : upperCaseMap1) {
+      if (upperCaseMap2.contains(uppercase)) {
+        //            System.out.println("DEBUG["+uppercaseEntity+"]");
+        cntUpperMatch++;
+      }
     }
-    sentence2 = buffer2.toString();
+    return upperCaseMap1.isEmpty() ? 0f : cntUpperMatch / upperCaseMap1.size();
+  }
 
-    // now, read tokens in first sentence and keep track of sequences of uppercased tokens
+  private static HashSet<String> getUppercaseParts(String[] tokens) {
+    HashSet<String> set = new HashSet<String>();
     StringBuilder buffer = new StringBuilder(" ");
-    List<String> tokens = Arrays.asList(sentence1.split("\\s+"));
+
     String uppercaseEntity = "";
-    for (int i=0; i < tokens.size(); i++) {
-      String token = tokens.get(i).trim();
+    for (int i=0; i < tokens.length; i++) {
+      String token = tokens[i].trim();
       // discard single-char upper-case tokens
       if (token.length() > 0 && Character.isUpperCase(token.charAt(0))) {
         buffer.append(token + " ");
       }else {
         uppercaseEntity = buffer.toString();
         if (!uppercaseEntity.trim().equals("") && uppercaseEntity.length() > 2) {
-          if (sentence2.contains(uppercaseEntity)) {
-            //            System.out.println("DEBUG["+uppercaseEntity+"]");
-            cntUpperMatch++;
-          }
-          cntUpperTotal++;
+          set.add(uppercaseEntity);
           buffer.delete(1, buffer.length());    // clear buffer
         }
       }
     } 
-
-    // compare last part of buffer
-    uppercaseEntity = buffer.toString();
-    if (!uppercaseEntity.trim().equals("")) {
-      if (sentence2.contains(uppercaseEntity)) {
-        cntUpperMatch++;
-      }
-      cntUpperTotal++;
-    }
-    return cntUpperTotal==0 ? 0 : cntUpperMatch/cntUpperTotal;
+    return set;
   }
 
   private static void printUsage() {

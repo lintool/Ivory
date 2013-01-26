@@ -22,8 +22,20 @@ public class TokenizerFactory {
     acceptedLanguages.put("tr", 1);
   }
 
-  public static Tokenizer createTokenizer(String lang, String modelPath, VocabularyWritable vocab){
-    return createTokenizer(lang, modelPath, true, null, null, vocab);
+  public static Tokenizer createTokenizer(FileSystem fs, String lang, String modelPath, boolean isStemming){
+    return createTokenizer(fs, lang, modelPath, isStemming, null, null, null);
+  }
+
+  public static Tokenizer createTokenizer(String lang, String modelPath, boolean isStemming){
+    return createTokenizer(lang, null, isStemming, null);
+  }
+
+  public static Tokenizer createTokenizer(String lang, boolean isStemming, VocabularyWritable vocab){
+    return createTokenizer(lang, null, isStemming, vocab);
+  }
+
+  public static Tokenizer createTokenizer(String lang, String modelPath, boolean isStemming, VocabularyWritable vocab){
+    return createTokenizer(lang, modelPath, isStemming, null, null, vocab);
   }
 
   public static Tokenizer createTokenizer(String lang, String modelPath, boolean isStemming, String stopwordFile, String stemmedStopwordFile, VocabularyWritable vocab){
@@ -33,10 +45,6 @@ public class TokenizerFactory {
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
-  }
-
-  public static Tokenizer createTokenizer(FileSystem fs, String lang, String modelPath, VocabularyWritable vocab){
-    return createTokenizer(fs, lang, modelPath, true, null, null, vocab);
   }
 
   public static Tokenizer createTokenizer(FileSystem fs, String lang, String modelPath, boolean isStemming, String stopwordFile, String stemmedStopwordFile, VocabularyWritable vocab){
