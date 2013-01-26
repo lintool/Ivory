@@ -1,11 +1,18 @@
 package ivory.lsh.eval;
 
+import ivory.lsh.driver.PwsimEnvironment;
+
 import java.io.IOException;
 import java.net.URI;
 import java.util.Iterator;
 import java.util.TreeSet;
-
-import org.apache.hadoop.conf.Configuration;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.GnuParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.filecache.DistributedCache;
 import org.apache.hadoop.fs.FileSystem;
@@ -28,27 +35,44 @@ import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-
 import edu.umd.cloud9.io.map.HMapIIW;
 import edu.umd.cloud9.io.pair.PairOfInts;
 
 @SuppressWarnings("deprecation")
 public class FilterResults extends Configured implements Tool {
-  public static final String[] RequiredParameters = {};
   private static final Logger sLogger = Logger.getLogger(FilterResults.class);
 
   static enum mapoutput {
     count
   };
 
-  private static int printUsage() {
-    System.out
-        .println("usage: [input-path] [output-path] [sample-docnos] [threshold] [num-results]");
-    return -1;
-  }
-
   public FilterResults() {
     super();
+  }
+
+  private static HMapIIW readSamplesFromCache(String samplesFile, JobConf conf) throws IOException {
+    Path[] localFiles = DistributedCache.getLocalCacheFiles(conf);
+    HMapIIW samplesMap = null;
+    for (Path localFile : localFiles) {
+      if (localFile.toString().contains(samplesFile)) {
+        samplesMap = new HMapIIW();
+        LineReader reader = new LineReader(FileSystem.getLocal(conf).open(localFile));
+        Text t = new Text();
+        while (reader.readLine(t) != 0) {
+          int docno = Integer.parseInt(t.toString());
+          sLogger.info(docno + " --> sample");
+          samplesMap.put(docno, 1);
+        }
+        reader.close();
+        sLogger.info(samplesMap.size() + " sampled");
+      }
+    }
+    if (samplesMap == null) throw new RuntimeException("Not found in local cache: " + samplesFile);
+    return samplesMap;
+  }
+  
+  private static String getFilename(String s) {
+    return s.substring(s.lastIndexOf("/") + 1);
   }
 
   /**
@@ -60,7 +84,7 @@ public class FilterResults extends Configured implements Tool {
    * 
    */
   public static class MyMapperTopN extends MapReduceBase implements
-      Mapper<PairOfInts, IntWritable, IntWritable, PairOfInts> {
+  Mapper<PairOfInts, IntWritable, IntWritable, PairOfInts> {
 
     static Path[] localFiles;
     HMapIIW samplesMap = null;
@@ -70,29 +94,19 @@ public class FilterResults extends Configured implements Tool {
       sLogger.setLevel(Level.INFO);
       maxDist = job.getInt("Ivory.MaxHammingDistance", -1);
 
-      // read doc ids of sample into vectors
+      // read sample docnos
+      String samplesFile = job.get("Ivory.SampleFile"); 
       try {
-        localFiles = DistributedCache.getLocalCacheFiles(job);
+        samplesMap = readSamplesFromCache(getFilename(samplesFile), job);
+      } catch (NumberFormatException e) {
+        e.printStackTrace();
+        throw new RuntimeException("Incorrect format in " + samplesFile);
+      } catch (IOException e) {
+        e.printStackTrace();
+        throw new RuntimeException("I/O error in " + samplesFile);
       } catch (Exception e) {
-        throw new RuntimeException("Error reading doc vectors!");
-      }
-
-      if (localFiles != null && localFiles.length > 0) {
-        samplesMap = new HMapIIW();
-        try {
-          LineReader reader = new LineReader(FileSystem.getLocal(job).open(localFiles[0]));
-          Text t = new Text();
-          while (reader.readLine(t) != 0) {
-            int docno = Integer.parseInt(t.toString());
-            sLogger.info(docno + " --> sample");
-            samplesMap.put(docno, 1);
-          }
-          reader.close();
-        } catch (IOException e1) {
-        }
-        sLogger.info(samplesMap.size() + " sampled");
-      } else {
-        sLogger.info("samples file not specified in local cache");
+        e.printStackTrace();
+        throw new RuntimeException("Error reading sample file " + samplesFile);
       }
     }
 
@@ -116,7 +130,7 @@ public class FilterResults extends Configured implements Tool {
   }
 
   public static class MyReducerTopN extends MapReduceBase implements
-      Reducer<IntWritable, PairOfInts, IntWritable, PairOfInts> {
+  Reducer<IntWritable, PairOfInts, IntWritable, PairOfInts> {
     int numResults;
     TreeSet<PairOfInts> list = new TreeSet<PairOfInts>();
 
@@ -143,7 +157,7 @@ public class FilterResults extends Configured implements Tool {
   }
 
   public static class MyMapper extends MapReduceBase implements
-      Mapper<PairOfInts, IntWritable, PairOfInts, IntWritable> {
+  Mapper<PairOfInts, IntWritable, PairOfInts, IntWritable> {
 
     static Path[] localFiles;
     HMapIIW samplesMap = null;
@@ -155,29 +169,19 @@ public class FilterResults extends Configured implements Tool {
       sLogger.setLevel(Level.INFO);
       maxDist = job.getInt("Ivory.MaxHammingDistance", -1);
 
-      // read doc ids of sample into vectors
+      // read sample docnos
+      String samplesFile = job.get("Ivory.SampleFile"); 
       try {
-        localFiles = DistributedCache.getLocalCacheFiles(job);
+        samplesMap = readSamplesFromCache(getFilename(samplesFile), job);
+      } catch (NumberFormatException e) {
+        e.printStackTrace();
+        throw new RuntimeException("Incorrect format in " + samplesFile);
+      } catch (IOException e) {
+        e.printStackTrace();
+        throw new RuntimeException("I/O error in " + samplesFile);
       } catch (Exception e) {
-        throw new RuntimeException("Error reading doc vectors!");
-      }
-
-      if (localFiles != null && localFiles.length > 0) {
-        samplesMap = new HMapIIW();
-        try {
-          LineReader reader = new LineReader(FileSystem.getLocal(job).open(localFiles[0]));
-          Text t = new Text();
-          while (reader.readLine(t) != 0) {
-            int docno = Integer.parseInt(t.toString());
-            sLogger.info(docno + " --> sample");
-            samplesMap.put(docno, 1);
-          }
-          reader.close();
-        } catch (IOException e1) {
-        }
-        sLogger.info(samplesMap.size() + " sampled");
-      } else {
-        sLogger.info("samples file not specified in option SampleDocnosFile");
+        e.printStackTrace();
+        throw new RuntimeException("Error reading sample file " + samplesFile);
       }
     }
 
@@ -187,7 +191,6 @@ public class FilterResults extends Configured implements Tool {
       int leftKey = key.getLeftElement(); // english docno
       int rightKey = key.getRightElement(); // german docno
 
-      sLogger.debug(rightKey);
       if (samplesMap == null || samplesMap.containsKey(rightKey)) {
         if (maxDist == -1 || value.get() <= maxDist) {
           outKey.set(leftKey, rightKey);
@@ -239,38 +242,32 @@ public class FilterResults extends Configured implements Tool {
   //
   // }
 
-  public String[] getRequiredParameters() {
-    return RequiredParameters;
-  }
-
   public int run(String[] args) throws Exception {
-    if (args.length != 5) {
+    if ( parseArgs(args) < 0 ) {
       printUsage();
       return -1;
     }
     JobConf job = new JobConf(getConf(), FilterResults.class);
 
-    String samplesFile = args[2];
-    int maxHammingDistance = Integer.parseInt(args[3]);
-    job.setInt("Ivory.MaxHammingDistance", maxHammingDistance);
-    int numResults = Integer.parseInt(args[4]);
+    job.setInt("Ivory.MaxHammingDistance", maxDist);
     job.setInt("Ivory.NumResults", numResults);
 
-    job.setJobName("FilterResults_" + maxHammingDistance + "_" + numResults);
-    FileSystem fs2 = FileSystem.get(job);
+    job.setJobName("FilterResults_sample=" + getFilename(sampleDocnosFile) + "_top=" + (numResults > 0 ? numResults : "all"));
+    FileSystem fs = FileSystem.get(job);
 
-    String inputPath2 = args[0];// job2.get("Ivory.PWSimOutputPath");
-    String outputPath2 = args[1];// job2.get("FilteredPWSimFile");
+    inputPath = (inputPath == null) ? PwsimEnvironment.getPwsimDir(workDir, signatureType, maxDist, numOfBits, numOfPermutations, windowSize) : inputPath;
+    outputPath = (outputPath == null) ? PwsimEnvironment.getFilteredPwsimDir(workDir, signatureType, maxDist, numOfBits, numOfPermutations, windowSize, sampleDocnosFile, numResults) : outputPath;
 
-    int numMappers2 = 300;
-    int numReducers2 = 1;
+    int numMappers = 300;
+    int numReducers = 1;
 
-    if (fs2.exists(new Path(outputPath2))) {
+    if (fs.exists(new Path(outputPath))) {
       sLogger.info("FilteredPwsim output already exists! Quitting...");
       return 0;
     }
-    FileInputFormat.setInputPaths(job, new Path(inputPath2));
-    FileOutputFormat.setOutputPath(job, new Path(outputPath2));
+
+    FileInputFormat.setInputPaths(job, new Path(inputPath));
+    FileOutputFormat.setOutputPath(job, new Path(outputPath));
     FileOutputFormat.setCompressOutput(job, false);
 
     job.set("mapred.child.java.opts", "-Xmx2048m");
@@ -278,15 +275,13 @@ public class FilterResults extends Configured implements Tool {
     job.setInt("mapred.reduce.max.attempts", 10);
     job.setInt("mapred.task.timeout", 6000000);
 
+    job.set("Ivory.SampleFile", sampleDocnosFile);
+    DistributedCache.addCacheFile(new URI(sampleDocnosFile), job); // sample docnos in file
+
     sLogger.info("Running job " + job.getJobName());
-    sLogger.info("Input directory: " + inputPath2);
-    sLogger.info("Output directory: " + outputPath2);
-
-    sLogger.info("Samples file: " + samplesFile);
-
-    if (!samplesFile.equals("none")) {
-      DistributedCache.addCacheFile(new URI(samplesFile), job); // sample doc vectors in file
-    }
+    sLogger.info("Input directory: " + inputPath);
+    sLogger.info("Output directory: " + outputPath);
+    sLogger.info("Samples file: " + sampleDocnosFile);
 
     if (numResults > 0) {
       sLogger.info("Number of results = " + numResults);
@@ -303,8 +298,8 @@ public class FilterResults extends Configured implements Tool {
     }
 
     job.setJarByClass(FilterResults.class);
-    job.setNumMapTasks(numMappers2);
-    job.setNumReduceTasks(numReducers2);
+    job.setNumMapTasks(numMappers);
+    job.setNumReduceTasks(numReducers);
     job.setInputFormat(SequenceFileInputFormat.class);
 
     JobClient.runJob(job);
@@ -312,9 +307,82 @@ public class FilterResults extends Configured implements Tool {
     return 0;
   }
 
-  public static void main(String[] args) throws Exception {
-    ToolRunner.run(new Configuration(), new FilterResults(), args);
-    return;
+  private static final String WORKDIR_PATH_OPTION = "index";
+  private static final String INPUT_PATH_OPTION = "input";
+  private static final String OUTPUT_PATH_OPTION = "output"; 
+  private static final String THRESHOLD_OPTION = "T";
+  private static final String SAMPLEDOCNOS_OPTION = "docnos";
+  private static final String WINDOWSIZE_OPTION = "B";
+  private static final String SIGNLENG_OPTION = "num_bits";
+  private static final String NUMPERMS_OPTION = "Q";
+  private static final String OVERLAPSIZE_OPTION = "overlap";
+  private static final String SIGNTYPE_OPTION = "type";
+  private static final String TOPN_OPTION = "topN";
+  private static final String LIBJARS_OPTION = "libjars";
+
+  private Options options;
+  private int numOfPermutations, windowSize, maxDist, numResults, numOfBits;
+  private String signatureType, sampleDocnosFile, workDir, inputPath, outputPath;
+
+  private void printUsage() {
+    HelpFormatter formatter = new HelpFormatter();
+    formatter.printHelp( this.getClass().getCanonicalName(), options );
   }
 
+  @SuppressWarnings("static-access")
+  private int parseArgs(String[] args) {
+    options = new Options();
+    options.addOption(OptionBuilder.withDescription("path to index directory").withArgName("path").hasArg().create(WORKDIR_PATH_OPTION));
+    options.addOption(OptionBuilder.withDescription("path to source-language index directory").withArgName("path").hasArg().create(INPUT_PATH_OPTION));
+    options.addOption(OptionBuilder.withDescription("path to target-language index directory").withArgName("path").hasArg().create(OUTPUT_PATH_OPTION));
+    options.addOption(OptionBuilder.withDescription("only keep pairs that match these docnos").withArgName("path to sample docnos file").hasArg().isRequired().create(SAMPLEDOCNOS_OPTION));
+    options.addOption(OptionBuilder.withDescription("hamming distance threshold for similar pairs").withArgName("threshold").hasArg().create(THRESHOLD_OPTION));
+    options.addOption(OptionBuilder.withDescription("keep only N results for each source document").withArgName("N").hasArg().create(TOPN_OPTION));
+    options.addOption(OptionBuilder.withDescription("length of signature").withArgName("number of bits").hasArg().create(SIGNLENG_OPTION));
+    options.addOption(OptionBuilder.withDescription("sliding window size").withArgName("window").hasArg().create(WINDOWSIZE_OPTION));
+    options.addOption(OptionBuilder.withDescription("type of signature").withArgName("random|minhash|simhash").hasArg().create(SIGNTYPE_OPTION));
+    options.addOption(OptionBuilder.withDescription("number of permutations (tables)").withArgName("permutations").hasArg().create(NUMPERMS_OPTION));    
+    options.addOption(OptionBuilder.withDescription("size of overlap between chunks (default: window size)").withArgName("overlap size").hasArg().create(OVERLAPSIZE_OPTION));
+    options.addOption(OptionBuilder.withDescription("Hadoop option to load external jars").withArgName("jar packages").hasArg().create(LIBJARS_OPTION));
+
+    CommandLine cmdline;
+    CommandLineParser parser = new GnuParser();
+    try {
+      cmdline = parser.parse(options, args);
+    } catch (ParseException exp) {
+      System.err.println("Error parsing command line: " + exp.getMessage());
+      return -1;
+    }
+
+    workDir = cmdline.hasOption(WORKDIR_PATH_OPTION) ? cmdline.getOptionValue(WORKDIR_PATH_OPTION) : null;
+    inputPath = cmdline.hasOption(INPUT_PATH_OPTION) ? cmdline.getOptionValue(INPUT_PATH_OPTION) : null;
+    outputPath = cmdline.hasOption(OUTPUT_PATH_OPTION) ? cmdline.getOptionValue(OUTPUT_PATH_OPTION) : null;
+    numOfBits = cmdline.hasOption(SIGNLENG_OPTION) ? Integer.parseInt(cmdline.getOptionValue(SIGNLENG_OPTION)) : -1;
+    signatureType = cmdline.hasOption(SIGNTYPE_OPTION) ? cmdline.getOptionValue(SIGNTYPE_OPTION) : null;
+    numOfPermutations = cmdline.hasOption(NUMPERMS_OPTION) ? Integer.parseInt(cmdline.getOptionValue(NUMPERMS_OPTION)) : -1;
+    maxDist = cmdline.hasOption(THRESHOLD_OPTION) ? Integer.parseInt(cmdline.getOptionValue(THRESHOLD_OPTION)) : -1;
+    windowSize = cmdline.hasOption(WINDOWSIZE_OPTION) ? Integer.parseInt(cmdline.getOptionValue(WINDOWSIZE_OPTION)) : -1;
+    
+    // either provide --input and --output, or enter all parameters so the program will determine these paths
+    if (!((workDir != null && numOfBits > 0 && numOfPermutations > 0 && windowSize > 0 && signatureType != null && maxDist > 0) 
+        || (inputPath != null && outputPath != null))) {
+      System.err.println("Either options -" + WORKDIR_PATH_OPTION + " and -" + SIGNLENG_OPTION + " and -" + SIGNTYPE_OPTION + " and -" + 
+          NUMPERMS_OPTION + " and -" + OVERLAPSIZE_OPTION + " or options -" + INPUT_PATH_OPTION + " and -" + OUTPUT_PATH_OPTION + "should be specified!");
+      return -1;
+    }
+    try {
+      PwsimEnvironment.getPwsimDir(workDir, signatureType, maxDist, numOfBits, numOfPermutations, windowSize);
+    } catch (IOException e) {
+      System.err.println("Error with path names: " + e.getMessage());
+      return -1;
+    }
+    sampleDocnosFile = cmdline.getOptionValue(SAMPLEDOCNOS_OPTION);
+    numResults = cmdline.hasOption(TOPN_OPTION) ? Integer.parseInt(cmdline.getOptionValue(TOPN_OPTION)) : -1;
+
+    return 0;
+  }
+
+  public static void main(String[] args) throws Exception {
+    ToolRunner.run(new FilterResults(), args);
+  }
 }

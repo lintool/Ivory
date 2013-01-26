@@ -57,11 +57,11 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
   private static final Logger LOG = Logger.getLogger(BuildTranslatedTermDocVectors.class);
   private static int SAMPLING = 1;
 
-  protected static enum Docs { DBG, ZERO, SHORT, Total };
+  protected static enum Docs { DBG, ZERO, SHORT, SHORTAfterTranslation, Total };
   protected static enum DF { TransDf, NoDf }
 
   private static class MyMapperTrans extends MapReduceBase implements
-    Mapper<IntWritable, TermDocVector, IntWritable, HMapSFW> {
+  Mapper<IntWritable, TermDocVector, IntWritable, HMapSFW> {
 
     private ScoringModel model;
     // eVocabSrc is the English vocabulary for probability table e2f_Probs.
@@ -222,7 +222,10 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
       // Translate doc vector.
       TermDocVector.Reader reader = doc.getReader();
       int numTerms = reader.getNumberOfTerms(); 
-      if (numTerms < MIN_SIZE) {
+      if (numTerms == 0) {
+        reporter.incrCounter(Docs.ZERO, 1);
+        return;
+      }else if (numTerms < MIN_SIZE) {
         reporter.incrCounter(Docs.SHORT, 1);
         return;
       }
@@ -238,8 +241,9 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
 
       // If no translation of any word is in the target vocab, remove document i.e., our model
       // wasn't capable of translating it.
-      if (v.isEmpty()) {
-        reporter.incrCounter(Docs.ZERO, 1);
+      if (v.size() < MIN_SIZE) {
+        reporter.incrCounter(Docs.SHORTAfterTranslation, 1);
+        return;
       } else {
         reporter.incrCounter(Docs.Total, 1);
         output.collect(docno, v);

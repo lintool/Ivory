@@ -82,12 +82,6 @@ setting up a cluster, but of course, you won't get the benefits of
 distributed processing either. Next, we'll run Hadoop on the single
 node virtual Hadoop cluster provided by Cloudera.</p>
 
-<table><tr><td valign="top"><span class="label label-warning">Warning</span></td>
-<td style="padding-left: 10px">Note that local mode doesn't work
-properly under Windows, even with cygwin, so Windows users following
-this guide should start with "Running Ivory on a Single Node Virtual
-Cluster"</td></tr></table>
-
 <h3>Download and Install Hadoop</h3>
 
 <p>Download Cloudera CDH
@@ -218,10 +212,8 @@ BM25.</p>
 etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/cacm/run.cacm.xml data/cacm/queries.cacm.xml
 </pre>
 
-<p>If you see errors about not being able to find terms, that's
-okay (there are query terms that don't appear in any documents).</p>
-
-<p>After the program finishes you should see two files:
+<p>If you see warnings about not being able to find terms, that's
+okay. After the program finishes you should see two files:
 <code>ranking.cacm-dir-base.txt</code>, <code>ranking.cacm-bm25-base.txt</code>. These
 are the retrieval results, the files containing the top 1000 hits per topic.</p>
 

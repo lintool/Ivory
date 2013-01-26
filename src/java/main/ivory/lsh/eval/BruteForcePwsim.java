@@ -11,6 +11,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.TreeSet;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.GnuParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.filecache.DistributedCache;
@@ -51,7 +58,6 @@ import edu.umd.cloud9.io.pair.PairOfWritables;
  */
 @SuppressWarnings("deprecation")
 public class BruteForcePwsim extends Configured implements Tool {
-  public static final String[] RequiredParameters = {};
   private static final Logger sLogger = Logger.getLogger(BruteForcePwsim.class);
 
   static enum Pairs {
@@ -61,15 +67,6 @@ public class BruteForcePwsim extends Configured implements Tool {
   static enum Sample {
     Size
   };
-
-  private static int printUsage() {
-    System.out.println("usage: [type = signature|termdocvector|intdocvector] [input-path] [output-path] [sample-path] [threshold] [num-results = -1 for all]");
-    return -1;
-  }
-
-  public BruteForcePwsim() {
-    super();
-  }
 
   /**
    * For every document in the sample, find all other docs that have cosine similarity higher than
@@ -85,19 +82,31 @@ public class BruteForcePwsim extends Configured implements Tool {
     static List<PairOfWritables<WritableComparable, Writable>> vectors;
     float threshold;
 
+    private String getFilename(String s) {
+      return s.substring(s.lastIndexOf("/") + 1);
+    }
+
     public void configure(JobConf job) {
       sLogger.setLevel(Level.INFO);
       threshold = job.getFloat("Ivory.CosineThreshold", -1);
       sLogger.info("Threshold = " + threshold);
 
+      String sampleFile = job.get("Ivory.SampleFile");
+
+
       // read doc ids of sample into vectors
-      Path[] localFiles = null;
       try {
-        localFiles = DistributedCache.getLocalCacheFiles(job);
-        vectors = SequenceFileUtils.readFile(localFiles[0], FileSystem.getLocal(job));
+        sampleFile = getFilename(sampleFile);
+        Path[] localFiles = DistributedCache.getLocalCacheFiles(job);
+        for (Path localFile : localFiles) {
+          if (localFile.toString().contains(sampleFile)) {
+            vectors = SequenceFileUtils.readFile(localFile, FileSystem.getLocal(job));
+          }
+        }
+        if (vectors == null) throw new RuntimeException("Sample file not found at " + sampleFile);
       } catch (Exception e) {
-        throw new RuntimeException("Error reading doc vectors from "
-            + (localFiles != null ? localFiles[0] : "null"));
+        e.printStackTrace();
+        throw new RuntimeException("Error reading doc vectors from " + sampleFile);
       }
       sLogger.info("Read " + vectors.size() + " sample doc vectors");
     }
@@ -136,14 +145,18 @@ public class BruteForcePwsim extends Configured implements Tool {
       threshold = job.getFloat("Ivory.CosineThreshold", -1);
       sLogger.info("Threshold = " + threshold);
 
+      String sampleFile = job.get("Ivory.SampleFile");
       // read doc ids of sample into vectors
-      Path[] localFiles = null;
       try {
-        localFiles = DistributedCache.getLocalCacheFiles(job);
-        vectors = SequenceFileUtils.readFile(localFiles[0], FileSystem.getLocal(job));
+        Path[] localFiles = DistributedCache.getLocalCacheFiles(job);
+        for (Path localFile : localFiles) {
+          if (localFile.toString().contains(sampleFile)) {
+            vectors = SequenceFileUtils.readFile(localFile, FileSystem.getLocal(job));
+          }
+        }
+        if (vectors == null) throw new RuntimeException("Sample file not found at " + sampleFile);
       } catch (Exception e) {
-        throw new RuntimeException("Error reading doc vectors from "
-            + (localFiles != null ? localFiles[0] : "null"));
+        throw new RuntimeException("Error reading doc vectors from " + sampleFile);
       }
       sLogger.info("Read " + vectors.size() + " sample doc vectors");
     }
@@ -186,11 +199,18 @@ public class BruteForcePwsim extends Configured implements Tool {
       maxDist = (int) job.getFloat("Ivory.MaxHammingDistance", -1);
       sLogger.info("Threshold = " + maxDist);
 
+      String sampleFile = job.get("Ivory.SampleFile");
       // read doc ids of sample into vectors
       try {
         Path[] localFiles = DistributedCache.getLocalCacheFiles(job);
-        signatures = SequenceFileUtils.readFile(localFiles[0], FileSystem.getLocal(job));
+        for (Path localFile : localFiles) {
+          if (localFile.toString().contains(sampleFile)) {
+            signatures = SequenceFileUtils.readFile(localFile, FileSystem.getLocal(job));
+          }
+        }
+        if (signatures == null) throw new RuntimeException("Sample file not found at " + sampleFile);
       } catch (Exception e) {
+        e.printStackTrace();
         throw new RuntimeException("Error reading sample signatures!");
       }
       sLogger.info(signatures.size());
@@ -273,36 +293,23 @@ public class BruteForcePwsim extends Configured implements Tool {
 
   }
 
-  public String[] getRequiredParameters() {
-    return RequiredParameters;
-  }
-
   public int run(String[] args) throws Exception {
-    if (args.length != 6) {
+    if ( parseArgs(args) < 0 ) {
       return printUsage();
     }
 
-    float threshold = -1;
-    threshold = Float.parseFloat(args[4]);
-    int numResults = Integer.parseInt(args[5]);
     JobConf job = new JobConf(getConf(), BruteForcePwsim.class);
 
     FileSystem fs = FileSystem.get(job);
 
-    Path inputPath = new Path(args[1]); // PwsimEnvironment.getFileNameWithPars(dir, "IntDocs");
-    Path outputPath = new Path(args[2]); // dir + "/real-cosine-pairs_"+THRESHOLD+"_all";
-
-    fs.delete(outputPath, true);
+    fs.delete(new Path(outputPath), true);
 
     int numMappers = 100;
     int numReducers = 1;
 
-    FileInputFormat.setInputPaths(job, inputPath);
-    FileOutputFormat.setOutputPath(job, outputPath);
+    FileInputFormat.setInputPaths(job, new Path(inputPath));
+    FileOutputFormat.setOutputPath(job, new Path(outputPath));
     FileOutputFormat.setCompressOutput(job, false);
-
-    DistributedCache.addCacheFile(new URI(args[3]), job); // sample doc vectors or signatures in
-    // file
 
     job.set("mapred.child.java.opts", "-Xmx2048m");
     job.setInt("mapred.map.max.attempts", 10);
@@ -317,26 +324,22 @@ public class BruteForcePwsim extends Configured implements Tool {
     job.setOutputKeyClass(PairOfInts.class);
     job.setOutputValueClass(FloatWritable.class);
 
-    int numBits = (getConf().getInt("Ivory.NumOfBits", -1) == -1 ? 0 : getConf().getInt(
-        "Ivory.NumOfBits", -1));
-    if (args[0].contains("signature")) {
-      job.setJobName("BruteForcePwsim_signature_D=" + numBits + "_" + threshold + "_"
-          + (numResults > 0 ? numResults : "all"));
+    job.set("Ivory.SampleFile", sampleFile);
+    DistributedCache.addCacheFile(new URI(sampleFile), job);
+
+    if (inputType.contains("signature")) {
       job.setMapperClass(MyMapperSignature.class);
       job.setFloat("Ivory.MaxHammingDistance", threshold);
-    } else if (args[0].contains("vector")) {
-      if (args[0].contains("term")) {
+    } else if (inputType.contains("vector")) {
+      if (inputType.contains("term")) {
         job.setMapperClass(MyMapperTermDocVectors.class);
-        job.setJobName("BruteForcePwsim_termdocvector_D=" + numBits + "_" + threshold + "_"
-            + (numResults > 0 ? numResults : "all"));
       } else {
         job.setMapperClass(MyMapperDocVectors.class);
-        job.setJobName("BruteForcePwsim_intdocvector_D=" + numBits + "_" + threshold + "_"
-            + (numResults > 0 ? numResults : "all"));
       }
       job.setFloat("Ivory.CosineThreshold", threshold);
-
     }
+    job.setJobName("BruteForcePwsim_type=" + inputType + "_cosine=" + threshold + "_top=" + (numResults > 0 ? numResults : "all"));
+
     if (numResults > 0) {
       job.setInt("Ivory.NumResults", numResults);
     }
@@ -349,8 +352,58 @@ public class BruteForcePwsim extends Configured implements Tool {
     return 0;
   }
 
+
+  private static final String INPUT_PATH_OPTION = "input";
+  private static final String OUTPUT_PATH_OPTION = "output"; 
+  private static final String INPTYPE_OPTION = "type";
+  private static final String THRESHOLD_OPTION = "cosineT";
+  private static final String SAMPLE_OPTION = "sample";
+  private static final String TOPN_OPTION = "topN";
+  private static final String LIBJARS_OPTION = "libjars";
+  private Options options;
+  private float threshold;
+  private int numResults;
+  private String sampleFile, inputPath, outputPath, inputType;
+
+
+  private int printUsage() {
+    HelpFormatter formatter = new HelpFormatter();
+    formatter.printHelp( this.getClass().getCanonicalName(), options );
+    return -1;
+  }
+
+  @SuppressWarnings("static-access")
+  private int parseArgs(String[] args) {
+    options = new Options();
+    options.addOption(OptionBuilder.withDescription("path to input doc vectors or signatures").withArgName("path").hasArg().isRequired().create(INPUT_PATH_OPTION));
+    options.addOption(OptionBuilder.withDescription("path to output directory").withArgName("path").hasArg().isRequired().create(OUTPUT_PATH_OPTION));
+    options.addOption(OptionBuilder.withDescription("cosine similarity threshold when type=*docvector, hamming distance threshold when type=signature").withArgName("threshold").hasArg().isRequired().create(THRESHOLD_OPTION));
+    options.addOption(OptionBuilder.withDescription("path to file with sample doc vectors or signatures").withArgName("path").hasArg().isRequired().create(SAMPLE_OPTION));
+    options.addOption(OptionBuilder.withDescription("type of input").withArgName("signature|intdocvector|termdocvector").hasArg().isRequired().create(INPTYPE_OPTION));
+    options.addOption(OptionBuilder.withDescription("keep only N results for each source document").withArgName("N").hasArg().create(TOPN_OPTION));
+    options.addOption(OptionBuilder.withDescription("Hadoop option to load external jars").withArgName("jar packages").hasArg().create(LIBJARS_OPTION));
+
+    CommandLine cmdline;
+    CommandLineParser parser = new GnuParser();
+    try {
+      cmdline = parser.parse(options, args);
+    } catch (ParseException exp) {
+      System.err.println("Error parsing command line: " + exp.getMessage());
+      return -1;
+    }
+
+    inputPath = cmdline.getOptionValue(INPUT_PATH_OPTION);
+    outputPath = cmdline.getOptionValue(OUTPUT_PATH_OPTION);
+    threshold = Float.parseFloat(cmdline.getOptionValue(THRESHOLD_OPTION));
+    sampleFile = cmdline.getOptionValue(SAMPLE_OPTION);
+    inputType = cmdline.getOptionValue(INPTYPE_OPTION);
+    numResults = cmdline.hasOption(TOPN_OPTION) ? Integer.parseInt(cmdline.getOptionValue(TOPN_OPTION)) : -1;
+
+    return 0;
+  }
+
   public static void main(String[] args) throws Exception {
-    ToolRunner.run(new Configuration(), new BruteForcePwsim(), args);
+    ToolRunner.run(new BruteForcePwsim(), args);
     return;
   }
 
