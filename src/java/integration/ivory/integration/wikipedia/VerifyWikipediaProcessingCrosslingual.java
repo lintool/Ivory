@@ -34,22 +34,22 @@ public class VerifyWikipediaProcessingCrosslingual {
   // en side: part 00000, key = 91805
   private int enTermDocVector1Id = 91805;
   private ImmutableMap<String, Float> enTermDocVector1 = ImmutableMap.of(
-      "clutter", 0.043639377f, "zoom", 0.060861073f, "portray", 0.022965258f, "refer", -0.0062234555f);
+      "religi", 0.056898247f, "lubric", 0.07892087f, "time", 0.021438342f, "refer", -0.017549722f);
 
   // en side: part 00010, key = 137938
   private int enTermDocVector2Id = 137938;
   private ImmutableMap<String, Float> enTermDocVector2 = ImmutableMap.of(
-      "histor", 0.018175913f, "vigilant", 0.11764987f, "augment", 0.04146363f, "time", 0.01755069f);
+      "stori", 0.034548897f, "2006", 0.023635013f, "nineti", 0.076754145f, "time", 0.019773208f);
 
   // en side: part 00002, key = 148600
   private int enIntDocVector1Id = 148600;
   private ImmutableMap<Integer, Float> enIntDocVector1 =
-    ImmutableMap.of(9767, 0.09995478f, 9855, 0.09942109f, 3265, 0.049947068f, 10928, 0.11828814f);
+    ImmutableMap.of(3310, 0.0071687745f, 4479, 0.09890289f, 7599, 0.24106947f, 2063, 0.16018048f);
 
   // en side: part 00011, key = 181342
   private int enIntDocVector2Id = 181342;
   private ImmutableMap<Integer, Float> enIntDocVector2 =
-    ImmutableMap.of(9788, 0.013477361f, 4393, 0.033166625f, 6576, 0.11134256f, 32, 0.07029859f);
+    ImmutableMap.of(6569, 0.044599857f, 4393, 0.019540867f, 16527, 0.05980431f, 9764, 0.045334294f);
 
   private static final String dewikiPath = 
     "/shared/collections/wikipedia/raw/dewiki-20121117-pages-articles.xml";
@@ -59,21 +59,21 @@ public class VerifyWikipediaProcessingCrosslingual {
   // de side: part 00010, key = 1000010078
   private int deTermDocVector1Id = 1000010078;
   private ImmutableMap<String, Float> deTermDocVector1 = ImmutableMap.of(
-      "total", 0.0029225545f, "2008", 0.032985184f, "...", 0.014565759f, "histor", 0.021209072f);
+      "total", 0.007482552f, "need", 0.06130964f, "big", 0.014260361f, "histor", 0.0714205f);
   // de side: part 00000, key = 1000960467
   private int deTermDocVector2Id = 1000960467;
   private ImmutableMap<String, Float> deTermDocVector2 = ImmutableMap.of(
-      "profession", 0.020181179f, "role", 0.0075097345f, "seminar", 0.13284045f, "categori", 0.08937906f);
+      "2008", 0.033327986f, "role", 0.008505447f, "bolkestein", 0.009285147f, "ordinari", 0.0077467756f);
 
   // de side: part 00002, key = 1000131394
   private int deIntDocVector1Id = 1000131394;
   private ImmutableMap<Integer, Float> deIntDocVector1 =
-    ImmutableMap.of(3281, 0.002396266f, 6585, 0.029588304f, 21, 0.009042849f, 3264, 0.0037004524f);
+    ImmutableMap.of(1100, 0.04779704f, 6585, 0.018187178f, 21, 0.007229667f, 2194, 0.009517357f);
 
   // de side: part 00011, key = 1000210390
   private int deIntDocVector2Id = 1000210390;
   private ImmutableMap<Integer, Float> deIntDocVector2 =
-    ImmutableMap.of(6585, 0.005131551f, 1141, 0.043817703f, 2210, 0.0308043f, 11912, 0.07676228f);
+    ImmutableMap.of(6585, 0.0050360947f, 15, 0.0047478294f, 2200, 0.040175833f, 6566, 0.013208171f);
 
   @Test
   public void runBuildIndexEnSide() throws Exception {
@@ -152,10 +152,10 @@ public class VerifyWikipediaProcessingCrosslingual {
         SequenceFile.Reader.file(new Path(enwikiEn + "/test_wt-term-doc-vectors/part-00000")));
     reader.next(key, value);
     verifyTermDocVector(enTermDocVector1, value);
-    System.out.println("enTermDocVector1\n"+value);
+    System.out.println("enTermDocVector1\n"+key+","+value);
     reader.next(key, value);
     verifyTermDocVector(enTermDocVector2, value);
-    System.out.println("enTermDocVector2\n"+value);
+    System.out.println("enTermDocVector2\n"+key+","+value);
     reader.close();
   }
 
@@ -173,10 +173,10 @@ public class VerifyWikipediaProcessingCrosslingual {
         SequenceFile.Reader.file(new Path(enwikiEn + "/test_wt-int-doc-vectors/part-00000")));
     reader.next(key, value);
     verifyIntDocVector(enIntDocVector1, value);
-    System.out.println("enIntDocVector1\n"+value);
+    System.out.println("enIntDocVector1\n"+key+","+value);
     reader.next(key, value);
     verifyIntDocVector(enIntDocVector2, value);
-    System.out.println("enIntDocVector2\n"+value);
+    System.out.println("enIntDocVector2\n"+key+","+value);
     reader.close();
   }
 
