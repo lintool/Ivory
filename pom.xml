@@ -12,7 +12,7 @@
   <artifactId>ivory</artifactId>
   <packaging>jar</packaging>
   <name>Ivory</name>
-  <version>0.9.0</version>
+  <version>0.9.1</version>
   <description>A Hadoop toolkit for web-scale information retrieval research</description>
   <url>http://ivory.cc</url>
   <licenses>
@@ -92,7 +92,7 @@
     <dependency>
       <groupId>edu.umd</groupId>
       <artifactId>cloud9</artifactId>
-      <version>1.4.3</version>
+      <version>1.4.6</version>
       <optional>true</optional>
     </dependency>
     <dependency>

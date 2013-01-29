@@ -1,10 +1,9 @@
 package ivory.lsh.bitext;
 
-import ivory.core.RetrievalEnvironment;
 import ivory.core.tokenize.Tokenizer;
 import ivory.core.util.CLIRUtils;
+import ivory.lsh.driver.PwsimEnvironment;
 import java.io.IOException;
-import java.net.URI;
 import opennlp.model.RealValueFileEventStream;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -14,8 +13,6 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.hadoop.conf.Configured;
-import org.apache.hadoop.filecache.DistributedCache;
-import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
@@ -43,7 +40,6 @@ import edu.umd.cloud9.io.map.HMapSIW;
  * @author ferhanture
  * 
  */
-@SuppressWarnings("deprecation")
 public class FilterSentencePairs extends Configured implements Tool {
 
   private static final Logger sLogger = Logger.getLogger(FilterSentencePairs.class);
@@ -78,7 +74,7 @@ public class FilterSentencePairs extends Configured implements Tool {
     private Text outSent1, outSent2;
     private float classifierThreshold;
     private int classifierPositiveId;
-    
+
     public void configure(JobConf job) {
       sLogger.setLevel(Level.INFO);
 
@@ -115,7 +111,7 @@ public class FilterSentencePairs extends Configured implements Tool {
       eVector = helper.createEDocVector(eSent, eSrcTfs);
       HMapSIW fSrcTfs = new HMapSIW();
       fVector = helper.createFDocVector(fSent, fSrcTfs);
-   
+
       if (eVector == null || fVector == null) {
         reporter.incrCounter(Sentences.ignored, 1);	
         return;
@@ -125,14 +121,14 @@ public class FilterSentencePairs extends Configured implements Tool {
 
       String[] instance = CLIRUtils.computeFeaturesF2(eSrcTfs, eVector, fSrcTfs, fVector, eLen, fLen, 
           helper.getESrc(), helper.getETrg(), helper.getFSrc(), helper.getFTrg(), helper.getE2F(), helper.getF2E(), 0.1f);
-      
-//      String[] instance = CLIRUtils.computeFeaturesF3(eSent, eSrcTfs, eVector, fSent, fSrcTfs, fVector, eLen, fLen, 
-//          helper.getESrc(), helper.getETrg(), helper.getFSrc(), helper.getFTrg(), helper.getE2F(), helper.getF2E());
+
+      //      String[] instance = CLIRUtils.computeFeaturesF3(eSent, eSrcTfs, eVector, fSent, fSrcTfs, fVector, eLen, fLen, 
+      //          helper.getESrc(), helper.getETrg(), helper.getFSrc(), helper.getFTrg(), helper.getE2F(), helper.getF2E());
       String s ="";
       for (String feat : instance) {
         s+=feat+" ";
       }
-      
+
       // classify w/ maxent model
       // emit if labeled parallel
       if(instance == null){
@@ -147,7 +143,7 @@ public class FilterSentencePairs extends Configured implements Tool {
       // e.g., for the F3 de-en classifier probs[1] gives pr(parallel), in F1 classifier probs[0] does
       // we pass this information as a program argument
       double confidence = probs[classifierPositiveId];
-          
+
       if (confidence > classifierThreshold) {
         reporter.incrCounter(Sentences.parallel, 1);
         outSent1.set(fSent + CLIRUtils.BitextSeparator + eSent + CLIRUtils.BitextSeparator + s + CLIRUtils.BitextSeparator + confidence);
@@ -155,7 +151,7 @@ public class FilterSentencePairs extends Configured implements Tool {
       }
     }
   }
-  
+
   /**
    * Runs this tool.
    */
@@ -164,97 +160,17 @@ public class FilterSentencePairs extends Configured implements Tool {
     JobConf conf = new JobConf(getConf(), FilterSentencePairs.class);
 
     // Read commandline arguments
-    CommandLine cmdline = parseArgs(args);
-    if (cmdline == null) {
+    conf = setupConf(conf, args);
+    if (conf == null) {
       printUsage();
+      return -1;
     }
-    String inputPath = cmdline.getOptionValue(INPUT_OPTION);
-    String outputPath = cmdline.getOptionValue(OUTPUT_OPTION);
-    String eDir = cmdline.getOptionValue(EINDEX_OPTION);
-    String fDir = cmdline.getOptionValue(FINDEX_OPTION);
-    String dataDir = cmdline.getOptionValue(DATADIR_OPTION);
-    String eLang = cmdline.getOptionValue(ELANG_OPTION);
-    String fLang = cmdline.getOptionValue(FLANG_OPTION);
-    String bitextName = cmdline.getOptionValue(BITEXTNAME_OPTION);
-    float classifierThreshold = Float.parseFloat(cmdline.getOptionValue(CLASSIFIERTHRESHOLD_OPTION));
-    int classifierId = Integer.parseInt(cmdline.getOptionValue(CLASSIFIERID_OPTION));
-
-    RetrievalEnvironment eEnv = new RetrievalEnvironment(eDir, FileSystem.get(conf));
-
-    String eSentDetect = dataDir+"/sent/"+eLang+"-sent.bin";
-    String eTokenizer = dataDir+"/token/"+eLang+"-token.bin";
-    String eVocabSrc = dataDir+"/"+bitextName+"/vocab."+eLang+"-"+fLang+"."+eLang;
-    String eVocabTrg = dataDir+"/"+bitextName+"/vocab."+fLang+"-"+eLang+"."+eLang;
-    String eStopwords = dataDir+"/token/"+eLang+".stop";
-    String eStemmedStopwords = dataDir+"/token/"+eLang+".stop.stemmed";
     
-    String fSentDetect = dataDir+"/sent/"+fLang+"-sent.bin";
-    String fTokenizer = dataDir+"/token/"+fLang+"-token.bin";
-    String fVocabSrc = dataDir+"/"+bitextName+"/vocab."+fLang+"-"+eLang+"."+fLang;
-    String fVocabTrg = dataDir+"/"+bitextName+"/vocab."+eLang+"-"+fLang+"."+fLang;
-    String fStopwords = dataDir+"/token/"+fLang+".stop";
-    String fStemmedStopwords = dataDir+"/token/"+fLang+".stop.stemmed";
-    
-    String f2e_ttableFile = dataDir+"/"+bitextName+"/ttable."+fLang+"-"+eLang;
-    String e2f_ttableFile = dataDir+"/"+bitextName+"/ttable."+eLang+"-"+fLang;
-
-//    String classifierFile = dataDir+"/"+bitextName+"/classifier-complexplus."+fLang+"-"+eLang;
-    String classifierFile = dataDir+"/"+bitextName+"/classifier-complex."+fLang+"-"+eLang;
-
-//    conf.setJobName("FilterSentencePairs_" + fLang +"-" + eLang +"_F4="+classifierThreshold+"["+classifierId+"]");
-    conf.setJobName("FilterSentencePairs_" + fLang +"-" + eLang +"_F3="+classifierThreshold+"["+classifierId+"]");
-
-    conf.set("eDir", eDir);
-    conf.set("fDir", fDir);
-    conf.set("eLang", eLang);
-    conf.set("fLang", fLang);
-    conf.setFloat("ClassifierThreshold", classifierThreshold);
-    conf.setInt("ClassifierId", classifierId);
-    conf.set("fTokenizer", fTokenizer);
-    conf.set("eTokenizer", eTokenizer);
-    conf.set("eStopword", eStopwords);
-    conf.set("fStopword", fStopwords);
-    conf.get("eStemmedStopword", eStemmedStopwords);
-    conf.get("fStemmedStopword", fStemmedStopwords);
-    
-    sLogger.info("caching files...");
-
-    /////en-files
-
-    sLogger.info("caching files...0,1,2,3,4");
-
-    DistributedCache.addCacheFile(new URI(eEnv.getDfByTermData()), conf);
-    DistributedCache.addCacheFile(new URI(eSentDetect), conf);
-    DistributedCache.addCacheFile(new URI(eTokenizer), conf);
-    DistributedCache.addCacheFile(new URI(eVocabSrc), conf);
-    DistributedCache.addCacheFile(new URI(eVocabTrg), conf);
-
-    /////de-files
-    sLogger.info("caching files...5,6,7,8");
-
-    //		DistributedCache.addCacheFile(new URI(fDir+"/transDf.dat"), conf);
-    DistributedCache.addCacheFile(new URI(fSentDetect), conf);
-    DistributedCache.addCacheFile(new URI(fTokenizer), conf);
-    DistributedCache.addCacheFile(new URI(fVocabSrc), conf);
-    DistributedCache.addCacheFile(new URI(fVocabTrg), conf);
-
-    /////cross-ling files
-
-    sLogger.info("caching files...9, 10,11,12");
-
-    DistributedCache.addCacheFile(new URI(f2e_ttableFile), conf);
-    DistributedCache.addCacheFile(new URI(e2f_ttableFile), conf);
-    DistributedCache.addCacheFile(new URI(eEnv.getIndexTermsData()), conf);
-    DistributedCache.addCacheFile(new URI(classifierFile), conf);
-
-    FileInputFormat.setInputPaths(conf, inputPath);
-    FileOutputFormat.setOutputPath(conf, new Path(outputPath));
-
     conf.setInt("mapred.task.timeout", 60000000);
-    conf.set("mapred.child.java.opts", "-Xmx2000m");
+    conf.set("mapreduce.map.memory.mb", "3000");
+    conf.set("mapreduce.map.java.opts", "-Xmx3000m");
     conf.setBoolean("mapred.map.tasks.speculative.execution", false);
     conf.setBoolean("mapred.reduce.tasks.speculative.execution", false);
-
     conf.setNumMapTasks(100);
     conf.setNumReduceTasks(1);
     conf.setInt("mapred.min.split.size", 2000000000);
@@ -267,7 +183,11 @@ public class FilterSentencePairs extends Configured implements Tool {
     conf.setOutputValueClass(Text.class);
     conf.setMapperClass(MyMapper.class);
     conf.setReducerClass(IdentityReducer.class);
-    JobClient.runJob(conf);	
+    
+    long startTime = System.currentTimeMillis();
+    JobClient.runJob(conf); 
+    sLogger.info("Job finished in " + (System.currentTimeMillis() - startTime) / 1000.0 + " seconds");
+    
     return 0;
   }
 
@@ -279,20 +199,21 @@ public class FilterSentencePairs extends Configured implements Tool {
   private static final String INPUT_OPTION = "input";
   private static final String OUTPUT_OPTION = "output";
   private static final String DATADIR_OPTION = "data";
-  private static final String PWSIM_OPTION = "pwsim_output";
   private static final String CLASSIFIERID_OPTION = "classifier_id";
   private static final String CLASSIFIERTHRESHOLD_OPTION = "threshold";
   private static final String LIBJARS_OPTION = "libjars";
 
   @SuppressWarnings("static-access")
-  private CommandLine parseArgs(String[] args) throws Exception {
-    options.addOption(OptionBuilder.withDescription("two-letter code for f-language").withArgName("en|de|tr|cs|zh|ar|es").hasArg().isRequired().create(FLANG_OPTION));
-    options.addOption(OptionBuilder.withDescription("two-letter code for e-language").withArgName("en|de|tr|cs|zh|ar|es").hasArg().isRequired().create(ELANG_OPTION));
+  private JobConf setupConf(JobConf conf, String[] args) throws Exception {
+    options = new Options();
+    options.addOption(OptionBuilder.withDescription("path to bitext (input)").withArgName("path").hasArg().isRequired().create(INPUT_OPTION));
+    options.addOption(OptionBuilder.withDescription("path to filtered bitext (output)").withArgName("path").hasArg().isRequired().create(OUTPUT_OPTION));
     options.addOption(OptionBuilder.withDescription("source-side index path").withArgName("path").hasArg().isRequired().create(FINDEX_OPTION));
     options.addOption(OptionBuilder.withDescription("target-side index path").withArgName("path").hasArg().isRequired().create(EINDEX_OPTION));
+    options.addOption(OptionBuilder.withDescription("two-letter code for f-language").withArgName("en|de|tr|cs|zh|ar|es").hasArg().isRequired().create(FLANG_OPTION));
+    options.addOption(OptionBuilder.withDescription("two-letter code for e-language").withArgName("en|de|tr|cs|zh|ar|es").hasArg().isRequired().create(ELANG_OPTION));
     options.addOption(OptionBuilder.withDescription("name of bitext").withArgName("string").hasArg().isRequired().create(BITEXTNAME_OPTION));
     options.addOption(OptionBuilder.withDescription("path to data files on HDFS").withArgName("path").hasArg().isRequired().create(DATADIR_OPTION));
-    options.addOption(OptionBuilder.withDescription("path to output of pwsim algorithm").withArgName("path").hasArg().isRequired().create(PWSIM_OPTION));
     options.addOption(OptionBuilder.withDescription("classifier id to retrieve P('PARALLEL'|instance)").withArgName("0 or 1").hasArg().isRequired().create(CLASSIFIERID_OPTION));
     options.addOption(OptionBuilder.withDescription("target vocabulary (e-side) of P(e|f)").withArgName("0-1").hasArg().isRequired().create(CLASSIFIERTHRESHOLD_OPTION));
     options.addOption(OptionBuilder.withDescription("Hadoop option to load external jars").withArgName("jar packages").hasArg().create(LIBJARS_OPTION));
@@ -306,7 +227,27 @@ public class FilterSentencePairs extends Configured implements Tool {
       return null;
     }
 
-    return cmdline;
+    String inputPath = cmdline.getOptionValue(INPUT_OPTION);
+    String outputPath = cmdline.getOptionValue(OUTPUT_OPTION);
+    String eDir = cmdline.getOptionValue(EINDEX_OPTION);
+    String fDir = cmdline.getOptionValue(FINDEX_OPTION);
+    String dataDir = cmdline.getOptionValue(DATADIR_OPTION);
+    String eLang = cmdline.getOptionValue(ELANG_OPTION);
+    String fLang = cmdline.getOptionValue(FLANG_OPTION);
+    String bitextName = cmdline.hasOption(BITEXTNAME_OPTION) ? cmdline.getOptionValue(BITEXTNAME_OPTION) : "";
+    float classifierThreshold = Float.parseFloat(cmdline.getOptionValue(CLASSIFIERTHRESHOLD_OPTION));
+    int classifierId = Integer.parseInt(cmdline.getOptionValue(CLASSIFIERID_OPTION));
+
+    conf = PwsimEnvironment.setBitextPaths(conf, dataDir, eLang, fLang, bitextName, eDir, fDir, classifierThreshold, classifierId, null, "complex");
+
+    FileInputFormat.setInputPaths(conf, inputPath);
+    FileOutputFormat.setOutputPath(conf, new Path(outputPath));
+
+    sLogger.info("Running job " + conf.getJobName());
+    sLogger.info("Input directory: " + inputPath);
+    sLogger.info("Output directory: " + outputPath);
+    
+    return conf;
   }
 
   /**

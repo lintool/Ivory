@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Ivory: Tokenization</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Le styles -->
+    <link href="assets/css/bootstrap.css" rel="stylesheet">
+    <link href="assets/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="assets/css/docs.css" rel="stylesheet">
+    <link href="assets/js/google-code-prettify/prettify.css" rel="stylesheet">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+  </head>
+
+  <body data-spy="scroll" data-target=".bs-docs-sidebar">
+
+    <!-- Navbar
+    ================================================== -->
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <div class="nav-collapse collapse">
+            <ul class="nav">
+              <li class="">
+                <a href="../index.html">Home</a>
+              </li>
+              <li class="">
+                <a href="./start.html">Getting Started</a>
+              </li>
+              <li class="">
+                <a href="./publications.html">Publications</a>
+              </li>
+              <li class="active">
+                <a href="./experiments.html">Experiments</a>
+              </li>
+              <li class="">
+                <a href="./team.html">Team</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+<!-- Subhead
+================================================== -->
+<header class="jumbotron subhead" id="overview">
+  <div class="container">
+    <h1>Ivory</h1>
+    <p class="lead">A Hadoop toolkit for web-scale information retrieval research</p>
+  </div>
+</header>
+
+  <div class="container">
+
+<div class="page-header">
+<h2>Tokenization in Ivory</h2>
+
+<p>As of 1/13/2013, Ivory supports tokenization in the following languages: English, German, Spanish, Chinese, 
+French, Arabic, Czech, and Turkish. Tokenizer classes in Ivory are based on <a href="http://lucene.apache.org/">Lucene</a> 
+for Spanish, Arabic, Czech, and Turkish, <a href="http://opennlp.apache.org/">OpenNLP</a> for English, German, 
+and French, and <a href="http://nlp.stanford.edu/software/segmenter.shtml">Stanford Chinese Segmenter</a> for Chinese.</p>
+
+<p>Tokenizing text in Ivory is done as follows:</p>
+
+<pre class="code">
+$IVORYDIR/etc/run.sh ivory.core.tokenize.Tokenizer \
+	-input=text.$lang \
+	-output=text.$lang.tok \
+	-stem=false \
+	-lang=$lang \
+	-stopword=$IVORYDIR/data/tokenizer/$lang.stop \
+	-stemmed_stopword=$IVORYDIR/data/tokenizer/$lang.stop.stemmed \
+	-model=$IVORYDIR/data/tokenizer/$lang-token.bin
+</pre>
+
+<table><tr><td valign="top"><span class="label label-info">Info</span></td>
+<td style="padding-left: 10px">
+Stemming is on by default, so you should include <code>-stem=false</code> if it is not desired.<p>
+</td>
+</tr>
+</table>
+
+<table><tr><td valign="top"><span class="label label-info">Info</span></td>
+<td style="padding-left: 10px">
+For stopword removal, include additional options <code>-stopword=$IVORYDIR/data/tokenizer/$lang.stop</code> and 
+<code>-stemmed_stopword=$IVORYDIR/data/tokenizer/$lang.stop.stemmed</code>. Either of these are used under different
+settings, so we require both files to be present.
+</td>
+</tr>
+</table>
+
+<table><tr><td valign="top"><span class="label label-info">Info</span></td>
+<td style="padding-left: 10px">
+A tokenizer model path is required for certain classes, such as <code>OpenNLPTokenizer</code> or <code>StanfordChineseTokenizer</code>.
+The <code>-model</code> option can be omitted in other cases. If there is no model file and language is set to English, 
+a <a href="http://www.galagosearch.org/">Galago</a>-based tokenizer is used. 
+</td>
+</tr>
+</table>
+
+<h4>Adding a new language</h4>
+<p>In order to add support for a new language in Ivory, you can extend the <code>ivory.core.tokenize.Tokenizer</code> class. 
+A few other changes are required for full support:</p>
+
+<li> add average #tokens/sentence in <code>PreprocessHelper</code> (make a guess-timate for now, can be updated from data)
+<li> add to <code>acceptedLanguages</code> in <code>TokenizerFactory</code>
+<li> update <code>getTokenizerClass</code> method in <code>TokenizerFactory</code><p>
+
+<p>The following language-specific data are assumed to be present under <code>$IVORYDIR/data/tokenizer</code>:</p>
+
+   <li>Tokenizer models for each language (dummy file even if model not required by Tokenizer class) named <code>$lang-token.bin</code>
+   <li>Stopwords (one stopword per line in text format) under <code>$lang.stop</code><p>
+
+<p>Also, we require the stemmed version of the stopwords file. Once the tokenizer is set up, it can be used to generate the stemmed stopwords file as follows:</p>
+<pre class="code">
+$IVORYDIR/etc/run.sh ivory.core.tokenize.Tokenizer \
+	-input=$IVORYDIR/data/tokenizer/$lang.stop \
+	-output=$IVORYDIR/data/tokenizer/$lang.stop.stemmed \
+	-stem=true -lang=$lang \
+	-model=$IVORYDIR/data/tokenizer/$lang-token.bin
+</pre>
+
+<p>Finally, if the language is going to be used in cross-lingual pairwise similarity, vocabulary and translation table files 
+are required in <a href="../docs/hooka.html">Hooka</a> format under the same folder (see <a href="../docs/pipeline.html">Hooka tutorial</a> 
+on how to create these files).</p>
+</div>
+
+</div>
+
+
+
+    <!-- Footer
+    ================================================== -->
+    <footer class="footer">
+      <div class="container">
+        <p class="pull-right"><a href="#">Back to top</a></p>
+        <p>Designed using <a href="http://twitter.github.com/bootstrap/">Bootstrap</a>.</p>
+        <p>Code licensed under <a href="http://www.apache.org/licenses/LICENSE-2.0" target="_blank">Apache License v2.0</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
+      </div>
+    </footer>
+
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="assets/js/jquery.js"></script>
+    <script src="assets/js/google-code-prettify/prettify.js"></script>
+    <script src="assets/js/bootstrap-transition.js"></script>
+    <script src="assets/js/bootstrap-alert.js"></script>
+    <script src="assets/js/bootstrap-modal.js"></script>
+    <script src="assets/js/bootstrap-dropdown.js"></script>
+    <script src="assets/js/bootstrap-scrollspy.js"></script>
+    <script src="assets/js/bootstrap-tab.js"></script>
+    <script src="assets/js/bootstrap-tooltip.js"></script>
+    <script src="assets/js/bootstrap-popover.js"></script>
+    <script src="assets/js/bootstrap-button.js"></script>
+    <script src="assets/js/bootstrap-collapse.js"></script>
+    <script src="assets/js/bootstrap-carousel.js"></script>
+    <script src="assets/js/bootstrap-typeahead.js"></script>
+    <script src="assets/js/bootstrap-affix.js"></script>
+
+  </body>
+</html>
+

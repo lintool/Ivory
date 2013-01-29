@@ -60,7 +60,7 @@ public class PreprocessHelper {
     lang2AvgSentLen.put("es",19);     
     // set to same as fr for now (no data yet)
     lang2AvgSentLen.put("cs",18);       
-};
+  };
 
   /**
    * Implemented for HDFS cluster mode, files read from local cache
@@ -82,7 +82,7 @@ public class PreprocessHelper {
    */
   public PreprocessHelper(int minVectorTerms, int minSentenceLength, Configuration conf) throws Exception {
     super();
-//    sLogger.setLevel(Level.DEBUG);
+    //    sLogger.setLevel(Level.DEBUG);
     fLang = conf.get("fLang");
     eLang = conf.get("eLang");
     eDir = conf.get("eDir");
@@ -120,7 +120,7 @@ public class PreprocessHelper {
       sLogger.info("In DistributedCache: " + p);
       if (p.toString().contains(sentDetectorFile)) {
         pathMapping.put(sentDetectorFile, p);
-        sLogger.info("--> sentdector");
+        sLogger.info("--> sentdetector");
       } else if (p.toString().contains(eVocabSrcFile)) {
         pathMapping.put(eVocabSrcFile, p);
         sLogger.info("--> eVocabSrcFile");
@@ -148,7 +148,7 @@ public class PreprocessHelper {
     InputStream modelIn = localFs.open(pathMapping.get(sentDetectorFile));
     SentenceModel model = new SentenceModel(modelIn);
     fModel = new SentenceDetectorME(model);
-    sLogger.info("Sentence model created successfully.");
+    sLogger.info("Sentence model created successfully from " + pathMapping.get(sentDetectorFile));
 
     eVocabSrc = (VocabularyWritable) HadoopAlign.loadVocab(pathMapping.get(eVocabSrcFile), localFs);
     eVocabTrg = (VocabularyWritable) HadoopAlign.loadVocab(pathMapping.get(eVocabTrgFile), localFs);
@@ -160,7 +160,7 @@ public class PreprocessHelper {
     // tokenizer file not read from cache, since it might be a directory (e.g. Chinese segmenter)
     String tokenizerFile = conf.get("fTokenizer");
     fTok = TokenizerFactory.createTokenizer(fs, fLang, tokenizerFile, true, conf.get("fStopword"), conf.get("fStemmedStopword"), null);
-    sLogger.info("Tokenizer and vocabs created successfully.");
+    sLogger.info("Tokenizer and vocabs created successfully from " + fLang + " " + tokenizerFile + "," + conf.get("fStopword") + "," + conf.get("fStemmedStopword"));
 
     // average sentence length = just a heuristic derived from sample text
     fScoreFn = (ScoringModel) new Bm25();
@@ -170,7 +170,10 @@ public class PreprocessHelper {
     RetrievalEnvironment eEnv = new RetrievalEnvironment(eDir, fs);
     fScoreFn.setDocCount(eEnv.readCollectionDocumentCount());   
 
-    classifier = new MoreGenericModelReader(pathMapping.get(modelFileName), localFs).constructModel();
+    if (pathMapping.containsKey(modelFileName)) {
+      classifier = new MoreGenericModelReader(pathMapping.get(modelFileName), localFs).constructModel();
+      sLogger.info("Bitext classifier created successfully from " + pathMapping.get(modelFileName));
+    }
   }
 
   private void loadEModels(JobConf conf) throws Exception {
@@ -184,7 +187,7 @@ public class PreprocessHelper {
       sLogger.info("In DistributedCache: " + p);
       if (p.toString().contains(sentDetectorFile)) {
         pathMapping.put(sentDetectorFile, p);
-        sLogger.info("--> sentdector");
+        sLogger.info("--> sentdetector");
       } 
     }
 
@@ -196,11 +199,11 @@ public class PreprocessHelper {
 
     FileSystem fs = FileSystem.get(conf);   
     RetrievalEnvironment env = new RetrievalEnvironment(eDir, fs);
-    sLogger.info("Environment created successfully.");
+    sLogger.info("Environment created successfully at " + eDir);
 
     String tokenizerFile = conf.get("eTokenizer");
     eTok = TokenizerFactory.createTokenizer(fs, eLang, tokenizerFile, true, conf.get("eStopword"), conf.get("eStemmedStopword"), null);
-    sLogger.info("Tokenizer and vocabs created successfully.");
+    sLogger.info("Tokenizer and vocabs created successfully from " + eLang + " " + tokenizerFile + "," + conf.get("eStopword") + "," + conf.get("eStemmedStopword"));
 
     eScoreFn = (ScoringModel) new Bm25();
     eScoreFn.setAvgDocLength(lang2AvgSentLen.get(eLang));        //average sentence length = heuristic based on De-En data
@@ -216,7 +219,7 @@ public class PreprocessHelper {
 
   public HMapSFW createFDocVector(String sentence, HMapSIW term2Tf) {
     String[] terms = fTok.processContent(sentence);
-    
+
     for(String term : terms){
       term2Tf.increment(term);
     }
@@ -229,9 +232,9 @@ public class PreprocessHelper {
       // transTermTf won't be updated if fTerm not in vocab
       transTermTf = CLIRUtils.updateTFsByTerm(fTerm, tf, transTermTf, eVocabSrc, eVocabTrg, fVocabSrc, fVocabTrg, e2f_Probs, f2e_Probs, eTok, sLogger);
     }
-    
+
     HMapSFW weightedVector = CLIRUtils.createTermDocVector(terms.length, transTermTf, eVocabTrg, fScoreFn, dict, dfTable, true, sLogger);
-  
+
     // don't count numbers for the min #terms constraint since Wikipedia has "sentences" full of numbers that doesn't make any sense
     int numNonNumbers = 0;
     for(String term : weightedVector.keySet()){      
@@ -257,7 +260,7 @@ public class PreprocessHelper {
     for(String term : terms){
       term2Tf.increment(term);     
     }
-    
+
     weightedVector = CLIRUtils.createTermDocVector(terms.length, term2Tf, eScoreFn, dict, dfTable, true, sLogger);
     // don't count numbers for the min #terms constraint since Wikipedia has "sentences" full of numbers that doesn't make any sense
     int numNonNumbers = 0;
@@ -301,7 +304,7 @@ public class PreprocessHelper {
   }
 
   public ArrayListWritable<Text> getFSentences(String text, ArrayListWritable<HMapSFW> vectors, ArrayListOfIntsWritable sentLengths) throws ClassNotFoundException, InstantiationException, IllegalAccessException, IOException {
-//        sLogger.setLevel(Level.DEBUG);
+    //        sLogger.setLevel(Level.DEBUG);
     sLogger.debug("text length="+text.length());
 
     ArrayListWritable<Text> sentences = new ArrayListWritable<Text>();
@@ -476,11 +479,11 @@ public class PreprocessHelper {
     dfTable = new DfTableArray(new Path(env.getDfByTermData()), localFs);
   }
 
-  public float getFInVocabRate(String fSent) {
-    return 1.0f-fTok.getOOVRate(fSent, fVocabSrc);
+  public float getFOOVRate(String fSent) {
+    return fTok.getOOVRate(fSent, fVocabSrc);
   }
 
-  public float getEInVocabRate(String eSent) {
-    return 1.0f-eTok.getOOVRate(eSent, eVocabSrc);
+  public float getEOOVRate(String eSent) {
+    return eTok.getOOVRate(eSent, eVocabSrc);
   }
 }

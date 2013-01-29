@@ -1,19 +1,25 @@
 package ivory.lsh.pwsim;
 
+import ivory.core.RetrievalEnvironment;
 import ivory.lsh.data.BitsSignatureTable;
 import ivory.lsh.data.PairOfIntSignature;
 import ivory.lsh.data.Permutation;
 import ivory.lsh.data.PermutationByBit;
 import ivory.lsh.data.Signature;
 import ivory.lsh.driver.PwsimEnvironment;
-
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.net.URI;
 import java.util.Iterator;
 import java.util.List;
-
-import org.apache.hadoop.conf.Configuration;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.GnuParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.filecache.DistributedCache;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -32,16 +38,17 @@ import org.apache.hadoop.mapred.Reducer;
 import org.apache.hadoop.mapred.Reporter;
 import org.apache.hadoop.mapred.SequenceFileInputFormat;
 import org.apache.hadoop.mapred.SequenceFileOutputFormat;
+import org.apache.hadoop.util.Tool;
+import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-
 import edu.umd.cloud9.io.SequenceFileUtils;
 import edu.umd.cloud9.io.array.ArrayListOfIntsWritable;
-import edu.umd.cloud9.util.PowerTool;
 
 @SuppressWarnings("deprecation")
-public class GenerateChunkedPermutedTables extends PowerTool {
+public class GenerateChunkedPermutedTables extends Configured implements Tool {
   private static final Logger sLogger = Logger.getLogger(GenerateChunkedPermutedTables.class);
+
   static {
     sLogger.setLevel(Level.WARN);
   }
@@ -50,8 +57,9 @@ public class GenerateChunkedPermutedTables extends PowerTool {
     Signatures, Chunks, SignaturesInChunks
   }
 
-  public GenerateChunkedPermutedTables(Configuration conf) {
-    super(conf);
+  private void printUsage() {
+    HelpFormatter formatter = new HelpFormatter();
+    formatter.printHelp( this.getClass().getCanonicalName(), options );
   }
 
   /**
@@ -63,18 +71,22 @@ public class GenerateChunkedPermutedTables extends PowerTool {
 
   @SuppressWarnings("unchecked")
   public static class MyMapper extends MapReduceBase implements
-      Mapper<IntWritable, Signature, PairOfIntSignature, IntWritable> {
+  Mapper<IntWritable, Signature, PairOfIntSignature, IntWritable> {
 
     static Path[] localFiles;
     static List<Writable> randomPermutations;
-    static int numOfPermutations;
+    static int numOfPermutations, numOfBits;
     static Signature permutedSignature;
     static Constructor pairConstructor;
     static PairOfIntSignature pair;
 
+    private String getFilename(String s) {
+      return s.substring(s.lastIndexOf("/") + 1);
+    }
+
     public void configure(JobConf job) {
       numOfPermutations = job.getInt("Ivory.NumOfPermutations", -1);
-      int numOfBits = job.getInt("Ivory.NumOfBits", -1);
+      numOfBits = job.getInt("Ivory.NumOfBits", -1);
       Class signatureClass = null;
 
       try {
@@ -90,49 +102,33 @@ public class GenerateChunkedPermutedTables extends PowerTool {
       }
 
       sLogger.debug("Reading permutations file....");
-      sLogger.debug("PwsimEnvironment.cluster: " + PwsimEnvironment.cluster);
-      sLogger.debug("PwsimEnvironment.cluster: " + PwsimEnvironment.cluster);
-      // sLogger.debug ("job.get(\"mapred.job.tracker\"): " + job.get ("mapred.job.tracker"));
-      // sLogger.debug ("job.get(\"mapred.job.tracker\").equals (\"local\"): " + job.get
-      // ("mapred.job.tracker").equals ("local"));
+      String randomPermsFile = job.get("Ivory.RandomPermsFile");
       try {
-        if (job.get("mapred.job.tracker").equals("local")) {
-          String rootPath = job.get("Ivory.IndexPath");
-          String randomPermFile = PwsimEnvironment.getFileNameWithPars(rootPath, "Permsbit");
-          randomPermutations = SequenceFileUtils.readValues(new Path(randomPermFile), FileSystem
-              .getLocal(job));
-          // randomPermutations =
-          // edu.umd.cloud9.util.SequenceFileUtils.readFile("index/random.perms", new Text(""), -1);
-        } else {
-          localFiles = DistributedCache.getLocalCacheFiles(job);
-          // sLogger.debug ("localFiles [0]: " + localFiles [0]);
-          randomPermutations = SequenceFileUtils
-              .readValues(localFiles[0], FileSystem.getLocal(job));
+        randomPermsFile = getFilename(randomPermsFile);
+        localFiles = DistributedCache.getLocalCacheFiles(job);
+        for (Path localFile : localFiles) {
+          if (localFile.toString().contains(randomPermsFile)) {
+            randomPermutations = SequenceFileUtils.readValues(localFile, FileSystem.getLocal(job));
+          }
         }
+        if (randomPermutations == null) throw new RuntimeException("Not found in local cache: " + randomPermsFile);
       } catch (Exception e) {
-        throw new RuntimeException("Error reading random vectors!");
+        e.printStackTrace();
+        throw new RuntimeException("Error reading random permutations " + randomPermsFile);
       }
       sLogger.debug("Done reading file.");
+
     }
 
     public void map(IntWritable docno, Signature signature,
         OutputCollector<PairOfIntSignature, IntWritable> output, Reporter reporter)
-        throws IOException {
-      sLogger.debug("Mapping signature " + docno);
-      sLogger.debug("Permuting " + signature + "...");
-
+    throws IOException {
       // Map each signature to Q random permutations
       for (int i = 0; i < numOfPermutations; i++) {
         signature.perm((ArrayListOfIntsWritable) randomPermutations.get(i), permutedSignature);
-        // sLogger.debug("Permutation "+i+" : "+permutedSign);
-        try {
-          pair.setInt(i);
-          pair.setSignature(permutedSignature);
-          output.collect(pair, docno);
-        } catch (Exception e) {
-          throw new RuntimeException("output.collect exception: \n" + e.toString());
-        }
-        sLogger.debug("emitted");
+        pair.setInt(i);
+        pair.setSignature(permutedSignature);
+        output.collect(pair, docno);
       }
       reporter.incrCounter(Count.Signatures, 1);
     }
@@ -149,7 +145,7 @@ public class GenerateChunkedPermutedTables extends PowerTool {
   }
 
   public static class MyReducer extends MapReduceBase implements
-      Reducer<PairOfIntSignature, IntWritable, IntWritable, BitsSignatureTable> {
+  Reducer<PairOfIntSignature, IntWritable, IntWritable, BitsSignatureTable> {
     static int permNo = -1;
     Signature[] signatures = null;
     int[] docNos = null;
@@ -162,8 +158,8 @@ public class GenerateChunkedPermutedTables extends PowerTool {
       overlapSize = conf.getInt("Ivory.OverlapSize", -1);
       chunckSize = conf.getInt("Ivory.ChunckSize", -1);
       if (overlapSize >= chunckSize)
-        throw new RuntimeException("Invalid Ivory.OverlapSize(" + overlapSize
-            + ") or Ivory.ChunkSize(" + chunckSize + ")");
+        throw new RuntimeException("Invalid Ivory.OverlapSize(" + 
+            overlapSize + ") or Ivory.ChunkSize(" + chunckSize + ")");
       signatures = new Signature[chunckSize];
       docNos = new int[chunckSize];
     }
@@ -176,14 +172,10 @@ public class GenerateChunkedPermutedTables extends PowerTool {
 
     public void reduce(PairOfIntSignature key, Iterator<IntWritable> val,
         OutputCollector<IntWritable, BitsSignatureTable> output, Reporter reporter)
-        throws IOException {
+    throws IOException {
       mReporter = reporter;
-      // all signatures:
-      // (1) belong to the same permutation table, and
-      // (2) sorted
       mOutput = output;
       lastKey = key;
-      // sLogger.debug(key.toString());
       while (val.hasNext()) {
         docNos[curTableSize] = val.next().get();
         signatures[curTableSize] = key.getSignature();
@@ -228,19 +220,16 @@ public class GenerateChunkedPermutedTables extends PowerTool {
 
   }
 
-  @Override
-  public String[] getRequiredParameters() {
-    return RequiredParameters;
-  }
-
   // create Q permutation functions and write them to file
   public static String createPermutations(FileSystem fs, JobConf job, String rootPath, int numBits,
       int numOfPermutations) throws Exception {
-    String randomPermFile = PwsimEnvironment.getFileNameWithPars(rootPath, "Permsbit");
+
+    String randomPermFile = PwsimEnvironment.getPermutationsFile(rootPath, fs, numBits, numOfPermutations);
     if (fs.exists(new Path(randomPermFile))) {
       sLogger.info("Random permutations output path already exists!");
       return randomPermFile;
     }
+
     SequenceFile.Writer writer = SequenceFile.createWriter(fs, job, new Path(randomPermFile),
         IntWritable.class, ArrayListOfIntsWritable.class);
     Permutation p = new PermutationByBit(numBits);
@@ -254,39 +243,18 @@ public class GenerateChunkedPermutedTables extends PowerTool {
     return randomPermFile;
   }
 
-  public static final String[] RequiredParameters = { "Ivory.NumMapTasks", "Ivory.NumReduceTasks",
-      "Ivory.CollectionName", "Ivory.IndexPath", "Ivory.NumOfPermutations", "Ivory.ChunckSize",
-      "Ivory.OverlapSize" };
-
-  @Override
-  public int runTool() throws Exception {
+  public int run(String[] args) throws Exception {
     sLogger.setLevel(Level.INFO);
-    int numOfPermutations = getConf().getInt("Ivory.NumOfPermutations", -1);
-    int numBits = getConf().getInt("Ivory.NumOfBits", -1);
-    if (numOfPermutations < 0)
-      throw new RuntimeException("parameters not read properly");
-
-    String rootPath = getConf().get("Ivory.IndexPath");
-
     JobConf job = new JobConf(getConf(), GenerateChunkedPermutedTables.class);
+    if ( parseArgs(args, job) < 0 ) {
+      printUsage();
+      System.exit(-1);
+    }
 
     FileSystem fs = FileSystem.get(job);
-    String inputPath, outputPath, fileno;
-    String collectionName = job.get("Ivory.CollectionName");
 
-    if (job.getBoolean("Ivory.SignaturesPartitioned", false)) {
-      inputPath = job.get("Ivory.PartitionFile");
-      fileno = inputPath.substring(inputPath.lastIndexOf('-') + 1);
-      outputPath = PwsimEnvironment.getFileNameWithPars(rootPath, "P-Tables") + "/" + fileno;
-      job.setJobName("GenerateChunkedPermutedTables: " + collectionName + "-p#"
-          + Integer.parseInt(fileno));
-    } else {
-      inputPath = PwsimEnvironment.getFileNameWithPars(rootPath, "Signatures" + job.get("Type"));
-      outputPath = PwsimEnvironment.getFileNameWithPars(rootPath, "Tables");
-      job.setJobName("GenerateChunkedPermutedTables: " + numOfPermutations + "_" + collectionName);
-    }
-    int numMappers = job.getInt("Ivory.NumMapTasks", 100);
-    int numReducers = job.getInt("Ivory.NumReduceTasks", 100);
+    job.setJobName(this.getClass().getCanonicalName() + "_" + numOfPermutations + "_" + signatureType + "_" + numOfBits);
+    PwsimEnvironment.setClassTypes(signatureType, job);
 
     if (fs.exists(new Path(outputPath))) {
       sLogger.info("Permuted tables already exist! Quitting...");
@@ -294,32 +262,32 @@ public class GenerateChunkedPermutedTables extends PowerTool {
     }
 
     // create Q permutation functions and write them to file
-    String randomPermFile = createPermutations(fs, job, rootPath, numBits, numOfPermutations);
+    String randomPermFile = createPermutations(fs, job, workDir, numOfBits, numOfPermutations);
+    job.set("Ivory.RandomPermsFile", randomPermFile);
     DistributedCache.addCacheFile(new URI(randomPermFile), job);
 
-    FileInputFormat.addInputPath(job, new Path(inputPath));
-
-    // ONLY FOR CROSS-LINGUAL CASE
-    if (PwsimEnvironment.isCrossLingual) {
-      String srcLangInputPath = PwsimEnvironment.getFileNameWithPars(job.get("SrcLangDir"),
-          "Signatures");
-      FileInputFormat.addInputPath(job, new Path(srcLangInputPath));
+    FileInputFormat.addInputPath(job, new Path(trgInputPath));
+    if (srcInputPath != null) {
+      FileInputFormat.addInputPath(job, new Path(srcInputPath));
     }
-    Path[] paths = FileInputFormat.getInputPaths(job);
 
+    Path[] paths = FileInputFormat.getInputPaths(job);
     for (Path path : paths) {
-      sLogger.info("Added " + path);
+      sLogger.info("Added input: " + path);
     }
     FileOutputFormat.setOutputPath(job, new Path(outputPath));
     FileOutputFormat.setCompressOutput(job, false);
 
-    job.set("mapred.child.java.opts", "-Xmx2048m");
-    // job.setInt("mapred.map.max.attempts", 10);
-    // job.setInt("mapred.reduce.max.attempts", 10);
-    job.setInt("mapred.task.timeout", 600000000);
+    job.setInt("Ivory.NumOfPermutations", numOfPermutations);
+    job.setInt("Ivory.NumOfBits", numOfBits);
+    job.setInt("Ivory.OverlapSize", chunkOverlapSize);
+    job.setInt("Ivory.ChunckSize", chunkSize);
 
-    job.setNumMapTasks(numMappers);
-    job.setNumReduceTasks(numReducers);
+    job.set("mapred.child.java.opts", "-Xmx2048m");
+    job.setInt("mapred.task.timeout", 600000000);
+    job.setJarByClass(GenerateChunkedPermutedTables.class);
+    job.setNumMapTasks(100);
+    job.setNumReduceTasks(numOfPermutations);
     job.setInputFormat(SequenceFileInputFormat.class);
     job.setMapOutputKeyClass(Class.forName(job.get("Ivory.PairClass")));
     job.setMapOutputValueClass(IntWritable.class);
@@ -331,14 +299,95 @@ public class GenerateChunkedPermutedTables extends PowerTool {
     job.setOutputFormat(SequenceFileOutputFormat.class);
 
     sLogger.info("Running job " + job.getJobName() + "...");
-    sLogger.info("Collection: " + collectionName);
-    sLogger.info("Number of bits/signature(D): " + numBits);
+    sLogger.info("Output path: " + outputPath);
+    sLogger.info("Number of bits/signature(D): " + numOfBits);
     sLogger.info("Number of permutations(Q): " + numOfPermutations);
-    sLogger.info("Overlap size: " + getConf().getInt("Ivory.OverlapSize", -1));
-    sLogger.info("Chunk size: " + getConf().getInt("Ivory.ChunckSize", -1));
+    sLogger.info("Overlap size: " + chunkOverlapSize);
+    sLogger.info("Chunk size: " + chunkSize);
 
+    long startTime = System.currentTimeMillis();
     JobClient.runJob(job);
+    System.out.println("Job finished in " + (System.currentTimeMillis() - startTime) / 1000.0 + " seconds");
+    
+    return 0;
+  }
+
+  private Options options;
+  private int numOfPermutations, numOfBits, chunkOverlapSize, slidingWindowSize, chunkSize;
+  private String signatureType, trgInputPath, srcInputPath, outputPath, workDir, srcWorkDir;
+
+  private static final String SOURCE_INPUT_OPTION = "sourceindex";
+  private static final String INPUT_OPTION = "index";
+  private static final String SIGNLENG_OPTION = "num_bits";
+  private static final String SIGNTYPE_OPTION = "type";
+  private static final String NUMPERMS_OPTION = "Q";
+  private static final String OVERLAPSIZE_OPTION = "overlap";
+  private static final String LIBJARS_OPTION = "libjars";
+  private static final String WINDOWSIZE_OPTION = "B";
+
+  @SuppressWarnings("static-access")
+  private int parseArgs(String[] args, JobConf conf) throws Exception {
+    FileSystem fs = FileSystem.get(conf);
+
+    options = new Options();
+    options.addOption(OptionBuilder.withDescription("path to source-language index directory").withArgName("path").hasArg().create(SOURCE_INPUT_OPTION));
+    options.addOption(OptionBuilder.withDescription("path to (target-language) index directory").withArgName("path").hasArg().isRequired().create(INPUT_OPTION));
+    options.addOption(OptionBuilder.withDescription("length of signature").withArgName("number of bits").hasArg().isRequired().create(SIGNLENG_OPTION));
+    options.addOption(OptionBuilder.withDescription("type of signature").withArgName("random|minhash|simhash").hasArg().isRequired().create(SIGNTYPE_OPTION));
+    options.addOption(OptionBuilder.withDescription("sliding window size").withArgName("window").hasArg().create(WINDOWSIZE_OPTION));
+    options.addOption(OptionBuilder.withDescription("number of permutations (tables)").withArgName("permutations").hasArg().isRequired().create(NUMPERMS_OPTION));    
+    options.addOption(OptionBuilder.withDescription("size of overlap between chunks (default: window size)").withArgName("overlap size").hasArg().create(OVERLAPSIZE_OPTION));
+    options.addOption(OptionBuilder.withDescription("Hadoop option to load external jars").withArgName("jar packages").hasArg().create(LIBJARS_OPTION));
+
+    CommandLine cmdline;
+    CommandLineParser parser = new GnuParser();
+    try {
+      cmdline = parser.parse(options, args);
+    } catch (ParseException exp) {
+      System.err.println("Error parsing command line: " + exp.getMessage());
+      return -1;
+    }
+
+    srcWorkDir = cmdline.hasOption(SOURCE_INPUT_OPTION) ? cmdline.getOptionValue(SOURCE_INPUT_OPTION) : null;
+    workDir = cmdline.getOptionValue(INPUT_OPTION);
+    numOfBits = Integer.parseInt(cmdline.getOptionValue(SIGNLENG_OPTION));
+    signatureType = cmdline.getOptionValue(SIGNTYPE_OPTION);
+    numOfPermutations = Integer.parseInt(cmdline.getOptionValue(NUMPERMS_OPTION));
+    slidingWindowSize = cmdline.hasOption(WINDOWSIZE_OPTION) ? Integer.parseInt(cmdline.getOptionValue(WINDOWSIZE_OPTION)) : 0;
+    srcInputPath = PwsimEnvironment.getSignaturesDir(srcWorkDir, numOfBits, signatureType);
+    trgInputPath = PwsimEnvironment.getSignaturesDir(workDir, numOfBits, signatureType);
+    if (cmdline.hasOption(OVERLAPSIZE_OPTION)){
+      chunkOverlapSize = Integer.parseInt(cmdline.getOptionValue(OVERLAPSIZE_OPTION));      
+    }else {
+      if (slidingWindowSize == 0) {
+        throw new RuntimeException("Either provide option --" + WINDOWSIZE_OPTION + " or --" + OVERLAPSIZE_OPTION);
+      }else {
+        chunkOverlapSize = slidingWindowSize;
+      }
+    }
+    outputPath = PwsimEnvironment.getTablesDir(workDir, fs, signatureType, numOfBits, chunkOverlapSize, numOfPermutations);
+
+    RetrievalEnvironment targetEnv = new RetrievalEnvironment(workDir, fs);
+    RetrievalEnvironment srcEnv = new RetrievalEnvironment(srcWorkDir, fs);
+    int collSize = targetEnv.readCollectionDocumentCount() + srcEnv.readCollectionDocumentCount();
+    
+    // split table into 10 chunks by default, limit chunk size to range (100k,2m)
+    chunkSize = collSize / 10;
+    if (chunkSize < 100000) { 
+      chunkSize = 100000;
+    } else if (chunkSize > 2000000) {
+      chunkSize = 2000000;
+    }
+
+    if (numOfPermutations < 0 || numOfBits < 0 || chunkOverlapSize < slidingWindowSize) {
+      return -1;
+    }
 
     return 0;
+  }
+
+  public static void main(String[] args) throws Exception {
+    ToolRunner.run(new GenerateChunkedPermutedTables(), args);
+    return;
   }
 }

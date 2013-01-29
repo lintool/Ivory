@@ -22,10 +22,22 @@ public class TokenizerFactory {
     acceptedLanguages.put("tr", 1);
   }
 
-  public static Tokenizer createTokenizer(String lang, String modelPath, VocabularyWritable vocab){
-    return createTokenizer(lang, modelPath, true, null, null, vocab);
+  public static Tokenizer createTokenizer(FileSystem fs, String lang, String modelPath, boolean isStemming){
+    return createTokenizer(fs, lang, modelPath, isStemming, null, null, null);
   }
-  
+
+  public static Tokenizer createTokenizer(String lang, String modelPath, boolean isStemming){
+    return createTokenizer(lang, null, isStemming, null);
+  }
+
+  public static Tokenizer createTokenizer(String lang, boolean isStemming, VocabularyWritable vocab){
+    return createTokenizer(lang, null, isStemming, vocab);
+  }
+
+  public static Tokenizer createTokenizer(String lang, String modelPath, boolean isStemming, VocabularyWritable vocab){
+    return createTokenizer(lang, modelPath, isStemming, null, null, vocab);
+  }
+
   public static Tokenizer createTokenizer(String lang, String modelPath, boolean isStemming, String stopwordFile, String stemmedStopwordFile, VocabularyWritable vocab){
     try {
       FileSystem fs = FileSystem.get(new Configuration());
@@ -35,15 +47,11 @@ public class TokenizerFactory {
     }
   }
 
-  public static Tokenizer createTokenizer(FileSystem fs, String lang, String modelPath, VocabularyWritable vocab){
-    return createTokenizer(fs, lang, modelPath, true, null, null, vocab);
-  }
-  
   public static Tokenizer createTokenizer(FileSystem fs, String lang, String modelPath, boolean isStemming, String stopwordFile, String stemmedStopwordFile, VocabularyWritable vocab){
     Configuration conf = new Configuration();
     return createTokenizer(fs, conf, lang, modelPath, isStemming, stopwordFile, stemmedStopwordFile, vocab);
   }
-  
+
   public static Tokenizer createTokenizer(FileSystem fs, Configuration conf, String lang, String modelPath, boolean isStemming, String stopwordFile, String stemmedStopwordFile, VocabularyWritable vocab){
     conf.setBoolean(Constants.Stemming, isStemming);
     if (stopwordFile != null) {
@@ -60,13 +68,15 @@ public class TokenizerFactory {
       if (!acceptedLanguages.containsKey(lang)) {
         throw new RuntimeException("Unknown language code: "+lang);
       }
-      
+
       conf.set(Constants.Language, lang);
-      conf.set(Constants.TokenizerData, modelPath);
-      
-      Class<? extends Tokenizer> tokenizerClass = getTokenizerClass(lang);
+      if (modelPath != null) {
+        conf.set(Constants.TokenizerData, modelPath);
+      }
+
+      Class<? extends Tokenizer> tokenizerClass = getTokenizerClass(lang, modelPath);
       Tokenizer tokenizer = (Tokenizer) tokenizerClass.newInstance();
-      
+
       if (vocab != null) {
         tokenizer.setVocab(vocab);
       }
@@ -79,15 +89,21 @@ public class TokenizerFactory {
     }
   }
 
-  public static Class<? extends Tokenizer> getTokenizerClass(String lang) {
+  public static Class<? extends Tokenizer> getTokenizerClass(String lang, String modelPath) {
     if (lang.equals("zh")) {
       return StanfordChineseTokenizer.class;
-    }else if(lang.equals("de") || lang.equals("en") || lang.equals("fr")) {
+    }else if(lang.equals("de") || lang.equals("fr")) {
       return OpenNLPTokenizer.class;
     }else if(lang.equals("ar")) {
       return LuceneArabicAnalyzer.class;
     }else if(lang.equals("tr") || lang.equals("es") || lang.equals("cs")) {
       return LuceneAnalyzer.class;
+    }else if(lang.equals("en")) {
+      if (modelPath == null) {
+        return GalagoTokenizer.class;
+      }else {
+        return OpenNLPTokenizer.class;
+      }
     }else {
       Log.info("Unknown class for language: " + lang);
       throw new RuntimeException("Unknown class for language: " + lang);

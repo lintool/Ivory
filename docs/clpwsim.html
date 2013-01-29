@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Ivory: Cross-Lingual Pairwise Similarity</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Le styles -->
+    <link href="assets/css/bootstrap.css" rel="stylesheet">
+    <link href="assets/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="assets/css/docs.css" rel="stylesheet">
+    <link href="assets/js/google-code-prettify/prettify.css" rel="stylesheet">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+  </head>
+
+  <body data-spy="scroll" data-target=".bs-docs-sidebar">
+
+    <!-- Navbar
+    ================================================== -->
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <div class="nav-collapse collapse">
+            <ul class="nav">
+              <li class="">
+                <a href="../index.html">Home</a>
+              </li>
+              <li class="">
+                <a href="./start.html">Getting Started</a>
+              </li>
+              <li class="">
+                <a href="./publications.html">Publications</a>
+              </li>
+              <li class="active">
+                <a href="./experiments.html">Experiments</a>
+              </li>
+              <li class="">
+                <a href="./team.html">Team</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+<!-- Subhead
+================================================== -->
+<header class="jumbotron subhead" id="overview">
+  <div class="container">
+    <h1>Ivory</h1>
+    <p class="lead">A Hadoop toolkit for web-scale information retrieval research</p>
+  </div>
+</header>
+
+  <div class="container">
+
+<div class="page-header">
+<h2>Cross-Lingual Pairwise Similarity</h2>
+<h4>A step-by-step tutorial for German and English Wikipedia</h4>
+</div>
+
+<p>Ivory can perform cross-lingual pairwise similarity on large collections. The
+underlying scalable approach is implemented as a two-phase pipeline.
+The first phase was introduced in Ture et al.'s SIGIR'11 paper 
+<b><a href="publications/Ture_etal_SIGIR2011.pdf">No Free Lunch: Brute Force vs 
+Locality-Sensitive Hashing for Cross-Lingual Pairwise Similarity</a></b> and
+the second is described in Ture & Lin's NAACL'12 paper 
+<b><a href="publications/Ture_Lin_NAACL-HLT2012.pdf">
+Why Not Grab a Free Lunch? Mining Large Corpora for Parallel Sentences To Improve
+Translation Modeling</a></b>.<p>
+In this two-part tutorial, we'll take you through the entire process using Wikipedia as our corpus: 
+Starting from scratch, we first show how to find similar German-English article pairs
+(i.e., phase 1), and then illustrate how to extract German-English parallel text (i.e., phase 2). 
+The output of phase 1 is used in phase 2, so you can skip to the 
+<a href="bitext-tutorial.html">second part of the tutorial</a>
+if you have already completed the first one.
+</p>
+
+<table><tr><td valign="top"><span class="label label-info">Tip</span></td>
+<td style="padding-left: 10px">
+Our approach can be applied to any collection format that is supported by
+<a href="http://lintool.github.com/Cloud9">Cloud<sup>9</sup></a>, and any
+language supported by Ivory. As of 1/13/2013, Ivory supports the following languages: English, German, French, Spanish, Chinese, 
+Arabic, Czech, and Turkish. Everything should work out of the box for these languages. See the
+<a href="../docs/tokenization.html">tokenization guide</a> on how to add support for other languages.
+<p>
+</td>
+</tr>
+</table>
+
+<h3>1. Downloading Wikipedia</h3>
+
+<p>Wikipedia articles can be downloaded in XML format from
+<a href="http://wikipedia.c3sl.ufpr.br/">here</a>. Wikipedia is offered in many languages,
+and you can download the content in different granularities. However, we only need the main 
+article content to run our algorithm.</p> 
+
+<p>Let's download and unpack German and English Wikipedia collections to our local
+machine:</p>
+
+<pre class="code">
+wget http://wikipedia.c3sl.ufpr.br/dewiki/20121215/dewiki-20121215-pages-articles.xml.bz2
+bunzip2 dewiki-20121215-pages-articles.xml.bz2
+wget http://wikipedia.c3sl.ufpr.br/enwiki/20121201/enwiki-20121201-pages-articles.xml.bz2
+bunzip2 enwiki-20121201-pages-articles.xml.bz2
+</pre>
+
+<table><tr><td valign="top"><span class="label label-info">Tip</span></td>
+<td style="padding-left: 10px">
+It might be a good idea to compare the MD5 checksums of the downloaded files to the values 
+<a href="http://wikipedia.c3sl.ufpr.br/enwiki/20121201/enwiki-20121201-md5sums.txt">here</a>
+and <a href="http://wikipedia.c3sl.ufpr.br/dewiki/20121215/dewiki-20121215-md5sums.txt">here</a>
+before moving further.
+<p>
+</td>
+</tr>
+</table>
+
+<p>A peek into these files should reveal Wikipedia's XML format:</p>
+
+<pre class="code">
+$ less dewiki-20121215-pages-articles.xml
+&lt;mediawiki ... xml:lang="de"&gt;
+ &lt;siteinfo&gt;
+  ...
+ &lt;page&gt;
+  ...
+ &lt;/page&gt;
+ &lt;page&gt;
+  ...
+ &lt;/page&gt;
+&lt;/mediawiki&gt;
+</pre>
+
+<p>Now, we are ready to transfer the XML-formatted collections to HDFS:</p>
+
+<pre class="code">
+hdfs dfs -put *wiki*pages-articles.xml $wiki/raw/
+</pre>
+
+<h3>2. Preprocessing Wikipedia</h3>
+
+<p>The standard preprocessing pipeline of Ivory is shown in detail 
+<a href="../docs/pipeline.html">here</a>, where the goal is to represent 
+each document as a vector of term weights.</p>
+
+<p>For stop word removal and stemming, we need to upload data files 
+to HDFS for tokenizers to load:</p>
+
+<pre class="code">
+hdfs dfs -mkdir $datadir
+hdfs dfs -put $IVORYDIR/data/tokenizer/*de*stop* $datadir/
+hdfs dfs -put $IVORYDIR/data/tokenizer/*en*stop* $datadir/
+hdfs dfs -put $IVORYDIR/data/tokenizer/de-token.bin $datadir/token/
+hdfs dfs -put $IVORYDIR/data/tokenizer/en-token.bin $datadir/token/
+</pre>
+
+<table><tr><td valign="top"><span class="label label-info">Tip</span></td>
+<td style="padding-left: 10px">
+For languages that do not require model files, there is no need
+to add the <code>*-token.bin</code> model file. See 
+<a href="../docs/tokenization.html">tokenization guide</a> for details.
+<p>
+</td>
+</tr>
+</table>
+
+<p>Since there are documents in two different languages in our case, we need to translate 
+the representations into the same language space for comparison. We use the cross-language 
+IR methods introduced in <i>Darwish and Oard</i>'s <b>Probabilistic Structured Query Methods (2003)</b>
+to translate the German representations into English.
+For this, we assume that vocabularies and translation tables
+are available on some HDFS data directory. These can be generated using 
+the <a href="hooka.html">Hooka word alignment toolkit</a> 
+(also supports conversion from GIZA++ or BerkeleyAligner).</p>
+
+<p>This should be how your HDFS directory looks like at this step:</p>
+<pre class="code">
+$ hdfs dfs -ls $datadir/
+Found 12 items
+1 data/token
+1349 data/de.stop
+685 data/de.stop.stemmed
+5301 data/en.stop
+3685 data/en.stop.stemmed
+10143994 data/ttable.de-en
+3613902 data/ttable.en-de
+3524605 data/vocab.de-en.de
+656146 data/vocab.de-en.en
+1360307 data/vocab.en-de.de
+689561 data/vocab.en-de.en
+</pre>
+
+<p>Now we are ready to run the preprocessing pipeline. The first run is
+for the English Wikipedia collection:</p>
+<pre class="code">
+etc/hadoop-cluster.sh ivory.app.PreprocessWikipedia \
+ -mode=crosslingE \
+ -index=$edir \
+ -xml=$wiki/raw/enwiki-20121201-pages-articles.xml \
+ -compressed=$wiki/compressed/enwiki-20121201.compressed \
+ -lang=en \
+ -tokenizermodel=$datadir/token/en-token.bin \
+ -collectionvocab=$datadir/vocab.de-en.en \
+ -e_stopword=$datadir/en.stop >& en.log &
+</pre>
+
+<table><tr><td valign="top"><span class="label label-info">Tip</span></td>
+<td style="padding-left: 10px">
+If the compressed Wikipedia collection already exists at <code>$wiki/compressed/enwiki-20121201.compressed</code>,
+this program will re-use it. If you are not sure that the existing files are compatible with what you are 
+running, remove or change them.
+<p>
+</td>
+</tr>
+</table>
+
+<p>Next, we preprocess and translate German Wikipedia articles:</p>
+
+<pre class="code">
+etc/hadoop-cluster.sh ivory.app.PreprocessWikipedia \
+ -mode=crosslingF \
+ -index=$fdir -targetindex=$edir \
+ -xml=$wiki/raw/dewiki-20121215-pages-articles.xml \
+ -compressed=$wiki/compressed/dewiki-20121215.compressed \
+ -lang=de -target_lang=en \
+ -tokenizermodel=$datadir/token/de-token.bin \
+ -e_tokenizermodel=$datadir/token/en-token.bin \
+ -f_f2e_vocab=$datadir/vocab.de-en.de \
+ -e_f2e_vocab=$datadir/vocab.de-en.en \
+ -f2e_ttable=$datadir/ttable.de-en \
+ -e_e2f_vocab=$datadir/vocab.en-de.en \
+ -f_e2f_vocab=$datadir/vocab.en-de.de \
+ -e2f_ttable=$datadir/ttable.en-de \
+ -e_stopword=$datadir/en.stop \
+ -f_stopword=$datadir/de.stop \
+ >& de.log &
+</pre>
+
+<p>The log output of this program should gives various statistics, such as 
+the number of documents, terms, tokens in the collection. Let's do a sanity
+check to make sure everything ran correctly:</p>
+
+<pre class="code">
+$ grep -P 'TOTAL=|ARTICLE=|OTHER=|SumOfDocLengths=|Terms=|TransDf=|SHORT=|ZERO=|Total=|VOCAB SIZE|TransDf|DISAMB' en.log | uniq
+ARTICLE=4037577
+DISAMBIGUATION=123666
+NON_ARTICLE=2893729
+OTHER=139627
+TOTAL=12961996
+SumOfDocLengths=1015496378
+Total=4037577
+SumOfDocLengths=1015496378
+Terms=56894
+Total=56894
+SHORT=24354
+Total=4013135
+ZERO=88
+Total=4013135
+VOCAB SIZE 80279
+</pre>
+
+<p>You should see the <i>exact</i> same numbers in your log output.</p>
+
+<pre class="code">
+$ grep -P 'TOTAL=|ARTICLE=|OTHER=|SumOfDocLengths=|Terms=|TransDf=|SHORT=|ZERO=|Total=|VOCAB SIZE|TransDf|DISAMB' de.log | uniq
+ARTICLE=1574139
+DISAMBIGUATION=174684
+NON_ARTICLE=49347
+OTHER=453150
+TOTAL=3001626
+SumOfDocLengths=360449459
+Total=1574139
+SumOfDocLengths=360449459
+Terms=168605
+Total=168605
+SHORT=154301
+Total=1418951
+ZERO=887
+Total=1418951
+VOCAB SIZE 80279
+</pre>
+
+
+<h3>3. Representing Documents as Signatures</h3>
+<p>Since we are done with preprocessing, we can now play with the document representation. 
+It is possible to compress the content of a document vector substantially by computing
+a <i>signature</i>, a bit/int array representation. Three different signature approaches 
+are implemented as part of Ivory (details available in 
+<a href="publications/Ture_etal_SIGIR2011.pdf">Ture et al's SIGIR'11 paper</a>):
+<i>Simhash</i>, <i>min-hash</i>, and <i>randomized projections</i>. </p>
+
+<p>Each of these methods has certain benefits and drawbacks, yet we have decided to use 
+<i>random projections</i> in this application mainly due to its ability to have an 
+arbitrary length (i.e., number of bits). The number of bits can be set empirically, 
+by looking at the trade-off between effectiveness (i.e., how good a signature approximates
+the document vector) and efficiency (i.e., time to compute similarity between two signatures) 
+as we vary the number. We'll use 1000 bits in this tutorial:</p>
+
+<pre class="code">
+etc/hadoop-cluster.sh ivory.lsh.driver.RunComputeSignatures -index=$fdir -num_bits=1000 -type=random
+</pre>
+
+<p>Since this process is based on 1000 randomly generated unit vectors, we need to use the same vectors when 
+running this process for the English side:</p>
+
+<pre class="code">
+$ hdfs dfs -cp $fdir/randomvectors_D=1000/ $edir/
+etc/hadoop-cluster.sh ivory.lsh.driver.RunComputeSignatures -index=$edir -num_bits=1000 -type=random
+</pre>
+
+As a result of these jobs, you should see a <code>signatures-random_D=1000</code> folder under each index directory.
+
+<h3>4. Finding Similar Document Pairs</h3>
+
+<p>
+In order to find similar Wikipedia articles, we will compare signatures by calculating the Hamming distance
+(i.e., number of different bits), and returning any pair with less than a specified distance <code>T</code>. 
+Instead of comparing all signatures of German Wikipedia to all signatures of English Wikipedia, which is called the 
+brute-force approach, we have implemented the sliding window-based algorithm in Ravichandran et al.'s 
+paper, <b>Randomized Algorithms and NLP: Using Locality Sensitive Hash Functions for High Speed Noun Clustering</b>.
+</p> 
+
+<p>
+According to this algorithm, we will generate <code>Q</code> permutations of each signature, resulting in <code>Q</code> 
+signature tables. Each table is sorted with respect to the bit values, and then we compare each signature of each
+table to its neighbors that are at most <code>B</code> positions away.
+</p> 
+
+<pre class="code">
+etc/hadoop-cluster.sh ivory.lsh.pwsim.GenerateChunkedPermutedTables \
+ -index=$edir -sourceindex=$fdir -num_bits=1000 -type=random -Q=300 -overlap=10000 -B=2000
+
+etc/hadoop-cluster.sh ivory.lsh.pwsim.cl.CLSlidingWindowPwsim \
+ -index=$edir -num_bits=1000 -B=2000 -T=400 -type=random -Q=300 -overlap=10000
+</pre>
+
+These two jobs may take a while to finish (e.g., few hours on a 128-core cluster), but if everything runs smoothly, 
+you should see the output written to <code>$edir/similardocs_random_maxdst=400_D=1000_Q=300_B=2000</code>. 
+The number of similar article pairs output by the algorithm will vary from run to run due to the randomized nature, 
+but you may expect about 40 million German-English article pairs output (see <code>Reduce output records</code>) under these settings.
+
+<h3>5. Evaluation</h3>
+<p>
+Ivory has many built-in functionalities for evaluation of pairwise similarity approaches. Let us describe the process
+of evaluating the sliding window algorithm's output by comparing it to the brute-force approach. 
+First, we'll sample about 1000 German Wikipedia articles for this evaluation:
+</p>
+
+<pre class="code">
+etc/hadoop-cluster.sh ivory.lsh.eval.SampleIntDocVectors -index=$fdir -size=1000 -docnos=$fdir/sample-docnos
+</pre>
+
+<p>
+At this point, around 1000 sampled document vectors should be written to <code>$fdir/wt-int-doc-vectors_sample=1000</code>,
+whereas the docnos identifying this sampled subset should be written to <code>$fdir/sample-docnos</code>.
+Next, we can filter the similar article pairs that do not appear in this sample:
+</p>
+
+<pre class="code">
+etc/hadoop-cluster.sh ivory.lsh.eval.FilterResults \
+ -input=$edir/similardocs_random_maxdst=400_D=1000_Q=300_B=2000 \
+ -output=$edir/similardocs_random_maxdst=400_D=1000_Q=300_B=2000-filtered \
+ -docnos=$fdir/sample-docnos
+</pre>
+
+<p>We can compute the same output using a brute-force approach (i.e., compare each sampled document vector from German 
+Wikipedia to all document vectors of English Wikipedia):</p>
+
+<pre class="code">
+etc/hadoop-cluster.sh ivory.lsh.eval.BruteForcePwsim \
+ -input=$edir/wt-int-doc-vectors -sample=$fdir/wt-int-doc-vectors_sample=1000/part-00000 \
+ -output=$edir/groundtruth_T=0.3 \
+ -cosineT=0.3 -type=intdocvector
+</pre>
+
+<p>
+The cosine similarity of two document vectors is computed from the normalized inner product. This program
+outputs all article pairs with the cosine similarity above 0.3, which corresponds to a Hamming distance of
+400 out of 1000 bits. This relation is due to the theory behind LSH and how it is used to approximate similarity.
+We consider this output as ground truth, so we can assess the error due to (i) the signature generation
+process, and (ii) the randomized sliding window algorithm (details about this evaluation is provided
+in <a href="publications/Ture_etal_SIGIR2011.pdf">Ture et al's SIGIR'11 paper</a>).
+</p>
+
+<p>
+Using the provided script <code>etc/eval.pl</code>, we can compute precision and recall of the filtered output
+with respect to the ground truth:
+</p>
+
+<pre class="code">
+hadoop dfs -get $edir/similardocs_random_maxdst=400_D=1000_Q=300_B=2000-filtered/part-00000 ./pwsim-filtered_400-1000-300-2000
+hadoop dfs -get $edir/groundtruth_T=0.3/part-00000 ./ground_0.3
+perl etc/eval.pl ground_0.3 pwsim-filtered_400-1000-300-2000 
+</pre>
+
+<p>
+Another useful tool is to convert the output of the sliding window algorithm (i.e., [key: (German document id, English document id), value: distance]) to
+a more human-friendly format, such as [key: German document title, value: English document title]. 
+</p>
+
+<p>
+First, let's combine all of the <code>Sequence</code> files under <code>$edir/similardocs_random_maxdst=400_D=1000_Q=300_B=2000</code> 
+into a single file for easy loading:
+</p>
+
+<pre class="code">
+etc/hadoop-cluster.sh edu.umd.cloud9.util.CombineSequenceFiles $edir/similardocs_random_maxdst=400_D=1000_Q=300_B=2000 $pwsimdir/similardocs_random_maxdst=400_D=1000_Q=300_B=2000.single 100 1 edu.umd.cloud9.io.pair.PairOfInts org.apache.hadoop.io.IntWritable sequence
+</pre>
+
+<p>Now, we can convert the docno-based output format to title pairs:</p>
+<pre class="code">
+etc/hadoop-cluster.sh ivory.lsh.eval.Docnos2Titles \
+ -pwsim_output=$pwsimdir/similardocs_random_maxdst=400_D=1000_Q=300_B=2000-filtered\
+ -output=$pwsimdir/similardocs_random_maxdst=400_D=1000_Q=300_B=2000-filtered.titles \
+ -e_collection=$wiki/compressed/enwiki-20121201.compressed \
+ -f_collection=$wiki/compressed/dewiki-20121215.compressed \
+ -f_lang=de -e_lang=en -docnos=$fdir/sample-docnos
+</pre>
+
+<p>Once the job completes, we can check out some of the similar Wikipedia titles:</p>
+
+<pre class="code">
+hdfs dfs -cat $edir/similardocs_random_maxdst=400_D=1000_Q=300_B=2000-filtered.titles/part-00000 | less
+</pre>
+
+<p>Although most of the pairs should be about relevant topics, you'll probably notice that some of the pairs 
+look wrong. This is expected, and may be due to several reasons, analyzed in more detail 
+in <a href="publications/Ture_etal_SIGIR2011.pdf">Ture et al's SIGIR'11 paper</a>.</p>
+
+Congratulations! You have completed the first phase of our cross-language similarity pipeline. 
+In the next phase, we show <a href="bitext-tutorial.html">how to find parallel sentence pairs</a> 
+from the output of this phase. For any further questions and comments, feel free to 
+contact <a href="mailto:ferhan.ture@gmail.com">Ferhan Ture</a>.
+<p>
+<p>
+  </div>
+
+
+
+    <!-- Footer
+    ================================================== -->
+    <footer class="footer">
+      <div class="container">
+        <p class="pull-right"><a href="#">Back to top</a></p>
+        <p>Designed using <a href="http://twitter.github.com/bootstrap/">Bootstrap</a>.</p>
+        <p>Code licensed under <a href="http://www.apache.org/licenses/LICENSE-2.0" target="_blank">Apache License v2.0</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
+      </div>
+    </footer>
+
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="assets/js/jquery.js"></script>
+    <script src="assets/js/google-code-prettify/prettify.js"></script>
+    <script src="assets/js/bootstrap-transition.js"></script>
+    <script src="assets/js/bootstrap-alert.js"></script>
+    <script src="assets/js/bootstrap-modal.js"></script>
+    <script src="assets/js/bootstrap-dropdown.js"></script>
+    <script src="assets/js/bootstrap-scrollspy.js"></script>
+    <script src="assets/js/bootstrap-tab.js"></script>
+    <script src="assets/js/bootstrap-tooltip.js"></script>
+    <script src="assets/js/bootstrap-popover.js"></script>
+    <script src="assets/js/bootstrap-button.js"></script>
+    <script src="assets/js/bootstrap-collapse.js"></script>
+    <script src="assets/js/bootstrap-carousel.js"></script>
+    <script src="assets/js/bootstrap-typeahead.js"></script>
+    <script src="assets/js/bootstrap-affix.js"></script>
+
+  </body>
+</html>
+

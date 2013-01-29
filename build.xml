@@ -15,7 +15,7 @@
   <property name="regression.dir" location="${test.dir}/regression" />
   <property name="integration.dir" location="${test.dir}/integration" />
 
-  <property name="version" value="0.9.0"/>
+  <property name="version" value="0.9.1"/>
 
   <!-- paths used for compilation and run  -->
   <path id="lib.path.id">
@@ -34,6 +34,12 @@
     <fileset dir="${lib.dir}/" includes="sux4j*.jar"/>
     <fileset dir="${lib.dir}/" includes="jsap*.jar"/>
     <fileset dir="${lib.dir}/" includes="commons-collections*.jar"/>
+    <fileset dir="${lib.dir}/" includes="maxent*.jar"/>
+    <fileset dir="${lib.dir}/" includes="tools*.jar"/>
+    <fileset dir="${lib.dir}/" includes="lucene*.jar"/>
+    <fileset dir="${lib.dir}/" includes="bliki*.jar"/>
+    <fileset dir="${lib.dir}/" includes="stanford*.jar"/>
+    <fileset dir="${lib.dir}/" includes="pig*.jar"/>
   </path>
 
   <property name="ivy.install.version" value="2.2.0"/>
@@ -277,13 +283,13 @@
 
     <echo file="./etc/run.${suffix}" message="${script_prefix}" />
     <echo file="./etc/run.${suffix}" message="${java_command} " append="true" />
-    <echo file="./etc/run.${suffix}" message="${param_prefix}1 ${param_prefix}2 ${param_prefix}3 ${param_prefix}4 ${param_prefix}5 ${param_prefix}6 ${param_prefix}7 ${param_prefix}8 ${param_prefix}9" append="true" />
+    <echo file="./etc/run.${suffix}" message="${param_prefix}1 ${param_prefix}2 ${param_prefix}3 ${param_prefix}4 ${param_prefix}5 ${param_prefix}6 ${param_prefix}7 ${param_prefix}8 ${param_prefix}9 ${param_prefix}{10} ${param_prefix}{11} ${param_prefix}{12} ${param_prefix}{13} ${param_prefix}{14} ${param_prefix}{15} ${param_prefix}{16} ${param_prefix}{17} ${param_prefix}{18} ${param_prefix}{19} ${param_prefix}{20}" append="true" />
 
     <echo file="./etc/hadoop-local.${suffix}" message="${script_prefix}" />
-    <echo file="./etc/hadoop-local.${suffix}" message="hadoop jar ${dist.dir}/${artifactId}-${version}.jar ${param_prefix}1 -D mapreduce.framework.name=local -D mapreduce.jobtracker.address=local -D fs.default.name=file:/// -D mapreduce.cluster.local.dir=/tmp/mapred/local -D mapreduce.cluster.temp.dir=/tmp/mapred/temp -D mapreduce.jobtracker.staging.root.dir=/tmp/mapred/staging -D mapreduce.jobtracker.system.dir=/tmp/mapred/system ${param_prefix}2 ${param_prefix}3 ${param_prefix}4 ${param_prefix}5 ${param_prefix}6 ${param_prefix}7 ${param_prefix}8 ${param_prefix}9${line.separator}" append="true" />
+    <echo file="./etc/hadoop-local.${suffix}" message="hadoop jar ${basedir}/${dist.dir}/${artifactId}-${version}.jar ${param_prefix}1 -D mapreduce.framework.name=local -D mapreduce.jobtracker.address=local -D fs.default.name=file:/// -D mapreduce.cluster.local.dir=/tmp/mapred/local -D mapreduce.cluster.temp.dir=/tmp/mapred/temp -D mapreduce.jobtracker.staging.root.dir=/tmp/mapred/staging -D mapreduce.jobtracker.system.dir=/tmp/mapred/system ${param_prefix}2 ${param_prefix}3 ${param_prefix}4 ${param_prefix}5 ${param_prefix}6 ${param_prefix}7 ${param_prefix}8 ${param_prefix}9 ${param_prefix}{10} ${param_prefix}{11} ${param_prefix}{12} ${param_prefix}{13} ${param_prefix}{14} ${param_prefix}{15} ${param_prefix}{16} ${param_prefix}{17} ${param_prefix}{18} ${param_prefix}{19} ${param_prefix}{20}${line.separator}" append="true" />
 
     <echo file="./etc/hadoop-cluster.${suffix}" message="${script_prefix}" />
-    <echo file="./etc/hadoop-cluster.${suffix}" message="hadoop jar ${dist.dir}/${artifactId}-${version}.jar ${param_prefix}1 -libjars ${libjars.path.id} ${param_prefix}2 ${param_prefix}3 ${param_prefix}4 ${param_prefix}5 ${param_prefix}6 ${param_prefix}7 ${param_prefix}8 ${param_prefix}9${line.separator}" append="true" />
+    <echo file="./etc/hadoop-cluster.${suffix}" message="hadoop jar ${basedir}/${dist.dir}/${artifactId}-${version}.jar ${param_prefix}1 -libjars ${libjars.path.id} ${param_prefix}2 ${param_prefix}3 ${param_prefix}4 ${param_prefix}5 ${param_prefix}6 ${param_prefix}7 ${param_prefix}8 ${param_prefix}9 ${param_prefix}{10} ${param_prefix}{11} ${param_prefix}{12} ${param_prefix}{13} ${param_prefix}{14} ${param_prefix}{15} ${param_prefix}{16} ${param_prefix}{17} ${param_prefix}{18} ${param_prefix}{19} ${param_prefix}{20}${line.separator}" append="true" />
 
      <chmod dir="./etc/" perm="ugo+rx" includes="**/*.sh"/>
   </target>
