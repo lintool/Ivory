@@ -37,13 +37,13 @@
               <li class="">
                 <a href="../index.html">Home</a>
               </li>
-              <li class="active">
+              <li class="">
                 <a href="./start.html">Getting Started</a>
               </li>
               <li class="">
                 <a href="./publications.html">Publications</a>
               </li>
-              <li class="">
+              <li class="active">
                 <a href="./experiments.html">Experiments</a>
               </li>
               <li class="">
@@ -84,7 +84,7 @@ In this two-part tutorial, we'll take you through the entire process using Wikip
 Starting from scratch, we first show how to find similar German-English article pairs
 (i.e., phase 1), and then illustrate how to extract German-English parallel text (i.e., phase 2). 
 The output of phase 1 is used in phase 2, so you can skip to the 
-<a href="docs/bitex-tutorial.html">second part of the tutorial</a>
+<a href="bitext-tutorial.html">second part of the tutorial</a>
 if you have already completed the first one.
 </p>
 
@@ -120,8 +120,8 @@ bunzip2 enwiki-20121201-pages-articles.xml.bz2
 <table><tr><td valign="top"><span class="label label-info">Tip</span></td>
 <td style="padding-left: 10px">
 It might be a good idea to compare the MD5 checksums of the downloaded files to the values 
-<a href="http://wikipedia.c3sl.ufpr.br/enwiki/20121201/enwiki-20121201-md5sums.txt/">here</a>
-and <a href="http://wikipedia.c3sl.ufpr.br/dewiki/20121215/dewiki-20121215-md5sums.txt/">here</a>
+<a href="http://wikipedia.c3sl.ufpr.br/enwiki/20121201/enwiki-20121201-md5sums.txt">here</a>
+and <a href="http://wikipedia.c3sl.ufpr.br/dewiki/20121215/dewiki-20121215-md5sums.txt">here</a>
 before moving further.
 <p>
 </td>
@@ -131,10 +131,7 @@ before moving further.
 <p>A peek into these files should reveal Wikipedia's XML format:</p>
 
 <pre class="code">
-less dewiki-20121215-pages-articles.xml
-</pre>
-
-<pre class="code">
+$ less dewiki-20121215-pages-articles.xml
 &lt;mediawiki ... xml:lang="de"&gt;
  &lt;siteinfo&gt;
   ...
@@ -186,15 +183,12 @@ IR methods introduced in <i>Darwish and Oard</i>'s <b>Probabilistic Structured Q
 to translate the German representations into English.
 For this, we assume that vocabularies and translation tables
 are available on some HDFS data directory. These can be generated using 
-the <a href="http://lintool.github.com/Cloud9/docs/hooka.html">Hooka word alignment toolkit</a> 
+the <a href="hooka.html">Hooka word alignment toolkit</a> 
 (also supports conversion from GIZA++ or BerkeleyAligner).</p>
 
 <p>This should be how your HDFS directory looks like at this step:</p>
 <pre class="code">
-hdfs dfs -ls $datadir/
-</pre>
-
-<pre class="code">
+$ hdfs dfs -ls $datadir/
 Found 12 items
 1 data/token
 1349 data/de.stop
@@ -212,16 +206,15 @@ Found 12 items
 <p>Now we are ready to run the preprocessing pipeline. The first run is
 for the English Wikipedia collection:</p>
 <pre class="code">
-$IVORYDIR/etc/hadoop-cluster.sh ivory.app.PreprocessWikipedia \
-	-mode=crosslingE \
-	-index=$edir \
-	-xml=$wiki/raw/enwiki-20121201-pages-articles.xml \
-	-compressed=$wiki/compressed/enwiki-20121201.compressed \
-	-lang=en \
-	-tokenizermodel=$datadir/token/en-token.bin \
-	-collectionvocab=$datadir/vocab.de-en.en \
-	-e_stopword=$datadir/en.stop >& en.log &
-	
+etc/hadoop-cluster.sh ivory.app.PreprocessWikipedia \
+ -mode=crosslingE \
+ -index=$edir \
+ -xml=$wiki/raw/enwiki-20121201-pages-articles.xml \
+ -compressed=$wiki/compressed/enwiki-20121201.compressed \
+ -lang=en \
+ -tokenizermodel=$datadir/token/en-token.bin \
+ -collectionvocab=$datadir/vocab.de-en.en \
+ -e_stopword=$datadir/en.stop >& en.log &
 </pre>
 
 <table><tr><td valign="top"><span class="label label-info">Tip</span></td>
@@ -237,23 +230,23 @@ running, remove or change them.
 <p>Next, we preprocess and translate German Wikipedia articles:</p>
 
 <pre class="code">
-$IVORYDIR/etc/hadoop-cluster.sh ivory.app.PreprocessWikipedia \
-	-mode=crosslingF \
-	-index=$fdir -targetindex=$edir \
-	-xml=$wiki/raw/dewiki-20121215-pages-articles.xml \
-	-compressed=$wiki/compressed/dewiki-20121215.compressed \
-	-lang=de -target_lang=en \
-	-tokenizermodel=$datadir/token/de-token.bin \
-	-e_tokenizermodel=$datadir/token/en-token.bin \
-	-f_f2e_vocab=$datadir/vocab.de-en.de \
-	-e_f2e_vocab=$datadir/vocab.de-en.en \
-	-f2e_ttable=$datadir/ttable.de-en \
-	-e_e2f_vocab=$datadir/vocab.en-de.en \
-	-f_e2f_vocab=$datadir/vocab.en-de.de \
-	-e2f_ttable=$datadir/ttable.en-de \
-	-e_stopword=$datadir/en.stop \
-	-f_stopword=$datadir/de.stop \
-	 >& de.log &
+etc/hadoop-cluster.sh ivory.app.PreprocessWikipedia \
+ -mode=crosslingF \
+ -index=$fdir -targetindex=$edir \
+ -xml=$wiki/raw/dewiki-20121215-pages-articles.xml \
+ -compressed=$wiki/compressed/dewiki-20121215.compressed \
+ -lang=de -target_lang=en \
+ -tokenizermodel=$datadir/token/de-token.bin \
+ -e_tokenizermodel=$datadir/token/en-token.bin \
+ -f_f2e_vocab=$datadir/vocab.de-en.de \
+ -e_f2e_vocab=$datadir/vocab.de-en.en \
+ -f2e_ttable=$datadir/ttable.de-en \
+ -e_e2f_vocab=$datadir/vocab.en-de.en \
+ -f_e2f_vocab=$datadir/vocab.en-de.de \
+ -e2f_ttable=$datadir/ttable.en-de \
+ -e_stopword=$datadir/en.stop \
+ -f_stopword=$datadir/de.stop \
+ >& de.log &
 </pre>
 
 <p>The log output of this program should gives various statistics, such as 
@@ -261,10 +254,7 @@ the number of documents, terms, tokens in the collection. Let's do a sanity
 check to make sure everything ran correctly:</p>
 
 <pre class="code">
-grep -P 'TOTAL=|ARTICLE=|OTHER=|SumOfDocLengths=|Terms=|TransDf=|SHORT=|ZERO=|Total=|VOCAB SIZE|TransDf|DISAMB' en.log | uniq
-</pre>
-
-<pre class="code">
+$ grep -P 'TOTAL=|ARTICLE=|OTHER=|SumOfDocLengths=|Terms=|TransDf=|SHORT=|ZERO=|Total=|VOCAB SIZE|TransDf|DISAMB' en.log | uniq
 ARTICLE=4037577
 DISAMBIGUATION=123666
 NON_ARTICLE=2893729
@@ -285,10 +275,7 @@ VOCAB SIZE 80279
 <p>You should see the <i>exact</i> same numbers in your log output.</p>
 
 <pre class="code">
-grep -P 'TOTAL=|ARTICLE=|OTHER=|SumOfDocLengths=|Terms=|TransDf=|SHORT=|ZERO=|Total=|VOCAB SIZE|TransDf|DISAMB' de.log | uniq
-</pre>
-
-<pre class="code">
+$ grep -P 'TOTAL=|ARTICLE=|OTHER=|SumOfDocLengths=|Terms=|TransDf=|SHORT=|ZERO=|Total=|VOCAB SIZE|TransDf|DISAMB' de.log | uniq
 ARTICLE=1574139
 DISAMBIGUATION=174684
 NON_ARTICLE=49347
@@ -323,17 +310,15 @@ the document vector) and efficiency (i.e., time to compute similarity between tw
 as we vary the number. We'll use 1000 bits in this tutorial:</p>
 
 <pre class="code">
-$IVORYDIR/etc/hadoop-cluster.sh ivory.lsh.driver.RunComputeSignatures -index=$fdir -num_bits=1000 -type=random
+etc/hadoop-cluster.sh ivory.lsh.driver.RunComputeSignatures -index=$fdir -num_bits=1000 -type=random
 </pre>
 
 <p>Since this process is based on 1000 randomly generated unit vectors, we need to use the same vectors when 
 running this process for the English side:</p>
 
 <pre class="code">
-hdfs dfs -cp $fdir/randomvectors_D=1000/ $edir/
-</pre>
-<pre class="code">
-$IVORYDIR/etc/hadoop-cluster.sh ivory.lsh.driver.RunComputeSignatures -index=$edir -num_bits=1000 -type=random
+$ hdfs dfs -cp $fdir/randomvectors_D=1000/ $edir/
+etc/hadoop-cluster.sh ivory.lsh.driver.RunComputeSignatures -index=$edir -num_bits=1000 -type=random
 </pre>
 
 As a result of these jobs, you should see a <code>signatures-random_D=1000</code> folder under each index directory.
@@ -344,7 +329,7 @@ As a result of these jobs, you should see a <code>signatures-random_D=1000</code
 In order to find similar Wikipedia articles, we will compare signatures by calculating the Hamming distance
 (i.e., number of different bits), and returning any pair with less than a specified distance <code>T</code>. 
 Instead of comparing all signatures of German Wikipedia to all signatures of English Wikipedia, which is called the 
-brute-force approach, we have implemented the sliding window-based algorithm introduced in <i>Ravichandran et al</i>'s 
+brute-force approach, we have implemented the sliding window-based algorithm in Ravichandran et al.'s 
 paper, <b>Randomized Algorithms and NLP: Using Locality Sensitive Hash Functions for High Speed Noun Clustering</b>.
 </p> 
 
@@ -355,11 +340,11 @@ table to its neighbors that are at most <code>B</code> positions away.
 </p> 
 
 <pre class="code">
-$IVORYDIR/etc/hadoop-cluster.sh ivory.lsh.pwsim.GenerateChunkedPermutedTables \
-	-index=$edir -sourceindex=$fdir -num_bits=1000 -type=random -Q=300 -overlap=10000 -B=2000
+etc/hadoop-cluster.sh ivory.lsh.pwsim.GenerateChunkedPermutedTables \
+ -index=$edir -sourceindex=$fdir -num_bits=1000 -type=random -Q=300 -overlap=10000 -B=2000
 
-$IVORYDIR/etc/hadoop-cluster.sh ivory.lsh.pwsim.cl.CLSlidingWindowPwsim \
-	-index=$edir -num_bits=1000 -B=2000 -T=400 -type=random -Q=300 -overlap=10000
+etc/hadoop-cluster.sh ivory.lsh.pwsim.cl.CLSlidingWindowPwsim \
+ -index=$edir -num_bits=1000 -B=2000 -T=400 -type=random -Q=300 -overlap=10000
 </pre>
 
 These two jobs may take a while to finish (e.g., few hours on a 128-core cluster), but if everything runs smoothly, 
@@ -375,7 +360,7 @@ First, we'll sample about 1000 German Wikipedia articles for this evaluation:
 </p>
 
 <pre class="code">
-$IVORYDIR/etc/hadoop-cluster.sh ivory.lsh.eval.SampleIntDocVectors -index=$fdir -size=1000 -docnos=$fdir/sample-docnos
+etc/hadoop-cluster.sh ivory.lsh.eval.SampleIntDocVectors -index=$fdir -size=1000 -docnos=$fdir/sample-docnos
 </pre>
 
 <p>
@@ -385,20 +370,20 @@ Next, we can filter the similar article pairs that do not appear in this sample:
 </p>
 
 <pre class="code">
-$IVORYDIR/etc/hadoop-cluster.sh ivory.lsh.eval.FilterResults \
-	-input=$edir/similardocs_random_maxdst=400_D=1000_Q=300_B=2000 \
-	-output=$edir/similardocs_random_maxdst=400_D=1000_Q=300_B=2000-filtered \
-	-docnos=$fdir/sample-docnos
+etc/hadoop-cluster.sh ivory.lsh.eval.FilterResults \
+ -input=$edir/similardocs_random_maxdst=400_D=1000_Q=300_B=2000 \
+ -output=$edir/similardocs_random_maxdst=400_D=1000_Q=300_B=2000-filtered \
+ -docnos=$fdir/sample-docnos
 </pre>
 
 <p>We can compute the same output using a brute-force approach (i.e., compare each sampled document vector from German 
 Wikipedia to all document vectors of English Wikipedia):</p>
 
 <pre class="code">
-$IVORYDIR/etc/hadoop-cluster.sh ivory.lsh.eval.BruteForcePwsim \
-	-input=$edir/wt-int-doc-vectors -sample=$fdir/wt-int-doc-vectors_sample=1000/part-00000 \
-	-output=$edir/groundtruth_T=0.3 \
-	-cosineT=0.3 -type=intdocvector
+etc/hadoop-cluster.sh ivory.lsh.eval.BruteForcePwsim \
+ -input=$edir/wt-int-doc-vectors -sample=$fdir/wt-int-doc-vectors_sample=1000/part-00000 \
+ -output=$edir/groundtruth_T=0.3 \
+ -cosineT=0.3 -type=intdocvector
 </pre>
 
 <p>
@@ -432,17 +417,17 @@ into a single file for easy loading:
 </p>
 
 <pre class="code">
-$IVORYDIR/etc/hadoop-cluster.sh edu.umd.cloud9.util.CombineSequenceFiles $edir/similardocs_random_maxdst=400_D=1000_Q=300_B=2000 $pwsimdir/similardocs_random_maxdst=400_D=1000_Q=300_B=2000.single 100 1 edu.umd.cloud9.io.pair.PairOfInts org.apache.hadoop.io.IntWritable sequence
+etc/hadoop-cluster.sh edu.umd.cloud9.util.CombineSequenceFiles $edir/similardocs_random_maxdst=400_D=1000_Q=300_B=2000 $pwsimdir/similardocs_random_maxdst=400_D=1000_Q=300_B=2000.single 100 1 edu.umd.cloud9.io.pair.PairOfInts org.apache.hadoop.io.IntWritable sequence
 </pre>
 
 <p>Now, we can convert the docno-based output format to title pairs:</p>
 <pre class="code">
-$IVORYDIR/etc/hadoop-cluster.sh ivory.lsh.eval.Docnos2Titles \
-	-pwsim_output=$pwsimdir/similardocs_random_maxdst=400_D=1000_Q=300_B=2000-filtered\
-	-output=$pwsimdir/similardocs_random_maxdst=400_D=1000_Q=300_B=2000-filtered.titles \
-	-e_collection=$wiki/compressed/enwiki-20121201.compressed \
-	-f_collection=$wiki/compressed/dewiki-20121215.compressed \
-	-f_lang=de -e_lang=en -docnos=$fdir/sample-docnos
+etc/hadoop-cluster.sh ivory.lsh.eval.Docnos2Titles \
+ -pwsim_output=$pwsimdir/similardocs_random_maxdst=400_D=1000_Q=300_B=2000-filtered\
+ -output=$pwsimdir/similardocs_random_maxdst=400_D=1000_Q=300_B=2000-filtered.titles \
+ -e_collection=$wiki/compressed/enwiki-20121201.compressed \
+ -f_collection=$wiki/compressed/dewiki-20121215.compressed \
+ -f_lang=de -e_lang=en -docnos=$fdir/sample-docnos
 </pre>
 
 <p>Once the job completes, we can check out some of the similar Wikipedia titles:</p>
@@ -456,7 +441,7 @@ look wrong. This is expected, and may be due to several reasons, analyzed in mor
 in <a href="publications/Ture_etal_SIGIR2011.pdf">Ture et al's SIGIR'11 paper</a>.</p>
 
 Congratulations! You have completed the first phase of our cross-language similarity pipeline. 
-In the next phase, we show <a href="docs/bitext-tutorial.html">how to find parallel sentence pairs</a> 
+In the next phase, we show <a href="bitext-tutorial.html">how to find parallel sentence pairs</a> 
 from the output of this phase. For any further questions and comments, feel free to 
 contact <a href="mailto:ferhan.ture@gmail.com">Ferhan Ture</a>.
 <p>
