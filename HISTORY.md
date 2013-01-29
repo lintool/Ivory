@@ -1,3 +1,10 @@
+Version 0.9.1
+=============
+January 29, 2013
+
++ Improvements to Wikipedia processing pipeline
++ Added documentation for cross-lingual pairwise-similarity
+
 Version 0.9.0
 =============
 January 13, 2013

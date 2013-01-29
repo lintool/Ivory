@@ -15,7 +15,7 @@
   <property name="regression.dir" location="${test.dir}/regression" />
   <property name="integration.dir" location="${test.dir}/integration" />
 
-  <property name="version" value="0.9.0"/>
+  <property name="version" value="0.9.1"/>
 
   <!-- paths used for compilation and run  -->
   <path id="lib.path.id">
