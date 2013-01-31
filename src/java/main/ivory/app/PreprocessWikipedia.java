@@ -198,11 +198,12 @@ public class PreprocessWikipedia extends Configured implements Tool {
       tool.run(arr);
 
       fs.delete(new Path(indexRootPath + "/wiki-docid-tmp"), true);
+    } else {
+      LOG.info("Docno mapping already exists at: " + mappingFile);
     }
 
     // Repack Wikipedia into sequential compressed block
-    p = new Path(seqCollection);
-    if (!fs.exists(p)) {
+    if (!fs.exists(new Path(seqCollection + "/part-00000"))) {
       LOG.info(seqCollection + " doesn't exist, creating...");
       String[] arr = new String[] { "-input=" + rawCollection,
           "-output=" + seqCollection,
@@ -214,6 +215,8 @@ public class PreprocessWikipedia extends Configured implements Tool {
       RepackWikipedia tool = new RepackWikipedia();
       tool.setConf(conf);
       tool.run(arr);
+    } else {
+      LOG.info("Repacked collection already exists at: " + seqCollection);      
     }
 
     conf.set(Constants.CollectionName, "Wikipedia-"+collectionLang);
