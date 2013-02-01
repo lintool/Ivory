@@ -400,7 +400,7 @@ public class FindParallelSentencePairs extends Configured implements Tool {
   private static Options options;
 
   @SuppressWarnings("static-access")
-  protected static JobConf setupConf(JobConf conf, String[] args) throws Exception {
+  protected JobConf setupConf(JobConf conf, String[] args) throws Exception {
     options = new Options();
     options.addOption(OptionBuilder.withDescription("source-side raw collection path").withArgName("path").hasArg().isRequired().create(FCOLLECTION_OPTION));
     options.addOption(OptionBuilder.withDescription("target-side raw collection path").withArgName("path").hasArg().isRequired().create(ECOLLECTION_OPTION));
@@ -408,7 +408,7 @@ public class FindParallelSentencePairs extends Configured implements Tool {
     options.addOption(OptionBuilder.withDescription("two-letter code for e-language").withArgName("en|de|tr|cs|zh|ar|es").hasArg().isRequired().create(ELANG_OPTION));
     options.addOption(OptionBuilder.withDescription("source-side index path").withArgName("path").hasArg().isRequired().create(FINDEX_OPTION));
     options.addOption(OptionBuilder.withDescription("target-side index path").withArgName("path").hasArg().isRequired().create(EINDEX_OPTION));
-    options.addOption(OptionBuilder.withDescription("name of bitext").withArgName("string").hasArg().isRequired().create(BITEXTNAME_OPTION));
+    options.addOption(OptionBuilder.withDescription("name of bitext").withArgName("string").hasArg().create(BITEXTNAME_OPTION));
     options.addOption(OptionBuilder.withDescription("path to data files on HDFS").withArgName("path").hasArg().isRequired().create(DATADIR_OPTION));
     options.addOption(OptionBuilder.withDescription("path to output of pwsim algorithm").withArgName("path").hasArg().isRequired().create(PWSIM_OPTION));
     options.addOption(OptionBuilder.withDescription("classifier id to retrieve P('PARALLEL'|instance)").withArgName("0 or 1").hasArg().isRequired().create(CLASSIFIERID_OPTION));
@@ -445,7 +445,7 @@ public class FindParallelSentencePairs extends Configured implements Tool {
     
     FileInputFormat.addInputPaths(conf, sentsPath);
     FileOutputFormat.setOutputPath(conf, new Path(outputPath));
-    conf.setJobName("FindParallelSentences_" + fLang +"-" + eLang +"_F1="+classifierThreshold+"["+classifierId+"]");
+    conf.setJobName(this.getClass().getCanonicalName() + "_" + fLang +"-" + eLang +"_F1="+classifierThreshold+"["+classifierId+"]");
 
     try {
       conf = PwsimEnvironment.setBitextPaths(conf, dataDir, eLang, fLang, bitextName, eDir, fDir, classifierThreshold, classifierId, pwsimPairsPath, "simple");
