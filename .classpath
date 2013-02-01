@@ -109,8 +109,8 @@
 	<classpathentry kind="lib" path="lib/sux4j-2.0.1.jar"/>
 	<classpathentry kind="lib" path="lib/tools-1.5.0.jar"/>
 	<classpathentry kind="lib" path="lib/xmlenc-0.52.jar"/>
-	<classpathentry kind="lib" path="lib/cloud9-1.4.6.jar"/>
 	<classpathentry kind="lib" path="lib/commons-daemon-1.0.9.jar"/>
 	<classpathentry kind="lib" path="lib/mail-1.4.5.jar"/>
+	<classpathentry kind="lib" path="lib/cloud9-1.4.9.jar"/>
 	<classpathentry kind="output" path="build"/>
 </classpath>
