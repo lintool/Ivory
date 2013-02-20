@@ -19,7 +19,8 @@ public class Constants {
   public static final String StemmedStopwordListQ= "query_stemmed_stopwordlist";
   public static final String QueriesPath = "queries_path";
   public static final String QrelsPath = "qrels_path";
-  public static final String SCFGPath = "scfg_path";
+  public static final String GrammarPath = "scfg_path";
+  public static final String UNKFile = "unknown";
   public static final String DocLanguage = "doc_lang";
   public static final String QueryLanguage = "query_lang";
   public static final String English = "en";
@@ -47,6 +48,7 @@ public class Constants {
   public static final String Heuristic4 = "H4";
   public static final String Heuristic5 = "H5";
   public static final String Heuristic6 = "H6";
+  public static final String One2Many = "one2many";
   public static final String Scaling = "scaling";
   public static final String BigramSegment = "biseg";
   public static final String RunName= "run";

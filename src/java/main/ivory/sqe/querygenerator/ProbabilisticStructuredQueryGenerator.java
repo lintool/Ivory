@@ -13,7 +13,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Set;
@@ -43,12 +45,11 @@ import edu.umd.hooka.ttables.TTable_monolithic_IFAs;
  */
 public class ProbabilisticStructuredQueryGenerator implements QueryGenerator {
   private static final Logger LOG = Logger.getLogger(ProbabilisticStructuredQueryGenerator.class);
-  private Tokenizer queryLangTokenizer, queryLangTokenizerWithStem, docLangTokenizer;
+  private Tokenizer queryLangTokenizer, queryLangTokenizerWithStemming, docLangTokenizer;
   private VocabularyWritable fVocab_f2e, eVocab_f2e;
   private TTable_monolithic_IFAs f2eProbs;
   private int length, numTransPerToken;
   private float lexProbThreshold, cumProbThreshold;
-  private Set<PairOfStrings> pairsInSCFG;
   private boolean H6, bigramSegment;
   private RetrievalEnvironment env;
   private String queryLang, docLang;
@@ -73,7 +74,7 @@ public class ProbabilisticStructuredQueryGenerator implements QueryGenerator {
     LOG.info("Stemmed stopword list file in doc-language:" + conf.get(Constants.StemmedStopwordListD));
 
     queryLangTokenizer = TokenizerFactory.createTokenizer(fs, conf, queryLang, conf.get(Constants.QueryTokenizerData), false, null, null, null);
-    queryLangTokenizerWithStem = TokenizerFactory.createTokenizer(fs, conf, queryLang, conf.get(Constants.QueryTokenizerData), true, null, conf.get(Constants.StemmedStopwordListQ), null);
+    queryLangTokenizerWithStemming = TokenizerFactory.createTokenizer(fs, conf, queryLang, conf.get(Constants.QueryTokenizerData), true, null, conf.get(Constants.StemmedStopwordListQ), null);
     docLangTokenizer = TokenizerFactory.createTokenizer(fs, conf, docLang, conf.get(Constants.DocTokenizerData), true, null, conf.get(Constants.StemmedStopwordListD), null);
 
     lexProbThreshold = conf.getFloat(Constants.LexicalProbThreshold, 0f);
@@ -88,11 +89,6 @@ public class ProbabilisticStructuredQueryGenerator implements QueryGenerator {
     }
     LOG.info("H6 = " + H6);
 
-    if (H6 && conf.get(Constants.SCFGPath) != null) {
-      pairsInSCFG = new HashSet<PairOfStrings>();
-      getPairsInSCFG(conf.get(Constants.SCFGPath));
-    }
-
     // initialize environment to access index
     try {
       env = new RetrievalEnvironment(conf.get(Constants.IndexPath), fs);
@@ -103,20 +99,24 @@ public class ProbabilisticStructuredQueryGenerator implements QueryGenerator {
   }
 
   @Override
-  public StructuredQuery parseQuery(String query) {
+  public StructuredQuery parseQuery(String query, FileSystem fs, Configuration conf) {   
     JsonObject queryJson = new JsonObject();
 
-    String origQuery = query.trim().split(";")[1].trim();
-    Map<String, String> stemmed2Stemmed = Utils.getStemMapping(origQuery, queryLangTokenizer,
-        queryLangTokenizerWithStem, docLangTokenizer);
+    String origQuery = query.trim().split("\\|\\|\\|\\|")[0].trim();
+    LOG.info("Original query: " + origQuery);
+    String grammarFile = conf.get(Constants.GrammarPath);
+    Set<PairOfStrings> phrasePairs = processGrammar(fs, conf, grammarFile);
 
-    String[] tokens = queryLangTokenizerWithStem.processContent(origQuery);
+    Map<String, String> stemmed2Stemmed = Utils.getStemMapping(origQuery, queryLangTokenizer,
+        queryLangTokenizerWithStemming, docLangTokenizer);
+
+    String[] tokens = queryLangTokenizerWithStemming.processContent(origQuery);
 
     length = tokens.length;
     JsonArray tokenTranslations = new JsonArray();
     for (String token : tokens) {
       LOG.info("Processing token " + token);
-      if (queryLangTokenizerWithStem.isStopWord(token))
+      if (queryLangTokenizerWithStemming.isStopWord(token))
         continue;
       LOG.info("not stopword");
 
@@ -130,7 +130,7 @@ public class ProbabilisticStructuredQueryGenerator implements QueryGenerator {
         }
       } else {
         JsonObject tokenTrans = new JsonObject();
-        HMapSFW distr = getTranslations(token, stemmed2Stemmed);
+        HMapSFW distr = getTranslations(origQuery, token, phrasePairs, stemmed2Stemmed);
         if (distr == null) {
           continue;
         }
@@ -145,6 +145,17 @@ public class ProbabilisticStructuredQueryGenerator implements QueryGenerator {
     return new StructuredQuery(queryJson, length);
   }
 
+  public Set<PairOfStrings> processGrammar(FileSystem fs, Configuration conf, String grammarFile) {
+    if (!H6) {
+      return null;
+    }
+    Set<PairOfStrings> pairsInSCFG = Utils.getPairsInSCFG(fs, grammarFile);
+    if (pairsInSCFG == null) {
+      LOG.info("No probabilities extracted from " + grammarFile);
+    } 
+    return pairsInSCFG;
+  }
+  
   protected String getBestTranslation(String token) {
     int f = fVocab_f2e.get(token);
     if (f <= 0) {
@@ -162,7 +173,7 @@ public class ProbabilisticStructuredQueryGenerator implements QueryGenerator {
     return token;
   }
 
-  protected HMapSFW getTranslations(String token, Map<String, String> stemmed2Stemmed) {
+  protected HMapSFW getTranslations(String query, String token, Set<PairOfStrings> pairsInSCFG, Map<String, String> stemmed2Stemmed) {
     HMapSFW probDist = new HMapSFW();
     int f = fVocab_f2e.get(token);
     if (f <= 0) {
@@ -231,29 +242,5 @@ public class ProbabilisticStructuredQueryGenerator implements QueryGenerator {
     //    LOG.info("Translations of "+token+"="+probDist);
 
     return probDist;
-  }
-
-  private void getPairsInSCFG(String grammarFile) {
-    BufferedReader reader;
-    try {
-      reader = new BufferedReader(new InputStreamReader(new FileInputStream(grammarFile), "UTF-8"));
-      String rule = null;
-      while ((rule = reader.readLine())!=null) {
-        String[] parts = rule.split("\\|\\|\\|");
-        String[] lhs = parts[1].trim().split(" ");
-        String[] rhs = parts[2].trim().split(" ");;
-        for (String l : lhs) {
-          for (String r : rhs) {
-            pairsInSCFG.add(new PairOfStrings(l, r));
-          }
-        }
-      }
-    } catch (UnsupportedEncodingException e) {
-      e.printStackTrace();
-    } catch (FileNotFoundException e) {
-      e.printStackTrace();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
   }
 }

@@ -5,20 +5,16 @@ import ivory.core.eval.Qrels;
 import ivory.core.eval.RankedListEvaluator;
 import ivory.smrf.retrieval.Accumulator;
 import ivory.sqe.querygenerator.Utils;
-
 import java.io.IOException;
 import java.util.Map;
-
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -27,7 +23,6 @@ import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-
 import edu.umd.cloud9.collection.DocnoMapping;
 
 public class RunQueryEngine {
@@ -125,7 +120,7 @@ public class RunQueryEngine {
     options.addOption(OptionBuilder.withArgName("path").hasArg().withDescription("doc-language vocabulary file").create(Constants.DocVocab));
     options.addOption(OptionBuilder.withArgName("path").hasArg().withDescription("query-language vocabulary file").create(Constants.QueryVocab));
     options.addOption(OptionBuilder.withArgName("path").hasArg().withDescription("query-lang -> doc-lang translation prob. table").create(Constants.f2eProbsPath));
-    options.addOption(OptionBuilder.withArgName("path").hasArg().withDescription("grammar file").create(Constants.SCFGPath));
+    options.addOption(OptionBuilder.withArgName("path").hasArg().withDescription("grammar file").create(Constants.GrammarPath));
     options.addOption(OptionBuilder.withArgName("0=unigram|1|2").hasArg().withDescription("min phrase size").create(Constants.MinWindow));
     options.addOption(OptionBuilder.withArgName("0=unigram|1|2").hasArg().withDescription("max phrase size").create(Constants.MaxWindow));
     options.addOption(OptionBuilder.withArgName("(0.0-1.0)").hasArg().withDescription("lexical probability threshold").create(Constants.LexicalProbThreshold));
@@ -137,7 +132,8 @@ public class RunQueryEngine {
     options.addOption(OptionBuilder.withArgName("(0.0-1.0)").hasArg().withDescription("weight of word translations when combining with other models").create(Constants.BitextWeight));
     options.addOption(OptionBuilder.withArgName("(0.0-1.0)").hasArg().withDescription("weight of token translations in query representation").create(Constants.TokenWeight));
     options.addOption(OptionBuilder.withArgName("(0.0-1.0)").hasArg().withDescription("weight of phrase translations in query representation").create(Constants.PhraseWeight)); 
-    options.addOption(OptionBuilder.withArgName("off|on").withDescription("filter bilingual translation pairs that do not appear in grammar").create(Constants.Heuristic6));  
+    options.addOption(OptionBuilder.withArgName("off|on").withDescription("filter bilingual translation pairs that do not appear in grammar").create(Constants.Heuristic6));
+    options.addOption(OptionBuilder.withArgName("0=one-to-none,1=one-to-one,2=one-to-many").hasArg().withDescription("three options for 1-to-many alignments").create(Constants.One2Many));
     options.addOption(OptionBuilder.withArgName("off|on").hasArg().withDescription("scale counts of source tokens that translate into multiple target tokens (i.e., fertility)").create(Constants.Scaling));  
     options.addOption(OptionBuilder.withArgName("0.0-1.0").hasArg().withDescription("paramater to discount the difference between likelihood of each k-best translation").create(Constants.Alpha));  
     options.addOption(OptionBuilder.withArgName("string").hasArg().withDescription("name of CLIR run").create(Constants.RunName));
@@ -147,6 +143,7 @@ public class RunQueryEngine {
     options.addOption(OptionBuilder.withArgName("path").hasArg().withDescription("one stemmed stopword per line, query lang").create(Constants.StemmedStopwordListQ));
     options.addOption(OptionBuilder.withArgName("path").hasArg().withDescription("one stopword per line, doc lang").create(Constants.StopwordListD));
     options.addOption(OptionBuilder.withArgName("path").hasArg().withDescription("one stemmed stopword per line, doc lang").create(Constants.StemmedStopwordListD));
+    options.addOption(OptionBuilder.withArgName("path").hasArg().withDescription("unknown words output by Moses -output-unknowns option").create(Constants.UNKFile));
 
     // read options from commandline or XML
     try {
@@ -171,8 +168,8 @@ public class RunQueryEngine {
       } else {
         conf.set(Constants.BigramSegment, "off");   //default
       }       
-      if (cmdline.hasOption(Constants.SCFGPath)) {
-        conf.set(Constants.SCFGPath, cmdline.getOptionValue(Constants.SCFGPath));
+      if (cmdline.hasOption(Constants.GrammarPath)) {
+        conf.set(Constants.GrammarPath, cmdline.getOptionValue(Constants.GrammarPath));
       }      
       if (cmdline.hasOption(Constants.f2eProbsPath) && cmdline.hasOption(Constants.QueryVocab) && cmdline.hasOption(Constants.DocVocab)) {
         conf.set(Constants.f2eProbsPath, cmdline.getOptionValue(Constants.f2eProbsPath));
@@ -210,8 +207,11 @@ public class RunQueryEngine {
         conf.setInt(Constants.MinWindow, Integer.parseInt(cmdline.getOptionValue(Constants.MinWindow)));
         conf.setInt(Constants.MaxWindow, Integer.parseInt(cmdline.getOptionValue(Constants.MaxWindow)));
       }
-      if (cmdline.hasOption(Constants.Heuristic3)) {
-        conf.set(Constants.Heuristic3, cmdline.getOptionValue(Constants.Heuristic3));
+      if (cmdline.hasOption(Constants.Heuristic6)) {
+        conf.set(Constants.Heuristic6, cmdline.getOptionValue(Constants.Heuristic6));
+      }
+      if (cmdline.hasOption(Constants.One2Many)) {
+        conf.setInt(Constants.One2Many, Integer.parseInt(cmdline.getOptionValue(Constants.One2Many)));
       }
       if (cmdline.hasOption(Constants.Scaling)) {
         conf.setBoolean(Constants.Scaling, true);
@@ -240,18 +240,17 @@ public class RunQueryEngine {
       if (cmdline.hasOption(Constants.StemmedStopwordListQ)) {
         conf.set(Constants.StemmedStopwordListQ , cmdline.getOptionValue(Constants.StemmedStopwordListQ));
       }
-
-    } catch (ConfigurationException e) {
-      e.printStackTrace();
+      if (cmdline.hasOption(Constants.UNKFile)) {
+        conf.set(Constants.UNKFile , cmdline.getOptionValue(Constants.UNKFile));
+      }
+    } catch (Exception e) {
+      System.err.println("Error parsing command line: " + e.getMessage());
       HelpFormatter formatter = new HelpFormatter();
       formatter.printHelp("RunQueryEngine", options);
       ToolRunner.printGenericCommandUsage(System.out);
       return null;
-    } catch (ParseException e) {
-      System.err.println("Error parsing command line: " + e.getMessage());
-      return null;
     }
-
+    
     return conf;
 
   }
@@ -296,8 +295,8 @@ public class RunQueryEngine {
     list = d.getElementsByTagName(Constants.QueryTokenizerData);
     if (list.getLength() > 0) {  conf.set(Constants.QueryTokenizerData, list.item(0).getTextContent());  }  
 
-    list = d.getElementsByTagName(Constants.SCFGPath);
-    if (list.getLength() > 0) {  conf.set(Constants.SCFGPath, list.item(0).getTextContent());  }  
+    list = d.getElementsByTagName(Constants.GrammarPath);
+    if (list.getLength() > 0) {  conf.set(Constants.GrammarPath, list.item(0).getTextContent());  }  
 
     list = d.getElementsByTagName(Constants.f2eProbsPath);
     if (list.getLength() > 0) {  conf.set(Constants.f2eProbsPath, list.item(0).getTextContent());  }  
@@ -355,6 +354,10 @@ public class RunQueryEngine {
 
     list = d.getElementsByTagName(Constants.StemmedStopwordListQ);
     if (list.getLength() > 0) {  conf.set(Constants.StemmedStopwordListQ, list.item(0).getTextContent());  }  
+ 
+    list = d.getElementsByTagName(Constants.UNKFile);
+    if (list.getLength() > 0) {  conf.set(Constants.UNKFile, list.item(0).getTextContent());  }  
+ 
   }
 
   static float eval(QueryEngine qe, Configuration conf, String setting){

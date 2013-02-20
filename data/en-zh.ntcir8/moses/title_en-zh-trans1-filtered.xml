@@ -1,0 +1,148 @@
+<parameters>
+<query id="2" grammar="/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/en-ar.trec02/moses.grammar/grammar.1">What is the relationship between the movie "Riding Alone for Thousands of Miles" and ZHANG Yimou?||||-236.11;;;what is the relationship between the movi " ride alon for thousand of mile " and zhang yimou ?|||的 关系 是 什么 电影 " 骑车 " 仅 数千 英里 , 张艺谋 来台 ?|||NaN|||0-3 1-2 2-0 3-1 4-1 6-4 7-5 8-6 14-7 9-8 11-9 13-10 15-11 16-12 17-12 17-13 18-14
+</query>
+<query id="5" grammar="/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/en-ar.trec02/moses.grammar/grammar.4">What is the definition of Aging Society?||||-4.32234;;;what is the definit of age societi ?|||的 定义 是 什么 时代 ?|||NaN|||0-3 1-2 2-0 3-1 4-0 5-4 7-5
+</query>
+<query id="6" grammar="/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/en-ar.trec02/moses.grammar/grammar.5">What is the relationship between Bali bombings and Bin Laden?||||-6.55456;;;what is the relationship between bali bomb and bin laden ?|||有 什么 关系 q 里岛 爆炸案 , 宾 拉登 ?|||NaN|||0-1 1-1 3-2 4-2 5-3 5-4 5-5 6-5 7-6 8-7 8-8 9-8 10-9
+</query>
+<query id="9" grammar="/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/en-ar.trec02/moses.grammar/grammar.8">Where will Olympics Game 2008 be held?||||-5.96963;;;where will olymp game 2008 be held ?|||奥运会 将 举办 奥运会 ?|||NaN|||4-0 1-1 6-2 2-3 3-3 7-4
+</query>
+<query id="12" grammar="/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/en-ar.trec02/moses.grammar/grammar.11">What is the virus of SARS?||||-3.85828;;;what is the virus of sar ?|||sars 病毒 是 什么 ?|||NaN|||5-0 3-1 0-3 1-2 6-4
+</query>
+<query id="15" grammar="/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/en-ar.trec02/moses.grammar/grammar.14">Where will Expo 2010 be held?||||-5.96332;;;where will expo 2010 be held ?|||2010 世博会 将 举行 ?|||NaN|||3-0 2-1 1-2 5-3 6-4
+</query>
+<query id="16" grammar="/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/en-ar.trec02/moses.grammar/grammar.15">Why does China want to import technology to build Shanghai Maglev Railway?||||-9.74365;;;whi doe china want to import technolog to build shanghai maglev railway ?|||为什么 中国 引进 技术 , 建设 上海 中的 磁悬浮 铁路 ?|||NaN|||0-0 1-0 2-1 5-2 6-3 8-5 9-6 10-7 10-8 11-9 12-10
+</query>
+<query id="18" grammar="/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/en-ar.trec02/moses.grammar/grammar.17">What is the Six-Party Talks?||||-3.84021;;;what is the six - parti talk ?|||什么 是 六方会谈 ?|||NaN|||0-0 1-1 3-2 4-2 5-2 6-2 7-3
+</query>
+<query id="19" grammar="/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/en-ar.trec02/moses.grammar/grammar.18">What is the definition of obesity?||||-3.56365;;;what is the definit of obes ?|||肥胖 的 定义 是 什么 ?|||NaN|||5-0 0-4 1-3 2-1 3-2 4-1 6-5
+</query>
+<query id="23" grammar="/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/en-ar.trec02/moses.grammar/grammar.22">Why does the bird flu threat to humans?||||-5.07439;;;whi doe the bird flu threat to human ?|||为什么 禽流感 威胁 人类 ?|||NaN|||0-0 1-0 3-1 4-1 5-2 7-3 8-4
+</query>
+<query id="26" grammar="/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/en-ar.trec02/moses.grammar/grammar.25">What is the relationship between Liu Guoliang and the men's table tennis team of China?||||-258.103;;;what is the relationship between liu guoliang and the men 's tabl tenni team of china ?|||有 什么 关系 刘 guoliang , 's 桌球 团队 ?|||NaN|||0-1 1-1 3-2 4-2 5-3 6-4 7-5 10-6 11-7 12-7 13-8 16-9
+</query>
+<query id="28" grammar="/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/en-ar.trec02/moses.grammar/grammar.27">Which organization declares Nobel Prize in Literature?||||-5.61763;;;which organ declar nobel prize in literatur ?|||组织 宣布 诺贝尔 文学 ?|||NaN|||1-0 2-1 3-2 4-2 6-3 7-4
+</query>
+<query id="29" grammar="/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/en-ar.trec02/moses.grammar/grammar.28">What is the relationship of Yong-Bo Li and the Chinese badminton team?||||-11.836;;;what is the relationship of yong - bo li and the chines badminton team ?|||是 什么 关系 涌 - 薄熙来 , 中国 羽毛球 团体 ?|||NaN|||0-1 1-0 3-2 5-3 6-4 7-5 9-6 11-7 12-8 13-9 14-10
+</query>
+<query id="30" grammar="/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/en-ar.trec02/moses.grammar/grammar.29">impression series of Zhang Yimou.||||-28.4952;;;impress seri of zhang yimou .|||张艺谋 来台 系列 深刻 的 印象 。|||NaN|||3-0 4-0 4-1 1-2 0-3 0-5 5-6
+</query>
+<query id="32" grammar="/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/en-ar.trec02/moses.grammar/grammar.31">What is the relationship between Liu Xiang and Johnson?||||-6.59543;;;what is the relationship between liu xiang and johnson ?|||什么样 的 关系 是 刘翔 , 约翰逊 ?|||NaN|||0-0 1-3 2-1 3-2 4-2 5-4 6-4 7-5 8-6 9-7
+</query>
+<query id="33" grammar="/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/en-ar.trec02/moses.grammar/grammar.32">events related to the Taliban and the United States||||-5.5925;;;event relat to the taliban and the unit state|||事件 相关 的 塔利班 和 美国|||NaN|||0-0 1-1 4-3 5-4 7-5 8-5
+</query>
+<query id="35" grammar="/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/en-ar.trec02/moses.grammar/grammar.34">events related to the movie "Initials D".||||-206.56;;;event relat to the movi " initi d " .|||事件 " 的 电影 " 的 初步 研究 。|||NaN|||0-0 5-1 3-2 4-3 8-4 6-6 7-7 9-8
+</query>
+<query id="36" grammar="/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/en-ar.trec02/moses.grammar/grammar.35">movies in which Zhao Wei participated.||||-6.27347;;;movi in which zhao wei particip .|||电影 , 赵 魏 参与 。|||NaN|||0-0 2-1 3-2 4-3 5-4 6-5
+</query>
+<query id="38" grammar="/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/en-ar.trec02/moses.grammar/grammar.37">What is the relationship between Xia Yu and Yuan Quan?||||-130.933;;;what is the relationship between xia yu and yuan quan ?|||有 什么 关系 夏 余 元 quan ?|||NaN|||0-1 1-1 3-2 4-2 5-3 6-4 8-5 9-6 10-7
+</query>
+<query id="39" grammar="/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/en-ar.trec02/moses.grammar/grammar.38">new year films made by Feng Xiaogang.||||-130.047;;;new year film made by feng xiaogang .|||今年 由 冯 xiaogang 电影 。|||NaN|||1-0 4-1 5-2 6-3 2-4 7-5
+</query>
+<query id="40" grammar="/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/en-ar.trec02/moses.grammar/grammar.39">What is the relationship between Guo Jingjing and Wu Minxia?||||-254.233;;;what is the relationship between guo jingj and wu minxia ?|||有 什么 关系 郭 jingj 吴 minxia ?|||NaN|||0-1 1-1 3-2 4-2 5-3 6-4 8-5 9-6 10-7
+</query>
+<query id="41" grammar="/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/en-ar.trec02/moses.grammar/grammar.40">Who is the 2004 US Presidential Democratic candidate?||||-6.65878;;;who is the 2004 us presidenti democrat candid ?|||美国 总统 2004 是 民主党 的 候选人 呢 ?|||NaN|||4-0 5-1 3-2 1-3 6-4 7-6 8-7 8-8
+</query>
+<query id="42" grammar="/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/en-ar.trec02/moses.grammar/grammar.41">What is the interrelationship between the petroleum industry and wars?||||-129.914;;;what is the interrelationship between the petroleum industri and war ?|||什么 是 interrelationship 之间 的 石油 工业 和 战争 ?|||NaN|||0-0 1-1 3-2 4-3 6-5 7-6 8-7 9-8 10-9
+</query>
+<query id="43" grammar="/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/en-ar.trec02/moses.grammar/grammar.42">What economic impact might Olympic Games have on host countries?||||-8.11305;;;what econom impact might olymp game have on host countri ?|||什么样 的 经济 影响 , 可能 对 举办 奥运会 ?|||NaN|||0-0 1-2 2-3 3-5 6-6 7-6 8-7 4-8 5-8 10-9
+</query>
+<query id="44" grammar="/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/en-ar.trec02/moses.grammar/grammar.43">How ultraviolet light might threaten human health?||||-5.9705;;;how ultraviolet light might threaten human health ?|||如何 紫外线 可能 危害 人类 健康 ?|||NaN|||0-0 1-1 2-1 3-2 4-3 5-4 6-5 7-6
+</query>
+<query id="45" grammar="/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/en-ar.trec02/moses.grammar/grammar.44">When did Arafat pass away?||||-4.57362;;;when did arafat pass away ?|||如果 没有 阿拉法特 的 去世 呢 ?|||NaN|||0-0 1-1 2-2 3-4 4-4 5-5 5-6
+</query>
+<query id="46" grammar="/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/en-ar.trec02/moses.grammar/grammar.45">Which year was Macau's return to China?||||-129.192;;;which year was macau 's return to china ?|||这 是 澳门 回归 中国 's ?|||NaN|||0-0 2-1 3-2 5-3 6-3 7-4 4-5 8-6
+</query>
+<query id="47" grammar="/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/en-ar.trec02/moses.grammar/grammar.46">Who is David Ho(Da-i Ho)?||||-132.394;;;who is david ho( da - i ho ) ?|||戴维 ho( 辕门 是 我 ) ?|||NaN|||2-0 3-1 4-2 1-3 6-4 8-5 9-6
+</query>
+<query id="48" grammar="/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/en-ar.trec02/moses.grammar/grammar.47">Who is Sean Chen(Chen Shin-An)?||||-132.232;;;who is sean chen( chen shin - an ) ?|||谁 是 肖恩 chen( 陈 新光 ) ?|||NaN|||0-0 1-1 2-2 3-3 4-4 5-5 8-6 9-7
+</query>
+<query id="49" grammar="/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/en-ar.trec02/moses.grammar/grammar.48">Who is Lung Yingtai?||||-4.94517;;;who is lung yingtai ?|||肺癌 是 为了 什么 ?|||NaN|||2-0 1-1 3-2 4-3 4-4
+</query>
+<query id="51" grammar="/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/en-ar.trec02/moses.grammar/grammar.50">What does "DINK" represent?||||-327.63;;;what doe " dink " repres ?|||" dink " 代表 什么 ?|||NaN|||2-0 3-1 4-2 5-3 0-4 6-5
+</query>
+<query id="52" grammar="/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/en-ar.trec02/moses.grammar/grammar.51">What is cholesterol?||||-2.86855;;;what is cholesterol ?|||什么 是 胆固醇 ?|||NaN|||0-0 1-1 2-2 3-3
+</query>
+<query id="53" grammar="/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/en-ar.trec02/moses.grammar/grammar.52">What is "Thangka"?||||-326.118;;;what is " thangka " ?|||什么 是 " thangka " ?|||NaN|||0-0 1-1 2-2 3-3 4-4 5-5
+</query>
+<query id="54" grammar="/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/en-ar.trec02/moses.grammar/grammar.53">What happened on the day of 7 July 2005 London Underground bombings?||||-8.89952;;;what happen on the day of 7 juli 2005 london underground bomb ?|||发生 在 二○○五年 七月 七日 伦敦 地下 炸弹 ?|||NaN|||1-0 2-1 8-2 6-4 7-3 9-5 10-6 11-7 12-8
+</query>
+<query id="56" grammar="/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/en-ar.trec02/moses.grammar/grammar.55">what is the disputes about China-Russia eastern border agreement?||||-7.51818;;;what is the disput about china - russia eastern border agreement ?|||什么 是 争议 的 中国 , 俄罗斯 东部 边界 协议 ?|||NaN|||0-0 1-1 3-2 4-2 5-4 7-6 8-7 9-8 10-9 11-10
+</query>
+<query id="57" grammar="/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/en-ar.trec02/moses.grammar/grammar.56">What is the disputes between China and Japan for the undersea natural gas field in the East China Sea?||||-10.823;;;what is the disput between china and japan for the undersea natur gas field in the east china sea ?|||什么 是 纠纷 和 日本 海底 天然气 领域 东海 ?|||NaN|||0-0 1-1 3-2 6-3 7-4 10-5 11-6 12-6 13-7 16-8 19-9
+</query>
+<query id="58" grammar="/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/en-ar.trec02/moses.grammar/grammar.57">Why did the Boxing Day Tsunami cause serious damage and deaths along the coasts of Indonesia, Sri Lanka, India, and Thailand?||||-13.3389;;;whi did the box day tsunami caus serious damag and death along the coast of indonesia , sri lanka , india , and thailand ?|||为什么 票房 天 死亡 的 海啸 造成 严重 损害 沿海 , 印度尼西亚 , 斯里兰卡 , 印度 和 泰国 ?|||NaN|||0-0 1-0 3-1 4-2 10-3 5-5 6-6 7-7 8-8 13-9 9-10 15-11 16-12 17-13 18-13 19-14 20-15 22-16 23-17 24-18
+</query>
+<query id="59" grammar="/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/en-ar.trec02/moses.grammar/grammar.58">What is the reason that 2003 invasion of Iraq was led by the US?||||-8.07242;;;what is the reason that 2003 invas of iraq was led by the us ?|||是 什么 原因 , 是 美国 入侵 伊拉克 率领 的 美国 ?|||NaN|||0-1 1-0 1-1 3-2 4-3 9-4 5-6 6-6 8-7 10-8 13-10 14-11
+</query>
+<query id="61" grammar="/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/en-ar.trec02/moses.grammar/grammar.60">Which company is Terry Guo (Tai-Ming Guo) president of?||||-34.8351;;;which compani is terri guo ( tai - ming guo ) presid of ?|||这 是 天立 郭 ( 戴 明 郭 ) ?|||NaN|||0-0 2-1 3-2 4-3 5-4 6-5 7-6 8-6 9-7 10-8 13-9
+</query>
+<query id="62" grammar="/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/en-ar.trec02/moses.grammar/grammar.61">Who was the President of the United States when Cheney served as Vice President?||||-8.14784;;;who was the presid of the unit state when cheney serv as vice presid ?|||谁 是 美国 总统 时 , 切尼 担任 副 总统 ?|||NaN|||0-0 1-1 3-3 6-2 7-2 8-4 9-6 10-7 11-7 12-8 13-9 14-10
+</query>
+<query id="63" grammar="/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/en-ar.trec02/moses.grammar/grammar.62">Who served as the Head of the PLO Negotiation Affairs Department, and Minister of Negotiations in Prime Minister Qureia's first cabinet?||||-262.09;;;who serv as the head of the plo negoti affair depart , and minist of negoti in prime minist qureia 's first cabinet ?|||担任 团长 , 巴勒斯坦 解放 组织 的 谈判 , 谈判 部长 's qureia 总理 第一 次 内阁 ?|||NaN|||1-0 4-1 6-2 7-3 7-4 7-5 8-7 11-8 15-9 13-10 20-11 19-12 17-13 18-13 21-14 21-15 22-16 23-17
+</query>
+<query id="64" grammar="/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/en-ar.trec02/moses.grammar/grammar.63">How was al-Zarqawi involved in the Japanese hostage incident in Iraq?||||-8.64087;;;how was al - zarqawi involv in the japanes hostag incid in iraq ?|||究竟 是 扎卡维 在 日本 人质 事件 , 伊拉克 ?|||NaN|||0-0 1-1 2-2 3-2 4-2 6-3 8-4 9-5 10-6 12-8 13-9
+</query>
+<query id="65" grammar="/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/en-ar.trec02/moses.grammar/grammar.64">Describe the relationship between Brazil and China, which have jointly launched an earth resources satellite.||||-8.59281;;;describ the relationship between brazil and china , which have joint launch an earth resourc satellit .|||巴西 的 关系 , 共同 发射 地球 资源 卫星 。|||NaN|||4-0 1-1 2-2 3-2 7-3 10-4 11-5 13-6 14-7 15-8 16-9
+</query>
+<query id="66" grammar="/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/en-ar.trec02/moses.grammar/grammar.65">What is the relationship between two Russian politicians, Kasianov and Putin?||||-131.453;;;what is the relationship between two russian politician , kasianov and putin ?|||什么样 的 关系 是 俄罗斯 政治家 , kasianov 和 普京 呢 ?|||NaN|||0-0 1-3 2-1 3-2 4-2 6-4 7-5 8-6 9-7 10-8 11-9 12-10 12-11
+</query>
+<query id="67" grammar="/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/en-ar.trec02/moses.grammar/grammar.66">What is the relationship between the UK and the euro?||||-5.87008;;;what is the relationship between the uk and the euro ?|||是 什么 关系 , 英国 和 欧元 ?|||NaN|||0-1 1-0 3-2 4-2 6-4 7-5 9-6 10-7
+</query>
+<query id="68" grammar="/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/en-ar.trec02/moses.grammar/grammar.67">When was the Kyoto Protocol enforced?||||-5.29833;;;when was the kyoto protocol enforc ?|||当 执法 的 京都 议定书 ?|||NaN|||0-0 5-1 2-2 3-3 4-4 6-5
+</query>
+<query id="69" grammar="/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/en-ar.trec02/moses.grammar/grammar.68">Who is Masatoshi Koshiba?||||-250.225;;;who is masatoshi koshiba ?|||谁 是 masatoshi koshiba ?|||NaN|||0-0 1-1 2-2 3-3 4-4
+</query>
+<query id="70" grammar="/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/en-ar.trec02/moses.grammar/grammar.69">Who is Koichi Tanaka?||||-105.023;;;who is koichi tanaka ?|||谁 是 koichi 田中 ?|||NaN|||0-0 1-1 2-2 3-3 4-4
+</query>
+<query id="71" grammar="/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/en-ar.trec02/moses.grammar/grammar.70">Who is Chen Shui-Bian?||||-3.17482;;;who is chen shui - bian ?|||而 陈水扁 呢 ?|||NaN|||0-0 2-1 3-1 4-1 5-1 6-2 6-3
+</query>
+<query id="72" grammar="/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/en-ar.trec02/moses.grammar/grammar.71">What are embryonic stem cells?||||-3.83784;;;what are embryon stem cell ?|||胚胎 干 细胞 是 什么 ?|||NaN|||2-0 3-1 4-2 0-4 1-3 5-5
+</query>
+<query id="73" grammar="/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/en-ar.trec02/moses.grammar/grammar.72">What is Hansen's disease?||||-128.068;;;what is hansen 's diseas ?|||汉森 's 是 什么 ?|||NaN|||2-0 3-1 0-3 1-2 5-4
+</query>
+<query id="74" grammar="/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/en-ar.trec02/moses.grammar/grammar.73">Where are Japan's Northern Territories located?||||-129.813;;;where are japan 's northern territori locat ?|||而 日本 的 北方 领土 's 定位 ?|||NaN|||1-0 2-1 4-3 5-4 3-5 6-6 7-7
+</query>
+<query id="75" grammar="/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/en-ar.trec02/moses.grammar/grammar.74">Which countries have borders in the Kashimir region?||||-129.597;;;which countri have border in the kashimir region ?|||这 个 边界 地区 的 kashimir ?|||NaN|||0-0 1-1 3-2 7-3 5-4 6-5 8-6
+</query>
+<query id="76" grammar="/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/en-ar.trec02/moses.grammar/grammar.75">Where is the Gaza Strip located?||||-4.74032;;;where is the gaza strip locat ?|||加沙 地带 地点 是 哪里 ?|||NaN|||3-0 3-1 4-0 5-2 1-3 0-4 6-5
+</query>
+<query id="77" grammar="/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/en-ar.trec02/moses.grammar/grammar.76">What was the BSE incident?||||-4.32702;;;what was the bse incid ?|||疯牛病 事件 是 什么 ?|||NaN|||3-0 4-1 0-3 1-2 5-4
+</query>
+<query id="78" grammar="/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/en-ar.trec02/moses.grammar/grammar.77">What are the characteristics of the largest earthquake that occurred off the coast of Sumatra, Indonesia?||||-10.3828;;;what are the characterist of the largest earthquak that occur off the coast of sumatra , indonesia ?|||什么 特点 的 大 地震 发生 在 印尼 苏门答腊 海岸 ?|||NaN|||0-0 1-0 3-1 6-3 7-4 9-5 11-6 16-7 14-8 12-9 17-10
+</query>
+<query id="80" grammar="/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/en-ar.trec02/moses.grammar/grammar.79">Describe the Iraq War, which started in March 2003 and was fought between regular military forces.||||-12.0316;;;describ the iraq war , which start in march 2003 and was fought between regular militari forc .|||把 伊拉克 战争 开始 在 3 年 , 是 定期 之间 的 军事 力量 。|||NaN|||0-0 2-1 3-2 6-3 7-4 8-5 9-6 10-7 11-8 14-9 13-10 15-12 16-13 17-14
+</query>
+<query id="82" grammar="/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/en-ar.trec02/moses.grammar/grammar.81">Why did Japan's dispatch of the Self-Defense Force to Iraq trigger a debate over amendment of the Japanese Constitution?||||-135.21;;;whi did japan 's dispatch of the self - defens forc to iraq trigger a debat over amend of the japanes constitut ?|||为什么 日本 's 派遣 自卫队 伊拉克 引发 争议 , 修改 日本 宪法 ?|||NaN|||0-0 1-0 2-1 3-2 4-3 7-4 8-4 9-4 10-4 12-5 13-6 14-6 15-7 17-9 20-10 21-11 22-12
+</query>
+<query id="83" grammar="/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/en-ar.trec02/moses.grammar/grammar.82">Why did the Argentine economic crisis occur?||||-4.45895;;;whi did the argentin econom crisi occur ?|||为什么 阿根廷 经济 危机 的 发生 ?|||NaN|||0-0 1-0 3-1 4-2 5-3 6-5 7-6
+</query>
+<query id="84" grammar="/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/en-ar.trec02/moses.grammar/grammar.83">Why did France vote against the EU Constitution?||||-5.79194;;;whi did franc vote against the eu constitut ?|||为什么 法国 对 欧盟 宪法 ?|||NaN|||0-0 1-0 2-1 4-2 6-3 7-4 8-5
+</query>
+<query id="85" grammar="/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/en-ar.trec02/moses.grammar/grammar.84">Why did oil prices rise sharply in 2004?||||-6.72534;;;whi did oil price rise sharpli in 2004 ?|||为什么 石油 价格 上涨 导致 年 ?|||NaN|||0-0 1-0 2-1 3-2 4-3 5-4 6-5 8-6
+</query>
+<query id="87" grammar="/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/en-ar.trec02/moses.grammar/grammar.86">What is the relationship between sleep and health?||||-5.49964;;;what is the relationship between sleep and health ?|||有 什么 关系 , 健康 ?|||NaN|||0-1 1-1 3-2 4-2 6-3 7-4 8-5
+</query>
+<query id="90" grammar="/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/en-ar.trec02/moses.grammar/grammar.89">What is the relationship between the Straits of Malacca and the Japanese people?||||-6.91894;;;what is the relationship between the strait of malacca and the japanes peopl ?|||有 什么 关系 马六甲 海峡 和 日本 人民 ?|||NaN|||0-1 1-1 3-2 4-2 8-3 8-4 9-5 11-6 12-7 13-8
+</query>
+<query id="91" grammar="/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/en-ar.trec02/moses.grammar/grammar.90">What links are there between Japan and the reconstruction of Iraq?||||-7.54641;;;what link are there between japan and the reconstruct of iraq ?|||有 什么 是 日本 与 伊拉克 的 重建 工作 ?|||NaN|||3-0 0-1 2-2 4-4 5-3 6-4 7-6 8-7 8-8 10-5 11-9
+</query>
+<query id="92" grammar="/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/en-ar.trec02/moses.grammar/grammar.91">What is the important issues of the Negotiation between India and Pakistan?||||-6.17057;;;what is the import issu of the negoti between india and pakistan ?|||什么 是 重要 的 问题 进行 谈判 , 印度 和 巴基斯坦 ?|||NaN|||0-0 1-1 3-2 4-4 7-6 9-8 10-9 11-10 12-11
+</query>
+<query id="93" grammar="/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/en-ar.trec02/moses.grammar/grammar.92">What is the contributions of Three Gorges Dam?||||-4.92809;;;what is the contribut of three gorg dam ?|||是 什么 贡献 , 三峡 大坝 ?|||NaN|||0-1 1-0 3-2 5-4 6-4 7-5 8-6
+</query>
+<query id="94" grammar="/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/en-ar.trec02/moses.grammar/grammar.93">Could you please give short descriptions to the Salt Lake Winter Olympic Games of 2002?||||-10.4761;;;could you pleas give short descript to the salt lake winter olymp game of 2002 ?|||稍后 请 您 描述 的 盐湖城 冬季 奥运会 2002 ?|||NaN|||4-0 2-1 1-2 5-3 7-4 8-5 9-5 10-6 11-7 12-7 14-8 15-9
+</query>
+<query id="95" grammar="/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/en-ar.trec02/moses.grammar/grammar.94">Why had SARS reports expanded rapidly from 2003?||||-8.3216;;;whi had sar report expand rapid from 2003 ?|||为什么 有 特区 报告 迅速 扩大 , 从 2003 ?|||NaN|||0-0 1-1 2-2 3-3 4-5 5-4 6-7 7-8 8-9
+</query>
+<query id="96" grammar="/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/en-ar.trec02/moses.grammar/grammar.95">Why is Iraq War a political tipping point to President Bush?||||-7.62878;;;whi is iraq war a polit tip point to presid bush ?|||为什么 是 伊拉克 战争 是 政治 冰山 指出 , 布什 总统 ?|||NaN|||0-0 1-1 2-2 3-3 4-4 5-5 6-6 7-7 9-10 10-9 11-11
+</query>
+<query id="97" grammar="/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/en-ar.trec02/moses.grammar/grammar.96">Why did China make a bid to host the 2008 Summer Olympics?||||-7.81756;;;whi did china make a bid to host the 2008 summer olymp ?|||为什么 中国 作出 申办 夏季 奥运会 ?|||NaN|||0-0 1-0 2-1 3-2 5-3 9-3 10-4 11-5 12-6
+</query>
+<query id="98" grammar="/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/en-ar.trec02/moses.grammar/grammar.97">Why did armed Chechens hold eight hundred hostages in Moscow theater in 2002?||||-11.1159;;;whi did arm chechen hold eight hundr hostag in moscow theater in 2002 ?|||为什么 车臣 武装 在 莫斯科 举行 的 八 名 人质 , 在 二○○二年 ?|||NaN|||0-0 1-0 3-1 2-2 8-3 9-4 4-5 5-7 6-8 7-9 11-11 12-12 13-13
+</query>
+<query id="99" grammar="/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/en-ar.trec02/moses.grammar/grammar.98">Why did China implement the Renminbi exchange rate reform in July 2005?||||-7.63996;;;whi did china implement the renminbi exchang rate reform in juli 2005 ?|||为什么 中国 实行 人民币 汇率 改革 二○○五年 七月 ?|||NaN|||0-0 1-0 2-1 3-2 5-3 6-4 7-4 8-5 11-6 10-7 12-8
+</query>
+<query id="100" grammar="/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/en-ar.trec02/moses.grammar/grammar.99">Why did U.S. troops occupy Baghdad?||||-5.07122;;;whi did u.s. troop occupi baghdad ?|||为什么 美国 部队 占领 巴格达 ?|||NaN|||0-0 1-0 2-1 3-2 4-3 5-4 6-5
+</query>
+</parameters>

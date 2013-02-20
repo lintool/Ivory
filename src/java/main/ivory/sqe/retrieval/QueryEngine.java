@@ -36,18 +36,19 @@ public class QueryEngine {
   private static final Logger LOG = Logger.getLogger(QueryEngine.class);
   private StructuredQueryRanker ranker;
   private Map<String, String> queries;
+  private Map<String, String> grammarPaths;
   private FileSystem fs;
   private Set<String> modelSet;
   private QueryGenerator generator;
   private DocnoMapping mapping;
   private String runName;
   private Map<String, Map<String, Accumulator[]>> allResults;
-  
+
   public QueryEngine() {
     allResults = Maps.newHashMap();
     modelSet = new HashSet<String>();
   }
-  
+
   public QueryEngine(Configuration conf, FileSystem fs) {
     allResults = Maps.newHashMap();
     modelSet = new HashSet<String>();
@@ -62,17 +63,20 @@ public class QueryEngine {
       }
       runName = Utils.getSetting(conf);
       modelSet.add(runName);
-      
+
       ranker = new StructuredQueryRanker(conf.get(Constants.IndexPath), fs, 1000);
       mapping = ranker.getDocnoMapping();
       queries = parseQueries(conf.get(Constants.QueriesPath), fs);
-      if (conf.get(Constants.QueryType).equals(Constants.CLIR)) {
-        generator = new ProbabilisticStructuredQueryGenerator();
-      }else if (conf.get(Constants.QueryType).equals(Constants.MTN)) {
-        generator = new MtNQueryGenerator();
-      }else {
-        generator = new BagOfWordsQueryGenerator();
-      }    
+      if (generator == null) {
+        if (conf.get(Constants.QueryType).equals(Constants.CLIR)) {
+          generator = new ProbabilisticStructuredQueryGenerator();
+        }else if (conf.get(Constants.QueryType).equals(Constants.MTN)) {
+          grammarPaths = parseGrammarPaths(conf.get(Constants.QueriesPath), fs);
+          generator = new MtNQueryGenerator();
+        }else {
+          generator = new BagOfWordsQueryGenerator();
+        }    
+      }
       generator.init(fs, conf);
 
     } catch (IOException e) {
@@ -83,7 +87,7 @@ public class QueryEngine {
       throw new RuntimeException(e);
     }
   }
-  
+
   private static Map<String, String> parseQueries(String qfile, FileSystem fs) throws ConfigurationException {
     Document d = null;
 
@@ -119,14 +123,52 @@ public class QueryEngine {
       }
       queries.put(qid, queryText);
     }
-   
+
     return queries;
+  }
+
+  private static Map<String, String> parseGrammarPaths(String qfile, FileSystem fs) throws ConfigurationException {
+    Document d = null;
+
+    try {
+      d = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(fs.open(new Path(qfile)));
+    } catch (SAXException e) {
+      throw new ConfigurationException(e.getMessage());
+    } catch (IOException e) {
+      throw new ConfigurationException(e.getMessage());
+    } catch (ParserConfigurationException e) {
+      throw new ConfigurationException(e.getMessage());
+    }
+
+    Map<String, String> grammarPaths = Maps.newLinkedHashMap();
+    NodeList queryNodes = d.getElementsByTagName("query");
+
+    LOG.info("Parsing "+queryNodes.getLength()+" nodes...");
+    for (int i = 0; i < queryNodes.getLength(); i++) {
+      // Get query XML node.
+      Node node = queryNodes.item(i);
+
+      // Get query id.
+      String qid = XMLTools.getAttributeValueOrThrowException(node, "id",
+      "Must specify a query id attribute for every query!");
+
+      String grammar = XMLTools.getAttributeValue(node, "grammar");
+
+      // Add query to internal map.
+      if (grammarPaths.get(qid) != null) {
+        throw new ConfigurationException(
+            "Duplicate query ids not allowed! Already parsed query with id=" + qid);
+      }
+      grammarPaths.put(qid, grammar);
+    }
+
+    return grammarPaths;
   }
 
   public Map<String, Map<String, Accumulator[]>> getAllResults() {   
     return allResults;
   }
-  
+
   private void printResults(String queryID, String runName, StructuredQueryRanker ranker, ResultWriter resultWriter) throws IOException {
     // Get the ranked list for this query.
     Accumulator[] list = ranker.getResults(queryID);
@@ -145,7 +187,7 @@ public class QueryEngine {
 
   public void runQueries(Configuration conf) {
     runName = Utils.getSetting(conf);
-    
+
     try {
       LOG.info("Parsed "+queries.size()+" queries");
 
@@ -154,8 +196,13 @@ public class QueryEngine {
       for ( String qid : queries.keySet()) {
         String query = queries.get(qid);
 
+        String grammarPath = grammarPaths.get(qid);
+        if (grammarPath != null) {
+          conf.set(Constants.GrammarPath, grammarPath);
+        }
+
         long start = System.currentTimeMillis();
-        StructuredQuery structuredQuery = generator.parseQuery(query);
+        StructuredQuery structuredQuery = generator.parseQuery(query, fs, conf);
         long end = System.currentTimeMillis();
         LOG.info("Generating " + qid + ": " + ( end - start) + "ms");
         generateTime += ( end - start ) ;
@@ -167,7 +214,7 @@ public class QueryEngine {
         LOG.info("Ranking " + qid + ": " + ( end - start) + "ms");
         rankTime += ( end - start ) ;
         printResults(qid, runName, ranker, resultWriter);
-        
+
         // save allResults
         allResults.put(runName, getResults());
       }   
@@ -185,7 +232,7 @@ public class QueryEngine {
   public DocnoMapping getDocnoMapping() {
     return mapping;
   }
-  
+
   public Set<String> getModels() {
     return modelSet;
   }
