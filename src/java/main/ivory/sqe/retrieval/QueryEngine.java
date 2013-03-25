@@ -58,10 +58,11 @@ public class QueryEngine {
   public void init(Configuration conf, FileSystem fs){
     try {
       this.fs = fs;
-      if (conf.getBoolean(Constants.Quiet, false)) {
-        LOG.setLevel(Level.OFF);
-      }
+//      if (conf.getBoolean(Constants.Quiet, false)) {
+//        LOG.setLevel(Level.OFF);
+//      }
       runName = Utils.getSetting(conf);
+      LOG.info("Running " + runName);
       modelSet.add(runName);
 
       ranker = new StructuredQueryRanker(conf.get(Constants.IndexPath), fs, 1000);

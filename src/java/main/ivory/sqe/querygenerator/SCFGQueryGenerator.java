@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.util.Map;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -39,6 +40,10 @@ public class SCFGQueryGenerator implements QueryGenerator {
 
   @Override
   public void init(FileSystem fs, Configuration conf) throws IOException {
+    if (conf.getBoolean(Constants.Quiet, false)) {
+      LOG.setLevel(Level.OFF);
+    }
+    
     LOG.info(conf.get(Constants.DocLanguage));
     LOG.info(conf.get(Constants.DocTokenizerData));
     LOG.info(conf.get(Constants.MinWindow));
@@ -74,9 +79,6 @@ public class SCFGQueryGenerator implements QueryGenerator {
     queryLangTokenizer = TokenizerFactory.createTokenizer(fs, conf, queryLang, conf.get(Constants.QueryTokenizerData), false, null, null, null);
     queryLangTokenizerWithStemming = TokenizerFactory.createTokenizer(fs, conf, queryLang, conf.get(Constants.QueryTokenizerData), true, null, conf.get(Constants.StemmedStopwordListQ), null);
     docLangTokenizer = TokenizerFactory.createTokenizer(fs, conf, docLang, conf.get(Constants.DocTokenizerData), true, null, conf.get(Constants.StemmedStopwordListD), null);
-
-    // read original queries from file
-//    originalQueries = Utils.readOriginalQueries(fs, conf.get(Constants.OriginalQueriesPath));
   }
 
   @Override

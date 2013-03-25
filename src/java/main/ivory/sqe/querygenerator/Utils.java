@@ -19,6 +19,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonPrimitive;
@@ -184,6 +185,9 @@ public class Utils {
    *    to check for stopwords on RHS
    */
   public static Map<String, HMapSFW> generateTranslationTable(FileSystem fs, Configuration conf, String grammarFile, Tokenizer queryLangTokenizer, Tokenizer docLangTokenizer) {
+    if (conf.getBoolean(Constants.Quiet, false)) {
+      LOG.setLevel(Level.OFF);
+    }
     LOG.info("Generating translation table from " + grammarFile);
 
     boolean isPhrase = conf.getInt(Constants.MaxWindow, 0) > 0;
@@ -584,8 +588,9 @@ public class Utils {
   public static String getSetting(Configuration conf) {
     return conf.get(Constants.RunName) + "_" + conf.getInt(Constants.KBest, 0) + 
     "-" + (int)(100*conf.getFloat(Constants.MTWeight, 0)) + 
-    "-" + (int) (100*conf.getFloat(Constants.BitextWeight, 0))+ 
-    "-" + (int) (100*conf.getFloat(Constants.TokenWeight, 0));
+    "-" + (int) (100*conf.getFloat(Constants.BitextWeight, 0) )+ 
+    "-" + (int) (100*conf.getFloat(Constants.TokenWeight, 0)) +
+    "_" + conf.getInt(Constants.One2Many, -1);
   }
 
   public static JsonArray createJsonArray(String[] elements) {
