@@ -34,13 +34,13 @@ Preparing document vectors
 --------------------------
 As the first step, you need to pack documents into one of the various document vector data structures located in the package `ivory.ffg.data`.
 
-	java -cp 'lib/*:dist/ivory-private-0.0.1.jar' ivory.ffg.preprocessing.GenerateDocumentVectors \
+	java -cp 'lib/*:dist/ivory.jar' ivory.ffg.preprocessing.GenerateDocumentVectors \
 	-index <index-root-path> -dvclass <DocumentVector-class> -judgment <tab-delimited-document-path> \
 	-output <output-path>
 
 To Prepare a positional inverted index, you need to run the following command:
 
-	java -cp 'lib/*:dist/ivory-private-0.0.1.jar' ivory.ffg.preprocessing.GenerateCompressedPositionalPostings \
+	java -cp 'lib/*:dist/ivory.jar' ivory.ffg.preprocessing.GenerateCompressedPositionalPostings \
 	-index <index-root-path> -query <query-path> -spam <spam-percentile-scores> -output <output-path>
 
 
@@ -48,13 +48,13 @@ Extracting features
 -------------------
 Given a feature file, a set of queries and a set of tab-delimited documents, you can run the feature extractors using any of the drivers provided in the `ivory.ffg.driver` package. For example, to run the feature extractor using the on-the-fly indexing, use the following command:
 
-	java -cp 'lib/*:dist/ivory-private-0.0.1.jar' ivory.ffg.driver.DocumentVectorOnTheFlyIndexing \
+	java -cp 'lib/*:dist/ivory.jar' ivory.ffg.driver.DocumentVectorOnTheFlyIndexing \
 	-index <index-path> -dvclass ivory.ffg.data.DocumentVectorHashedArray -document <document-vector-path> \
 	-query <query-path> -judgment <tab-delimited-document-path> -feature <feature-path>
 
 Or use the following to retrieve candidates using SmallAdaptive and extract their features:
 
-	java -cp 'lib/*:dist/ivory-private-0.0.1.jar' ivory.ffg.driver.RankAndFeaturesSmallAdaptive \
+	java -cp 'lib/*:dist/ivory.jar' ivory.ffg.driver.RankAndFeaturesSmallAdaptive \
 	-index <index-root-path> -posting <compressedPositionalPostings-root-path> \
 	-query <query-path> -judgment <tab-delimited-document-path> -feature <feature-path> [-hits <hits>]
 
