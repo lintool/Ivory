@@ -51,14 +51,16 @@ Given a feature file, a set of queries and a set of tab-delimited documents, you
 	java -cp 'lib/*:dist/ivory.jar' ivory.ffg.driver.DocumentVectorOnTheFlyIndexing \
 	-index <index-path> -dvclass ivory.ffg.data.DocumentVectorHashedArray -document <document-vector-path> \
 	-query <query-path> -judgment <tab-delimited-document-path> -feature <feature-path>
+	[-output <output-path>]
 
 Or use the following to retrieve candidates using SmallAdaptive and extract their features:
 
 	java -cp 'lib/*:dist/ivory.jar' ivory.ffg.driver.RankAndFeaturesSmallAdaptive \
 	-index <index-root-path> -posting <compressedPositionalPostings-root-path> \
 	-query <query-path> -judgment <tab-delimited-document-path> -feature <feature-path> [-hits <hits>]
+	[-spam <spam-percentile-scores> -output <output-path>]
 
-The default value of `hits` is 10,000 documents.
+The default value of `hits` is 10,000 documents. The output file will contain feature values for each document (one per line in the following format: "qid \t document number \t space-delimited-feature-values.")
 
 Adding new DocumentVector classes
 ---------------------------------
