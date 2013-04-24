@@ -6,6 +6,7 @@ import java.util.Map;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.FSDataInputStream;
+import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
 
@@ -17,6 +18,7 @@ import ivory.bloomir.util.OptionManager;
 import ivory.bloomir.util.QueryUtility;
 import ivory.bloomir.util.DocumentUtility;
 import ivory.core.RetrievalEnvironment;
+import ivory.core.data.stat.SpamPercentileScore;
 import ivory.ffg.data.CompressedPositionalPostings;
 import ivory.ffg.feature.Feature;
 import ivory.ffg.stats.GlobalStats;
@@ -137,7 +139,9 @@ public class RankAndFeaturesSmallAdaptive {
     }
   }
 
-  public float[][] extract(int[] query, int hits,Feature[] features) throws IOException {
+  public float[][] extract(int[] query, int hits,Feature[] features,
+                           int qid, boolean writeOutput, int[] docidLookup,
+                           FSDataOutputStream output) throws IOException {
     float[][] fvalues = new float[hits][features.length];
     int[][] pos = new int[query.length][];
 
@@ -164,6 +168,14 @@ public class RankAndFeaturesSmallAdaptive {
           for(int fid = 0; fid < features.length; fid++) {
             fvalues[cnt][fid] = features[fid].computeScoreWithMiniIndexes(pos, query, dl, stats);
           }
+          if(writeOutput) {
+            output.write((qid + "\t" + docidLookup[docno] + "\t").getBytes());
+            for(int fid = 0; fid < fvalues[cnt].length; fid++) {
+              output.write((fvalues[cnt][fid] + " ").getBytes());
+            }
+            output.write(("\n").getBytes());
+          }
+
           cnt++;
           if(cnt >= hits) {
             ps.close();
@@ -205,10 +217,16 @@ public class RankAndFeaturesSmallAdaptive {
         found++;
         pos[index] = postings.get(query[index]).decompressPositions(r[2]);
         if(found == query.length) {
-          //          results[cnt] = value;
           int dl = docLengths.get(value);
           for(int fid = 0; fid < features.length; fid++) {
             fvalues[cnt][fid] = features[fid].computeScoreWithMiniIndexes(pos, query, dl, stats);
+          }
+          if(writeOutput) {
+            output.write((qid + "\t" + docidLookup[value] + "\t").getBytes());
+            for(int fid = 0; fid < fvalues[cnt].length; fid++) {
+              output.write((fvalues[cnt][fid] + " ").getBytes());
+            }
+            output.write(("\n").getBytes());
           }
           cnt++;
           if(cnt >= hits) {
@@ -253,6 +271,9 @@ public class RankAndFeaturesSmallAdaptive {
     options.addOption(OptionManager.JUDGMENT_PATH, "path", "Tab-Delimited judgments", true);
     options.addOption(OptionManager.FEATURE_PATH, "path", "XML features", true);
     options.addOption(OptionManager.HITS, "integer", "number of hits (default: 10,000)", false);
+    options.addOption(OptionManager.SPAM_PATH, "path", "spam percentile score", false);
+    options.addOption(OptionManager.OUTPUT_PATH, "", "Print feature values", false);
+    options.addDependency(OptionManager.OUTPUT_PATH, OptionManager.SPAM_PATH);
 
     try {
       options.parse(args);
@@ -265,6 +286,7 @@ public class RankAndFeaturesSmallAdaptive {
     String queryPath = options.getOptionValue(OptionManager.QUERY_PATH);
     String qrelPath = options.getOptionValue(OptionManager.JUDGMENT_PATH);
     String featurePath = options.getOptionValue(OptionManager.FEATURE_PATH);
+    boolean writeOutput = options.foundOption(OptionManager.OUTPUT_PATH);
     int hits = 10000;
     if(options.foundOption(OptionManager.HITS)) {
       hits = Integer.parseInt(options.getOptionValue(OptionManager.HITS));
@@ -292,6 +314,16 @@ public class RankAndFeaturesSmallAdaptive {
     generator.prepareStats(idfs, cfs);
     generator.preparePostings(postingsPath);
 
+    int[] newDocidsLookup = null;
+    FSDataOutputStream output = null;
+    if(writeOutput) {
+      final SpamPercentileScore spamScores = new SpamPercentileScore();
+      spamScores.initialize(options.getOptionValue(OptionManager.SPAM_PATH), fs);
+      newDocidsLookup = DocumentUtility.reverseLookupSpamSortedDocids(DocumentUtility.spamSortDocids(spamScores));
+
+      output = fs.create(new Path(options.getOptionValue(OptionManager.OUTPUT_PATH)));
+    }
+
     System.gc();
     Thread.currentThread().sleep(20000);
     long cnt = 0;
@@ -303,7 +335,8 @@ public class RankAndFeaturesSmallAdaptive {
       }
 
       long start = System.nanoTime();
-      float[][] fvalues = generator.extract(qterms, hits, features);
+      float[][] fvalues = generator.extract(qterms, hits, features,
+                                            qid, writeOutput, newDocidsLookup, output);
       long end = System.nanoTime();
       System.out.println((end - start));
 
@@ -311,6 +344,10 @@ public class RankAndFeaturesSmallAdaptive {
         System.gc();
         Thread.currentThread().sleep(5000);
       }
+    }
+
+    if(writeOutput) {
+      output.close();
     }
   }
 }

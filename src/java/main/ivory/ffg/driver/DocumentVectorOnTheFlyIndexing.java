@@ -5,6 +5,7 @@ import java.util.Map;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.FSDataInputStream;
+import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
 
@@ -81,6 +82,7 @@ public class DocumentVectorOnTheFlyIndexing {
     options.addOption(OptionManager.QUERY_PATH, "path", "XML query", true);
     options.addOption(OptionManager.JUDGMENT_PATH, "path", "Tab-Delimited judgments", true);
     options.addOption(OptionManager.FEATURE_PATH, "path", "XML features", true);
+    options.addOption(OptionManager.OUTPUT_PATH, "", "Print feature values", false);
 
     try {
       options.parse(args);
@@ -94,6 +96,7 @@ public class DocumentVectorOnTheFlyIndexing {
     String queryPath = options.getOptionValue(OptionManager.QUERY_PATH);
     String qrelPath = options.getOptionValue(OptionManager.JUDGMENT_PATH);
     String featurePath = options.getOptionValue(OptionManager.FEATURE_PATH);
+    boolean writeOutput = options.foundOption(OptionManager.OUTPUT_PATH);
 
     FileSystem fs = FileSystem.get(new Configuration());
     RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fs);
@@ -118,6 +121,11 @@ public class DocumentVectorOnTheFlyIndexing {
     generator.prepareStats(idfs, cfs);
     generator.prepareDocuments(documentVectorClass, documentsPath);
 
+    FSDataOutputStream output = null;
+    if(writeOutput) {
+      output = fs.create(new Path(options.getOptionValue(OptionManager.OUTPUT_PATH)));
+    }
+
     System.gc();
     Thread.currentThread().sleep(20000);
     long cnt = 0;
@@ -134,10 +142,24 @@ public class DocumentVectorOnTheFlyIndexing {
       long end = System.nanoTime();
       System.out.println((end - start));
 
+      if(writeOutput) {
+        for(int i = 0; i < qrels.get(qid).length; i++) {
+          output.write((qid + "\t" + qrels.get(qid)[i] + "\t").getBytes());
+          for(int j = 0; j < fvalues[i].length; j++) {
+            output.write((fvalues[i][j] + " ").getBytes());
+          }
+          output.write(("\n").getBytes());
+        }
+      }
+
       if(++cnt % 50 == 0) {
         System.gc();
         Thread.currentThread().sleep(5000);
       }
+    }
+
+    if(writeOutput) {
+      output.close();
     }
   }
 }
