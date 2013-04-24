@@ -1,0 +1,73 @@
+<parameters>
+  <feature id="feat-lm-term"
+           featureClass="ivory.ffg.feature.TermFeature"
+           scoringFunctionClass="ivory.ffg.score.DirichletScoringFunction" mu="1000.0" />
+
+  <feature id="feat-lm-ordered-sd-1"
+           featureClass="ivory.ffg.feature.OrderedWindowSequentialDependenceFeature" width="1"
+           scoringFunctionClass="ivory.ffg.score.DirichletScoringFunction" mu="750.0" />
+  <feature id="feat-lm-ordered-sd-2"
+           featureClass="ivory.ffg.feature.OrderedWindowSequentialDependenceFeature" width="2"
+           scoringFunctionClass="ivory.ffg.score.DirichletScoringFunction" mu="750.0" />
+  <feature id="feat-lm-ordered-sd-4"
+           featureClass="ivory.ffg.feature.OrderedWindowSequentialDependenceFeature" width="4"
+           scoringFunctionClass="ivory.ffg.score.DirichletScoringFunction" mu="750.0" />
+  <feature id="feat-lm-ordered-sd-8"
+           featureClass="ivory.ffg.feature.OrderedWindowSequentialDependenceFeature" width="8"
+           scoringFunctionClass="ivory.ffg.score.DirichletScoringFunction" mu="750.0" />
+  <feature id="feat-lm-ordered-sd-16"
+           featureClass="ivory.ffg.feature.OrderedWindowSequentialDependenceFeature" width="16"
+           scoringFunctionClass="ivory.ffg.score.DirichletScoringFunction" mu="750.0" />
+
+  <feature id="feat-lm-unordered-sd-1"
+           featureClass="ivory.ffg.feature.UnorderedWindowSequentialDependenceFeature" width="1"
+           scoringFunctionClass="ivory.ffg.score.DirichletScoringFunction" mu="750.0" />
+  <feature id="feat-lm-unordered-sd-2"
+           featureClass="ivory.ffg.feature.UnorderedWindowSequentialDependenceFeature" width="2"
+           scoringFunctionClass="ivory.ffg.score.DirichletScoringFunction" mu="750.0" />
+  <feature id="feat-lm-unordered-sd-4"
+           featureClass="ivory.ffg.feature.UnorderedWindowSequentialDependenceFeature" width="4"
+           scoringFunctionClass="ivory.ffg.score.DirichletScoringFunction" mu="750.0" />
+  <feature id="feat-lm-unordered-sd-8"
+           featureClass="ivory.ffg.feature.UnorderedWindowSequentialDependenceFeature" width="8"
+           scoringFunctionClass="ivory.ffg.score.DirichletScoringFunction" mu="750.0" />
+  <feature id="feat-lm-unordered-sd-16"
+           featureClass="ivory.ffg.feature.UnorderedWindowSequentialDependenceFeature" width="16"
+           scoringFunctionClass="ivory.ffg.score.DirichletScoringFunction" mu="750.0" />
+
+  <feature id="feat-bm25-term"
+           featureClass="ivory.ffg.feature.TermFeature"
+           scoringFunctionClass="ivory.ffg.score.BM25ScoringFunction" k1="0.5" b="0.3" />
+
+  <feature id="feat-bm25-ordered-sd-1"
+           featureClass="ivory.ffg.feature.OrderedWindowSequentialDependenceFeature" width="1"
+           scoringFunctionClass="ivory.ffg.score.BM25ScoringFunction" k1="0.25" b="0.0" />
+  <feature id="feat-bm25-ordered-sd-2"
+           featureClass="ivory.ffg.feature.OrderedWindowSequentialDependenceFeature" width="2"
+           scoringFunctionClass="ivory.ffg.score.BM25ScoringFunction" k1="0.25" b="0.0" />
+  <feature id="feat-bm25-ordered-sd-4"
+           featureClass="ivory.ffg.feature.OrderedWindowSequentialDependenceFeature" width="4"
+           scoringFunctionClass="ivory.ffg.score.BM25ScoringFunction" k1="0.25" b="0.0" />
+  <feature id="feat-bm25-ordered-sd-8"
+           featureClass="ivory.ffg.feature.OrderedWindowSequentialDependenceFeature" width="8"
+           scoringFunctionClass="ivory.ffg.score.BM25ScoringFunction" k1="0.25" b="0.0" />
+  <feature id="feat-bm25-ordered-sd-16"
+           featureClass="ivory.ffg.feature.OrderedWindowSequentialDependenceFeature" width="16"
+           scoringFunctionClass="ivory.ffg.score.BM25ScoringFunction" k1="0.25" b="0.0" />
+
+  <feature id="feat-bm25-unordered-sd-1"
+           featureClass="ivory.ffg.feature.UnorderedWindowSequentialDependenceFeature" width="1"
+           scoringFunctionClass="ivory.ffg.score.BM25ScoringFunction" k1="0.25" b="0.0" />
+  <feature id="feat-bm25-unordered-sd-2"
+           featureClass="ivory.ffg.feature.UnorderedWindowSequentialDependenceFeature" width="2"
+           scoringFunctionClass="ivory.ffg.score.BM25ScoringFunction" k1="0.25" b="0.0" />
+  <feature id="feat-bm25-unordered-sd-4"
+           featureClass="ivory.ffg.feature.UnorderedWindowSequentialDependenceFeature" width="4"
+           scoringFunctionClass="ivory.ffg.score.BM25ScoringFunction" k1="0.25" b="0.0" />
+  <feature id="feat-bm25-unordered-sd-8"
+           featureClass="ivory.ffg.feature.UnorderedWindowSequentialDependenceFeature" width="8"
+           scoringFunctionClass="ivory.ffg.score.BM25ScoringFunction" k1="0.25" b="0.0" />
+  <feature id="feat-bm25-unordered-sd-16"
+           featureClass="ivory.ffg.feature.UnorderedWindowSequentialDependenceFeature" width="16"
+           scoringFunctionClass="ivory.ffg.score.BM25ScoringFunction" k1="0.25" b="0.0" />
+</parameters>
