@@ -10,7 +10,7 @@ import org.apache.hadoop.io.WritableUtils;
 
 public class DictionaryTransformationStrategy {
   public static TransformationStrategy<CharSequence> getStrategy() {
-    return TransformationStrategies.prefixFreeIso();
+    return TransformationStrategies.prefixFreeUtf16();
   }
 
   public static class WritableComparator extends org.apache.hadoop.io.WritableComparator {
