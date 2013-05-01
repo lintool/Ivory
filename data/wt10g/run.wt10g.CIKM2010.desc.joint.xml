@@ -2,7 +2,7 @@
 
      <!-- Note: query-independent features are ordered by their contributions to effectiveness for Joint model -->
 
-     <index>/scratch0/indexes/wt10g</index>
+     <index>/scratch0/indexes/adhoc/wt10g</index>
 
      <!-- Concept importance model definition -->
      <importancemodel id="wsd" type="ivory.smrf.model.importance.LinearImportanceModel">

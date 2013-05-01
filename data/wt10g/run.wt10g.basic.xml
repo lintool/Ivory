@@ -1,6 +1,6 @@
 <parameters>
 
-     <index>/scratch0/indexes/wt10g</index>
+     <index>/scratch0/indexes/adhoc/wt10g</index>
 
      <!-- Dirichlet, full independence -->
      <model id="wt10g-dir-base" type="Feature" output="ranking.wt10g-dir-base.txt" hits="1000">
