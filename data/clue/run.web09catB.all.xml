@@ -1,6 +1,6 @@
 <parameters>
 
-     <index>/scratch0/indexes/clue.en.01</index>
+     <index>/scratch0/indexes/adhoc/clue.en.01</index>
 
      <model id="ql-base" type="Feature" output="ranking.web09catB.all.ql.base.txt" hits="1000">
          <feature id="termWt" weight="1.0" 
