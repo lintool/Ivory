@@ -22,12 +22,12 @@ import ivory.bloomir.ranker.BloomRanker;
 import ivory.bloomir.ranker.SmallAdaptiveRanker;
 
 public class RelativeRecallUtil {
-  private static final String IVORY_INDEX_PATH = "/scratch0/indexes/clue.en.01.nopos/";
+  private static final String IVORY_INDEX_PATH = "/scratch0/indexes/adhoc/clue.en.01.nopos/";
 
   // Index paths used in CIKM experiments
-  private static final String SPAM_PATH = "/scratch0/indexes/CIKM2012/docscores-spam.dat.en.01";
-  private static final String CIKM_STANDARD_INDEX = "/scratch0/indexes/CIKM2012/indexes/standard/";
-  private static final String CIKM_BLOOM_INDEX_BASE_PATH = "/scratch0/indexes/CIKM2012/indexes/bloom-";
+  private static final String SPAM_PATH = "/scratch0/indexes/adhoc/CIKM2012/docscores-spam.dat.en.01";
+  private static final String CIKM_STANDARD_INDEX = "/scratch0/indexes/adhoc/CIKM2012/standard/";
+  private static final String CIKM_BLOOM_INDEX_BASE_PATH = "/scratch0/indexes/adhoc/CIKM2012/bloom-";
   private static final String CIKM_QUERIES = "data/clue/queries.web09.xml";
   private static final String CIKM_QRELS = "data/clue/qrels.web09catB.txt";
 
