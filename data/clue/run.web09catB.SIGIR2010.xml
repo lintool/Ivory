@@ -1,6 +1,5 @@
 <parameters>
-
-     <index>/scratch0/indexes/clue.en.01</index>
+     <index>/scratch0/indexes/adhoc/clue.en.01</index>
 
      <!-- Dirichlet, full independence -->
      <model id="clue-ql" type="Feature" output="ranking.sigir2010-web09catB-ql.txt" hits="1000">

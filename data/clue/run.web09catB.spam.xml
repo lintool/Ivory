@@ -1,8 +1,8 @@
 <parameters>
 
-     <index>/scratch0/indexes/clue.en.01</index>
+     <index>/scratch0/indexes/adhoc/clue.en.01</index>
 
-     <docscore type="spam" provider="ivory.data.SpamPercentileScore">/scratch0/indexes/clue.en.01/docscores-spam.dat</docscore>
+     <docscore type="spam" provider="ivory.data.SpamPercentileScore">/scratch0/indexes/clue.en.01/adhoc/docscores-spam.dat</docscore>
 
      <model id="web09catB-ql-waterloo-spam-0.3" type="Feature" output="ranking.web09catB-ql-waterloo-spam.0.3.txt" hits="1000">
          <feature id="termWt" weight="1.0" 

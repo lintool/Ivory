@@ -2,7 +2,7 @@
 
      <!-- Note: query-independent features are ordered by their contributions to effectiveness for Joint model -->
 
-     <index>/scratch0/indexes/clue.en.01</index>
+     <index>/scratch0/indexes/adhoc/clue.en.01</index>
 
      <importancemodel id="wsd" type="ivory.smrf.model.importance.LinearImportanceModel">
          <feature id="collection_freq" weight="0.00099009900990099" file="data/clue/stats.clue.cf.collection.desc.txt.norm" default="0.0"/>
