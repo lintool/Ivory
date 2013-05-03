@@ -1,6 +1,5 @@
 <parameters>
-
-  <index>/scratch0/indexes/wt10g</index>
+  <index>/scratch0/indexes/adhoc/wt10g</index>
 
   <!-- Concept importance model for feature prune -->
   <importancemodel id="wsd_featureprune" type="ivory.smrf.model.importance.LinearImportanceModel">

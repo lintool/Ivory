@@ -1,6 +1,6 @@
 <parameters>
 
-     <index>/scratch0/indexes/trec.nopos</index>
+     <index>/scratch0/indexes/adhoc/trec.nopos</index>
 
      <!-- Dirichlet, full independence -->
      <model id="robust04-dir-base" type="Feature" output="ranking.robust04-dir-base.txt" hits="1000">

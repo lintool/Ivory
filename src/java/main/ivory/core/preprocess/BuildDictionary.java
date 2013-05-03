@@ -183,7 +183,7 @@ public class BuildDictionary extends PowerTool {
 
       ShiftAddXorSignedStringMap dict = new ShiftAddXorSignedStringMap(termList.iterator(),
           new TwoStepsLcpMonotoneMinimalPerfectHashFunction<CharSequence>(termList,
-              new DictionaryTransformationStrategy(true)));
+              DictionaryTransformationStrategy.getStrategy()));
 
       bytesOut = new ByteArrayOutputStream();
       objOut = new ObjectOutputStream(bytesOut);
