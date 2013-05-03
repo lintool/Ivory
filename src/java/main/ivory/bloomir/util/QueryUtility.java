@@ -1,27 +1,24 @@
 package ivory.bloomir.util;
 
-import java.io.InputStream;
-import java.io.IOException;
+import ivory.core.RetrievalEnvironment;
+
 import java.io.File;
-import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
-import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
-import com.google.common.io.InputSupplier;
-import com.google.common.io.Files;
-
-import org.xml.sax.SAXException;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
-import ivory.core.RetrievalEnvironment;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
+import com.google.common.io.Files;
+import com.google.common.io.InputSupplier;
 
 import edu.umd.cloud9.util.map.HMapIF;
 import edu.umd.cloud9.util.map.HMapIV;
@@ -36,7 +33,6 @@ public class QueryUtility {
    * Loads and tokenizes a set of queries.
    *
    * @param queryPath Path to the file containing the queries
-   * @param tokenizer Tokenizer to be used to parse the query text
    * @return Map of query id to an array of strings (i.e., the tokens
    * of the original query)
    */

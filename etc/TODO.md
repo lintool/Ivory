@@ -2,7 +2,6 @@ Ivory TODO List
 ===============
 
 + multi-partition retrieval
-+ upgrade new jars for `dsiutils`
 + refactor Cloud9 code to repack ClueWeb
 + open source IRJ code
 
