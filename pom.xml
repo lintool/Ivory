@@ -12,7 +12,7 @@
   <artifactId>ivory</artifactId>
   <packaging>jar</packaging>
   <name>Ivory</name>
-  <version>0.9.1</version>
+  <version>0.10.0</version>
   <description>A Hadoop toolkit for web-scale information retrieval research</description>
   <url>http://ivory.cc</url>
   <licenses>
@@ -36,63 +36,9 @@
   </developers>
   <dependencies>
     <dependency>
-      <groupId>org.apache.hadoop</groupId>
-      <artifactId>hadoop-common</artifactId>
-      <version>2.0.0-cdh4.1.2</version>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.hadoop</groupId>
-      <artifactId>hadoop-yarn-api</artifactId>
-      <version>2.0.0-cdh4.1.2</version>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.hadoop</groupId>
-      <artifactId>hadoop-yarn-common</artifactId>
-      <version>2.0.0-cdh4.1.2</version>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.hadoop</groupId>
-      <artifactId>hadoop-yarn-server-common</artifactId>
-      <version>2.0.0-cdh4.1.2</version>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.hadoop</groupId>
-      <artifactId>hadoop-yarn-server-nodemanager</artifactId>
-      <version>2.0.0-cdh4.1.2</version>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.hadoop</groupId>
-      <artifactId>hadoop-yarn-server-resourcemanager</artifactId>
-      <version>2.0.0-cdh4.1.2</version>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.hadoop</groupId>
-      <artifactId>hadoop-hdfs</artifactId>
-      <version>2.0.0-cdh4.1.2</version>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.hadoop</groupId>
-      <artifactId>hadoop-mapreduce-client-core</artifactId>
-      <version>2.0.0-cdh4.1.2</version>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.pig</groupId>
-      <artifactId>pig</artifactId>
-      <version>0.10.0</version>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
       <groupId>edu.umd</groupId>
       <artifactId>cloud9</artifactId>
-      <version>1.4.6</version>
+      <version>1.4.14</version>
       <optional>true</optional>
     </dependency>
     <dependency>
