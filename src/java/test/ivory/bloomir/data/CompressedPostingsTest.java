@@ -1,5 +1,7 @@
 package ivory.bloomir.data;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
@@ -9,8 +11,6 @@ import junit.framework.JUnit4TestAdapter;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class CompressedPostingsTest {
   private static final int[] smallDataset = new int[]{
@@ -24,7 +24,8 @@ public class CompressedPostingsTest {
     }
   }
 
-  @Test public void testSmallDataset() throws Exception {
+  @Test 
+  public void testSmallDataset() throws Exception {
     CompressedPostings postings = CompressedPostings.newInstance(smallDataset);
 
     assertEquals(postings.getBlockCount(),
@@ -37,7 +38,7 @@ public class CompressedPostingsTest {
     int size = postings.decompressBlock(decomp, 0);
     assertEquals(size, smallDataset.length);
     int docid = 0;
-    for(int i = 0; i < size; i++) {
+    for (int i = 0; i < size; i++) {
       docid += decomp[i];
       assertEquals(docid, smallDataset[i]);
       assertEquals(postings.getBlockNumber(i), 0);
@@ -45,21 +46,22 @@ public class CompressedPostingsTest {
     }
   }
 
-  @Test public void testLargeDataset() throws Exception {
+  @Test
+  public void testLargeDataset() throws Exception {
     CompressedPostings postings = CompressedPostings.newInstance(largeDataset);
 
     assertEquals(postings.getBlockCount(),
-                 (int) Math.ceil(((float) largeDataset.length) / CompressedPostings.getBlockSize()));
+        (int) Math.ceil(((float) largeDataset.length) / CompressedPostings.getBlockSize()));
     assertEquals(postings.getBlockStartIndex(0), 0);
     assertEquals(postings.getBlockStartIndex(1), CompressedPostings.getBlockSize());
     assertEquals(postings.isFirstElementInBlock(CompressedPostings.getBlockSize()), true);
     assertEquals(postings.isFirstElementInBlock(CompressedPostings.getBlockSize() + 1), false);
 
     int[] decomp = new int[CompressedPostings.getBlockSize()];
-    for(int i = 0; i < postings.getBlockCount(); i++) {
+    for (int i = 0; i < postings.getBlockCount(); i++) {
       int size = postings.decompressBlock(decomp, i);
       int docid = 0;
-      for(int j = 0; j < size; j++) {
+      for (int j = 0; j < size; j++) {
         docid += decomp[j];
         assertEquals(docid, largeDataset[i * CompressedPostings.getBlockSize() + j]);
         assertEquals(postings.getBlockNumber(i * CompressedPostings.getBlockSize() + j), i);
@@ -68,7 +70,8 @@ public class CompressedPostingsTest {
     }
   }
 
-  @Test public void testIO() throws Exception {
+  @Test
+  public void testIO() throws Exception {
     CompressedPostings postings = CompressedPostings.newInstance(largeDataset);
 
     ByteArrayOutputStream byteOut = new ByteArrayOutputStream();

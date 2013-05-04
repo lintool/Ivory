@@ -1,25 +1,22 @@
 package ivory.regression.cikm2012;
 
-import java.io.File;
-import java.util.Set;
-import java.util.Map;
-
-import junit.framework.JUnit4TestAdapter;
-
-import com.google.common.io.Files;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.FSDataInputStream;
-import org.apache.hadoop.fs.Path;
-import org.apache.log4j.Logger;
 import static org.junit.Assert.assertEquals;
-import org.junit.Test;
-
 import ivory.bloomir.ranker.BloomRanker;
 import ivory.bloomir.ranker.SmallAdaptiveRanker;
+
+import java.io.File;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FSDataInputStream;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.util.LineReader;
+
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 public class RelativeRecallUtil {
   private static final String IVORY_INDEX_PATH = "/scratch0/indexes/adhoc/clue.en.01.nopos/";
@@ -44,14 +41,15 @@ public class RelativeRecallUtil {
     // Load Qrels into a map
     Map<String, Set<String>> qrels = Maps.newHashMap();
     FSDataInputStream qrelsInput = fs.open(new Path(CIKM_QRELS));
-    String line;
-    while((line = qrelsInput.readLine()) != null) {
-      String[] tokens = line.split("\\s+");
+    LineReader reader = new LineReader(qrelsInput);
+    Text line = new Text();
+    while (reader.readLine(line) > 0) {
+      String[] tokens = line.toString().split("\\s+");
       String qid = tokens[0];
       String docid = tokens[2];
       int grade = Integer.parseInt(tokens[3]);
 
-      if(grade <= 0) {
+      if (grade <= 0) {
         continue;
       }
 
@@ -61,6 +59,7 @@ public class RelativeRecallUtil {
       }
       qrels.get(qid).add(docid);
     }
+    reader.close();
     qrelsInput.close();
 
     // Run Small Adaptive baseline
@@ -78,9 +77,11 @@ public class RelativeRecallUtil {
     // Load the output into a Map
     Map<String, Set<String>> saRelOutput = Maps.newHashMap();
     FSDataInputStream saInput = fs.open(new Path(postingOutput.getPath()));
-    while((line = saInput.readLine()) != null) {
-      if(line.startsWith("<judgment")) {
-        String[] tokens = line.split("\"");
+    reader = new LineReader(saInput);
+    while (reader.readLine(line) > 0) {
+      String s = line.toString();
+      if (s.startsWith("<judgment")) {
+        String[] tokens = s.split("\"");
         String docid = tokens[3];
         String qid = tokens[1];
 
@@ -101,6 +102,7 @@ public class RelativeRecallUtil {
         saRelOutput.get(qid).add(docid);
       }
     }
+    reader.close();
     saInput.close();
 
     // Bloom Retrieval
@@ -119,9 +121,11 @@ public class RelativeRecallUtil {
     // Compute relative recall of relevant documents
     Map<String, Integer> counter = Maps.newHashMap();
     FSDataInputStream bInput = fs.open(new Path(bloomOutput.getPath()));
-    while((line = bInput.readLine()) != null) {
-      if(line.startsWith("<judgment")) {
-        String[] tokens = line.split("\"");
+    reader = new LineReader(bInput);
+    while (reader.readLine(line) > 0) {
+      String s = line.toString();
+      if (s.startsWith("<judgment")) {
+        String[] tokens = s.split("\"");
         String docid = tokens[3];
         String qid = tokens[1];
 

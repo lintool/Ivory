@@ -88,7 +88,7 @@ The output of phase 1 is used in phase 2, so you can skip to the
 if you have already completed the first one.
 </p>
 
-<table><tr><td valign="top"><span class="label label-info">Tip</span></td>
+<table><tr><td valign="top"><span class="label label-info">Info</span></td>
 <td style="padding-left: 10px">
 Our approach can be applied to any collection format that is supported by
 <a href="http://lintool.github.com/Cloud9">Cloud<sup>9</sup></a>, and any
@@ -161,10 +161,13 @@ to HDFS for tokenizers to load:</p>
 
 <pre class="code">
 hdfs dfs -mkdir $datadir
-hdfs dfs -put $IVORYDIR/data/tokenizer/*de*stop* $datadir/
-hdfs dfs -put $IVORYDIR/data/tokenizer/*en*stop* $datadir/
+hdfs dfs -mkdir $datadir/token
+hdfs dfs -put $IVORYDIR/data/tokenizer/*de*stop* $datadir/token/
+hdfs dfs -put $IVORYDIR/data/tokenizer/*en*stop* $datadir/token/
 hdfs dfs -put $IVORYDIR/data/tokenizer/de-token.bin $datadir/token/
 hdfs dfs -put $IVORYDIR/data/tokenizer/en-token.bin $datadir/token/
+hdfs dfs -put $IVORYDIR/data/vocab/*de-en* $datadir/
+hdfs dfs -put $IVORYDIR/data/vocab/*en-de* $datadir/
 </pre>
 
 <table><tr><td valign="top"><span class="label label-info">Tip</span></td>
@@ -188,22 +191,23 @@ the <a href="hooka.html">Hooka word alignment toolkit</a>
 
 <p>This should be how your HDFS directory looks like at this step:</p>
 <pre class="code">
-$ hdfs dfs -ls $datadir/
-Found 12 items
-1 data/token
-1349 data/de.stop
-685 data/de.stop.stemmed
-5301 data/en.stop
-3685 data/en.stop.stemmed
-10143994 data/ttable.de-en
-3613902 data/ttable.en-de
-3524605 data/vocab.de-en.de
-656146 data/vocab.de-en.en
-1360307 data/vocab.en-de.de
-689561 data/vocab.en-de.en
+hdfs dfs -ls $datadir/
 </pre>
 
-<p>Now we are ready to run the preprocessing pipeline. The first run is
+<pre class="code">
+Found 11 items
+0 data/token
+3929563 data/ttable.de-en
+2059694 data/ttable.en-de
+2728544 data/vocab.de-en.de
+662751 data/vocab.de-en.en
+1336552 data/vocab.en-de.de
+754025 data/vocab.en-de.en
+</pre>
+
+<p>Under <code>$datadir/token</code>, there should be two <code>*token.bin</code> files
+and four <code>*stop*</code> files.<p>
+Now we are ready to run the preprocessing pipeline. The first run is
 for the English Wikipedia collection:</p>
 <pre class="code">
 etc/hadoop-cluster.sh ivory.app.PreprocessWikipedia \
@@ -217,11 +221,11 @@ etc/hadoop-cluster.sh ivory.app.PreprocessWikipedia \
  -e_stopword=$datadir/en.stop >& en.log &
 </pre>
 
-<table><tr><td valign="top"><span class="label label-info">Tip</span></td>
+<table><tr><td valign="top"><span class="label label-info">Warning</span></td>
 <td style="padding-left: 10px">
 If the compressed Wikipedia collection already exists at <code>$wiki/compressed/enwiki-20121201.compressed</code>,
-this program will re-use it. If you are not sure that the existing files are compatible with what you are 
-running, remove or change them.
+the above program will re-use it. If you are not sure that the existing files are compatible with what you are 
+running, remove or change them before running the above.
 <p>
 </td>
 </tr>
@@ -230,6 +234,25 @@ running, remove or change them.
 <p>Next, we preprocess and translate German Wikipedia articles:</p>
 
 <pre class="code">
+<<<<<<< HEAD
+$IVORYDIR/etc/hadoop-cluster.sh ivory.app.PreprocessWikipedia \
+	-mode=crosslingF \
+	-index=$fdir -targetindex=$edir \
+	-xml=$wiki/raw/dewiki-20121215-pages-articles.xml \
+	-compressed=$wiki/compressed/dewiki-20121215.compressed \
+	-lang=de -target_lang=en \
+	-tokenizermodel=$datadir/token/de-token.bin \
+	-e_tokenizermodel=$datadir/token/en-token.bin \
+	-f_f2e_vocab=$datadir/vocab.de-en.de \
+	-e_f2e_vocab=$datadir/vocab.de-en.en \
+	-f2e_ttable=$datadir/ttable.de-en \
+	-e_e2f_vocab=$datadir/vocab.en-de.en \
+	-f_e2f_vocab=$datadir/vocab.en-de.de \
+	-e2f_ttable=$datadir/ttable.en-de \
+	-e_stopword=$datadir/token/en.stop \
+	-f_stopword=$datadir/token/de.stop \
+	 >& de.log &
+=======
 etc/hadoop-cluster.sh ivory.app.PreprocessWikipedia \
  -mode=crosslingF \
  -index=$fdir -targetindex=$edir \
@@ -247,6 +270,7 @@ etc/hadoop-cluster.sh ivory.app.PreprocessWikipedia \
  -e_stopword=$datadir/en.stop \
  -f_stopword=$datadir/de.stop \
  >& de.log &
+>>>>>>> upstream2/master
 </pre>
 
 <p>The log output of this program should gives various statistics, such as 
@@ -254,43 +278,62 @@ the number of documents, terms, tokens in the collection. Let's do a sanity
 check to make sure everything ran correctly:</p>
 
 <pre class="code">
+<<<<<<< HEAD
+grep -P 'TOTAL=|ARTICLE=|OTHER=|SumOfDocLengths=|Terms=|TransDf=|SHORT=|ZERO=|Total=|VOCAB SIZE|TransDf|DISAMB' en.log | uniq
+</pre>
+
+<pre class="code">
+ARTICLE=4033137
+=======
 $ grep -P 'TOTAL=|ARTICLE=|OTHER=|SumOfDocLengths=|Terms=|TransDf=|SHORT=|ZERO=|Total=|VOCAB SIZE|TransDf|DISAMB' en.log | uniq
 ARTICLE=4037577
+>>>>>>> upstream2/master
 DISAMBIGUATION=123666
-NON_ARTICLE=2893729
-OTHER=139627
+NON_ARTICLE=2899446
+OTHER=138350
 TOTAL=12961996
-SumOfDocLengths=1015496378
-Total=4037577
-SumOfDocLengths=1015496378
-Terms=56894
-Total=56894
-SHORT=24354
-Total=4013135
-ZERO=88
-Total=4013135
-VOCAB SIZE 80279
+SumOfDocLengths=970609402
+Total=4033137
+SumOfDocLengths=970609402
+Terms=39431
+Total=39431
+SHORT=28619
+Total=4004410
+ZERO=108
+Total=4004410
+VOCAB SIZE 71644
 </pre>
 
 <p>You should see the <i>exact</i> same numbers in your log output.</p>
 
 <pre class="code">
+<<<<<<< HEAD
+grep -P 'TOTAL=|ARTICLE=|OTHER=|SumOfDocLengths=|Terms=|TransDf=|SHORT=|ZERO=|Total=|VOCAB SIZE|TransDf|DISAMB' de.log | uniq
+</pre>
+
+<pre class="code">
+ARTICLE=1326111
+DISAMBIGUATION=174678
+NON_ARTICLE=450258
+OTHER=35564
+=======
 $ grep -P 'TOTAL=|ARTICLE=|OTHER=|SumOfDocLengths=|Terms=|TransDf=|SHORT=|ZERO=|Total=|VOCAB SIZE|TransDf|DISAMB' de.log | uniq
 ARTICLE=1574139
 DISAMBIGUATION=174684
 NON_ARTICLE=49347
 OTHER=453150
+>>>>>>> upstream2/master
 TOTAL=3001626
-SumOfDocLengths=360449459
-Total=1574139
-SumOfDocLengths=360449459
-Terms=168605
-Total=168605
-SHORT=154301
-Total=1418951
-ZERO=887
-Total=1418951
-VOCAB SIZE 80279
+SumOfDocLengths=328525405
+Total=1326111
+SumOfDocLengths=328525405
+Terms=115368
+Total=115368
+SHORT=1183
+Total=1324902
+ZERO=7
+Total=1324902
+VOCAB SIZE 71644
 </pre>
 
 
@@ -340,17 +383,38 @@ table to its neighbors that are at most <code>B</code> positions away.
 </p> 
 
 <pre class="code">
+<<<<<<< HEAD
+$IVORYDIR/etc/hadoop-cluster.sh ivory.lsh.pwsim.GenerateChunkedPermutedTables \
+	-sourceindex=$fdir -index=$edir -num_bits=1000 -type=random -Q=300 -overlap=10000 -B=2000
+
+$IVORYDIR/etc/hadoop-cluster.sh ivory.lsh.pwsim.cl.CLSlidingWindowPwsim \
+	-index=$edir -num_bits=1000 -type=random -Q=300 -overlap=10000 -B=2000 -T=400
+=======
 etc/hadoop-cluster.sh ivory.lsh.pwsim.GenerateChunkedPermutedTables \
  -index=$edir -sourceindex=$fdir -num_bits=1000 -type=random -Q=300 -overlap=10000 -B=2000
 
 etc/hadoop-cluster.sh ivory.lsh.pwsim.cl.CLSlidingWindowPwsim \
  -index=$edir -num_bits=1000 -B=2000 -T=400 -type=random -Q=300 -overlap=10000
+>>>>>>> upstream2/master
 </pre>
+
+<table><tr><td valign="top"><span class="label label-info">Info</span></td>
+<td style="padding-left: 10px">
+We perform a special optimization as the permuted signature tables are generated.
+Each table is split into a number of consecutive <i>chunks</i> in order to increase
+the degree of parallelism in the sliding window algorithm. The parameter 
+<code>overlap</code> defines the amount of overlap between these chunks, and needs
+to be at least as large as <code>B</code>.
+<p>
+</td>
+</tr>
+</table>
 
 These two jobs may take a while to finish (e.g., few hours on a 128-core cluster), but if everything runs smoothly, 
 you should see the output written to <code>$edir/similardocs_random_maxdst=400_D=1000_Q=300_B=2000</code>. 
 The number of similar article pairs output by the algorithm will vary from run to run due to the randomized nature, 
-but you may expect about 40 million German-English article pairs output (see <code>Reduce output records</code>) under these settings.
+but you should see tens of millions of German-English article pairs output (see counter <code>Reduce output records</code>) 
+in the log output of <code>ivory.lsh.pwsim.cl.CLSlidingWindowPwsim</code>.
 
 <h3>5. Evaluation</h3>
 <p>
@@ -365,7 +429,14 @@ etc/hadoop-cluster.sh ivory.lsh.eval.SampleIntDocVectors -index=$fdir -size=1000
 
 <p>
 At this point, around 1000 sampled document vectors should be written to <code>$fdir/wt-int-doc-vectors_sample=1000</code>,
-whereas the docnos identifying this sampled subset should be written to <code>$fdir/sample-docnos</code>.
+whereas the docnos identifying this sampled subset should be written to <code>$fdir/sample-docnos</code>. We can do a quick
+sanity check on that file, making sure that the following returns a number close to 1000 (not exactly due to random sampling):
+
+<pre class="code">
+hdfs dfs -cat $fdir/sample-docnos | wc -l
+</pre>
+
+<p>
 Next, we can filter the similar article pairs that do not appear in this sample:
 </p>
 
@@ -376,7 +447,8 @@ etc/hadoop-cluster.sh ivory.lsh.eval.FilterResults \
  -docnos=$fdir/sample-docnos
 </pre>
 
-<p>We can compute the same output using a brute-force approach (i.e., compare each sampled document vector from German 
+<p>Notice that the number of similar pairs was filtered down from tens of millions to tens of thousands.
+We can compute comparable output using a brute-force approach (i.e., compare each sampled document vector from German 
 Wikipedia to all document vectors of English Wikipedia):</p>
 
 <pre class="code">
@@ -401,9 +473,10 @@ with respect to the ground truth:
 </p>
 
 <pre class="code">
-hadoop dfs -get $edir/similardocs_random_maxdst=400_D=1000_Q=300_B=2000-filtered/part-00000 ./pwsim-filtered_400-1000-300-2000
-hadoop dfs -get $edir/groundtruth_T=0.3/part-00000 ./ground_0.3
-perl etc/eval.pl ground_0.3 pwsim-filtered_400-1000-300-2000 
+hadoop dfs -get $edir/similardocs_random_maxdst=400_D=1000_Q=300_B=2000-filtered/part-00000 $IVORYDIR/pwsim-filtered_400-1000-300-2000
+hadoop dfs -get $edir/groundtruth_T=0.3/part-00000 $IVORYDIR/ground_0.3
+cd $IVORYDIR/etc
+perl eval.pl $IVORYDIR/ground_0.3 $IVORYDIR/pwsim-filtered_400-1000-300-2000 
 </pre>
 
 <p>
@@ -417,23 +490,37 @@ into a single file for easy loading:
 </p>
 
 <pre class="code">
+<<<<<<< HEAD
+hdfs dfs -mkdir $pwsimdir
+$IVORYDIR/etc/hadoop-cluster.sh edu.umd.cloud9.util.CombineSequenceFiles $edir/similardocs_random_maxdst=400_D=1000_Q=300_B=2000 $pwsimdir/similardocs_random_maxdst=400_D=1000_Q=300_B=2000.single 100 1 edu.umd.cloud9.io.pair.PairOfInts org.apache.hadoop.io.IntWritable sequence
+=======
 etc/hadoop-cluster.sh edu.umd.cloud9.util.CombineSequenceFiles $edir/similardocs_random_maxdst=400_D=1000_Q=300_B=2000 $pwsimdir/similardocs_random_maxdst=400_D=1000_Q=300_B=2000.single 100 1 edu.umd.cloud9.io.pair.PairOfInts org.apache.hadoop.io.IntWritable sequence
+>>>>>>> upstream2/master
 </pre>
 
 <p>Now, we can convert the docno-based output format to title pairs:</p>
 <pre class="code">
+<<<<<<< HEAD
+$IVORYDIR/etc/hadoop-cluster.sh ivory.lsh.eval.Docnos2Titles \
+	-pwsim_output=$pwsimdir/similardocs_random_maxdst=400_D=1000_Q=300_B=2000.single \
+	-output=$pwsimdir/similardocs_random_maxdst=400_D=1000_Q=300_B=2000-filtered.titles \
+	-e_collection=$wiki/compressed/enwiki-20121201.compressed \
+	-f_collection=$wiki/compressed/dewiki-20121215.compressed \
+	-f_lang=de -e_lang=en -docnos=$fdir/sample-docnos
+=======
 etc/hadoop-cluster.sh ivory.lsh.eval.Docnos2Titles \
  -pwsim_output=$pwsimdir/similardocs_random_maxdst=400_D=1000_Q=300_B=2000-filtered\
  -output=$pwsimdir/similardocs_random_maxdst=400_D=1000_Q=300_B=2000-filtered.titles \
  -e_collection=$wiki/compressed/enwiki-20121201.compressed \
  -f_collection=$wiki/compressed/dewiki-20121215.compressed \
  -f_lang=de -e_lang=en -docnos=$fdir/sample-docnos
+>>>>>>> upstream2/master
 </pre>
 
 <p>Once the job completes, we can check out some of the similar Wikipedia titles:</p>
 
 <pre class="code">
-hdfs dfs -cat $edir/similardocs_random_maxdst=400_D=1000_Q=300_B=2000-filtered.titles/part-00000 | less
+hdfs dfs -cat $pwsimdir/similardocs_random_maxdst=400_D=1000_Q=300_B=2000-filtered.titles/part-00000 | less
 </pre>
 
 <p>Although most of the pairs should be about relevant topics, you'll probably notice that some of the pairs 

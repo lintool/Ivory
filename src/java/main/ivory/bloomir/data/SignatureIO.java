@@ -84,7 +84,7 @@ public class SignatureIO {
     BloomConfig bloomConfig =  new BloomConfig((int) env.getDocumentCount(),
                                                collectionSize, nbHash, bitsPerElement);
     //Deletes the output path if it already exists.
-    fs.delete(new Path(outputPath));
+    fs.delete(new Path(outputPath), true);
 
     //Serialize and write the configuration parameters.
     out = fs.create(new Path(outputPath + "/" + BloomConfig.CONFIG_FILE));

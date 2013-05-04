@@ -1,23 +1,25 @@
 package ivory.integration.cikm2012;
 
-import java.io.File;
-
-import junit.framework.JUnit4TestAdapter;
-
-import com.google.common.io.Files;
-
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.FSDataInputStream;
-import org.apache.hadoop.fs.Path;
-import org.apache.log4j.Logger;
 import static org.junit.Assert.assertEquals;
-import org.junit.Test;
-
 import ivory.bloomir.preprocessing.GenerateBloomFilters;
 import ivory.bloomir.preprocessing.GenerateCompressedPostings;
 import ivory.bloomir.ranker.BloomRanker;
 import ivory.bloomir.ranker.SmallAdaptiveRanker;
+
+import java.io.File;
+
+import junit.framework.JUnit4TestAdapter;
+
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FSDataInputStream;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.util.LineReader;
+import org.apache.log4j.Logger;
+import org.junit.Test;
+
+import com.google.common.io.Files;
 
 public class VerifyBloomIntersection {
   private static final Logger LOG = Logger.getLogger(VerifyBloomIntersection.class);
@@ -277,6 +279,7 @@ public class VerifyBloomIntersection {
   private static final String IVORY_INDEX_PATH = "/scratch0/indexes/adhoc/clue.en.01.nopos/";
   private static final String SPAM_PATH = "/scratch0/indexes/adhoc/CIKM2012/docscores-spam.dat.en.01";
 
+  @SuppressWarnings("static-access")
   @Test public void runRegression() throws Exception {
     FileSystem fs = FileSystem.getLocal(new Configuration());
     File postingIndex = Files.createTempDir();
@@ -333,38 +336,44 @@ public class VerifyBloomIntersection {
     BloomRanker.main(paramsBloomRanker);
 
     FSDataInputStream saInput = fs.open(new Path(postingOutput.getPath()));
-    String line;
+    LineReader reader = new LineReader(saInput);
+    Text line = new Text();
     int i = 0;
-    while((line = saInput.readLine()) != null) {
-      if(line.startsWith("<judgment")) {
-        String docid = line.split("\"")[3];
+    while (reader.readLine(line) > 0) {
+      String s = line.toString();
+      if (s.startsWith("<judgment")) {
+        String docid = s.split("\"")[3];
         assertEquals(EXACT_RETRIEVAL[i++], docid);
       }
     }
+    reader.close();
     saInput.close();
     assertEquals(EXACT_RETRIEVAL.length, i);
     LOG.info("Small Adaptive output checked.");
 
     FSDataInputStream bInput = fs.open(new Path(bloomOutput.getPath()));
+    reader = new LineReader(bInput);
     int c = 0, lastQid = -1;
     i = 0;
-    while((line = bInput.readLine()) != null) {
-      if(line.startsWith("<judgment")) {
-        int qid = Integer.parseInt(line.split("\"")[1]);
-        if(qid != lastQid) {
+    while (reader.readLine(line) > 0) {
+      String s = line.toString();
+      if (s.startsWith("<judgment")) {
+        int qid = Integer.parseInt(s.split("\"")[1]);
+        if (qid != lastQid) {
           lastQid = qid;
           c = 0;
         }
 
-        if(c < 10) {
-          String docid = line.split("\"")[3];
-          if(EXACT_RETRIEVAL[i].equals(docid)) {
+        if (c < 10) {
+          String docid = s.split("\"")[3];
+          if (EXACT_RETRIEVAL[i].equals(docid)) {
             i++;
             c++;
           }
         }
       }
     }
+    reader.close();
     bInput.close();
     assertEquals(EXACT_RETRIEVAL.length, i);
 
