@@ -1,3 +1,12 @@
+Version 0.10.0
+==============
+May 3, 2013
+
++ Upgraded to Cloud9 1.4.14
++ Indirectly (via Cloud9) upgraded CDH
++ Indirectly (via Cloud9) upgraded dsiutils, sux4j, fastutil: new dictionary format that is not backwards compatible
++ Fixed CACAM integration test
+
 Version 0.9.1
 =============
 January 29, 2013
