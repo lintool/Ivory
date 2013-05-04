@@ -83,8 +83,8 @@ public class VerifyFeatureExtraction {
     "ivory.ffg.data.DocumentVectorMiniInvertedIndex"
   };
 
-  private static final String IVORY_INDEX_PATH = "/scratch0/indexes/clue.en.01/";
-  private static final String SPAM_PATH = "/scratch0/indexes/CIKM2012/docscores-spam.dat.en.01";
+  private static final String IVORY_INDEX_PATH = "/scratch0/indexes/adhoc/clue.en.01/";
+  private static final String SPAM_PATH = "/scratch0/indexes/adhoc/CIKM2012/docscores-spam.dat.en.01";
   private static final String QUERY_PATH = "data/ivory/ffg/queries.xml";
   private static final String FEATURES_PATH = "data/ivory/ffg/features.xml";
   private static final String DOCUMENTS_PATH = "data/ivory/ffg/documents.txt";
