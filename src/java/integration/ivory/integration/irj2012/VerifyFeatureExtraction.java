@@ -126,7 +126,7 @@ public class VerifyFeatureExtraction {
     String line;
     int i = 0;
     while((line = input.readLine()) != null) {
-      assertTrue(FEATURES[i].trim().equals(line.trim()));
+      assertTrue(FEATURES[i++].trim().equals(line.trim()));
     }
     input.close();
     assertEquals(FEATURES.length, i);
@@ -163,7 +163,7 @@ public class VerifyFeatureExtraction {
       input = fs.open(new Path(features.getPath()));
       i = 0;
       while((line = input.readLine()) != null) {
-        assertTrue(FEATURES[i].trim().equals(line.trim()));
+        assertTrue(FEATURES[i++].trim().equals(line.trim()));
       }
       input.close();
       assertEquals(FEATURES.length, i);
