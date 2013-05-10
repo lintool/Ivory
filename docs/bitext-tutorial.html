@@ -78,12 +78,15 @@ This is the second part of a two-part tutorial, so please make sure you have com
 we will show how to extract parallel sentence pairs from the similar article pairs
 we found previously.
 
-<p>First of all, in order to split documents into sentences, we need to upload sentence
+<h3>1. Splitting Documents into Sentences</h3>
+
+<p>In order to split documents into sentences, we need to upload sentence
 detection model files to HDFS:</p>
 
 <pre class="code">
-hdfs dfs -put $IVORYDIR/data/tokenizer/de-sent.bin $datadir/sent/
-hdfs dfs -put $IVORYDIR/data/tokenizer/en-sent.bin $datadir/sent/
+hdfs dfs -mkdir $datadir/sent
+hdfs dfs -put $IVORYDIR/data/vocab/de-sent.bin $datadir/sent/
+hdfs dfs -put $IVORYDIR/data/vocab/en-sent.bin $datadir/sent/
 </pre>
 
 <table><tr><td valign="top"><span class="label label-info">Tip</span></td>
@@ -102,31 +105,76 @@ OpenNLP documentation</a> to train your own models.
 <pre class="code">
 $IVORYDIR/etc/hadoop-cluster.sh ivory.lsh.bitext.Docs2Sentences \
 	-e_collection=$wiki/compressed/enwiki-20121201.compressed -f_collection=$wiki/compressed/dewiki-20121215.compressed \
-	-sentences=$pwsimdir/sentences.$f-$e \
-	-e_index=$edir -f_index=$fdir -data=$datadir -e_lang=$e -f_lang=$f
+	-sentences=$pwsimdir/sentences.de-en \
+	-e_index=$edir -f_index=$fdir -data=$datadir -e_lang=en -f_lang=de
 </pre>
 
-<table><tr><td valign="top"><span class="label label-info">Tip</span></td>
+<table><tr><td valign="top"><span class="label label-info">Info</span></td>
 <td style="padding-left: 10px">
-As a heuristic, the above program will discard any sentence in which more than half of the tokens are out-of-vocabulary.
+As a heuristic, the above program will discard any sentence with less than 5 tokens or 3 unique terms,
+and any sentence in which more than half of the tokens are out-of-vocabulary. The latter can be changed
+by setting option <code>-oov_rate</code> to the maximum allowed ratio of out-of-vocabulary tokens.
 <p>
 </td>
 </tr>
 </table>
 
+<p>
+All sentences in the two collections are now written to <code>$pwsimdir/sentences.de-en</code>, with identifiers
+to distinguish between German and English. 
+</p>
+
+<h3>2. Classifying Sentence Pairs</h3>
+
+Next step is to classify each German-English sentence pair as parallel
+or not, using a novel two-step classification approach described in Ture and Lin's NAACL'12 paper <b><a href="publications/Ture_Lin_NAACL-HLT2012.pdf">
+Why Not Grab a Free Lunch? Mining Large Corpora for Parallel Sentences To Improve
+Translation Modeling</a></b>. Trained classifier models are provided under <code>$IVORYDIR/data/classifier</code>. Let
+us first upload these files to HDFS where the program can access them:
+<p>
+
+<pre class="code">
+hdfs dfs -put $IVORYDIR/data/classifier/classifier-simple.de-en $datadir/
+hdfs dfs -put $IVORYDIR/data/classifier/classifier-complex.de-en $datadir/
+</pre>
+
+The first classification step will generate all candidate sentence pairs, and then apply the simple classifier,
+emitting all pairs scored above the provided threshold (e.g., <code>F1=0.9</code>):
+
+</p>
 <pre class="code">
 $IVORYDIR/etc/hadoop-cluster.sh ivory.lsh.bitext.FindParallelSentencePairs \
 	-e_collection=$wiki/compressed/enwiki-20121201.compressed -f_collection=$wiki/compressed/dewiki-20121215.compressed \
-	-sentences=sentences.$f-$e \
+	-sentences=$pwsimdir/sentences.de-en \
 	-pwsim_output=$pwsimdir/similardocs_random_maxdst=400_D=1000_Q=300_B=2000.single/part-00000 \
 	-bitext=$pwsimdir/bitext.F1=90 \
-	-e_index=$edir -f_index=$fdir -data=$datadir -e_lang=$e -f_lang=$f -threshold=0.9 -classifier_id=1
+	-e_index=$edir -f_index=$fdir -data=$datadir -e_lang=en -f_lang=de \
+	-threshold=0.9 -classifier_id=1
 </pre>
+
+<table><tr><td valign="top"><span class="label label-info">Tip</span></td>
+<td style="padding-left: 10px">
+Modifying this threshold will have a corresponding effect on precision/recall.
+One way to set this parameter is to evaluate the classifier on held-out data, and
+pick a value that yields high recall for <code>F1</code>, and high precision for 
+<code>F2</code>. You may learn more details about the classifier training process
+and our implementation
+<a href="docs/bitext.html">from online documentation</a>, or read 
+<a href="publications/Ture_Lin_NAACL-HLT2012.pdf">Ture and Lin's NAACL'12 paper</a>.
+<p>
+</td>
+</tr>
+</table>
+
+The second classification step will apply the complex classifier on each pair output
+by the first step, and emit all pairs scored above the provided threshold (e.g., <code>F2=0.5</code>):
+<p>
 
 <pre class="code">
 $IVORYDIR/etc/hadoop-cluster.sh ivory.lsh.bitext.FilterSentencePairs \
 	-input=$pwsimdir/bitext.F1=90 -output=$pwsimdir/bitext.F1=90.F2=50 \
-	-e_index=$edir -f_index=$fdir -data=$datadir -e_lang=$e -f_lang=$f -threshold=0.5 -classifier_id=1
+	-e_index=$edir -f_index=$fdir -data=$datadir -e_lang=en -f_lang=de \
+	-threshold=0.5 -classifier_id=1
 </pre>
 
 

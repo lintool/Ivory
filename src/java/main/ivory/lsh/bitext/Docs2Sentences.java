@@ -84,11 +84,14 @@ public class Docs2Sentences extends Configured implements Tool {
     private WikiSentenceInfo valOut;
     private PreprocessHelper helper;							// for modularity, helper provides methods to preprocess data
     private float maxOOVRate;
+    private String eLang, fLang;
 
     public void configure(JobConf job) {
       sLogger.setLevel(Level.INFO);
       maxOOVRate = job.getFloat("MaxOOVRate", 0.5f);    
-
+      eLang = job.get("eLang");
+      fLang = job.get("fLang");
+      
       try {
         helper = new PreprocessHelper(CLIRUtils.MinVectorTerms, CLIRUtils.MinSentenceLength, job);
       } catch (Exception e) {
@@ -110,18 +113,21 @@ public class Docs2Sentences extends Configured implements Tool {
       // identify sentences in document, filter out ones below MinSentLength threshold
       // convert each sentence into a tf-idf vector, using general DF map for collection and a heuristic for avg. doc length
       // filter out sentences for which the vector has less than MinVectorTerms terms
+   
       try {
         String article = p.getContent();
-        if (lang.equals("en")) {
+        if (lang.equals(eLang)) {
           sentences = helper.getESentences(article, vectors, sentLengths);		
           langID = CLIRUtils.E;
-        }else {
+        }else if (lang.equals(fLang)){
           // Turkish Wiki articles' XML does not encode paragraph breaks
           if (lang.equals("tr")) {
             article = article.replaceAll("\\.", ". ");
           }
           sentences = helper.getFSentences(article, vectors, sentLengths);
           langID = CLIRUtils.F;
+        }else {
+          throw new RuntimeException("Unknown language: " + lang);
         }
       } catch (Exception e) {
         e.printStackTrace();
