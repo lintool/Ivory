@@ -1,3 +1,10 @@
+Version 0.11.0
+==============
+May 10, 2013
+
++ Added code for feature extraction on document vectors (IRJ 2012)
++ Minor updates to documentation
+
 Version 0.10.0
 ==============
 May 3, 2013
