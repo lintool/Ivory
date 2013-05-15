@@ -9,7 +9,7 @@ import ivory.core.RetrievalEnvironment;
 
 /**
  * Generates the Bloom filters for the original postings lists, given
- * a set of configuration parameters {@link data.BloomConfig} for an
+ * a set of configuration parameters {@link ivory.bloomir.data.BloomConfig} for an
  * experiment.
  *
  * @author Nima Asadi

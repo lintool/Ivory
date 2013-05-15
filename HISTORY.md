@@ -1,3 +1,10 @@
+Version 0.11.0
+==============
+May 10, 2013
+
++ Added code for feature extraction on document vectors (IRJ 2012)
++ Minor updates to documentation
+
 Version 0.10.0
 ==============
 May 3, 2013
@@ -5,7 +12,7 @@ May 3, 2013
 + Upgraded to Cloud9 1.4.14
 + Indirectly (via Cloud9) upgraded CDH
 + Indirectly (via Cloud9) upgraded dsiutils, sux4j, fastutil: new dictionary format that is not backwards compatible
-+ Fixed CACAM integration test
++ Fixed CACM integration test
 
 Version 0.9.1
 =============

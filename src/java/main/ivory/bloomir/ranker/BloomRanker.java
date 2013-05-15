@@ -1,26 +1,24 @@
 package ivory.bloomir.ranker;
 
-import java.io.IOException;
-
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.FileStatus;
-import org.apache.hadoop.fs.FSDataOutputStream;
-import org.apache.hadoop.fs.Path;
-import org.apache.log4j.Logger;
-
-import edu.umd.cloud9.collection.DocnoMapping;
-import edu.umd.cloud9.util.map.HMapIV;
-
 import ivory.bloomir.data.CompressedPostings;
 import ivory.bloomir.data.CompressedPostingsIO;
 import ivory.bloomir.data.Signature;
 import ivory.bloomir.data.SignatureIO;
-import ivory.bloomir.util.QueryUtility;
 import ivory.bloomir.util.DocumentUtility;
 import ivory.bloomir.util.OptionManager;
+import ivory.bloomir.util.QueryUtility;
 import ivory.core.RetrievalEnvironment;
 import ivory.core.data.stat.SpamPercentileScore;
+
+import java.io.IOException;
+
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FSDataOutputStream;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
+
+import edu.umd.cloud9.collection.DocnoMapping;
+import edu.umd.cloud9.util.map.HMapIV;
 
 /**
  * A driver that loads the full PForDelta compressed postings lists as
@@ -30,7 +28,6 @@ import ivory.core.data.stat.SpamPercentileScore;
  * @author Nima Asadi
  */
 public class BloomRanker {
-  private static final Logger LOGGER = Logger.getLogger(BloomRanker.class);
   private final int[] decomp = new int[CompressedPostings.getBlockSize()];
 
   private CompressedPostings[] postings;  //Postings lists

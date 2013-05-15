@@ -1,27 +1,24 @@
 package ivory.bloomir.ranker;
 
+import ivory.bloomir.data.CompressedPostings;
+import ivory.bloomir.data.CompressedPostingsIO;
+import ivory.bloomir.util.DocumentUtility;
+import ivory.bloomir.util.OptionManager;
+import ivory.bloomir.util.QueryUtility;
+import ivory.core.RetrievalEnvironment;
+import ivory.core.data.stat.SpamPercentileScore;
+
 import java.io.IOException;
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.FSDataOutputStream;
+import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.log4j.Logger;
 
 import edu.umd.cloud9.collection.DocnoMapping;
 import edu.umd.cloud9.util.map.HMapIV;
 
-import ivory.bloomir.data.CompressedPostings;
-import ivory.bloomir.data.CompressedPostingsIO;
-import ivory.bloomir.util.DocumentUtility;
-import ivory.bloomir.util.QueryUtility;
-import ivory.bloomir.util.OptionManager;
-import ivory.core.RetrievalEnvironment;
-import ivory.core.data.stat.SpamPercentileScore;
-
 public class SmallAdaptiveRanker {
-  private static final Logger LOGGER = Logger.getLogger(SmallAdaptiveRanker.class);
-
   private CompressedPostings[] postings;  //Postings lists
   private int[] dfs;  //Df values
 

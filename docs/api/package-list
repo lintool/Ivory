@@ -19,6 +19,13 @@ ivory.core.index
 ivory.core.preprocess
 ivory.core.tokenize
 ivory.core.util
+ivory.ffg.data
+ivory.ffg.driver
+ivory.ffg.feature
+ivory.ffg.preprocessing
+ivory.ffg.score
+ivory.ffg.stats
+ivory.ffg.util
 ivory.lsh.bitext
 ivory.lsh.data
 ivory.lsh.driver

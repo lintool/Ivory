@@ -3,18 +3,17 @@ package ivory.bloomir.util;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.OptionBuilder;
-import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 /**
  * Utility class that helps manage command line options
@@ -97,6 +96,7 @@ public class OptionManager {
    * @param isRequired Whether this option is required or optional
    * @param hasArg Whether this option takes argument
    */
+  @SuppressWarnings("static-access")
   public void addOption(String option, String valueType, String description, boolean isRequired,
                         boolean hasArg) {
     Preconditions.checkNotNull(option);
@@ -125,10 +125,10 @@ public class OptionManager {
   }
 
   /**
-   * Please use {@link #parseCommandLine} before calling this method.
+   * Please use {@link #parse} before calling this method.
    *
    * @param option Option name
-   * @return Value of the given option
+   * @return value of the given option
    */
   public String getOptionValue(String option) {
     Preconditions.checkNotNull(cmdline, "Command line arguments not parsed yet!");
@@ -137,10 +137,10 @@ public class OptionManager {
   }
 
   /**
-   * Please use {@link #parseCommandLine} before calling this method.
+   * Please use {@link #parse} before calling this method.
    *
    * @param option Option name
-   * @return Whether the given option is present in the command line arguments
+   * @return whether the given option is present in the command line arguments
    */
   public boolean foundOption(String option) {
     Preconditions.checkNotNull(cmdline, "Command line arguments not parsed yet!");
