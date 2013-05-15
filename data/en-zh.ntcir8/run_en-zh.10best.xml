@@ -5,11 +5,11 @@
      <index>/scratch0/indexes/clir/ntcir_xin.zh_02-05.index</index>
      <doc_lang>zh</doc_lang>
      <query_lang>en</query_lang>
-     <doc_tokenizer>/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/tokenizer/zh-token.bin</doc_tokenizer>
-     <query_tokenizer>/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/tokenizer/en-token.bin</query_tokenizer>
-     <query_vocab>/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/vocab/vocab.en-zh.en</query_vocab>
-     <doc_vocab>/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/vocab/vocab.en-zh.zh</doc_vocab>
-     <f2eProbs>/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/vocab/ttable.en-zh</f2eProbs>
+     <doc_tokenizer>data/tokenizer/zh-token.bin</doc_tokenizer>
+     <query_tokenizer>data/tokenizer/en-token.bin</query_tokenizer>
+     <query_vocab>data/vocab/vocab.en-zh.en</query_vocab>
+     <doc_vocab>data/vocab/vocab.en-zh.zh</doc_vocab>
+     <f2eProbs>data/vocab/ttable.en-zh</f2eProbs>
      <LexProbThreshold>0.005</LexProbThreshold>
      <CumProbThreshold>0.95</CumProbThreshold>
      <mt_weight>1</mt_weight>
@@ -18,6 +18,6 @@
      <token_weight>1</token_weight>
      <phrase_weight>0</phrase_weight>
      <kBest>10</kBest>
-     <query_stemmed_stopwordlist>/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/tokenizer/en.stop.stemmed</query_stemmed_stopwordlist>
+     <query_stemmed_stopwordlist>data/tokenizer/en.stop.stemmed</query_stemmed_stopwordlist>
 
 </parameters>

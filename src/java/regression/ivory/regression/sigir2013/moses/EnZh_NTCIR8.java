@@ -29,7 +29,7 @@ public class EnZh_NTCIR8 {
     expectedMAPs.put(1, new float[]{0.1514f, 0.1553f, 0.1634f});   // "one2one" -> phrase,1best,10best
     expectedMAPs.put(2, new float[]{0.1564f, 0.1497f, 0.1693f});   // "one2many" -> phrase,1best,10best
   };
-  private static float expectedTokenMAP = 0.2714f;
+  private static float expectedTokenMAP = 0.1497f;
   private static int numTopics = 73;
 
   private static Map<Integer, String[]> phrase_AP = new HashMap<Integer, String[]>();
@@ -152,7 +152,7 @@ public class EnZh_NTCIR8 {
 
     Map<String, GroundTruth> g = Maps.newHashMap();
 
-    g.put("en-" + LANGUAGE + ".token_10-0-100-100_0", new GroundTruth(Metric.AP, 50, baseline_token_AP, expectedTokenMAP));
+    g.put("en-" + LANGUAGE + ".token_10-0-100-100_0", new GroundTruth(Metric.AP, numTopics, baseline_token_AP, expectedTokenMAP));
 
     for (int heuristic=0; heuristic <= 2; heuristic++) {
       g.put("en-" + LANGUAGE + ".phrase_10-0-0-100_" + heuristic, new GroundTruth(Metric.AP, numTopics, phrase_AP.get(heuristic), expectedMAPs.get(heuristic)[0]));

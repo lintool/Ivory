@@ -1174,32 +1174,31 @@ public class CLIRUtils extends Configured {
       // src-->trg and trg-->src token translation ratio
       features.add("wordtransratio1=" + getWordTransRatio(fSrcTfs, eSrcTfs, fVocabSrc, eVocabTrg, f2e_Probs, prob) );
       features.add("wordtransratio2=" + getWordTransRatio(eSrcTfs, fSrcTfs, eVocabSrc, fVocabTrg, e2f_Probs, prob) );
-    }
-
-    ////////////////////////////////////
-
-    fSentence = fSentence.replaceAll("([',:;.?%!])", " $1 ");
-    eSentence = eSentence.replaceAll("([',:;.?%!])", " $1 ");
-
-    String[] fTokens = fSentence.split("\\s+");
-    String[] eTokens = eSentence.split("\\s+");
-    if (featSet > 2) {
-      // future work = count number of single/double letter words in src and trg side
-      float fSingleCnt = 1 + getNumberOfWordsWithNDigits(1, fTokens);
-      int eSingleCnt = 1 + getNumberOfWordsWithNDigits(1, eTokens);
-      float fDoubleCnt = 1 + getNumberOfWordsWithNDigits(2, fTokens);
-      int eDoubleCnt = 1 + getNumberOfWordsWithNDigits(2, eTokens);
-      features.add("Ndigitratio=" + (fSingleCnt/eSingleCnt)*(fDoubleCnt/eDoubleCnt));
-
-      // future work = binary feature if there is same multi-digit number on both sides (e.g. 4-digit for years)
-      getNumberRatio(fTokens, eTokens);
-    }
-
-    if (featSet > 3) {
-      // uppercase token matching features : find uppercased tokens that exactly appear on both sides
-      // lack of this evidence does not imply anything, but its existence might indicate parallel
-      PairOfFloats pair = getUppercaseRatio(fTokens, eTokens);
-      features.add("uppercaseratio=" + Math.max(pair.getLeftElement(), pair.getRightElement()));
+      ////////////////////////////////////
+      
+      if (featSet > 2) {
+        fSentence = fSentence.replaceAll("([',:;.?%!])", " $1 ");
+        eSentence = eSentence.replaceAll("([',:;.?%!])", " $1 ");
+        
+        String[] fTokens = fSentence.split("\\s+");
+        String[] eTokens = eSentence.split("\\s+");
+        
+        // future work = count number of single/double letter words in src and trg side
+        float fSingleCnt = 1 + getNumberOfWordsWithNDigits(1, fTokens);
+        int eSingleCnt = 1 + getNumberOfWordsWithNDigits(1, eTokens);
+        float fDoubleCnt = 1 + getNumberOfWordsWithNDigits(2, fTokens);
+        int eDoubleCnt = 1 + getNumberOfWordsWithNDigits(2, eTokens);
+        features.add("Ndigitratio=" + (fSingleCnt/eSingleCnt)*(fDoubleCnt/eDoubleCnt));
+        
+        // future work = binary feature if there is same multi-digit number on both sides (e.g. 4-digit for years)
+        getNumberRatio(fTokens, eTokens);
+        if (featSet > 3) {
+          // uppercase token matching features : find uppercased tokens that exactly appear on both sides
+          // lack of this evidence does not imply anything, but its existence might indicate parallel
+          PairOfFloats pair = getUppercaseRatio(fTokens, eTokens);
+          features.add("uppercaseratio=" + Math.max(pair.getLeftElement(), pair.getRightElement()));
+        }
+      }
     }
 
     return features.toArray(new String[features.size()]);
@@ -1283,7 +1282,7 @@ public class CLIRUtils extends Configured {
           length = length2; 
         }
         if (upperCaseMap2.contains(uppercase)) {
-//        if (org.apache.commons.lang.StringUtils.getLevenshteinDistance(uppercase, uppercase2) < length * 0.25f) {
+          //        if (org.apache.commons.lang.StringUtils.getLevenshteinDistance(uppercase, uppercase2) < length * 0.25f) {
           cntUpperMatch++;          
           //          System.out.println("DEBUG["+uppercase+"]["+uppercase2+"]");
         }
@@ -1291,7 +1290,7 @@ public class CLIRUtils extends Configured {
     }
     PairOfFloats pair = new PairOfFloats(
         upperCaseMap1.isEmpty() ? 0f : cntUpperMatch / upperCaseMap1.size(), 
-        upperCaseMap2.isEmpty() ? 0f : cntUpperMatch / upperCaseMap2.size());
+            upperCaseMap2.isEmpty() ? 0f : cntUpperMatch / upperCaseMap2.size());
     return pair;
   }
 
