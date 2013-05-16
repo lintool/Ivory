@@ -19,7 +19,7 @@ public class Constants {
   public static final String StemmedStopwordListQ= "query_stemmed_stopwordlist";
   public static final String QueriesPath = "queries_path";
   public static final String QrelsPath = "qrels_path";
-  public static final String GrammarPath = "scfg_path";
+  public static final String GrammarPath = "grammar_path";
   public static final String UNKFile = "unknown";
   public static final String DocLanguage = "doc_lang";
   public static final String QueryLanguage = "query_lang";
@@ -36,7 +36,7 @@ public class Constants {
   public static final String NumTransPerToken = "numtrans";
   public static final String KBest = "kBest";
   public static final String MTWeight = "mt_weight";
-  public static final String SCFGWeight = "scfg_weight";
+  public static final String GrammarWeight = "grammar_weight";
   public static final String BitextWeight = "bitext_weight";  
   public static final String TokenWeight = "token_weight";
   public static final String PhraseWeight = "phrase_weight";

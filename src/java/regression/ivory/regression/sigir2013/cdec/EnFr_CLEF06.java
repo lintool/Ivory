@@ -24,22 +24,22 @@ public class EnFr_CLEF06 {
   private static String PATH = "en-fr.clef06";
   private static String LANGUAGE = "fr";
   private static Map<Integer,float[]> expectedMAPs = new HashMap<Integer,float[]>();{ 
-    expectedMAPs.put(0, new float[]{0.2916f, 0.2351f, 0.2947f});   // "one2none" -> phrase,1best,10best
-    expectedMAPs.put(1, new float[]{0.2881f, 0.2756f, 0.3039f});   // "one2one" -> phrase,1best,10best
-    expectedMAPs.put(2, new float[]{0.2965f, 0.2758f, 0.307f});   // "one2many" -> phrase,1best,10best
+    expectedMAPs.put(0, new float[]{0.2916f, 0.2351f, 0.2947f});   // "one2none" -> grammar,1best,10best
+    expectedMAPs.put(1, new float[]{0.2881f, 0.2756f, 0.3039f});   // "one2one" -> grammar,1best,10best
+    expectedMAPs.put(2, new float[]{0.2965f, 0.2758f, 0.307f});   // "one2many" -> grammar,1best,10best
   };
   private static float expectedTokenMAP = 0.2617f;
   private static int numTopics = 50;
 
-  private static Map<Integer, String[]> phrase_AP = new HashMap<Integer, String[]>();
+  private static Map<Integer, String[]> grammar_AP = new HashMap<Integer, String[]>();
   {
-    phrase_AP.put(0, new String[] {
+    grammar_AP.put(0, new String[] {
         "338", "0.0626","339", "0.4926","332", "0.0","333", "0.87","330", "0.6","331", "0.2202","336", "0.1429","337", "0.6079","334", "0.1542","335", "0.5335","349", "0.3377","302", "0.2526","301", "0.4408","304", "0.2722","303", "0.2131","341", "0.3835","306", "0.0474","305", "0.2105","342", "0.3384","343", "0.11","308", "0.2575","344", "0.3351","307", "0.1218","345", "0.2614","346", "0.0305","309", "0.0127","347", "0.0718","348", "0.5596","340", "0.1738","318", "0.505","319", "0.4936","316", "0.4007","317", "0.0789","314", "0.0763","315", "0.3548","312", "0.241","313", "0.3681","310", "0.0063","311", "0.0699","327", "0.7041","328", "0.448","329", "0.8094","323", "0.065","324", "0.0","325", "0.0177","326", "0.7436","320", "0.0519","321", "0.4159","350", "0.4338","322", "0.1797",
     });
-    phrase_AP.put(1, new String[] {
+    grammar_AP.put(1, new String[] {
         "338", "0.03","339", "0.4853","332", "0.0","333", "0.8708","330", "0.6","331", "0.2195","336", "0.125","337", "0.5982","334", "0.4293","335", "0.3559","349", "0.3503","302", "0.2506","301", "0.4353","304", "0.2823","303", "0.2163","341", "0.2762","306", "0.0458","305", "0.2278","342", "0.3372","343", "0.1129","308", "0.1951","344", "0.3081","307", "0.1257","345", "0.2605","346", "0.0216","309", "0.0127","347", "0.0659","348", "0.5613","340", "0.1744","318", "0.5062","319", "0.5616","316", "0.4","317", "0.1168","314", "0.0736","315", "0.3603","312", "0.2316","313", "0.2151","310", "0.0056","311", "0.0712","327", "0.669","328", "0.4604","329", "0.7951","323", "0.134","324", "0.0","325", "0.0139","326", "0.7436","320", "0.0571","321", "0.4164","350", "0.4288","322", "0.1701",
     });
-    phrase_AP.put(2, new String[] {
+    grammar_AP.put(2, new String[] {
         "338", "0.071","339", "0.4926","332", "0.0","333", "0.8698","330", "0.6","331", "0.2201","336", "0.1429","337", "0.6055","334", "0.4133","335", "0.5272","349", "0.3347","302", "0.2522","301", "0.4343","304", "0.2668","303", "0.2115","341", "0.3584","306", "0.0477","305", "0.2214","342", "0.338","343", "0.1119","308", "0.2258","344", "0.3072","307", "0.1303","345", "0.2617","346", "0.0324","309", "0.0127","347", "0.0745","348", "0.561","340", "0.1906","318", "0.511","319", "0.4832","316", "0.4007","317", "0.1413","314", "0.0741","315", "0.361","312", "0.2409","313", "0.3605","310", "0.0063","311", "0.0677","327", "0.7031","328", "0.4594","329", "0.7951","323", "0.0648","324", "0.0","325", "0.0182","326", "0.7436","320", "0.052","321", "0.4189","350", "0.4347","322", "0.1719",
     });
   };
@@ -125,10 +125,10 @@ public class EnFr_CLEF06 {
     qe.init(conf, fs);
     qe.runQueries(conf);
 
-    /////// phrase
+    /////// grammar
 
     conf = RunQueryEngine.parseArgs(new String[] {
-        "--xml", "data/"+ PATH + "/run_en-" + LANGUAGE + ".phrase.xml",
+        "--xml", "data/"+ PATH + "/run_en-" + LANGUAGE + ".grammar.xml",
         "--queries_path", "data/"+ PATH + "/cdec/title_en-" + LANGUAGE + "-trans10-filtered.xml", "--one2many", heuristic + "" });
 
     qe.init(conf, fs);
@@ -161,7 +161,7 @@ public class EnFr_CLEF06 {
     g.put("en-" + LANGUAGE + ".token_10-0-100-100_0", new GroundTruth(Metric.AP, numTopics, baseline_token_AP, expectedTokenMAP));
 
     for (int heuristic=0; heuristic <= 2; heuristic++) {
-      g.put("en-" + LANGUAGE + ".phrase_10-0-0-100_" + heuristic, new GroundTruth(Metric.AP, numTopics, phrase_AP.get(heuristic), expectedMAPs.get(heuristic)[0]));
+      g.put("en-" + LANGUAGE + ".grammar_10-0-0-100_" + heuristic, new GroundTruth(Metric.AP, numTopics, grammar_AP.get(heuristic), expectedMAPs.get(heuristic)[0]));
       g.put("en-" + LANGUAGE + ".1best_1-0-0-100_" + heuristic, new GroundTruth(Metric.AP, numTopics, Onebest_AP.get(heuristic), expectedMAPs.get(heuristic)[1]));
       g.put("en-" + LANGUAGE + ".10best_10-100-0-100_" + heuristic, new GroundTruth(Metric.AP, numTopics, Nbest_AP.get(heuristic), expectedMAPs.get(heuristic)[2]));
     }
@@ -180,7 +180,7 @@ public class EnFr_CLEF06 {
   }
 
   public static void main(String[] args) {
-    phrase_AP.put(2, new String[] {
+    grammar_AP.put(2, new String[] {
         "338", "0.071","339", "0.4926","332", "0.0","333", "0.8698","330", "0.6","331", "0.2201","336", "0.1429","337", "0.6055","334", "0.4133","335", "0.5272","349", "0.3347","302", "0.2522","301", "0.4343","304", "0.2668","303", "0.2115","341", "0.3584","306", "0.0477","305", "0.2214","342", "0.338","343", "0.1119","308", "0.2258","344", "0.3072","307", "0.1303","345", "0.2617","346", "0.0324","309", "0.0127","347", "0.0745","348", "0.561","340", "0.1906","318", "0.511","319", "0.4832","316", "0.4007","317", "0.1413","314", "0.0741","315", "0.361","312", "0.2409","313", "0.3605","310", "0.0063","311", "0.0677","327", "0.7031","328", "0.4594","329", "0.7951","323", "0.0648","324", "0.0","325", "0.0182","326", "0.7436","320", "0.052","321", "0.4189","350", "0.4347","322", "0.1719",
     });
     Onebest_AP.put(2, new String[] {
@@ -194,17 +194,17 @@ public class EnFr_CLEF06 {
     });
     HMapSFW tenbestAPMap = array2Map(Nbest_AP.get(2));
     HMapSFW onebestAPMap = array2Map(Onebest_AP.get(2));
-    HMapSFW phraseAPMap = array2Map(phrase_AP.get(2));
+    HMapSFW grammarAPMap = array2Map(grammar_AP.get(2));
     HMapSFW tokenAPMap = array2Map(baseline_token_AP);
     HMapSFW gridAPMap = array2Map(Gridbest_AP.get(2));
     System.out.println(countNumberOfImprovedTopics(tokenAPMap, gridAPMap));
     System.out.println(countNumberOfImprovedTopics(tokenAPMap, tenbestAPMap));
     System.out.println(countNumberOfImprovedTopics(tokenAPMap, onebestAPMap));
-    System.out.println(countNumberOfImprovedTopics(tokenAPMap, phraseAPMap));
+    System.out.println(countNumberOfImprovedTopics(tokenAPMap, grammarAPMap));
     System.out.println(countNumberOfNegligibleTopics(tokenAPMap, gridAPMap));
     System.out.println(countNumberOfNegligibleTopics(tokenAPMap, tenbestAPMap));
     System.out.println(countNumberOfNegligibleTopics(tokenAPMap, onebestAPMap));
-    System.out.println(countNumberOfNegligibleTopics(tokenAPMap, phraseAPMap));
+    System.out.println(countNumberOfNegligibleTopics(tokenAPMap, grammarAPMap));
   }
 
   private static int countNumberOfImprovedTopics(HMapSFW tokenAPMap, HMapSFW gridAPMap) {

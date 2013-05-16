@@ -25,22 +25,22 @@ public class EnZh_NTCIR8 {
   private static String PATH = "en-zh.ntcir8";
   private static String LANGUAGE = "zh";
   private static Map<Integer,float[]> expectedMAPs = new HashMap<Integer,float[]>();{ 
-    expectedMAPs.put(0, new float[]{0.1665f, 0.1461f, 0.1633f});   // "one2none" -> phrase,1best,10best
-    expectedMAPs.put(1, new float[]{0.1514f, 0.1553f, 0.1634f});   // "one2one" -> phrase,1best,10best
-    expectedMAPs.put(2, new float[]{0.1564f, 0.1497f, 0.1693f});   // "one2many" -> phrase,1best,10best
+    expectedMAPs.put(0, new float[]{0.1665f, 0.1461f, 0.1633f});   // "one2none" -> grammar,1best,10best
+    expectedMAPs.put(1, new float[]{0.1514f, 0.1553f, 0.1634f});   // "one2one" -> grammar,1best,10best
+    expectedMAPs.put(2, new float[]{0.1564f, 0.1497f, 0.1693f});   // "one2many" -> grammar,1best,10best
   };
   private static float expectedTokenMAP = 0.1497f;
   private static int numTopics = 73;
 
-  private static Map<Integer, String[]> phrase_AP = new HashMap<Integer, String[]>();
+  private static Map<Integer, String[]> grammar_AP = new HashMap<Integer, String[]>();
   {
-    phrase_AP.put(0, new String[] {
+    grammar_AP.put(0, new String[] {
         "78", "0.2268","77", "0.2834","35", "0.0025","36", "0.0037","33", "0.3593","39", "0.024","38", "0.0","43", "0.0677","42", "0.2807","41", "0.0837","40", "0.0","82", "0.2387","83", "0.125","80", "0.0923","87", "0.2687","84", "0.3897","85", "0.1471","67", "0.1674","66", "0.0071","69", "0.0","68", "0.6847","23", "0.1406","26", "0.0156","28", "0.4795","29", "0.1019","2", "0.0687","30", "0.1548","6", "0.1378","32", "0.2224","5", "0.0016","70", "0.02","9", "0.1004","71", "0.4932","72", "0.3698","73", "0.0014","74", "0.059","75", "0.0023","76", "0.1204","59", "0.0367","58", "0.1107","57", "0.2242","19", "0.2737","56", "0.1247","18", "1.0E-4","15", "0.2154","16", "0.0622","12", "0.0545","64", "0.3435","65", "0.4672","62", "0.4946","63", "0.1854","99", "0.4383","61", "0.0313","100", "0.102","98", "0.4264","49", "0.0","97", "0.0088","48", "0.0020","96", "0.0383","95", "0.0067","94", "0.1035","45", "0.0671","93", "0.1538","44", "0.3571","92", "0.2312","47", "0.0","91", "0.6418","46", "0.0442","90", "0.474","51", "0.0","52", "0.1534","53", "0.0","54", "0.3372",
     });
-    phrase_AP.put(1, new String[] {
+    grammar_AP.put(1, new String[] {
         "78", "0.2521","77", "0.254","35", "0.0020","36", "0.0035","33", "0.3444","39", "0.0244","38", "0.0","43", "0.0844","42", "0.2372","41", "0.062","40", "1.0E-4","82", "0.2404","83", "0.1241","80", "0.0876","87", "0.2532","84", "0.4002","85", "0.1139","67", "0.1603","66", "0.0064","69", "0.0","68", "0.6811","23", "0.1321","26", "0.032","28", "0.4595","29", "0.0577","2", "0.136","30", "0.3204","6", "0.0343","32", "0.1952","5", "0.0015","70", "0.0147","9", "0.1255","71", "0.4915","72", "0.3808","73", "0.0015","74", "0.0349","75", "0.0026","76", "0.115","59", "0.0606","58", "0.1007","57", "0.2159","19", "0.1566","56", "0.1227","18", "3.0E-4","15", "0.0641","16", "0.0697","12", "0.0539","64", "0.3974","65", "0.4601","62", "0.4834","63", "0.0040","99", "0.4633","61", "0.044","100", "0.1025","98", "0.4092","49", "0.0","97", "0.0195","48", "0.0015","96", "0.0337","95", "0.0029","94", "0.0586","45", "0.0856","93", "0.1789","44", "0.0878","92", "0.2366","47", "0.0","91", "0.6598","46", "0.0465","90", "0.0719","51", "0.0","52", "0.1534","53", "0.0","54", "0.3376",
     });
-    phrase_AP.put(2, new String[] {
+    grammar_AP.put(2, new String[] {
         "78", "0.2861","77", "0.2821","35", "0.0026","36", "0.0036","33", "0.3453","39", "0.0244","38", "0.0","43", "0.0689","42", "0.2809","41", "0.077","40", "0.0","82", "0.2331","83", "0.1257","80", "0.0977","87", "0.2645","84", "0.3899","85", "0.0977","67", "0.177","66", "0.0081","69", "0.0","68", "0.6825","23", "0.145","26", "0.017","28", "0.4531","29", "0.0555","2", "0.0495","30", "0.053","6", "0.0324","32", "0.1536","5", "0.0017","70", "0.0285","9", "0.1818","71", "0.4932","72", "0.3629","73", "0.0014","74", "0.0587","75", "0.0023","76", "0.1711","59", "0.0374","58", "0.1118","57", "0.2113","19", "0.2736","56", "0.1285","18", "2.0E-4","15", "0.3116","16", "0.0735","12", "0.0542","64", "0.3578","65", "0.4685","62", "0.483","63", "0.0399","99", "0.431","61", "0.0306","100", "0.1024","98", "0.4019","49", "0.0","97", "0.0116","48", "0.0020","96", "0.036","95", "0.0056","94", "0.1051","45", "0.0969","93", "0.1563","44", "0.3376","92", "0.2338","47", "0.0","91", "0.6177","46", "0.045","90", "0.031","51", "0.0","52", "0.1534","53", "0.0","54", "0.3631",
     });
   };
@@ -75,7 +75,7 @@ public class EnZh_NTCIR8 {
     "78", "0.2855","77", "0.1152","35", "0.0021","36", "0.0028","33", "0.354","39", "0.0542","38", "0.0","43", "0.0723","42", "0.2187","41", "0.0712","40", "0.0","82", "0.173","83", "0.1171","80", "0.0968","87", "0.2274","84", "0.3617","85", "0.06","67", "0.1404","66", "0.0118","69", "0.0","68", "0.6597","23", "0.1503","26", "0.0056","28", "0.4382","29", "0.1725","2", "0.1554","30", "0.1201","6", "0.0755","32", "0.1401","5", "0.0024","70", "0.0015","9", "0.1323","71", "0.4966","72", "0.3776","73", "7.0E-4","74", "0.0384","75", "0.0041","76", "0.3721","59", "0.0329","58", "0.0956","57", "0.1211","19", "0.2074","56", "0.1257","18", "0.0","15", "0.2479","16", "0.0552","12", "0.0476","64", "0.4514","65", "0.4463","62", "0.4401","63", "0.0063","99", "0.3902","61", "0.0106","100", "0.1015","98", "0.3637","49", "0.0","97", "0.0062","48", "2.0E-4","96", "0.0306","95", "7.0E-4","94", "0.1811","45", "0.1176","93", "0.1338","44", "0.026","92", "0.212","47", "0.0","91", "0.6703","46", "0.2169","90", "0.0233","51", "0.0","52", "0.1413","53", "0.1198","54", "0.1988",
   };
 
-  //  private static String[] Gridbest_AP = phrase_AP_one2none;
+  //  private static String[] Gridbest_AP = grammar_AP_one2none;
 
   public EnZh_NTCIR8() {
     super();
@@ -116,10 +116,10 @@ public class EnZh_NTCIR8 {
     qe.init(conf, fs);
     qe.runQueries(conf);
 
-    /////// phrase
+    /////// grammar
 
     conf = RunQueryEngine.parseArgs(new String[] {
-        "--xml", "data/" + PATH + "/run_en-" + LANGUAGE + ".phrase.xml",
+        "--xml", "data/" + PATH + "/run_en-" + LANGUAGE + ".grammar.xml",
         "--queries_path", "data/" + PATH + "/moses/title_en-" + LANGUAGE + "-trans10-filtered.xml", "--one2many", heuristic + "",
         "--unknown", "data/" + PATH + "/moses/10.unk"});
 
@@ -155,7 +155,7 @@ public class EnZh_NTCIR8 {
     g.put("en-" + LANGUAGE + ".token_10-0-100-100_0", new GroundTruth(Metric.AP, numTopics, baseline_token_AP, expectedTokenMAP));
 
     for (int heuristic=0; heuristic <= 2; heuristic++) {
-      g.put("en-" + LANGUAGE + ".phrase_10-0-0-100_" + heuristic, new GroundTruth(Metric.AP, numTopics, phrase_AP.get(heuristic), expectedMAPs.get(heuristic)[0]));
+      g.put("en-" + LANGUAGE + ".grammar_10-0-0-100_" + heuristic, new GroundTruth(Metric.AP, numTopics, grammar_AP.get(heuristic), expectedMAPs.get(heuristic)[0]));
       g.put("en-" + LANGUAGE + ".1best_1-0-0-100_" + heuristic, new GroundTruth(Metric.AP, numTopics, Onebest_AP.get(heuristic), expectedMAPs.get(heuristic)[1]));
       g.put("en-" + LANGUAGE + ".10best_10-100-0-100_" + heuristic, new GroundTruth(Metric.AP, numTopics, Nbest_AP.get(heuristic), expectedMAPs.get(heuristic)[2]));
     }
@@ -177,17 +177,17 @@ public class EnZh_NTCIR8 {
     //    HMapSFW gridAPMap = array2Map(Gridbest_AP);
     HMapSFW tenbestAPMap = array2Map(Nbest_AP.get(2));
     HMapSFW onebestAPMap = array2Map(Onebest_AP.get(1));
-    HMapSFW phraseAPMap = array2Map(phrase_AP.get(0));
+    HMapSFW grammarAPMap = array2Map(grammar_AP.get(0));
     HMapSFW tokenAPMap = array2Map(baseline_token_AP);
     //    System.out.println(countNumberOfImprovedTopics(tokenAPMap, gridAPMap));
     System.out.println(countNumberOfImprovedTopics(tokenAPMap, tenbestAPMap));
     System.out.println(countNumberOfImprovedTopics(tokenAPMap, onebestAPMap));
-    System.out.println(countNumberOfImprovedTopics(tokenAPMap, phraseAPMap));
+    System.out.println(countNumberOfImprovedTopics(tokenAPMap, grammarAPMap));
     System.out.println(countNumberOfImprovedTopics(tokenAPMap, tokenAPMap));
     //    System.out.println(countNumberOfNegligibleTopics(tokenAPMap, gridAPMap));
     System.out.println(countNumberOfNegligibleTopics(tokenAPMap, tenbestAPMap));
     System.out.println(countNumberOfNegligibleTopics(tokenAPMap, onebestAPMap));
-    System.out.println(countNumberOfNegligibleTopics(tokenAPMap, phraseAPMap));
+    System.out.println(countNumberOfNegligibleTopics(tokenAPMap, grammarAPMap));
     System.out.println(countNumberOfNegligibleTopics(tokenAPMap, tokenAPMap));
   }
 

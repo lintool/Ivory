@@ -75,7 +75,7 @@ public class RunQueryEngine {
         LOG.info("Lambda2 = "+lambda2);
         conf.setFloat(Constants.MTWeight, lambda1);
         conf.setFloat(Constants.BitextWeight, lambda2);
-        conf.setFloat(Constants.SCFGWeight, 1-lambda1-lambda2);
+        conf.setFloat(Constants.GrammarWeight, 1-lambda1-lambda2);
 
         qe.init(conf, FileSystem.get(conf));    // set three weights
 
@@ -128,7 +128,7 @@ public class RunQueryEngine {
     options.addOption(OptionBuilder.withArgName("1|5|10").hasArg().withDescription("number of best query translations").create(Constants.KBest));
     options.addOption(OptionBuilder.withArgName("").hasArg().withDescription("max number of translations per token to keep").create(Constants.NumTransPerToken));
     options.addOption(OptionBuilder.withArgName("(0.0-1.0)").hasArg().withDescription("weight of mt output when combining with other models").create(Constants.MTWeight));
-    options.addOption(OptionBuilder.withArgName("(0.0-1.0)").hasArg().withDescription("weight of phrase translations when combining with other models").create(Constants.SCFGWeight));
+    options.addOption(OptionBuilder.withArgName("(0.0-1.0)").hasArg().withDescription("weight of phrase translations when combining with other models").create(Constants.GrammarWeight));
     options.addOption(OptionBuilder.withArgName("(0.0-1.0)").hasArg().withDescription("weight of word translations when combining with other models").create(Constants.BitextWeight));
     options.addOption(OptionBuilder.withArgName("(0.0-1.0)").hasArg().withDescription("weight of token translations in query representation").create(Constants.TokenWeight));
     options.addOption(OptionBuilder.withArgName("(0.0-1.0)").hasArg().withDescription("weight of phrase translations in query representation").create(Constants.PhraseWeight)); 
@@ -194,8 +194,8 @@ public class RunQueryEngine {
       if (cmdline.hasOption(Constants.BitextWeight)) {
         conf.setFloat(Constants.BitextWeight, Float.parseFloat(cmdline.getOptionValue(Constants.BitextWeight)));
       }
-      if (cmdline.hasOption(Constants.SCFGWeight)) {
-        conf.setFloat(Constants.SCFGWeight, Float.parseFloat(cmdline.getOptionValue(Constants.SCFGWeight)));
+      if (cmdline.hasOption(Constants.GrammarWeight)) {
+        conf.setFloat(Constants.GrammarWeight, Float.parseFloat(cmdline.getOptionValue(Constants.GrammarWeight)));
       }
       if (cmdline.hasOption(Constants.KBest)) {
         conf.setInt(Constants.KBest, Integer.parseInt(cmdline.getOptionValue(Constants.KBest)));
@@ -328,8 +328,8 @@ public class RunQueryEngine {
     list = d.getElementsByTagName(Constants.BitextWeight);
     if (list.getLength() > 0) {  conf.setFloat(Constants.BitextWeight, Float.parseFloat(list.item(0).getTextContent()));  }  
 
-    list = d.getElementsByTagName(Constants.SCFGWeight);
-    if (list.getLength() > 0) {  conf.setFloat(Constants.SCFGWeight, Float.parseFloat(list.item(0).getTextContent()));  }  
+    list = d.getElementsByTagName(Constants.GrammarWeight);
+    if (list.getLength() > 0) {  conf.setFloat(Constants.GrammarWeight, Float.parseFloat(list.item(0).getTextContent()));  }  
 
     list = d.getElementsByTagName(Constants.Quiet);
     if (list.getLength() > 0) {  conf.setBoolean(Constants.Quiet, Boolean.parseBoolean(list.item(0).getTextContent()));  }  

@@ -74,10 +74,10 @@ public class MtNQueryGenerator implements QueryGenerator {
 
     mtWeight = conf.getFloat(Constants.MTWeight, 1f);
     bitextWeight = conf.getFloat(Constants.BitextWeight, 0f);
-    scfgWeight = conf.getFloat(Constants.SCFGWeight, 0f);
+    scfgWeight = conf.getFloat(Constants.GrammarWeight, 0f);
     LOG.info(conf.get(Constants.MTWeight));
     LOG.info(conf.get(Constants.BitextWeight));
-    LOG.info(conf.get(Constants.SCFGWeight));
+    LOG.info(conf.get(Constants.GrammarWeight));
 
     queryLangTokenizer = TokenizerFactory.createTokenizer(fs, conf, queryLang, queryTokenizerPath, false, null, null, null);
     queryLangTokenizerWithStemming = TokenizerFactory.createTokenizer(fs, conf, queryLang, queryTokenizerPath, true, null, conf.get(Constants.StemmedStopwordListQ), null);

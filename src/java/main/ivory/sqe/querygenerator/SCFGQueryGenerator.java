@@ -48,7 +48,7 @@ public class SCFGQueryGenerator implements QueryGenerator {
     LOG.info(conf.get(Constants.DocTokenizerData));
     LOG.info(conf.get(Constants.MinWindow));
     LOG.info(conf.get(Constants.MaxWindow));
-    LOG.info(conf.get(Constants.SCFGWeight));
+    LOG.info(conf.get(Constants.GrammarWeight));
 
     LOG.info("Stemmed stopword list file in query-language:" + conf.get(Constants.StemmedStopwordListQ));
     LOG.info("Stemmed stopword list file in doc-language:" + conf.get(Constants.StemmedStopwordListD));
