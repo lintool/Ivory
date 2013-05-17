@@ -39,7 +39,7 @@ import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.SequenceFile;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-
+import edu.stanford.nlp.util.StringUtils;
 import edu.umd.cloud9.io.map.HMapIFW;
 import edu.umd.cloud9.io.map.HMapSFW;
 import edu.umd.cloud9.io.map.HMapSIW;
@@ -61,11 +61,11 @@ import edu.umd.hooka.ttables.TTable_monolithic_IFAs;
  * E is the "non-foreign" language, the language into which documents are translated.<p>
  * <p>
  * Required files: <p>
- * 		ttable E-->F (i.e., Pr(f|e))<p>
- * 		ttable F-->E (i.e., Pr(e|f))<p>
- * 		Pair of vocabulary files for each ttable<p> 
- * 			V_E & V_F for E-->F<p>
- * 			V_E & V_F for F-->E<p>
+ *    ttable E-->F (i.e., Pr(f|e))<p>
+ *    ttable F-->E (i.e., Pr(e|f))<p>
+ *    Pair of vocabulary files for each ttable<p> 
+ *      V_E & V_F for E-->F<p>
+ *      V_E & V_F for F-->E<p>
  * 
  * @author ferhanture
  *
@@ -83,11 +83,11 @@ public class CLIRUtils extends Configured {
    * Read df mapping from file.
    * 
    * @param path
-   * 		path to df table
+   *    path to df table
    * @param fs
-   * 		FileSystem object
+   *    FileSystem object
    * @return
-   * 		mapping from term ids to df values
+   *    mapping from term ids to df values
    */
   public static HMapIFW readTransDfTable(Path path, FileSystem fs) {
     HMapIFW transDfTable = new HMapIFW();
@@ -99,7 +99,7 @@ public class CLIRUtils extends Configured {
 
       while (reader.next(key, value)) {
         transDfTable.put(key.get(), value.get());
-        //				logger.info(key.get()+"-->"+value.get());
+        //        logger.info(key.get()+"-->"+value.get());
         key = (IntWritable) reader.getKeyClass().newInstance();
         value = (FloatWritable) reader.getValueClass().newInstance();
       }
@@ -107,16 +107,16 @@ public class CLIRUtils extends Configured {
     } catch (Exception e) {
       throw new RuntimeException("Exception reading file trans-df table file");
     }
-    return transDfTable;		
+    return transDfTable;    
   }
 
   /**
    * @param vectorA
-   * 		a term document vector
+   *    a term document vector
    * @param vectorB
-   * 		another term document vector
+   *    another term document vector
    * @return
-   * 		cosine score
+   *    cosine score
    */
   public static float cosine(HMapIFW vectorA, HMapIFW vectorB) {
     float sum = 0, magA = 0, magB = 0;
@@ -140,11 +140,11 @@ public class CLIRUtils extends Configured {
 
   /**
    * @param vectorA
-   * 		a term document vector
+   *    a term document vector
    * @param vectorB
-   * 		another term document vector
+   *    another term document vector
    * @return
-   * 		cosine score
+   *    cosine score
    */
   public static float cosine(HMapSFW vectorA, HMapSFW vectorB) {
     float sum = 0, magA = 0, magB = 0;
@@ -169,11 +169,11 @@ public class CLIRUtils extends Configured {
   /**
    * 
    * @param vectorA
-   * 		a normalized term document vector
+   *    a normalized term document vector
    * @param vectorB
-   * 		another normalized term document vector
+   *    another normalized term document vector
    * @return
-   * 		cosine score
+   *    cosine score
    */
   public static float cosineNormalized(HMapSFW vectorA, HMapSFW vectorB) {
     float sum = 0;
@@ -190,13 +190,13 @@ public class CLIRUtils extends Configured {
    * Given a mapping from F-terms to their df values, compute a df value for each E-term using the CLIR algorithm: df(e) = sum_f{df(f)*prob(f|e)}
    * 
    * @param eVocabSrc
-   * 		source-side vocabulary of the ttable E-->F (i.e., Pr(f|e))
+   *    source-side vocabulary of the ttable E-->F (i.e., Pr(f|e))
    * @param fVocabTrg
-   * 		target-side vocabulary of the ttable E-->F (i.e., Pr(f|e))
+   *    target-side vocabulary of the ttable E-->F (i.e., Pr(f|e))
    * @param e2f_probs
-   * 		ttable E-->F (i.e., Pr(f|e))
+   *    ttable E-->F (i.e., Pr(f|e))
    * @return
-   * 		mapping from E-terms to their computed df values
+   *    mapping from E-terms to their computed df values
    */
   public static HMapIFW translateDFTable(Vocab eVocabSrc, Vocab fVocabTrg, TTable_monolithic_IFAs e2f_probs, FrequencySortedDictionary dict, DfTableArray dfTable){
     HMapIFW transDfTable = new HMapIFW();
@@ -208,7 +208,7 @@ public class CLIRUtils extends Configured {
         String fTerm = fVocabTrg.get(f);
         int id = dict.getId(fTerm); 
         if(id != -1){
-          float df_f = dfTable.getDf(id);				
+          float df_f = dfTable.getDf(id);       
           df += (probEF*df_f);
         }else{
           logger.debug(fTerm+" not in dict");
@@ -223,15 +223,15 @@ public class CLIRUtils extends Configured {
    * Given a mapping from F-terms to their df values, compute a df value for each E-term using the CLIR algorithm: df(e) = sum_f{df(f)*prob(f|e)}
    * 
    * @param eVocabSrc
-   * 		source-side vocabulary of the ttable E-->F (i.e., Pr(f|e))
+   *    source-side vocabulary of the ttable E-->F (i.e., Pr(f|e))
    * @param fVocabTrg
-   * 		target-side vocabulary of the ttable E-->F (i.e., Pr(f|e))
+   *    target-side vocabulary of the ttable E-->F (i.e., Pr(f|e))
    * @param e2f_probs
-   * 		ttable E-->F (i.e., Pr(f|e))
+   *    ttable E-->F (i.e., Pr(f|e))
    * @param dfs
-   * 		mapping from F-terms to their df values
+   *    mapping from F-terms to their df values
    * @return
-   * 		mapping from E-terms to their computed df values
+   *    mapping from E-terms to their computed df values
    */
   public static HMapIFW translateDFTable(Vocab eVocabSrc, Vocab fVocabTrg, TTable_monolithic_IFAs e2f_probs, HMapSIW dfs){
     HMapIFW transDfTable = new HMapIFW();
@@ -246,9 +246,9 @@ public class CLIRUtils extends Configured {
       for(int f : fS){
         float probEF = e2f_probs.get(e, f);
         String fTerm = fVocabTrg.get(f);
-        if(!dfs.containsKey(fTerm)){	//only if word is in the collection, can it contribute to the df values.
+        if(!dfs.containsKey(fTerm)){  //only if word is in the collection, can it contribute to the df values.
           continue;
-        }			
+        }     
         float df_f = dfs.get(fTerm);
         df+=(probEF*df_f);
       }
@@ -262,27 +262,27 @@ public class CLIRUtils extends Configured {
    * Calling this method computes a single summand of the above equation.
    * 
    * @param fTerm
-   *	 	term in a document in F
+   *    term in a document in F
    * @param tf
-   * 		term frequency of fTerm
+   *    term frequency of fTerm
    * @param tfTable
-   * 		to be updated, a mapping from E-term ids to tf values
+   *    to be updated, a mapping from E-term ids to tf values
    * @param eVocabSrc
-   * 		source-side vocabulary of the ttable E-->F (i.e., Pr(f|e))
+   *    source-side vocabulary of the ttable E-->F (i.e., Pr(f|e))
    * @param eVocabTrg
-   * 		target-side vocabulary of the ttable F-->E (i.e., Pr(f|e))
+   *    target-side vocabulary of the ttable F-->E (i.e., Pr(f|e))
    * @param fVocabSrc
-   * 		source-side vocabulary of the ttable F-->E (i.e., Pr(e|f))
+   *    source-side vocabulary of the ttable F-->E (i.e., Pr(e|f))
    * @param fVocabTrg
-   * 		target-side vocabulary of the ttable E-->F (i.e., Pr(f|e))
+   *    target-side vocabulary of the ttable E-->F (i.e., Pr(f|e))
    * @param e2fProbs
-   * 		ttable E-->F (i.e., Pr(f|e))
+   *    ttable E-->F (i.e., Pr(f|e))
    * @param f2eProbs
-   * 		ttable F-->E (i.e., Pr(e|f))
+   *    ttable F-->E (i.e., Pr(e|f))
    * @param sLogger
-   * 		Logger object for log output
+   *    Logger object for log output
    * @return
-   * 		updated mapping from E-term ids to tf values
+   *    updated mapping from E-term ids to tf values
    * @throws IOException
    */
   public static HMapIFW updateTFsByTerm(String fTerm, int tf, HMapIFW tfTable, Vocab eVocabSrc, Vocab eVocabTrg, Vocab fVocabSrc, Vocab fVocabTrg, 
@@ -317,23 +317,23 @@ public class CLIRUtils extends Configured {
    * Given a document in F, and its tf mapping, compute a tf value for each term in E using the CLIR algorithm: tf(e) = sum_f{tf(f)*prob(e|f)}
    * 
    * @param doc
-   *	 	mapping from F-term strings to tf values
+   *    mapping from F-term strings to tf values
    * @param tfTable
-   * 		to be returned, a mapping from E-term ids to tf values
+   *    to be returned, a mapping from E-term ids to tf values
    * @param eVocabSrc
-   * 		source-side vocabulary of the ttable E-->F (i.e., Pr(f|e))
+   *    source-side vocabulary of the ttable E-->F (i.e., Pr(f|e))
    * @param eVocabTrg
-   * 		target-side vocabulary of the ttable F-->E (i.e., Pr(f|e))
+   *    target-side vocabulary of the ttable F-->E (i.e., Pr(f|e))
    * @param fVocabSrc
-   * 		source-side vocabulary of the ttable F-->E (i.e., Pr(e|f))
+   *    source-side vocabulary of the ttable F-->E (i.e., Pr(e|f))
    * @param fVocabTrg
-   * 		target-side vocabulary of the ttable E-->F (i.e., Pr(f|e))
+   *    target-side vocabulary of the ttable E-->F (i.e., Pr(f|e))
    * @param e2fProbs
-   * 		ttable E-->F (i.e., Pr(f|e))
+   *    ttable E-->F (i.e., Pr(f|e))
    * @param f2eProbs
-   * 		ttable F-->E (i.e., Pr(e|f))
+   *    ttable F-->E (i.e., Pr(e|f))
    * @param sLogger
-   * 		Logger object for log output
+   *    Logger object for log output
    * @throws IOException
    */
   public static int translateTFs(TermDocVector doc, HMapIFW tfTable, Vocab eVocabSrc, Vocab eVocabTrg, Vocab fVocabSrc, Vocab fVocabTrg, 
@@ -344,7 +344,7 @@ public class CLIRUtils extends Configured {
 
     //sLogger.setLevel(Level.DEBUG);
 
-    //translate doc vector		
+    //translate doc vector    
     TermDocVector.Reader reader = doc.getReader();
     int docLen = 0;
     while (reader.hasMoreTerms()) {
@@ -363,7 +363,7 @@ public class CLIRUtils extends Configured {
 
       // tf(e) = sum_f{tf(f)*prob(e|f)}
       for(int e : eS){
-        if(e<=0){		//if eTerm is NULL, that means there were cases where fTerm was unaligned in a sentence pair. Just skip these cases, since the word NULL is not in our target vocab.
+        if(e<=0){   //if eTerm is NULL, that means there were cases where fTerm was unaligned in a sentence pair. Just skip these cases, since the word NULL is not in our target vocab.
           continue;
         }
         String eTerm = eVocabTrg.get(e);
@@ -385,23 +385,23 @@ public class CLIRUtils extends Configured {
    * Given a document in F, and its tf mapping, compute a tf value for each term in E using the CLIR algorithm: tf(e) = sum_f{tf(f)*prob(e|f)}
    * 
    * @param doc
-   *	 	mapping from F-term strings to tf values
+   *    mapping from F-term strings to tf values
    * @param tfTable
-   * 		to be returned, a mapping from E-term ids to tf values
+   *    to be returned, a mapping from E-term ids to tf values
    * @param eVocabSrc
-   * 		source-side vocabulary of the ttable E-->F (i.e., Pr(f|e))
+   *    source-side vocabulary of the ttable E-->F (i.e., Pr(f|e))
    * @param eVocabTrg
-   * 		target-side vocabulary of the ttable F-->E (i.e., Pr(f|e))
+   *    target-side vocabulary of the ttable F-->E (i.e., Pr(f|e))
    * @param fVocabSrc
-   * 		source-side vocabulary of the ttable F-->E (i.e., Pr(e|f))
+   *    source-side vocabulary of the ttable F-->E (i.e., Pr(e|f))
    * @param fVocabTrg
-   * 		target-side vocabulary of the ttable E-->F (i.e., Pr(f|e))
+   *    target-side vocabulary of the ttable E-->F (i.e., Pr(f|e))
    * @param e2fProbs
-   * 		ttable E-->F (i.e., Pr(f|e))
+   *    ttable E-->F (i.e., Pr(f|e))
    * @param f2eProbs
-   * 		ttable F-->E (i.e., Pr(e|f))
+   *    ttable F-->E (i.e., Pr(e|f))
    * @param sLogger
-   * 		Logger object for log output
+   *    Logger object for log output
    * @throws IOException
    */
   public static int translateTFs(HMapSIW doc, HMapIFW tfTable, Vocab eVocabSrc, Vocab eVocabTrg, Vocab fVocabSrc, Vocab fVocabTrg, 
@@ -417,7 +417,7 @@ public class CLIRUtils extends Configured {
       docLen += tf;
       int f = fVocabSrc.get(fTerm);
       if(f <= 0){
-        //				sLogger.warn(f+","+fTerm+": word not in aligner's vocab (source side of f2e)");
+        //        sLogger.warn(f+","+fTerm+": word not in aligner's vocab (source side of f2e)");
         continue;
       }
       int[] eS = f2eProbs.get(f).getTranslations(0.0f);
@@ -445,20 +445,20 @@ public class CLIRUtils extends Configured {
    * Given the TF, DF values, doc length, scoring model, this method creates the term doc vector for a document.
    * 
    * @param docLen
-   * 		doc length
+   *    doc length
    * @param tfTable
-   * 		mapping from term id to tf values
+   *    mapping from term id to tf values
    * @param eVocab
-   * 		vocabulary object for final doc vector language
+   *    vocabulary object for final doc vector language
    * @param scoringModel model
    * @param dfTable
-   * 		mapping from term id to df values
+   *    mapping from term id to df values
    * @param isNormalize
-   * 		indicating whether to normalize the doc vector weights or not
+   *    indicating whether to normalize the doc vector weights or not
    * @param sLogger
-   * 		Logger object for log output
+   *    Logger object for log output
    * @return
-   * 		Term doc vector representing the document
+   *    Term doc vector representing the document
    */
   public static HMapSFW createTermDocVector(int docLen, HMapIFW tfTable, Vocab eVocab, ScoringModel scoringModel, HMapIFW dfTable, boolean isNormalize, Logger sLogger) {
     if(sLogger == null){
@@ -483,7 +483,7 @@ public class CLIRUtils extends Configured {
         v.put(eTerm, score);
         if(isNormalize){
           normalization+=Math.pow(score, 2);
-        }		
+        }   
       }
     }
 
@@ -541,18 +541,18 @@ public class CLIRUtils extends Configured {
    * Given the TF, DF values, doc length, scoring model, this method creates the term doc vector for a document.
    * 
    * @param docLen
-   * 		doc length
+   *    doc length
    * @param tfTable
-   * 		mapping from term id to tf values
+   *    mapping from term id to tf values
    * @param eVocab
-   * 		vocabulary object for final doc vector language
+   *    vocabulary object for final doc vector language
    * @param scoringModel model
    * @param dfTable
-   * 		mapping from term id to df values
+   *    mapping from term id to df values
    * @param isNormalize
-   * 		indicating whether to normalize the doc vector weights or not
+   *    indicating whether to normalize the doc vector weights or not
    * @param sLogger
-   * 		Logger object for log output
+   *    Logger object for log output
    * @return term doc vector representing the document
    */
   public static HMapSFW createTermDocVector(int docLen, HMapIFW tfTable, Vocab eVocab, ScoringModel scoringModel, FrequencySortedDictionary dict, DfTableArray dfTable, boolean isNormalize, Logger sLogger) {
@@ -569,7 +569,7 @@ public class CLIRUtils extends Configured {
       String eTerm = eVocab.get(entry.getKey());
       float tf = entry.getValue();
       int eId = dict.getId(eTerm);
-      if(eId < 1){		//OOV
+      if(eId < 1){    //OOV
         continue;
       }
       int df = dfTable.getDf(eId);
@@ -585,7 +585,7 @@ public class CLIRUtils extends Configured {
         v.put(eTerm, score);
         if(isNormalize){
           normalization+=Math.pow(score, 2);
-        }		
+        }   
       }
     }
 
@@ -670,26 +670,26 @@ public class CLIRUtils extends Configured {
    * For each source language term, top numTrans entries (with highest translation probability) are kept, unless the top K < numTrans entries have a cumulatite probability above PROB_THRESHOLD.
    * 
    * @param inputFile
-   * 		output of Berkeley Aligner (probability values from source language to target language). Format should be: 
-   * 			[source-word] entropy ... nTrans ... sum 1.000000
-   * 				[target-word1]: [prob1]
-   * 				[target-word2]: [prob2]
-   * 				..
+   *    output of Berkeley Aligner (probability values from source language to target language). Format should be: 
+   *      [source-word] entropy ... nTrans ... sum 1.000000
+   *        [target-word1]: [prob1]
+   *        [target-word2]: [prob2]
+   *        ..
    * @param srcVocabFile
-   * 		path where created source vocabulary (VocabularyWritable) will be written
+   *    path where created source vocabulary (VocabularyWritable) will be written
    * @param trgVocabFile
-   * 		path where created target vocabulary (VocabularyWritable) will be written
+   *    path where created target vocabulary (VocabularyWritable) will be written
    * @param probsFile
-   * 		path where created probability table (TTable_monolithic_IFAs) will be written
+   *    path where created probability table (TTable_monolithic_IFAs) will be written
    * @param fs
-   * 		FileSystem object
+   *    FileSystem object
    * @throws IOException
    */
   public static void createTTableFromBerkeleyAligner(String inputFile, String srcVocabFile, String trgVocabFile, String probsFile, 
       float probThreshold, int numTrans, FileSystem fs) throws IOException{
     TTable_monolithic_IFAs table = new TTable_monolithic_IFAs();
     VocabularyWritable trgVocab = new VocabularyWritable(), srcVocab = new VocabularyWritable();
-    int cnt = 0;		// for statistical purposes only
+    int cnt = 0;    // for statistical purposes only
     HookaStats stats = new HookaStats(numTrans, probThreshold);
 
     //In BerkeleyAligner output, dictionary entries of each source term are already sorted by prob. value. 
@@ -714,7 +714,7 @@ public class CLIRUtils extends Configured {
         if ( m.find() ) {
           cur = m.group(1);
 
-          int gerIndex = srcVocab.addOrGet(cur);	
+          int gerIndex = srcVocab.addOrGet(cur);  
           logger.debug("Found: "+cur+" with index: "+gerIndex);
 
 
@@ -738,7 +738,7 @@ public class CLIRUtils extends Configured {
                   i = numTrans;
                   break;
                 }
-                //								logger.debug("FFFF"+line);
+                //                logger.debug("FFFF"+line);
               } else {
                 String term = m2.group(1);
                 if ( !term.equals("NULL") ) {
@@ -806,19 +806,19 @@ public class CLIRUtils extends Configured {
    * This method converts the output of GIZA into a TTable_monolithic_IFAs object. 
    * For each source language term, top numTrans entries (with highest translation probability) are kept, unless the top K < numTrans entries have a cumulatite probability above probThreshold.
    * 
-   * @param inputFile
-   * 		output of GIZA (probability values from source language to target language. In GIZA, format of each line should be: 
-   * 			[target-word1] [source-word] [prob1]
-   * 			[target-word2] [source-word] [prob2]
+   * @param filename
+   *    output of GIZA (probability values from source language to target language. In GIZA, format of each line should be: 
+   *      [target-word1] [source-word] [prob1]
+   *      [target-word2] [source-word] [prob2]
    *          ...
    * @param srcVocabFile
-   * 		path where created source vocabulary (VocabularyWritable) will be written
+   *    path where created source vocabulary (VocabularyWritable) will be written
    * @param trgVocabFile
-   * 		path where created target vocabulary (VocabularyWritable) will be written
+   *    path where created target vocabulary (VocabularyWritable) will be written
    * @param probsFile
-   * 		path where created probability table (TTable_monolithic_IFAs) will be written
+   *    path where created probability table (TTable_monolithic_IFAs) will be written
    * @param fs
-   * 		FileSystem object
+   *    FileSystem object
    * @throws IOException
    */
   public static void createTTableFromGIZA(String inputFile, String srcVocabFile, String trgVocabFile, String probsFile, 
@@ -841,10 +841,10 @@ public class CLIRUtils extends Configured {
       float sumOfProbs = 0.0f, prob;
       HookaStats stats = new HookaStats(numTrans, probThreshold);
 
-      while (true) {	
+      while (true) {  
         //        line = bis.readLine();
         line = inputReader.readLine();
-        if(line == null)	break;
+        if(line == null)  break;
         String[] parts = line.split(" ");
         if(parts.length != 3){
           throw new RuntimeException("Unknown format: "+cnt+" = \n"+line);
@@ -870,7 +870,7 @@ public class CLIRUtils extends Configured {
           // initialize the translation distribution of the source term
           sumOfProbs = 0.0f;
           topTrans.clear();
-          earlyTerminate = false;		// reset status
+          earlyTerminate = false;   // reset status
           skipTerm = false;
           prev = srcTerm;
           int prevIndex = curIndex;
@@ -878,15 +878,15 @@ public class CLIRUtils extends Configured {
           if(curIndex <= prevIndex){
             // we've seen this foreign term before. probably due to tokenization or sorting error in aligner. just ignore.
             logger.debug("FLAG: "+line);
-            curIndex = prevIndex;		// revert curIndex value since we're skipping this one
+            curIndex = prevIndex;   // revert curIndex value since we're skipping this one
             skipTerm = true;
             continue;
           }
-          logger.debug("Processing: "+srcTerm+" with index: "+curIndex);			
+          logger.debug("Processing: "+srcTerm+" with index: "+curIndex);      
           topTrans.add(new PairOfFloatString(prob, trgTerm));
           sumOfProbs += prob;
           logger.debug("Added to queue: "+trgTerm+" with prob: "+prob+" (sum: "+sumOfProbs+")");      
-        }else if(!earlyTerminate && !skipTerm && !delims.contains(srcTerm)){	//continue adding translation term,prob pairs (except if early termination is ON)
+        }else if(!earlyTerminate && !skipTerm && !delims.contains(srcTerm)){  //continue adding translation term,prob pairs (except if early termination is ON)
           topTrans.add(new PairOfFloatString(prob, trgTerm));
           sumOfProbs += prob;
           logger.debug("Added to queue: "+trgTerm+" with prob: "+prob+" (sum: "+sumOfProbs+")");      
@@ -938,19 +938,19 @@ public class CLIRUtils extends Configured {
    * For each source language term, top numTrans entries (with highest translation probability) are kept, unless the top K < numTrans entries have a cumulatite probability above probThreshold.
    * 
    * @param srcVocabFile
-   * 		path to source vocabulary file output by Hooka
+   *    path to source vocabulary file output by Hooka
    * @param trgVocabFile
-   * 	 	path to target vocabulary file output by Hooka
+   *    path to target vocabulary file output by Hooka
    * @param tableFile
-   * 		path to ttable file output by Hooka
+   *    path to ttable file output by Hooka
    * @param finalSrcVocabFile
-   * 		path where created source vocabulary (VocabularyWritable) will be written
+   *    path where created source vocabulary (VocabularyWritable) will be written
    * @param finalTrgVocabFile
-   * 		path where created target vocabulary (VocabularyWritable) will be written
+   *    path where created target vocabulary (VocabularyWritable) will be written
    * @param finalTableFile
-   * 		path where created probability table (TTable_monolithic_IFAs) will be written
+   *    path where created probability table (TTable_monolithic_IFAs) will be written
    * @param fs
-   * 		FileSystem object
+   *    FileSystem object
    * @throws IOException
    */
   public static void createTTableFromHooka(String srcVocabFile, String trgVocabFile, String tableFile, String finalSrcVocabFile, 
@@ -970,7 +970,7 @@ public class CLIRUtils extends Configured {
     int curIndex = -1;
     TreeSet<PairOfFloatString> topTrans = new TreeSet<PairOfFloatString>();
     float sumOfProbs = 0.0f, prob;
-    //    int cntLongTail = 0, cntShortTail = 0, sumShortTail = 0;		// for statistical purposes only
+    //    int cntLongTail = 0, cntShortTail = 0, sumShortTail = 0;    // for statistical purposes only
     HookaStats stats = new HookaStats(numTrans, probThreshold);
 
     //modify current ttable wrt foll. criteria: top numTrans translations per source term, unless cumulative prob. distr. exceeds probThreshold before that.
@@ -1011,7 +1011,7 @@ public class CLIRUtils extends Configured {
         if (sumOfProbs > probThreshold) {
           logger.debug("Sum of probs > "+probThreshold+", early termination.");
           break;
-        }	
+        } 
       }
 
       //store previous term's top translations to ttable
@@ -1152,7 +1152,6 @@ public class CLIRUtils extends Configured {
       HMapSIW eSrcTfs, HMapSFW eVector, HMapSIW fSrcTfs, HMapSFW translatedFVector, float eSentLength, float fSentLength,
       Vocab eVocabSrc, Vocab eVocabTrg, Vocab fVocabSrc, Vocab fVocabTrg, TTable_monolithic_IFAs e2f_Probs, TTable_monolithic_IFAs f2e_Probs, float prob, Logger sLogger) {
     List<String> features = new ArrayList<String>();
-
     if(fSentLength == 0 || eSentLength == 0){
       return null;
     }
@@ -1171,26 +1170,60 @@ public class CLIRUtils extends Configured {
       // src-->trg and trg-->src token translation ratio
       features.add("wordtransratio1=" + getWordTransRatio(fSrcTfs, eSrcTfs, fVocabSrc, eVocabTrg, f2e_Probs, prob) );
       features.add("wordtransratio2=" + getWordTransRatio(eSrcTfs, fSrcTfs, eVocabSrc, fVocabTrg, e2f_Probs, prob) );
-    }
-
-    ////////////////////////////////////
-
-    if (featSet > 2) {
-      // uppercase token matching features : find uppercased tokens that exactly appear on both sides
-      // lack of this evidence does not imply anything, but its existence might indicate parallel
-//      fSentence.replaceAll("([',:;.?%!])", " $1 ");
-//      eSentence.replaceAll("([',:;.?%!])", " $1 ");
-      PairOfFloats pair = getUppercaseRatio(fTokenizer.processContent(fSentence), eTokenizer.processContent(eSentence));
-      features.add("uppercaseratio1=" + pair.getLeftElement() );
-      features.add("uppercaseratio2=" + pair.getRightElement() );
-    }
-
-    if (featSet > 3) {
-      // future work = count number of single/double letter words in src and trg side
-
+      ////////////////////////////////////
+      
+      if (featSet > 2) {
+        fSentence = fSentence.replaceAll("([',:;.?%!])", " $1 ");
+        eSentence = eSentence.replaceAll("([',:;.?%!])", " $1 ");
+        
+        String[] fTokens = fSentence.split("\\s+");
+        String[] eTokens = eSentence.split("\\s+");
+        
+        // future work = count number of single/double letter words in src and trg side
+        float fSingleCnt = 1 + getNumberOfWordsWithNDigits(1, fTokens);
+        int eSingleCnt = 1 + getNumberOfWordsWithNDigits(1, eTokens);
+        float fDoubleCnt = 1 + getNumberOfWordsWithNDigits(2, fTokens);
+        int eDoubleCnt = 1 + getNumberOfWordsWithNDigits(2, eTokens);
+        features.add("Ndigitratio=" + (fSingleCnt/eSingleCnt)*(fDoubleCnt/eDoubleCnt));
+        
+        // future work = binary feature if there is same multi-digit number on both sides (e.g. 4-digit for years)
+        getNumberRatio(fTokens, eTokens);
+        if (featSet > 3) {
+          // uppercase token matching features : find uppercased tokens that exactly appear on both sides
+          // lack of this evidence does not imply anything, but its existence might indicate parallel
+          PairOfFloats pair = getUppercaseRatio(fTokens, eTokens);
+          features.add("uppercaseratio=" + Math.max(pair.getLeftElement(), pair.getRightElement()));
+        }
+      }
     }
 
     return features.toArray(new String[features.size()]);
+  }
+
+  private static PairOfFloats getNumberRatio(String[] tokens1, String[] tokens2) {
+    HashSet<String> numberMap1 = getNumbers(tokens1);
+    HashSet<String> numberMap2 = getNumbers(tokens2);
+    return getRatio(numberMap1, numberMap2);
+  }
+
+  private static HashSet<String> getNumbers(String[] tokens) {
+    HashSet<String> numbers = new HashSet<String>();
+    for (String token : tokens) {
+      if (isNumber.matcher(token).find()) {
+        numbers.add(token);
+      }
+    }
+    return numbers;
+  }
+
+  private static int getNumberOfWordsWithNDigits(int N, String[] tokens) {
+    int cnt = 0;
+    for (String token : tokens) {
+      if (token.length() == N) {
+        cnt++;
+      }
+    }
+    return cnt;
   }
 
   private static float getWordTransRatio(HMapSIW eSrcTfs, HMapSIW fSrcTfs, Vocab eVocabSrc, Vocab fVocabTrg, TTable_monolithic_IFAs e2fProbs, float probThreshold) {
@@ -1230,41 +1263,83 @@ public class CLIRUtils extends Configured {
   private static PairOfFloats getUppercaseRatio(String[] tokens1, String[] tokens2) {
     //ěáčé
     // now, read tokens in first sentence and keep track of sequences of uppercased tokens in buffer
-    HashSet<String> upperCaseMap1 = getUppercaseParts(tokens1);
-    HashSet<String> upperCaseMap2 = getUppercaseParts(tokens2);
-    float cntUpperRatio1 = getRatio(upperCaseMap1, upperCaseMap2);
-    float cntUpperRatio2 = getRatio(upperCaseMap2, upperCaseMap1);
-    PairOfFloats result = new PairOfFloats(cntUpperRatio1, cntUpperRatio2);
-    return result;
+    HashSet<String> upperCaseMap1 = getDoubleUppercaseParts(tokens1);
+    HashSet<String> upperCaseMap2 = getDoubleUppercaseParts(tokens2);
+    return getRatio(upperCaseMap1, upperCaseMap2);
   }
 
-  private static float getRatio(HashSet<String> upperCaseMap1, HashSet<String> upperCaseMap2) {
+  private static PairOfFloats getRatio(HashSet<String> upperCaseMap1, HashSet<String> upperCaseMap2) {
     float cntUpperMatch = 0;
     for (String uppercase : upperCaseMap1) {
-      if (upperCaseMap2.contains(uppercase)) {
-        //            System.out.println("DEBUG["+uppercaseEntity+"]");
-        cntUpperMatch++;
+      int length = uppercase.length(); 
+      for (String uppercase2 : upperCaseMap2) {
+        int length2 = uppercase2.length();
+        if (length2 < length) {
+          length = length2; 
+        }
+        if (upperCaseMap2.contains(uppercase)) {
+          //        if (org.apache.commons.lang.StringUtils.getLevenshteinDistance(uppercase, uppercase2) < length * 0.25f) {
+          cntUpperMatch++;          
+          //          System.out.println("DEBUG["+uppercase+"]["+uppercase2+"]");
+        }
       }
     }
-    return upperCaseMap1.isEmpty() ? 0f : cntUpperMatch / upperCaseMap1.size();
+    PairOfFloats pair = new PairOfFloats(
+        upperCaseMap1.isEmpty() ? 0f : cntUpperMatch / upperCaseMap1.size(), 
+            upperCaseMap2.isEmpty() ? 0f : cntUpperMatch / upperCaseMap2.size());
+    return pair;
   }
 
   private static HashSet<String> getUppercaseParts(String[] tokens) {
     HashSet<String> set = new HashSet<String>();
     StringBuilder buffer = new StringBuilder(" ");
 
+    int numUppercaseTokensInBuffer = 0;
     String uppercaseEntity = "";
     for (int i=0; i < tokens.length; i++) {
       String token = tokens[i].trim();
+      //      System.out.println("DEBUG[Token=" + token);
       // discard single-char upper-case tokens
       if (token.length() > 0 && Character.isUpperCase(token.charAt(0))) {
         buffer.append(token + " ");
+        numUppercaseTokensInBuffer++;
       }else {
-        uppercaseEntity = buffer.toString();
-        if (!uppercaseEntity.trim().equals("") && uppercaseEntity.length() > 2) {
+        uppercaseEntity = buffer.toString().trim();
+        //        System.out.println("DEBUG[Uppercase=" + uppercaseEntity);
+        if (!uppercaseEntity.equals("") && uppercaseEntity.length() > 2 && numUppercaseTokensInBuffer > 1) {
           set.add(uppercaseEntity);
           buffer.delete(1, buffer.length());    // clear buffer
+          numUppercaseTokensInBuffer = 0;
         }
+      }
+    } 
+    return set;
+  }
+
+  private static HashSet<String> getDoubleUppercaseParts(String[] tokens) {
+    HashSet<String> set = new HashSet<String>();
+    StringBuilder buffer = new StringBuilder(" ");
+
+    int numUppercaseTokensInBuffer = 0;
+    String uppercaseEntity = "";
+    for (int i=0; i < tokens.length; i++) {
+      String token = tokens[i].trim();
+      if (token.length() > 0 && Character.isUpperCase(token.charAt(0))) {
+        buffer.append(token + " ");
+        numUppercaseTokensInBuffer++;
+        if (numUppercaseTokensInBuffer == 2) {
+          uppercaseEntity = buffer.toString().trim();
+          //        System.out.println("DEBUG[Uppercase=" + uppercaseEntity);
+          if (!uppercaseEntity.equals("") && uppercaseEntity.length() > 2) {
+            set.add(uppercaseEntity);
+            buffer.delete(1, buffer.length());    // clear buffer
+            buffer.append(token + " ");            
+            numUppercaseTokensInBuffer = 1;
+          }
+        }
+      }else {
+        buffer.delete(1, buffer.length());    // clear buffer
+        numUppercaseTokensInBuffer = 0;        
       }
     } 
     return set;
