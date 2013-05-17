@@ -12,14 +12,12 @@
      <f2eProbs>data/vocab/ttable.en-zh</f2eProbs>
      <LexProbThreshold>0.005</LexProbThreshold>
      <CumProbThreshold>0.95</CumProbThreshold>
-     <mt_weight>0.2</mt_weight>
-     <scfg_weight>0.7</scfg_weight>
+     <mt_weight>0.1</mt_weight>
+     <grammar_weight>0.8</grammar_weight>
      <bitext_weight>0.1</bitext_weight>
      <token_weight>1</token_weight>
      <phrase_weight>0</phrase_weight>
-     <scfg_path>data/en-zh.ntcir8/grammar.en-zh.ntcir8</scfg_path>
      <kBest>10</kBest>
-
      <query_stemmed_stopwordlist>data/tokenizer/en.stop.stemmed</query_stemmed_stopwordlist>
 
 </parameters>

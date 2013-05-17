@@ -13,11 +13,10 @@
      <LexProbThreshold>0.005</LexProbThreshold>
      <CumProbThreshold>0.95</CumProbThreshold>
      <mt_weight>1</mt_weight>
-     <scfg_weight>0</scfg_weight>
+     <grammar_weight>0</grammar_weight>
      <bitext_weight>0</bitext_weight>
      <token_weight>1</token_weight>
      <phrase_weight>0</phrase_weight>
-     <scfg_path>data/en-fr.clef06/grammar.en-fr.clef06</scfg_path>
      <kBest>10</kBest>
 
      <doc_stemmed_stopwordlist>data/tokenizer/fr.stop.stemmed</doc_stemmed_stopwordlist>
