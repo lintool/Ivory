@@ -137,7 +137,7 @@ You can run the driver as follows:
 
 <pre class="code">
 etc/run.sh ivory.ffg.preprocessing.GenerateDocumentVectors \
--index &lt;Ivory-Index-Path&gt; -dvclass &lt;DocumentVector-Class&gt; -judgment &lt;Documents-Path&gt; \
+-index &lt;Ivory-Index-Path&gt; -dvclass &lt;DocumentVector-Class&gt; -candidate &lt;Documents-Path&gt; \
 -output &lt;DV-Path&gt;
 </pre>
 
@@ -149,7 +149,7 @@ use the following driver:</p>
 <pre class="code">
 etc/run.sh ivory.ffg.driver.RankAndFeaturesSmallAdaptive \
 -index &lt;Ivory-Index-Path&gt; -posting &lt;PII-Path&gtl; \
--query &lt;Queries-Path&gt; -judgment &lt;Documents-Path&gt; -feature &lt;Features-Path&gt; \
+-query &lt;Queries-Path&gt; -candidate &lt;Documents-Path&gt; -feature &lt;Features-Path&gt; \
 [-hits &lt;Hits&gt;] [-spam &lt;Spam-Scores-Path&gt; -output &lt;Output-Path&gt;]
 </pre>
 
@@ -161,7 +161,7 @@ etc/run.sh ivory.ffg.driver.RankAndFeaturesSmallAdaptive \
 <pre class="code">
 etc/run.sh ivory.ffg.driver.[DocumentVectorOnTheFlyIndexing|DocumentVectorSlidingWindow] \
 -index &lt;Ivory-Index-Path&gt; -dvclass &lt;DocumentVector-Class&gt; -document &lt;DocumentVector-Path&gt; \
--query &lt;Query-Path&gt; -judgment &lt;Documents-Path&gt; -feature &lt;Features-Path&gt; \
+-query &lt;Query-Path&gt; -candidate &lt;Documents-Path&gt; -feature &lt;Features-Path&gt; \
 [-output &lt;Output-Path&gt;]
 </pre>
 
