@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Ivory: Experiments</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Le styles -->
+    <link href="assets/css/bootstrap.css" rel="stylesheet">
+    <link href="assets/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="assets/css/docs.css" rel="stylesheet">
+    <link href="assets/js/google-code-prettify/prettify.css" rel="stylesheet">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+  </head>
+
+  <body data-spy="scroll" data-target=".bs-docs-sidebar">
+
+    <!-- Navbar
+    ================================================== -->
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <div class="nav-collapse collapse">
+            <ul class="nav">
+              <li class="">
+                <a href="../index.html">Home</a>
+              </li>
+              <li class="">
+                <a href="./start.html">Getting Started</a>
+              </li>
+              <li class="">
+                <a href="./publications.html">Publications</a>
+              </li>
+              <li class="active">
+                <a href="./experiments.html">Experiments</a>
+              </li>
+              <li class="">
+                <a href="./team.html">Team</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+<!-- Subhead
+================================================== -->
+<header class="jumbotron subhead" id="overview">
+  <div class="container">
+    <h1>Ivory</h1>
+    <p class="lead">A Hadoop toolkit for web-scale information retrieval research</p>
+  </div>
+</header>
+
+  <div class="container">
+
+<div class="page-header">
+<h2>Experiments: Asadi and Lin's IRJ 2012</h2>
+</div>
+<p>The following is a step-by-step guide to replicating experiments from Asadi and Lin's paper in
+the Journal of Information Retrieval (IRJ) 2012.</p>
+
+<h3>Queries, Documents, and Features</h3>
+
+Queries must be in the following XML format:
+
+<pre class="code">
+&lt;parameters&gt;
+  &lt;query id="query_id"&gt;query_text&lt;/query&gt;
+&lt;/parameters&gt;
+</pre>
+
+<p>A sample query file can be found at <code>data/ivory/ffg/queries.xml</code>.</p>
+
+<p>Documents from which the program computes features should be in a separate file
+in the following format:</p>
+
+<pre class="code">
+&lt;line&gt; .=. &lt;query-id&gt; \t &lt;document-id&gt;
+&lt;query-id&gt; .=. &lt;integer&gt;
+&lt;document-id&gt; .=. &lt;integer&gt;
+</pre>
+
+<p>For a sample documens file, please see <code>data/ivory/ffg/documents.xml</code>.</p>
+
+<p>Finally, a list of feature definitions must be given as input, in the following format:</p>
+
+<pre class="code">
+&lt;parameters&gt;
+&lt;feature id="FeatureID" \
+    featureClass="FeatureClass" \
+    scoringFunctionClass="ScoringFunctionClass" \
+    &lt;parameter&gt;:"&lt;values&gt;" ... /&gt;
+&lt;/parameters&gt;
+</pre>
+
+<p>A sample list of features is included at <code>data/ivory/ffg/features.xml</code>.</p>
+
+<h3>Preparing ClueWeb09 Indexes</h3>
+
+<p>The first step is to construct a Positional Inverted Index (PII) or Document Vectors (DV).
+A PII can be used to perform both candidate generation and feature extraction together in a
+single pass. To construct a PII, the driver uses an Ivory index and
+<a href="http://plg.uwaterloo.ca/~gvcormac/clueweb09spam/">spam scores</a>.</p>
+
+<pre class="code">
+etc/run.sh ivory.ffg.preprocessing.GenerateCompressedPositionalPostings \
+-index &lt;Ivory-Index-Path&gt; -query &lt;Queries-Path&gt; -spam &lt;Spam-Scores-Path&gt; \
+-output &lt;PII-Path&gt;
+</pre>
+
+<p>To construct document vectors, you need to pack documents into one of the various
+document vector data structures located under <code>ivory.ffg.data</code>. These include:</p>
+
+<ul>
+<li>PFOR-compressed DV: <code>ivory.ffg.data.DocumentVectorPForDetlaArray</code></li>
+<li>VByte-compressed DV: <code>ivory.ffg.data.DocumentVectorVIntArray</code></li>
+<li>Hash-compressed (from IRJ) DV: <code>ivory.ffg.data.DocumentVectorHashedArray</code></li>
+<li>Mini-Indexed DV: <code>ivory.ffg.data.DocumentVectorMiniInvertedIndex</code></li>
+</ul>
+
+<p>
+You can run the driver as follows:
+</p>
+
+<pre class="code">
+etc/run.sh ivory.ffg.preprocessing.GenerateDocumentVectors \
+-index &lt;Ivory-Index-Path&gt; -dvclass &lt;DocumentVector-Class&gt; -candidate &lt;Documents-Path&gt; \
+-output &lt;DV-Path&gt;
+</pre>
+
+<h3>Computing Features</h3>
+
+<p>In order to perform candidate generation (with Small Adaptive) and feature extraction in one pass using a PII,
+use the following driver:</p>
+
+<pre class="code">
+etc/run.sh ivory.ffg.driver.RankAndFeaturesSmallAdaptive \
+-index &lt;Ivory-Index-Path&gt; -posting &lt;PII-Path&gtl; \
+-query &lt;Queries-Path&gt; -candidate &lt;Documents-Path&gt; -feature &lt;Features-Path&gt; \
+[-hits &lt;Hits&gt;] [-spam &lt;Spam-Scores-Path&gt; -output &lt;Output-Path&gt;]
+</pre>
+
+<p>Per-query latency values are written to stdout.</p>
+
+<p>To perform feature extraction using Document Vectors with either the Sliding Window technique or
+"on-the-fly indexing" technique, use the following drivers:</p>
+
+<pre class="code">
+etc/run.sh ivory.ffg.driver.[DocumentVectorOnTheFlyIndexing|DocumentVectorSlidingWindow] \
+-index &lt;Ivory-Index-Path&gt; -dvclass &lt;DocumentVector-Class&gt; -document &lt;DocumentVector-Path&gt; \
+-query &lt;Query-Path&gt; -candidate &lt;Documents-Path&gt; -feature &lt;Features-Path&gt; \
+[-output &lt;Output-Path&gt;]
+</pre>
+
+<p>
+The default value of hits is 10,000 documents. The output file will contain
+feature values for each document (one per line in the following format:
+"qid \t document number \t space-delimited-feature-values.")
+</p>
+
+  </div>
+
+
+
+    <!-- Footer
+    ================================================== -->
+    <footer class="footer">
+      <div class="container">
+        <p class="pull-right"><a href="#">Back to top</a></p>
+        <p>Designed using <a href="http://twitter.github.com/bootstrap/">Bootstrap</a>.</p>
+        <p>Code licensed under <a href="http://www.apache.org/licenses/LICENSE-2.0" target="_blank">Apache License v2.0</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
+      </div>
+    </footer>
+
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="assets/js/jquery.js"></script>
+    <script src="assets/js/google-code-prettify/prettify.js"></script>
+    <script src="assets/js/bootstrap-transition.js"></script>
+    <script src="assets/js/bootstrap-alert.js"></script>
+    <script src="assets/js/bootstrap-modal.js"></script>
+    <script src="assets/js/bootstrap-dropdown.js"></script>
+    <script src="assets/js/bootstrap-scrollspy.js"></script>
+    <script src="assets/js/bootstrap-tab.js"></script>
+    <script src="assets/js/bootstrap-tooltip.js"></script>
+    <script src="assets/js/bootstrap-popover.js"></script>
+    <script src="assets/js/bootstrap-button.js"></script>
+    <script src="assets/js/bootstrap-collapse.js"></script>
+    <script src="assets/js/bootstrap-carousel.js"></script>
+    <script src="assets/js/bootstrap-typeahead.js"></script>
+    <script src="assets/js/bootstrap-affix.js"></script>
+
+  </body>
+</html>
+
