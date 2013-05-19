@@ -227,6 +227,7 @@ public class FindParallelSentencePairs extends Configured implements Tool {
         helper = new PreprocessHelper(CLIRUtils.MinVectorTerms, CLIRUtils.MinSentenceLength, job);
       } catch (Exception e) {
         e.printStackTrace();
+        throw new RuntimeException("Helper not created properly: " + helper + "," + helper.getClassifier());
       }
       classifierPositiveId = job.getInt("ClassifierId", -1);
       if(classifierPositiveId != 0 && classifierPositiveId != 1){
@@ -356,10 +357,10 @@ public class FindParallelSentencePairs extends Configured implements Tool {
     }
 
     conf.setInt("mapred.task.timeout", 60000000);
-    conf.set("mapreduce.map.memory.mb", "3000");
-    conf.set("mapreduce.map.java.opts", "-Xmx3000m");
-    conf.set("mapreduce.reduce.memory.mb", "3000");
-    conf.set("mapreduce.reduce.java.opts", "-Xmx3000m");
+    conf.set("mapreduce.map.memory.mb", "3500");
+    conf.set("mapreduce.map.java.opts", "-Xmx3500m");
+    conf.set("mapreduce.reduce.memory.mb", "3500");
+    conf.set("mapreduce.reduce.java.opts", "-Xmx3500m");
     conf.setBoolean("mapred.map.tasks.speculative.execution", false);
     conf.setBoolean("mapred.reduce.tasks.speculative.execution", false);
     conf.setNumMapTasks(100);

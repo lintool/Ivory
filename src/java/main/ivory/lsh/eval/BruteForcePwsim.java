@@ -68,6 +68,10 @@ public class BruteForcePwsim extends Configured implements Tool {
     Size
   };
 
+  protected static String getFilename(String s) {
+    return s.substring(s.lastIndexOf("/") + 1);
+  }
+
   /**
    * For every document in the sample, find all other docs that have cosine similarity higher than
    * some given threshold.
@@ -82,9 +86,7 @@ public class BruteForcePwsim extends Configured implements Tool {
     static List<PairOfWritables<WritableComparable, Writable>> vectors;
     float threshold;
 
-    private String getFilename(String s) {
-      return s.substring(s.lastIndexOf("/") + 1);
-    }
+
 
     public void configure(JobConf job) {
       sLogger.setLevel(Level.INFO);
@@ -92,7 +94,6 @@ public class BruteForcePwsim extends Configured implements Tool {
       sLogger.info("Threshold = " + threshold);
 
       String sampleFile = job.get("Ivory.SampleFile");
-
 
       // read doc ids of sample into vectors
       try {
@@ -148,6 +149,7 @@ public class BruteForcePwsim extends Configured implements Tool {
       String sampleFile = job.get("Ivory.SampleFile");
       // read doc ids of sample into vectors
       try {
+        sampleFile = getFilename(sampleFile);
         Path[] localFiles = DistributedCache.getLocalCacheFiles(job);
         for (Path localFile : localFiles) {
           if (localFile.toString().contains(sampleFile)) {
@@ -200,11 +202,15 @@ public class BruteForcePwsim extends Configured implements Tool {
       sLogger.info("Threshold = " + maxDist);
 
       String sampleFile = job.get("Ivory.SampleFile");
+      sLogger.info("Sample file: " + sampleFile);
       // read doc ids of sample into vectors
       try {
+        sampleFile = getFilename(sampleFile);
         Path[] localFiles = DistributedCache.getLocalCacheFiles(job);
         for (Path localFile : localFiles) {
+          sLogger.info("In DistributedCache: " + localFile);
           if (localFile.toString().contains(sampleFile)) {
+            sLogger.info("Reading signatures from " + localFile);
             signatures = SequenceFileUtils.readFile(localFile, FileSystem.getLocal(job));
           }
         }
@@ -223,19 +229,8 @@ public class BruteForcePwsim extends Configured implements Tool {
         IntWritable sampleDocno = (IntWritable) signatures.get(i).getLeftElement();
         Signature fromSample = (Signature) signatures.get(i).getRightElement();
         int dist = signature.hammingDistance(fromSample, maxDist);
-        // if((sampleDocno.get()==1000009022 && docno.get()==189034) ||
-        // (sampleDocno.get()==1000170828 && docno.get()==2898431)){
-        // reporter.incrCounter(Pairs.DEBUG, 1);
-        // sLogger.info(sampleDocno.get()+","+docno.get()+"="+dist);
-        // sLogger.info(fromSample);
-        // sLogger.info(signature);
-        // }else{
-        // continue;
-        // }
-
         if (dist <= maxDist) {
-          output
-          .collect(new IntWritable(sampleDocno.get()), new PairOfFloatInt(-dist, docno.get()));
+          output.collect(new IntWritable(sampleDocno.get()), new PairOfFloatInt(-dist, docno.get()));
           reporter.incrCounter(Pairs.Emitted, 1);
         }
       }
@@ -326,6 +321,7 @@ public class BruteForcePwsim extends Configured implements Tool {
 
     job.set("Ivory.SampleFile", sampleFile);
     DistributedCache.addCacheFile(new URI(sampleFile), job);
+    sLogger.info("Added to DistributedCache: " + sampleFile);
 
     if (inputType.contains("signature")) {
       job.setMapperClass(MyMapperSignature.class);
