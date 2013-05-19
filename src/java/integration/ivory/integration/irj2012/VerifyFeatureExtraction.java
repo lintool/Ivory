@@ -106,7 +106,7 @@ public class VerifyFeatureExtraction {
       "-index", VerifyFeatureExtraction.IVORY_INDEX_PATH,
       "-posting", vectors.getPath(),
       "-query", VerifyFeatureExtraction.QUERY_PATH,
-      "-judgment", VerifyFeatureExtraction.DOCUMENTS_PATH,
+      "-candidate", VerifyFeatureExtraction.DOCUMENTS_PATH,
       "-feature", VerifyFeatureExtraction.FEATURES_PATH,
       "-hits", "10",
       "-spam", VerifyFeatureExtraction.SPAM_PATH,
@@ -137,7 +137,7 @@ public class VerifyFeatureExtraction {
       String[] paramsDocumentVector = new String[] {
         "-index", VerifyFeatureExtraction.IVORY_INDEX_PATH,
         "-dvclass", vectorType,
-        "-judgment", VerifyFeatureExtraction.DOCUMENTS_PATH,
+        "-candidate", VerifyFeatureExtraction.DOCUMENTS_PATH,
         "-output", vectors.getPath()
       };
 
@@ -146,7 +146,7 @@ public class VerifyFeatureExtraction {
         "-dvclass", vectorType,
         "-document", vectors.getPath(),
         "-query", VerifyFeatureExtraction.QUERY_PATH,
-        "-judgment", VerifyFeatureExtraction.DOCUMENTS_PATH,
+        "-candidate", VerifyFeatureExtraction.DOCUMENTS_PATH,
         "-feature", VerifyFeatureExtraction.FEATURES_PATH,
         "-output", features.getPath()
       };
