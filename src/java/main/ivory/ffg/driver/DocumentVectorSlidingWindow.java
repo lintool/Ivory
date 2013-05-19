@@ -81,7 +81,7 @@ public class DocumentVectorSlidingWindow {
     options.addOption(OptionManager.DOCUMENT_VECTOR_CLASS, "class_name", "DocumentVector class", true);
     options.addOption(OptionManager.DOCUMENT_PATH, "path", "documents", true);
     options.addOption(OptionManager.QUERY_PATH, "path", "XML query", true);
-    options.addOption(OptionManager.JUDGMENT_PATH, "path", "Tab-Delimited judgments", true);
+    options.addOption(OptionManager.JUDGMENT_PATH, "path", "Tab-Delimited documents", true);
     options.addOption(OptionManager.FEATURE_PATH, "path", "XML features", true);
     options.addOption(OptionManager.OUTPUT_PATH, "", "Print feature values", false);
 

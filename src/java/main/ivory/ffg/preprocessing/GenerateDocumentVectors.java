@@ -29,7 +29,7 @@ public class GenerateDocumentVectors {
     options.addOption(OptionManager.INDEX_ROOT_PATH, "path", "index root", true);
     options.addOption(OptionManager.DOCUMENT_VECTOR_CLASS, "class_name", "documentVector class", true);
     options.addOption(OptionManager.OUTPUT_PATH, "path", "output", true);
-    options.addOption(OptionManager.JUDGMENT_PATH, "path", "Tab-Delimited judgments", true);
+    options.addOption(OptionManager.JUDGMENT_PATH, "path", "Tab-Delimited documents", true);
 
     try {
       options.parse(args);
