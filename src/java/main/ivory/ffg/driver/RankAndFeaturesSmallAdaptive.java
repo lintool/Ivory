@@ -268,7 +268,7 @@ public class RankAndFeaturesSmallAdaptive {
     options.addOption(OptionManager.INDEX_ROOT_PATH, "path", "index root", true);
     options.addOption(OptionManager.POSTINGS_ROOT_PATH, "path", "Positional postings root", true);
     options.addOption(OptionManager.QUERY_PATH, "path", "XML query", true);
-    options.addOption(OptionManager.JUDGMENT_PATH, "path", "Tab-Delimited judgments", true);
+    options.addOption(OptionManager.JUDGMENT_PATH, "path", "Tab-Delimited documents", true);
     options.addOption(OptionManager.FEATURE_PATH, "path", "XML features", true);
     options.addOption(OptionManager.HITS, "integer", "number of hits (default: 10,000)", false);
     options.addOption(OptionManager.SPAM_PATH, "path", "spam percentile score", false);

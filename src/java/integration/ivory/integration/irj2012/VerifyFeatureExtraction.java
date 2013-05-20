@@ -1,24 +1,22 @@
 package ivory.integration.irj2012;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import ivory.ffg.driver.DocumentVectorOnTheFlyIndexing;
+import ivory.ffg.driver.RankAndFeaturesSmallAdaptive;
+import ivory.ffg.preprocessing.GenerateCompressedPositionalPostings;
+import ivory.ffg.preprocessing.GenerateDocumentVectors;
+
 import java.io.File;
 
 import junit.framework.JUnit4TestAdapter;
 
-import com.google.common.io.Files;
-
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.FSDataInputStream;
+import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import org.junit.Test;
-
-import ivory.ffg.preprocessing.GenerateDocumentVectors;
-import ivory.ffg.preprocessing.GenerateCompressedPositionalPostings;
-import ivory.ffg.driver.DocumentVectorOnTheFlyIndexing;
-import ivory.ffg.driver.RankAndFeaturesSmallAdaptive;
 
 public class VerifyFeatureExtraction {
   private static final Logger LOG = Logger.getLogger(VerifyFeatureExtraction.class);
@@ -106,7 +104,7 @@ public class VerifyFeatureExtraction {
       "-index", VerifyFeatureExtraction.IVORY_INDEX_PATH,
       "-posting", vectors.getPath(),
       "-query", VerifyFeatureExtraction.QUERY_PATH,
-      "-judgment", VerifyFeatureExtraction.DOCUMENTS_PATH,
+      "-candidate", VerifyFeatureExtraction.DOCUMENTS_PATH,
       "-feature", VerifyFeatureExtraction.FEATURES_PATH,
       "-hits", "10",
       "-spam", VerifyFeatureExtraction.SPAM_PATH,
@@ -137,7 +135,7 @@ public class VerifyFeatureExtraction {
       String[] paramsDocumentVector = new String[] {
         "-index", VerifyFeatureExtraction.IVORY_INDEX_PATH,
         "-dvclass", vectorType,
-        "-judgment", VerifyFeatureExtraction.DOCUMENTS_PATH,
+        "-candidate", VerifyFeatureExtraction.DOCUMENTS_PATH,
         "-output", vectors.getPath()
       };
 
@@ -146,7 +144,7 @@ public class VerifyFeatureExtraction {
         "-dvclass", vectorType,
         "-document", vectors.getPath(),
         "-query", VerifyFeatureExtraction.QUERY_PATH,
-        "-judgment", VerifyFeatureExtraction.DOCUMENTS_PATH,
+        "-candidate", VerifyFeatureExtraction.DOCUMENTS_PATH,
         "-feature", VerifyFeatureExtraction.FEATURES_PATH,
         "-output", features.getPath()
       };
