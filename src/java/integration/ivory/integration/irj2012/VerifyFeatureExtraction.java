@@ -1,24 +1,22 @@
 package ivory.integration.irj2012;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import ivory.ffg.driver.DocumentVectorOnTheFlyIndexing;
+import ivory.ffg.driver.RankAndFeaturesSmallAdaptive;
+import ivory.ffg.preprocessing.GenerateCompressedPositionalPostings;
+import ivory.ffg.preprocessing.GenerateDocumentVectors;
+
 import java.io.File;
 
 import junit.framework.JUnit4TestAdapter;
 
-import com.google.common.io.Files;
-
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.FSDataInputStream;
+import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import org.junit.Test;
-
-import ivory.ffg.preprocessing.GenerateDocumentVectors;
-import ivory.ffg.preprocessing.GenerateCompressedPositionalPostings;
-import ivory.ffg.driver.DocumentVectorOnTheFlyIndexing;
-import ivory.ffg.driver.RankAndFeaturesSmallAdaptive;
 
 public class VerifyFeatureExtraction {
   private static final Logger LOG = Logger.getLogger(VerifyFeatureExtraction.class);
