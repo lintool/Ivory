@@ -4,7 +4,6 @@ import ivory.core.eval.Qrels;
 import ivory.regression.GroundTruth;
 import ivory.regression.GroundTruth.Metric;
 import ivory.smrf.retrieval.Accumulator;
-import ivory.sqe.retrieval.Constants;
 import ivory.sqe.retrieval.QueryEngine;
 import ivory.sqe.retrieval.RunQueryEngine;
 import java.util.HashMap;
@@ -13,21 +12,19 @@ import java.util.Set;
 import junit.framework.JUnit4TestAdapter;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
-import org.apache.log4j.Logger;
 import org.junit.Test;
 import com.google.common.collect.Maps;
 import edu.umd.cloud9.collection.DocnoMapping;
 import edu.umd.cloud9.io.map.HMapSFW;
 
 public class EnAr_TREC02 {
-  private static final Logger LOG = Logger.getLogger(EnAr_TREC02.class);
   private QueryEngine qe;
   private static String PATH = "en-ar.trec02";
   private static String LANGUAGE = "ar";
   private static Map<Integer,float[]> expectedMAPs = new HashMap<Integer,float[]>();{ 
-    expectedMAPs.put(0, new float[]{0.2725f, 0.2320f, 0.2489f}); 
-    expectedMAPs.put(1, new float[]{0.2656f, 0.2492f, 0.2544f}); 
-    expectedMAPs.put(2, new float[]{0.2742f, 0.2456f, 0.2636f}); 
+    expectedMAPs.put(0, new float[]{0.2725f, 0.2320f, 0.2489f, 0.2748f});   // "one2none" -> grammar,1best,10best,interp
+    expectedMAPs.put(1, new float[]{0.2656f, 0.2492f, 0.2544f, 0.2735f});   // "one2one" -> grammar,1best,10best,interp
+    expectedMAPs.put(2, new float[]{0.2742f, 0.2456f, 0.2636f, 0.2776f});   // "one2many" -> grammar,1best,10best,interp
   };
   private static float expectedTokenMAP = 0.2714f;
   private static int numTopics = 50;
@@ -75,8 +72,19 @@ public class EnAr_TREC02 {
     "35", "0.1661","36", "0.0022","33", "0.0198","34", "0.0059","39", "0.324","37", "0.3725","38", "0.0068","43", "0.0","42", "0.4007","41", "0.3236","40", "0.5037","67", "0.5584","66", "0.2819","69", "0.5405","68", "0.2965","26", "0.0037","27", "0.2963","28", "0.0021","29", "0.5275","30", "0.7243","32", "0.3655","31", "0.042","70", "0.5104","71", "0.2278","72", "0.0276","73", "0.248","74", "0.0159","75", "0.1714","59", "0.7359","58", "0.1171","57", "0.0971","56", "0.3585","55", "0.616","64", "6.0E-4","65", "0.5153","62", "0.0509","63", "0.0783","60", "0.7071","61", "0.0885","49", "0.7933","48", "0.7146","45", "0.0731","44", "0.171","47", "0.3368","46", "0.2876","51", "0.0186","52", "0.0617","53", "0.0038","54", "0.0409","50", "0.7403"
   };
 
-  //  private static String[] Gridbest_AP = grammar_AP_one2none;
-
+  private static Map<Integer, String[]> Interp_AP = new HashMap<Integer, String[]>();
+  {
+    Interp_AP.put(0, new String[] {
+        "35", "0.1802","36", "0.0027","33", "0.0258","34", "0.0053","39", "0.3406","37", "0.3371","38", "0.0070","43", "0.0","42", "0.415","41", "0.3588","40", "0.5054","67", "0.6247","66", "0.2385","69", "0.5531","68", "0.2346","26", "0.0078","27", "0.311","28", "0.021","29", "0.5217","30", "0.6294","32", "0.2574","31", "0.0585","70", "0.532","71", "0.2315","72", "0.0266","73", "0.2417","74", "0.0253","75", "0.1621","59", "0.7341","58", "0.1366","57", "0.1264","56", "0.4036","55", "0.6272","64", "6.0E-4","65", "0.4858","62", "0.0506","63", "0.0848","60", "0.7417","61", "0.0891","49", "0.7783","48", "0.7015","45", "0.1264","44", "0.1696","47", "0.3355","46", "0.3179","51", "0.057","52", "0.1282","53", "0.0033","54", "0.0371","50", "0.7493"
+    });
+    Interp_AP.put(1, new String[] {
+        "35", "0.1644","36", "0.0027","33", "0.0215","34", "0.0052","39", "0.3201","37", "0.3365","38", "0.0069","43", "0.0","42", "0.4157","41", "0.2666","40", "0.3948","67", "0.6229","66", "0.3132","69", "0.5314","68", "0.2389","26", "0.0071","27", "0.3111","28", "0.0221","29", "0.5288","30", "0.6816","32", "0.1236","31", "0.0602","70", "0.5315","71", "0.2376","72", "0.0257","73", "0.2471","74", "0.0324","75", "0.1614","59", "0.7345","58", "0.1099","57", "0.1269","56", "0.3877","55", "0.6295","64", "6.0E-4","65", "0.5192","62", "0.0511","63", "0.0832","60", "0.7306","61", "0.0899","49", "0.8235","48", "0.7013","45", "0.2919","44", "0.1701","47", "0.3379","46", "0.3166","51", "0.0575","52", "0.1312","53", "0.0035","54", "0.0393","50", "0.7298"
+    });
+    Interp_AP.put(2, new String[] {
+        "35", "0.1799","36", "0.0027","33", "0.0278","34", "0.0052","39", "0.3408","37", "0.3385","38", "0.0070","43", "0.0","42", "0.4157","41", "0.1878","40", "0.5133","67", "0.6263","66", "0.2904","69", "0.5522","68", "0.2321","26", "0.0076","27", "0.311","28", "0.0194","29", "0.5242","30", "0.6404","32", "0.2063","31", "0.0585","70", "0.531","71", "0.2333","72", "0.0267","73", "0.2451","74", "0.0256","75", "0.1621","59", "0.7343","58", "0.135","57", "0.1264","56", "0.4115","55", "0.634","64", "6.0E-4","65", "0.5263","62", "0.0491","63", "0.0848","60", "0.7398","61", "0.0902","49", "0.7975","48", "0.702","45", "0.2794","44", "0.1701","47", "0.3348","46", "0.3215","51", "0.0571","52", "0.1295","53", "0.0033","54", "0.038","50", "0.8037"
+    });
+  }
+  
   public EnAr_TREC02() {
     super();
     qe = new QueryEngine();
@@ -98,8 +106,6 @@ public class EnAr_TREC02 {
         "--queries_path", "data/" + PATH + "/moses/title_en-" + LANGUAGE + "-trans10-filtered.xml", "--one2many", heuristic + "", 
         "--unknown", "data/" + PATH + "/moses/10.unk"});
     FileSystem fs = FileSystem.getLocal(conf);
-
-    conf.setBoolean(Constants.Quiet, true);
         
     // no need to repeat token-based case for other heuristics
     if (heuristic == 0) {
@@ -136,15 +142,15 @@ public class EnAr_TREC02 {
     qe.init(conf, fs);
     qe.runQueries(conf);
 
-    /////// grid-best
+    /////// interp
 
-    //    conf = RunQueryEngine.parseArgs(new String[] {
-    //        "--xml", "data/" + PATH + "/run_en-ar.gridbest.xml",
-    //        "--queries_path", "data/" + PATH + "/moses/title_en-ar-trans10-filtered.xml", "--one2many", heuristic + "",
-    //    "--unknown", "data/" + PATH + "/moses/10.unk"});
-    //
-    //    qe.init(conf, fs);
-    //    qe.runQueries(conf);
+    conf = RunQueryEngine.parseArgs(new String[] {
+        "--xml", "data/"+ PATH + "/run_en-" + LANGUAGE + ".interp.xml",
+        "--queries_path", "data/" + PATH + "/moses/title_en-" + LANGUAGE + "-trans10-filtered.xml", "--one2many", heuristic + "",
+        "--unknown", "data/" + PATH + "/moses/10.unk"});
+
+    qe.init(conf, fs);
+    qe.runQueries(conf);
   }
 
   public static void verifyAllResults(Set<String> models,
@@ -158,23 +164,26 @@ public class EnAr_TREC02 {
       g.put("en-" + LANGUAGE + ".grammar_10-0-0-100_" + heuristic, new GroundTruth(Metric.AP, numTopics, grammar_AP.get(heuristic), expectedMAPs.get(heuristic)[0]));
       g.put("en-" + LANGUAGE + ".1best_1-0-0-100_" + heuristic, new GroundTruth(Metric.AP, numTopics, Onebest_AP.get(heuristic), expectedMAPs.get(heuristic)[1]));
       g.put("en-" + LANGUAGE + ".10best_10-100-0-100_" + heuristic, new GroundTruth(Metric.AP, numTopics, Nbest_AP.get(heuristic), expectedMAPs.get(heuristic)[2]));
+      g.put("en-" + LANGUAGE + ".interp_10-30-30-100_" + heuristic, new GroundTruth(Metric.AP, numTopics, Interp_AP.get(heuristic), expectedMAPs.get(heuristic)[3]));
     }
 
     for (String model : models) {
-      LOG.info("Verifying results of model \"" + model + "\"");
+      System.err.println("Verifying results of model \"" + model + "\"");
 
-      g.get(model).verify(results.get(model), mapping, qrels);
+      GroundTruth groundTruth = g.get(model); 
+      Map<String, Accumulator[]> result = results.get(model);
+      groundTruth.verify(result, mapping, qrels);
 
-      LOG.info("Done!");
+      System.err.println("Done!");
     }
   }
-
+  
   public static junit.framework.Test suite() {
     return new JUnit4TestAdapter(EnAr_TREC02.class);
   }
 
   public static void main(String[] args) {
-    //    HMapSFW gridAPMap = array2Map(Gridbest_AP);
+    //    HMapSFW gridAPMap = array2Map(Interp_AP);
     HMapSFW tenbestAPMap = array2Map(Nbest_AP.get(2));
     HMapSFW onebestAPMap = array2Map(Onebest_AP.get(1));
     HMapSFW grammarAPMap = array2Map(grammar_AP.get(0));

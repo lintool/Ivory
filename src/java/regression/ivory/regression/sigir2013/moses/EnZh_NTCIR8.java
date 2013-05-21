@@ -13,21 +13,19 @@ import java.util.Set;
 import junit.framework.JUnit4TestAdapter;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
-import org.apache.log4j.Logger;
-import org.junit.Test;
+  import org.junit.Test;
 import com.google.common.collect.Maps;
 import edu.umd.cloud9.collection.DocnoMapping;
 import edu.umd.cloud9.io.map.HMapSFW;
 
 public class EnZh_NTCIR8 {
-  private static final Logger LOG = Logger.getLogger(EnZh_NTCIR8.class);
   private QueryEngine qe;
   private static String PATH = "en-zh.ntcir8";
   private static String LANGUAGE = "zh";
   private static Map<Integer,float[]> expectedMAPs = new HashMap<Integer,float[]>();{ 
-    expectedMAPs.put(0, new float[]{0.1665f, 0.1461f, 0.1633f});   // "one2none" -> grammar,1best,10best
-    expectedMAPs.put(1, new float[]{0.1514f, 0.1553f, 0.1634f});   // "one2one" -> grammar,1best,10best
-    expectedMAPs.put(2, new float[]{0.1564f, 0.1497f, 0.1693f});   // "one2many" -> grammar,1best,10best
+    expectedMAPs.put(0, new float[]{0.1665f, 0.1461f, 0.1633f, 0.1802f});   // "one2none" -> grammar,1best,10best,interp
+    expectedMAPs.put(1, new float[]{0.1514f, 0.1553f, 0.1634f, 0.1763f});   // "one2one" -> grammar,1best,10best,interp
+    expectedMAPs.put(2, new float[]{0.1564f, 0.1497f, 0.1693f, 0.1784f});   // "one2many" -> grammar,1best,10best,interp
   };
   private static float expectedTokenMAP = 0.1497f;
   private static int numTopics = 73;
@@ -75,8 +73,19 @@ public class EnZh_NTCIR8 {
     "78", "0.2855","77", "0.1152","35", "0.0021","36", "0.0028","33", "0.354","39", "0.0542","38", "0.0","43", "0.0723","42", "0.2187","41", "0.0712","40", "0.0","82", "0.173","83", "0.1171","80", "0.0968","87", "0.2274","84", "0.3617","85", "0.06","67", "0.1404","66", "0.0118","69", "0.0","68", "0.6597","23", "0.1503","26", "0.0056","28", "0.4382","29", "0.1725","2", "0.1554","30", "0.1201","6", "0.0755","32", "0.1401","5", "0.0024","70", "0.0015","9", "0.1323","71", "0.4966","72", "0.3776","73", "7.0E-4","74", "0.0384","75", "0.0041","76", "0.3721","59", "0.0329","58", "0.0956","57", "0.1211","19", "0.2074","56", "0.1257","18", "0.0","15", "0.2479","16", "0.0552","12", "0.0476","64", "0.4514","65", "0.4463","62", "0.4401","63", "0.0063","99", "0.3902","61", "0.0106","100", "0.1015","98", "0.3637","49", "0.0","97", "0.0062","48", "2.0E-4","96", "0.0306","95", "7.0E-4","94", "0.1811","45", "0.1176","93", "0.1338","44", "0.026","92", "0.212","47", "0.0","91", "0.6703","46", "0.2169","90", "0.0233","51", "0.0","52", "0.1413","53", "0.1198","54", "0.1988",
   };
 
-  //  private static String[] Gridbest_AP = grammar_AP_one2none;
-
+  private static Map<Integer, String[]> Interp_AP = new HashMap<Integer, String[]>();
+  {
+    Interp_AP.put(0, new String[] {
+        "78", "0.2718","77", "0.237","35", "0.0023","36", "0.0030","33", "0.359","39", "0.0733","38", "0.0","43", "0.0632","42", "0.2166","41", "0.1512","40", "0.0","82", "0.3059","83", "0.1201","80", "0.0924","87", "0.2822","84", "0.3849","85", "0.1178","67", "0.136","66", "0.0085","69", "0.0","68", "0.6863","23", "0.1556","26", "0.0050","28", "0.488","29", "0.1044","2", "0.1904","30", "0.3805","6", "0.1183","32", "0.3584","5", "0.0025","70", "0.0298","9", "0.1154","71", "0.5121","72", "0.3694","73", "0.0039","74", "0.0694","75", "0.0033","76", "0.0888","59", "0.0317","58", "0.1001","57", "0.2078","19", "0.2688","56", "0.1321","18", "0.0366","15", "0.3869","16", "0.0519","12", "0.0547","64", "0.4572","65", "0.4482","62", "0.4928","63", "0.0089","99", "0.4194","61", "0.0539","100", "0.0511","98", "0.3937","49", "0.0","97", "0.0060","48", "5.0E-4","96", "0.0331","95", "8.0E-4","94", "0.4678","45", "0.2917","93", "0.098","44", "0.2971","92", "0.2178","47", "0.0","91", "0.671","46", "0.2192","90", "0.1807","51", "0.0","52", "0.1494","53", "0.1198","54", "0.3008"
+    });
+    Interp_AP.put(1, new String[] {
+        "78", "0.2572","77", "0.2316","35", "0.0023","36", "0.0029","33", "0.3569","39", "0.0711","38", "0.0","43", "0.0676","42", "0.2009","41", "0.1441","40", "0.0","82", "0.3083","83", "0.1208","80", "0.0921","87", "0.2817","84", "0.3931","85", "0.1192","67", "0.1349","66", "0.0090","69", "0.0","68", "0.6801","23", "0.1544","26", "0.0081","28", "0.4862","29", "0.1029","2", "0.2122","30", "0.3711","6", "0.0656","32", "0.3497","5", "0.0025","70", "0.0296","9", "0.126","71", "0.5132","72", "0.3716","73", "0.0045","74", "0.0662","75", "0.0031","76", "0.0859","59", "0.0457","58", "0.1017","57", "0.208","19", "0.2258","56", "0.1278","18", "0.0362","15", "0.3453","16", "0.0455","12", "0.0544","64", "0.4688","65", "0.4448","62", "0.4869","63", "0.0056","99", "0.492","61", "0.0386","100", "0.0413","98", "0.3828","49", "0.0","97", "0.0076","48", "4.0E-4","96", "0.0322","95", "6.0E-4","94", "0.4632","45", "0.3059","93", "0.1067","44", "0.267","92", "0.217","47", "0.0","91", "0.6852","46", "0.2153","90", "0.0386","51", "0.0","52", "0.1494","53", "0.1198","54", "0.2858"
+    });
+    Interp_AP.put(2, new String[] {
+        "78", "0.2736","77", "0.234","35", "0.0028","36", "0.0031","33", "0.3541","39", "0.0728","38", "0.0","43", "0.0633","42", "0.2171","41", "0.1444","40", "0.0","82", "0.3056","83", "0.1202","80", "0.094","87", "0.2833","84", "0.3851","85", "0.1114","67", "0.1368","66", "0.0094","69", "0.0","68", "0.6845","23", "0.1555","26", "0.0049","28", "0.4784","29", "0.0957","2", "0.1949","30", "0.377","6", "0.0638","32", "0.3559","5", "0.0025","70", "0.0296","9", "0.1333","71", "0.5123","72", "0.3678","73", "0.0039","74", "0.0689","75", "0.0033","76", "0.1059","59", "0.0317","58", "0.1008","57", "0.1731","19", "0.2688","56", "0.1332","18", "0.0366","15", "0.4058","16", "0.0561","12", "0.0547","64", "0.4739","65", "0.448","62", "0.489","63", "0.0112","99", "0.4144","61", "0.0529","100", "0.0412","98", "0.3986","49", "0.0","97", "0.0061","48", "5.0E-4","96", "0.0337","95", "8.0E-4","94", "0.4655","45", "0.3077","93", "0.0981","44", "0.2955","92", "0.2185","47", "0.0","91", "0.6528","46", "0.2191","90", "0.1005","51", "0.0","52", "0.1494","53", "0.1198","54", "0.3182"
+    });
+  }
+  
   public EnZh_NTCIR8() {
     super();
     qe = new QueryEngine();
@@ -136,15 +145,15 @@ public class EnZh_NTCIR8 {
     qe.init(conf, fs);
     qe.runQueries(conf);
 
-    /////// grid-best
+    /////// interp
 
-    //    conf = RunQueryEngine.parseArgs(new String[] {
-    //        "--xml", "data/" + PATH + "/run_en-ar.gridbest.xml",
-    //        "--queries_path", "data/" + PATH + "/moses/title_en-ar-trans10-filtered.xml", "--one2many", heuristic + "",
-    //    "--unknown", "data/" + PATH + "/moses/10.unk"});
-    //
-    //    qe.init(conf, fs);
-    //    qe.runQueries(conf);
+    conf = RunQueryEngine.parseArgs(new String[] {
+        "--xml", "data/"+ PATH + "/run_en-" + LANGUAGE + ".interp.xml",
+        "--queries_path", "data/" + PATH + "/moses/title_en-" + LANGUAGE + "-trans10-filtered.xml", "--one2many", heuristic + "",
+        "--unknown", "data/" + PATH + "/moses/10.unk"});
+
+    qe.init(conf, fs);
+    qe.runQueries(conf);
   }
 
   public static void verifyAllResults(Set<String> models,
@@ -158,23 +167,26 @@ public class EnZh_NTCIR8 {
       g.put("en-" + LANGUAGE + ".grammar_10-0-0-100_" + heuristic, new GroundTruth(Metric.AP, numTopics, grammar_AP.get(heuristic), expectedMAPs.get(heuristic)[0]));
       g.put("en-" + LANGUAGE + ".1best_1-0-0-100_" + heuristic, new GroundTruth(Metric.AP, numTopics, Onebest_AP.get(heuristic), expectedMAPs.get(heuristic)[1]));
       g.put("en-" + LANGUAGE + ".10best_10-100-0-100_" + heuristic, new GroundTruth(Metric.AP, numTopics, Nbest_AP.get(heuristic), expectedMAPs.get(heuristic)[2]));
+      g.put("en-" + LANGUAGE + ".interp_10-30-30-100_" + heuristic, new GroundTruth(Metric.AP, numTopics, Interp_AP.get(heuristic), expectedMAPs.get(heuristic)[3]));
     }
 
     for (String model : models) {
-      LOG.info("Verifying results of model \"" + model + "\"");
+      System.err.println("Verifying results of model \"" + model + "\"");
 
-      g.get(model).verify(results.get(model), mapping, qrels);
+      GroundTruth groundTruth = g.get(model); 
+      Map<String, Accumulator[]> result = results.get(model);
+      groundTruth.verify(result, mapping, qrels);
 
-      LOG.info("Done!");
+      System.err.println("Done!");
     }
   }
-
+  
   public static junit.framework.Test suite() {
     return new JUnit4TestAdapter(EnZh_NTCIR8.class);
   }
 
   public static void main(String[] args) {
-    //    HMapSFW gridAPMap = array2Map(Gridbest_AP);
+    //    HMapSFW gridAPMap = array2Map(Interp_AP);
     HMapSFW tenbestAPMap = array2Map(Nbest_AP.get(2));
     HMapSFW onebestAPMap = array2Map(Onebest_AP.get(1));
     HMapSFW grammarAPMap = array2Map(grammar_AP.get(0));

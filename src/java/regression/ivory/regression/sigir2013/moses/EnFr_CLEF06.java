@@ -4,7 +4,6 @@ import ivory.core.eval.Qrels;
 import ivory.regression.GroundTruth;
 import ivory.regression.GroundTruth.Metric;
 import ivory.smrf.retrieval.Accumulator;
-import ivory.sqe.retrieval.Constants;
 import ivory.sqe.retrieval.QueryEngine;
 import ivory.sqe.retrieval.RunQueryEngine;
 import java.util.HashMap;
@@ -13,21 +12,19 @@ import java.util.Set;
 import junit.framework.JUnit4TestAdapter;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
-import org.apache.log4j.Logger;
 import org.junit.Test;
 import com.google.common.collect.Maps;
 import edu.umd.cloud9.collection.DocnoMapping;
 import edu.umd.cloud9.io.map.HMapSFW;
 
 public class EnFr_CLEF06 {
-  private static final Logger LOG = Logger.getLogger(EnFr_CLEF06.class);
   private QueryEngine qe;
   private static String PATH = "en-fr.clef06";
   private static String LANGUAGE = "fr";
   private static Map<Integer,float[]> expectedMAPs = new HashMap<Integer,float[]>();{ 
-    expectedMAPs.put(0, new float[]{0.2620f, 0.2421f, 0.2820f});   // "one2none" -> grammar,1best,10best
-    expectedMAPs.put(1, new float[]{0.2567f, 0.2966f, 0.3002f});   // "one2one" -> grammar,1best,10best
-    expectedMAPs.put(2, new float[]{0.2638f, 0.2967f, 0.2894f});   // "one2many" -> grammar,1best,10best
+    expectedMAPs.put(0, new float[]{0.2620f, 0.2421f, 0.2820f, 0.2956f});   // "one2none" -> grammar,1best,10best,interp
+    expectedMAPs.put(1, new float[]{0.2567f, 0.2966f, 0.3002f, 0.2921f});   // "one2one" -> grammar,1best,10best,interp
+    expectedMAPs.put(2, new float[]{0.2638f, 0.2967f, 0.2894f, 0.2968f});   // "one2many" -> grammar,1best,10best,interp
   };
   private static float expectedTokenMAP = 0.2617f;
   private static int numTopics = 50;
@@ -75,8 +72,19 @@ public class EnFr_CLEF06 {
     "338", "0.0336","339", "0.4941","332", "0.0","333", "0.8719","330", "0.6","331", "0.2255","336", "0.5","337", "0.6051","334", "0.4261","335", "0.37","349", "0.3297","302", "0.2168","301", "0.4115","304", "0.2738","303", "0.2342","306", "0.0442","341", "0.4332","305", "0.1813","342", "0.0641","308", "0.2852","343", "0.1029","307", "0.1168","344", "0.3045","345", "0.3336","309", "0.0134","346", "0.0499","347", "0.0647","348", "0.5605","340", "0.1798","318", "0.4432","319", "0.5609","316", "0.3711","317", "0.0334","314", "0.0666","315", "0.1825","312", "0.2237","313", "0.2365","310", "0.0033","311", "0.0668","327", "0.225","328", "0.4386","329", "0.7745","323", "0.0775","324", "0.0","325", "0.0104","326", "0.0","320", "0.0707","350", "0.4197","321", "0.4164","322", "0.1389",
   };
 
-  //  private static String[] Gridbest_AP = grammar_AP_one2none;
-
+  private static Map<Integer, String[]> Interp_AP = new HashMap<Integer, String[]>();
+  {
+    Interp_AP.put(0, new String[] {
+        "338", "0.0748","339", "0.497","332", "0.0","333", "0.8761","330", "0.6","331", "0.2208","336", "1.0","337", "0.6109","334", "0.2234","335", "0.4613","349", "0.345","302", "0.2099","301", "0.4413","304", "0.3165","303", "0.2178","306", "0.0446","341", "0.2365","305", "0.2049","342", "0.1804","308", "0.2346","343", "0.1065","307", "0.1597","344", "0.3154","345", "0.2496","309", "0.0137","346", "0.057","347", "0.0663","348", "0.5636","340", "0.1843","318", "0.4795","319", "0.5382","316", "0.3947","317", "0.083","314", "0.0725","315", "0.2807","312", "0.2401","313", "0.3452","310", "0.0053","311", "0.0722","327", "0.6409","328", "0.4309","329", "0.7897","323", "0.093","324", "0.0","325", "0.0124","326", "0.5556","320", "0.0565","350", "0.4215","321", "0.4153","322", "0.1422"    
+    });
+    Interp_AP.put(1, new String[] {
+        "338", "0.052","339", "0.4938","332", "0.0","333", "0.8758","330", "0.6","331", "0.2197","336", "1.0","337", "0.6101","334", "0.4399","335", "0.4534","349", "0.3444","302", "0.2098","301", "0.4423","304", "0.317","303", "0.2206","306", "0.0443","341", "0.0854","305", "0.2042","342", "0.2042","308", "0.2277","343", "0.1079","307", "0.1614","344", "0.3076","345", "0.2504","309", "0.0136","346", "0.0465","347", "0.0683","348", "0.564","340", "0.1808","318", "0.4881","319", "0.5468","316", "0.3941","317", "0.1281","314", "0.074","315", "0.2225","312", "0.2329","313", "0.2568","310", "0.0056","311", "0.0639","327", "0.4816","328", "0.4337","329", "0.7753","323", "0.1131","324", "0.0","325", "0.0143","326", "0.5556","320", "0.0568","350", "0.4215","321", "0.4188","322", "0.174"
+    });
+    Interp_AP.put(2, new String[] {
+        "338", "0.0759","339", "0.4973","332", "0.0","333", "0.8765","330", "0.6","331", "0.2183","336", "1.0","337", "0.6091","334", "0.3996","335", "0.4483","349", "0.3438","302", "0.2099","301", "0.4413","304", "0.3169","303", "0.2217","306", "0.0464","341", "0.1732","305", "0.2064","342", "0.1852","308", "0.2274","343", "0.107","307", "0.1617","344", "0.3181","345", "0.2505","309", "0.0137","346", "0.0628","347", "0.0675","348", "0.5639","340", "0.2036","318", "0.4813","319", "0.5325","316", "0.3947","317", "0.0709","314", "0.0684","315", "0.2897","312", "0.2402","313", "0.3528","310", "0.0053","311", "0.0643","327", "0.6409","328", "0.4344","329", "0.781","323", "0.091","324", "0.0","325", "0.0121","326", "0.5","320", "0.0558","350", "0.4215","321", "0.4173","322", "0.1411"
+    });
+  };
+  
   public EnFr_CLEF06() {
     super();
     qe = new QueryEngine();
@@ -98,8 +106,6 @@ public class EnFr_CLEF06 {
         "--queries_path", "data/" + PATH + "/moses/title_en-" + LANGUAGE + "-trans10-filtered.xml", "--one2many", heuristic + "", 
         "--unknown", "data/" + PATH + "/moses/10.unk"});
     FileSystem fs = FileSystem.getLocal(conf);
-
-    conf.setBoolean(Constants.Quiet, true);
         
     // no need to repeat token-based case for other heuristics
     if (heuristic == 0) {
@@ -136,15 +142,15 @@ public class EnFr_CLEF06 {
     qe.init(conf, fs);
     qe.runQueries(conf);
 
-    /////// grid-best
+    /////// interp
 
-    //    conf = RunQueryEngine.parseArgs(new String[] {
-    //        "--xml", "data/" + PATH + "/run_en-ar.gridbest.xml",
-    //        "--queries_path", "data/" + PATH + "/moses/title_en-ar-trans10-filtered.xml", "--one2many", heuristic + "",
-    //    "--unknown", "data/" + PATH + "/moses/10.unk"});
-    //
-    //    qe.init(conf, fs);
-    //    qe.runQueries(conf);
+    conf = RunQueryEngine.parseArgs(new String[] {
+        "--xml", "data/"+ PATH + "/run_en-" + LANGUAGE + ".interp.xml",
+        "--queries_path", "data/" + PATH + "/moses/title_en-" + LANGUAGE + "-trans10-filtered.xml", "--one2many", heuristic + "",
+        "--unknown", "data/" + PATH + "/moses/10.unk"});
+
+    qe.init(conf, fs);
+    qe.runQueries(conf);
   }
 
   public static void verifyAllResults(Set<String> models,
@@ -158,14 +164,17 @@ public class EnFr_CLEF06 {
       g.put("en-" + LANGUAGE + ".grammar_10-0-0-100_" + heuristic, new GroundTruth(Metric.AP, numTopics, grammar_AP.get(heuristic), expectedMAPs.get(heuristic)[0]));
       g.put("en-" + LANGUAGE + ".1best_1-0-0-100_" + heuristic, new GroundTruth(Metric.AP, numTopics, Onebest_AP.get(heuristic), expectedMAPs.get(heuristic)[1]));
       g.put("en-" + LANGUAGE + ".10best_10-100-0-100_" + heuristic, new GroundTruth(Metric.AP, numTopics, Nbest_AP.get(heuristic), expectedMAPs.get(heuristic)[2]));
+      g.put("en-" + LANGUAGE + ".interp_10-30-30-100_" + heuristic, new GroundTruth(Metric.AP, numTopics, Interp_AP.get(heuristic), expectedMAPs.get(heuristic)[3]));
     }
 
     for (String model : models) {
-      LOG.info("Verifying results of model \"" + model + "\"");
+      System.err.println("Verifying results of model \"" + model + "\"");
 
-      g.get(model).verify(results.get(model), mapping, qrels);
+      GroundTruth groundTruth = g.get(model); 
+      Map<String, Accumulator[]> result = results.get(model);
+      groundTruth.verify(result, mapping, qrels);
 
-      LOG.info("Done!");
+      System.err.println("Done!");
     }
   }
 

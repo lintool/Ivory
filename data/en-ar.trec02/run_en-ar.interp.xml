@@ -1,6 +1,6 @@
 <parameters>
 
-     <run>en-ar.gridbest</run>
+     <run>en-ar.interp</run>
      <query_type>mtN</query_type>
      <index>/scratch0/indexes/clir/trec2001-03_cleaned+nodups+notags.ar-nostop.index</index>
      <doc_lang>ar</doc_lang>
@@ -12,9 +12,9 @@
      <f2eProbs>data/vocab/ttable.en-ar</f2eProbs>
      <LexProbThreshold>0.005</LexProbThreshold>
      <CumProbThreshold>0.95</CumProbThreshold> 
-     <mt_weight>0</mt_weight>
-     <grammar_weight>1</grammar_weight>
-     <bitext_weight>0</bitext_weight>
+     <mt_weight>0.3</mt_weight>
+     <grammar_weight>0.4</grammar_weight>
+     <bitext_weight>0.3</bitext_weight>
      <token_weight>1</token_weight>
      <phrase_weight>0</phrase_weight>
      <kBest>10</kBest>

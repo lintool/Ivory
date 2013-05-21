@@ -588,7 +588,7 @@ public class Utils {
   public static String getSetting(Configuration conf) {
     return conf.get(Constants.RunName) + "_" + conf.getInt(Constants.KBest, 0) + 
     "-" + (int)(100*conf.getFloat(Constants.MTWeight, 0)) + 
-    "-" + (int) (100*conf.getFloat(Constants.BitextWeight, 0) )+ 
+    "-" + (int) (100*conf.getFloat(Constants.BitextWeight, 0)) + 
     "-" + (int) (100*conf.getFloat(Constants.TokenWeight, 0)) +
     "_" + conf.getInt(Constants.One2Many, -1);
   }
