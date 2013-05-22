@@ -2,40 +2,37 @@ package ivory.integration.clir;
 
 import static org.junit.Assert.assertTrue;
 import ivory.core.eval.Qrels;
-import ivory.core.tokenize.LuceneArabicAnalyzer;
+import ivory.core.tokenize.OpenNLPTokenizer;
 import ivory.integration.IntegrationUtils;
-import ivory.regression.coling2012.EnAr_TREC02;
 import ivory.sqe.retrieval.QueryEngine;
 import ivory.sqe.retrieval.RunQueryEngine;
-
 import java.util.List;
-
 import junit.framework.JUnit4TestAdapter;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.log4j.Logger;
 import org.junit.Test;
-
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
 public class VerifyTrecArabicPositionalIndexIP {
-  private static final Logger LOG = Logger.getLogger(VerifyTrecArabicPositionalIndexIP.class);
 
   private Path collectionPath = new Path("/shared/collections/clir/trec/ldc2001t55.ar-cleaned.xml");
   private String index = this.getClass().getCanonicalName() + "-index";
-  
+  private static String PATH = "en-ar.trec02";
+  private static String LANGUAGE = "ar";
+  private static String MTMODEL = "cdec";
+  private static int numTopics = 75;
+
   @Test
   public void runBuildIndex() throws Exception {
     Configuration conf = IntegrationUtils.getBespinConfiguration();
     FileSystem fs = FileSystem.get(conf);
-
+    
     assertTrue(fs.exists(collectionPath));
 
     fs.delete(new Path(index), true);
-
+     
     List<String> jars = Lists.newArrayList();
     jars.add(IntegrationUtils.getJar("lib", "cloud9"));
     jars.add(IntegrationUtils.getJar("lib", "guava"));
@@ -46,34 +43,44 @@ public class VerifyTrecArabicPositionalIndexIP {
     jars.add(IntegrationUtils.getJar("lib", "commons-collections"));
     jars.add(IntegrationUtils.getJar("lib", "lucene-analyzers"));
     jars.add(IntegrationUtils.getJar("lib", "lucene-core"));
+    jars.add(IntegrationUtils.getJar("lib", "tools"));
+    jars.add(IntegrationUtils.getJar("lib", "maxent"));
+    jars.add(IntegrationUtils.getJar("lib", "commons-lang"));
+    jars.add(IntegrationUtils.getJar("lib", "commons-cli"));
+    jars.add(IntegrationUtils.getJar("lib", "bliki-core"));
     jars.add(IntegrationUtils.getJar("dist", "ivory"));
 
     String libjars = String.format("-libjars=%s", Joiner.on(",").join(jars));
-
-    fs.copyFromLocalFile(false, true, new Path("data/vocab/vocab.en-ar.en"),
-        new Path(index + "/vocab.en-ar.en"));
-    fs.copyFromLocalFile(false, true, new Path("data/vocab/vocab.en-ar.ar"),
-        new Path(index + "/vocab.en-ar.ar"));
-    fs.copyFromLocalFile(false, true, new Path("data/vocab/ttable.en-ar"),
-        new Path(index + "/ttable.en-ar"));
-    fs.copyFromLocalFile(false, true, new Path("data/tokenizer/ar-token.bin"),
-        new Path(index + "/ar-token.bin"));
+    
+    // Done with indexing, now do retrieval run.
+    fs.copyFromLocalFile(false, true, new Path("data/vocab/vocab.en-" + LANGUAGE + ".en"),
+        new Path(index + "/vocab.en-" + LANGUAGE + ".en"));
+    fs.copyFromLocalFile(false, true, new Path("data/vocab/vocab.en-" + LANGUAGE + "." + LANGUAGE + ""),
+        new Path(index + "/vocab.en-" + LANGUAGE + "." + LANGUAGE + ""));
+    fs.copyFromLocalFile(false, true, new Path("data/vocab/ttable.en-" + LANGUAGE + ""),
+        new Path(index + "/ttable.en-" + LANGUAGE + ""));
+    fs.copyFromLocalFile(false, true, new Path("data/tokenizer/" + LANGUAGE + "-token.bin"),
+        new Path(index + "/" + LANGUAGE + "-token.bin"));
     fs.copyFromLocalFile(false, true, new Path("data/tokenizer/en-token.bin"),
         new Path(index + "/en-token.bin"));
-    fs.copyFromLocalFile(false, true, new Path("data/tokenizer/ar.stop.stemmed"),
-        new Path(index + "/ar.stop.stemmed"));
+    fs.copyFromLocalFile(false, true, new Path("data/tokenizer/" + LANGUAGE + ".stop.stemmed"),
+        new Path(index + "/" + LANGUAGE + ".stop.stemmed"));
     fs.copyFromLocalFile(false, true, new Path("data/tokenizer/en.stop.stemmed"),
         new Path(index + "/en.stop.stemmed"));
-    fs.copyFromLocalFile(false, true, new Path("data/en-ar.trec02/grammar.en-ar.trec02"),
-        new Path(index + "/grammar.en-ar.trec02"));
-    fs.copyFromLocalFile(false, true, new Path("data/en-ar.trec02/queries.en-ar.k10.trec02.xml"),
-        new Path(index + "/queries.en-ar.k10.trec02.xml"));
-  
+    for (int i = 0; i < numTopics; i++) {
+      fs.copyFromLocalFile(false, true, new Path("data/" + PATH + "/" + MTMODEL + ".grammar/grammar." + i),
+        new Path(index + "/grammar." + i));
+    }
+    fs.copyFromLocalFile(false, true, new Path("data/" + PATH + "/" + MTMODEL + "/title_en-" 
+        + LANGUAGE + "-trans10-filtered-integration.xml"),
+        new Path(index + "/title_en-" + LANGUAGE + "-trans10-filtered.xml"));
+
     String[] args = new String[] { "hadoop jar", IntegrationUtils.getJar("dist", "ivory"),
         ivory.app.PreprocessTrecForeign.class.getCanonicalName(), libjars,
         "-input=" + collectionPath.toString(), "-index=" + index, 
-        "-lang=ar" , "-tokenizerclass=" + LuceneArabicAnalyzer.class.getCanonicalName(),
-        "-tokenizermodel=" + index + "/ar-token.bin", "-name=TREC2001-02.Arabic" };
+        "-lang=fr" , "-tokenizerclass=" + OpenNLPTokenizer.class.getCanonicalName(),
+        "-tokenizermodel=" + index + "/" + LANGUAGE + "-token.bin", "-name=" 
+        + VerifyClefFrenchPositionalIndexIP.class.getCanonicalName()};
 
     IntegrationUtils.exec(Joiner.on(" ").join(args));
 
@@ -82,48 +89,50 @@ public class VerifyTrecArabicPositionalIndexIP {
         "-index=" + index, "-indexPartitions=10", "-positionalIndexIP" };
 
     IntegrationUtils.exec(Joiner.on(" ").join(args));
-
-    // Done with indexing, now do retrieval run.
-    conf = RunQueryEngine.parseArgs(new String[] {
-        "-index=" + index,
-        "-queries_path=" + index + "/queries.en-ar.k10.trec02.xml",
-        "-run=en-ar.gridbest",
-        "-query_type=mtN",
-        "-doc_lang=ar",
-        "-query_lang=en", 
-        "-doc_tokenizer=" + index + "/ar-token.bin",
-        "-query_tokenizer=" + index + "/en-token.bin",
-        "-query_vocab=" + index + "/vocab.en-ar.en",
-        "-doc_vocab=" + index + "/vocab.en-ar.ar",
-        "-f2eProbs=" + index + "/ttable.en-ar",
-        "-LexProbThreshold=0.005", 
-        "-CumProbThreshold=0.95",  
-        "-mt_weight=0",
-        "-scfg_weight=1",
-        "-bitext_weight=0",
-        "-token_weight=1",
-        "-phrase_weight=0",
-        "-scfg_path=" + index + "/grammar.en-ar.trec02",
-        "-kBest=10", 
-        "-doc_stemmed_stopwordlist=" + index + "/ar.stop.stemmed",
-        "-query_stemmed_stopwordlist=" + index + "/en.stop.stemmed"
-    }, fs, conf);
+     
     QueryEngine qr = new QueryEngine();
-    qr.init(conf, fs);
 
-    long start = System.currentTimeMillis();
-    qr.runQueries(conf);
-    long end = System.currentTimeMillis();
+    for (int heuristic=0; heuristic<=2; heuristic++) {
+      conf = RunQueryEngine.parseArgs(new String[] {
+          "-index=" + index,
+          "-queries_path=" + index + "/title_en-" + LANGUAGE + "-trans10-filtered.xml",
+          "-run=en-" + LANGUAGE + ".interp",
+          "-query_type=mtN",
+          "-doc_lang=" + LANGUAGE + "",
+          "-query_lang=en", 
+          "-doc_tokenizer=" + index + "/" + LANGUAGE + "-token.bin",
+          "-query_tokenizer=" + index + "/en-token.bin",
+          "-query_vocab=" + index + "/vocab.en-" + LANGUAGE + ".en",
+          "-doc_vocab=" + index + "/vocab.en-" + LANGUAGE + "." + LANGUAGE + "",
+          "-f2eProbs=" + index + "/ttable.en-" + LANGUAGE + "",
+          "-LexProbThreshold=0.005", 
+          "-CumProbThreshold=0.95",  
+          "-mt_weight=0.3",
+          "-grammar_weight=0.4",
+          "-bitext_weight=0.3",
+          "-token_weight=1",
+          "-phrase_weight=0",
+          "-kBest=10", 
+          "-doc_stemmed_stopwordlist=" + index + "/" + LANGUAGE + ".stop.stemmed",
+          "-query_stemmed_stopwordlist=" + index + "/en.stop.stemmed",
+          "--one2many=" + heuristic
+      }, fs, conf);
 
-    LOG.info("Total query time: " + (end - start) + "ms");
+      long start = System.currentTimeMillis();
+      qr.init(conf, fs);
+      qr.runQueries(conf);
+      long end = System.currentTimeMillis();
 
-    EnAr_TREC02.verifyAllResults(qr.getModels(), qr.getAllResults(), qr.getDocnoMapping(),
-        new Qrels("data/en-ar.trec02/qrels.en-ar.trec02.txt"));
+      System.err.println("Total query time for heuristic " + heuristic + ":" + (end - start) + "ms");
+    }
+    ivory.regression.sigir2013.cdec.EnFr_CLEF06.initialize();
+    ivory.regression.sigir2013.cdec.EnFr_CLEF06.verifyAllResults(qr.getModels(), qr.getAllResults(), qr.getDocnoMapping(),
+        new Qrels("data/" + PATH + "/qrels." + PATH+ ".txt"));
 
-    LOG.info("Done!");
+    System.err.println("Done!");
   }
 
   public static junit.framework.Test suite() {
-    return new JUnit4TestAdapter(VerifyTrecArabicPositionalIndexIP.class);
+    return new JUnit4TestAdapter(VerifyClefFrenchPositionalIndexIP.class);
   }
 }
