@@ -133,6 +133,6 @@ public class VerifyTrecArabicPositionalIndexIP {
   }
 
   public static junit.framework.Test suite() {
-    return new JUnit4TestAdapter(VerifyClefFrenchPositionalIndexIP.class);
+    return new JUnit4TestAdapter(VerifyTrecArabicPositionalIndexIP.class);
   }
 }
