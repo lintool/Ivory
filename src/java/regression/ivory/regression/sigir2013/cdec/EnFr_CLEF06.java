@@ -26,6 +26,11 @@ public class EnFr_CLEF06 {
   private static float expectedTokenMAP = 0.2617f;
   private static Map<Integer,float[]> expectedMAPs = new HashMap<Integer,float[]>();
 
+  private static Map<Integer, String[]> grammar_AP = new HashMap<Integer, String[]>();
+  private static Map<Integer, String[]> Nbest_AP = new HashMap<Integer, String[]>();
+  private static Map<Integer, String[]> Onebest_AP = new HashMap<Integer, String[]>();
+  private static Map<Integer, String[]> Interp_AP = new HashMap<Integer, String[]>();
+
   public static void initialize() {
     expectedMAPs.put(0, new float[]{0.2916f, 0.2351f, 0.2947f, 0.3112f});   // "one2none" -> grammar,1best,10best,interp
     expectedMAPs.put(1, new float[]{0.2881f, 0.2756f, 0.3039f, 0.3109f});   // "one2one" -> grammar,1best,10best,interp
@@ -68,10 +73,6 @@ public class EnFr_CLEF06 {
     });
   }
 
-  private static Map<Integer, String[]> grammar_AP = new HashMap<Integer, String[]>();
-  private static Map<Integer, String[]> Nbest_AP = new HashMap<Integer, String[]>();
-  private static Map<Integer, String[]> Onebest_AP = new HashMap<Integer, String[]>();
-  private static Map<Integer, String[]> Interp_AP = new HashMap<Integer, String[]>();
   private static String[] baseline_token_AP = new String[] {
     "338", "0.0336","339", "0.4941","332", "0.0","333", "0.8719","330", "0.6","331", "0.2255","336", "0.5","337", "0.6051","334", "0.4261","335", "0.37","349", "0.3297","302", "0.2168","301", "0.4115","304", "0.2738","303", "0.2342","341", "0.4332","306", "0.0442","305", "0.1813","342", "0.0641","343", "0.1029","308", "0.2852","344", "0.3045","307", "0.1168","345", "0.3336","346", "0.0499","309", "0.0134","347", "0.0647","348", "0.5605","340", "0.1798","318", "0.4432","319", "0.5609","316", "0.3711","317", "0.0334","314", "0.0666","315", "0.1825","312", "0.2237","313", "0.2365","310", "0.0033","311", "0.0668","327", "0.225","328", "0.4386","329", "0.7745","323", "0.0775","324", "0.0","325", "0.0104","326", "0.0","320", "0.0707","321", "0.4164","350", "0.4197","322", "0.1389",
   };

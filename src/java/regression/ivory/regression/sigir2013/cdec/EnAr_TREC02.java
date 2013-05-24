@@ -26,6 +26,11 @@ public class EnAr_TREC02 {
   private static float expectedTokenMAP = 0.2714f;
   private static Map<Integer,float[]> expectedMAPs = new HashMap<Integer,float[]>();
 
+  private static Map<Integer, String[]> grammar_AP = new HashMap<Integer, String[]>();
+  private static Map<Integer, String[]> Nbest_AP = new HashMap<Integer, String[]>();
+  private static Map<Integer, String[]> Onebest_AP = new HashMap<Integer, String[]>();
+  private static Map<Integer, String[]> Interp_AP = new HashMap<Integer, String[]>();
+
   public static void initialize() {
     expectedMAPs.put(0, new float[]{0.3020f, 0.2497f, 0.2475f, 0.2865f});  // "one2none" -> grammar,1best,10best,interp
     expectedMAPs.put(1, new float[]{0.2824f, 0.2489f, 0.2488f, 0.2733f});  // "one2one" -> grammar,1best,10best,interp
@@ -67,11 +72,6 @@ public class EnAr_TREC02 {
         "35", "0.1807","36", "0.0027","33", "0.0241","34", "0.0044","39", "0.3323","37", "0.3308","38", "0.0064","43", "0.0","42", "0.4085","41", "0.2136","40", "0.5166","67", "0.6253","66", "0.2055","69", "0.5464","68", "0.2556","26", "0.0082","27", "0.3113","28", "0.0058","29", "0.5319","30", "0.6832","32", "0.3168","31", "0.081","70", "0.5252","71", "0.219","72", "0.0278","73", "0.2601","74", "0.0302","75", "0.1449","59", "0.7421","58", "0.1165","57", "0.0905","56", "0.3992","55", "0.636","64", "6.0E-4","65", "0.5581","62", "0.0492","63", "0.0815","60", "0.7408","61", "0.0905","49", "0.7575","48", "0.7018","45", "0.3528","44", "0.1752","47", "0.3373","46", "0.3308","51", "0.0628","52", "0.0749","53", "0.0038","54", "0.0415","50", "0.7537"
     });
   }
-  
-  private static Map<Integer, String[]> grammar_AP = new HashMap<Integer, String[]>();
-  private static Map<Integer, String[]> Nbest_AP = new HashMap<Integer, String[]>();
-  private static Map<Integer, String[]> Onebest_AP = new HashMap<Integer, String[]>();
-  private static Map<Integer, String[]> Interp_AP = new HashMap<Integer, String[]>();
 
   private static String[] baseline_token_AP = new String[] {
     "35", "0.1661","36", "0.0022","33", "0.0198","34", "0.0059","39", "0.324","37", "0.3725","38", "0.0068","43", "0.0","42", "0.4007","41", "0.3236","40", "0.5037","67", "0.5584","66", "0.2819","69", "0.5405","68", "0.2965","26", "0.0037","27", "0.2963","28", "0.0021","29", "0.5275","30", "0.7243","32", "0.3655","31", "0.042","70", "0.5104","71", "0.2278","72", "0.0276","73", "0.248","74", "0.0159","75", "0.1714","59", "0.7359","58", "0.1171","57", "0.0971","56", "0.3585","55", "0.616","64", "6.0E-4","65", "0.5153","62", "0.0509","63", "0.0783","60", "0.7071","61", "0.0885","49", "0.7933","48", "0.7146","45", "0.0731","44", "0.171","47", "0.3368","46", "0.2876","51", "0.0186","52", "0.0617","53", "0.0038","54", "0.0409","50", "0.7403"
@@ -84,6 +84,7 @@ public class EnAr_TREC02 {
 
   @Test
   public void runRegressions() throws Exception {
+    initialize();
     runRegression(0);   // "one2none"
     runRegression(1);   // "one2one"
     runRegression(2);   // "one2many"
