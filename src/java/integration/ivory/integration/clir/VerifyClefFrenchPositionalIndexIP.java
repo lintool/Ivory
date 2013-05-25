@@ -78,7 +78,7 @@ public class VerifyClefFrenchPositionalIndexIP {
     String[] args = new String[] { "hadoop jar", IntegrationUtils.getJar("dist", "ivory"),
         ivory.app.PreprocessTrecForeign.class.getCanonicalName(), libjars,
         "-input=" + collectionPath.toString(), "-index=" + index, 
-        "-lang=fr" , "-tokenizerclass=" + OpenNLPTokenizer.class.getCanonicalName(),
+        "-lang=" + LANGUAGE , "-tokenizerclass=" + OpenNLPTokenizer.class.getCanonicalName(),
         "-tokenizermodel=" + index + "/" + LANGUAGE + "-token.bin", "-name=" 
         + VerifyClefFrenchPositionalIndexIP.class.getCanonicalName()};
 

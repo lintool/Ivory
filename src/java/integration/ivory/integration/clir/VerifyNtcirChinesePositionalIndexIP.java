@@ -2,7 +2,7 @@ package ivory.integration.clir;
 
 import static org.junit.Assert.assertTrue;
 import ivory.core.eval.Qrels;
-import ivory.core.tokenize.OpenNLPTokenizer;
+import ivory.core.tokenize.StanfordChineseTokenizer;
 import ivory.integration.IntegrationUtils;
 import ivory.sqe.retrieval.QueryEngine;
 import ivory.sqe.retrieval.RunQueryEngine;
@@ -23,16 +23,16 @@ public class VerifyNtcirChinesePositionalIndexIP {
   private static String LANGUAGE = "zh";
   private static String MTMODEL = "cdec";
   private static int numTopics = 100;
-  
+
   @Test
   public void runBuildIndex() throws Exception {
     Configuration conf = IntegrationUtils.getBespinConfiguration();
     FileSystem fs = FileSystem.get(conf);
-    
-    assertTrue(fs.exists(collectionPath));
 
+    assertTrue(fs.exists(collectionPath));
+    
     fs.delete(new Path(index), true);
-     
+    
     List<String> jars = Lists.newArrayList();
     jars.add(IntegrationUtils.getJar("lib", "cloud9"));
     jars.add(IntegrationUtils.getJar("lib", "guava"));
@@ -48,10 +48,11 @@ public class VerifyNtcirChinesePositionalIndexIP {
     jars.add(IntegrationUtils.getJar("lib", "commons-lang"));
     jars.add(IntegrationUtils.getJar("lib", "commons-cli"));
     jars.add(IntegrationUtils.getJar("lib", "bliki-core"));
+    jars.add(IntegrationUtils.getJar("lib", "stanford-chinese-segmenter"));
     jars.add(IntegrationUtils.getJar("dist", "ivory"));
 
     String libjars = String.format("-libjars=%s", Joiner.on(",").join(jars));
-    
+
     // Done with indexing, now do retrieval run.
     fs.copyFromLocalFile(false, true, new Path("data/vocab/vocab.en-" + LANGUAGE + ".en"),
         new Path(index + "/vocab.en-" + LANGUAGE + ".en"));
@@ -69,7 +70,7 @@ public class VerifyNtcirChinesePositionalIndexIP {
         new Path(index + "/en.stop.stemmed"));
     for (int i = 0; i < numTopics; i++) {
       fs.copyFromLocalFile(false, true, new Path("data/" + PATH + "/" + MTMODEL + ".grammar/grammar." + i),
-        new Path(index + "/grammar." + i));
+          new Path(index + "/grammar." + i));
     }
     fs.copyFromLocalFile(false, true, new Path("data/" + PATH + "/" + MTMODEL + "/title_en-" 
         + LANGUAGE + "-trans10-filtered-integration.xml"),
@@ -78,9 +79,9 @@ public class VerifyNtcirChinesePositionalIndexIP {
     String[] args = new String[] { "hadoop jar", IntegrationUtils.getJar("dist", "ivory"),
         ivory.app.PreprocessTrecForeign.class.getCanonicalName(), libjars,
         "-input=" + collectionPath.toString(), "-index=" + index, 
-        "-lang=fr" , "-tokenizerclass=" + OpenNLPTokenizer.class.getCanonicalName(),
+        "-lang=" + LANGUAGE , "-tokenizerclass=" + StanfordChineseTokenizer.class.getCanonicalName(),
         "-tokenizermodel=" + index + "/" + LANGUAGE + "-token.bin", "-name=" 
-        + VerifyClefFrenchPositionalIndexIP.class.getCanonicalName()};
+        + VerifyNtcirChinesePositionalIndexIP.class.getCanonicalName()};
 
     IntegrationUtils.exec(Joiner.on(" ").join(args));
 
@@ -89,7 +90,7 @@ public class VerifyNtcirChinesePositionalIndexIP {
         "-index=" + index, "-indexPartitions=10", "-positionalIndexIP" };
 
     IntegrationUtils.exec(Joiner.on(" ").join(args));
-     
+
     QueryEngine qr = new QueryEngine();
 
     for (int heuristic=0; heuristic<=2; heuristic++) {

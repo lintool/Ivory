@@ -2,7 +2,7 @@ package ivory.integration.clir;
 
 import static org.junit.Assert.assertTrue;
 import ivory.core.eval.Qrels;
-import ivory.core.tokenize.OpenNLPTokenizer;
+import ivory.core.tokenize.LuceneArabicAnalyzer;
 import ivory.integration.IntegrationUtils;
 import ivory.sqe.retrieval.QueryEngine;
 import ivory.sqe.retrieval.RunQueryEngine;
@@ -78,9 +78,9 @@ public class VerifyTrecArabicPositionalIndexIP {
     String[] args = new String[] { "hadoop jar", IntegrationUtils.getJar("dist", "ivory"),
         ivory.app.PreprocessTrecForeign.class.getCanonicalName(), libjars,
         "-input=" + collectionPath.toString(), "-index=" + index, 
-        "-lang=fr" , "-tokenizerclass=" + OpenNLPTokenizer.class.getCanonicalName(),
+        "-lang=" + LANGUAGE , "-tokenizerclass=" + LuceneArabicAnalyzer.class.getCanonicalName(),
         "-tokenizermodel=" + index + "/" + LANGUAGE + "-token.bin", "-name=" 
-        + VerifyClefFrenchPositionalIndexIP.class.getCanonicalName()};
+        + VerifyTrecArabicPositionalIndexIP.class.getCanonicalName()};
 
     IntegrationUtils.exec(Joiner.on(" ").join(args));
 
@@ -125,8 +125,8 @@ public class VerifyTrecArabicPositionalIndexIP {
 
       System.err.println("Total query time for heuristic " + heuristic + ":" + (end - start) + "ms");
     }
-    ivory.regression.sigir2013.cdec.EnFr_CLEF06.initialize();
-    ivory.regression.sigir2013.cdec.EnFr_CLEF06.verifyAllResults(qr.getModels(), qr.getAllResults(), qr.getDocnoMapping(),
+    ivory.regression.sigir2013.cdec.EnAr_TREC02.initialize();
+    ivory.regression.sigir2013.cdec.EnAr_TREC02.verifyAllResults(qr.getModels(), qr.getAllResults(), qr.getDocnoMapping(),
         new Qrels("data/" + PATH + "/qrels." + PATH+ ".txt"));
 
     System.err.println("Done!");
