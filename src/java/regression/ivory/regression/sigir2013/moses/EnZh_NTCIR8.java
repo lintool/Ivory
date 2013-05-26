@@ -13,7 +13,7 @@ import java.util.Set;
 import junit.framework.JUnit4TestAdapter;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
-  import org.junit.Test;
+import org.junit.Test;
 import com.google.common.collect.Maps;
 import edu.umd.cloud9.collection.DocnoMapping;
 import edu.umd.cloud9.io.map.HMapSFW;
@@ -85,6 +85,7 @@ public class EnZh_NTCIR8 {
 
   @Test
   public void runRegressions() throws Exception {
+    initialize();
     runRegression(0);   // "one2none"
     runRegression(1);   // "one2one"
     runRegression(2);   // "one2many"

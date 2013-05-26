@@ -84,6 +84,7 @@ public class EnFr_CLEF06 {
 
   @Test
   public void runRegressions() throws Exception {
+    initialize();
     runRegression(0);   // "one2none"
     runRegression(1);   // "one2one"
     runRegression(2);   // "one2many"
