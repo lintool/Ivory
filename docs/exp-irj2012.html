@@ -67,54 +67,99 @@
   <div class="container">
 
 <div class="page-header">
-<h2>Experimental Results</h2>
+<h2>Experiments: Feature Extraction using Document Vectors (IRJ 2012)</h2>
 </div>
 
-<p/>
+<p>The following is a step-by-step guide to replicating experiments from Asadi and Lin's paper <a href="publications/Asadi_Lin_IRJ2012.pdf">Document Vector Representations for Feature Extraction in Multi-Stage Document Ranking</a> in the Information Retrieval Journal (2012).</p>
 
-<p>This page describes a number of experiments on standard test
-collections using Ivory.  Each experiment is associated with a
-command-line invocation to perform the experiment, command-line
-invocations to evaluate the results, and a JUnit test case that
-performs the experiment and checks to see if the results are as
-expected (in terms of standard metrics of effectiveness).  The purpose
-of enumerating these experiments is for others to be able to replicate
-our results, thereby providing a solid foundation for building on our
-work.</p>
+<h3>Queries, Documents, and Features</h3>
 
-<p>Here are the experiments categorized:</p>
+<p>Queries must be in the following XML format:</p>
+
+<pre class="code">
+&lt;parameters&gt;
+  &lt;query id="query_id"&gt;query_text&lt;/query&gt;
+&lt;/parameters&gt;
+</pre>
+
+<p>A sample query file can be found at <code><a href="../data/ivory/ffg/queries.xml">data/ivory/ffg/queries.xml</a></code>.</p>
+
+<p>Candidate documents from which features are extracted should be in a separate file
+in the following format:</p>
+
+<pre class="code">
+&lt;line&gt; .=. &lt;query-id&gt; \t &lt;document-id&gt;
+&lt;query-id&gt; .=. &lt;integer&gt;
+&lt;document-id&gt; .=. &lt;integer&gt;
+</pre>
+
+<p>For a sample, see <code><a href="../data/ivory/ffg/documents.txt">data/ivory/ffg/documents.txt</a></code>.</p>
+
+<p>Finally, a list of feature definitions must be provided.
+A sample list of features is included in
+<code><a href="../data/ivory/ffg/features.xml">data/ivory/ffg/features.xml</a></code>.</p>
+
+<h3>Preparing ClueWeb09 Indexes</h3>
+
+<p>The first step is to construct a Positional Inverted Index (PII) or Document Vectors (DV).
+A PII can be used to perform both candidate generation and feature extraction together in a
+single pass. To construct a PII, the driver uses an Ivory index and
+<a href="http://plg.uwaterloo.ca/~gvcormac/clueweb09spam/">spam scores</a>.</p>
+
+<pre class="code">
+etc/run.sh ivory.ffg.preprocessing.GenerateCompressedPositionalPostings \
+  -index [Ivory-index-path] -query [queries-path] \
+  -spam [spam-scores-path] -output [PII-path]
+</pre>
+
+<p>To construct document vectors, you need to pack documents into one of the various
+document vector representations in <code>ivory.ffg.data</code>. These include:</p>
 
 <ul>
-
-  <li>Experiments on <a href="exp-trec45.html">TREC Disks 4-5</a>: baselines,
-  weighted sequential dependence model, latent concept expansion</li>
-
-  <li>Experiments on <a href="exp-wt10g.html">Wt10g</a>: baselines</li>
-
-  <li>Experiments on <a href="exp-gov2.html">Gov2</a>: baselines</li>
-
-  <li>Experiments on <a href="exp-clueweb09catB.html">ClueWeb09,
-  category B</a>: baselines, Waterloo spam scores</li>
-
-  <li>Experiments from Wang et al.'s <a href="exp-sigir2010.html">SIGIR 2010
-  paper</a>: the efficient sequential dependence model (ESD) on Wt10g,
-  Gov2, and Clue</li>
-
-  <li>Experiments from Wang et al.'s <a href="exp-cikm2010.html">CIKM 2010 
-  paper</a>: temporally constrained linear models on Wt10g, Gov2, and Clue</li>
-
-  <li>Experiments from Wang et al.'s <a href="exp-sigir2011.html">SIGIR 2011
-  paper</a>: cascade model on Wt10g, Gov2, and Clue</li>
-
-  <li>Experiments from Ture et al.'s <a href="clpwsim.html">SIGIR 2011
-  paper</a>: cross-lingual pairwise similarity comparison on
-  Wikipedia.</li>
-
-  <li>Experiments from Asadi and Lin's <a href="exp-irj2012.html">IRJ 2012
-  paper</a>: document vector representations for feature extraction in
-  multi-stage search architectures.</li>
-
+<li>PFOR-compressed DV: <code>ivory.ffg.data.DocumentVectorPForDetlaArray</code></li>
+<li>VByte-compressed DV: <code>ivory.ffg.data.DocumentVectorVIntArray</code></li>
+<li>Hash-compressed (from IRJ) DV: <code>ivory.ffg.data.DocumentVectorHashedArray</code></li>
+<li>Mini-Indexed DV: <code>ivory.ffg.data.DocumentVectorMiniInvertedIndex</code></li>
 </ul>
+
+<p>
+You can run the driver as follows:
+</p>
+
+<pre class="code">
+etc/run.sh ivory.ffg.preprocessing.GenerateDocumentVectors \
+  -index [Ivory-index-path] -dvclass [document-vector-class] \
+  -candidate [documents-path] -output [document-vectors-path]
+</pre>
+
+<h3>Computing Features</h3>
+
+<p>In order to perform candidate generation (with Small Adaptive) and feature extraction in one pass using a PII,
+use the following driver:</p>
+
+<pre class="code">
+etc/run.sh ivory.ffg.driver.RankAndFeaturesSmallAdaptive \
+  -index [Ivory-index-path] -posting [PII-path] \
+  -query [queries-path] -candidate [documents-path] -feature [features-path] \
+  (-hits [num-hits]) (-spam [spam-scores-path] -output [output-path])
+</pre>
+
+<p>The default value of hits is 10,000 documents.</p>
+
+<p>To perform feature extraction using document vectors with either the sliding window technique or
+"on-the-fly indexing" technique, use the following drivers:</p>
+
+<pre class="code">
+etc/run.sh ivory.ffg.driver.(DocumentVectorOnTheFlyIndexing|DocumentVectorSlidingWindow) \
+  -index [Ivory-index-path] -dvclass [document-vector-class] -document [document-vectors-path] \
+  -query [query-path] -candidate [documents-path] -feature [features-path] \
+  (-output [output-path])
+</pre>
+
+<p>The output file will contain feature values for each document (one
+per line in the following format: "qid \t document number \t
+space-delimited-feature-values.")
+</p>
 
   </div>
 

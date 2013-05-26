@@ -32,7 +32,7 @@ public class OptionManager {
   public static final String HITS = "hits";
   public static final String DOCUMENT_VECTOR_CLASS = "dvclass";
   public static final String DOCUMENT_PATH = "document";
-  public static final String JUDGMENT_PATH = "judgment";
+  public static final String JUDGMENT_PATH = "candidate";
   public static final String FEATURE_PATH = "feature";
 
   private Options options;
