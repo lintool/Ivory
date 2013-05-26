@@ -121,9 +121,9 @@ public class ComputeSignaturesSimhash extends PowerTool {
     RetrievalEnvironment env = new RetrievalEnvironment(dir, fs);
     job.setJobName("ComputeSignatures_simhash" + "_D=64_" + env.readCollectionName());
 
-    String inputPath = PwsimEnvironment.getFileNameWithPars(dir, "TermDocs");
-    String outputPath = PwsimEnvironment.getFileNameWithPars(dir, "SignaturesSimhash");
-
+    String inputPath = PwsimEnvironment.getTermDocvectorsFile(dir, fs);
+    String outputPath = PwsimEnvironment.getSignaturesDir(dir, 64, "simhash");
+    
     int numMappers = 300;
 
     if (fs.exists(new Path(outputPath))) {
@@ -165,8 +165,7 @@ public class ComputeSignaturesSimhash extends PowerTool {
     }
     long startTime = System.currentTimeMillis();
     JobClient.runJob(job);
-    System.out.println("Job finished in " + (System.currentTimeMillis() - startTime)
-        + " milliseconds");
+    System.out.println("Job finished in " + (System.currentTimeMillis() - startTime) / 1000.0 + " seconds");
     return 0;
   }
 

@@ -32,22 +32,22 @@ public class VerifyWikipediaProcessingMonolingual {
   // Galago: part 00010, key = 34096
   private int galagoTermDocVector1Id = 34096;
   private ImmutableMap<String, Float> galagoTermDocVector1 = ImmutableMap.of(
-      "beneventum", 0.19515267f, "pre", 0.06326606f, "egypt", 0.08399084f, "coloni", 0.070443f);
+      "time", 0.018549806f, "refer", -0.021184113f, "greec", 0.09738249f, "sparta", 0.12279472f);
 
   // Galago: part 00000, key = 91805
   private int galagoTermDocVector2Id = 91805;
   private ImmutableMap<String, Float> galagoTermDocVector2 = ImmutableMap.of(
-      "entir", 0.012336632f, "91", 0.027462268f, "pollak", 0.09643835f, "found", 0.006558274f);
+      "religi", 0.04332288f, "lubric", 0.06086864f, "time", 0.016003875f, "refer", -0.013383096f);
 
   // Galago: part 00011, key = 34096
   private int galagoIntDocVector1Id = 34096;
   private ImmutableMap<Integer, Float> galagoIntDocVector1 =
-    ImmutableMap.of(1, -0.0206428f, 756, 0.059395142f, 51217, 0.18819067f, 982, 0.063754365f);
+    ImmutableMap.of(1, -0.021184111f, 23917, 0.14610383f, 5, 0.01883354f, 9, 0.018549804f);
 
   // Galago: part 00002, key = 100585
   private int galagoIntDocVector2Id = 100585;
   private ImmutableMap<Integer, Float> galagoIntDocVector2 =
-    ImmutableMap.of(5, 0.01021795f, 585, 0.028274508f, 45242, 0.13892333f, 3414, 0.045721285f);
+    ImmutableMap.of(41851, 0.059388004f, 1101, 0.024443226f, 5, 0.00780255f, 3282, 0.03333674f);
 
   private static final String opennlpIndex = tmp + "/enwiki.opennlp";
   private static final String vocabPath = tmp + "/vocab";
@@ -56,22 +56,22 @@ public class VerifyWikipediaProcessingMonolingual {
   // Opennlp: part 00000, key = 91805
   private int opennlpTermDocVector1Id = 91805;
   private ImmutableMap<String, Float> opennlpTermDocVector1 = ImmutableMap.of(
-      "clutter", 0.043639377f, "zoom", 0.060861073f, "portray", 0.022965258f, "refer", -0.0062234555f);
+      "religi", 0.056898247f, "lubric", 0.07892087f, "time", 0.021438342f, "refer", -0.017549722f);
 
   // Opennlp: part 00010, key = 137938
   private int opennlpTermDocVector2Id = 137938;
   private ImmutableMap<String, Float> opennlpTermDocVector2 = ImmutableMap.of(
-      "histor", 0.018175913f, "vigilant", 0.11764987f, "augment", 0.04146363f, "time", 0.01755069f);
+      "stori", 0.034548897f, "2006", 0.023635013f, "nineti", 0.076754145f, "time", 0.019773208f);
 
   // Opennlp: part 00002, key = 4764
   private int opennlpIntDocVector1Id = 4764;
   private ImmutableMap<Integer, Float> opennlpIntDocVector1 =
-    ImmutableMap.of(4, 0.019955039f, 8, 0.027558785f, 2066, 0.12415717f, 1072, 0.12747908f);
+    ImmutableMap.of(4, 0.019922445f, 8, 0.027526723f, 1095, 0.104451805f, 1028, 0.102825336f);
 
   // Opennlp: part 00011, key = 148600
   private int opennlpIntDocVector2Id = 148600;
   private ImmutableMap<Integer, Float> opennlpIntDocVector2 =
-    ImmutableMap.of(1, -0.02064175f, 9783, 0.1542827f, 1103, 0.06609425f, 5468, 0.1312336f);
+    ImmutableMap.of(2, 0.0059410483f, 1102, 0.16451068f, 88, 0.09218009f, 140, 0.098902896f);
 
   @Test
   public void runBuildIndexGalago() throws Exception {
@@ -92,7 +92,7 @@ public class VerifyWikipediaProcessingMonolingual {
     List<String> jars = Lists.newArrayList();
     jars.add(IntegrationUtils.getJar("lib", "cloud9"));
     jars.add(IntegrationUtils.getJar("lib", "bliki-core"));
-    jars.add(IntegrationUtils.getJar("lib", "guava-13"));
+    jars.add(IntegrationUtils.getJar("lib", "guava"));
     jars.add(IntegrationUtils.getJar("lib", "dsiutils"));
     jars.add(IntegrationUtils.getJar("lib", "fastutil"));
     jars.add(IntegrationUtils.getJar("lib", "jsap"));
@@ -195,7 +195,7 @@ public class VerifyWikipediaProcessingMonolingual {
     List<String> jars = Lists.newArrayList();
     jars.add(IntegrationUtils.getJar("lib", "cloud9"));
     jars.add(IntegrationUtils.getJar("lib", "bliki-core"));
-    jars.add(IntegrationUtils.getJar("lib", "guava-13"));
+    jars.add(IntegrationUtils.getJar("lib", "guava"));
     jars.add(IntegrationUtils.getJar("lib", "dsiutils"));
     jars.add(IntegrationUtils.getJar("lib", "fastutil"));
     jars.add(IntegrationUtils.getJar("lib", "jsap"));

@@ -71,34 +71,28 @@
 </div>
 
 <p>Ivory is designed to work with Hadoop YARN and has been tested
-against Cloudera CDH 4.1.2 (on both Mac and Linux). It should work
+against Cloudera CDH 4.2.1 (on both Mac and Linux). It should work
 with other Hadoop distributions or on other platforms with only minor
 modifications; however, switching to a non-YARN version of Hadoop will
 requiring recompiling the jars. In this tutorial, we'll take you
 through the process of building an inverted index on a toy collection
 and running retrieval experiments. First, we'll use Hadoop local
-mode. Running in local model, as the name suggests, does not require
+mode (also called standalone mode). Running in local model, as the name suggests, does not require
 setting up a cluster, but of course, you won't get the benefits of
-distributed processing either. Next, we'll run Hadoop on the single
+distributed processing either. Next, we'll run Ivory on the single
 node virtual Hadoop cluster provided by Cloudera.</p>
-
-<table><tr><td valign="top"><span class="label label-warning">Warning</span></td>
-<td style="padding-left: 10px">Note that local mode doesn't work
-properly under Windows, even with cygwin, so Windows users following
-this guide should start with "Running Ivory on a Single Node Virtual
-Cluster"</td></tr></table>
 
 <h3>Download and Install Hadoop</h3>
 
 <p>Download Cloudera CDH
-4.1.2 <a href="https://ccp.cloudera.com/display/SUPPORT/CDH+Downloads">here</a>. The
+4.2.1 <a href="https://ccp.cloudera.com/display/SUPPORT/CDH+Downloads">here</a>. The
 easiest way is to download the tarball and unpack on your local
 machine. Make sure
 <code>PATH_TO_HADOOP/bin</code> is on your path. Verify that Hadoop is running
 with the pi example. In a shell, run the following command:</p>
 
 <pre class="code">
-hadoop jar PATH_TO_HADOOP/share/hadoop/mapreduce/hadoop-mapreduce-examples-2.0.0-cdh4.1.2.jar pi \
+hadoop jar PATH_TO_HADOOP/share/hadoop/mapreduce/hadoop-mapreduce-examples-2.0.0-cdh4.2.1.jar pi \
   -D mapreduce.framework.name=local -D mapreduce.jobtracker.address=local -D fs.default.name=file:/// \
   -D mapreduce.cluster.local.dir=/tmp/mapred/local \
   -D mapreduce.cluster.temp.dir=/tmp/mapred/temp\
@@ -218,10 +212,8 @@ BM25.</p>
 etc/run.sh ivory.smrf.retrieval.RunQueryLocal data/cacm/run.cacm.xml data/cacm/queries.cacm.xml
 </pre>
 
-<p>If you see errors about not being able to find terms, that's
-okay (there are query terms that don't appear in any documents).</p>
-
-<p>After the program finishes you should see two files:
+<p>If you see warnings about not being able to find terms, that's
+okay. After the program finishes you should see two files:
 <code>ranking.cacm-dir-base.txt</code>, <code>ranking.cacm-bm25-base.txt</code>. These
 are the retrieval results, the files containing the top 1000 hits per topic.</p>
 
@@ -334,7 +326,7 @@ it and you'll see. Note that the paths here are referencing HDFS
 paths, not local paths.</p>
 
 <p>After the indexing finishes, you should be able to see the indexes
-on HFS:</p>
+on HDFS:</p>
 
 <pre class="code">
 hadoop fs -ls index-cacm

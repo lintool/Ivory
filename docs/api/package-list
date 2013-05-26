@@ -1,4 +1,8 @@
 ivory.app
+ivory.bloomir.data
+ivory.bloomir.preprocessing
+ivory.bloomir.ranker
+ivory.bloomir.util
 ivory.cascade.model
 ivory.cascade.model.builder
 ivory.cascade.model.potential
@@ -15,6 +19,13 @@ ivory.core.index
 ivory.core.preprocess
 ivory.core.tokenize
 ivory.core.util
+ivory.ffg.data
+ivory.ffg.driver
+ivory.ffg.feature
+ivory.ffg.preprocessing
+ivory.ffg.score
+ivory.ffg.stats
+ivory.ffg.util
 ivory.lsh.bitext
 ivory.lsh.data
 ivory.lsh.driver
@@ -41,6 +52,5 @@ ivory.smrf.model.importance
 ivory.smrf.model.potential
 ivory.smrf.model.score
 ivory.smrf.retrieval
-ivory.smrf.retrieval.distributed
 ivory.sqe.querygenerator
 ivory.sqe.retrieval

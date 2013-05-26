@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Ivory: Scalable Bitext Classification</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Le styles -->
+    <link href="assets/css/bootstrap.css" rel="stylesheet">
+    <link href="assets/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="assets/css/docs.css" rel="stylesheet">
+    <link href="assets/js/google-code-prettify/prettify.css" rel="stylesheet">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+  </head>
+
+  <body data-spy="scroll" data-target=".bs-docs-sidebar">
+
+    <!-- Navbar
+    ================================================== -->
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <div class="nav-collapse collapse">
+            <ul class="nav">
+              <li class="">
+                <a href="../index.html">Home</a>
+              </li>
+              <li class="">
+                <a href="./start.html">Getting Started</a>
+              </li>
+              <li class="">
+                <a href="./publications.html">Publications</a>
+              </li>
+              <li class="active">
+                <a href="./experiments.html">Experiments</a>
+              </li>
+              <li class="">
+                <a href="./team.html">Team</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+<!-- Subhead
+================================================== -->
+<header class="jumbotron subhead" id="overview">
+  <div class="container">
+    <h1>Ivory</h1>
+    <p class="lead">A Hadoop toolkit for web-scale information retrieval research</p>
+  </div>
+</header>
+
+  <div class="container">
+
+<div class="page-header">
+<h2>Parallel Corpus Extraction</h2>
+<h4>A step-by-step tutorial for German and English Wikipedia</h4>
+</div>
+
+
+<p>
+This is the second part of a two-part tutorial, so please make sure you have completed 
+<a href=clpwsim.html>the first part</a> before starting this one. In this part,
+we will show how to extract parallel sentence pairs from the similar article pairs
+we found previously.
+
+<h3>1. Splitting Documents into Sentences</h3>
+
+<p>In order to split documents into sentences, we need to upload sentence
+detection model files to HDFS:</p>
+
+<pre class="code">
+hdfs dfs -mkdir $datadir/sent
+hdfs dfs -put $IVORYDIR/data/vocab/de-sent.bin $datadir/sent/
+hdfs dfs -put $IVORYDIR/data/vocab/en-sent.bin $datadir/sent/
+</pre>
+
+<table><tr><td valign="top"><span class="label label-info">Tip</span></td>
+<td style="padding-left: 10px">
+For languages that are not currently supported (i.e., no <code>*-sent.bin</code> file under 
+<code>$IVORYDIR/data/tokenizer</code>), refer to 
+<a href="http://sourceforge.net/apps/mediawiki/opennlp/index.php?title=Sentence_Detector">
+OpenNLP documentation</a> to train your own models.
+<p>
+</td>
+</tr>
+</table>
+
+<p>Let's split each document into a list of sentences:</p>
+
+<pre class="code">
+$IVORYDIR/etc/hadoop-cluster.sh ivory.lsh.bitext.Docs2Sentences \
+	-e_collection=$wiki/compressed/enwiki-20121201.compressed -f_collection=$wiki/compressed/dewiki-20121215.compressed \
+	-sentences=$pwsimdir/sentences.de-en \
+	-e_index=$edir -f_index=$fdir -data=$datadir -e_lang=en -f_lang=de
+</pre>
+
+<table><tr><td valign="top"><span class="label label-info">Info</span></td>
+<td style="padding-left: 10px">
+As a heuristic, the above program will discard any sentence with less than 5 tokens or 3 unique terms,
+and any sentence in which more than half of the tokens are out-of-vocabulary. The latter can be changed
+by setting option <code>-oov_rate</code> to the maximum allowed ratio of out-of-vocabulary tokens.
+<p>
+</td>
+</tr>
+</table>
+
+<p>
+All sentences in the two collections are now written to <code>$pwsimdir/sentences.de-en</code>, with identifiers
+to distinguish between German and English. 
+</p>
+
+<h3>2. Classifying Sentence Pairs</h3>
+
+Next step is to classify each German-English sentence pair as parallel
+or not, using a novel two-step classification approach described in Ture and Lin's NAACL'12 paper <b><a href="publications/Ture_Lin_NAACL-HLT2012.pdf">
+Why Not Grab a Free Lunch? Mining Large Corpora for Parallel Sentences To Improve
+Translation Modeling</a></b>. Trained classifier models are provided under <code>$IVORYDIR/data/classifier</code>. Let
+us first upload these files to HDFS where the program can access them:
+<p>
+
+<pre class="code">
+hdfs dfs -put $IVORYDIR/data/classifier/classifier-simple.de-en $datadir/
+hdfs dfs -put $IVORYDIR/data/classifier/classifier-complex.de-en $datadir/
+</pre>
+
+The first classification step will generate all candidate sentence pairs, and then apply the simple classifier,
+emitting all pairs scored above the provided threshold (e.g., <code>F1=0.9</code>):
+
+</p>
+<pre class="code">
+$IVORYDIR/etc/hadoop-cluster.sh ivory.lsh.bitext.FindParallelSentencePairs \
+	-e_collection=$wiki/compressed/enwiki-20121201.compressed -f_collection=$wiki/compressed/dewiki-20121215.compressed \
+	-sentences=$pwsimdir/sentences.de-en \
+	-pwsim_output=$pwsimdir/similardocs_random_maxdst=400_D=1000_Q=300_B=2000.single/part-00000 \
+	-bitext=$pwsimdir/bitext.F1=90 \
+	-e_index=$edir -f_index=$fdir -data=$datadir -e_lang=en -f_lang=de \
+	-threshold=0.9 -classifier_id=1
+</pre>
+
+<table><tr><td valign="top"><span class="label label-info">Tip</span></td>
+<td style="padding-left: 10px">
+Modifying this threshold will have a corresponding effect on precision/recall.
+One way to set this parameter is to evaluate the classifier on held-out data, and
+pick a value that yields high recall for <code>F1</code>, and high precision for 
+<code>F2</code>. You may learn more details about the classifier training process
+and our implementation
+<a href="docs/bitext.html">from online documentation</a>, or read 
+<a href="publications/Ture_Lin_NAACL-HLT2012.pdf">Ture and Lin's NAACL'12 paper</a>.
+<p>
+</td>
+</tr>
+</table>
+
+The second classification step will apply the complex classifier on each pair output
+by the first step, and emit all pairs scored above the provided threshold (e.g., <code>F2=0.5</code>):
+<p>
+
+<pre class="code">
+$IVORYDIR/etc/hadoop-cluster.sh ivory.lsh.bitext.FilterSentencePairs \
+	-input=$pwsimdir/bitext.F1=90 -output=$pwsimdir/bitext.F1=90.F2=50 \
+	-e_index=$edir -f_index=$fdir -data=$datadir -e_lang=en -f_lang=de \
+	-threshold=0.5 -classifier_id=1
+</pre>
+
+
+  </div>
+
+
+
+    <!-- Footer
+    ================================================== -->
+    <footer class="footer">
+      <div class="container">
+        <p class="pull-right"><a href="#">Back to top</a></p>
+        <p>Designed using <a href="http://twitter.github.com/bootstrap/">Bootstrap</a>.</p>
+        <p>Code licensed under <a href="http://www.apache.org/licenses/LICENSE-2.0" target="_blank">Apache License v2.0</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
+      </div>
+    </footer>
+
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="assets/js/jquery.js"></script>
+    <script src="assets/js/google-code-prettify/prettify.js"></script>
+    <script src="assets/js/bootstrap-transition.js"></script>
+    <script src="assets/js/bootstrap-alert.js"></script>
+    <script src="assets/js/bootstrap-modal.js"></script>
+    <script src="assets/js/bootstrap-dropdown.js"></script>
+    <script src="assets/js/bootstrap-scrollspy.js"></script>
+    <script src="assets/js/bootstrap-tab.js"></script>
+    <script src="assets/js/bootstrap-tooltip.js"></script>
+    <script src="assets/js/bootstrap-popover.js"></script>
+    <script src="assets/js/bootstrap-button.js"></script>
+    <script src="assets/js/bootstrap-collapse.js"></script>
+    <script src="assets/js/bootstrap-carousel.js"></script>
+    <script src="assets/js/bootstrap-typeahead.js"></script>
+    <script src="assets/js/bootstrap-affix.js"></script>
+
+  </body>
+</html>
+

@@ -72,8 +72,8 @@ public class MinhashSignatureTest {
       e.printStackTrace();
     }
 
-    List<PairOfWritables<WritableComparable, Writable>> listOfKeysPairs = SequenceFileUtils
-        .readFile(new Path(TMP_FILENAME1));
+    List<PairOfWritables<WritableComparable<IntWritable>, Writable>> listOfKeysPairs =
+        SequenceFileUtils.readFile(new Path(TMP_FILENAME1));
     FileSystem.get(conf).delete(new Path(TMP_FILENAME1), true);
 
     MinhashSignature read1 = (MinhashSignature) listOfKeysPairs.get(0).getRightElement();

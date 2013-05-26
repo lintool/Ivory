@@ -47,6 +47,7 @@ public abstract class Tokenizer {
     LOG.setLevel(Level.INFO);
   }
   public abstract void configure(Configuration conf);
+  public abstract void configure(Configuration conf, FileSystem fs);
   public abstract String[] processContent(String text);
   protected static String delims = "`~!@#^&*()-_=+]}[{\\|'\";:/?.>,<";
   protected static int MIN_LENGTH = 2, MAX_LENGTH = 50;
@@ -280,13 +281,11 @@ public abstract class Tokenizer {
     }
     return utf8.trim();
   }
-
-  public abstract void configure(Configuration mJobConf, FileSystem fs);
-
+  
   @SuppressWarnings("static-access")
   public static void main(String[] args) {
     Options options = new Options();
-    options.addOption(OptionBuilder.withArgName("full path to model file or directory").hasArg().withDescription("model file").isRequired().create("model"));
+    options.addOption(OptionBuilder.withArgName("full path to model file or directory").hasArg().withDescription("model file").create("model"));
     options.addOption(OptionBuilder.withArgName("full path to input file").hasArg().withDescription("input file").isRequired().create("input"));
     options.addOption(OptionBuilder.withArgName("full path to output file").hasArg().withDescription("output file").isRequired().create("output"));
     options.addOption(OptionBuilder.withArgName("en | zh | de | fr | ar | tr | es").hasArg().withDescription("2-character language code").isRequired().create("lang"));
@@ -298,7 +297,7 @@ public abstract class Tokenizer {
     CommandLine cmdline;
     CommandLineParser parser = new GnuParser();
     try {
-      String stopwordList = null, stemmedStopwordList = null;
+      String stopwordList = null, stemmedStopwordList = null, modelFile = null;
       boolean isStem = true;
       cmdline = parser.parse(options, args);
       if(cmdline.hasOption("stopword")){
@@ -310,9 +309,13 @@ public abstract class Tokenizer {
       if(cmdline.hasOption("stem")){
         isStem = Boolean.parseBoolean(cmdline.getOptionValue("stem"));
       }
+      if(cmdline.hasOption("model")){
+        modelFile = cmdline.getOptionValue("model");
+      }
+
       ivory.core.tokenize.Tokenizer tokenizer = TokenizerFactory.createTokenizer(
           cmdline.getOptionValue("lang"), 
-          cmdline.getOptionValue("model"), 
+          modelFile,
           isStem, 
           stopwordList, stemmedStopwordList,
           null);

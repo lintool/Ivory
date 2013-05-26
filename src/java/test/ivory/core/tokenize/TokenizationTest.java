@@ -16,7 +16,8 @@ import org.junit.Test;
 import edu.umd.hooka.VocabularyWritable;
 
 public class TokenizationTest {
-  String dir = ""; // /Users/ferhanture/Documents/workspace/ivory-github/Ivory/";
+  private String dir = "./";
+  private String[] languages = {"ar", "tr", "cs", "es", "de", "fr", "en"};//, "zh"};
 
   private List<String> readInput(String file) {
     List<String> lines = new ArrayList<String>();
@@ -40,8 +41,13 @@ public class TokenizationTest {
 
   public void testTokenization(String lang, String tokenizerModelFile, boolean isStem, String stopwordsFile, VocabularyWritable vocab, String inputFile, String expectedFile) throws IOException{
     Tokenizer tokenizer = TokenizerFactory.createTokenizer(lang, tokenizerModelFile, isStem, stopwordsFile, null, vocab);
-    assertTrue(lang.equals("zh") || tokenizer.isStemming() == isStem);
-    assertTrue(lang.equals("zh") || tokenizer.isStopwordRemoval() == (stopwordsFile != null));
+    // two classes are not aware of the stemming/stopword options (they use default option instead): StanfordChineseTokenizer, GalagoTokenizer
+    assertTrue(tokenizer.isStemming() == isStem 
+        || (tokenizer.getClass() == StanfordChineseTokenizer.class) 
+        || (tokenizer.getClass() == GalagoTokenizer.class));
+    assertTrue(tokenizer.isStopwordRemoval() == (stopwordsFile != null) 
+        || (tokenizer.getClass() == StanfordChineseTokenizer.class) 
+        || (tokenizer.getClass()==GalagoTokenizer.class));
 
     List<String> sentences = readInput(inputFile);
     List<String> expectedSentences = readInput(expectedFile);
@@ -73,7 +79,6 @@ public class TokenizationTest {
 
   @Test
   public void testAllTokenization() {
-    String[] languages = {"ar", "tr", "cs", "es", "de", "en", "zh"};
     try {
       for (String language : languages) {
         String rawFile = dir + "data/tokenizer/test/" + language + "-test.raw";
@@ -87,6 +92,20 @@ public class TokenizationTest {
         testTokenization(language, tokenizer, true, null, null, rawFile, tokenizedStemmedFile);
         testTokenization(language, tokenizer, false, stopwords, null, rawFile, tokenizedStopFile);
         testTokenization(language, tokenizer, true, stopwords, null, rawFile, tokenizedStemmedStopFile);
+        
+        // for Lucene tokenizers, everything should work without model file
+        if (language.equals("cs") || language.equals("ar") || language.equals("tr") || language.equals("es")) {
+          testTokenization(language, null, false, null, null, rawFile, tokenizedFile);
+          testTokenization(language, null, true, null, null, rawFile, tokenizedStemmedFile);
+          testTokenization(language, null, false, stopwords, null, rawFile, tokenizedStopFile);
+          testTokenization(language, null, true, stopwords, null, rawFile, tokenizedStemmedStopFile);          
+        }
+        
+        if (language.equals("en")) {
+          // stemming = true or false should have same output (since stemming is default)
+          testTokenization(language, null, false, null, null, rawFile, tokenizedFile + "-galago");
+          testTokenization(language, null, true, null, null, rawFile, tokenizedFile + "-galago");
+        }
       }
     } catch (IOException e) {
       Assert.fail("Error in tokenizer test: " + e.getMessage());

@@ -1,6 +1,6 @@
 <parameters>
 
-     <index>/scratch0/indexes/trec</index>
+     <index>/scratch0/indexes/adhoc/trec</index>
 
      <!-- Dirichlet, full independence, Latent Concept Expansion (1-grams) ["RM3"] (Fast Version) -->
      <model id="robust04-dir-rm3-f" type="Feature" output="ranking.robust04-dir-rm3-f.txt" hits="1000">

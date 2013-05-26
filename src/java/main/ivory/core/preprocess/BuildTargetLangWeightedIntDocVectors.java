@@ -174,7 +174,7 @@ public class BuildTargetLangWeightedIntDocVectors extends PowerTool {
     String vocabFile = getConf().get("Ivory.FinalVocab");
     DistributedCache.addCacheFile(new URI(vocabFile), conf);
 
-    Path inputPath = new Path(PwsimEnvironment.getFileNameWithPars(indexPath, "TermDocs", fs));
+    Path inputPath = new Path(PwsimEnvironment.getTermDocvectorsFile(indexPath, fs));
     Path weightedVectorsPath = new Path(outputPath);
 
     if (fs.exists(weightedVectorsPath)) {

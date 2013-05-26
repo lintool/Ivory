@@ -9,4 +9,5 @@ etc/hadoop-cluster.sh
 etc/run-integration.sh
 ivy/ivy.jar
 lib/
+data/tokenizer/zh-token.bin/
 ranking.*

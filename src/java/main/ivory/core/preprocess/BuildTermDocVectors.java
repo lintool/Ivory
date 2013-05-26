@@ -99,7 +99,7 @@ public class BuildTermDocVectors extends PowerTool {
       // Initialize the tokenizer.
       try {
         tokenizer = (Tokenizer) Class.forName(conf.get(Constants.Tokenizer)).newInstance();
-        tokenizer.configure(conf);
+        tokenizer.configure(conf, FileSystem.get(conf));
       } catch (Exception e) {
         e.printStackTrace();
         throw new RuntimeException("Error initializing tokenizer: " + e.getMessage());
@@ -217,6 +217,7 @@ public class BuildTermDocVectors extends PowerTool {
         LOG.info("InputPath: " + inputPath);
         LOG.info("DocLengthDataFile: " + dataFile);
         LOG.info("DocnoOffset: " + docnoOffset);
+        LOG.info("CollectionDocCount: " + collectionDocCount);
 
         FileSystem fs = FileSystem.get(conf);
         FileStatus[] fileStats = fs.listStatus(p);
@@ -250,6 +251,11 @@ public class BuildTermDocVectors extends PowerTool {
                   + "!");
             }
 
+            if (docno - docnoOffset >= doclengths.length) {
+              throw new RuntimeException("Error: docno - docnoOffset " + (docno - docnoOffset) 
+                  + " >= collectionDocCount " + collectionDocCount + "!");
+            }
+            
             doclengths[docno - docnoOffset] = len;
 
             if (docno > maxDocno) {
@@ -359,9 +365,7 @@ public class BuildTermDocVectors extends PowerTool {
     env.writeTokenizerClass(tokenizer);
     env.writeDocnoOffset(docnoOffset);
 
-    //conf.set("mapred.child.java.opts", "-Xmx2048m");
-    //conf.set("mapred.task.timeout", "6000000");			// needed for stragglers (e.g., very long documents in Wikipedia)
-
+    conf.set("mapreduce.task.timeout", "6000000");			// needed for stragglers (e.g., very long documents in Wikipedia)
     conf.set("mapreduce.map.memory.mb", "2048");
     conf.set("mapreduce.map.java.opts", "-Xmx2048m");
 
