@@ -10,7 +10,6 @@ import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
 import edu.stanford.nlp.ie.crf.CRFClassifier;
 import edu.stanford.nlp.sequences.DocumentReaderAndWriter;
-import edu.umd.hooka.VocabularyWritable;
 
 public class StanfordChineseTokenizer extends Tokenizer {
   private static final Logger LOG = Logger.getLogger(StanfordChineseTokenizer.class);

@@ -3,6 +3,9 @@ package ivory.core.tokenize;
 import ivory.core.Constants;
 import java.io.IOException;
 import java.io.StringReader;
+import java.text.Normalizer;
+import java.text.Normalizer.Form;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -59,12 +62,14 @@ public class LuceneArabicAnalyzer extends ivory.core.tokenize.Tokenizer {
     tokenizer = new StandardTokenizer(Version.LUCENE_35, new StringReader(text));
     TokenStream tokenStream = new LowerCaseFilter(Version.LUCENE_35, tokenizer);
     String tokenized = postNormalize(streamToString(tokenStream));
+    tokenized = Normalizer.normalize(tokenized, Form.NFKC);
 
     StringBuilder finalTokenized = new StringBuilder();
     for (String token : tokenized.split(" ")) {
       if ( isStopwordRemoval() && isDiscard(false, token) ) {
         continue;
       }
+
       finalTokenized.append( token + " " );
     }
     String stemmedTokenized = finalTokenized.toString().trim();
