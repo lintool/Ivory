@@ -1,0 +1,102 @@
+<parameters>
+<query id="301" grammar="data/en-ar.trec02/moses.grammar/grammar.0">Nestlé Brands||||-2.0383;;;nestlé brand|||le marqu nestl|||NaN|||1-1 0-2
+</query>
+<query id="302" grammar="data/en-ar.trec02/moses.grammar/grammar.1">Consumer Boycotts||||-1.73022;;;consum boycott|||le consomm qui boycott|||NaN|||0-1 1-3
+</query>
+<query id="303" grammar="data/en-ar.trec02/moses.grammar/grammar.2">Italian paintings||||-1.38489;;;italian paint|||de la peintur italien .|||NaN|||1-2 0-3
+</query>
+<query id="304" grammar="data/en-ar.trec02/moses.grammar/grammar.3">World Heritage Sites||||-1.17311;;;world heritag site|||le sit du patrimoin mondial .|||NaN|||1-3 2-1 0-4
+</query>
+<query id="305" grammar="data/en-ar.trec02/moses.grammar/grammar.4">Oil Prices||||-0.536719;;;oil price|||le prix du pétrol|||NaN|||0-0 0-2 0-3 1-1
+</query>
+<query id="306" grammar="data/en-ar.trec02/moses.grammar/grammar.5">ETA Activities in France||||-1.64918;;;eta activ in franc|||le activ d' eta en franc|||NaN|||0-3 1-1 2-4 3-5
+</query>
+<query id="307" grammar="data/en-ar.trec02/moses.grammar/grammar.6">Films Set in Scotland||||-2.36416;;;film set in scotland|||le film ser en écoss .|||NaN|||0-1 1-2 2-3 3-4
+</query>
+<query id="308" grammar="data/en-ar.trec02/moses.grammar/grammar.7">Solar Eclipse||||-1.80603;;;solar eclips|||éclips solair|||NaN|||1-0 0-1
+</query>
+<query id="309" grammar="data/en-ar.trec02/moses.grammar/grammar.8">"Hard" Drugs||||-1.79929;;;" hard " drug|||« dur » de la drogu|||NaN|||0-0 1-1 2-2 3-5
+</query>
+<query id="310" grammar="data/en-ar.trec02/moses.grammar/grammar.9">Treatment of Industrial Waste||||-1.36271;;;treatment of industri wast|||le trait de déchet industriel|||NaN|||0-1 1-2 2-4 3-3
+</query>
+<query id="311" grammar="data/en-ar.trec02/moses.grammar/grammar.10">Unemployment in Europe||||-0.986539;;;unemploy in europ|||le chômag en europ|||NaN|||0-1 1-2 2-3
+</query>
+<query id="312" grammar="data/en-ar.trec02/moses.grammar/grammar.11">Dog Attacks||||-1.47766;;;dog attack|||l' attaqu de chien|||NaN|||1-1 0-3
+</query>
+<query id="313" grammar="data/en-ar.trec02/moses.grammar/grammar.12">Centenary Celebrations||||-1.67091;;;centenari celebr|||centenair|||NaN|||0-0 1-0
+</query>
+<query id="314" grammar="data/en-ar.trec02/moses.grammar/grammar.13">Endangered Species||||-1.29621;;;endang speci|||de espec en dang|||NaN|||1-1 0-3
+</query>
+<query id="315" grammar="data/en-ar.trec02/moses.grammar/grammar.14">Doping in Sports||||-0.855709;;;dope in sport|||le dopag dan le sport .|||NaN|||0-1 1-2 2-4
+</query>
+<query id="316" grammar="data/en-ar.trec02/moses.grammar/grammar.15">Strikes||||-1.22843;;;strike|||la grev|||NaN|||0-1
+</query>
+<query id="317" grammar="data/en-ar.trec02/moses.grammar/grammar.16">Anti-cancer Drugs||||-1.63217;;;anti - cancer drug|||le médic anti - canc|||NaN|||3-1 0-2 1-3 2-4
+</query>
+<query id="318" grammar="data/en-ar.trec02/moses.grammar/grammar.17">Sex Education||||-1.37876;;;sex educ|||l' éduc sexuel|||NaN|||0-2 1-1
+</query>
+<query id="319" grammar="data/en-ar.trec02/moses.grammar/grammar.18">Global Opium Production||||-1.6845;;;global opium product|||la product mondial d' opium|||NaN|||2-1 0-2 1-4
+</query>
+<query id="320" grammar="data/en-ar.trec02/moses.grammar/grammar.19">Energy Crises||||-1.36438;;;energi crise|||le cris de l' énerg|||NaN|||0-4 1-1
+</query>
+<query id="321" grammar="data/en-ar.trec02/moses.grammar/grammar.20">The Talibans in Afghanistan||||-0.690343;;;the taliban in afghanistan|||le taliban en afghanistan|||NaN|||0-0 1-1 2-2 3-3
+</query>
+<query id="322" grammar="data/en-ar.trec02/moses.grammar/grammar.21">Atomic Energy||||-1.15578;;;atom energi|||l' énerg atom|||NaN|||0-0 0-2 1-1
+</query>
+<query id="323" grammar="data/en-ar.trec02/moses.grammar/grammar.22">Tightening Visa Requirements||||-2.19413;;;tighten visa requir|||serr la vis .|||NaN|||0-0 1-2 2-2
+</query>
+<query id="324" grammar="data/en-ar.trec02/moses.grammar/grammar.23">Supermodels||||-101.897;;;supermodel|||supermodel|||NaN|||0-0
+</query>
+<query id="325" grammar="data/en-ar.trec02/moses.grammar/grammar.24">Student Fees||||-1.79073;;;student fee|||le frais de scolar de étudi|||NaN|||1-1 1-3 0-5
+</query>
+<query id="326" grammar="data/en-ar.trec02/moses.grammar/grammar.25">Emmy International Awards||||-102.763;;;emmi intern award|||emmi récompens international|||NaN|||0-0 1-2 2-1
+</query>
+<query id="327" grammar="data/en-ar.trec02/moses.grammar/grammar.26">Earthquakes in Mexico City||||-1.63687;;;earthquak in mexico citi|||le trembl de terr à mexico|||NaN|||0-1 0-3 1-4 2-5 3-5
+</query>
+<query id="328" grammar="data/en-ar.trec02/moses.grammar/grammar.27">Iraqi Kurds and Turkey||||-1.59511;;;iraqi kurd and turkey|||le kurd irakien et de la turqu|||NaN|||0-2 1-1 2-3 3-5 3-6
+</query>
+<query id="329" grammar="data/en-ar.trec02/moses.grammar/grammar.28">Consequences if Charles and Diana Divorce||||-2.14855;;;consequ if charl and diana divorc|||par conséquent , si le divorc de charl et dian|||NaN|||0-0 0-1 1-3 5-5 2-7 3-8 4-9
+</query>
+<query id="330" grammar="data/en-ar.trec02/moses.grammar/grammar.29">Films with Keanu Reeves||||-201.785;;;film with keanu reev|||le film avec keanu reev|||NaN|||0-1 1-2 2-3 3-4
+</query>
+<query id="331" grammar="data/en-ar.trec02/moses.grammar/grammar.30">Zedillo's Economic Policies||||-2.87802;;;zedillo 's econom polici|||zedillo , de la polit économ|||NaN|||0-0 1-3 2-5 3-4
+</query>
+<query id="332" grammar="data/en-ar.trec02/moses.grammar/grammar.31">Shooting of Tupac Shakur||||-102.081;;;shoot of tupac shakur|||assassinat de tupac shakur|||NaN|||0-0 1-1 2-2 3-3
+</query>
+<query id="333" grammar="data/en-ar.trec02/moses.grammar/grammar.32">Trial of Paul Touvier||||-122.968;;;trial of paul touvier|||le proces de paul touvier|||NaN|||0-1 1-2 2-3 3-4
+</query>
+<query id="334" grammar="data/en-ar.trec02/moses.grammar/grammar.33">Election of George W. Bush||||-0.663668;;;elect of georg w. bush|||l' élect de georg w . bush .|||NaN|||0-1 1-2 2-3 3-4 3-5 3-7 4-6
+</query>
+<query id="335" grammar="data/en-ar.trec02/moses.grammar/grammar.34">Labour after John Smith||||-2.27023;;;labour after john smith|||apres le travail de john smith|||NaN|||1-0 0-2 2-4 3-5
+</query>
+<query id="336" grammar="data/en-ar.trec02/moses.grammar/grammar.35">NBA Labour Conflicts||||-102.054;;;nba labour conflict|||nba qu' un confl du travail .|||NaN|||0-0 2-3 1-4 1-5
+</query>
+<query id="337" grammar="data/en-ar.trec02/moses.grammar/grammar.36">Civil War in the Yemen||||-1.23683;;;civil war in the yemen|||la guerr civil au yémen|||NaN|||0-0 0-2 1-1 2-3 4-4
+</query>
+<query id="338" grammar="data/en-ar.trec02/moses.grammar/grammar.37">Carlos' Extradition and Trial||||-2.81562;;;carlo ' extradit and trial|||carlos " l' extradit et au proces|||NaN|||0-0 1-1 2-3 3-4 4-6
+</query>
+<query id="339" grammar="data/en-ar.trec02/moses.grammar/grammar.38">Sinn Fein and the Anglo-Irish Declaration||||-3.17291;;;sinn fein and the anglo - irish declar|||le sinn fein , et le déclar de l' anglo - irish|||NaN|||0-1 1-2 2-4 3-5 7-6 4-9 5-10 6-11
+</query>
+<query id="340" grammar="data/en-ar.trec02/moses.grammar/grammar.39">New Quebec Premier||||-1.36644;;;new quebec premier|||le nouveau premi ministr du québec|||NaN|||0-1 2-2 2-3 1-4 1-5
+</query>
+<query id="341" grammar="data/en-ar.trec02/moses.grammar/grammar.40">Theft of "The Scream"||||-2.57645;;;theft of " the scream "|||le vol de la « cris » .|||NaN|||0-1 1-2 2-4 4-5 5-6 5-7
+</query>
+<query id="342" grammar="data/en-ar.trec02/moses.grammar/grammar.41">Four Weddings and a Funeral||||-1.0176;;;four wed and a funer|||quatr mariag et un enterr|||NaN|||0-0 1-1 2-2 3-3 4-4
+</query>
+<query id="343" grammar="data/en-ar.trec02/moses.grammar/grammar.42">South African National Party||||-1.57078;;;south african nation parti|||le part national sud - africain|||NaN|||2-0 2-2 3-1 0-3 1-5
+</query>
+<query id="344" grammar="data/en-ar.trec02/moses.grammar/grammar.43">Brazil vs. Sweden World Cup Semifinals||||-124.21;;;brazil vs. sweden world cup semifin|||le brésil contr la sued à la coup du mond de football semifin|||NaN|||0-1 1-2 2-3 2-4 3-8 3-9 4-7 4-11 5-12
+</query>
+<query id="345" grammar="data/en-ar.trec02/moses.grammar/grammar.44">Cross-country Skiing at the Olympic Games.||||-2.18357;;;cross - countri ski at the olymp game .|||ski de fond aux jeux olymp .|||NaN|||2-0 3-0 5-3 6-5 7-4 8-6
+</query>
+<query id="346" grammar="data/en-ar.trec02/moses.grammar/grammar.45">Grand Slam Winners||||-2.8313;;;grand slam winner|||le grand gagn de claqu|||NaN|||0-1 2-2 1-4
+</query>
+<query id="347" grammar="data/en-ar.trec02/moses.grammar/grammar.46">Best Picture Oscar 1994||||-2.99686;;;best pictur oscar 1994|||le meilleur imag de oscar en 1994 .|||NaN|||0-1 1-2 2-4 3-6
+</query>
+<query id="348" grammar="data/en-ar.trec02/moses.grammar/grammar.47">Yann Piat's Assassination||||-102.818;;;yann piat 's assassin|||l' assassinat de yann piat|||NaN|||2-0 2-2 3-1 0-3 1-4
+</query>
+<query id="349" grammar="data/en-ar.trec02/moses.grammar/grammar.48">Nixon's Death||||-2.30089;;;nixon 's death|||la mort de nixon|||NaN|||1-0 1-2 2-1 0-3
+</query>
+<query id="350" grammar="data/en-ar.trec02/moses.grammar/grammar.49">Ayrton Senna's Death.||||-223.886;;;ayrton senna 's death .|||ayrton senna sa mort .|||NaN|||0-0 1-1 2-2 3-3 4-4
+</query>
+</parameters>

@@ -1,0 +1,102 @@
+<parameters>
+<query id="26" grammar="data/en-ar.trec02/moses.grammar/grammar.25">Kurdistan Independence||||-0.943004;;;kurdistan independ|||ب استقلال كردست|||NaN|||0-2 1-1
+</query>
+<query id="27" grammar="data/en-ar.trec02/moses.grammar/grammar.26">Iranian and Iraqi P.O.W.'s||||-116.713;;;iranian and iraqi p.o.w. 's|||ايران و عراق ل p.o.w.|||NaN|||0-0 1-1 2-2 4-3 3-4
+</query>
+<query id="28" grammar="data/en-ar.trec02/moses.grammar/grammar.27">Hazardous waste disposal||||-1.21151;;;hazard wast dispos|||تخلص من نفا خطر|||NaN|||2-0 0-2 0-3 1-2
+</query>
+<query id="29" grammar="data/en-ar.trec02/moses.grammar/grammar.28">Saudi Internet Service Providers||||-1.14999;;;saudi internet servic provid|||سعود تقدم خدم انترنت|||NaN|||0-0 2-2 3-1 1-3
+</query>
+<query id="30" grammar="data/en-ar.trec02/moses.grammar/grammar.29">Iraqi Satellite Television||||-0.606451;;;iraqi satellit televis|||تلفز عراق فضائ|||NaN|||0-1 1-2 2-0
+</query>
+<query id="31" grammar="data/en-ar.trec02/moses.grammar/grammar.30">Trade Integration||||-0.878745;;;trade integr|||تكامل تجار|||NaN|||0-1 1-0
+</query>
+<query id="32" grammar="data/en-ar.trec02/moses.grammar/grammar.31">Caspian Beluga Conservation||||-1.03325;;;caspian beluga conserv|||دلف ابيض ببحر قزو محافظ|||NaN|||0-3 1-0 1-1 1-2 2-4
+</query>
+<query id="33" grammar="data/en-ar.trec02/moses.grammar/grammar.32">Suez Canal Traffic||||-1.0291;;;suez canal traffic|||حرك مرور في قنا سويس|||NaN|||2-0 2-1 0-4 1-3 1-4
+</query>
+<query id="34" grammar="data/en-ar.trec02/moses.grammar/grammar.33">Agricultural Development project||||-0.668185;;;agricultur develop project|||مشروع تنم زراع|||NaN|||0-2 1-1 2-0
+</query>
+<query id="35" grammar="data/en-ar.trec02/moses.grammar/grammar.34">Mina Sulman/Umm Qasr Sea Link||||-117.455;;;mina sulman/umm qasr sea link|||من sulman/umm قصر صل بحر|||NaN|||0-0 1-1 2-2 3-4 4-3
+</query>
+<query id="36" grammar="data/en-ar.trec02/moses.grammar/grammar.35">'Oil for Food' program||||-0.233449;;;oil for food ' program|||برنامج نفط مقابل غذاء|||NaN|||0-1 1-2 2-3 4-0
+</query>
+<query id="37" grammar="data/en-ar.trec02/moses.grammar/grammar.36">Beirut Film Festival||||-0.586231;;;beirut film festiv|||مهرج بيروت سينمائ|||NaN|||0-1 1-2 2-0
+</query>
+<query id="38" grammar="data/en-ar.trec02/moses.grammar/grammar.37">Traditional Arab Arts||||-1.03598;;;tradit arab art|||فن عرب تقليد|||NaN|||2-0 0-2 1-1
+</query>
+<query id="39" grammar="data/en-ar.trec02/moses.grammar/grammar.38">Jerash Festival Critics||||-1.182;;;jerash festiv critic|||مهرج جرش انتقاد|||NaN|||0-1 1-0 2-2
+</query>
+<query id="40" grammar="data/en-ar.trec02/moses.grammar/grammar.39">Iranian Caspian Access||||-1.80944;;;iranian caspian access|||دخول قزو ايران|||NaN|||2-0 1-1 0-2
+</query>
+<query id="41" grammar="data/en-ar.trec02/moses.grammar/grammar.40">Meningitis Vaccine Access||||-1.62395;;;mening vaccin access|||دخول عل مصل التهاب سحائ|||NaN|||2-0 0-3 0-4 1-2 1-4
+</query>
+<query id="42" grammar="data/en-ar.trec02/moses.grammar/grammar.41">Sadeq al-Sadr Assassination||||-1.63475;;;sadeq al - sadr assassin|||صادق صدر اغتيال|||NaN|||0-0 1-1 2-0 3-1 4-2
+</query>
+<query id="43" grammar="data/en-ar.trec02/moses.grammar/grammar.42">Child/Motherhood Welfare Society||||-116.357;;;child/motherhood welfar societi|||child/motherhood مجتمع رفا|||NaN|||0-0 1-2 2-1
+</query>
+<query id="44" grammar="data/en-ar.trec02/moses.grammar/grammar.43">Gaza International Airport||||-0.248832;;;gaza intern airport|||مطار غز دول|||NaN|||0-1 1-2 2-0
+</query>
+<query id="45" grammar="data/en-ar.trec02/moses.grammar/grammar.44">Wye River Agreement||||-0.844853;;;wye river agreement|||اتفاق وا ريفر|||NaN|||0-0 0-1 0-2 1-2
+</query>
+<query id="46" grammar="data/en-ar.trec02/moses.grammar/grammar.45">Lahoud's Presidential Victory||||-1.27541;;;lahoud 's presidenti victori|||لحود فوز رئاس|||NaN|||0-0 3-1 2-2
+</query>
+<query id="47" grammar="data/en-ar.trec02/moses.grammar/grammar.46">European Union Expansion||||-0.394095;;;european union expans|||توسيع اتحاد اوروب|||NaN|||1-1 2-0 0-2
+</query>
+<query id="48" grammar="data/en-ar.trec02/moses.grammar/grammar.47">Refugees in Zaire||||-0.428383;;;refuge in zair|||لاجئ في زائير|||NaN|||0-0 1-1 2-2
+</query>
+<query id="49" grammar="data/en-ar.trec02/moses.grammar/grammar.48">Earthquake in Turkey||||-0.362159;;;earthquak in turkey|||زلزال في تركيا|||NaN|||0-0 1-1 2-2
+</query>
+<query id="50" grammar="data/en-ar.trec02/moses.grammar/grammar.49">Transnational Muslim Brotherhood||||-1.14771;;;transnat muslim brotherhood|||جماع اخو مسلم متعد جنس|||NaN|||1-2 2-0 2-1 0-3 0-4
+</query>
+<query id="51" grammar="data/en-ar.trec02/moses.grammar/grammar.50">Personal Status Law.||||-0.603789;;;person status law .|||قان احوال شخص|||NaN|||0-2 1-1 2-0
+</query>
+<query id="52" grammar="data/en-ar.trec02/moses.grammar/grammar.51">Nile Basin Initiative||||-0.459302;;;nile basin initi|||مبادر حوض نيل|||NaN|||1-1 2-0 0-2
+</query>
+<query id="53" grammar="data/en-ar.trec02/moses.grammar/grammar.52">Tunisian Urban Transport||||-1.33125;;;tunisian urban transport|||نقل حضر في تونس|||NaN|||1-1 2-0 0-3
+</query>
+<query id="54" grammar="data/en-ar.trec02/moses.grammar/grammar.53">Blue Nile Dam||||-1.28925;;;blue nile dam|||سد نيل ازرق|||NaN|||2-0 0-2 1-1
+</query>
+<query id="55" grammar="data/en-ar.trec02/moses.grammar/grammar.54">Umm Kalthoum's Influence||||-1.34358;;;umm kalthoum 's influenc|||ام كلثوم نفوذ|||NaN|||0-0 1-1 3-2
+</query>
+<query id="56" grammar="data/en-ar.trec02/moses.grammar/grammar.55">Indo-Pakistani Political Instability||||-1.20151;;;indo - pakistani polit instabl|||هند باكستان في حال عدم استقرار سياس|||NaN|||0-0 2-1 4-3 4-4 4-5 3-6
+</query>
+<query id="57" grammar="data/en-ar.trec02/moses.grammar/grammar.56">Palestinian Students, Israeli Schools||||-1.03923;;;palestinian student , isra school|||طالب فلسطين و اسرائيل|||NaN|||0-1 1-0 2-2 3-3
+</query>
+<query id="58" grammar="data/en-ar.trec02/moses.grammar/grammar.57">Pan Am Lockerbie Negotiations||||-1.94405;;;pan am lockerbi negoti|||طائر لوكرب|||NaN|||0-0 2-1
+</query>
+<query id="59" grammar="data/en-ar.trec02/moses.grammar/grammar.58">Bosnian War Crimes Tribunal||||-0.46225;;;bosnian war crime tribun|||محكم جرائم حرب في بوسن|||NaN|||2-1 3-0 0-4 1-2
+</query>
+<query id="60" grammar="data/en-ar.trec02/moses.grammar/grammar.59">Microsoft Anti-trust Case||||-1.58946;;;microsoft anti - trust case|||قض مكافح احتكار مايكروسوفت|||NaN|||4-0 1-1 3-2 0-3
+</query>
+<query id="61" grammar="data/en-ar.trec02/moses.grammar/grammar.60">Southern Lebanon, Israeli Retaliation||||-0.978773;;;southern lebanon , isra retali|||جنوب لبن و انتقام اسرائيل|||NaN|||0-0 1-1 2-2 3-4 4-3
+</query>
+<query id="62" grammar="data/en-ar.trec02/moses.grammar/grammar.61">Netanyahu's re-election campaign||||-1.26461;;;netanyahu 's re - elect campaign|||نتنياهو حمل اعاد انتخاب|||NaN|||0-0 5-1 2-2 4-3
+</query>
+<query id="63" grammar="data/en-ar.trec02/moses.grammar/grammar.62">Changes, Russian Constitution||||-1.11332;;;chang , russian constitut|||تغيير و دستور روس|||NaN|||0-0 1-1 2-3 3-2
+</query>
+<query id="64" grammar="data/en-ar.trec02/moses.grammar/grammar.63">security measures, sporting events||||-1.10192;;;secur measur , sport event|||اجراء امن و احداث رياض|||NaN|||0-1 1-0 2-2 3-4 4-3
+</query>
+<query id="65" grammar="data/en-ar.trec02/moses.grammar/grammar.64">Mad Cow and EU||||-0.599794;;;mad cow and eu|||جن بقر و اتحاد اوروب|||NaN|||0-0 0-1 1-1 2-2 3-3 3-4
+</query>
+<query id="66" grammar="data/en-ar.trec02/moses.grammar/grammar.65">Arab countries and mad cow||||-0.934358;;;arab countri and mad cow|||دول عرب و جن بقر|||NaN|||0-1 1-0 2-2 3-3 4-4
+</query>
+<query id="67" grammar="data/en-ar.trec02/moses.grammar/grammar.66">Clinton and Camp David talks||||-1.0369;;;clinton and camp david talk|||كلينت محادث كامب ديفيد|||NaN|||0-0 2-2 3-2 3-3 4-1
+</query>
+<query id="68" grammar="data/en-ar.trec02/moses.grammar/grammar.67">AlFayed, Dodi and Diana's deaths||||-116.86;;;alfay , dodi and diana 's death|||alfay دود و فا ديانا|||NaN|||0-0 2-1 3-2 4-4 5-4 6-3
+</query>
+<query id="69" grammar="data/en-ar.trec02/moses.grammar/grammar.68">Mir returns to earth||||-1.11677;;;mir return to earth|||مير عود ال ارض|||NaN|||0-0 1-1 2-2 3-3
+</query>
+<query id="70" grammar="data/en-ar.trec02/moses.grammar/grammar.69">bin Laden Targets U.S.||||-116.071;;;bin laden target u.s.|||بن لادن استهدف u.s.|||NaN|||0-0 1-1 2-2 3-3
+</query>
+<query id="71" grammar="data/en-ar.trec02/moses.grammar/grammar.70">The Pope in Palestine||||-0.674852;;;the pope in palestin|||بابا في فلسط|||NaN|||1-0 2-1 3-2
+</query>
+<query id="72" grammar="data/en-ar.trec02/moses.grammar/grammar.71">NATO, Serbo-Kosovar Conflict||||-2.75148;;;nato , serbo - kosovar conflict|||ناتو بفتر نزاع في كوسوفو|||NaN|||0-0 2-1 5-2 4-4
+</query>
+<query id="73" grammar="data/en-ar.trec02/moses.grammar/grammar.72">Chechnyan Attacks against Russia||||-0.884611;;;chechnyan attack against russia|||هجوم شيشان ضد روسيا|||NaN|||0-1 1-0 2-2 3-3
+</query>
+<query id="74" grammar="data/en-ar.trec02/moses.grammar/grammar.73">Year 2000 bug||||-1.557;;;year 2000 bug|||بق عام 2000|||NaN|||2-0 0-1 1-2
+</query>
+<query id="75" grammar="data/en-ar.trec02/moses.grammar/grammar.74">Computer viruses in Arab world||||-0.119272;;;comput virus in arab world|||فيروس كمبيوتر في عالم عرب|||NaN|||0-1 1-0 2-2 3-4 4-3
+</query>
+</parameters>

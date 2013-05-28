@@ -54,7 +54,7 @@ public class BagOfWordsQueryGenerator implements QueryGenerator {
 	}
 	
   @Override
-  public StructuredQuery parseQuery(String query) {
+  public StructuredQuery parseQuery(String query, FileSystem fs, Configuration conf) {   
     String[] tokens = tokenizer.processContent(query.trim());
     int length = tokens.length;
 

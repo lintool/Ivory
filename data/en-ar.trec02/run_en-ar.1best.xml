@@ -12,12 +12,8 @@
      <f2eProbs>data/vocab/ttable.en-ar</f2eProbs>
      <LexProbThreshold>0.005</LexProbThreshold>
      <CumProbThreshold>0.95</CumProbThreshold> 
-     <mt_weight>1</mt_weight>
-     <scfg_weight>0</scfg_weight>
-     <bitext_weight>0</bitext_weight>
      <token_weight>1</token_weight>
      <phrase_weight>0</phrase_weight>
-     <scfg_path>data/en-ar.trec02/grammar.en-ar.trec02</scfg_path>
      <kBest>1</kBest>
      <doc_stemmed_stopwordlist>data/tokenizer/ar.stop.stemmed</doc_stemmed_stopwordlist>
      <query_stemmed_stopwordlist>data/tokenizer/en.stop.stemmed</query_stemmed_stopwordlist>
