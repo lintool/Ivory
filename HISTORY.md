@@ -1,3 +1,9 @@
+Version 0.12.0
+==============
+May 28, 2013
+
++ Added code for various CLIR techniques (SIGIR 2013)
+
 Version 0.11.1
 ==============
 May 19, 2013
