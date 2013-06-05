@@ -234,7 +234,6 @@ running, remove or change them before running the above.
 <p>Next, we preprocess and translate German Wikipedia articles:</p>
 
 <pre class="code">
-<<<<<<< HEAD
 $IVORYDIR/etc/hadoop-cluster.sh ivory.app.PreprocessWikipedia \
 	-mode=crosslingF \
 	-index=$fdir -targetindex=$edir \
@@ -252,25 +251,6 @@ $IVORYDIR/etc/hadoop-cluster.sh ivory.app.PreprocessWikipedia \
 	-e_stopword=$datadir/token/en.stop \
 	-f_stopword=$datadir/token/de.stop \
 	 >& de.log &
-=======
-etc/hadoop-cluster.sh ivory.app.PreprocessWikipedia \
- -mode=crosslingF \
- -index=$fdir -targetindex=$edir \
- -xml=$wiki/raw/dewiki-20121215-pages-articles.xml \
- -compressed=$wiki/compressed/dewiki-20121215.compressed \
- -lang=de -target_lang=en \
- -tokenizermodel=$datadir/token/de-token.bin \
- -e_tokenizermodel=$datadir/token/en-token.bin \
- -f_f2e_vocab=$datadir/vocab.de-en.de \
- -e_f2e_vocab=$datadir/vocab.de-en.en \
- -f2e_ttable=$datadir/ttable.de-en \
- -e_e2f_vocab=$datadir/vocab.en-de.en \
- -f_e2f_vocab=$datadir/vocab.en-de.de \
- -e2f_ttable=$datadir/ttable.en-de \
- -e_stopword=$datadir/en.stop \
- -f_stopword=$datadir/de.stop \
- >& de.log &
->>>>>>> upstream2/master
 </pre>
 
 <p>The log output of this program should gives various statistics, such as 
@@ -278,16 +258,8 @@ the number of documents, terms, tokens in the collection. Let's do a sanity
 check to make sure everything ran correctly:</p>
 
 <pre class="code">
-<<<<<<< HEAD
-grep -P 'TOTAL=|ARTICLE=|OTHER=|SumOfDocLengths=|Terms=|TransDf=|SHORT=|ZERO=|Total=|VOCAB SIZE|TransDf|DISAMB' en.log | uniq
-</pre>
-
-<pre class="code">
-ARTICLE=4033137
-=======
 $ grep -P 'TOTAL=|ARTICLE=|OTHER=|SumOfDocLengths=|Terms=|TransDf=|SHORT=|ZERO=|Total=|VOCAB SIZE|TransDf|DISAMB' en.log | uniq
 ARTICLE=4037577
->>>>>>> upstream2/master
 DISAMBIGUATION=123666
 NON_ARTICLE=2899446
 OTHER=138350
@@ -307,22 +279,11 @@ VOCAB SIZE 71644
 <p>You should see the <i>exact</i> same numbers in your log output.</p>
 
 <pre class="code">
-<<<<<<< HEAD
-grep -P 'TOTAL=|ARTICLE=|OTHER=|SumOfDocLengths=|Terms=|TransDf=|SHORT=|ZERO=|Total=|VOCAB SIZE|TransDf|DISAMB' de.log | uniq
-</pre>
-
-<pre class="code">
-ARTICLE=1326111
-DISAMBIGUATION=174678
-NON_ARTICLE=450258
-OTHER=35564
-=======
 $ grep -P 'TOTAL=|ARTICLE=|OTHER=|SumOfDocLengths=|Terms=|TransDf=|SHORT=|ZERO=|Total=|VOCAB SIZE|TransDf|DISAMB' de.log | uniq
 ARTICLE=1574139
 DISAMBIGUATION=174684
 NON_ARTICLE=49347
 OTHER=453150
->>>>>>> upstream2/master
 TOTAL=3001626
 SumOfDocLengths=328525405
 Total=1326111
@@ -383,19 +344,11 @@ table to its neighbors that are at most <code>B</code> positions away.
 </p> 
 
 <pre class="code">
-<<<<<<< HEAD
 $IVORYDIR/etc/hadoop-cluster.sh ivory.lsh.pwsim.GenerateChunkedPermutedTables \
 	-sourceindex=$fdir -index=$edir -num_bits=1000 -type=random -Q=300 -overlap=10000 -B=2000
 
 $IVORYDIR/etc/hadoop-cluster.sh ivory.lsh.pwsim.cl.CLSlidingWindowPwsim \
 	-index=$edir -num_bits=1000 -type=random -Q=300 -overlap=10000 -B=2000 -T=400
-=======
-etc/hadoop-cluster.sh ivory.lsh.pwsim.GenerateChunkedPermutedTables \
- -index=$edir -sourceindex=$fdir -num_bits=1000 -type=random -Q=300 -overlap=10000 -B=2000
-
-etc/hadoop-cluster.sh ivory.lsh.pwsim.cl.CLSlidingWindowPwsim \
- -index=$edir -num_bits=1000 -B=2000 -T=400 -type=random -Q=300 -overlap=10000
->>>>>>> upstream2/master
 </pre>
 
 <table><tr><td valign="top"><span class="label label-info">Info</span></td>
@@ -490,31 +443,18 @@ into a single file for easy loading:
 </p>
 
 <pre class="code">
-<<<<<<< HEAD
 hdfs dfs -mkdir $pwsimdir
 $IVORYDIR/etc/hadoop-cluster.sh edu.umd.cloud9.util.CombineSequenceFiles $edir/similardocs_random_maxdst=400_D=1000_Q=300_B=2000 $pwsimdir/similardocs_random_maxdst=400_D=1000_Q=300_B=2000.single 100 1 edu.umd.cloud9.io.pair.PairOfInts org.apache.hadoop.io.IntWritable sequence
-=======
-etc/hadoop-cluster.sh edu.umd.cloud9.util.CombineSequenceFiles $edir/similardocs_random_maxdst=400_D=1000_Q=300_B=2000 $pwsimdir/similardocs_random_maxdst=400_D=1000_Q=300_B=2000.single 100 1 edu.umd.cloud9.io.pair.PairOfInts org.apache.hadoop.io.IntWritable sequence
->>>>>>> upstream2/master
 </pre>
 
 <p>Now, we can convert the docno-based output format to title pairs:</p>
 <pre class="code">
-<<<<<<< HEAD
 $IVORYDIR/etc/hadoop-cluster.sh ivory.lsh.eval.Docnos2Titles \
 	-pwsim_output=$pwsimdir/similardocs_random_maxdst=400_D=1000_Q=300_B=2000.single \
 	-output=$pwsimdir/similardocs_random_maxdst=400_D=1000_Q=300_B=2000-filtered.titles \
 	-e_collection=$wiki/compressed/enwiki-20121201.compressed \
 	-f_collection=$wiki/compressed/dewiki-20121215.compressed \
 	-f_lang=de -e_lang=en -docnos=$fdir/sample-docnos
-=======
-etc/hadoop-cluster.sh ivory.lsh.eval.Docnos2Titles \
- -pwsim_output=$pwsimdir/similardocs_random_maxdst=400_D=1000_Q=300_B=2000-filtered\
- -output=$pwsimdir/similardocs_random_maxdst=400_D=1000_Q=300_B=2000-filtered.titles \
- -e_collection=$wiki/compressed/enwiki-20121201.compressed \
- -f_collection=$wiki/compressed/dewiki-20121215.compressed \
- -f_lang=de -e_lang=en -docnos=$fdir/sample-docnos
->>>>>>> upstream2/master
 </pre>
 
 <p>Once the job completes, we can check out some of the similar Wikipedia titles:</p>
