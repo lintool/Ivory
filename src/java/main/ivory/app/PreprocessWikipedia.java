@@ -44,7 +44,7 @@ import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Logger;
-import edu.umd.cloud9.collection.wikipedia.BuildWikipediaDocnoMapping;
+import edu.umd.cloud9.collection.wikipedia.WikipediaDocnoMappingBuilder;
 import edu.umd.cloud9.collection.wikipedia.RepackWikipedia;
 import edu.umd.cloud9.collection.wikipedia.WikipediaDocnoMapping;
 import edu.umd.hooka.Vocab;
@@ -188,12 +188,11 @@ public class PreprocessWikipedia extends Configured implements Tool {
       LOG.info(mappingFile + " doesn't exist, creating...");
       String[] arr = new String[] {
           "-input=" + rawCollection,
-          "-output_path=" + indexRootPath + "/wiki-docid-tmp",
           "-output_file=" + mappingFile.toString(),
           "-wiki_language=" + collectionLang };
-      LOG.info("Running BuildWikipediaDocnoMapping with args " + Arrays.toString(arr));
+      LOG.info("Running WikipediaDocnoMappingBuilder with args " + Arrays.toString(arr));
 
-      BuildWikipediaDocnoMapping tool = new BuildWikipediaDocnoMapping();
+      WikipediaDocnoMappingBuilder tool = new WikipediaDocnoMappingBuilder();
       tool.setConf(conf);
       tool.run(arr);
 

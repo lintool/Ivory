@@ -21,11 +21,9 @@ import edu.umd.cloud9.io.map.HMapSFW;
 
 public class VerifyWikipediaProcessingMonolingual {
   private static final Random RAND = new Random();
-  private static final String tmp =
-      VerifyWikipediaProcessingMonolingual.class.getCanonicalName() + RAND.nextInt(10000);
+  private static final String tmp = VerifyWikipediaProcessingMonolingual.class.getCanonicalName() + RAND.nextInt(10000);
 
-  private static final String collectionPath = 
-    "/shared/collections/wikipedia/raw/enwiki-20121201-pages-articles.xml";
+  private static final String collectionPath = "/shared/collections/wikipedia/raw/enwiki-20121201-pages-articles";
   private static final String collectionRepacked = tmp + "/enwiki-20121201.repacked";
   private static final String galagoIndex = tmp + "/enwiki.galago";
 
@@ -75,7 +73,6 @@ public class VerifyWikipediaProcessingMonolingual {
 
   @Test
   public void runBuildIndexGalago() throws Exception {
-
     Configuration conf = IntegrationUtils.getBespinConfiguration();
     FileSystem fs = FileSystem.get(conf);
 

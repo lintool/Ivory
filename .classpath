@@ -95,7 +95,6 @@
 	<classpathentry kind="lib" path="lib/tools-1.5.0.jar"/>
 	<classpathentry kind="lib" path="lib/xmlenc-0.52.jar"/>
 	<classpathentry kind="lib" path="lib/ant-1.6.5.jar"/>
-	<classpathentry kind="lib" path="lib/cloud9-1.4.14.jar"/>
 	<classpathentry kind="lib" path="lib/commons-lang-2.6.jar"/>
 	<classpathentry kind="lib" path="lib/guava-13.0.1.jar"/>
 	<classpathentry kind="lib" path="lib/hadoop-annotations-2.0.0-cdh4.2.1.jar"/>
@@ -113,5 +112,6 @@
 	<classpathentry kind="lib" path="lib/jasper-compiler-5.5.12.jar"/>
 	<classpathentry kind="lib" path="lib/log4j-1.2.16.jar"/>
 	<classpathentry kind="lib" path="lib/spymemcached-2.8.1.jar"/>
+	<classpathentry kind="lib" path="lib/cloud9-1.4.15.jar"/>
 	<classpathentry kind="output" path="build"/>
 </classpath>

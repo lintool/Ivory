@@ -3,7 +3,8 @@ Ivory TODO List
 
 + multi-partition retrieval
 + refactor Cloud9 code to repack ClueWeb
-+ open source IRJ code
++ CLIR code: integration tests for moses
++ Figure out why `ant tests` fails on mac
 
 BloomIR
 -------
