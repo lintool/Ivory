@@ -226,7 +226,7 @@ for the English Wikipedia collection:</p>
 <pre class="code">
 nohup etc/hadoop-cluster.sh ivory.app.PreprocessWikipedia \
  -mode=crosslingE -xml=/shared/collections/wikipedia/raw/enwiki-20121201-pages-articles \
- -compressed=pwsim.enwiki.compressed -index=pswim.enwiki.index -lang=en \
+ -compressed=pwsim.enwiki.compressed -index=pwsim.enwiki.index -lang=en \
  -tokenizermodel=wikidata/token/en-token.bin \
  -collectionvocab=wikidata/vocab.de-en.en \
  -e_stopword=wikidata/token/en.stop >& pwsim.en.log &
@@ -247,7 +247,7 @@ running, remove or change them before running the above.
 <pre class="code">
 nohup etc/hadoop-cluster.sh ivory.app.PreprocessWikipedia \
  -mode=crosslingF -xml=/shared/collections/wikipedia/raw/dewiki-20121215-pages-articles.xml \
- -compressed=pwsim.dewiki.compressed -index=pswim.dewiki.index -targetindex=pswim.enwiki.index \
+ -compressed=pwsim.dewiki.compressed -index=pwsim.dewiki.index -targetindex=pwsim.enwiki.index \
  -lang=de -target_lang=en \
  -tokenizermodel=wikidata/token/de-token.bin \
  -e_tokenizermodel=wikidata/token/en-token.bin \
@@ -322,20 +322,20 @@ the document vector) and efficiency (i.e., time to compute similarity between tw
 as we vary the number. We'll use 1000 bits in this tutorial:</p>
 
 <pre class="code">
-etc/hadoop-cluster.sh ivory.lsh.driver.RunComputeSignatures -index=pswim.dewiki.index -num_bits=1000 -type=random
+etc/hadoop-cluster.sh ivory.lsh.driver.RunComputeSignatures -index=pwsim.dewiki.index -num_bits=1000 -type=random
 </pre>
 
 <p>Since this process is based on 1000 randomly generated unit vectors, we need to use the same vectors when 
 running this process for the English side. That's why we copy the random vectors over first:</p>
 
 <pre class="code">
-hdfs dfs -cp pswim.dewiki.index/randomvectors_D=1000/ pswim.enwiki.index/
+hdfs dfs -cp pwsim.dewiki.index/randomvectors_D=1000/ pwsim.enwiki.index/
 </pre>
 
 <p>And then run signature generation:</p>
 
 <pre class="code">
-etc/hadoop-cluster.sh ivory.lsh.driver.RunComputeSignatures -index=pswim.enwiki.index -num_bits=1000 -type=random
+etc/hadoop-cluster.sh ivory.lsh.driver.RunComputeSignatures -index=pwsim.enwiki.index -num_bits=1000 -type=random
 </pre>
 
 As a result of these jobs, you should see a <code>signatures-random_D=1000</code> folder under each index directory.
@@ -358,10 +358,10 @@ table to its neighbors that are at most <code>B</code> positions away.
 
 <pre class="code">
 nohup etc/hadoop-cluster.sh ivory.lsh.pwsim.GenerateChunkedPermutedTables \
- -sourceindex=pswim.dewiki.index -index=pswim.enwiki.index -num_bits=1000 -type=random -Q=300 -overlap=10000 -B=2000 >& chunking.log &
+ -sourceindex=pwsim.dewiki.index -index=pwsim.enwiki.index -num_bits=1000 -type=random -Q=300 -overlap=10000 -B=2000 >& chunking.log &
 
 nohup etc/hadoop-cluster.sh ivory.lsh.pwsim.cl.CLSlidingWindowPwsim \
- -index=pswim.enwiki.index -num_bits=1000 -type=random -Q=300 -overlap=10000 -B=2000 -T=400 >& windowing.log &
+ -index=pwsim.enwiki.index -num_bits=1000 -type=random -Q=300 -overlap=10000 -B=2000 -T=400 >& windowing.log &
 </pre>
 
 <table><tr><td valign="top"><span class="label label-info">Info</span></td>
@@ -390,7 +390,7 @@ First, we'll sample about 1000 German Wikipedia articles for this evaluation:
 </p>
 
 <pre class="code">
-etc/hadoop-cluster.sh ivory.lsh.eval.SampleIntDocVectors -index=pswim.dewiki.index -size=1000 -docnos=pswim.dewiki.index/sample-docnos
+etc/hadoop-cluster.sh ivory.lsh.eval.SampleIntDocVectors -index=pwsim.dewiki.index -size=1000 -docnos=pwsim.dewiki.index/sample-docnos
 </pre>
 
 <p>
@@ -399,7 +399,7 @@ whereas the docnos identifying this sampled subset should be written to <code>$f
 sanity check on that file, making sure that the following returns a number close to 1000 (not exactly due to random sampling):
 
 <pre class="code">
-hdfs dfs -cat pswim.dewiki.index/sample-docnos | wc -l
+hdfs dfs -cat pwsim.dewiki.index/sample-docnos | wc -l
 </pre>
 
 <p>
@@ -408,9 +408,9 @@ Next, we can filter the similar article pairs that do not appear in this sample:
 
 <pre class="code">
 etc/hadoop-cluster.sh ivory.lsh.eval.FilterResults \
- -input=pswim.enwiki.index/similardocs_random_maxdst=400_D=1000_Q=300_B=2000 \
- -output=pswim.enwiki.index/similardocs_random_maxdst=400_D=1000_Q=300_B=2000-filtered \
- -docnos=pswim.dewiki.index/sample-docnos
+ -input=pwsim.enwiki.index/similardocs_random_maxdst=400_D=1000_Q=300_B=2000 \
+ -output=pwsim.enwiki.index/similardocs_random_maxdst=400_D=1000_Q=300_B=2000-filtered \
+ -docnos=pwsim.dewiki.index/sample-docnos
 </pre>
 
 <p>Notice that the number of similar pairs was filtered down from tens of millions to tens of thousands.
@@ -419,9 +419,9 @@ Wikipedia to all document vectors of English Wikipedia):</p>
 
 <pre class="code">
 etc/hadoop-cluster.sh ivory.lsh.eval.BruteForcePwsim \
- -input=pswim.enwiki.index/wt-int-doc-vectors \
- -sample=pswim.dewiki.index/wt-int-doc-vectors_sample=1000/part-00000 \
- -output=pswim.enwiki.index/groundtruth_T=0.3 \
+ -input=pwsim.enwiki.index/wt-int-doc-vectors \
+ -sample=pwsim.dewiki.index/wt-int-doc-vectors_sample=1000/part-00000 \
+ -output=pwsim.enwiki.index/groundtruth_T=0.3 \
  -cosineT=0.3 -type=intdocvector
 </pre>
 
@@ -440,10 +440,43 @@ with respect to the ground truth:
 </p>
 
 <pre class="code">
-hadoop dfs -get pswim.enwiki.index/similardocs_random_maxdst=400_D=1000_Q=300_B=2000-filtered/part-00000 ./pwsim-filtered_400-1000-300-2000
-hadoop dfs -get pswim.enwiki.index/groundtruth_T=0.3/part-00000 ./ground_0.3
+hadoop dfs -get pwsim.enwiki.index/similardocs_random_maxdst=400_D=1000_Q=300_B=2000-filtered/part-00000 ./pwsim-filtered_400-1000-300-2000
+hadoop dfs -get pwsim.enwiki.index/groundtruth_T=0.3/part-00000 ./ground_0.3
 cd etc/
 perl eval.pl ../ground_0.3 ../pwsim-filtered_400-1000-300-2000 
+</pre>
+
+<p>
+Since the output of our algorithm mixes two kinds of error (mentioned above), we can also generate an upperbound output by running brute force on signatures. This allows
+us to measure the error due to the sliding window algorithm in isolation. For this, we first need to sample signatures (like we did for int doc vectors):
+</p>
+
+<pre class="code">
+etc/hadoop-cluster.sh ivory.lsh.eval.SampleSignatures 
+ pwsim.dewiki.index/signatures-random_D=1000 
+ pwsim.dewiki.index/signatures-random_D=1000_sample=1000 
+ random -1 pwsim.dewiki.index/sample-docnos
+</pre>
+
+Now, we can run the same brute-force program to output pairs based on Hamming distance (as opposed to true cosine similarity):
+
+<pre class="code">
+etc/hadoop-cluster.sh ivory.lsh.eval.BruteForcePwsim 
+ -input=pwsim.enwiki.index/signatures-random_D=1000 
+ -sample=pwsim.dewiki.index/signatures-random_D=1000_sample=1000/part-00000 
+ -output=pwsim.enwiki.index/upperbound_maxdst=400
+ -cosineT=400 -type=signature
+</pre>
+
+<p>
+Again, using the provided script <code>etc/eval.pl</code>, we can compute precision and recall of the filtered output
+with respect to this upperbound:
+</p>
+
+<pre class="code">
+hadoop dfs -get pwsim.enwiki.index/upperbound_maxdst=400/part-00000 ./upper_400
+cd etc/
+perl eval.pl ../upper_400 ../pwsim-filtered_400-1000-300-2000
 </pre>
 
 <p>
@@ -452,14 +485,14 @@ a more human-friendly format, such as [key: German document title, value: Englis
 </p>
 
 <p>
-First, let's combine all of the <code>SequenceFile</code>s under <code>pswim.enwiki.index/similardocs_random_maxdst=400_D=1000_Q=300_B=2000</code> 
+First, let's combine all of the <code>SequenceFile</code>s under <code>pwsim.enwiki.index/similardocs_random_maxdst=400_D=1000_Q=300_B=2000</code> 
 into a single file for easy loading:
 </p>
 
 <pre class="code">
 hdfs dfs -mkdir pwsim.results
 etc/hadoop-cluster.sh edu.umd.cloud9.util.CombineSequenceFiles \
- pswim.enwiki.index/similardocs_random_maxdst=400_D=1000_Q=300_B=2000 \
+ pwsim.enwiki.index/similardocs_random_maxdst=400_D=1000_Q=300_B=2000 \
  pwsim.results/similardocs_random_maxdst=400_D=1000_Q=300_B=2000.single \
  100 1 edu.umd.cloud9.io.pair.PairOfInts org.apache.hadoop.io.IntWritable sequence
 </pre>
@@ -471,7 +504,7 @@ etc/hadoop-cluster.sh ivory.lsh.eval.Docnos2Titles \
  -output=pwsim.results/similardocs_random_maxdst=400_D=1000_Q=300_B=2000-filtered.titles \
  -e_collection=pwsim.enwiki.compressed \
  -f_collection=pwsim.dewiki.compressed \
- -f_lang=de -e_lang=en -docnos=pswim.dewiki.index/sample-docnos
+ -f_lang=de -e_lang=en -docnos=pwsim.dewiki.index/sample-docnos
 </pre>
 
 <p>Once the job completes, we can check out some of the similar Wikipedia titles:</p>
