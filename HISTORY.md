@@ -1,3 +1,12 @@
+Version 0.12.1
+==============
+June 16, 2013
+
++ Minor cleanup in CLIR code
++ Minor tweaks to bitext classification code
++ Updated documentation cross-lingual pairwise-comparison
++ Upgraded to newer version of Cloud9 artifact
+
 Version 0.12.0
 ==============
 May 28, 2013
