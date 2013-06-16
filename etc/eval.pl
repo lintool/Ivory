@@ -17,4 +17,3 @@ if($numargs==2){
 }else{
 	die "usage: eval.pl [ground] [pwsim] (optional: [is-language-links-format])"
 }
-print "Precision = $prec\nRecall = $recall\n";

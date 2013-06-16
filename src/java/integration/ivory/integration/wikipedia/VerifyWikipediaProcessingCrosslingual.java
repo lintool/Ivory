@@ -26,8 +26,7 @@ public class VerifyWikipediaProcessingCrosslingual {
 
   private static final String vocabPath = tmp + "/vocab";
   private static final String tokenizerPath = tmp + "/tokenizer";
-  private static final String enwikiPath = 
-    "/shared/collections/wikipedia/raw/enwiki-20121201-pages-articles.xml";
+  private static final String enwikiPath = "/shared/collections/wikipedia/raw/enwiki-20121201-pages-articles";
   private static final String enwikiRepacked = tmp + "/enwiki-20121201.repacked";
   private static final String enwikiEn = tmp + "/enwiki.en";
 
