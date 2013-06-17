@@ -6,7 +6,7 @@
   </publications>
 
   <dependencies>
-    <dependency org="edu.umd" name="cloud9" rev="1.4.15" conf="*->*,!sources,!javadoc" />
+    <dependency org="edu.umd" name="cloud9" rev="1.4.16" conf="*->*,!sources,!javadoc" />
     <dependency org="" name="stanford-chinese-segmenter" rev="2011-09-14-ivory" conf="*->*,!sources,!javadoc"/>
 
     <!-- Needed for building dictionaries: com.martiansoftware.jsap.StringParser -->
