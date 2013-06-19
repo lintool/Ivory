@@ -18,7 +18,6 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.filecache.DistributedCache;
 import org.apache.hadoop.fs.FileSystem;
@@ -26,8 +25,6 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.FloatWritable;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.io.Writable;
-import org.apache.hadoop.io.WritableComparable;
 import org.apache.hadoop.mapred.FileInputFormat;
 import org.apache.hadoop.mapred.FileOutputFormat;
 import org.apache.hadoop.mapred.JobClient;
@@ -56,9 +53,8 @@ import edu.umd.cloud9.io.pair.PairOfWritables;
  * @author ferhanture
  * 
  */
-@SuppressWarnings("deprecation")
 public class BruteForcePwsim extends Configured implements Tool {
-  private static final Logger sLogger = Logger.getLogger(BruteForcePwsim.class);
+  private static final Logger LOG = Logger.getLogger(BruteForcePwsim.class);
 
   static enum Pairs {
     Total, Emitted, DEBUG, DEBUG2, Total2
@@ -69,34 +65,24 @@ public class BruteForcePwsim extends Configured implements Tool {
   };
 
   /**
-   * For every document in the sample, find all other docs that have cosine similarity higher than
-   * some given threshold.
-   * 
+   * For every document (weighted int doc vector) in the sample, find all other docs that have
+   * cosine similarity higher than some given threshold.
+   *
    * @author ferhanture
-   * 
    */
-  public static class MyMapperDocVectors extends MapReduceBase implements
-  Mapper<IntWritable, WeightedIntDocVector, IntWritable, PairOfFloatInt> {
-
-    @SuppressWarnings("unchecked")
-    static List<PairOfWritables<WritableComparable, Writable>> vectors;
-    float threshold;
-
-    private String getFilename(String s) {
-      return s.substring(s.lastIndexOf("/") + 1);
-    }
+  public static class MyMapperWeightedIntDocVectors extends MapReduceBase implements
+      Mapper<IntWritable, WeightedIntDocVector, IntWritable, PairOfFloatInt> {
+    private List<PairOfWritables<IntWritable, WeightedIntDocVector>> vectors;
+    private float threshold;
 
     public void configure(JobConf job) {
-      sLogger.setLevel(Level.INFO);
       threshold = job.getFloat("Ivory.CosineThreshold", -1);
-      sLogger.info("Threshold = " + threshold);
+      LOG.info("Threshold = " + threshold);
 
       String sampleFile = job.get("Ivory.SampleFile");
+      LOG.info("Reading signature from : " + sampleFile);
 
-
-      // read doc ids of sample into vectors
       try {
-        sampleFile = getFilename(sampleFile);
         Path[] localFiles = DistributedCache.getLocalCacheFiles(job);
         for (Path localFile : localFiles) {
           if (localFile.toString().contains(sampleFile)) {
@@ -108,15 +94,15 @@ public class BruteForcePwsim extends Configured implements Tool {
         e.printStackTrace();
         throw new RuntimeException("Error reading doc vectors from " + sampleFile);
       }
-      sLogger.info("Read " + vectors.size() + " sample doc vectors");
+      LOG.info("Read " + vectors.size() + " sample weighted int doc vectors");
     }
 
     public void map(IntWritable docno, WeightedIntDocVector docvector,
         OutputCollector<IntWritable, PairOfFloatInt> output, Reporter reporter) throws IOException {
       for (int i = 0; i < vectors.size(); i++) {
-        IntWritable sampleDocno = (IntWritable) vectors.get(i).getLeftElement();
+        IntWritable sampleDocno = vectors.get(i).getLeftElement();
 
-        WeightedIntDocVector fromSample = (WeightedIntDocVector) vectors.get(i).getRightElement();
+        WeightedIntDocVector fromSample = vectors.get(i).getRightElement();
         float cs = CLIRUtils.cosine(docvector.getWeightedTerms(), fromSample.getWeightedTerms());
 
         if (cs >= threshold) {
@@ -127,26 +113,23 @@ public class BruteForcePwsim extends Configured implements Tool {
   }
 
   /**
-   * For every document in the sample, find all other docs that have cosine similarity higher than
-   * some given threshold.
-   * 
+   * For every document (term doc vector) in the sample, find all other docs that have cosine
+   * similarity higher than some given threshold.
+   *
    * @author ferhanture
-   * 
    */
   public static class MyMapperTermDocVectors extends MapReduceBase implements
   Mapper<IntWritable, HMapSFW, IntWritable, PairOfFloatInt> {
-
-    @SuppressWarnings("unchecked")
-    static List<PairOfWritables<WritableComparable, Writable>> vectors;
+    private List<PairOfWritables<IntWritable, HMapSFW>> vectors;
     float threshold;
 
     public void configure(JobConf job) {
-      sLogger.setLevel(Level.INFO);
+      LOG.setLevel(Level.INFO);
       threshold = job.getFloat("Ivory.CosineThreshold", -1);
-      sLogger.info("Threshold = " + threshold);
+      LOG.info("Threshold = " + threshold);
 
       String sampleFile = job.get("Ivory.SampleFile");
-      // read doc ids of sample into vectors
+      LOG.info("Reading signature from " + sampleFile);
       try {
         Path[] localFiles = DistributedCache.getLocalCacheFiles(job);
         for (Path localFile : localFiles) {
@@ -158,21 +141,21 @@ public class BruteForcePwsim extends Configured implements Tool {
       } catch (Exception e) {
         throw new RuntimeException("Error reading doc vectors from " + sampleFile);
       }
-      sLogger.info("Read " + vectors.size() + " sample doc vectors");
+      LOG.info("Read " + vectors.size() + " sample doc vectors");
     }
 
     public void map(IntWritable docno, HMapSFW docvector,
         OutputCollector<IntWritable, PairOfFloatInt> output, Reporter reporter) throws IOException {
       for (int i = 0; i < vectors.size(); i++) {
         reporter.incrCounter(Pairs.Total, 1);
-        IntWritable sampleDocno = (IntWritable) vectors.get(i).getLeftElement();
-        HMapSFW fromSample = (HMapSFW) vectors.get(i).getRightElement();
+        IntWritable sampleDocno = vectors.get(i).getLeftElement();
+        HMapSFW fromSample = vectors.get(i).getRightElement();
 
         float cs = CLIRUtils.cosine(docvector, fromSample);       
         if (cs >= threshold) {
-          sLogger.debug(sampleDocno + "," + fromSample + "\n" + fromSample.length());
-          sLogger.debug(docno + "," + docvector + "\n" + docvector.length());
-          sLogger.debug(cs);
+          LOG.debug(sampleDocno + "," + fromSample + "\n" + fromSample.length());
+          LOG.debug(docno + "," + docvector + "\n" + docvector.length());
+          LOG.debug(cs);
           reporter.incrCounter(Pairs.Emitted, 1);
           output.collect(new IntWritable(sampleDocno.get()), new PairOfFloatInt(cs, docno.get()));
         }
@@ -181,25 +164,22 @@ public class BruteForcePwsim extends Configured implements Tool {
   }
 
   /**
-   * For every document in the sample, find all other docs that are closer than some given hamming
-   * distance.
-   * 
+   * For every document (signature) in the sample, find all other docs that are closer than some
+   * given hamming distance.
+   *
    * @author ferhanture
-   * 
    */
   public static class MyMapperSignature extends MapReduceBase implements
-  Mapper<IntWritable, Signature, IntWritable, PairOfFloatInt> {
-
-    @SuppressWarnings("unchecked")
-    static List<PairOfWritables<WritableComparable, Writable>> signatures;
-    int maxDist;
+      Mapper<IntWritable, Signature, IntWritable, PairOfFloatInt> {
+    private List<PairOfWritables<IntWritable, Signature>> signatures;
+    private int maxDist;
 
     public void configure(JobConf job) {
-      sLogger.setLevel(Level.INFO);
       maxDist = (int) job.getFloat("Ivory.MaxHammingDistance", -1);
-      sLogger.info("Threshold = " + maxDist);
+      LOG.info("Threshold = " + maxDist);
 
       String sampleFile = job.get("Ivory.SampleFile");
+      LOG.info("Reading signature from " + sampleFile);
       // read doc ids of sample into vectors
       try {
         Path[] localFiles = DistributedCache.getLocalCacheFiles(job);
@@ -213,29 +193,18 @@ public class BruteForcePwsim extends Configured implements Tool {
         e.printStackTrace();
         throw new RuntimeException("Error reading sample signatures!");
       }
-      sLogger.info(signatures.size());
+      LOG.info(signatures.size());
     }
 
     public void map(IntWritable docno, Signature signature,
         OutputCollector<IntWritable, PairOfFloatInt> output, Reporter reporter) throws IOException {
       for (int i = 0; i < signatures.size(); i++) {
         reporter.incrCounter(Pairs.Total, 1);
-        IntWritable sampleDocno = (IntWritable) signatures.get(i).getLeftElement();
-        Signature fromSample = (Signature) signatures.get(i).getRightElement();
+        IntWritable sampleDocno = signatures.get(i).getLeftElement();
+        Signature fromSample = signatures.get(i).getRightElement();
         int dist = signature.hammingDistance(fromSample, maxDist);
-        // if((sampleDocno.get()==1000009022 && docno.get()==189034) ||
-        // (sampleDocno.get()==1000170828 && docno.get()==2898431)){
-        // reporter.incrCounter(Pairs.DEBUG, 1);
-        // sLogger.info(sampleDocno.get()+","+docno.get()+"="+dist);
-        // sLogger.info(fromSample);
-        // sLogger.info(signature);
-        // }else{
-        // continue;
-        // }
-
         if (dist <= maxDist) {
-          output
-          .collect(new IntWritable(sampleDocno.get()), new PairOfFloatInt(-dist, docno.get()));
+          output.collect(new IntWritable(sampleDocno.get()), new PairOfFloatInt(-dist, docno.get()));
           reporter.incrCounter(Pairs.Emitted, 1);
         }
       }
@@ -247,7 +216,6 @@ public class BruteForcePwsim extends Configured implements Tool {
    * (Ivory.NumResults).
    * 
    * @author ferhanture
-   * 
    */
   public static class MyReducer extends MapReduceBase implements
   Reducer<IntWritable, PairOfFloatInt, PairOfInts, Text> {
@@ -258,7 +226,7 @@ public class BruteForcePwsim extends Configured implements Tool {
     NumberFormat nf;
 
     public void configure(JobConf conf) {
-      sLogger.setLevel(Level.INFO);
+      LOG.setLevel(Level.INFO);
       numResults = conf.getInt("Ivory.NumResults", Integer.MAX_VALUE);
       nf = NumberFormat.getInstance();
       nf.setMaximumFractionDigits(3);
@@ -271,17 +239,17 @@ public class BruteForcePwsim extends Configured implements Tool {
       while (values.hasNext()) {
         PairOfFloatInt p = values.next();
         if (!list.add(new PairOfFloatInt(p.getLeftElement(), p.getRightElement()))) {
-          sLogger.debug("Not added: " + p);
+          LOG.debug("Not added: " + p);
         } else {
-          sLogger.debug("Added: " + p);
+          LOG.debug("Added: " + p);
         }
         reporter.incrCounter(Pairs.Total, 1);
       }
-      sLogger.debug(list.size());
+      LOG.debug(list.size());
       int cntr = 0;
       while (!list.isEmpty() && cntr < numResults) {
         PairOfFloatInt pair = list.pollLast();
-        sLogger.debug("output " + cntr + "=" + pair);
+        LOG.debug("output " + cntr + "=" + pair);
 
         keyOut.set(pair.getRightElement(), key.get()); // first english docno, then foreign language
         // docno
@@ -324,7 +292,7 @@ public class BruteForcePwsim extends Configured implements Tool {
     job.setOutputKeyClass(PairOfInts.class);
     job.setOutputValueClass(FloatWritable.class);
 
-    job.set("Ivory.SampleFile", sampleFile);
+    job.set("Ivory.SampleFile", sampleFile.substring(sampleFile.lastIndexOf("/") + 1));
     DistributedCache.addCacheFile(new URI(sampleFile), job);
 
     if (inputType.contains("signature")) {
@@ -334,7 +302,7 @@ public class BruteForcePwsim extends Configured implements Tool {
       if (inputType.contains("term")) {
         job.setMapperClass(MyMapperTermDocVectors.class);
       } else {
-        job.setMapperClass(MyMapperDocVectors.class);
+        job.setMapperClass(MyMapperWeightedIntDocVectors.class);
       }
       job.setFloat("Ivory.CosineThreshold", threshold);
     }
@@ -345,7 +313,7 @@ public class BruteForcePwsim extends Configured implements Tool {
     }
     job.setReducerClass(MyReducer.class);
 
-    sLogger.info("Running job " + job.getJobName());
+    LOG.info("Running job " + job.getJobName());
 
     JobClient.runJob(job);
 

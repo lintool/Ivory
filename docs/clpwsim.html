@@ -394,8 +394,8 @@ etc/hadoop-cluster.sh ivory.lsh.eval.SampleIntDocVectors -index=pwsim.dewiki.ind
 </pre>
 
 <p>
-At this point, around 1000 sampled document vectors should be written to <code>$fdir/wt-int-doc-vectors_sample=1000</code>,
-whereas the docnos identifying this sampled subset should be written to <code>$fdir/sample-docnos</code>. We can do a quick
+At this point, around 1000 sampled document vectors should be written to <code>pwsim.dewiki.index/wt-int-doc-vectors_sample=1000</code>,
+whereas the docnos identifying this sampled subset should be written to <code>pwsim.dewiki.index/sample-docnos</code>. We can do a quick
 sanity check on that file, making sure that the following returns a number close to 1000 (not exactly due to random sampling):
 
 <pre class="code">
@@ -452,19 +452,19 @@ us to measure the error due to the sliding window algorithm in isolation. For th
 </p>
 
 <pre class="code">
-etc/hadoop-cluster.sh ivory.lsh.eval.SampleSignatures 
- pwsim.dewiki.index/signatures-random_D=1000 
- pwsim.dewiki.index/signatures-random_D=1000_sample=1000 
+etc/hadoop-cluster.sh ivory.lsh.eval.SampleSignatures \
+ pwsim.dewiki.index/signatures-random_D=1000 \
+ pwsim.dewiki.index/signatures-random_D=1000_sample=1000 \
  random -1 pwsim.dewiki.index/sample-docnos
 </pre>
 
 Now, we can run the same brute-force program to output pairs based on Hamming distance (as opposed to true cosine similarity):
 
 <pre class="code">
-etc/hadoop-cluster.sh ivory.lsh.eval.BruteForcePwsim 
- -input=pwsim.enwiki.index/signatures-random_D=1000 
- -sample=pwsim.dewiki.index/signatures-random_D=1000_sample=1000/part-00000 
- -output=pwsim.enwiki.index/upperbound_maxdst=400
+etc/hadoop-cluster.sh ivory.lsh.eval.BruteForcePwsim \
+ -input=pwsim.enwiki.index/signatures-random_D=1000 \
+ -sample=pwsim.dewiki.index/signatures-random_D=1000_sample=1000/part-00000 \
+ -output=pwsim.enwiki.index/upperbound_maxdst=400 \
  -cosineT=400 -type=signature
 </pre>
 

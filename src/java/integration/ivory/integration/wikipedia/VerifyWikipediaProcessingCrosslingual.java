@@ -125,7 +125,7 @@ public class VerifyWikipediaProcessingCrosslingual {
         "-input=" + enwikiEn + "/wt-term-doc-vectors", 
         "-output=" + enwikiEn + "/test_wt-term-doc-vectors", 
         "-keys=" + enTermDocVector1Id + "," + enTermDocVector2Id, 
-    "-valueclass=edu.umd.cloud9.io.map.HMapSFW"};
+        "-valueclass=" + edu.umd.cloud9.io.map.HMapSFW.class.getCanonicalName()};
     IntegrationUtils.exec(Joiner.on(" ").join(args));
 
     args = new String[] { "hadoop jar", IntegrationUtils.getJar("dist", "ivory"),
@@ -133,7 +133,7 @@ public class VerifyWikipediaProcessingCrosslingual {
         "-input=" + enwikiEn + "/wt-int-doc-vectors", 
         "-output=" + enwikiEn + "/test_wt-int-doc-vectors", 
         "-keys=" + enIntDocVector1Id + "," + enIntDocVector2Id, 
-    "-valueclass=ivory.core.data.document.WeightedIntDocVector"};
+        "-valueclass=" + ivory.core.data.document.WeightedIntDocVector.class.getCanonicalName()};
     IntegrationUtils.exec(Joiner.on(" ").join(args));
   }
 
@@ -240,7 +240,7 @@ public class VerifyWikipediaProcessingCrosslingual {
         "-input=" + dewikiEn + "/wt-term-doc-vectors", 
         "-output=" + dewikiEn + "/test_wt-term-doc-vectors", 
         "-keys=" + deTermDocVector1Id + "," + deTermDocVector2Id, 
-    "-valueclass=edu.umd.cloud9.io.map.HMapSFW"};
+        "-valueclass=" + edu.umd.cloud9.io.map.HMapSFW.class.getCanonicalName()};
     IntegrationUtils.exec(Joiner.on(" ").join(args));
 
     args = new String[] { "hadoop jar", IntegrationUtils.getJar("dist", "ivory"),
@@ -248,7 +248,7 @@ public class VerifyWikipediaProcessingCrosslingual {
         "-input=" + dewikiEn + "/wt-int-doc-vectors", 
         "-output=" + dewikiEn + "/test_wt-int-doc-vectors", 
         "-keys=" + deIntDocVector1Id + "," + deIntDocVector2Id, 
-    "-valueclass=ivory.core.data.document.WeightedIntDocVector"};
+        "-valueclass=" + ivory.core.data.document.WeightedIntDocVector.class.getCanonicalName()};
     IntegrationUtils.exec(Joiner.on(" ").join(args));
   }
 
