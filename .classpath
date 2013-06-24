@@ -68,8 +68,6 @@
 	<classpathentry kind="lib" path="lib/kfs-0.3.jar"/>
 	<classpathentry kind="lib" path="lib/logback-classic-1.0.9.jar"/>
 	<classpathentry kind="lib" path="lib/logback-core-1.0.9.jar"/>
-	<classpathentry kind="lib" path="lib/lucene-analyzers-3.5.0.jar"/>
-	<classpathentry kind="lib" path="lib/lucene-core-3.5.0.jar"/>
 	<classpathentry kind="lib" path="lib/mail-1.4.5.jar"/>
 	<classpathentry kind="lib" path="lib/maxent-3.0.0.jar"/>
 	<classpathentry kind="lib" path="lib/mockito-all-1.8.5.jar"/>
@@ -113,5 +111,7 @@
 	<classpathentry kind="lib" path="lib/log4j-1.2.16.jar"/>
 	<classpathentry kind="lib" path="lib/spymemcached-2.8.1.jar"/>
 	<classpathentry kind="lib" path="lib/cloud9-1.4.15.jar"/>
+	<classpathentry kind="lib" path="lib/lucene-analyzers-common-4.3.1.jar"/>
+	<classpathentry kind="lib" path="lib/lucene-core-4.3.1.jar"/>
 	<classpathentry kind="output" path="build"/>
 </classpath>

@@ -24,7 +24,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.galagosearch.core.parse.Document;
 import org.galagosearch.core.parse.TagTokenizer;
-import org.tartarus.snowball.ext.englishStemmer;
+import org.tartarus.snowball.ext.EnglishStemmer;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -766,7 +766,7 @@ public class GalagoTokenizer extends Tokenizer {
     "zillion",
  };
 
-  private final englishStemmer stemmer = new englishStemmer();
+  private final EnglishStemmer stemmer = new EnglishStemmer();
   private final Map<String, String> cache = Maps.newHashMap();
   private final Set<String> stopwords = Sets.newHashSet(TERRIER_STOP_WORDS);
 

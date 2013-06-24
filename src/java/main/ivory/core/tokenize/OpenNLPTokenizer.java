@@ -1,17 +1,21 @@
 package ivory.core.tokenize;
 
 import ivory.core.Constants;
+
 import java.io.IOException;
+
 import opennlp.tools.tokenize.Tokenizer;
 import opennlp.tools.tokenize.TokenizerME;
 import opennlp.tools.tokenize.TokenizerModel;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.tartarus.snowball.SnowballStemmer;
+import org.tartarus.snowball.SnowballProgram;
+
 import edu.umd.hooka.VocabularyWritable;
 import edu.umd.hooka.alignment.HadoopAlign;
 
@@ -25,9 +29,9 @@ public class OpenNLPTokenizer extends ivory.core.tokenize.Tokenizer {
   private int lang;
   private static final int ENGLISH = 0, FRENCH = 1, GERMAN = 2;
   private static final String[] classes = {
-    "org.tartarus.snowball.ext.englishStemmer", 
-    "org.tartarus.snowball.ext.frenchStemmer", 
-    "org.tartarus.snowball.ext.germanStemmer"};
+    org.tartarus.snowball.ext.EnglishStemmer.class.getCanonicalName(),
+    org.tartarus.snowball.ext.FrenchStemmer.class.getCanonicalName(), 
+    org.tartarus.snowball.ext.GermanStemmer.class.getCanonicalName()};
 
   public OpenNLPTokenizer(){
     super();
@@ -101,10 +105,10 @@ public class OpenNLPTokenizer extends ivory.core.tokenize.Tokenizer {
   @SuppressWarnings("unchecked")
   public void setLanguageAndStemmer(String l){
     setLanguage(l);
-    Class<? extends SnowballStemmer> stemClass;
+    Class<? extends SnowballProgram> stemClass;
     try {
-      stemClass = (Class<? extends SnowballStemmer>) Class.forName(classes[lang]);
-      stemmer = (SnowballStemmer) stemClass.newInstance();
+      stemClass = (Class<? extends SnowballProgram>) Class.forName(classes[lang]);
+      stemmer = new SnowballStemmer(stemClass.newInstance());
     } catch (ClassNotFoundException e) {
       sLogger.warn("Stemmer class not recognized!\n" + classes[lang]);
       stemmer = null;
@@ -155,17 +159,6 @@ public class OpenNLPTokenizer extends ivory.core.tokenize.Tokenizer {
   @Override
   public int getNumberTokens(String string){
     return tokenizer.tokenize(string).length;
-  }
-
-  @Override
-  public String stem(String token) {
-    if ( stemmer != null ) {
-      stemmer.setCurrent(token);
-      stemmer.stem();
-      return stemmer.getCurrent();
-    }else {
-      return token;
-    }
   }
 
   @Override

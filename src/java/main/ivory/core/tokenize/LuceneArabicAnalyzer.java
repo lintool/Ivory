@@ -1,6 +1,7 @@
 package ivory.core.tokenize;
 
 import ivory.core.Constants;
+
 import java.io.IOException;
 import java.io.StringReader;
 import java.text.Normalizer;
@@ -11,14 +12,15 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.apache.lucene.analysis.LowerCaseFilter;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.ar.ArabicNormalizationFilter;
 import org.apache.lucene.analysis.ar.ArabicStemFilter;
+import org.apache.lucene.analysis.core.LowerCaseFilter;
 import org.apache.lucene.analysis.standard.StandardFilter;
 import org.apache.lucene.analysis.standard.StandardTokenizer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.util.Version;
+
 import edu.umd.hooka.VocabularyWritable;
 import edu.umd.hooka.alignment.HadoopAlign;
 
@@ -59,8 +61,8 @@ public class LuceneArabicAnalyzer extends ivory.core.tokenize.Tokenizer {
   @Override
   public String[] processContent(String text) {   
     text = preNormalize(text);
-    tokenizer = new StandardTokenizer(Version.LUCENE_35, new StringReader(text));
-    TokenStream tokenStream = new LowerCaseFilter(Version.LUCENE_35, tokenizer);
+    tokenizer = new StandardTokenizer(Version.LUCENE_43, new StringReader(text));
+    TokenStream tokenStream = new LowerCaseFilter(Version.LUCENE_43, tokenizer);
     String tokenized = postNormalize(streamToString(tokenStream));
     tokenized = Normalizer.normalize(tokenized, Form.NFKC);
 
@@ -83,31 +85,35 @@ public class LuceneArabicAnalyzer extends ivory.core.tokenize.Tokenizer {
 
   @Override
   public String stem(String token) {
-    tokenizer = new StandardTokenizer(Version.LUCENE_35, new StringReader(token));
-    TokenStream tokenStream = new ArabicStemFilter(new ArabicNormalizationFilter(tokenizer));
-    CharTermAttribute termAtt = tokenStream.getAttribute(CharTermAttribute.class);
-    tokenStream.clearAttributes();
     StringBuilder stemmed = new StringBuilder();
+
     try {
+      tokenizer = new StandardTokenizer(Version.LUCENE_43, new StringReader(token));
+      TokenStream tokenStream = new ArabicStemFilter(new ArabicNormalizationFilter(tokenizer));
+      CharTermAttribute cattr = tokenStream.addAttribute(CharTermAttribute.class);
+      tokenStream.reset();
+
       while (tokenStream.incrementToken()) {
-        String curToken = termAtt.toString();
-        if ( vocab != null && vocab.get(curToken) <= 0) {
+        String curToken = cattr.toString();
+        if (vocab != null && vocab.get(curToken) <= 0) {
           continue;
         }
-        stemmed.append( curToken + " " );
+        stemmed.append(curToken + " ");
       }
-    }catch (IOException e) {
+      tokenStream.close();
+    } catch (IOException e) {
       e.printStackTrace();
     }
+
     return stemmed.toString().trim();
   }
 
   @Override
   public float getOOVRate(String text, VocabularyWritable vocab) {
     int countOOV = 0, countAll = 0;
-    tokenizer = new StandardTokenizer(Version.LUCENE_35, new StringReader(text));
-    TokenStream tokenStream = new StandardFilter(Version.LUCENE_35, tokenizer);
-    tokenStream = new LowerCaseFilter(Version.LUCENE_35, tokenStream);
+    tokenizer = new StandardTokenizer(Version.LUCENE_43, new StringReader(text));
+    TokenStream tokenStream = new StandardFilter(Version.LUCENE_43, tokenizer);
+    tokenStream = new LowerCaseFilter(Version.LUCENE_43, tokenStream);
     String tokenized = postNormalize(streamToString(tokenStream));
 
     StringBuilder finalTokenized = new StringBuilder();
@@ -126,13 +132,14 @@ public class LuceneArabicAnalyzer extends ivory.core.tokenize.Tokenizer {
     }
     
     if (isStemming()) {
-      tokenizer = new StandardTokenizer(Version.LUCENE_35, new StringReader(finalTokenized.toString().trim()));
-      tokenStream = new ArabicStemFilter(new ArabicNormalizationFilter(tokenizer));
-      CharTermAttribute termAtt = tokenStream.getAttribute(CharTermAttribute.class);
-      tokenStream.clearAttributes();
+      tokenizer = new StandardTokenizer(Version.LUCENE_43, new StringReader(finalTokenized.toString().trim()));
       try {
+        tokenStream = new ArabicStemFilter(new ArabicNormalizationFilter(tokenizer));
+        CharTermAttribute cattr = tokenStream.addAttribute(CharTermAttribute.class);
+        tokenStream.reset();
+
         while (tokenStream.incrementToken()) {
-          String curToken = termAtt.toString();
+          String curToken = cattr.toString();
           if ( vocab != null && vocab.get(curToken) <= 0) {
             countOOV++;
           }

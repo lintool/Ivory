@@ -195,12 +195,12 @@ public abstract class Tokenizer {
    *    String corresponding to the tokens output by tokenStream
    */
   protected static String streamToString(TokenStream tokenStream) {
-    CharTermAttribute termAtt = tokenStream.getAttribute(CharTermAttribute.class);
-    tokenStream.clearAttributes();
     StringBuilder tokenized = new StringBuilder();
     try {
+      CharTermAttribute cattr = tokenStream.addAttribute(CharTermAttribute.class);
+      tokenStream.reset();
       while (tokenStream.incrementToken()) {
-        tokenized.append( termAtt.toString() + " " );
+        tokenized.append(cattr.toString() + " " );
       }
     } catch (IOException e) {
       e.printStackTrace();

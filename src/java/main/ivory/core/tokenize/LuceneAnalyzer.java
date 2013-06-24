@@ -1,18 +1,21 @@
 package ivory.core.tokenize;
 
 import ivory.core.Constants;
+
 import java.io.StringReader;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.apache.lucene.analysis.LowerCaseFilter;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.Tokenizer;
+import org.apache.lucene.analysis.core.LowerCaseFilter;
 import org.apache.lucene.analysis.standard.StandardFilter;
 import org.apache.lucene.analysis.standard.StandardTokenizer;
 import org.apache.lucene.util.Version;
+
 import edu.umd.hooka.VocabularyWritable;
 import edu.umd.hooka.alignment.HadoopAlign;
 
@@ -94,9 +97,9 @@ public class LuceneAnalyzer extends ivory.core.tokenize.Tokenizer {
   
   @Override
   public String[] processContent(String text) {  
-    tokenizer = new StandardTokenizer(Version.LUCENE_35, new StringReader(text));
-    TokenStream tokenStream = new StandardFilter(Version.LUCENE_35, tokenizer);
-    tokenStream = new LowerCaseFilter(Version.LUCENE_35, tokenStream);
+    tokenizer = new StandardTokenizer(Version.LUCENE_43, new StringReader(text));
+    TokenStream tokenStream = new StandardFilter(Version.LUCENE_43, tokenizer);
+    tokenStream = new LowerCaseFilter(Version.LUCENE_43, tokenStream);
     String tokenized = postNormalize(streamToString(tokenStream));
 
     StringBuilder finalTokenized = new StringBuilder();
@@ -126,9 +129,9 @@ public class LuceneAnalyzer extends ivory.core.tokenize.Tokenizer {
   @Override
   public float getOOVRate(String text, VocabularyWritable vocab) {
     int countOOV = 0, countAll = 0;
-    tokenizer = new StandardTokenizer(Version.LUCENE_35, new StringReader(text));
-    TokenStream tokenStream = new StandardFilter(Version.LUCENE_35, tokenizer);
-    tokenStream = new LowerCaseFilter(Version.LUCENE_35, tokenStream);
+    tokenizer = new StandardTokenizer(Version.LUCENE_43, new StringReader(text));
+    TokenStream tokenStream = new StandardFilter(Version.LUCENE_43, tokenizer);
+    tokenStream = new LowerCaseFilter(Version.LUCENE_43, tokenStream);
     String tokenized = postNormalize(streamToString(tokenStream));
 
     for (String token : tokenized.split(" ")) {
