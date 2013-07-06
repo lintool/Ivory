@@ -7,6 +7,7 @@
 
   <dependencies>
     <dependency org="edu.umd" name="cloud9" rev="1.4.17" conf="*->*,!sources,!javadoc" />
+    <dependency org="org.apache.hadoop" name="hadoop-auth" rev="2.0.0-cdh4.3.0" conf="*->*,!sources,!javadoc"/>
     <dependency org="" name="stanford-chinese-segmenter" rev="2011-09-14-ivory" conf="*->*,!sources,!javadoc"/>
 
     <!-- Needed for building dictionaries: com.martiansoftware.jsap.StringParser -->
