@@ -1,7 +1,5 @@
 package ivory.ffg.stats;
 
-import java.util.Map;
-
 import edu.umd.cloud9.util.map.HMapIF;
 
 /**
@@ -54,7 +52,7 @@ public class GlobalStats {
   }
 
   /**
-   * @retun idf values
+   * @return idf values
    */
   public HMapIF getIdfs() {
     return idf;
