@@ -17,7 +17,11 @@ import org.junit.Test;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+
+import edu.umd.cloud9.io.map.HMapIFW;
 import edu.umd.cloud9.io.map.HMapSFW;
+import edu.umd.cloud9.util.map.MapIF;
+import edu.umd.cloud9.util.map.MapKF;
 
 public class VerifyWikipediaProcessingCrosslingual {
   private static final Random RAND = new Random();
@@ -30,49 +34,137 @@ public class VerifyWikipediaProcessingCrosslingual {
   private static final String enwikiRepacked = tmp + "/enwiki-20121201.repacked";
   private static final String enwikiEn = tmp + "/enwiki.en";
 
-  // en side: part 00000, key = 91805
-  private int enTermDocVector1Id = 91805;
-  private ImmutableMap<String, Float> enTermDocVector1 = ImmutableMap.of(
-      "religi", 0.056898247f, "lubric", 0.07892087f, "time", 0.021438342f, "refer", -0.017549722f);
+  // docno 1000 = docid 2508: Artillery
+  // docno 12345 = docid 26094: Romanticism
 
-  // en side: part 00010, key = 137938
-  private int enTermDocVector2Id = 137938;
-  private ImmutableMap<String, Float> enTermDocVector2 = ImmutableMap.of(
-      "stori", 0.034548897f, "2006", 0.023635013f, "nineti", 0.076754145f, "time", 0.019773208f);
+  private int enTermDocVector1Id = 1000;
+  private ImmutableMap<String, Float> enTermDocVector1 =
+      new ImmutableMap.Builder<String, Float>()
+          .put("projectil", 0.1401f)
+          .put("artilleri", 0.1297f)
+          .put("mortar", 0.1213f)
+          .put("ammunit", 0.1111f)
+          .put("propel", 0.1083f)
+          .put("barrel", 0.1068f)
+          .put("muzzl", 0.1067f)
+          .put("batteri", 0.1063f)
+          .put("cannon", 0.1034f)
+          .put("indirect", 0.0984f)
+          .build();
 
-  // en side: part 00002, key = 148600
-  private int enIntDocVector1Id = 148600;
+  private int enTermDocVector2Id = 12345;
+  private ImmutableMap<String, Float> enTermDocVector2 =
+      new ImmutableMap.Builder<String, Float>()
+          .put("romantic", 0.1747f)
+          .put("romant", 0.1203f)
+          .put("byron", 0.0994f)
+          .put("friedrich", 0.0911f)
+          .put("realism", 0.0879f)
+          .put("goya", 0.0878f)
+          .put("enlighten", 0.0835f)
+          .put("literatur", 0.0785f)
+          .put("norton", 0.0779f)
+          .put("paint", 0.0778f)
+          .build();
+
+  private int enIntDocVector1Id = 1000;
   private ImmutableMap<Integer, Float> enIntDocVector1 =
-    ImmutableMap.of(3310, 0.0071687745f, 4479, 0.09890289f, 7599, 0.24106947f, 2063, 0.16018048f);
+      new ImmutableMap.Builder<Integer, Float>()
+          .put(52122, 0.1401f)
+          .put(6985, 0.1297f)
+          .put(11772, 0.1213f)
+          .put(22735, 0.1111f)
+          .put(20210, 0.1083f)
+          .put(16577, 0.1068f)
+          .put(11868, 0.1067f)
+          .put(3814, 0.1063f)
+          .put(20221, 0.1034f)
+          .put(25506, 0.0984f)
+          .build();
 
-  // en side: part 00011, key = 181342
-  private int enIntDocVector2Id = 181342;
+  private int enIntDocVector2Id = 12345;
   private ImmutableMap<Integer, Float> enIntDocVector2 =
-    ImmutableMap.of(6569, 0.044599857f, 4393, 0.019540867f, 16527, 0.05980431f, 9764, 0.045334294f);
+      new ImmutableMap.Builder<Integer, Float>()
+          .put(6653, 0.1747f)
+          .put(38336, 0.1203f)
+          .put(66533, 0.0994f)
+          .put(17415, 0.0911f)
+          .put(22488, 0.0879f)
+          .put(25108, 0.0878f)
+          .put(16466, 0.0835f)
+          .put(20556, 0.0785f)
+          .put(62521, 0.0779f)
+          .put(8216, 0.0778f)
+          .build();
 
   private static final String dewikiPath = 
     "/shared/collections/wikipedia/raw/dewiki-20121117-pages-articles.xml";
+
   private static final String dewikiRepacked = tmp + "/dewiki-20121117.repacked";
   private static final String dewikiEn = tmp + "/dewiki.en";
 
-  // de side: part 00010, key = 1000010078
-  private int deTermDocVector1Id = 1000010078;
-  private ImmutableMap<String, Float> deTermDocVector1 = ImmutableMap.of(
-      "total", 0.007482552f, "need", 0.06130964f, "big", 0.014260361f, "histor", 0.0714205f);
-  // de side: part 00000, key = 1000960467
-  private int deTermDocVector2Id = 1000960467;
-  private ImmutableMap<String, Float> deTermDocVector2 = ImmutableMap.of(
-      "2008", 0.033327986f, "role", 0.008505447f, "bolkestein", 0.009285147f, "ordinari", 0.0077467756f);
+  // docno 500 = docid 918: Cha-Cha-Cha
+  // docno 1024 = docid 1964: Gene Roddenberry
 
-  // de side: part 00002, key = 1000131394
-  private int deIntDocVector1Id = 1000131394;
+  private int deTermDocVector1Id = 1000000500;
+  private ImmutableMap<String, Float> deTermDocVector1 =
+      new ImmutableMap.Builder<String, Float>()
+          .put("sopexa", 0.3736f)
+          .put("optimal", 0.2171f)
+          .put("unite", 0.1982f)
+          .put("bandwagon", 0.1843f)
+          .put("paladium", 0.1743f)
+          .put("trampl", 0.1719f)
+          .put("cha", 0.1615f)
+          .put("flout", 0.1580f)
+          .put("cuban", 0.1348f)
+          .put("semiopen", 0.1242f)
+          .build();
+
+  private int deTermDocVector2Id = 1000001024;
+  private ImmutableMap<String, Float> deTermDocVector2 =
+      new ImmutableMap.Builder<String, Float>()
+          .put("october", 0.3206f)
+          .put("office", 0.1620f)
+          .put("spaceship", 0.1377f)
+          .put("melk", 0.1351f)
+          .put("barrett", 0.1330f)
+          .put("cinematograph", 0.1299f)
+          .put("angele", 0.1275f)
+          .put("spacecraft", 0.1259f)
+          .put("aire", 0.1167f)
+          .put("gene", 0.1114f)
+          .build();
+
+  private int deIntDocVector1Id = 1000000500;
   private ImmutableMap<Integer, Float> deIntDocVector1 =
-    ImmutableMap.of(1100, 0.04779704f, 6585, 0.018187178f, 21, 0.007229667f, 2194, 0.009517357f);
+      new ImmutableMap.Builder<Integer, Float>()
+          .put(28750, 0.3736f)
+          .put(8397, 0.2171f)
+          .put(3208, 0.1982f)
+          .put(43524, 0.1843f)
+          .put(22251, 0.1743f)
+          .put(7084, 0.1719f)
+          .put(1999, 0.1615f)
+          .put(13827, 0.1580f)
+          .put(13481, 0.1348f)
+          .put(42106, 0.1242f)
+          .build();
 
-  // de side: part 00011, key = 1000210390
-  private int deIntDocVector2Id = 1000210390;
+  private int deIntDocVector2Id = 1000001024;
   private ImmutableMap<Integer, Float> deIntDocVector2 =
-    ImmutableMap.of(6585, 0.0050360947f, 15, 0.0047478294f, 2200, 0.040175833f, 6566, 0.013208171f);
+      new ImmutableMap.Builder<Integer, Float>()
+          .put(28044, 0.3206f)
+          .put(771, 0.1620f)
+          .put(66841, 0.1377f)
+          .put(8524, 0.1351f)
+          .put(15531, 0.1330f)
+          .put(15257, 0.1299f)
+          .put(28417, 0.1275f)
+          .put(58008, 0.1259f)
+          .put(26069, 0.1167f)
+          .put(7512, 0.1114f)
+          .build();
 
   @Test
   public void runBuildIndexEnSide() throws Exception {
@@ -107,7 +199,8 @@ public class VerifyWikipediaProcessingCrosslingual {
 
     String libjars = String.format("-libjars=%s", Joiner.on(",").join(jars));
 
-    String[] args = new String[] { "hadoop jar", IntegrationUtils.getJar("dist", "ivory"),
+    String[] args;
+    args = new String[] { "hadoop jar", IntegrationUtils.getJar("dist", "ivory"),
         ivory.app.PreprocessWikipedia.class.getCanonicalName(), libjars,
         "-index=" + enwikiEn,
         "-xml=" + enwikiPath,
@@ -125,7 +218,7 @@ public class VerifyWikipediaProcessingCrosslingual {
         "-input=" + enwikiEn + "/wt-term-doc-vectors", 
         "-output=" + enwikiEn + "/test_wt-term-doc-vectors", 
         "-keys=" + enTermDocVector1Id + "," + enTermDocVector2Id, 
-    "-valueclass=edu.umd.cloud9.io.map.HMapSFW"};
+        "-valueclass=" + edu.umd.cloud9.io.map.HMapSFW.class.getCanonicalName()};
     IntegrationUtils.exec(Joiner.on(" ").join(args));
 
     args = new String[] { "hadoop jar", IntegrationUtils.getJar("dist", "ivory"),
@@ -133,7 +226,7 @@ public class VerifyWikipediaProcessingCrosslingual {
         "-input=" + enwikiEn + "/wt-int-doc-vectors", 
         "-output=" + enwikiEn + "/test_wt-int-doc-vectors", 
         "-keys=" + enIntDocVector1Id + "," + enIntDocVector2Id, 
-    "-valueclass=ivory.core.data.document.WeightedIntDocVector"};
+        "-valueclass=" + ivory.core.data.document.WeightedIntDocVector.class.getCanonicalName()};
     IntegrationUtils.exec(Joiner.on(" ").join(args));
   }
 
@@ -150,11 +243,18 @@ public class VerifyWikipediaProcessingCrosslingual {
     reader = new SequenceFile.Reader(fs.getConf(),
         SequenceFile.Reader.file(new Path(enwikiEn + "/test_wt-term-doc-vectors/part-00000")));
     reader.next(key, value);
+    System.out.println("*** top 10 terms ***");
+    for (MapKF.Entry<String> entry : value.getEntriesSortedByValue(10)) {
+      System.out.println(entry.getKey() + ": " + entry.getValue());
+    }
     verifyTermDocVector(enTermDocVector1, value);
-    System.out.println("enTermDocVector1\n"+key+","+value);
+
     reader.next(key, value);
+    System.out.println("*** top 10 terms ***");
+    for (MapKF.Entry<String> entry : value.getEntriesSortedByValue(10)) {
+      System.out.println(entry.getKey() + ": " + entry.getValue());
+    }
     verifyTermDocVector(enTermDocVector2, value);
-    System.out.println("enTermDocVector2\n"+key+","+value);
     reader.close();
   }
 
@@ -166,16 +266,27 @@ public class VerifyWikipediaProcessingCrosslingual {
 
     SequenceFile.Reader reader;
     IntWritable key = new IntWritable();
+    HMapIFW map = new HMapIFW();
     WeightedIntDocVector value = new WeightedIntDocVector();
 
     reader = new SequenceFile.Reader(fs.getConf(),
         SequenceFile.Reader.file(new Path(enwikiEn + "/test_wt-int-doc-vectors/part-00000")));
+
     reader.next(key, value);
+    System.out.println("*** top 10 terms ***");
+    map = value.getWeightedTerms();
+    for ( MapIF.Entry entry : map.getEntriesSortedByValue(10)) {
+      System.out.println(entry.getKey() + ": " + entry.getValue());
+    }
     verifyIntDocVector(enIntDocVector1, value);
-    System.out.println("enIntDocVector1\n"+key+","+value);
+
     reader.next(key, value);
+    System.out.println("*** top 10 terms ***");
+    map = value.getWeightedTerms();
+    for ( MapIF.Entry entry : map.getEntriesSortedByValue(10)) {
+      System.out.println(entry.getKey() + ": " + entry.getValue());
+    }
     verifyIntDocVector(enIntDocVector2, value);
-    System.out.println("enIntDocVector2\n"+key+","+value);
     reader.close();
   }
 
@@ -212,7 +323,8 @@ public class VerifyWikipediaProcessingCrosslingual {
 
     String libjars = String.format("-libjars=%s", Joiner.on(",").join(jars));
 
-    String[] args = new String[] { "hadoop jar", IntegrationUtils.getJar("dist", "ivory"),
+    String[] args;
+    args = new String[] { "hadoop jar", IntegrationUtils.getJar("dist", "ivory"),
         ivory.app.PreprocessWikipedia.class.getCanonicalName(), libjars,
         "-index=" + dewikiEn,
         "-xml=" + dewikiPath,
@@ -232,7 +344,7 @@ public class VerifyWikipediaProcessingCrosslingual {
         "-e_stopword=" + tokenizerPath + "/en.stop", 
         "-f_stopword=" + tokenizerPath + "/de.stop",
         "-e_tokenizermodel=" + tokenizerPath + "/en-token.bin",
-    "-target_lang=en"};
+        "-target_lang=en"};
     IntegrationUtils.exec(Joiner.on(" ").join(args));
 
     args = new String[] { "hadoop jar", IntegrationUtils.getJar("dist", "ivory"),
@@ -240,7 +352,7 @@ public class VerifyWikipediaProcessingCrosslingual {
         "-input=" + dewikiEn + "/wt-term-doc-vectors", 
         "-output=" + dewikiEn + "/test_wt-term-doc-vectors", 
         "-keys=" + deTermDocVector1Id + "," + deTermDocVector2Id, 
-    "-valueclass=edu.umd.cloud9.io.map.HMapSFW"};
+        "-valueclass=" + edu.umd.cloud9.io.map.HMapSFW.class.getCanonicalName()};
     IntegrationUtils.exec(Joiner.on(" ").join(args));
 
     args = new String[] { "hadoop jar", IntegrationUtils.getJar("dist", "ivory"),
@@ -248,7 +360,7 @@ public class VerifyWikipediaProcessingCrosslingual {
         "-input=" + dewikiEn + "/wt-int-doc-vectors", 
         "-output=" + dewikiEn + "/test_wt-int-doc-vectors", 
         "-keys=" + deIntDocVector1Id + "," + deIntDocVector2Id, 
-    "-valueclass=ivory.core.data.document.WeightedIntDocVector"};
+        "-valueclass=" + ivory.core.data.document.WeightedIntDocVector.class.getCanonicalName()};
     IntegrationUtils.exec(Joiner.on(" ").join(args));
   }
 
@@ -265,11 +377,18 @@ public class VerifyWikipediaProcessingCrosslingual {
     reader = new SequenceFile.Reader(fs.getConf(),
         SequenceFile.Reader.file(new Path(dewikiEn + "/test_wt-term-doc-vectors/part-00000")));
     reader.next(key, value);
+    System.out.println("*** top 10 terms ***");
+    for (MapKF.Entry<String> entry : value.getEntriesSortedByValue(10)) {
+      System.out.println(entry.getKey() + ": " + entry.getValue());
+    }
     verifyTermDocVector(deTermDocVector1, value);
-    System.out.println("deTermDocVector1\n"+key+","+value);
+
     reader.next(key, value);
+    System.out.println("*** top 10 terms ***");
+    for (MapKF.Entry<String> entry : value.getEntriesSortedByValue(10)) {
+      System.out.println(entry.getKey() + ": " + entry.getValue());
+    }
     verifyTermDocVector(deTermDocVector2, value);
-    System.out.println("deTermDocVector2\n"+key+","+value);
     reader.close();
   }
 
@@ -281,16 +400,26 @@ public class VerifyWikipediaProcessingCrosslingual {
 
     SequenceFile.Reader reader;
     IntWritable key = new IntWritable();
+    HMapIFW map = new HMapIFW();
     WeightedIntDocVector value = new WeightedIntDocVector();
 
     reader = new SequenceFile.Reader(fs.getConf(),
         SequenceFile.Reader.file(new Path(dewikiEn + "/test_wt-int-doc-vectors/part-00000")));
     reader.next(key, value);
+    System.out.println("*** top 10 terms ***");
+    map = value.getWeightedTerms();
+    for ( MapIF.Entry entry : map.getEntriesSortedByValue(10)) {
+      System.out.println(entry.getKey() + ": " + entry.getValue());
+    }
     verifyIntDocVector(deIntDocVector1, value);
-    System.out.println("deIntDocVector1\n"+key+","+value);
+
     reader.next(key, value);
+    System.out.println("*** top 10 terms ***");
+    map = value.getWeightedTerms();
+    for ( MapIF.Entry entry : map.getEntriesSortedByValue(10)) {
+      System.out.println(entry.getKey() + ": " + entry.getValue());
+    }
     verifyIntDocVector(deIntDocVector2, value);
-    System.out.println("deIntDocVector2\n"+key+","+value);
     reader.close();
   }
 
@@ -298,7 +427,7 @@ public class VerifyWikipediaProcessingCrosslingual {
     assertTrue(value != null);
     for (Map.Entry<String, Float> entry : doc.entrySet()) {
       assertTrue(value.containsKey(entry.getKey()));
-      assertEquals(entry.getValue(), value.get(entry.getKey()), 10e-6);
+      assertEquals(entry.getValue(), value.get(entry.getKey()), 10e-4);
     }
   }
 
@@ -306,7 +435,7 @@ public class VerifyWikipediaProcessingCrosslingual {
     assertTrue(value != null);
     for (Map.Entry<Integer, Float> entry : doc.entrySet()) {
       assertTrue(value.containsTerm(entry.getKey()));
-      assertEquals(entry.getValue(), value.getWeight(entry.getKey()), 10e-6);
+      assertEquals(entry.getValue(), value.getWeight(entry.getKey()), 10e-4);
     }
   }
 
