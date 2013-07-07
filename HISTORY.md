@@ -1,3 +1,11 @@
+Version 0.12.2
+=============
+July 7, 2013
+
++ Upgrade to CDH 4.3.0, Cloud9 1.4.17
++ Minor tweaks to cross-lingual pairwise-comparison code
++ Refactored Wikipedia integration tests
+
 Version 0.12.1
 ==============
 June 16, 2013
