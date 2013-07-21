@@ -1,0 +1,6 @@
+Training data used in current MaxEnt classifier models:
+es-en: WMT12
+de-en: WMT12
+ar-en: GALE-P5 (from UMD October evaluation)
+zh-en: BOLT P1 mixed data (see Ture'13 dissertation for details)
+tr-en: 50k sentences provided by Kemal Oflazer (see Ture'13 dissertation for details)

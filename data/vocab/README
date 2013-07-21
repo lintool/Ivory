@@ -1,0 +1,5 @@
+Training data used in current vocab and ttable models:
+fr-en: WMT12
+de-en: WMT12
+ar-en: GALE-P5 (from UMD October evaluation)
+zh-en: BOLT P1 mixed data (see Ture'13 dissertation for details)
