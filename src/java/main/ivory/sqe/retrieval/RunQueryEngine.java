@@ -371,7 +371,7 @@ public class RunQueryEngine {
 
       float p10 = (float) RankedListEvaluator.computePN(10, results.get(qid), mapping,
           qrels.getReldocsForQid(qid));
-      LOG.info("<AP>:::"+setting+":::"+qid+":::"+results.get(qid).length+":::"+qrels.getReldocsForQid(qid).size()+":::"+ap+":::"+p10);
+      System.err.println("<AP>:::"+setting+":::"+qid+":::"+results.get(qid).length+":::"+qrels.getReldocsForQid(qid).size()+":::"+ap+":::"+p10);
       apSum += ap;
       p10Sum += p10;
     }
@@ -379,7 +379,7 @@ public class RunQueryEngine {
     conf.setFloat("P10", p10Sum);
     float MAP = (float) RankedListEvaluator.roundTo4SigFigs(apSum / results.size());
     float P10Avg = (float) RankedListEvaluator.roundTo4SigFigs(p10Sum / results.size());
-    LOG.info("<MAP>:::"+setting+":::"+MAP+":::"+P10Avg+"\nNumber of queries = "+results.size());
+    System.err.println("<MAP>:::"+setting+":::"+MAP+":::"+P10Avg+"\nNumber of queries = "+results.size());
 
     return MAP;
   }

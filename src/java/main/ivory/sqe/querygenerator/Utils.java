@@ -590,7 +590,7 @@ public class Utils {
     "-" + (int)(100*conf.getFloat(Constants.MTWeight, 0)) + 
     "-" + (int) (100*conf.getFloat(Constants.BitextWeight, 0)) + 
     "-" + (int) (100*conf.getFloat(Constants.TokenWeight, 0)) +
-    "_" + conf.getInt(Constants.One2Many, -1);
+    "_" + conf.getInt(Constants.One2Many, 2);
   }
 
   public static JsonArray createJsonArray(String[] elements) {

@@ -1,5 +1,7 @@
 Training data used in current vocab and ttable models:
-fr-en: WMT12
-de-en: WMT12
-ar-en: GALE-P5 (from UMD October evaluation)
-zh-en: BOLT P1 mixed data (see Ture'13 dissertation for details)
+fr-en: WMT10 (default), WMT12 
+de-en: WMT10, WMT12 (default)
+ar-en: GALE-P5 (from UMD October evaluation, see Ture'12 COLING for details)
+zh-en: BOLT P1 mixed data (see Ture'13 dissertation for details), FBIS subset (see Ture'12 COLING for details)
+
+Default models are placed directly under Ivory/data/vocab/ whereas other models are located under Ivory/data/vocab/other.
