@@ -43,7 +43,7 @@ public class RunQueryEngine {
       long end = System.currentTimeMillis();
       LOG.info("Initializing QueryEngine : " + ( end - start) + "ms");
 
-      // MT-Bitext-SCFG components have no meaning when K=1
+      // MT-Bitext-SCFG components have no meaning when K=1, so default to non-gridsearch if K=1
       if (conf.getInt(Constants.KBest, 0) == 1 || !conf.getBoolean(Constants.GridSearch, false)) {
         LOG.info("Running the queries ...");
         start = System.currentTimeMillis();
@@ -138,6 +138,7 @@ public class RunQueryEngine {
     options.addOption(OptionBuilder.withArgName("0.0-1.0").hasArg().withDescription("paramater to discount the difference between likelihood of each k-best translation").create(Constants.Alpha));  
     options.addOption(OptionBuilder.withArgName("string").hasArg().withDescription("name of CLIR run").create(Constants.RunName));
     options.addOption(OptionBuilder.withDescription("run grid search on parameters").create(Constants.GridSearch));
+    options.addOption(OptionBuilder.withDescription("print translated query (no retrieval)").create(Constants.TranslateOnly));
     options.addOption(OptionBuilder.withDescription("do not print log info").create(Constants.Quiet));
     options.addOption(OptionBuilder.withArgName("path").hasArg().withDescription("one stopword per line, query lang").create(Constants.StopwordListQ));
     options.addOption(OptionBuilder.withArgName("path").hasArg().withDescription("one stemmed stopword per line, query lang").create(Constants.StemmedStopwordListQ));
@@ -224,6 +225,9 @@ public class RunQueryEngine {
       }
       if (cmdline.hasOption(Constants.GridSearch)) {
         conf.setBoolean(Constants.GridSearch, true);
+      }
+      if (cmdline.hasOption(Constants.TranslateOnly)) {
+        conf.setBoolean(Constants.TranslateOnly, true);
       }
       if (cmdline.hasOption(Constants.Quiet)) {
         conf.setBoolean(Constants.Quiet, true);

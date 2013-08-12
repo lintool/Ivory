@@ -9,15 +9,12 @@ import ivory.sqe.querygenerator.MtNQueryGenerator;
 import ivory.sqe.querygenerator.ProbabilisticStructuredQueryGenerator;
 import ivory.sqe.querygenerator.QueryGenerator;
 import ivory.sqe.querygenerator.Utils;
-
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -27,9 +24,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-
+import com.google.gson.JsonObject;
 import com.google.common.collect.Maps;
-
 import edu.umd.cloud9.collection.DocnoMapping;
 
 public class QueryEngine {
@@ -185,42 +181,75 @@ public class QueryEngine {
           + list[i].score + " " + runName);
     }
   }
+  
+  private void printResults(String queryID, String runName, StructuredQuery query, ResultWriter resultWriter) throws IOException {
+    JsonObject queryText = query.getQuery();
+    if (queryText == null) {
+      LOG.info("null query for: " + queryID);
+      return;
+    } else {
+      resultWriter.println(queryID + " " + queryText + " " + runName);
+    }
+  }
+
 
   public void runQueries(Configuration conf) {
     runName = Utils.getSetting(conf);
+    float rankTime = 0, generateTime = 0;
 
     try {
-      LOG.info("Parsed "+queries.size()+" queries");
-
-      ResultWriter resultWriter = new ResultWriter("ranking." + runName + ".txt", false, fs);
-      float rankTime = 0, generateTime = 0;
-      for ( String qid : queries.keySet()) {
-        String query = queries.get(qid);
-
-        String grammarPath = grammarPaths.get(qid);
-        if (grammarPath != null) {
-          conf.set(Constants.GrammarPath, grammarPath);
+      LOG.info("Parsed " + queries.size() + " queries");
+      
+      if (conf.getBoolean(Constants.TranslateOnly, false)) {
+        ResultWriter resultWriter = new ResultWriter("translations." + runName + ".txt", false, fs);
+        for (String qid : queries.keySet()) {
+          String query = queries.get(qid);
+        
+          if (grammarPaths != null) {
+            String grammarPath = grammarPaths.get(qid);
+            conf.set(Constants.GrammarPath, grammarPath);
+          }
+        
+          long start = System.currentTimeMillis();
+          StructuredQuery structuredQuery = generator.parseQuery(query, fs, conf);
+          long end = System.currentTimeMillis();
+          LOG.info("Generating " + qid + ": " + ( end - start) + "ms");
+          generateTime += ( end - start ) ;
+          LOG.info("<Processed>:::" + runName + ":::" + qid + ":::" + structuredQuery.getQuery());
+          printResults(qid, runName, structuredQuery, resultWriter);
         }
+        resultWriter.flush();
+        LOG.info("<TIME>:::" + runName + ":::" + generateTime + ":::" + rankTime);
+      } else {
+        ResultWriter resultWriter = new ResultWriter("ranking." + runName + ".txt", false, fs);
+        for ( String qid : queries.keySet()) {
+          String query = queries.get(qid);
 
-        long start = System.currentTimeMillis();
-        StructuredQuery structuredQuery = generator.parseQuery(query, fs, conf);
-        long end = System.currentTimeMillis();
-        LOG.info("Generating " + qid + ": " + ( end - start) + "ms");
-        generateTime += ( end - start ) ;
-        LOG.info("<Processed>:::" + runName + ":::" + qid + ":::" + structuredQuery.getQuery());
-
-        start = System.currentTimeMillis();
-        ranker.rank(qid, structuredQuery.getQuery(), structuredQuery.getQueryLength());
-        end = System.currentTimeMillis();
-        LOG.info("Ranking " + qid + ": " + ( end - start) + "ms");
-        rankTime += ( end - start ) ;
-        printResults(qid, runName, ranker, resultWriter);
-
-        // save allResults
-        allResults.put(runName, getResults());
-      }   
-      resultWriter.flush();
-      LOG.info("<TIME>:::" + runName + ":::" + generateTime + ":::" + rankTime);
+          if (grammarPaths != null) {
+            String grammarPath = grammarPaths.get(qid);
+            conf.set(Constants.GrammarPath, grammarPath);
+          }
+          
+          long start = System.currentTimeMillis();
+          StructuredQuery structuredQuery = generator.parseQuery(query, fs, conf);
+          long end = System.currentTimeMillis();
+          LOG.info("Generating " + qid + ": " + ( end - start) + "ms");
+          generateTime += ( end - start ) ;
+          LOG.info("<Processed>:::" + runName + ":::" + qid + ":::" + structuredQuery.getQuery());
+          
+          start = System.currentTimeMillis();
+          ranker.rank(qid, structuredQuery.getQuery(), structuredQuery.getQueryLength());
+          end = System.currentTimeMillis();
+          LOG.info("Ranking " + qid + ": " + ( end - start) + "ms");
+          rankTime += ( end - start ) ;
+          printResults(qid, runName, ranker, resultWriter);
+          
+          // save allResults
+          allResults.put(runName, getResults());
+        }   
+        resultWriter.flush();
+        LOG.info("<TIME>:::" + runName + ":::" + generateTime + ":::" + rankTime);
+      }
     } catch (IOException e) {
       e.printStackTrace();
     }
