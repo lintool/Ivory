@@ -182,16 +182,18 @@ public class QueryEngine {
     }
   }
   
-  private void printResults(String queryID, String runName, StructuredQuery query, ResultWriter resultWriter) throws IOException {
-    JsonObject queryText = query.getQuery();
-    if (queryText == null) {
+  private void printResults(String queryID, String runName, StructuredQuery query, ResultWriter resultWriter, boolean isIndri) throws IOException {
+    if (query == null) {
       LOG.info("null query for: " + queryID);
       return;
     } else {
+      String queryText = query.getQuery().toString();
+      if (isIndri) {
+        queryText = queryText.replaceAll("\"#combine\":","#combine").replaceAll("\"#weight\":","#weight").replaceAll("\\{","").replaceAll("\\}","").replaceAll("\\[","(").replaceAll("\\]",")").replaceAll("\","," ").replaceAll(",\""," ").replaceAll("\"\\),",") ").replaceAll("\"\\)\\)","))");
+      }
       resultWriter.println(queryID + " " + queryText + " " + runName);
     }
   }
-
 
   public void runQueries(Configuration conf) {
     runName = Utils.getSetting(conf);
@@ -200,7 +202,8 @@ public class QueryEngine {
     try {
       LOG.info("Parsed " + queries.size() + " queries");
       
-      if (conf.getBoolean(Constants.TranslateOnly, false)) {
+      String translateOnly = conf.get(Constants.TranslateOnly);
+      if (translateOnly != null) {
         ResultWriter resultWriter = new ResultWriter("translations." + runName + ".txt", false, fs);
         for (String qid : queries.keySet()) {
           String query = queries.get(qid);
@@ -216,7 +219,7 @@ public class QueryEngine {
           LOG.info("Generating " + qid + ": " + ( end - start) + "ms");
           generateTime += ( end - start ) ;
           LOG.info("<Processed>:::" + runName + ":::" + qid + ":::" + structuredQuery.getQuery());
-          printResults(qid, runName, structuredQuery, resultWriter);
+          printResults(qid, runName, structuredQuery, resultWriter, translateOnly.equals(Constants.Indri));
         }
         resultWriter.flush();
         LOG.info("<TIME>:::" + runName + ":::" + generateTime + ":::" + rankTime);

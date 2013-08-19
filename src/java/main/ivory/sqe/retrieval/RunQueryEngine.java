@@ -138,7 +138,7 @@ public class RunQueryEngine {
     options.addOption(OptionBuilder.withArgName("0.0-1.0").hasArg().withDescription("paramater to discount the difference between likelihood of each k-best translation").create(Constants.Alpha));  
     options.addOption(OptionBuilder.withArgName("string").hasArg().withDescription("name of CLIR run").create(Constants.RunName));
     options.addOption(OptionBuilder.withDescription("run grid search on parameters").create(Constants.GridSearch));
-    options.addOption(OptionBuilder.withDescription("print translated query (no retrieval)").create(Constants.TranslateOnly));
+    options.addOption(OptionBuilder.withArgName("ivory|indri").hasArg().withDescription("print translated query in specified format (no retrieval)").create(Constants.TranslateOnly));
     options.addOption(OptionBuilder.withDescription("do not print log info").create(Constants.Quiet));
     options.addOption(OptionBuilder.withArgName("path").hasArg().withDescription("one stopword per line, query lang").create(Constants.StopwordListQ));
     options.addOption(OptionBuilder.withArgName("path").hasArg().withDescription("one stemmed stopword per line, query lang").create(Constants.StemmedStopwordListQ));
@@ -227,7 +227,7 @@ public class RunQueryEngine {
         conf.setBoolean(Constants.GridSearch, true);
       }
       if (cmdline.hasOption(Constants.TranslateOnly)) {
-        conf.setBoolean(Constants.TranslateOnly, true);
+        conf.set(Constants.TranslateOnly, cmdline.getOptionValue(Constants.TranslateOnly));
       }
       if (cmdline.hasOption(Constants.Quiet)) {
         conf.setBoolean(Constants.Quiet, true);

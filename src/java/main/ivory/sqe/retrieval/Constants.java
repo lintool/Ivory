@@ -56,4 +56,5 @@ public class Constants {
   public static final String ConfigXML = "xml";
   public static final String Quiet = "quiet";
   public static final String TranslateOnly = "translate_only";
+  public static final String Indri = "indri";
 }
