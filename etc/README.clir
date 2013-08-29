@@ -111,7 +111,16 @@ perl pbmt.pl $WORKDIR 50 $WORKDIR/title.en $WORKDIR/title.en.tok $ROOT/model/phr
 
 #### QUERY TRANSLATION WITH CLIR
 
-etc/run.sh ivory.sqe.retrieval.RunQueryEngine ???
+## CLIR Engine is run with following class:
+etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/run.xml --queries_path data/queries.xml 
+ 
+## Options can be specified in xml file, or from command-line, or from both (command-line overrides XML)
+
+ ## Some useful options:
+ 
+ # -translate_only indri: Skip retrieval, only translate the query. Argument (indri or ivory) specifies the output format
+ # -output_path: Specify output file. Default is generated based on parameters.
+
 
 ==============================================================================
 
@@ -126,16 +135,16 @@ set MT=moses
 set UNKNOWN1="--unknown data/en-fr.clef06/moses/1.unk"
 set UNKNOWN10="--unknown data/en-fr.clef06/moses/10.unk"
 
-etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-fr.clef06/run_en-fr.gridbest.xml -queries_path data/en-fr.clef06/$MT/title_en-fr-trans10-filtered.xml $UNKNOWN10 >& run.en-fr.gridbest.log
+etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-fr.clef06/run_en-fr.gridbest.xml -queries_path data/en-fr.clef06/$MT/title_en-fr-trans10-filtered.xml $UNKNOWN10 --is_stemming >& run.en-fr.gridbest.log
 etc/clir.scripts/trec_eval data/en-fr.clef06/qrels.en-fr.clef06.txt ranking.en-fr.gridbest_10-30-30-100.txt
 
-etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-fr.clef06/run_en-fr.10best.xml -queries_path data/en-fr.clef06/$MT/title_en-fr-trans10-filtered.xml $UNKNOWN10 >& run.en-fr.10best.log
+etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-fr.clef06/run_en-fr.10best.xml -queries_path data/en-fr.clef06/$MT/title_en-fr-trans10-filtered.xml $UNKNOWN10 --is_stemming >& run.en-fr.10best.log
 etc/clir.scripts/trec_eval data/en-fr.clef06/qrels.en-fr.clef06.txt ranking.en-fr.10best_10-100-0-100.txt
 
-etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-fr.clef06/run_en-fr.phrase.xml -queries_path data/en-fr.clef06/$MT/title_en-fr-trans10-filtered.xml $UNKNOWN1 >& run.en-fr.phrase.log
+etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-fr.clef06/run_en-fr.phrase.xml -queries_path data/en-fr.clef06/$MT/title_en-fr-trans10-filtered.xml $UNKNOWN1 --is_stemming >& run.en-fr.phrase.log
 etc/clir.scripts/trec_eval data/en-fr.clef06/qrels.en-fr.clef06.txt ranking.en-fr.phrase_10-0-0-100.txt
 
-etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-fr.clef06/run_en-fr.1best.xml -queries_path data/en-fr.clef06/$MT/title_en-fr-trans1-filtered.xml $UNKNOWN10 >& run.en-fr.1best.log
+etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-fr.clef06/run_en-fr.1best.xml -queries_path data/en-fr.clef06/$MT/title_en-fr-trans1-filtered.xml $UNKNOWN10 --is_stemming >& run.en-fr.1best.log
 etc/clir.scripts/trec_eval data/en-fr.clef06/qrels.en-fr.clef06.txt ranking.en-fr.1best_1-100-0-100.txt 
 
 ## Current implementation allows two ways to run the token-based CLIR approach: 
@@ -159,16 +168,16 @@ etc/junit.sh ivory.regression.coling2012.EnFr_CLEF06 >& log &
 set UNKNOWN1="--unknown data/en-ar.trec02/moses/1.unk"
 set UNKNOWN10="--unknown data/en-ar.trec02/moses/10.unk"
 
-etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-ar.trec02/run_en-ar.gridbest.xml -queries_path data/en-ar.trec02/$MT/title_en-ar-trans10-filtered.xml $UNKNOWN10 >& run.en-ar.gridbest.log
+etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-ar.trec02/run_en-ar.gridbest.xml -queries_path data/en-ar.trec02/$MT/title_en-ar-trans10-filtered.xml $UNKNOWN10 --is_stemming >& run.en-ar.gridbest.log
 ./trec_eval data/en-ar.trec02/qrels.en-ar.trec02.txt ranking.en-ar.gridbest_10-0-0-100.txt
 
-etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-ar.trec02//run_en-ar.10best.xml -queries_path data/en-ar.trec02/$MT/title_en-ar-trans10-filtered.xml $UNKNOWN10 >& run.en-ar.10best.log
+etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-ar.trec02//run_en-ar.10best.xml -queries_path data/en-ar.trec02/$MT/title_en-ar-trans10-filtered.xml $UNKNOWN10 --is_stemming >& run.en-ar.10best.log
  ./trec_eval data/en-ar.trec02/qrels.en-ar.trec02.txt ranking.en-ar.10best_10-100-0-100.txt
 
-etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-ar.trec02//run_en-ar.phrase.xml -queries_path data/en-ar.trec02/$MT/title_en-ar-trans10-filtered.xml $UNKNOWN10 >& run.en-ar.phrase.log
+etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-ar.trec02//run_en-ar.phrase.xml -queries_path data/en-ar.trec02/$MT/title_en-ar-trans10-filtered.xml $UNKNOWN10 --is_stemming >& run.en-ar.phrase.log
 ./trec_eval data/en-ar.trec02/qrels.en-ar.trec02.txt ranking.en-ar.phrase_10-0-0-100.txt 
 
-etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-ar.trec02/run_en-ar.1best.xml -queries_path data/en-ar.trec02/$MT/title_en-ar-trans1-filtered.xml $UNKNOWN1 >& run.en-ar.1best.log
+etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-ar.trec02/run_en-ar.1best.xml -queries_path data/en-ar.trec02/$MT/title_en-ar-trans1-filtered.xml $UNKNOWN1 --is_stemming >& run.en-ar.1best.log
 ./trec_eval data/en-ar.trec02/qrels.en-ar.trec02.txt ranking.en-ar.1best_1-100-0-100.txt
 
 ## current implementation allows two ways to run the token-based CLIR approach: 
@@ -193,16 +202,16 @@ etc/junit.sh ivory.regression.coling2012.EnAr_TREC02 >& log &
 set UNKNOWN1="--unknown data/en-zh.ntcir8/moses/1.unk"
 set UNKNOWN10="--unknown data/en-zh.ntcir8/moses/10.unk"
 
-etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-zh.ntcir8/run_en-zh.gridbest.xml -queries_path data/en-zh.ntcir8/$MT/title_en-zh-trans10-filtered.xml $UNKNOWN10 >& run.en-zh.gridbest.log
+etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-zh.ntcir8/run_en-zh.gridbest.xml -queries_path data/en-zh.ntcir8/$MT/title_en-zh-trans10-filtered.xml $UNKNOWN10 --is_stemming >& run.en-zh.gridbest.log
 ./trec_eval data/en-zh.ntcir8/qrels.en-zh.ntcir8.txt ranking.en-zh.gridbest_10-20-10-100.txt
 
-etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-zh.ntcir8/run_en-zh.10best.xml -queries_path data/en-zh.ntcir8/$MT/title_en-zh-trans10-filtered.xml $UNKNOWN10 >& run.en-zh.10best.log 
+etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-zh.ntcir8/run_en-zh.10best.xml -queries_path data/en-zh.ntcir8/$MT/title_en-zh-trans10-filtered.xml $UNKNOWN10 --is_stemming >& run.en-zh.10best.log 
 ./trec_eval data/en-zh.ntcir8/qrels.en-zh.ntcir8.txt ranking.en-zh.10best_10-100-0-100.txt
 
-etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-zh.ntcir8/run_en-zh.phrase.xml -queries_path data/en-zh.ntcir8/$MT/title_en-zh-trans10-filtered.xml $UNKNOWN10 >& run.en-zh.phrase.log
+etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-zh.ntcir8/run_en-zh.phrase.xml -queries_path data/en-zh.ntcir8/$MT/title_en-zh-trans10-filtered.xml $UNKNOWN10 --is_stemming >& run.en-zh.phrase.log
 ./trec_eval data/en-zh.ntcir8/qrels.en-zh.ntcir8.txt ranking.en-zh.phrase_10-0-0-100.txt
 
-etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-zh.ntcir8/run_en-zh.1best.xml -queries_path data/en-zh.ntcir8/$MT/title_en-zh-trans1-filtered.xml $UNKNOWN1 >& run.en-zh.1best.log
+etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-zh.ntcir8/run_en-zh.1best.xml -queries_path data/en-zh.ntcir8/$MT/title_en-zh-trans1-filtered.xml $UNKNOWN1 --is_stemming >& run.en-zh.1best.log
 ./trec_eval data/en-zh.ntcir8/qrels.en-zh.ntcir8.txt ranking.en-zh.1best_1-100-0-100.txt
 
 ## current implementation allows two ways to run the token-based CLIR approach: 
