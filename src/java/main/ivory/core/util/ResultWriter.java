@@ -49,7 +49,7 @@ public class ResultWriter {
 			gzipStream = new GZIPOutputStream(out);
 			writer = new OutputStreamWriter(gzipStream);
 		} else {
-			writer = new BufferedWriter(new OutputStreamWriter(out), OUTPUT_BUFFER_SIZE);
+			writer = new BufferedWriter(new OutputStreamWriter(out, "UTF8"), OUTPUT_BUFFER_SIZE);
 		}
 	}
 

@@ -45,12 +45,12 @@ import edu.umd.hooka.ttables.TTable_monolithic_IFAs;
  */
 public class ProbabilisticStructuredQueryGenerator implements QueryGenerator {
   private static final Logger LOG = Logger.getLogger(ProbabilisticStructuredQueryGenerator.class);
-  private Tokenizer queryLangTokenizer, queryLangTokenizerWithStemming, docLangTokenizer;
+  private Tokenizer defaultTokenizer, queryLangTokenizer, queryLangTokenizerWithStemming, docLangTokenizer;
   private VocabularyWritable fVocab_f2e, eVocab_f2e;
   private TTable_monolithic_IFAs f2eProbs;
   private int length, numTransPerToken;
   private float lexProbThreshold, cumProbThreshold;
-  private boolean H6, bigramSegment;
+  private boolean isStemming, H6, bigramSegment;
   private RetrievalEnvironment env;
   private String queryLang, docLang;
 
@@ -81,6 +81,13 @@ public class ProbabilisticStructuredQueryGenerator implements QueryGenerator {
     cumProbThreshold = conf.getFloat(Constants.CumulativeProbThreshold, 1f);
     numTransPerToken = conf.getInt(Constants.NumTransPerToken, Integer.MAX_VALUE);
 
+    isStemming = conf.getBoolean(Constants.IsStemming, false);
+    if (isStemming) {
+      defaultTokenizer = queryLangTokenizerWithStemming;
+    } else {
+      defaultTokenizer = queryLangTokenizer;
+    }
+    
     String h6 = conf.get(Constants.Heuristic6);
     if (h6 == null || h6.equals("off")) {
       H6 = false;
@@ -90,11 +97,14 @@ public class ProbabilisticStructuredQueryGenerator implements QueryGenerator {
     LOG.info("H6 = " + H6);
 
     // initialize environment to access index
-    try {
-      env = new RetrievalEnvironment(conf.get(Constants.IndexPath), fs);
-      env.initialize(true);
-    } catch (ConfigurationException e) {
-      e.printStackTrace();
+    // skip this if we only want to translate query (i.e., no retrieval)
+    if (conf.get(Constants.TranslateOnly) == null) {    
+      try {
+        env = new RetrievalEnvironment(conf.get(Constants.IndexPath), fs);
+        env.initialize(true);
+      } catch (Exception e) {
+        throw new RuntimeException(e);
+      }
     }
   }
 
@@ -103,22 +113,26 @@ public class ProbabilisticStructuredQueryGenerator implements QueryGenerator {
     JsonObject queryJson = new JsonObject();
 
     String origQuery = query.trim().split("\\|\\|\\|\\|")[0].trim();
-    LOG.info("Original query: " + origQuery);
     String grammarFile = conf.get(Constants.GrammarPath);
     Set<PairOfStrings> phrasePairs = processGrammar(fs, conf, grammarFile);
 
-    Map<String, String> stemmed2Stemmed = Utils.getStemMapping(origQuery, queryLangTokenizer,
+    // Not neeeded if we only want to translate query (i.e., no retrieval)
+    Map<String, String> stemmed2Stemmed = null; 
+    if (conf.get(Constants.TranslateOnly) == null && isStemming) {
+      stemmed2Stemmed = Utils.getStemMapping(origQuery, queryLangTokenizer,
         queryLangTokenizerWithStemming, docLangTokenizer);
+    }
 
-    String[] tokens = queryLangTokenizerWithStemming.processContent(origQuery);
+    String[] tokens = defaultTokenizer.processContent(origQuery);
 
     length = tokens.length;
     JsonArray tokenTranslations = new JsonArray();
     for (String token : tokens) {
-      LOG.info("Processing token " + token);
-      if (queryLangTokenizerWithStemming.isStopWord(token))
+      System.out.println("Processing token " + token);
+
+      if (defaultTokenizer.isStopWord(token)) {
         continue;
-      LOG.info("not stopword");
+      }
 
       // output is not a weighted structure iff numTransPerToken=1
       // and we're not doing bigram segmentation (which requires a weighted structure since it
@@ -131,9 +145,6 @@ public class ProbabilisticStructuredQueryGenerator implements QueryGenerator {
       } else {
         JsonObject tokenTrans = new JsonObject();
         HMapSFW distr = getTranslations(origQuery, token, phrasePairs, stemmed2Stemmed);
-        if (distr == null) {
-          continue;
-        }
         JsonArray weights = Utils.createJsonArrayFromProbabilities(distr);
         if (weights != null) {
           tokenTrans.add("#weight", weights);
@@ -180,7 +191,7 @@ public class ProbabilisticStructuredQueryGenerator implements QueryGenerator {
       // LOG.info("OOV: "+token);
 
       // heuristic: if no translation found, include itself as only translation
-      String targetStem = stemmed2Stemmed.get(token);
+      String targetStem = stemmed2Stemmed == null ? null : stemmed2Stemmed.get(token);
       String target = (stemmed2Stemmed == null || targetStem == null) ? token : stemmed2Stemmed.get(token);
       probDist.put(target, 1);      
       return probDist;
@@ -207,8 +218,9 @@ public class ProbabilisticStructuredQueryGenerator implements QueryGenerator {
           String[] eTokens = docLangTokenizer.processContent(eTerm);
           float splitProb = probEF / eTokens.length;
           for (String eToken : eTokens) {
-            // filter tokens that are not in the index for efficiency
-            if (env.getPostingsList(eToken) != null) {
+            // heuristic: only keep translations that are in our collection
+            // exception: index might not be specified if running in --translate_only mode (in that case, we cannot run this heuristic) 
+            if (env == null || env.getPostingsList(eToken) != null) {
               probDist.put(eToken, splitProb);
             }
           }
@@ -218,7 +230,9 @@ public class ProbabilisticStructuredQueryGenerator implements QueryGenerator {
           // only faster
           sumProbEF += probEF;      
         }else {
-          if (env.getPostingsList(eTerm) != null) {
+	  // heuristic: only keep translations that are in our collection
+	  // exception: index might not be specified if running in --translate_only mode (in that case, we cannot run this heuristic) 
+          if (env == null || env.getPostingsList(eTerm) != null) {
             probDist.increment(eTerm, probEF);
             sumProbEF += probEF;
           }

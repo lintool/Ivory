@@ -121,6 +121,7 @@ public class RunQueryEngine {
     options.addOption(OptionBuilder.withArgName("path").hasArg().withDescription("query-language vocabulary file").create(Constants.QueryVocab));
     options.addOption(OptionBuilder.withArgName("path").hasArg().withDescription("query-lang -> doc-lang translation prob. table").create(Constants.f2eProbsPath));
     options.addOption(OptionBuilder.withArgName("path").hasArg().withDescription("grammar file").create(Constants.GrammarPath));
+    options.addOption(OptionBuilder.withArgName("path").hasArg().withDescription("output file").create(Constants.OutputPath));
     options.addOption(OptionBuilder.withArgName("0=unigram|1|2").hasArg().withDescription("min phrase size").create(Constants.MinWindow));
     options.addOption(OptionBuilder.withArgName("0=unigram|1|2").hasArg().withDescription("max phrase size").create(Constants.MaxWindow));
     options.addOption(OptionBuilder.withArgName("(0.0-1.0)").hasArg().withDescription("lexical probability threshold").create(Constants.LexicalProbThreshold));
@@ -144,13 +145,14 @@ public class RunQueryEngine {
     options.addOption(OptionBuilder.withArgName("path").hasArg().withDescription("one stemmed stopword per line, query lang").create(Constants.StemmedStopwordListQ));
     options.addOption(OptionBuilder.withArgName("path").hasArg().withDescription("one stopword per line, doc lang").create(Constants.StopwordListD));
     options.addOption(OptionBuilder.withArgName("path").hasArg().withDescription("one stemmed stopword per line, doc lang").create(Constants.StemmedStopwordListD));
+    options.addOption(OptionBuilder.withDescription("stem query text").create(Constants.IsStemming));
     options.addOption(OptionBuilder.withArgName("path").hasArg().withDescription("unknown words output by Moses -output-unknowns option").create(Constants.UNKFile));
 
     // read options from commandline or XML
     try {
       CommandLineParser parser = new GnuParser();
       CommandLine cmdline = parser.parse(options, args);
-      if (cmdline.hasOption(Constants.ConfigXML) && cmdline.hasOption(Constants.QueriesPath)) {
+      if (cmdline.hasOption(Constants.ConfigXML)) {
         readXMLOptions(cmdline, fs, conf);
       } else{
         conf.set(Constants.QueryType, cmdline.getOptionValue(Constants.QueryType));
@@ -171,7 +173,10 @@ public class RunQueryEngine {
       }       
       if (cmdline.hasOption(Constants.GrammarPath)) {
         conf.set(Constants.GrammarPath, cmdline.getOptionValue(Constants.GrammarPath));
-      }      
+      }  
+      if (cmdline.hasOption(Constants.OutputPath)) {
+        conf.set(Constants.OutputPath, cmdline.getOptionValue(Constants.OutputPath));
+      }    
       if (cmdline.hasOption(Constants.f2eProbsPath) && cmdline.hasOption(Constants.QueryVocab) && cmdline.hasOption(Constants.DocVocab)) {
         conf.set(Constants.f2eProbsPath, cmdline.getOptionValue(Constants.f2eProbsPath));
         conf.set(Constants.QueryVocab, cmdline.getOptionValue(Constants.QueryVocab));
@@ -244,6 +249,9 @@ public class RunQueryEngine {
       if (cmdline.hasOption(Constants.StemmedStopwordListQ)) {
         conf.set(Constants.StemmedStopwordListQ , cmdline.getOptionValue(Constants.StemmedStopwordListQ));
       }
+      if (cmdline.hasOption(Constants.IsStemming)) {
+        conf.setBoolean(Constants.IsStemming, true);
+      }
       if (cmdline.hasOption(Constants.UNKFile)) {
         conf.set(Constants.UNKFile , cmdline.getOptionValue(Constants.UNKFile));
       }
@@ -273,7 +281,9 @@ public class RunQueryEngine {
       throw new ConfigurationException(e.getMessage());
     }
 
-    conf.set(Constants.QueriesPath, cmdline.getOptionValue(Constants.QueriesPath));
+    if (cmdline.hasOption(Constants.QueriesPath)) {
+      conf.set(Constants.QueriesPath, cmdline.getOptionValue(Constants.QueriesPath));
+    }
 
     NodeList list = d.getElementsByTagName(Constants.QueryType);
     if (list.getLength() > 0) {  conf.set(Constants.QueryType, list.item(0).getTextContent());  }
@@ -358,6 +368,12 @@ public class RunQueryEngine {
 
     list = d.getElementsByTagName(Constants.StemmedStopwordListQ);
     if (list.getLength() > 0) {  conf.set(Constants.StemmedStopwordListQ, list.item(0).getTextContent());  }  
+
+    list = d.getElementsByTagName(Constants.IsStemming);
+    if (list.getLength() > 0) {  conf.setBoolean(Constants.IsStemming, true);  }
+
+    list = d.getElementsByTagName(Constants.OutputPath);
+    if (list.getLength() > 0) {  conf.set(Constants.OutputPath, list.item(0).getTextContent());  }
  
     list = d.getElementsByTagName(Constants.UNKFile);
     if (list.getLength() > 0) {  conf.set(Constants.UNKFile, list.item(0).getTextContent());  }  

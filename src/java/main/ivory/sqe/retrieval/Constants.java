@@ -16,9 +16,11 @@ public class Constants {
   public static final String StopwordListD = "doc_stopwordlist";
   public static final String StopwordListQ= "query_stopwordlist";
   public static final String StemmedStopwordListD = "doc_stemmed_stopwordlist";
-  public static final String StemmedStopwordListQ= "query_stemmed_stopwordlist";
+  public static final String StemmedStopwordListQ = "query_stemmed_stopwordlist";
+  public static final String IsStemming = "is_stemming";
   public static final String QueriesPath = "queries_path";
   public static final String QrelsPath = "qrels_path";
+  public static final String OutputPath = "output_path";
   public static final String GrammarPath = "grammar_path";
   public static final String UNKFile = "unknown";
   public static final String DocLanguage = "doc_lang";

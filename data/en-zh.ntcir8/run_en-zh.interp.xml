@@ -20,4 +20,5 @@
      <kBest>10</kBest>
      <query_stemmed_stopwordlist>data/tokenizer/en.stop.stemmed</query_stemmed_stopwordlist>
 
+<is_stemming></is_stemming>
 </parameters>

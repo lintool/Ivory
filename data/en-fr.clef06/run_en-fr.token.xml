@@ -21,4 +21,5 @@
      <doc_stemmed_stopwordlist>data/tokenizer/fr.stop.stemmed</doc_stemmed_stopwordlist>
      <query_stemmed_stopwordlist>data/tokenizer/en.stop.stemmed</query_stemmed_stopwordlist>
 
+<is_stemming></is_stemming>
 </parameters>

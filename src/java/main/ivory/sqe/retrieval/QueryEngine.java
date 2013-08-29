@@ -61,8 +61,10 @@ public class QueryEngine {
       LOG.info("Running " + runName);
       modelSet.add(runName);
 
-      ranker = new StructuredQueryRanker(conf.get(Constants.IndexPath), fs, 1000);
-      mapping = ranker.getDocnoMapping();
+      if (conf.get(Constants.TranslateOnly) == null) {
+        ranker = new StructuredQueryRanker(conf.get(Constants.IndexPath), fs, 1000);
+        mapping = ranker.getDocnoMapping();
+      }
       queries = parseQueries(conf.get(Constants.QueriesPath), fs);
       if (generator == null) {
         if (conf.get(Constants.QueryType).equals(Constants.CLIR)) {
@@ -189,7 +191,7 @@ public class QueryEngine {
     } else {
       String queryText = query.getQuery().toString();
       if (isIndri) {
-        queryText = queryText.replaceAll("\"#combine\":","#combine").replaceAll("\"#weight\":","#weight").replaceAll("\\{","").replaceAll("\\}","").replaceAll("\\[","(").replaceAll("\\]",")").replaceAll("\","," ").replaceAll(",\""," ").replaceAll("\"\\),",") ").replaceAll("\"\\)\\)","))");
+        queryText = Utils.ivory2Indri(queryText);
       }
       resultWriter.println(queryID + " " + queryText + " " + runName);
     }
@@ -202,9 +204,11 @@ public class QueryEngine {
     try {
       LOG.info("Parsed " + queries.size() + " queries");
       
+      String outFile = conf.get(Constants.OutputPath);
+
       String translateOnly = conf.get(Constants.TranslateOnly);
       if (translateOnly != null) {
-        ResultWriter resultWriter = new ResultWriter("translations." + runName + ".txt", false, fs);
+        ResultWriter resultWriter = new ResultWriter((outFile == null ? "translations." + runName + ".txt" : outFile), false, fs);
         for (String qid : queries.keySet()) {
           String query = queries.get(qid);
         
@@ -224,7 +228,7 @@ public class QueryEngine {
         resultWriter.flush();
         LOG.info("<TIME>:::" + runName + ":::" + generateTime + ":::" + rankTime);
       } else {
-        ResultWriter resultWriter = new ResultWriter("ranking." + runName + ".txt", false, fs);
+        ResultWriter resultWriter = new ResultWriter((outFile == null ? "ranking." + runName + ".txt" : outFile), false, fs);
         for ( String qid : queries.keySet()) {
           String query = queries.get(qid);
 

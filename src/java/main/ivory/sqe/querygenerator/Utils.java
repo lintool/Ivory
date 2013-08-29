@@ -696,4 +696,7 @@ public class Utils {
     return pairsInSCFG;
   }
 
+  public static String ivory2Indri(String structuredQuery) {
+    return structuredQuery.replaceAll("\"#combine\":","#combine").replaceAll("\"#weight\":","#weight").replaceAll("\\{","").replaceAll("\\}","").replaceAll("\\[","(").replaceAll("\\]",")").replaceAll("\","," ").replaceAll(",\""," ").replaceAll("\"\\),",") ").replaceAll("\"\\)\\)","))");
+  }
 }
