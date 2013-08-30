@@ -480,8 +480,8 @@ public class BitextClassifierUtils {
   }
 
   private static void runCLIRComparison() throws IOException, ClassNotFoundException, InstantiationException, IllegalAccessException {
-    String VOCABDIR = "/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/vocab";    // /Users/ferhanture/Documents/workspace/ivory-github/Ivory/data/vocab
-    String TOKENDIR = "/fs/clip-qa/ferhan/end2end-experiments/Ivory/data/tokenizer";   // "/Users/ferhanture/Documents/workspace/ivory-github/Ivory/data/tokenizer
+    String VOCABDIR = "data/vocab";    // /Users/ferhanture/Documents/workspace/ivory-github/Ivory/data/vocab
+    String TOKENDIR = "data/tokenizer";   // "/Users/ferhanture/Documents/workspace/ivory-github/Ivory/data/tokenizer
     String DATADIR = "/fs/clip-qa/ferhan/cl-pwsim/pwsim-experiments-2013";    // /Users/ferhanture/edu/research_archive/data/de-en/eu-nc-wmt08
     
     BitextClassifierUtils dt = new BitextClassifierUtils();

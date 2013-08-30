@@ -84,15 +84,15 @@ we found previously.
 detection model files to HDFS:</p>
 
 <pre class="code">
-hdfs dfs -mkdir $datadir/sent
-hdfs dfs -put $IVORYDIR/data/vocab/de-sent.bin $datadir/sent/
-hdfs dfs -put $IVORYDIR/data/vocab/en-sent.bin $datadir/sent/
+hdfs dfs -mkdir wikidata/sent
+hdfs dfs -put data/vocab/de-sent.bin wikidata/sent/
+hdfs dfs -put data/vocab/en-sent.bin wikidata/sent/
 </pre>
 
 <table><tr><td valign="top"><span class="label label-info">Tip</span></td>
 <td style="padding-left: 10px">
 For languages that are not currently supported (i.e., no <code>*-sent.bin</code> file under 
-<code>$IVORYDIR/data/tokenizer</code>), refer to 
+<code>data/tokenizer</code>), refer to 
 <a href="http://sourceforge.net/apps/mediawiki/opennlp/index.php?title=Sentence_Detector">
 OpenNLP documentation</a> to train your own models.
 <p>
@@ -103,10 +103,11 @@ OpenNLP documentation</a> to train your own models.
 <p>Let's split each document into a list of sentences:</p>
 
 <pre class="code">
-$IVORYDIR/etc/hadoop-cluster.sh ivory.lsh.bitext.Docs2Sentences \
-	-e_collection=$wiki/compressed/enwiki-20121201.compressed -f_collection=$wiki/compressed/dewiki-20121215.compressed \
-	-sentences=$pwsimdir/sentences.de-en \
-	-e_index=$edir -f_index=$fdir -data=$datadir -e_lang=en -f_lang=de
+nohup etc/hadoop-cluster.sh ivory.lsh.bitext.Docs2Sentences \
+ -data=wikidata -e_lang=en -f_lang=de \
+ -e_collection=pwsim.enwiki.compressed -f_collection=pwsim.dewiki.compressed \
+ -e_index=pwsim.enwiki.index -f_index=pwsim.dewiki.index \
+ -sentences=pwsim.results/sentences.de-en >& sentence-split.log &
 </pre>
 
 <table><tr><td valign="top"><span class="label label-info">Info</span></td>
@@ -120,7 +121,7 @@ by setting option <code>-oov_rate</code> to the maximum allowed ratio of out-of-
 </table>
 
 <p>
-All sentences in the two collections are now written to <code>$pwsimdir/sentences.de-en</code>, with identifiers
+All sentences in the two collections are now written to <code>pwsim.results/sentences.de-en</code>, with identifiers
 to distinguish between German and English. 
 </p>
 
@@ -129,13 +130,13 @@ to distinguish between German and English.
 Next step is to classify each German-English sentence pair as parallel
 or not, using a novel two-step classification approach described in Ture and Lin's NAACL'12 paper <b><a href="publications/Ture_Lin_NAACL-HLT2012.pdf">
 Why Not Grab a Free Lunch? Mining Large Corpora for Parallel Sentences To Improve
-Translation Modeling</a></b>. Trained classifier models are provided under <code>$IVORYDIR/data/classifier</code>. Let
+Translation Modeling</a></b>. Trained classifier models are provided under <code>data/classifier</code>. Let
 us first upload these files to HDFS where the program can access them:
 <p>
 
 <pre class="code">
-hdfs dfs -put $IVORYDIR/data/classifier/classifier-simple.de-en $datadir/
-hdfs dfs -put $IVORYDIR/data/classifier/classifier-complex.de-en $datadir/
+hdfs dfs -put data/classifier/de-en.wmt12/classifier-simple.de-en wikidata/
+hdfs dfs -put data/classifier/de-en.wmt12/classifier-complex.de-en wikidata/
 </pre>
 
 The first classification step will generate all candidate sentence pairs, and then apply the simple classifier,
@@ -143,13 +144,13 @@ emitting all pairs scored above the provided threshold (e.g., <code>F1=0.9</code
 
 </p>
 <pre class="code">
-$IVORYDIR/etc/hadoop-cluster.sh ivory.lsh.bitext.FindParallelSentencePairs \
-	-e_collection=$wiki/compressed/enwiki-20121201.compressed -f_collection=$wiki/compressed/dewiki-20121215.compressed \
-	-sentences=$pwsimdir/sentences.de-en \
-	-pwsim_output=$pwsimdir/similardocs_random_maxdst=400_D=1000_Q=300_B=2000.single/part-00000 \
-	-bitext=$pwsimdir/bitext.F1=90 \
-	-e_index=$edir -f_index=$fdir -data=$datadir -e_lang=en -f_lang=de \
-	-threshold=0.9 -classifier_id=1
+nohup etc/hadoop-cluster.sh ivory.lsh.bitext.FindParallelSentencePairs \
+ -e_collection=pwsim.enwiki.compressed -f_collection=pwsim.dewiki.compressed \
+ -sentences=pwsim.results/sentences.de-en \
+ -pwsim_output=pwsim.results/similardocs_random_maxdst=400_D=1000_Q=300_B=2000.single/part-00000 \
+ -bitext=pwsim.results/bitext.F1=90 \
+ -e_index=pwsim.enwiki.index -f_index=pwsim.dewiki.index \
+ -data=wikidata -e_lang=en -f_lang=de -threshold=0.9 -classifier_id=1 >& classify1.log &
 </pre>
 
 <table><tr><td valign="top"><span class="label label-info">Tip</span></td>
@@ -171,10 +172,11 @@ by the first step, and emit all pairs scored above the provided threshold (e.g.,
 <p>
 
 <pre class="code">
-$IVORYDIR/etc/hadoop-cluster.sh ivory.lsh.bitext.FilterSentencePairs \
-	-input=$pwsimdir/bitext.F1=90 -output=$pwsimdir/bitext.F1=90.F2=50 \
-	-e_index=$edir -f_index=$fdir -data=$datadir -e_lang=en -f_lang=de \
-	-threshold=0.5 -classifier_id=1
+nohup etc/hadoop-cluster.sh ivory.lsh.bitext.FilterSentencePairs \
+ -input=pwsim.results/bitext.F1=90 -output=pwsim.results/bitext.F1=90.F2=50 \
+ -e_index=pwsim.enwiki.index -f_index=pwsim.dewiki.index \
+ -data=wikidata -e_lang=en -f_lang=de \
+ -threshold=0.5 -classifier_id=1 >& classify2.log &
 </pre>
 
 

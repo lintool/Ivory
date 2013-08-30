@@ -107,7 +107,6 @@ public class DocumentVectorUtility {
   /**
    * Compresses positions using PForDelta compression
    *
-   * @param positions Array of positions for a term
    * @return Serialized positions (using PForDelta)
    */
   public static int[][] compressData(int[] data, int blockSize, boolean computeGaps) {
