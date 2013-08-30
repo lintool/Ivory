@@ -50,7 +50,7 @@ public class ProbabilisticStructuredQueryGenerator implements QueryGenerator {
   private TTable_monolithic_IFAs f2eProbs;
   private int length, numTransPerToken;
   private float lexProbThreshold, cumProbThreshold;
-  private boolean isStemming, H6, bigramSegment;
+  private boolean isDocStemmed, isStemming, H6, bigramSegment;
   private RetrievalEnvironment env;
   private String queryLang, docLang;
 
@@ -73,14 +73,7 @@ public class ProbabilisticStructuredQueryGenerator implements QueryGenerator {
     LOG.info("Stemmed stopword list file in query-language:" + conf.get(Constants.StemmedStopwordListQ));
     LOG.info("Stemmed stopword list file in doc-language:" + conf.get(Constants.StemmedStopwordListD));
 
-    queryLangTokenizer = TokenizerFactory.createTokenizer(fs, conf, queryLang, conf.get(Constants.QueryTokenizerData), false, null, null, null);
-    queryLangTokenizerWithStemming = TokenizerFactory.createTokenizer(fs, conf, queryLang, conf.get(Constants.QueryTokenizerData), true, null, conf.get(Constants.StemmedStopwordListQ), null);
-    docLangTokenizer = TokenizerFactory.createTokenizer(fs, conf, docLang, conf.get(Constants.DocTokenizerData), true, null, conf.get(Constants.StemmedStopwordListD), null);
-
-    lexProbThreshold = conf.getFloat(Constants.LexicalProbThreshold, 0f);
-    cumProbThreshold = conf.getFloat(Constants.CumulativeProbThreshold, 1f);
-    numTransPerToken = conf.getInt(Constants.NumTransPerToken, Integer.MAX_VALUE);
-
+    isDocStemmed = conf.getBoolean(Constants.IsDocStemmed, false);
     isStemming = conf.getBoolean(Constants.IsStemming, false);
     if (isStemming) {
       defaultTokenizer = queryLangTokenizerWithStemming;
@@ -88,6 +81,20 @@ public class ProbabilisticStructuredQueryGenerator implements QueryGenerator {
       defaultTokenizer = queryLangTokenizer;
     }
     
+    
+    queryLangTokenizer = TokenizerFactory.createTokenizer(fs, conf, queryLang, conf.get(Constants.QueryTokenizerData), false, conf.get(Constants.StopwordListQ), null, null);
+    queryLangTokenizerWithStemming = TokenizerFactory.createTokenizer(fs, conf, queryLang, conf.get(Constants.QueryTokenizerData), true, null, conf.get(Constants.StemmedStopwordListQ), null);
+    
+    if (isDocStemmed) {
+      docLangTokenizer = TokenizerFactory.createTokenizer(fs, conf, docLang, conf.get(Constants.DocTokenizerData), true, null, conf.get(Constants.StemmedStopwordListD), null);
+    } else {
+      docLangTokenizer = TokenizerFactory.createTokenizer(fs, conf, docLang, conf.get(Constants.DocTokenizerData), false, conf.get(Constants.StopwordListD), null, null);
+    }
+
+    lexProbThreshold = conf.getFloat(Constants.LexicalProbThreshold, 0f);
+    cumProbThreshold = conf.getFloat(Constants.CumulativeProbThreshold, 1f);
+    numTransPerToken = conf.getInt(Constants.NumTransPerToken, Integer.MAX_VALUE);
+
     String h6 = conf.get(Constants.Heuristic6);
     if (h6 == null || h6.equals("off")) {
       H6 = false;
@@ -118,7 +125,7 @@ public class ProbabilisticStructuredQueryGenerator implements QueryGenerator {
 
     // Not neeeded if we only want to translate query (i.e., no retrieval)
     Map<String, String> stemmed2Stemmed = null; 
-    if (conf.get(Constants.TranslateOnly) == null && isStemming) {
+    if (isDocStemmed) {
       stemmed2Stemmed = Utils.getStemMapping(origQuery, queryLangTokenizer,
         queryLangTokenizerWithStemming, docLangTokenizer);
     }
@@ -191,8 +198,7 @@ public class ProbabilisticStructuredQueryGenerator implements QueryGenerator {
       // LOG.info("OOV: "+token);
 
       // heuristic: if no translation found, include itself as only translation
-      String targetStem = stemmed2Stemmed == null ? null : stemmed2Stemmed.get(token);
-      String target = (stemmed2Stemmed == null || targetStem == null) ? token : stemmed2Stemmed.get(token);
+      String target = (stemmed2Stemmed == null) ? token : stemmed2Stemmed.get(token);
       probDist.put(target, 1);      
       return probDist;
     }

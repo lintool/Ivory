@@ -115,7 +115,7 @@ public class VerifyClefFrenchPositionalIndexIP {
           "-kBest=10", 
           "-doc_stemmed_stopwordlist=" + index + "/" + LANGUAGE + ".stop.stemmed",
           "-query_stemmed_stopwordlist=" + index + "/en.stop.stemmed",
-          "--one2many=" + heuristic
+          "--one2many=" + heuristic, "--is_stemming", "--is_doc_stemmed"
       }, fs, conf);
 
       long start = System.currentTimeMillis();

@@ -96,7 +96,7 @@ public class EnZh_NTCIR8 {
     /////// baseline-token
     Configuration conf = RunQueryEngine.parseArgs(new String[] {
         "--xml", "data/"+ PATH + "/run_en-" + LANGUAGE + ".token.xml",
-        "--queries_path", "data/"+ PATH + "/cdec/title_en-" + LANGUAGE + "-trans10-filtered.xml", "--one2many", heuristic + "" });
+        "--queries_path", "data/"+ PATH + "/cdec/title_en-" + LANGUAGE + "-trans10-filtered.xml", "--one2many", heuristic + "", "--is_stemming", "--is_doc_stemmed" });
     FileSystem fs = FileSystem.getLocal(conf);
 
     // no need to repeat token-based case for other heuristics
@@ -108,7 +108,7 @@ public class EnZh_NTCIR8 {
 
     conf = RunQueryEngine.parseArgs(new String[] {
         "--xml", "data/"+ PATH + "/run_en-" + LANGUAGE + ".1best.xml",
-        "--queries_path", "data/"+ PATH + "/cdec/title_en-" + LANGUAGE + "-trans1-filtered.xml", "--one2many", heuristic + "" });
+        "--queries_path", "data/"+ PATH + "/cdec/title_en-" + LANGUAGE + "-trans1-filtered.xml", "--one2many", heuristic + "", "--is_stemming", "--is_doc_stemmed" });
 
     qe.init(conf, fs);
     qe.runQueries(conf);
@@ -117,7 +117,7 @@ public class EnZh_NTCIR8 {
 
     conf = RunQueryEngine.parseArgs(new String[] {
         "--xml", "data/"+ PATH + "/run_en-" + LANGUAGE + ".grammar.xml",
-        "--queries_path", "data/"+ PATH + "/cdec/title_en-" + LANGUAGE + "-trans10-filtered.xml", "--one2many", heuristic + "" });
+        "--queries_path", "data/"+ PATH + "/cdec/title_en-" + LANGUAGE + "-trans10-filtered.xml", "--one2many", heuristic + "", "--is_stemming", "--is_doc_stemmed" });
 
     qe.init(conf, fs);
     qe.runQueries(conf);
@@ -126,7 +126,7 @@ public class EnZh_NTCIR8 {
 
     conf = RunQueryEngine.parseArgs(new String[] {
         "--xml", "data/"+ PATH + "/run_en-" + LANGUAGE + ".10best.xml",
-        "--queries_path", "data/"+ PATH + "/cdec/title_en-" + LANGUAGE + "-trans10-filtered.xml", "--one2many", heuristic + "" });
+        "--queries_path", "data/"+ PATH + "/cdec/title_en-" + LANGUAGE + "-trans10-filtered.xml", "--one2many", heuristic + "", "--is_stemming", "--is_doc_stemmed" });
 
     qe.init(conf, fs);
     qe.runQueries(conf);
@@ -135,7 +135,7 @@ public class EnZh_NTCIR8 {
 
     conf = RunQueryEngine.parseArgs(new String[] {
         "--xml", "data/"+ PATH + "/run_en-" + LANGUAGE + ".interp.xml",
-        "--queries_path", "data/"+ PATH + "/cdec/title_en-" + LANGUAGE + "-trans10-filtered.xml", "--one2many", heuristic + "" });
+        "--queries_path", "data/"+ PATH + "/cdec/title_en-" + LANGUAGE + "-trans10-filtered.xml", "--one2many", heuristic + "", "--is_stemming", "--is_doc_stemmed" });
 
     qe.init(conf, fs);
     qe.runQueries(conf);

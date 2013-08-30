@@ -146,6 +146,7 @@ public class RunQueryEngine {
     options.addOption(OptionBuilder.withArgName("path").hasArg().withDescription("one stopword per line, doc lang").create(Constants.StopwordListD));
     options.addOption(OptionBuilder.withArgName("path").hasArg().withDescription("one stemmed stopword per line, doc lang").create(Constants.StemmedStopwordListD));
     options.addOption(OptionBuilder.withDescription("stem query text").create(Constants.IsStemming));
+    options.addOption(OptionBuilder.withDescription("use if documents were stemmed").create(Constants.IsDocStemmed));
     options.addOption(OptionBuilder.withArgName("path").hasArg().withDescription("unknown words output by Moses -output-unknowns option").create(Constants.UNKFile));
 
     // read options from commandline or XML
@@ -248,6 +249,9 @@ public class RunQueryEngine {
       }
       if (cmdline.hasOption(Constants.StemmedStopwordListQ)) {
         conf.set(Constants.StemmedStopwordListQ , cmdline.getOptionValue(Constants.StemmedStopwordListQ));
+      }
+      if (cmdline.hasOption(Constants.IsDocStemmed)) {
+        conf.setBoolean(Constants.IsDocStemmed, true);
       }
       if (cmdline.hasOption(Constants.IsStemming)) {
         conf.setBoolean(Constants.IsStemming, true);
@@ -369,6 +373,9 @@ public class RunQueryEngine {
     list = d.getElementsByTagName(Constants.StemmedStopwordListQ);
     if (list.getLength() > 0) {  conf.set(Constants.StemmedStopwordListQ, list.item(0).getTextContent());  }  
 
+    list = d.getElementsByTagName(Constants.IsDocStemmed);
+    if (list.getLength() > 0) {  conf.setBoolean(Constants.IsDocStemmed, true);  }
+
     list = d.getElementsByTagName(Constants.IsStemming);
     if (list.getLength() > 0) {  conf.setBoolean(Constants.IsStemming, true);  }
 
@@ -378,6 +385,9 @@ public class RunQueryEngine {
     list = d.getElementsByTagName(Constants.UNKFile);
     if (list.getLength() > 0) {  conf.set(Constants.UNKFile, list.item(0).getTextContent());  }  
  
+    list = d.getElementsByTagName(Constants.TranslateOnly);
+    if (list.getLength() > 0) {  conf.set(Constants.TranslateOnly, list.item(0).getTextContent());  }  
+
   }
 
   static float eval(QueryEngine qe, Configuration conf, String setting){
