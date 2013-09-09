@@ -6,7 +6,7 @@ import ivory.core.tokenize.Tokenizer;
 import ivory.core.tokenize.TokenizerFactory;
 import ivory.sqe.retrieval.Constants;
 import ivory.sqe.retrieval.StructuredQuery;
-
+import java.util.regex.*;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -19,17 +19,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Set;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-
 import edu.umd.cloud9.io.map.HMapSFW;
 import edu.umd.cloud9.io.pair.PairOfFloatInt;
 import edu.umd.cloud9.io.pair.PairOfStrings;
@@ -52,7 +49,8 @@ public class ProbabilisticStructuredQueryGenerator implements QueryGenerator {
   private float lexProbThreshold, cumProbThreshold;
   private boolean isDocStemmed, isStemming, H6, bigramSegment;
   private RetrievalEnvironment env;
-  private String queryLang, docLang;
+  private String queryLang, docLang, translateOnly;
+  private Pattern indriPuncPattern = Pattern.compile(".*\\p{Punct}.*");
 
   public ProbabilisticStructuredQueryGenerator() throws IOException {
     super();
@@ -73,6 +71,9 @@ public class ProbabilisticStructuredQueryGenerator implements QueryGenerator {
     LOG.info("Stemmed stopword list file in query-language:" + conf.get(Constants.StemmedStopwordListQ));
     LOG.info("Stemmed stopword list file in doc-language:" + conf.get(Constants.StemmedStopwordListD));
 
+    queryLangTokenizer = TokenizerFactory.createTokenizer(fs, conf, queryLang, conf.get(Constants.QueryTokenizerData), false, conf.get(Constants.StopwordListQ), null, null);
+    queryLangTokenizerWithStemming = TokenizerFactory.createTokenizer(fs, conf, queryLang, conf.get(Constants.QueryTokenizerData), true, null, conf.get(Constants.StemmedStopwordListQ), null);
+    
     isDocStemmed = conf.getBoolean(Constants.IsDocStemmed, false);
     isStemming = conf.getBoolean(Constants.IsStemming, false);
     if (isStemming) {
@@ -80,10 +81,6 @@ public class ProbabilisticStructuredQueryGenerator implements QueryGenerator {
     } else {
       defaultTokenizer = queryLangTokenizer;
     }
-    
-    
-    queryLangTokenizer = TokenizerFactory.createTokenizer(fs, conf, queryLang, conf.get(Constants.QueryTokenizerData), false, conf.get(Constants.StopwordListQ), null, null);
-    queryLangTokenizerWithStemming = TokenizerFactory.createTokenizer(fs, conf, queryLang, conf.get(Constants.QueryTokenizerData), true, null, conf.get(Constants.StemmedStopwordListQ), null);
     
     if (isDocStemmed) {
       docLangTokenizer = TokenizerFactory.createTokenizer(fs, conf, docLang, conf.get(Constants.DocTokenizerData), true, null, conf.get(Constants.StemmedStopwordListD), null);
@@ -103,9 +100,11 @@ public class ProbabilisticStructuredQueryGenerator implements QueryGenerator {
     }
     LOG.info("H6 = " + H6);
 
+    translateOnly = conf.get(Constants.TranslateOnly);
+
     // initialize environment to access index
     // skip this if we only want to translate query (i.e., no retrieval)
-    if (conf.get(Constants.TranslateOnly) == null) {    
+    if (translateOnly == null) {    
       try {
         env = new RetrievalEnvironment(conf.get(Constants.IndexPath), fs);
         env.initialize(true);
@@ -216,7 +215,8 @@ public class ProbabilisticStructuredQueryGenerator implements QueryGenerator {
 
       //      LOG.info("Pr("+eTerm+"|"+token+")="+probEF);
 
-      if (probEF > 0 && e > 0 && !docLangTokenizer.isStopWord(eTerm) && (pairsInSCFG == null || pairsInSCFG.contains(new PairOfStrings(token,eTerm)))) {      
+      if (probEF > 0 && e > 0 && !docLangTokenizer.isStopWord(eTerm) && !(translateOnly.equals("indri") && indriPuncPattern.matcher(eTerm).matches()) && (pairsInSCFG == null || pairsInSCFG.contains(new PairOfStrings(token,eTerm)))) {      
+System.out.println(eTerm);
         // assuming our bilingual dictionary is learned from normally segmented text, but we want to use bigram tokenizer for CLIR purposes
         // then we need to convert the translations of each source token into a sequence of bigrams
         // we can distribute the translation probability equally to the each bigram
