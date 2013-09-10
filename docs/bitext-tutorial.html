@@ -84,9 +84,9 @@ we found previously.
 detection model files to HDFS:</p>
 
 <pre class="code">
-hdfs dfs -mkdir wikidata/sent
-hdfs dfs -put data/vocab/de-sent.bin wikidata/sent/
-hdfs dfs -put data/vocab/en-sent.bin wikidata/sent/
+$ hdfs dfs -mkdir wikidata/sent
+$ hdfs dfs -put data/vocab/de-sent.bin wikidata/sent/
+$ hdfs dfs -put data/vocab/en-sent.bin wikidata/sent/
 </pre>
 
 <table><tr><td valign="top"><span class="label label-info">Tip</span></td>
@@ -103,11 +103,11 @@ OpenNLP documentation</a> to train your own models.
 <p>Let's split each document into a list of sentences:</p>
 
 <pre class="code">
-nohup etc/hadoop-cluster.sh ivory.lsh.bitext.Docs2Sentences \
- -data=wikidata -e_lang=en -f_lang=de \
- -e_collection=pwsim.enwiki.compressed -f_collection=pwsim.dewiki.compressed \
- -e_index=pwsim.enwiki.index -f_index=pwsim.dewiki.index \
- -sentences=pwsim.results/sentences.de-en >& sentence-split.log &
+$ nohup etc/hadoop-cluster.sh ivory.lsh.bitext.Docs2Sentences \
+   -data=wikidata -e_lang=en -f_lang=de \
+   -e_collection=pwsim.enwiki.compressed -f_collection=pwsim.dewiki.compressed \
+   -e_index=pwsim.enwiki.index -f_index=pwsim.dewiki.index \
+   -sentences=pwsim.results/sentences.de-en >& sentence-split.log &
 </pre>
 
 <table><tr><td valign="top"><span class="label label-info">Info</span></td>
@@ -135,8 +135,8 @@ us first upload these files to HDFS where the program can access them:
 <p>
 
 <pre class="code">
-hdfs dfs -put data/classifier/de-en.wmt12/classifier-simple.de-en wikidata/
-hdfs dfs -put data/classifier/de-en.wmt12/classifier-complex.de-en wikidata/
+$ hdfs dfs -put data/classifier/classifier-simple.de-en wikidata/
+$ hdfs dfs -put data/classifier/classifier-complex.de-en wikidata/
 </pre>
 
 The first classification step will generate all candidate sentence pairs, and then apply the simple classifier,
@@ -144,13 +144,13 @@ emitting all pairs scored above the provided threshold (e.g., <code>F1=0.9</code
 
 </p>
 <pre class="code">
-nohup etc/hadoop-cluster.sh ivory.lsh.bitext.FindParallelSentencePairs \
- -e_collection=pwsim.enwiki.compressed -f_collection=pwsim.dewiki.compressed \
- -sentences=pwsim.results/sentences.de-en \
- -pwsim_output=pwsim.results/similardocs_random_maxdst=400_D=1000_Q=300_B=2000.single/part-00000 \
- -bitext=pwsim.results/bitext.F1=90 \
- -e_index=pwsim.enwiki.index -f_index=pwsim.dewiki.index \
- -data=wikidata -e_lang=en -f_lang=de -threshold=0.9 -classifier_id=1 >& classify1.log &
+$ nohup etc/hadoop-cluster.sh ivory.lsh.bitext.FindParallelSentencePairs \
+   -e_collection=pwsim.enwiki.compressed -f_collection=pwsim.dewiki.compressed \
+   -sentences=pwsim.results/sentences.de-en \
+   -pwsim_output=pwsim.results/similardocs_random_maxdst=400_D=1000_Q=300_B=2000.single/part-00000 \
+   -bitext=pwsim.results/bitext.F1=90 \
+   -e_index=pwsim.enwiki.index -f_index=pwsim.dewiki.index \
+   -data=wikidata -e_lang=en -f_lang=de -threshold=0.9 -classifier_id=1 >& classify1.log &
 </pre>
 
 <table><tr><td valign="top"><span class="label label-info">Tip</span></td>
@@ -172,11 +172,11 @@ by the first step, and emit all pairs scored above the provided threshold (e.g.,
 <p>
 
 <pre class="code">
-nohup etc/hadoop-cluster.sh ivory.lsh.bitext.FilterSentencePairs \
- -input=pwsim.results/bitext.F1=90 -output=pwsim.results/bitext.F1=90.F2=50 \
- -e_index=pwsim.enwiki.index -f_index=pwsim.dewiki.index \
- -data=wikidata -e_lang=en -f_lang=de \
- -threshold=0.5 -classifier_id=1 >& classify2.log &
+$ nohup etc/hadoop-cluster.sh ivory.lsh.bitext.FilterSentencePairs \
+   -input=pwsim.results/bitext.F1=90 -output=pwsim.results/bitext.F1=90.F2=50 \
+   -e_index=pwsim.enwiki.index -f_index=pwsim.dewiki.index \
+   -data=wikidata -e_lang=en -f_lang=de \
+   -threshold=0.5 -classifier_id=1 >& classify2.log &
 </pre>
 
 
