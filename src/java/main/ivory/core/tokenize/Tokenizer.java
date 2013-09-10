@@ -335,6 +335,7 @@ public abstract class Tokenizer {
       out.close();
 
     } catch (Exception exp) {
+      System.out.println(exp);
       HelpFormatter formatter = new HelpFormatter();
       formatter.printHelp( "Tokenizer", options );
       System.exit(-1);   

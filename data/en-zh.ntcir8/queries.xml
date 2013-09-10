@@ -1,0 +1,75 @@
+<parameters>
+<query id="2" grammar="data/en-zh.ntcir8/cdec.grammar/grammar.1">What is the relationship between the movie "Riding Alone for Thousands of Miles" and ZHANG Yimou?</query>
+<query id="12" grammar="data/en-zh.ntcir8/cdec.grammar/grammar.11">What is the virus of SARS?</query>
+<query id="15" grammar="data/en-zh.ntcir8/cdec.grammar/grammar.14">Where will Expo 2010 be held?</query>
+<query id="16" grammar="data/en-zh.ntcir8/cdec.grammar/grammar.15">Why does China want to import technology to build Shanghai Maglev Railway?</query>
+<query id="18" grammar="data/en-zh.ntcir8/cdec.grammar/grammar.17">What is the Six-Party Talks?</query>
+<query id="19" grammar="data/en-zh.ntcir8/cdec.grammar/grammar.18">What is the definition of obesity?</query>
+<query id="23" grammar="data/en-zh.ntcir8/cdec.grammar/grammar.22">Why does the bird flu threat to humans?</query>
+<query id="26" grammar="data/en-zh.ntcir8/cdec.grammar/grammar.25">What is the relationship between Liu Guoliang and the men's table tennis team of China?</query>
+<query id="28" grammar="data/en-zh.ntcir8/cdec.grammar/grammar.27">Which organization declares Nobel Prize in Literature?</query>
+<query id="29" grammar="data/en-zh.ntcir8/cdec.grammar/grammar.28">What is the relationship of Yong-Bo Li and the Chinese badminton team?</query>
+<query id="30" grammar="data/en-zh.ntcir8/cdec.grammar/grammar.29">impression series of Zhang Yimou.</query>
+<query id="32" grammar="data/en-zh.ntcir8/cdec.grammar/grammar.31">What is the relationship between Liu Xiang and Johnson?</query>
+<query id="33" grammar="data/en-zh.ntcir8/cdec.grammar/grammar.32">events related to the Taliban and the United States</query>
+<query id="35" grammar="data/en-zh.ntcir8/cdec.grammar/grammar.34">events related to the movie "Initials D".</query>
+<query id="36" grammar="data/en-zh.ntcir8/cdec.grammar/grammar.35">movies in which Zhao Wei participated.</query>
+<query id="38" grammar="data/en-zh.ntcir8/cdec.grammar/grammar.37">What is the relationship between Xia Yu and Yuan Quan?</query>
+<query id="39" grammar="data/en-zh.ntcir8/cdec.grammar/grammar.38">new year films made by Feng Xiaogang.</query>
+<query id="40" grammar="data/en-zh.ntcir8/cdec.grammar/grammar.39">What is the relationship between Guo Jingjing and Wu Minxia?</query>
+<query id="5" grammar="data/en-zh.ntcir8/cdec.grammar/grammar.4">What is the definition of Aging Society?</query>
+<query id="41" grammar="data/en-zh.ntcir8/cdec.grammar/grammar.40">Who is the 2004 US Presidential Democratic candidate?</query>
+<query id="42" grammar="data/en-zh.ntcir8/cdec.grammar/grammar.41">What is the interrelationship between the petroleum industry and wars?</query>
+<query id="43" grammar="data/en-zh.ntcir8/cdec.grammar/grammar.42">What economic impact might Olympic Games have on host countries?</query>
+<query id="44" grammar="data/en-zh.ntcir8/cdec.grammar/grammar.43">How ultraviolet light might threaten human health?</query>
+<query id="45" grammar="data/en-zh.ntcir8/cdec.grammar/grammar.44">When did Arafat pass away?</query>
+<query id="46" grammar="data/en-zh.ntcir8/cdec.grammar/grammar.45">Which year was Macau's return to China?</query>
+<query id="47" grammar="data/en-zh.ntcir8/cdec.grammar/grammar.46">Who is David Ho(Da-i Ho)?</query>
+<query id="48" grammar="data/en-zh.ntcir8/cdec.grammar/grammar.47">Who is Sean Chen(Chen Shin-An)?</query>
+<query id="49" grammar="data/en-zh.ntcir8/cdec.grammar/grammar.48">Who is Lung Yingtai?</query>
+<query id="6" grammar="data/en-zh.ntcir8/cdec.grammar/grammar.5">What is the relationship between Bali bombings and Bin Laden?</query>
+<query id="51" grammar="data/en-zh.ntcir8/cdec.grammar/grammar.50">What does "DINK" represent?</query>
+<query id="52" grammar="data/en-zh.ntcir8/cdec.grammar/grammar.51">What is cholesterol?</query>
+<query id="53" grammar="data/en-zh.ntcir8/cdec.grammar/grammar.52">What is "Thangka"?</query>
+<query id="54" grammar="data/en-zh.ntcir8/cdec.grammar/grammar.53">What happened on the day of 7 July 2005 London Underground bombings?</query>
+<query id="56" grammar="data/en-zh.ntcir8/cdec.grammar/grammar.55">what is the disputes about China-Russia eastern border agreement?</query>
+<query id="57" grammar="data/en-zh.ntcir8/cdec.grammar/grammar.56">What is the disputes between China and Japan for the undersea natural gas field in the East China Sea?</query>
+<query id="58" grammar="data/en-zh.ntcir8/cdec.grammar/grammar.57">Why did the Boxing Day Tsunami cause serious damage and deaths along the coasts of Indonesia, Sri Lanka, India, and Thailand?</query>
+<query id="59" grammar="data/en-zh.ntcir8/cdec.grammar/grammar.58">What is the reason that 2003 invasion of Iraq was led by the US?</query>
+<query id="61" grammar="data/en-zh.ntcir8/cdec.grammar/grammar.60">Which company is Terry Guo (Tai-Ming Guo) president of?</query>
+<query id="62" grammar="data/en-zh.ntcir8/cdec.grammar/grammar.61">Who was the President of the United States when Cheney served as Vice President?</query>
+<query id="63" grammar="data/en-zh.ntcir8/cdec.grammar/grammar.62">Who served as the Head of the PLO Negotiation Affairs Department, and Minister of Negotiations in Prime Minister Qureia's first cabinet?</query>
+<query id="64" grammar="data/en-zh.ntcir8/cdec.grammar/grammar.63">How was al-Zarqawi involved in the Japanese hostage incident in Iraq?</query>
+<query id="65" grammar="data/en-zh.ntcir8/cdec.grammar/grammar.64">Describe the relationship between Brazil and China, which have jointly launched an earth resources satellite.</query>
+<query id="66" grammar="data/en-zh.ntcir8/cdec.grammar/grammar.65">What is the relationship between two Russian politicians, Kasianov and Putin?</query>
+<query id="67" grammar="data/en-zh.ntcir8/cdec.grammar/grammar.66">What is the relationship between the UK and the euro?</query>
+<query id="68" grammar="data/en-zh.ntcir8/cdec.grammar/grammar.67">When was the Kyoto Protocol enforced?</query>
+<query id="69" grammar="data/en-zh.ntcir8/cdec.grammar/grammar.68">Who is Masatoshi Koshiba?</query>
+<query id="70" grammar="data/en-zh.ntcir8/cdec.grammar/grammar.69">Who is Koichi Tanaka?</query>
+<query id="71" grammar="data/en-zh.ntcir8/cdec.grammar/grammar.70">Who is Chen Shui-Bian?</query>
+<query id="72" grammar="data/en-zh.ntcir8/cdec.grammar/grammar.71">What are embryonic stem cells?</query>
+<query id="73" grammar="data/en-zh.ntcir8/cdec.grammar/grammar.72">What is Hansen's disease?</query>
+<query id="74" grammar="data/en-zh.ntcir8/cdec.grammar/grammar.73">Where are Japan's Northern Territories located?</query>
+<query id="75" grammar="data/en-zh.ntcir8/cdec.grammar/grammar.74">Which countries have borders in the Kashimir region?</query>
+<query id="76" grammar="data/en-zh.ntcir8/cdec.grammar/grammar.75">Where is the Gaza Strip located?</query>
+<query id="77" grammar="data/en-zh.ntcir8/cdec.grammar/grammar.76">What was the BSE incident?</query>
+<query id="78" grammar="data/en-zh.ntcir8/cdec.grammar/grammar.77">What are the characteristics of the largest earthquake that occurred off the coast of Sumatra, Indonesia?</query>
+<query id="80" grammar="data/en-zh.ntcir8/cdec.grammar/grammar.79">Describe the Iraq War, which started in March 2003 and was fought between regular military forces.</query>
+<query id="9" grammar="data/en-zh.ntcir8/cdec.grammar/grammar.8">Where will Olympics Game 2008 be held?</query>
+<query id="82" grammar="data/en-zh.ntcir8/cdec.grammar/grammar.81">Why did Japan's dispatch of the Self-Defense Force to Iraq trigger a debate over amendment of the Japanese Constitution?</query>
+<query id="83" grammar="data/en-zh.ntcir8/cdec.grammar/grammar.82">Why did the Argentine economic crisis occur?</query>
+<query id="84" grammar="data/en-zh.ntcir8/cdec.grammar/grammar.83">Why did France vote against the EU Constitution?</query>
+<query id="85" grammar="data/en-zh.ntcir8/cdec.grammar/grammar.84">Why did oil prices rise sharply in 2004?</query>
+<query id="87" grammar="data/en-zh.ntcir8/cdec.grammar/grammar.86">What is the relationship between sleep and health?</query>
+<query id="90" grammar="data/en-zh.ntcir8/cdec.grammar/grammar.89">What is the relationship between the Straits of Malacca and the Japanese people?</query>
+<query id="91" grammar="data/en-zh.ntcir8/cdec.grammar/grammar.90">What links are there between Japan and the reconstruction of Iraq?</query>
+<query id="92" grammar="data/en-zh.ntcir8/cdec.grammar/grammar.91">What is the important issues of the Negotiation between India and Pakistan?</query>
+<query id="93" grammar="data/en-zh.ntcir8/cdec.grammar/grammar.92">What is the contributions of Three Gorges Dam?</query>
+<query id="94" grammar="data/en-zh.ntcir8/cdec.grammar/grammar.93">Could you please give short descriptions to the Salt Lake Winter Olympic Games of 2002?</query>
+<query id="95" grammar="data/en-zh.ntcir8/cdec.grammar/grammar.94">Why had SARS reports expanded rapidly from 2003?</query>
+<query id="96" grammar="data/en-zh.ntcir8/cdec.grammar/grammar.95">Why is Iraq War a political tipping point to President Bush?</query>
+<query id="97" grammar="data/en-zh.ntcir8/cdec.grammar/grammar.96">Why did China make a bid to host the 2008 Summer Olympics?</query>
+<query id="98" grammar="data/en-zh.ntcir8/cdec.grammar/grammar.97">Why did armed Chechens hold eight hundred hostages in Moscow theater in 2002?</query>
+<query id="99" grammar="data/en-zh.ntcir8/cdec.grammar/grammar.98">Why did China implement the Renminbi exchange rate reform in July 2005?</query>
+<query id="100" grammar="data/en-zh.ntcir8/cdec.grammar/grammar.99">Why did U.S. troops occupy Baghdad?</query>
+</parameters>

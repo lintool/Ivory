@@ -1,5 +1,4 @@
 <parameters>
-
      <run>en-ar.token</run>
      <query_type>mtN</query_type>
      <index>/scratch0/indexes/clir/trec2001-03_cleaned+nodups+notags.ar-nostop.index</index>
@@ -20,5 +19,6 @@
      <kBest>10</kBest>
      <doc_stemmed_stopwordlist>data/tokenizer/ar.stop.stemmed</doc_stemmed_stopwordlist>
      <query_stemmed_stopwordlist>data/tokenizer/en.stop.stemmed</query_stemmed_stopwordlist>
+
 
 </parameters>
