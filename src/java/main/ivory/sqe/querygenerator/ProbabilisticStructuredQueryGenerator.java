@@ -215,7 +215,7 @@ public class ProbabilisticStructuredQueryGenerator implements QueryGenerator {
 
       //      LOG.info("Pr("+eTerm+"|"+token+")="+probEF);
 
-      if (probEF > 0 && e > 0 && !docLangTokenizer.isStopWord(eTerm) && !(translateOnly.equals("indri") && indriPuncPattern.matcher(eTerm).matches()) && (pairsInSCFG == null || pairsInSCFG.contains(new PairOfStrings(token,eTerm)))) {      
+      if (probEF > 0 && e > 0 && !docLangTokenizer.isStopWord(eTerm) && (translateOnly == null || !translateOnly.equals("indri") || indriPuncPattern.matcher(eTerm).matches()) && (pairsInSCFG == null || pairsInSCFG.contains(new PairOfStrings(token,eTerm)))) {      
 System.out.println(eTerm);
         // assuming our bilingual dictionary is learned from normally segmented text, but we want to use bigram tokenizer for CLIR purposes
         // then we need to convert the translations of each source token into a sequence of bigrams
