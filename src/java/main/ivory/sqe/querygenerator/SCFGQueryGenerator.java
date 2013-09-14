@@ -26,10 +26,10 @@ import edu.umd.cloud9.io.map.HMapSFW;
  */
 public class SCFGQueryGenerator implements QueryGenerator {
   private static final Logger LOG = Logger.getLogger(SCFGQueryGenerator.class);
-  private Tokenizer queryLangTokenizerWithStemming, docLangTokenizer, queryLangTokenizer, bigramTokenizer;
+  private Tokenizer defaultTokenizer, docLangTokenizer, queryLangTokenizerWithStemming, queryLangTokenizer, bigramTokenizer;
   private Map<String, Map<String, HMapSFW>> query2probMap;
   private int length, numTransPerToken;
-  private boolean bigramSegment;
+  private boolean isDocStemmed, isStemming, bigramSegment = false;
   private RetrievalEnvironment env;
   private String queryLang, docLang;
 //  private List<String> originalQueries; 
@@ -76,8 +76,18 @@ public class SCFGQueryGenerator implements QueryGenerator {
       e.printStackTrace();
     }
 
+    isDocStemmed = conf.getBoolean(Constants.IsDocStemmed, false);
+    isStemming = conf.getBoolean(Constants.IsStemming, false);
+    
     queryLangTokenizer = TokenizerFactory.createTokenizer(fs, conf, queryLang, conf.get(Constants.QueryTokenizerData), false, null, null, null);
     queryLangTokenizerWithStemming = TokenizerFactory.createTokenizer(fs, conf, queryLang, conf.get(Constants.QueryTokenizerData), true, null, conf.get(Constants.StemmedStopwordListQ), null);
+    
+    if (isStemming) {
+      defaultTokenizer = queryLangTokenizerWithStemming;
+    } else {
+      defaultTokenizer = queryLangTokenizer;
+    }
+    
     docLangTokenizer = TokenizerFactory.createTokenizer(fs, conf, docLang, conf.get(Constants.DocTokenizerData), true, null, conf.get(Constants.StemmedStopwordListD), null);
   }
 
@@ -89,8 +99,7 @@ public class SCFGQueryGenerator implements QueryGenerator {
     String grammarFile = conf.get(Constants.GrammarPath);
     Map<String, HMapSFW> probMap = processGrammar(fs, conf, grammarFile);
     
-    Map<String, String> stemmed2Stemmed = Utils.getStemMapping(origQuery, queryLangTokenizer,
-        queryLangTokenizerWithStemming, docLangTokenizer);
+    Map<String, String> stemmed2Stemmed = Utils.getStemMapping(origQuery, defaultTokenizer, docLangTokenizer);
 
     JsonArray tokenTranslations = new JsonArray();
     String[] tokens = queryLangTokenizerWithStemming.processContent(origQuery);
