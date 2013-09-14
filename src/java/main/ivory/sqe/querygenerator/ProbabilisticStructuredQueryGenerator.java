@@ -81,7 +81,7 @@ public class ProbabilisticStructuredQueryGenerator implements QueryGenerator {
     } else {
       defaultTokenizer = queryLangTokenizer;
     }
-    
+
     if (isDocStemmed) {
       docLangTokenizer = TokenizerFactory.createTokenizer(fs, conf, docLang, conf.get(Constants.DocTokenizerData), true, null, conf.get(Constants.StemmedStopwordListD), null);
     } else {
@@ -125,8 +125,7 @@ public class ProbabilisticStructuredQueryGenerator implements QueryGenerator {
     // Not neeeded if we only want to translate query (i.e., no retrieval)
     Map<String, String> stemmed2Stemmed = null; 
     if (isDocStemmed) {
-      stemmed2Stemmed = Utils.getStemMapping(origQuery, queryLangTokenizer,
-        queryLangTokenizerWithStemming, docLangTokenizer);
+      stemmed2Stemmed = Utils.getStemMapping(origQuery, defaultTokenizer, docLangTokenizer);
     }
 
     String[] tokens = defaultTokenizer.processContent(origQuery);
@@ -134,7 +133,7 @@ public class ProbabilisticStructuredQueryGenerator implements QueryGenerator {
     length = tokens.length;
     JsonArray tokenTranslations = new JsonArray();
     for (String token : tokens) {
-      System.out.println("Processing token " + token);
+//      System.out.println("Processing token " + token);
 
       if (defaultTokenizer.isStopWord(token)) {
         continue;
@@ -151,7 +150,7 @@ public class ProbabilisticStructuredQueryGenerator implements QueryGenerator {
       } else {
         JsonObject tokenTrans = new JsonObject();
         HMapSFW distr = getTranslations(origQuery, token, phrasePairs, stemmed2Stemmed);
-        JsonArray weights = Utils.createJsonArrayFromProbabilities(distr);
+	JsonArray weights = Utils.createJsonArrayFromProbabilities(distr);
         if (weights != null) {
           tokenTrans.add("#weight", weights);
           tokenTranslations.add(tokenTrans);
@@ -194,7 +193,6 @@ public class ProbabilisticStructuredQueryGenerator implements QueryGenerator {
     HMapSFW probDist = new HMapSFW();
     int f = fVocab_f2e.get(token);
     if (f <= 0) {
-      // LOG.info("OOV: "+token);
 
       // heuristic: if no translation found, include itself as only translation
       String target = (stemmed2Stemmed == null) ? token : stemmed2Stemmed.get(token);
@@ -216,7 +214,6 @@ public class ProbabilisticStructuredQueryGenerator implements QueryGenerator {
       //      LOG.info("Pr("+eTerm+"|"+token+")="+probEF);
 
       if (probEF > 0 && e > 0 && !docLangTokenizer.isStopWord(eTerm) && (translateOnly == null || !translateOnly.equals("indri") || indriPuncPattern.matcher(eTerm).matches()) && (pairsInSCFG == null || pairsInSCFG.contains(new PairOfStrings(token,eTerm)))) {      
-System.out.println(eTerm);
         // assuming our bilingual dictionary is learned from normally segmented text, but we want to use bigram tokenizer for CLIR purposes
         // then we need to convert the translations of each source token into a sequence of bigrams
         // we can distribute the translation probability equally to the each bigram

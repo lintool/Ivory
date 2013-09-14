@@ -14,6 +14,8 @@ import org.apache.log4j.Logger;
 import org.tartarus.snowball.SnowballStemmer;
 import edu.umd.hooka.VocabularyWritable;
 import edu.umd.hooka.alignment.HadoopAlign;
+import java.util.Map;
+import java.util.HashMap;
 
 public class OpenNLPTokenizer extends ivory.core.tokenize.Tokenizer {
   private static final Logger sLogger = Logger.getLogger(OpenNLPTokenizer.class);
@@ -114,7 +116,7 @@ public class OpenNLPTokenizer extends ivory.core.tokenize.Tokenizer {
       throw new RuntimeException(e);
     } 
   }
-
+    
   @Override
   public String[] processContent(String text) {
     text = preNormalize(text);
@@ -150,6 +152,43 @@ public class OpenNLPTokenizer extends ivory.core.tokenize.Tokenizer {
     }
 
     return tokenized.toString().trim().split(" ");
+  }
+  
+  @Override
+  public Map<String, String> getStem2NonStemMapping(String text) {
+    Map<String, String> stem2NonStemMapping = new HashMap<String, String>();
+    text = preNormalize(text);
+    if ( lang == FRENCH ) {
+      text = text.replaceAll("'", "' ");    // openNLP does not separate what comes after the apostrophe, which seems to work better
+    }
+    
+    String[] tokens = tokenizer.tokenize(text);
+    StringBuilder tokenized = new StringBuilder();
+    for ( String token : tokens ){
+      tokenized.append(token + " ");
+    }
+    
+    // do post-normalizations before any stemming or stopword removal
+    String[] normalizedTokens = postNormalize(tokenized.toString().trim()).split(" ");
+    tokenized.delete(0, tokenized.length());
+    for ( int i = 0; i < normalizedTokens.length; i++ ){
+      String token = normalizedTokens[i].toLowerCase();
+      if ( isStopwordRemoval() && isDiscard(false, token) ) {
+        //        sLogger.warn("Discarded stopword "+token);
+        continue;
+      }
+      
+      //apply stemming on token
+      String stemmedToken = stem(token);
+      
+      //skip if out of vocab
+      if ( vocab != null && vocab.get(stemmedToken) <= 0) {
+        //        sLogger.warn("Discarded OOV "+token);
+        continue;
+      }
+      stem2NonStemMapping.put(stemmedToken, token);
+    }
+    return stem2NonStemMapping;
   }
 
   @Override
