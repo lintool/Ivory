@@ -1,5 +1,4 @@
 <parameters>
-
      <run>en-fr.token</run>
      <query_type>mtN</query_type>
      <index>/scratch0/indexes/clir/clef_lemonde94-95_sda94-95_nostop-index.fr</index>
@@ -21,5 +20,6 @@
 
      <doc_stemmed_stopwordlist>data/tokenizer/fr.stop.stemmed</doc_stemmed_stopwordlist>
      <query_stemmed_stopwordlist>data/tokenizer/en.stop.stemmed</query_stemmed_stopwordlist>
+
 
 </parameters>

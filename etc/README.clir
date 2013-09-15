@@ -1,0 +1,226 @@
+#### DOCUMENT PROCESSING
+
+### Each collection was preprocessed to remove duplicates and all tags except for <DOC> and <DOCNO>, and also convert NTCIR tag names to be TREC-compatible.
+### scripts and instructions for each collection are available under $IVORY/etc/clir.scripts/[collection]
+### below are the md5 checksum values the final indexed collection files (generated with md5sum command):
+6da9494cca1324334ce4a8e4f64f5a5a  clef/lemonde94-95+sda94-95.fr-cleaned.xml
+36e29a6c446408c23a8b92a28ceb6785  ntcir/gigaword-xin.2002-06.zh-cleaned.xml
+8a9c5b47c54e2a3ffabc8dc7c556fbca  trec/ldc2001t55.ar-cleaned.xml
+
+### MT derivations are represented in a compressed format understood by our query parser:
+<query>
+original_query
+||||score of derivation 1;;;rule 1 of derivation 1;;;rule2;;;…
+||||score of derivation 2;;;rule 1 of derivation 2;;;rule2;;;…
+...
+||||score of derivation n;;;rule 1 of derivation n;;;rule2;;;…
+</query>
+
+and each rule is represented in standard Moses format:
+	LHS|||RHS|||-log prob|||word_alignments_list
+and word alignments are separated by a dash:
+	src_token1-trg_token1 src_token2-trg_token2
+
+==============================================================================
+
+#### QUERY TRANSLATION WITH MT
+
+### If using cdec, here are instructions on how to generate the query file as above.
+
+### Assumptions:
+### -- run name is $name (e.g., title)
+### -- grammar file for topic $i is extracted to: $name.grammar/grammar.$i
+### -- we want to do $n-best MT
+### -- cdec binary is $cdec, cdec ini file is $inifile, weights file is $weights
+### -- $e is query language code, $f is document language code
+
+### compile suffix array and place on tmp dir
+~/ferhan/end2end-experiments/scripts/compile-and-place.sh /fs/clip-qa/ferhan/end2end-experiments/scripts/cdec-bolt /fs/clip-qa/ferhan/clir-experiments/2013/train/en-fr/europarl-newscommentary.fr-en-filtered en fr /tmp/sa-fture/en-fr.wmt12
+
+### extract grammar
+
+### $name.$e.seg is the set of topics in cdec input format: <seg id="i" grammar="path to grammar file of topic #i"> topic #i </seg>
+### $grammardir is the directory to which per-sentence grammar files are extracted to
+perl ~/trunk/preprocess/add-seg.pl $name.$e.tok $grammardir/grammar > $name.$e.seg
+### OR the following if grammar files are gzipped
+perl ~/trunk/preprocess/add-seg.pl $name.$e.tok $grammardir/grammar .gz > $name.$e.seg
+
+### run cdec with --show_derivations option to output derivations to folder derivs.$nbest
+mkdir derivs.${n}best
+cat $name.$e.seg | $cdec -c $inifile -w $weights -k $n --show_derivations derivs.${n}best 1> out.$n 2> err.$n
+
+### remove initial nonterminal [X] in grammar rules, for compatibility with Moses phrase table format
+perl $IVORY/etc/clean-scfg.pl $name.grammar/grammar.*
+
+### put all grammar rules together, for easy lookup
+cat $name.grammar/grammar.* > $name.grammar.singlefile
+
+### convert derivations to Ivory input format
+### $offset is the difference between 1 and the first query id (e.g., CLEF06 starts from 301, so offset=300)
+cat derivs.${n}best/derivs.* > derivs.${n}best.singlefile
+perl deriv2queries.pl derivs.${n}best.singlefile $name.grammar.singlefile $name.$e $offset $grammardir 1> $name_$e-$f-trans$n.xml 2> err
+
+### filter topics that are either not used in the evaluation task, or have no qrels
+### (need to create file noqrel-topics depending on collection, with format: one to-be-filtered topic id per line)
+perl filter-noqrel-topics.pl noqrel-topics $name_$e-$f-trans$n.xml > $name_$e-$f-trans$n-filtered.xml
+
+==============================================================================
+
+### If using Moses, here are instructions on how to generate the query file as above.
+
+TRAINPREFIX=/cliphomes/fture/ferhan/end2end-experiments/fr-en.wmt12/clir.en-fr/europarl-newscommentary.fr-en-filtered
+DEVPREFIX=/cliphomes/fture/ferhan/end2end-experiments/fr-en.wmt12/dev/newstest2011
+LM=/fs/clip-qa/ferhan/end2end-experiments/fr-en.wmt12/lm/news.2011.shuffled.align-tok.5gram.klm
+ROOT=/scratch0/fture/en-fr.mt
+WORKDIR=/fs/clip-qa/ferhan/clir-experiments/2013/moses/clef06
+f=fr
+e=en
+
+### escape | characters
+cat $TRAINPREFIX.$f.align-tok | $MOSES/scripts/tokenizer/escape-special-chars.perl >& $TRAINPREFIX-escaped.$f.align-tok
+cat $TRAINPREFIX.$e.align-tok | $MOSES/scripts/tokenizer/escape-special-chars.perl >& $TRAINPREFIX-escaped.$e.align-tok
+
+### GIZA alignment + lex
+### moses train 5--9
+perl $MOSES/scripts/training/train-model.perl -root-dir $ROOT --corpus $TRAINPREFIX-escaped --f $e.align-tok --e $f.align-tok --first-step 5 --last-step 9 --lm 0:5:$LM:8 --alignment grow-diag-final-and -reordering msd-bidirectional-fe --temp-dir $ROOT
+
+### mert tuning
+cd $ROOT
+$MOSES/scripts/training/mert-moses.pl $DEVPREFIX.$e.align-tok $DEVPREFIX.$f.align-tok $MOSES/bin/moses model/moses.ini --mertdir $MOSES/bin/ --decoder-flags="-threads 4" >& mert.out
+
+### binarize unfiltered table
+mkdir $ROOT/binarised-model
+$MOSES/bin/processPhraseTable -ttable 0 0 $ROOT/model/phrase-table.gz -nscores 5 -out $ROOT/binarised-model/phrase-table
+$MOSES/bin/processLexicalTable -in $ROOT/model/reordering-table.wbe-msd-bidirectional-fe.gz -out $ROOT/binarised-model/reordering-table &
+
+### change $ROOT/mert-work/moses.ini to point to binarised-model/ and echo "[n-best-list]\nnbest.txt\n10" >> moses.ini
+sed -i 's|model/|binarised-model/|g;' $ROOT/mert-work/moses.ini
+sed -i 's|0 0 0 5|1 0 0 5|g;' $ROOT/mert-work/moses.ini
+sed -i 's|0 0 0 5|1 0 0 5|g;' $ROOT/mert-work/moses.ini
+sed -i 's|reordering-table.wbe-msd-bidirectional-fe.gz|reordering-table|g;' $ROOT/mert-work/moses.ini
+sed -i 's|phrase-table.gz|phrase-table|g;' $ROOT/mert-work/moses.ini
+
+mv $ROOT/mert-work/moses.ini $ROOT/moses.ini 
+
+### CHANGE ttable-limit from 20 to 0 in $ROOT/moses.ini
+
+### run decoder and filter phrase table for each topic text
+perl pbmt.pl $WORKDIR 50 $WORKDIR/title.en $WORKDIR/title.en.tok $ROOT/model/phrase-table.gz $ROOT/moses.ini $WORKDIR/title_en-fr-trans10.xml $offset 10 >& title_en-fr-trans10-filtered.xml &
+
+==============================================================================
+
+#### QUERY TRANSLATION WITH CLIR
+
+## CLIR Engine is run with following class:
+etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/run.xml --queries_path data/queries.xml 
+ 
+## Options can be specified in xml file, or from command-line, or from both (command-line overrides XML)
+
+ ## Some useful options:
+ 
+ # -translate_only indri: Skip retrieval, only translate the query. Argument (indri or ivory) specifies the output format
+ # -output_path: Specify output file. Default is generated based on parameters.
+
+
+==============================================================================
+
+set MT=cdec 
+OR 
+set MT=moses
+
+### Commands to run English-French CLEF06 experiments
+
+## If MT=moses, define the following for unknown words to be processed correctly
+
+set UNKNOWN1="--unknown data/en-fr.clef06/moses/1.unk"
+set UNKNOWN10="--unknown data/en-fr.clef06/moses/10.unk"
+
+etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-fr.clef06/run_en-fr.interp.xml -queries_path data/en-fr.clef06/$MT/title_en-fr-trans10-filtered.xml $UNKNOWN10 --is_stemming --is_doc_stemmed >& run.en-fr.interp.log
+etc/clir.scripts/trec_eval data/en-fr.clef06/qrels.en-fr.clef06.txt ranking.en-fr.interp_10-30-30-100.txt
+
+etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-fr.clef06/run_en-fr.10best.xml -queries_path data/en-fr.clef06/$MT/title_en-fr-trans10-filtered.xml $UNKNOWN10 --is_stemming --is_doc_stemmed >& run.en-fr.10best.log
+etc/clir.scripts/trec_eval data/en-fr.clef06/qrels.en-fr.clef06.txt ranking.en-fr.10best_10-100-0-100.txt
+
+etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-fr.clef06/run_en-fr.phrase.xml -queries_path data/en-fr.clef06/$MT/title_en-fr-trans10-filtered.xml $UNKNOWN1 --is_stemming --is_doc_stemmed >& run.en-fr.phrase.log
+etc/clir.scripts/trec_eval data/en-fr.clef06/qrels.en-fr.clef06.txt ranking.en-fr.phrase_10-0-0-100.txt
+
+etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-fr.clef06/run_en-fr.1best.xml -queries_path data/en-fr.clef06/$MT/title_en-fr-trans1-filtered.xml $UNKNOWN10 --is_stemming --is_doc_stemmed >& run.en-fr.1best.log
+etc/clir.scripts/trec_eval data/en-fr.clef06/qrels.en-fr.clef06.txt ranking.en-fr.1best_1-100-0-100.txt 
+
+## Current implementation allows two ways to run the token-based CLIR approach: 
+
+## 1) run interpolation mode (query_type=mtN) with token_weight set to 100.
+etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-fr.clef06/run_en-fr.token.xml -queries_path data/en-fr.clef06/$MT/title_en-fr-trans10-filtered.xml >& run.en-fr.token.log
+etc/clir.scripts/trec_eval data/en-fr.clef06/qrels.en-fr.clef06.txt ranking.en-fr.token_10-0-100-100_-1.txt
+
+## 2) run token-based mode (query_type=clir).
+etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-fr.clef06/run_en-fr.token-alt.xml -queries_path data/en-fr.clef06/queries.xml >& run.en-fr.token-alt.log
+etc/clir.scripts/trec_eval data/en-fr.clef06/qrels.en-fr.clef06.txt ranking.en-fr.token_0-0-0-100_-1.txt
+
+etc/junit.sh ivory.regression.coling2012.EnFr_CLEF06 >& log &
+
+==============================================================================
+
+### Commands to run English-Arabic TREC 2002 experiments
+
+## If MT=moses, define the following for unknown words to be processed correctly
+
+set UNKNOWN1="--unknown data/en-ar.trec02/moses/1.unk"
+set UNKNOWN10="--unknown data/en-ar.trec02/moses/10.unk"
+
+etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-ar.trec02/run_en-ar.interp.xml -queries_path data/en-ar.trec02/$MT/title_en-ar-trans10-filtered.xml $UNKNOWN10 --is_stemming --is_doc_stemmed >& run.en-ar.interp.log
+./trec_eval data/en-ar.trec02/qrels.en-ar.trec02.txt ranking.en-ar.interp_10-0-0-100.txt
+
+etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-ar.trec02//run_en-ar.10best.xml -queries_path data/en-ar.trec02/$MT/title_en-ar-trans10-filtered.xml $UNKNOWN10 --is_stemming --is_doc_stemmed >& run.en-ar.10best.log
+ ./trec_eval data/en-ar.trec02/qrels.en-ar.trec02.txt ranking.en-ar.10best_10-100-0-100.txt
+
+etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-ar.trec02//run_en-ar.phrase.xml -queries_path data/en-ar.trec02/$MT/title_en-ar-trans10-filtered.xml $UNKNOWN10 --is_stemming --is_doc_stemmed >& run.en-ar.phrase.log
+./trec_eval data/en-ar.trec02/qrels.en-ar.trec02.txt ranking.en-ar.phrase_10-0-0-100.txt 
+
+etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-ar.trec02/run_en-ar.1best.xml -queries_path data/en-ar.trec02/$MT/title_en-ar-trans1-filtered.xml $UNKNOWN1 --is_stemming --is_doc_stemmed >& run.en-ar.1best.log
+./trec_eval data/en-ar.trec02/qrels.en-ar.trec02.txt ranking.en-ar.1best_1-100-0-100.txt
+
+## current implementation allows two ways to run the token-based CLIR approach: 
+## 1) run interpolation mode (query_type=mtN) with token_weight set to 100.
+etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-ar.trec02/run_en-ar.token.xml -queries_path data/en-ar.trec02/$MT/title_en-ar-trans10-filtered.xml  >& run.en-ar.token.log
+etc/clir.scripts/trec_eval data/en-ar.trec02/qrels.en-ar.trec02.txt ranking.en-ar.token_10-0-100-100_-1.txt 
+
+## 2) run token-based mode (query_type=clir).
+etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-ar.trec02/run_en-ar.token-alt.xml -queries_path data/en-ar.trec02/queries.xml  >& run.en-ar.token-alt.log
+etc/clir.scripts/trec_eval data/en-ar.trec02/qrels.en-ar.trec02.txt ranking.en-ar.token_0-0-0-100_-1.txt 
+
+etc/junit.sh ivory.regression.coling2012.EnAr_TREC02 >& log &
+
+/////////////////////////////////////////////////////////////
+
+### Commands to run English-Chinese NTCIR-8 experiments
+
+## WARNING: Before running NTCIR English-Chinese experiments, please download zh-token.bin from https://github.com/ferhanture/stanford-segmenter-ivory.git and add it to data/tokenizer/.
+
+## If MT=moses, define the following for unknown words to be processed correctly
+
+set UNKNOWN1="--unknown data/en-zh.ntcir8/moses/1.unk"
+set UNKNOWN10="--unknown data/en-zh.ntcir8/moses/10.unk"
+
+etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-zh.ntcir8/run_en-zh.interp.xml -queries_path data/en-zh.ntcir8/$MT/title_en-zh-trans10-filtered.xml $UNKNOWN10 --is_stemming --is_doc_stemmed >& run.en-zh.interp.log
+./trec_eval data/en-zh.ntcir8/qrels.en-zh.ntcir8.txt ranking.en-zh.interp_10-20-10-100.txt
+
+etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-zh.ntcir8/run_en-zh.10best.xml -queries_path data/en-zh.ntcir8/$MT/title_en-zh-trans10-filtered.xml $UNKNOWN10 --is_stemming --is_doc_stemmed >& run.en-zh.10best.log 
+./trec_eval data/en-zh.ntcir8/qrels.en-zh.ntcir8.txt ranking.en-zh.10best_10-100-0-100.txt
+
+etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-zh.ntcir8/run_en-zh.phrase.xml -queries_path data/en-zh.ntcir8/$MT/title_en-zh-trans10-filtered.xml $UNKNOWN10 --is_stemming --is_doc_stemmed >& run.en-zh.phrase.log
+./trec_eval data/en-zh.ntcir8/qrels.en-zh.ntcir8.txt ranking.en-zh.phrase_10-0-0-100.txt
+
+etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-zh.ntcir8/run_en-zh.1best.xml -queries_path data/en-zh.ntcir8/$MT/title_en-zh-trans1-filtered.xml $UNKNOWN1 --is_stemming --is_doc_stemmed >& run.en-zh.1best.log
+./trec_eval data/en-zh.ntcir8/qrels.en-zh.ntcir8.txt ranking.en-zh.1best_1-100-0-100.txt
+
+## current implementation allows two ways to run the token-based CLIR approach: 
+## 1) run interpolation mode (query_type=mtN) with token_weight set to 100.
+etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-zh.ntcir8/run_en-zh.token.xml -queries_path data/en-zh.ntcir8/$MT/title_en-zh-trans10-filtered.xml >& run.en-zh.token.log
+etc/clir.scripts/trec_eval data/en-zh.ntcir8/qrels.en-zh.ntcir8.txt ranking.en-zh.token_10-0-100-100_-1.txt
+
+## 2) run token-based mode (query_type=clir).
+etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-zh.ntcir8/run_en-zh.token-alt.xml -queries_path data/en-zh.ntcir8/queries.en-zh.ntcir8.xml >& run.en-zh.token-alt.log
+etc/clir.scripts/trec_eval data/en-zh.ntcir8/qrels.en-zh.ntcir8.txt ranking.en-zh.token_0-0-0-100_-1.txt 
+
+etc/junit.sh ivory.regression.coling2012.EnZh_NTCIR8 >& log &

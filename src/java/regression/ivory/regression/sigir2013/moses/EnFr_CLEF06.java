@@ -96,7 +96,7 @@ public class EnFr_CLEF06 {
     /////// baseline-token
     Configuration conf = RunQueryEngine.parseArgs(new String[] {
         "--xml", "data/" + PATH + "/run_en-" + LANGUAGE + ".token.xml",
-        "--queries_path", "data/" + PATH + "/moses/title_en-" + LANGUAGE + "-trans10-filtered.xml", "--one2many", heuristic + "", 
+        "--queries_path", "data/" + PATH + "/moses/title_en-" + LANGUAGE + "-trans10-filtered.xml", "--one2many", heuristic + "", "--is_stemming", "--is_doc_stemmed", 
         "--unknown", "data/" + PATH + "/moses/10.unk"});
     FileSystem fs = FileSystem.getLocal(conf);
         
@@ -110,7 +110,7 @@ public class EnFr_CLEF06 {
 
     conf = RunQueryEngine.parseArgs(new String[] {
         "--xml", "data/" + PATH + "/run_en-" + LANGUAGE + ".1best.xml",
-        "--queries_path", "data/" + PATH + "/moses/title_en-" + LANGUAGE + "-trans1-filtered.xml", "--one2many", heuristic + "",
+        "--queries_path", "data/" + PATH + "/moses/title_en-" + LANGUAGE + "-trans1-filtered.xml", "--one2many", heuristic + "", "--is_stemming", "--is_doc_stemmed",
         "--unknown", "data/" + PATH + "/moses/1.unk"});
 
     qe.init(conf, fs);
@@ -120,7 +120,7 @@ public class EnFr_CLEF06 {
 
     conf = RunQueryEngine.parseArgs(new String[] {
         "--xml", "data/" + PATH + "/run_en-" + LANGUAGE + ".grammar.xml",
-        "--queries_path", "data/" + PATH + "/moses/title_en-" + LANGUAGE + "-trans10-filtered.xml", "--one2many", heuristic + "",
+        "--queries_path", "data/" + PATH + "/moses/title_en-" + LANGUAGE + "-trans10-filtered.xml", "--one2many", heuristic + "", "--is_stemming", "--is_doc_stemmed",
         "--unknown", "data/" + PATH + "/moses/10.unk"});
 
     qe.init(conf, fs);
@@ -130,7 +130,7 @@ public class EnFr_CLEF06 {
 
     conf = RunQueryEngine.parseArgs(new String[] {
         "--xml", "data/" + PATH + "/run_en-" + LANGUAGE + ".10best.xml",
-        "--queries_path", "data/" + PATH + "/moses/title_en-" + LANGUAGE + "-trans10-filtered.xml", "--one2many", heuristic + "",
+        "--queries_path", "data/" + PATH + "/moses/title_en-" + LANGUAGE + "-trans10-filtered.xml", "--one2many", heuristic + "", "--is_stemming", "--is_doc_stemmed",
         "--unknown", "data/" + PATH + "/moses/10.unk"});
 
     qe.init(conf, fs);
@@ -140,7 +140,7 @@ public class EnFr_CLEF06 {
 
     conf = RunQueryEngine.parseArgs(new String[] {
         "--xml", "data/"+ PATH + "/run_en-" + LANGUAGE + ".interp.xml",
-        "--queries_path", "data/" + PATH + "/moses/title_en-" + LANGUAGE + "-trans10-filtered.xml", "--one2many", heuristic + "",
+        "--queries_path", "data/" + PATH + "/moses/title_en-" + LANGUAGE + "-trans10-filtered.xml", "--one2many", heuristic + "", "--is_stemming", "--is_doc_stemmed",
         "--unknown", "data/" + PATH + "/moses/10.unk"});
 
     qe.init(conf, fs);

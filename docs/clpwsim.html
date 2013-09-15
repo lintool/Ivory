@@ -71,15 +71,6 @@
 <h4>A step-by-step tutorial for German and English Wikipedia</h4>
 </div>
 
-<!-- last time these instructions were run:
-
-commit ea06ae441257566a2637625df82674b8f1452655
-Merge: 6dff282 63e7e88
-Author: lintool <jimmylin@umd.edu>
-Date:   Thu Jun 13 03:25:01 2013 -0400
-
--->
-
 <p>Ivory can perform cross-lingual pairwise similarity on large collections. The
 underlying scalable approach is implemented as a two-phase pipeline.
 The first phase was introduced in Ture et al.'s SIGIR'11 paper 
@@ -112,32 +103,15 @@ Arabic, Czech, and Turkish. Everything should work out of the box for these lang
 <h3>1. Downloading Wikipedia</h3>
 
 <p>Wikipedia articles can be downloaded in XML format from
-<a href="http://wikipedia.c3sl.ufpr.br/">here</a>. Wikipedia is offered in many languages,
+<a href="http://dumps.wikimedia.org/enwiki/">here</a>. Wikipedia is offered in many languages,
 and you can download the content in different granularities. However, we only need the main 
 article content to run our algorithm.</p> 
 
-<p>Let's download and unpack German and English Wikipedia collections to our local
-machine:</p>
-
-<pre class="code">
-wget http://wikipedia.c3sl.ufpr.br/dewiki/20121215/dewiki-20121215-pages-articles.xml.bz2
-bunzip2 dewiki-20121215-pages-articles.xml.bz2
-wget http://wikipedia.c3sl.ufpr.br/enwiki/20121201/enwiki-20121201-pages-articles.xml.bz2
-bunzip2 enwiki-20121201-pages-articles.xml.bz2
-</pre>
-
-<table><tr><td valign="top"><span class="label label-info">Tip</span></td>
-<td style="padding-left: 10px">
-It might be a good idea to compare the MD5 checksums of the downloaded files to the values 
-<a href="http://wikipedia.c3sl.ufpr.br/enwiki/20121201/enwiki-20121201-md5sums.txt">here</a>
-and <a href="http://wikipedia.c3sl.ufpr.br/dewiki/20121215/dewiki-20121215-md5sums.txt">here</a>
-before moving further.
-<p>
-</td>
-</tr>
-</table>
-
-<p>A peek into these files should reveal Wikipedia's XML format:</p>
+<p>This is built around
+the <code>dewiki-20121215-pages-articles.xml.bz2</code> dump of German
+Wikipedia and the <code>enwiki-20121201-pages-articles.xml.bz2</code>
+dump of English Wikipedia. Download an uncompresse those files. A peek
+into these files should reveal Wikipedia's XML format:</p>
 
 <pre class="code">
 $ less dewiki-20121215-pages-articles.xml
@@ -156,7 +130,7 @@ $ less dewiki-20121215-pages-articles.xml
 <p>Now, we are ready to transfer the XML-formatted collections to HDFS:</p>
 
 <pre class="code">
-hdfs dfs -put *wiki*pages-articles.xml $wiki/raw/
+$ hdfs dfs -put *wiki*pages-articles.xml $wiki/raw/
 </pre>
 
 <h3>2. Preprocessing Wikipedia</h3>
@@ -169,14 +143,14 @@ each document as a vector of term weights.</p>
 to HDFS for tokenizers to load:</p>
 
 <pre class="code">
-hdfs dfs -mkdir wikidata
-hdfs dfs -mkdir wikidata/token
-hdfs dfs -put data/tokenizer/*de*stop* wikidata/token/
-hdfs dfs -put data/tokenizer/*en*stop* wikidata/token/
-hdfs dfs -put data/tokenizer/de-token.bin wikidata/token/
-hdfs dfs -put data/tokenizer/en-token.bin wikidata/token/
-hdfs dfs -put data/vocab/*de-en* wikidata/
-hdfs dfs -put data/vocab/*en-de* wikidata/
+$ hdfs dfs -mkdir wikidata
+$ hdfs dfs -mkdir wikidata/token
+$ hdfs dfs -put data/tokenizer/*de*stop* wikidata/token/
+$ hdfs dfs -put data/tokenizer/*en*stop* wikidata/token/
+$ hdfs dfs -put data/tokenizer/de-token.bin wikidata/token/
+$ hdfs dfs -put data/tokenizer/en-token.bin wikidata/token/
+$ hdfs dfs -put data/vocab/*de-en* wikidata/
+$ hdfs dfs -put data/vocab/*en-de* wikidata/
 </pre>
 
 <table><tr><td valign="top"><span class="label label-info">Tip</span></td>
@@ -198,38 +172,16 @@ are available on some HDFS data directory. These can be generated using
 the <a href="hooka.html">Hooka word alignment toolkit</a> 
 (also supports conversion from GIZA++ or BerkeleyAligner).</p>
 
-<p>This should be how your HDFS directory looks like at this step:</p>
-<pre class="code">
-$ hdfs dfs -ls wikidata/
-Found 7 items
-drwxr-xr-x   - jimmylin supergroup          0 2013-06-13 03:31 wikidata/token
--rw-r--r--   3 jimmylin supergroup    3929563 2013-06-13 03:31 wikidata/ttable.de-en
--rw-r--r--   3 jimmylin supergroup    2059694 2013-06-13 03:31 wikidata/ttable.en-de
--rw-r--r--   3 jimmylin supergroup    2728544 2013-06-13 03:31 wikidata/vocab.de-en.de
--rw-r--r--   3 jimmylin supergroup     662751 2013-06-13 03:31 wikidata/vocab.de-en.en
--rw-r--r--   3 jimmylin supergroup    1336552 2013-06-13 03:31 wikidata/vocab.en-de.de
--rw-r--r--   3 jimmylin supergroup     754025 2013-06-13 03:31 wikidata/vocab.en-de.en
-
-$ hdfs dfs -ls wikidata/token
-Found 6 items
--rw-r--r--   3 jimmylin supergroup     851682 2013-06-13 03:30 wikidata/token/de-token.bin
--rw-r--r--   3 jimmylin supergroup       1349 2013-06-13 03:30 wikidata/token/de.stop
--rw-r--r--   3 jimmylin supergroup        685 2013-06-13 03:30 wikidata/token/de.stop.stemmed
--rw-r--r--   3 jimmylin supergroup     439890 2013-06-13 03:31 wikidata/token/en-token.bin
--rw-r--r--   3 jimmylin supergroup       5301 2013-06-13 03:30 wikidata/token/en.stop
--rw-r--r--   3 jimmylin supergroup       3685 2013-06-13 03:30 wikidata/token/en.stop.stemmed
-</pre>
-
 <p>Now we are ready to run the preprocessing pipeline. The first run is
 for the English Wikipedia collection:</p>
 
 <pre class="code">
-nohup etc/hadoop-cluster.sh ivory.app.PreprocessWikipedia \
- -mode=crosslingE -xml=/shared/collections/wikipedia/raw/enwiki-20121201-pages-articles \
- -compressed=pwsim.enwiki.compressed -index=pwsim.enwiki.index -lang=en \
- -tokenizermodel=wikidata/token/en-token.bin \
- -collectionvocab=wikidata/vocab.de-en.en \
- -e_stopword=wikidata/token/en.stop >& pwsim.en.log &
+$ nohup etc/hadoop-cluster.sh ivory.app.PreprocessWikipedia \
+   -mode=crosslingE -xml=/shared/collections/wikipedia/raw/enwiki-20121201-pages-articles \
+   -compressed=pwsim.enwiki.compressed -index=pwsim.enwiki.index -lang=en \
+   -tokenizermodel=wikidata/token/en-token.bin \
+   -collectionvocab=wikidata/vocab.de-en.en \
+   -e_stopword=wikidata/token/en.stop >& pwsim.en.log &
 </pre>
 
 <table><tr><td valign="top"><span class="label label-info">Warning</span></td>
@@ -245,20 +197,20 @@ running, remove or change them before running the above.
 <p>Next, we preprocess and translate German Wikipedia articles:</p>
 
 <pre class="code">
-nohup etc/hadoop-cluster.sh ivory.app.PreprocessWikipedia \
- -mode=crosslingF -xml=/shared/collections/wikipedia/raw/dewiki-20121215-pages-articles.xml \
- -compressed=pwsim.dewiki.compressed -index=pwsim.dewiki.index -targetindex=pwsim.enwiki.index \
- -lang=de -target_lang=en \
- -tokenizermodel=wikidata/token/de-token.bin \
- -e_tokenizermodel=wikidata/token/en-token.bin \
- -f_f2e_vocab=wikidata/vocab.de-en.de \
- -e_f2e_vocab=wikidata/vocab.de-en.en \
- -f2e_ttable=wikidata/ttable.de-en \
- -e_e2f_vocab=wikidata/vocab.en-de.en \
- -f_e2f_vocab=wikidata/vocab.en-de.de \
- -e2f_ttable=wikidata/ttable.en-de \
- -e_stopword=wikidata/token/en.stop \
- -f_stopword=wikidata/token/de.stop >& pwsim.de.log &
+$ nohup etc/hadoop-cluster.sh ivory.app.PreprocessWikipedia \
+   -mode=crosslingF -xml=/shared/collections/wikipedia/raw/dewiki-20121215-pages-articles.xml \
+   -compressed=pwsim.dewiki.compressed -index=pwsim.dewiki.index -targetindex=pwsim.enwiki.index \
+   -lang=de -target_lang=en \
+   -tokenizermodel=wikidata/token/de-token.bin \
+   -e_tokenizermodel=wikidata/token/en-token.bin \
+   -f_f2e_vocab=wikidata/vocab.de-en.de \
+   -e_f2e_vocab=wikidata/vocab.de-en.en \
+   -f2e_ttable=wikidata/ttable.de-en \
+   -e_e2f_vocab=wikidata/vocab.en-de.en \
+   -f_e2f_vocab=wikidata/vocab.en-de.de \
+   -e2f_ttable=wikidata/ttable.en-de \
+   -e_stopword=wikidata/token/en.stop \
+   -f_stopword=wikidata/token/de.stop >& pwsim.de.log &
 </pre>
 
 <p>The log output of this program should gives various statistics, such as 
@@ -266,43 +218,41 @@ the number of documents, terms, tokens in the collection. Let's do a sanity
 check to make sure everything ran correctly:</p>
 
 <pre class="code">
-$ grep -P 'TOTAL=|ARTICLE=|OTHER=|SumOfDocLengths=|Terms=|TransDf=|SHORT=|ZERO=|Total=|VOCAB SIZE|TransDf|DISAMB' pwsim.en.log | uniq
+$ grep -P 'TOTAL=|ARTICLE=|OTHER=|SumOfDocLengths=|Terms=|SHORT=|ZERO=|Total=|DISAMB' pwsim.en.log | uniq
 ARTICLE=4033137
 DISAMBIGUATION=123666
 NON_ARTICLE=2899446
 OTHER=138350
 TOTAL=12961996
-SumOfDocLengths=970609403
+SumOfDocLengths=1014925528
 Total=4033137
-SumOfDocLengths=970609403
-Terms=39431
-Total=39431
-SHORT=28619
-Total=4004410
-ZERO=108
-Total=4004410
-VOCAB SIZE 71644
+SumOfDocLengths=1014925528
+Terms=56893
+Total=56893
+SHORT=24170
+Total=4008884
+ZERO=83
+Total=4008884
 </pre>
 
-<p>You should see the <i>exact</i> same numbers in your log output.</p>
+<p>You should see the same numbers in your log output.</p>
 
 <pre class="code">
-$ grep -P 'TOTAL=|ARTICLE=|OTHER=|SumOfDocLengths=|Terms=|TransDf=|SHORT=|ZERO=|Total=|VOCAB SIZE|TransDf|DISAMB' pwsim.de.log | uniq
+$ grep -P 'TOTAL=|ARTICLE=|OTHER=|SumOfDocLengths=|Terms=|SHORT=|ZERO=|Total=|DISAMB' pwsim.de.log | uniq
 ARTICLE=1326111
 DISAMBIGUATION=174678
 NON_ARTICLE=450258
 OTHER=35564
 TOTAL=3001626
-SumOfDocLengths=328525410
+SumOfDocLengths=355374189
 Total=1326111
-SumOfDocLengths=328525410
-Terms=115368
-Total=115368
-SHORT=1183
-Total=1324902
-ZERO=7
-Total=1324902
-VOCAB SIZE 71644
+SumOfDocLengths=355374189
+Terms=168447
+Total=168447
+SHORT=486
+Total=1325619
+ZERO=6
+Total=1325619
 </pre>
 
 
@@ -322,20 +272,20 @@ the document vector) and efficiency (i.e., time to compute similarity between tw
 as we vary the number. We'll use 1000 bits in this tutorial:</p>
 
 <pre class="code">
-etc/hadoop-cluster.sh ivory.lsh.driver.RunComputeSignatures -index=pwsim.dewiki.index -num_bits=1000 -type=random
+$ etc/hadoop-cluster.sh ivory.lsh.driver.RunComputeSignatures -index=pwsim.dewiki.index -num_bits=1000 -type=random
 </pre>
 
 <p>Since this process is based on 1000 randomly generated unit vectors, we need to use the same vectors when 
 running this process for the English side. That's why we copy the random vectors over first:</p>
 
 <pre class="code">
-hdfs dfs -cp pwsim.dewiki.index/randomvectors_D=1000/ pwsim.enwiki.index/
+$ hdfs dfs -cp pwsim.dewiki.index/randomvectors_D=1000/ pwsim.enwiki.index/
 </pre>
 
 <p>And then run signature generation:</p>
 
 <pre class="code">
-etc/hadoop-cluster.sh ivory.lsh.driver.RunComputeSignatures -index=pwsim.enwiki.index -num_bits=1000 -type=random
+$ etc/hadoop-cluster.sh ivory.lsh.driver.RunComputeSignatures -index=pwsim.enwiki.index -num_bits=1000 -type=random
 </pre>
 
 As a result of these jobs, you should see a <code>signatures-random_D=1000</code> folder under each index directory.
@@ -357,11 +307,13 @@ table to its neighbors that are at most <code>B</code> positions away.
 </p> 
 
 <pre class="code">
-nohup etc/hadoop-cluster.sh ivory.lsh.pwsim.GenerateChunkedPermutedTables \
- -sourceindex=pwsim.dewiki.index -index=pwsim.enwiki.index -num_bits=1000 -type=random -Q=300 -overlap=10000 -B=2000 >& chunking.log &
+$ nohup etc/hadoop-cluster.sh ivory.lsh.pwsim.GenerateChunkedPermutedTables \
+   -sourceindex=pwsim.dewiki.index -index=pwsim.enwiki.index -num_bits=1000 \
+   -type=random -Q=300 -overlap=10000 -B=2000 >& chunking.log &
 
-nohup etc/hadoop-cluster.sh ivory.lsh.pwsim.cl.CLSlidingWindowPwsim \
- -index=pwsim.enwiki.index -num_bits=1000 -type=random -Q=300 -overlap=10000 -B=2000 -T=400 >& windowing.log &
+$ nohup etc/hadoop-cluster.sh ivory.lsh.pwsim.cl.CLSlidingWindowPwsim \
+    -index=pwsim.enwiki.index -num_bits=1000 -type=random -Q=300 \
+    -overlap=10000 -B=2000 -T=400 >& windowing.log &
 </pre>
 
 <table><tr><td valign="top"><span class="label label-info">Info</span></td>
@@ -377,7 +329,7 @@ to be at least as large as <code>B</code>.
 </table>
 
 These two jobs may take a while to finish (e.g., few hours on a 128-core cluster), but if everything runs smoothly, 
-you should see the output written to <code>$edir/similardocs_random_maxdst=400_D=1000_Q=300_B=2000</code>. 
+you should see the output written to <code>pwsim.enwiki.index/similardocs_random_maxdst=400_D=1000_Q=300_B=2000</code>. 
 The number of similar article pairs output by the algorithm will vary from run to run due to the randomized nature, 
 but you should see tens of millions of German-English article pairs output (see counter <code>Reduce output records</code>) 
 in the log output of <code>ivory.lsh.pwsim.cl.CLSlidingWindowPwsim</code>.
@@ -390,7 +342,8 @@ First, we'll sample about 1000 German Wikipedia articles for this evaluation:
 </p>
 
 <pre class="code">
-etc/hadoop-cluster.sh ivory.lsh.eval.SampleIntDocVectors -index=pwsim.dewiki.index -size=1000 -docnos=pwsim.dewiki.index/sample-docnos
+$ etc/hadoop-cluster.sh ivory.lsh.eval.SampleIntDocVectors \
+   -index=pwsim.dewiki.index -size=1000 -docnos=pwsim.dewiki.index/sample-docnos
 </pre>
 
 <p>
@@ -399,7 +352,7 @@ whereas the docnos identifying this sampled subset should be written to <code>pw
 sanity check on that file, making sure that the following returns a number close to 1000 (not exactly due to random sampling):
 
 <pre class="code">
-hdfs dfs -cat pwsim.dewiki.index/sample-docnos | wc -l
+$ hdfs dfs -cat pwsim.dewiki.index/sample-docnos | wc -l
 </pre>
 
 <p>
@@ -407,10 +360,10 @@ Next, we can filter the similar article pairs that do not appear in this sample:
 </p>
 
 <pre class="code">
-etc/hadoop-cluster.sh ivory.lsh.eval.FilterResults \
- -input=pwsim.enwiki.index/similardocs_random_maxdst=400_D=1000_Q=300_B=2000 \
- -output=pwsim.enwiki.index/similardocs_random_maxdst=400_D=1000_Q=300_B=2000-filtered \
- -docnos=pwsim.dewiki.index/sample-docnos
+$ etc/hadoop-cluster.sh ivory.lsh.eval.FilterResults \
+   -input=pwsim.enwiki.index/similardocs_random_maxdst=400_D=1000_Q=300_B=2000 \
+   -output=pwsim.enwiki.index/similardocs_random_maxdst=400_D=1000_Q=300_B=2000-filtered \
+   -docnos=pwsim.dewiki.index/sample-docnos
 </pre>
 
 <p>Notice that the number of similar pairs was filtered down from tens of millions to tens of thousands.
@@ -418,11 +371,11 @@ We can compute comparable output using a brute-force approach (i.e., compare eac
 Wikipedia to all document vectors of English Wikipedia):</p>
 
 <pre class="code">
-etc/hadoop-cluster.sh ivory.lsh.eval.BruteForcePwsim \
- -input=pwsim.enwiki.index/wt-int-doc-vectors \
- -sample=pwsim.dewiki.index/wt-int-doc-vectors_sample=1000/part-00000 \
- -output=pwsim.enwiki.index/groundtruth_T=0.3 \
- -cosineT=0.3 -type=intdocvector
+$ etc/hadoop-cluster.sh ivory.lsh.eval.BruteForcePwsim \
+   -input=pwsim.enwiki.index/wt-int-doc-vectors \
+   -sample=pwsim.dewiki.index/wt-int-doc-vectors_sample=1000/part-00000 \
+   -output=pwsim.enwiki.index/groundtruth_T=0.3 \
+   -cosineT=0.3 -type=intdocvector
 </pre>
 
 <p>
@@ -440,10 +393,10 @@ with respect to the ground truth:
 </p>
 
 <pre class="code">
-hadoop dfs -get pwsim.enwiki.index/similardocs_random_maxdst=400_D=1000_Q=300_B=2000-filtered/part-00000 ./pwsim-filtered_400-1000-300-2000
-hadoop dfs -get pwsim.enwiki.index/groundtruth_T=0.3/part-00000 ./ground_0.3
-cd etc/
-perl eval.pl ../ground_0.3 ../pwsim-filtered_400-1000-300-2000 
+$ hadoop dfs -get pwsim.enwiki.index/similardocs_random_maxdst=400_D=1000_Q=300_B=2000-filtered/part-00000 ../pwsim-filtered_400-1000-300-2000
+$ hadoop dfs -get pwsim.enwiki.index/groundtruth_T=0.3/part-00000 ./ground_0.3
+$ cd etc/
+$ perl eval.pl ../ground_0.3 ../pwsim-filtered_400-1000-300-2000 
 </pre>
 
 <p>
@@ -452,20 +405,20 @@ us to measure the error due to the sliding window algorithm in isolation. For th
 </p>
 
 <pre class="code">
-etc/hadoop-cluster.sh ivory.lsh.eval.SampleSignatures \
- pwsim.dewiki.index/signatures-random_D=1000 \
- pwsim.dewiki.index/signatures-random_D=1000_sample=1000 \
- random -1 pwsim.dewiki.index/sample-docnos
+$ etc/hadoop-cluster.sh ivory.lsh.eval.SampleSignatures \
+    pwsim.dewiki.index/signatures-random_D=1000 \
+    pwsim.dewiki.index/signatures-random_D=1000_sample=1000 \
+    random -1 pwsim.dewiki.index/sample-docnos
 </pre>
 
-Now, we can run the same brute-force program to output pairs based on Hamming distance (as opposed to true cosine similarity):
+<p>Now, we can run the same brute-force program to output pairs based on Hamming distance (as opposed to true cosine similarity):</p>
 
 <pre class="code">
-etc/hadoop-cluster.sh ivory.lsh.eval.BruteForcePwsim \
- -input=pwsim.enwiki.index/signatures-random_D=1000 \
- -sample=pwsim.dewiki.index/signatures-random_D=1000_sample=1000/part-00000 \
- -output=pwsim.enwiki.index/upperbound_maxdst=400 \
- -cosineT=400 -type=signature
+$ etc/hadoop-cluster.sh ivory.lsh.eval.BruteForcePwsim \
+    -input=pwsim.enwiki.index/signatures-random_D=1000 \
+    -sample=pwsim.dewiki.index/signatures-random_D=1000_sample=1000/part-00000 \
+    -output=pwsim.enwiki.index/upperbound_maxdst=400 \
+    -cosineT=400 -type=signature
 </pre>
 
 <p>
@@ -474,9 +427,9 @@ with respect to this upperbound:
 </p>
 
 <pre class="code">
-hadoop dfs -get pwsim.enwiki.index/upperbound_maxdst=400/part-00000 ./upper_400
-cd etc/
-perl eval.pl ../upper_400 ../pwsim-filtered_400-1000-300-2000
+$ hadoop dfs -get pwsim.enwiki.index/upperbound_maxdst=400/part-00000 ./upper_400
+$ cd etc/
+$ perl eval.pl ../upper_400 ../pwsim-filtered_400-1000-300-2000
 </pre>
 
 <p>
@@ -490,39 +443,37 @@ into a single file for easy loading:
 </p>
 
 <pre class="code">
-hdfs dfs -mkdir pwsim.results
-etc/hadoop-cluster.sh edu.umd.cloud9.util.CombineSequenceFiles \
- pwsim.enwiki.index/similardocs_random_maxdst=400_D=1000_Q=300_B=2000 \
- pwsim.results/similardocs_random_maxdst=400_D=1000_Q=300_B=2000.single \
- 100 1 edu.umd.cloud9.io.pair.PairOfInts org.apache.hadoop.io.IntWritable sequence
+$ etc/hadoop-cluster.sh edu.umd.cloud9.util.CombineSequenceFiles \
+    pwsim.enwiki.index/similardocs_random_maxdst=400_D=1000_Q=300_B=2000 \
+    pwsim.results/similardocs_random_maxdst=400_D=1000_Q=300_B=2000.single \
+    100 1 edu.umd.cloud9.io.pair.PairOfInts org.apache.hadoop.io.IntWritable sequence
 </pre>
 
 <p>Now, we can convert the docno-based output format to title pairs:</p>
+
 <pre class="code">
-etc/hadoop-cluster.sh ivory.lsh.eval.Docnos2Titles \
- -pwsim_output=pwsim.results/similardocs_random_maxdst=400_D=1000_Q=300_B=2000.single/part-00000 \
- -output=pwsim.results/similardocs_random_maxdst=400_D=1000_Q=300_B=2000-filtered.titles \
- -e_collection=pwsim.enwiki.compressed \
- -f_collection=pwsim.dewiki.compressed \
- -f_lang=de -e_lang=en -docnos=pwsim.dewiki.index/sample-docnos
+$ etc/hadoop-cluster.sh ivory.lsh.eval.Docnos2Titles \
+    -pwsim_output=pwsim.results/similardocs_random_maxdst=400_D=1000_Q=300_B=2000.single/part-00000 \
+    -output=pwsim.results/similardocs_random_maxdst=400_D=1000_Q=300_B=2000-filtered.titles \
+    -e_collection=pwsim.enwiki.compressed -f_collection=pwsim.dewiki.compressed \
+    -f_lang=de -e_lang=en -docnos=pwsim.dewiki.index/sample-docnos
 </pre>
 
 <p>Once the job completes, we can check out some of the similar Wikipedia titles:</p>
 
 <pre class="code">
-hdfs dfs -cat pwsim.results/similardocs_random_maxdst=400_D=1000_Q=300_B=2000-filtered.titles/part-00000 | less
+$ hdfs dfs -cat pwsim.results/similardocs_random_maxdst=400_D=1000_Q=300_B=2000-filtered.titles/part-00000 | less
 </pre>
 
 <p>Although most of the pairs should be about relevant topics, you'll probably notice that some of the pairs 
 look wrong. This is expected, and may be due to several reasons, analyzed in more detail 
 in <a href="publications/Ture_etal_SIGIR2011.pdf">Ture et al's SIGIR'11 paper</a>.</p>
 
-Congratulations! You have completed the first phase of our cross-language similarity pipeline. 
+<p>Congratulations! You have completed the first phase of our cross-language similarity pipeline. 
 In the next phase, we show <a href="bitext-tutorial.html">how to find parallel sentence pairs</a> 
 from the output of this phase. For any further questions and comments, feel free to 
-contact <a href="mailto:ferhan.ture@gmail.com">Ferhan Ture</a>.
-<p>
-<p>
+contact <a href="mailto:ferhan.ture@gmail.com">Ferhan Ture</a>.</p>
+
   </div>
 
 

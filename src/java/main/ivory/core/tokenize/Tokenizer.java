@@ -25,6 +25,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.Map;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
@@ -40,6 +41,7 @@ import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import edu.umd.hooka.VocabularyWritable;
+import java.lang.UnsupportedOperationException;
 
 public abstract class Tokenizer {
   private static final Logger LOG = Logger.getLogger(Tokenizer.class);
@@ -49,6 +51,15 @@ public abstract class Tokenizer {
   public abstract void configure(Configuration conf);
   public abstract void configure(Configuration conf, FileSystem fs);
   public abstract String[] processContent(String text);
+  
+  /*
+   A method to create a mapping from stemmed version of each token to non-stemmed version. Useful in IR tasks where we want to recover non-stemmed version.
+   Implemented in some sub-classes.
+   */
+  public Map<String, String> getStem2NonStemMapping(String text) {
+    throw new UnsupportedOperationException();
+  }
+  
   protected static String delims = "`~!@#^&*()-_=+]}[{\\|'\";:/?.>,<";
   protected static int MIN_LENGTH = 2, MAX_LENGTH = 50;
   protected VocabularyWritable vocab;
@@ -335,6 +346,7 @@ public abstract class Tokenizer {
       out.close();
 
     } catch (Exception exp) {
+      System.out.println(exp);
       HelpFormatter formatter = new HelpFormatter();
       formatter.printHelp( "Tokenizer", options );
       System.exit(-1);   

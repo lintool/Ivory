@@ -1,5 +1,4 @@
 <parameters>
-
      <run>en-zh.token</run>
      <query_type>mtN</query_type>
      <index>/scratch0/indexes/clir/ntcir_xin.zh_02-05.index</index>
@@ -19,5 +18,6 @@
      <phrase_weight>0</phrase_weight>
      <kBest>10</kBest>
      <query_stemmed_stopwordlist>data/tokenizer/en.stop.stemmed</query_stemmed_stopwordlist>
+
 
 </parameters>

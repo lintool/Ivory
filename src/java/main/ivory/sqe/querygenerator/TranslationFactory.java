@@ -15,11 +15,11 @@ public class TranslationFactory {
   private static final Logger LOG = Logger.getLogger(TranslationFactory.class);
 
   public static Translation readTranslationsFromNBest(String queryRepresentation, float alpha, Set<String> unknownWords, 
-      Tokenizer queryLangTokenizer, Tokenizer queryLangTokenizerWithStemming, Tokenizer docLangTokenizer, Configuration conf) {
+      Tokenizer queryLangTokenizer, Tokenizer docLangTokenizer, Configuration conf) {
     String[] arr = queryRepresentation.trim().split("\\|\\|\\|\\|");
     String origQuery = arr[0];
 
-    Map<String,String> stemmed2Stemmed = Utils.getStemMapping(origQuery, queryLangTokenizer, queryLangTokenizerWithStemming, docLangTokenizer);
+    Map<String,String> stemmed2Stemmed = Utils.getStemMapping(origQuery, queryLangTokenizer, docLangTokenizer);
 
     int n = arr.length - 1;
     if (n <= 0) {
@@ -59,7 +59,7 @@ public class TranslationFactory {
       for (int i = 1; i < line.length; i++) {
         try {
           Utils.processRule(one2many, isPhrase, transProbs[k], line[i], bagOfTargetTokens, token2tokenDist, phraseDist, srcTokenCnt, 
-              queryLangTokenizerWithStemming, docLangTokenizer, stemmed2Stemmed, unknownWords);
+              queryLangTokenizer, docLangTokenizer, stemmed2Stemmed, unknownWords);
         } catch (Exception e) {
           e.printStackTrace();
           LOG.info("Error while processing rule: " + line[i]);

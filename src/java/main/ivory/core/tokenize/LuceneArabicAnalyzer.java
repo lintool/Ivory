@@ -80,7 +80,6 @@ public class LuceneArabicAnalyzer extends ivory.core.tokenize.Tokenizer {
     return stemmedTokenized.split(" ");
   }
 
-
   @Override
   public String stem(String token) {
     tokenizer = new StandardTokenizer(Version.LUCENE_35, new StringReader(token));

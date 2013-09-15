@@ -1,0 +1,52 @@
+<parameters>
+<query id="301" grammar="data/en-fr.clef06/cdec.grammar/grammar.0">Nestlé Brands</query>
+<query id="302" grammar="data/en-fr.clef06/cdec.grammar/grammar.1">Consumer Boycotts</query>
+<query id="311" grammar="data/en-fr.clef06/cdec.grammar/grammar.10">Unemployment in Europe</query>
+<query id="312" grammar="data/en-fr.clef06/cdec.grammar/grammar.11">Dog Attacks</query>
+<query id="313" grammar="data/en-fr.clef06/cdec.grammar/grammar.12">Centenary Celebrations</query>
+<query id="314" grammar="data/en-fr.clef06/cdec.grammar/grammar.13">Endangered Species</query>
+<query id="315" grammar="data/en-fr.clef06/cdec.grammar/grammar.14">Doping in Sports</query>
+<query id="316" grammar="data/en-fr.clef06/cdec.grammar/grammar.15">Strikes</query>
+<query id="317" grammar="data/en-fr.clef06/cdec.grammar/grammar.16">Anti-cancer Drugs</query>
+<query id="318" grammar="data/en-fr.clef06/cdec.grammar/grammar.17">Sex Education</query>
+<query id="319" grammar="data/en-fr.clef06/cdec.grammar/grammar.18">Global Opium Production</query>
+<query id="320" grammar="data/en-fr.clef06/cdec.grammar/grammar.19">Energy Crises</query>
+<query id="303" grammar="data/en-fr.clef06/cdec.grammar/grammar.2">Italian paintings</query>
+<query id="321" grammar="data/en-fr.clef06/cdec.grammar/grammar.20">The Talibans in Afghanistan</query>
+<query id="322" grammar="data/en-fr.clef06/cdec.grammar/grammar.21">Atomic Energy</query>
+<query id="323" grammar="data/en-fr.clef06/cdec.grammar/grammar.22">Tightening Visa Requirements</query>
+<query id="324" grammar="data/en-fr.clef06/cdec.grammar/grammar.23">Supermodels</query>
+<query id="325" grammar="data/en-fr.clef06/cdec.grammar/grammar.24">Student Fees</query>
+<query id="326" grammar="data/en-fr.clef06/cdec.grammar/grammar.25">Emmy International Awards</query>
+<query id="327" grammar="data/en-fr.clef06/cdec.grammar/grammar.26">Earthquakes in Mexico City</query>
+<query id="328" grammar="data/en-fr.clef06/cdec.grammar/grammar.27">Iraqi Kurds and Turkey</query>
+<query id="329" grammar="data/en-fr.clef06/cdec.grammar/grammar.28">Consequences if Charles and Diana Divorce</query>
+<query id="330" grammar="data/en-fr.clef06/cdec.grammar/grammar.29">Films with Keanu Reeves</query>
+<query id="304" grammar="data/en-fr.clef06/cdec.grammar/grammar.3">World Heritage Sites</query>
+<query id="331" grammar="data/en-fr.clef06/cdec.grammar/grammar.30">Zedillo's Economic Policies</query>
+<query id="332" grammar="data/en-fr.clef06/cdec.grammar/grammar.31">Shooting of Tupac Shakur</query>
+<query id="333" grammar="data/en-fr.clef06/cdec.grammar/grammar.32">Trial of Paul Touvier</query>
+<query id="334" grammar="data/en-fr.clef06/cdec.grammar/grammar.33">Election of George W. Bush</query>
+<query id="335" grammar="data/en-fr.clef06/cdec.grammar/grammar.34">Labour after John Smith</query>
+<query id="336" grammar="data/en-fr.clef06/cdec.grammar/grammar.35">NBA Labour Conflicts</query>
+<query id="337" grammar="data/en-fr.clef06/cdec.grammar/grammar.36">Civil War in the Yemen</query>
+<query id="338" grammar="data/en-fr.clef06/cdec.grammar/grammar.37">Carlos' Extradition and Trial</query>
+<query id="339" grammar="data/en-fr.clef06/cdec.grammar/grammar.38">Sinn Fein and the Anglo-Irish Declaration</query>
+<query id="340" grammar="data/en-fr.clef06/cdec.grammar/grammar.39">New Quebec Premier</query>
+<query id="305" grammar="data/en-fr.clef06/cdec.grammar/grammar.4">Oil Prices</query>
+<query id="341" grammar="data/en-fr.clef06/cdec.grammar/grammar.40">Theft of "The Scream"</query>
+<query id="342" grammar="data/en-fr.clef06/cdec.grammar/grammar.41">Four Weddings and a Funeral</query>
+<query id="343" grammar="data/en-fr.clef06/cdec.grammar/grammar.42">South African National Party</query>
+<query id="344" grammar="data/en-fr.clef06/cdec.grammar/grammar.43">Brazil vs. Sweden World Cup Semifinals</query>
+<query id="345" grammar="data/en-fr.clef06/cdec.grammar/grammar.44">Cross-country Skiing at the Olympic Games.</query>
+<query id="346" grammar="data/en-fr.clef06/cdec.grammar/grammar.45">Grand Slam Winners</query>
+<query id="347" grammar="data/en-fr.clef06/cdec.grammar/grammar.46">Best Picture Oscar 1994</query>
+<query id="348" grammar="data/en-fr.clef06/cdec.grammar/grammar.47">Yann Piat's Assassination</query>
+<query id="349" grammar="data/en-fr.clef06/cdec.grammar/grammar.48">Nixon's Death</query>
+<query id="350" grammar="data/en-fr.clef06/cdec.grammar/grammar.49">Ayrton Senna's Death.</query>
+<query id="306" grammar="data/en-fr.clef06/cdec.grammar/grammar.5">ETA Activities in France</query>
+<query id="307" grammar="data/en-fr.clef06/cdec.grammar/grammar.6">Films Set in Scotland</query>
+<query id="308" grammar="data/en-fr.clef06/cdec.grammar/grammar.7">Solar Eclipse</query>
+<query id="309" grammar="data/en-fr.clef06/cdec.grammar/grammar.8">"Hard" Drugs</query>
+<query id="310" grammar="data/en-fr.clef06/cdec.grammar/grammar.9">Treatment of Industrial Waste</query>
+</parameters>

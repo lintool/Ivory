@@ -356,14 +356,14 @@ public class FindParallelSentencePairs extends Configured implements Tool {
     }
 
     conf.setInt("mapred.task.timeout", 60000000);
-    conf.set("mapreduce.map.memory.mb", "3000");
-    conf.set("mapreduce.map.java.opts", "-Xmx3000m");
-    conf.set("mapreduce.reduce.memory.mb", "3000");
-    conf.set("mapreduce.reduce.java.opts", "-Xmx3000m");
+    conf.set("mapreduce.map.memory.mb", "4096");
+    conf.set("mapreduce.map.java.opts", "-Xmx4096m");
+    conf.set("mapreduce.reduce.memory.mb", "8192");
+    conf.set("mapreduce.reduce.java.opts", "-Xmx8192m");
     conf.setBoolean("mapred.map.tasks.speculative.execution", false);
     conf.setBoolean("mapred.reduce.tasks.speculative.execution", false);
     conf.setNumMapTasks(100);
-    conf.setNumReduceTasks(50);
+    conf.setNumReduceTasks(100);
     conf.setInt("mapred.min.split.size", 2000000000);
     conf.setFloat("mapred.reduce.slowstart.completed.maps", 0.9f);
     conf.setInputFormat(SequenceFileInputFormat.class);

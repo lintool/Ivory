@@ -15,6 +15,8 @@ import org.apache.lucene.analysis.standard.StandardTokenizer;
 import org.apache.lucene.util.Version;
 import edu.umd.hooka.VocabularyWritable;
 import edu.umd.hooka.alignment.HadoopAlign;
+import java.util.Map;
+import java.util.HashMap;
 
 public class LuceneAnalyzer extends ivory.core.tokenize.Tokenizer {
   private static final Logger LOG = Logger.getLogger(LuceneAnalyzer.class);
@@ -112,6 +114,30 @@ public class LuceneAnalyzer extends ivory.core.tokenize.Tokenizer {
       finalTokenized.append(stemmedToken + " ");
     }
     return finalTokenized.toString().trim().split(" ");
+  }
+
+  @Override
+  public Map<String, String> getStem2NonStemMapping(String text) {
+    Map<String, String> stem2NonStemMapping = new HashMap<String, String>();
+    tokenizer = new StandardTokenizer(Version.LUCENE_35, new StringReader(text));
+    TokenStream tokenStream = new StandardFilter(Version.LUCENE_35, tokenizer);
+    tokenStream = new LowerCaseFilter(Version.LUCENE_35, tokenStream);
+    String tokenized = postNormalize(streamToString(tokenStream));
+    
+    StringBuilder finalTokenized = new StringBuilder();
+    for (String token : tokenized.split(" ")) {
+      if ( isStopwordRemoval() && isDiscard(false, token) ) {
+        continue;
+      }
+      String stemmedToken = stem(token);
+      
+      if ( vocab != null && vocab.get(stemmedToken) <= 0) {
+        continue;
+      }
+      stem2NonStemMapping.put(stemmedToken, token);
+    }
+    return stem2NonStemMapping;
+
   }
 
   @Override

@@ -178,7 +178,7 @@ public class VerifyWikipediaProcessingCrosslingual {
     fs.delete(new Path(vocabPath), true);
     fs.delete(new Path(tokenizerPath), true);
    
-    fs.copyFromLocalFile(false, true, new Path("data/vocab"), new Path(vocabPath));
+    fs.copyFromLocalFile(false, true, new Path("data/vocab/other/de-en.wmt10"), new Path(vocabPath));
     fs.copyFromLocalFile(false, true, new Path("data/tokenizer"), new Path(tokenizerPath));
 
     List<String> jars = Lists.newArrayList();
@@ -302,7 +302,7 @@ public class VerifyWikipediaProcessingCrosslingual {
     fs.delete(new Path(vocabPath), true);
     fs.delete(new Path(tokenizerPath), true);
 
-    fs.copyFromLocalFile(false, true, new Path("data/vocab"), new Path(vocabPath));
+    fs.copyFromLocalFile(false, true, new Path("data/vocab/other/de-en.wmt10"), new Path(vocabPath));
     fs.copyFromLocalFile(false, true, new Path("data/tokenizer"), new Path(tokenizerPath));
 
     List<String> jars = Lists.newArrayList();

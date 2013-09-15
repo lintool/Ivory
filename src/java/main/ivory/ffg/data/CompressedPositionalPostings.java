@@ -1,5 +1,8 @@
 package ivory.ffg.data;
 
+import ivory.bloomir.data.CompressedPostings;
+import ivory.core.data.index.TermPositions;
+
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
@@ -7,15 +10,7 @@ import java.util.List;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
-
 import com.kamikaze.pfordelta.PForDelta;
-
-import org.apache.hadoop.io.Writable;
-
-import ivory.bloomir.data.CompressedPostings;
-import ivory.core.compression.BitInputStream;
-import ivory.core.compression.BitOutputStream;
-import ivory.core.data.index.TermPositions;
 
 /**
  * A compressed positional postings list representation. This class uses
@@ -137,7 +132,6 @@ public class CompressedPositionalPostings extends CompressedPostings {
    * Retrieves positions for a document given a forward index and the index of the document
    * in the document id vector.
    *
-   * @param skipList Forward index decompressed using {@link #decompressSkipList}.
    * @param index Index of the document id in the document id vector
    * @return Positions of the occurrences of the term within a document
    */

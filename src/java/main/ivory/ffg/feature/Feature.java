@@ -14,7 +14,7 @@ public interface Feature {
   /**
    * Initializes this feature.
    *
-   * @param Scoring function
+   * @param score scoring function
    */
   public void initialize(ScoringFunction score);
 

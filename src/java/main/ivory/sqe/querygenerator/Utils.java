@@ -554,11 +554,11 @@ public class Utils {
   }
 
   /**
-   * Create a mapping between query-language stemming and document-language stemming. If there is a query token for which we do 
+   * Create a mapping between query-language stemming and document-language stemming (if both are turned on). If there is a query token for which we do 
    * not have any translation, it is helpful to search for that token in documents. However, since we perform stemming on documents 
    * with doc-language stemmer, we might miss some. 
    * 
-   * Example: In query 'emmy award', if we dont know how to translate emmy, we should search for 'emmi' in French documents, instead of 'emmy'.
+   * Example: In query 'emmy award', if we dont know how to translate emmy, we should search for 'emmy' in French documents, instead of 'emmi', which is how it's stemmed in English.
    * 
    * @param origQuery
    * @param queryLangTokenizer
@@ -568,19 +568,15 @@ public class Utils {
    * @param docLangTokenizer
    *    no stopword removal, stemming enabled
    */
-  public static Map<String, String> getStemMapping(String origQuery, Tokenizer queryLangTokenizer, Tokenizer queryLangTokenizerWithStemming, Tokenizer docLangTokenizer) {
+  public static Map<String, String> getStemMapping(String origQuery, Tokenizer queryLangTokenizer, Tokenizer docLangTokenizer) {
     Map<String, String> map = new HashMap<String, String>();
 
-    // strip out punctuation to prevent problems (FIX THIS)
-    // ===> this aims to remove end of sentence period but accidentally removes last dot from u.s.a. as well
-    //    origQuery = origQuery.replaceAll("\\?\\s*$", "").replaceAll("\"", "").replaceAll("\\(", "").replaceAll("\\)", "");  
+    Map<String, String> stem2NonStemMapping = queryLangTokenizer.getStem2NonStemMapping(origQuery);
 
-    String[] tokens = queryLangTokenizer.processContent(origQuery);
-
-    for (int i = 0; i < tokens.length; i++) {
-      String stem1 = queryLangTokenizerWithStemming.processContent(tokens[i].trim())[0];
-      String stem2 = docLangTokenizer.processContent(tokens[i].trim())[0];
-      map.put(stem1, stem2);
+    for (String stem : stem2NonStemMapping.keySet()) {
+      String token = stem2NonStemMapping.get(stem);
+      String docStem = docLangTokenizer.processContent(token.trim())[0];
+      map.put(stem, docStem);
     }
     return map;
   }
@@ -590,7 +586,7 @@ public class Utils {
     "-" + (int)(100*conf.getFloat(Constants.MTWeight, 0)) + 
     "-" + (int) (100*conf.getFloat(Constants.BitextWeight, 0)) + 
     "-" + (int) (100*conf.getFloat(Constants.TokenWeight, 0)) +
-    "_" + conf.getInt(Constants.One2Many, -1);
+    "_" + conf.getInt(Constants.One2Many, 2);
   }
 
   public static JsonArray createJsonArray(String[] elements) {
@@ -696,4 +692,7 @@ public class Utils {
     return pairsInSCFG;
   }
 
+  public static String ivory2Indri(String structuredQuery) {
+    return structuredQuery.replaceAll("\"#combine\":","#combine").replaceAll("\"#weight\":","#weight").replaceAll("\\{","").replaceAll("\\}","").replaceAll("\\[","(").replaceAll("\\]",")").replaceAll("\","," ").replaceAll(",\""," ").replaceAll("\"\\),",") ").replaceAll("\"\\)\\)","))");
+  }
 }

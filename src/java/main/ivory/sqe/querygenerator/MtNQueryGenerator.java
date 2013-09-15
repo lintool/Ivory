@@ -35,10 +35,10 @@ import edu.umd.cloud9.io.pair.PairOfStrings;
  */
 public class MtNQueryGenerator implements QueryGenerator {
   private static final Logger LOG = Logger.getLogger(MtNQueryGenerator.class);
-  private Tokenizer docLangTokenizer, queryLangTokenizerWithStemming, queryLangTokenizer;
+  private Tokenizer defaultTokenizer, docLangTokenizer, queryLangTokenizerWithStemming, queryLangTokenizer;
   private int length;
   private int kBest;
-  private boolean bigramSegment = false;
+  private boolean isDocStemmed, isStemming, bigramSegment = false;
   private ProbabilisticStructuredQueryGenerator clGenerator;
   private SCFGQueryGenerator scfgGenerator;
   private float mtWeight, bitextWeight,scfgWeight, tokenWeight, phraseWeight, alpha, lexProbThreshold;
@@ -75,13 +75,25 @@ public class MtNQueryGenerator implements QueryGenerator {
     mtWeight = conf.getFloat(Constants.MTWeight, 1f);
     bitextWeight = conf.getFloat(Constants.BitextWeight, 0f);
     scfgWeight = conf.getFloat(Constants.GrammarWeight, 0f);
-    LOG.info(conf.get(Constants.MTWeight));
-    LOG.info(conf.get(Constants.BitextWeight));
-    LOG.info(conf.get(Constants.GrammarWeight));
+    
+    isDocStemmed = conf.getBoolean(Constants.IsDocStemmed, false);
+    isStemming = conf.getBoolean(Constants.IsStemming, false);
 
-    queryLangTokenizer = TokenizerFactory.createTokenizer(fs, conf, queryLang, queryTokenizerPath, false, null, null, null);
-    queryLangTokenizerWithStemming = TokenizerFactory.createTokenizer(fs, conf, queryLang, queryTokenizerPath, true, null, conf.get(Constants.StemmedStopwordListQ), null);
-    docLangTokenizer = TokenizerFactory.createTokenizer(fs, conf, docLang, docTokenizerPath, true, null, conf.get(Constants.StemmedStopwordListD), null);
+    queryLangTokenizer = TokenizerFactory.createTokenizer(fs, conf, queryLang, conf.get(Constants.QueryTokenizerData), false, conf.get(Constants.StopwordListQ), null, null);
+    queryLangTokenizerWithStemming = TokenizerFactory.createTokenizer(fs, conf, queryLang, conf.get(Constants.QueryTokenizerData), true, null, conf.get(Constants.StemmedStopwordListQ), null);
+
+    if (isStemming) {
+      defaultTokenizer = queryLangTokenizerWithStemming;
+    } else {
+      defaultTokenizer = queryLangTokenizer;
+    }
+
+    if (isDocStemmed) {
+      docLangTokenizer = TokenizerFactory.createTokenizer(fs, conf, docLang, conf.get(Constants.DocTokenizerData), true, null, conf.get(Constants.StemmedStopwordListD), null);
+    } else {
+      docLangTokenizer = TokenizerFactory.createTokenizer(fs, conf, docLang, conf.get(Constants.DocTokenizerData), false, conf.get(Constants.StopwordListD), null, null);
+    }
+
 
     unknownWords = Utils.readUnknowns(fs, conf.get(Constants.UNKFile));
     LOG.info("Unknown words = " + unknownWords);
@@ -107,7 +119,7 @@ public class MtNQueryGenerator implements QueryGenerator {
     List<String> tokensBOW = new ArrayList<String>(), tokensBOP = new ArrayList<String>();
 
     Translation translation = TranslationFactory.readTranslationsFromNBest(query, alpha, 
-        unknownWords, queryLangTokenizer, queryLangTokenizerWithStemming, docLangTokenizer, conf);
+        unknownWords, defaultTokenizer, docLangTokenizer, conf);
 
     String origQuery = translation.getOriginalQuery();
     String grammarFile = conf.get(Constants.GrammarPath);
@@ -126,7 +138,7 @@ public class MtNQueryGenerator implements QueryGenerator {
 
     // create a mapping from {source token stemmed with query language tokenizer} to {source token stemmed with doc language tokenizer}
     // if decoder uses a pass-through rule and leave a token as it is, we use this mapping to re-stem the token wrt doc language vocab
-    String[] stemmedSourceTokens = queryLangTokenizerWithStemming.processContent(origQuery);
+    String[] stemmedSourceTokens = defaultTokenizer.processContent(origQuery);
     Map<String,String> stemmed2Stemmed = translation.getStemMapping();
 
     // if k is 1, we assume standard space-delimited query format
@@ -174,7 +186,7 @@ public class MtNQueryGenerator implements QueryGenerator {
         for (String srcToken : stemmedSourceTokens) {
           HMapSFW nbestDist = translation.getDistributionOf(srcToken);
 
-          if (queryLangTokenizerWithStemming.isStopWord(srcToken)){
+          if (defaultTokenizer.isStopWord(srcToken)){
             continue;
           }
           LOG.info("Processing "+srcToken);
