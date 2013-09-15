@@ -563,8 +563,6 @@ public class Utils {
    * @param origQuery
    * @param queryLangTokenizer
    *    no stemming or stopword removal
-   * @param queryLangTokenizerWithStemming
-   *    no stopword removal, stemming enabled  
    * @param docLangTokenizer
    *    no stopword removal, stemming enabled
    */

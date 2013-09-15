@@ -1,5 +1,12 @@
+Version 0.12.3
+==============
+September 15, 2013
+
++ Improvements to cross-lingual pairwise-comparison documentation
++ Improvements to CLIR code; better configuration options
+
 Version 0.12.2
-=============
+==============
 July 7, 2013
 
 + Upgrade to CDH 4.3.0, Cloud9 1.4.17
