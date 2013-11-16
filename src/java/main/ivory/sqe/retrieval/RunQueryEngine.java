@@ -250,12 +250,15 @@ public class RunQueryEngine {
       if (cmdline.hasOption(Constants.StemmedStopwordListQ)) {
         conf.set(Constants.StemmedStopwordListQ , cmdline.getOptionValue(Constants.StemmedStopwordListQ));
       }
+<<<<<<< HEAD
       if (cmdline.hasOption(Constants.IsDocStemmed)) {
         conf.setBoolean(Constants.IsDocStemmed, true);
       }
       if (cmdline.hasOption(Constants.IsStemming)) {
         conf.setBoolean(Constants.IsStemming, true);
       }
+=======
+>>>>>>> fb7fde43c125178cc6f407906d8a6d0390fa3852
       if (cmdline.hasOption(Constants.UNKFile)) {
         conf.set(Constants.UNKFile , cmdline.getOptionValue(Constants.UNKFile));
       }
@@ -372,6 +375,7 @@ public class RunQueryEngine {
 
     list = d.getElementsByTagName(Constants.StemmedStopwordListQ);
     if (list.getLength() > 0) {  conf.set(Constants.StemmedStopwordListQ, list.item(0).getTextContent());  }  
+<<<<<<< HEAD
 
     list = d.getElementsByTagName(Constants.IsDocStemmed);
     if (list.getLength() > 0) {  conf.setBoolean(Constants.IsDocStemmed, true);  }
@@ -381,13 +385,18 @@ public class RunQueryEngine {
 
     list = d.getElementsByTagName(Constants.OutputPath);
     if (list.getLength() > 0) {  conf.set(Constants.OutputPath, list.item(0).getTextContent());  }
+=======
+>>>>>>> fb7fde43c125178cc6f407906d8a6d0390fa3852
  
     list = d.getElementsByTagName(Constants.UNKFile);
     if (list.getLength() > 0) {  conf.set(Constants.UNKFile, list.item(0).getTextContent());  }  
  
+<<<<<<< HEAD
     list = d.getElementsByTagName(Constants.TranslateOnly);
     if (list.getLength() > 0) {  conf.set(Constants.TranslateOnly, list.item(0).getTextContent());  }  
 
+=======
+>>>>>>> fb7fde43c125178cc6f407906d8a6d0390fa3852
   }
 
   static float eval(QueryEngine qe, Configuration conf, String setting){
