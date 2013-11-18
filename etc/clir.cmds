@@ -31,7 +31,20 @@ paste 10-0-100.ap 1-100-0.ap 10-100-0.ap 10-0-0.ap 10-x-y.ap topics.$e-$f  | awk
 ### statistical significance testing
 perl etc/stat_sig.pl 10-0-100.ap 10-100-0.ap 10000
 
-### cross-fold validation experiments
-perl crossval.pl 1 100 10 ../2013/cdec.grid.one2many.zh
+#######################################################################################
+# k-fold cross-validation experiments (need to run from script directory)
+#######################################################################################
+cd Ivory/etc/clir.scripts
+perl crossval.pl [first-topic-no] [last-topic-no] [k] run-with-grid.log
+
+# e.g., for Chinese, topics range from 1 to 100. Some of them are not processed, so there are 73 in total
+perl crossval.pl 1 100 10 run-with-grid.log
+
+# AP values for the 10-fold cross-validation setting is written to crossval10.ap
+mv crossval10.ap Ivory/runs_tois.en-zh
+cd Ivory/runs_tois.en-zh
 awk '{sum=sum+}END{print sum/73}' crossval10.ap
-perl stat_sig.pl 2013/crossval10-zh.ap 2013/cdec.10best.one2many.zh.ap 10000
+
+# now we can run statistical significance test for the cross-validation run
+# e.g., cross-validation vs. word-based
+perl stat_sig.pl crossval10.ap 10-0-100.ap 10000
