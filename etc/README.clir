@@ -50,7 +50,8 @@ mkdir derivs.${n}best
 cat $name.$e.seg | $cdec -c $inifile -w $weights -k $n --show_derivations derivs.${n}best 1> out.$n 2> err.$n
 
 ### remove initial nonterminal [X] in grammar rules, for compatibility with Moses phrase table format
-perl $IVORY/etc/clean-scfg.pl $name.grammar/grammar.*
+### (There is a script to undo this: $IVORY/etc/clir.scripts/unclean-scfg.pl)
+perl $IVORY/etc/clir.scripts/clean-scfg.pl $name.grammar/grammar.*
 
 ### put all grammar rules together, for easy lookup
 cat $name.grammar/grammar.* > $name.grammar.singlefile

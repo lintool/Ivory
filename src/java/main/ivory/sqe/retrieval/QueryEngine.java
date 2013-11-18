@@ -142,7 +142,6 @@ public class QueryEngine {
     Map<String, String> grammarPaths = Maps.newLinkedHashMap();
     NodeList queryNodes = d.getElementsByTagName("query");
 
-    System.out.println("Parsing "+queryNodes.getLength()+" nodes...");
     for (int i = 0; i < queryNodes.getLength(); i++) {
       // Get query XML node.
       Node node = queryNodes.item(i);
