@@ -53,7 +53,6 @@ public class VerifyNtcirChinesePositionalIndexIP {
 
     String libjars = String.format("-libjars=%s", Joiner.on(",").join(jars));
 
-    // Done with indexing, now do retrieval run.
     fs.copyFromLocalFile(false, true, new Path("data/vocab/vocab.en-" + LANGUAGE + ".en"),
         new Path(index + "/vocab.en-" + LANGUAGE + ".en"));
     fs.copyFromLocalFile(false, true, new Path("data/vocab/vocab.en-" + LANGUAGE + "." + LANGUAGE + ""),
@@ -91,8 +90,8 @@ public class VerifyNtcirChinesePositionalIndexIP {
 
     IntegrationUtils.exec(Joiner.on(" ").join(args));
 
+    // Done with indexing, now do retrieval run.
     QueryEngine qr = new QueryEngine();
-
     for (int heuristic=0; heuristic<=2; heuristic++) {
       conf = RunQueryEngine.parseArgs(new String[] {
           "-index=" + index,
@@ -126,6 +125,7 @@ public class VerifyNtcirChinesePositionalIndexIP {
 
       System.err.println("Total query time for heuristic " + heuristic + ":" + (end - start) + "ms");
     }
+
     ivory.regression.sigir2013.cdec.EnZh_NTCIR8.initialize();
     ivory.regression.sigir2013.cdec.EnZh_NTCIR8.verifyAllResults(qr.getModels(), qr.getAllResults(), qr.getDocnoMapping(),
         new Qrels("data/" + PATH + "/qrels." + PATH+ ".txt"));
