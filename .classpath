@@ -95,7 +95,6 @@
 	<classpathentry kind="lib" path="lib/commons-lang-2.6.jar"/>
 	<classpathentry kind="lib" path="lib/guava-13.0.1.jar"/>
 	<classpathentry kind="lib" path="lib/jasper-compiler-5.5.12.jar"/>
-	<classpathentry kind="lib" path="lib/log4j-1.2.16.jar"/>
 	<classpathentry kind="lib" path="lib/spymemcached-2.8.1.jar"/>
 	<classpathentry kind="lib" path="lib/avro-1.7.4.jar"/>
 	<classpathentry kind="lib" path="lib/cloud9-1.4.17.jar"/>
@@ -113,5 +112,6 @@
 	<classpathentry kind="lib" path="lib/hadoop-yarn-server-resourcemanager-2.0.0-cdh4.3.0.jar"/>
 	<classpathentry kind="lib" path="lib/hadoop-yarn-server-web-proxy-2.0.0-cdh4.3.0.jar"/>
 	<classpathentry kind="lib" path="lib/xz-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/log4j-1.2.17.jar"/>
 	<classpathentry kind="output" path="build"/>
 </classpath>

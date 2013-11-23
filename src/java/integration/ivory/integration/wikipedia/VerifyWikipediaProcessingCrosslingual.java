@@ -167,6 +167,16 @@ public class VerifyWikipediaProcessingCrosslingual {
           .build();
 
   @Test
+  public void runTests() throws Exception {
+    runBuildIndexEnSide();
+    verifyTermDocVectorsEn();
+    verifyIntDocVectorsEn();
+
+    runBuildIndexDeSide();
+    verifyTermDocVectorsDe();
+    verifyIntDocVectorsDe();
+  }
+
   public void runBuildIndexEnSide() throws Exception {
     Configuration conf = IntegrationUtils.getBespinConfiguration();
     FileSystem fs = FileSystem.get(conf);
@@ -230,7 +240,6 @@ public class VerifyWikipediaProcessingCrosslingual {
     IntegrationUtils.exec(Joiner.on(" ").join(args));
   }
 
-  @Test
   public void verifyTermDocVectorsEn() throws Exception {
     System.out.println("verifyTermDocVectorsEn");
     Configuration conf = IntegrationUtils.getBespinConfiguration();
@@ -258,7 +267,6 @@ public class VerifyWikipediaProcessingCrosslingual {
     reader.close();
   }
 
-  @Test
   public void verifyIntDocVectorsEn() throws Exception {
     System.out.println("verifyIntDocVectorsEn");
     Configuration conf = IntegrationUtils.getBespinConfiguration();
@@ -290,7 +298,6 @@ public class VerifyWikipediaProcessingCrosslingual {
     reader.close();
   }
 
-  @Test
   public void runBuildIndexDeSide() throws Exception {
     Configuration conf = IntegrationUtils.getBespinConfiguration();
     FileSystem fs = FileSystem.get(conf);
@@ -364,7 +371,6 @@ public class VerifyWikipediaProcessingCrosslingual {
     IntegrationUtils.exec(Joiner.on(" ").join(args));
   }
 
-  @Test
   public void verifyTermDocVectorsDe() throws Exception {
     System.out.println("verifyTermDocVectorsDe");
     Configuration conf = IntegrationUtils.getBespinConfiguration();
@@ -392,7 +398,6 @@ public class VerifyWikipediaProcessingCrosslingual {
     reader.close();
   }
 
-  @Test
   public void verifyIntDocVectorsDe() throws Exception {
     System.out.println("verifyIntDocVectorsDe");
     Configuration conf = IntegrationUtils.getBespinConfiguration();

@@ -150,7 +150,7 @@ public class ProbabilisticStructuredQueryGenerator implements QueryGenerator {
       } else {
         JsonObject tokenTrans = new JsonObject();
         HMapSFW distr = getTranslations(origQuery, token, phrasePairs, stemmed2Stemmed);
-	JsonArray weights = Utils.createJsonArrayFromProbabilities(distr);
+        JsonArray weights = Utils.createJsonArrayFromProbabilities(distr);
         if (weights != null) {
           tokenTrans.add("#weight", weights);
           tokenTranslations.add(tokenTrans);

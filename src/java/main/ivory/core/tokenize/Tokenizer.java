@@ -257,6 +257,7 @@ public abstract class Tokenizer {
    * @return
    *    same text without the stop words.
    */
+  @Deprecated
   public String removeBorderStopWords(String tokenizedText) {
     String[] tokens = tokenizedText.split(" ");
     int start = 0, end = tokens.length-1;

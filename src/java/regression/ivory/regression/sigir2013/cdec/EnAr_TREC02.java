@@ -171,30 +171,16 @@ public class EnAr_TREC02 {
   }
 
   public static void main(String[] args) {
-    Nbest_AP.put(2, new String[] {
-        "35", "0.1409","36", "0.0032","33", "0.0245","34", "0.0036","39", "0.2905","37", "0.2489","38", "0.0052","43", "0.0","42", "0.4121","41", "7.0E-4","40", "0.4974","67", "0.5895","66", "0.3265","69", "0.5263","68", "0.1974","26", "0.0142","27", "0.2883","28", "0.0028","29", "0.5233","30", "0.6088","32", "0.0832","31", "0.0743","70", "0.4782","71", "0.0889","72", "0.0038","73", "0.1723","74", "0.0211","75", "0.1259","59", "0.7296","58", "0.097","57", "0.0488","56", "0.3877","55", "0.6302","64", "6.0E-4","65", "0.6409","62", "0.0698","63", "0.0757","60", "0.7257","61", "0.0706","49", "0.704","48", "0.6716","45", "0.341","44", "0.1796","47", "0.3359","46", "0.3344","51", "0.0825","52", "0.0832","53", "0.0023","54", "0.0352","50", "0.7544"
-    });
-    Onebest_AP.put(2, new String[] {
-        "35", "0.1409","36", "0.0032","33", "0.029","34", "0.0036","39", "0.2904","37", "0.2199","38", "0.0052","43", "0.0","42", "0.4017","41", "0.0678","40", "0.4349","67", "0.6033","66", "0.342","69", "0.5263","68", "0.176","26", "0.0176","27", "0.2883","28", "0.0031","29", "0.5233","30", "0.6088","32", "0.0484","31", "0.0743","70", "0.474","71", "0.0889","72", "0.0010","73", "0.1376","74", "0.0221","75", "0.1259","59", "0.7296","58", "0.1442","57", "0.0129","56", "0.0834","55", "0.6427","64", "6.0E-4","65", "0.3971","62", "0.0541","63", "0.0757","60", "0.7003","61", "0.0706","49", "0.704","48", "0.6716","45", "0.5155","44", "0.1796","47", "0.3341","46", "0.3358","51", "0.0825","52", "0.0832","53", "0.0021","54", "0.0339","50", "0.6004"
-    });
-    grammar_AP.put(2, new String[] {
-        "35", "0.1807","36", "0.0027","33", "0.0241","34", "0.0044","39", "0.3323","37", "0.3308","38", "0.0064","43", "0.0","42", "0.4085","41", "0.2136","40", "0.5166","67", "0.6253","66", "0.2055","69", "0.5464","68", "0.2556","26", "0.0082","27", "0.3113","28", "0.0058","29", "0.5319","30", "0.6832","32", "0.3168","31", "0.081","70", "0.5252","71", "0.219","72", "0.0278","73", "0.2601","74", "0.0302","75", "0.1449","59", "0.7421","58", "0.1165","57", "0.0905","56", "0.3992","55", "0.636","64", "6.0E-4","65", "0.5581","62", "0.0492","63", "0.0815","60", "0.7408","61", "0.0905","49", "0.7575","48", "0.7018","45", "0.3528","44", "0.1752","47", "0.3373","46", "0.3308","51", "0.0628","52", "0.0749","53", "0.0038","54", "0.0415","50", "0.7537"
-    });
+    initialize();
 
     HMapSFW tenbestAPMap = array2Map(Nbest_AP.get(2));
     HMapSFW onebestAPMap = array2Map(Onebest_AP.get(2));
     HMapSFW grammarAPMap = array2Map(grammar_AP.get(2));
     HMapSFW tokenAPMap = array2Map(baseline_token_AP);
-    HMapSFW gridAPMap = array2Map(Interp_AP.get(2));
 
-    System.out.println(countNumberOfImprovedTopics(tokenAPMap, gridAPMap));
-    System.out.println(countNumberOfImprovedTopics(tokenAPMap, tenbestAPMap));
-    System.out.println(countNumberOfImprovedTopics(tokenAPMap, onebestAPMap));
-    System.out.println(countNumberOfImprovedTopics(tokenAPMap, grammarAPMap));
-    System.out.println(countNumberOfNegligibleTopics(tokenAPMap, gridAPMap));
-    System.out.println(countNumberOfNegligibleTopics(tokenAPMap, tenbestAPMap));
-    System.out.println(countNumberOfNegligibleTopics(tokenAPMap, onebestAPMap));
-    System.out.println(countNumberOfNegligibleTopics(tokenAPMap, grammarAPMap));
+    System.out.println("10best: improved=" + countNumberOfImprovedTopics(tokenAPMap, tenbestAPMap) + ", negligible=" + countNumberOfNegligibleTopics(tokenAPMap, tenbestAPMap));
+    System.out.println("Grammar: improved=" + countNumberOfImprovedTopics(tokenAPMap, grammarAPMap) + ", negligible=" + countNumberOfNegligibleTopics(tokenAPMap, grammarAPMap));
+    System.out.println("1best: improved=" + countNumberOfImprovedTopics(tokenAPMap, onebestAPMap) + ", negligible=" + countNumberOfNegligibleTopics(tokenAPMap, onebestAPMap));
   }
 
   private static int countNumberOfImprovedTopics(HMapSFW tokenAPMap, HMapSFW gridAPMap) {

@@ -71,29 +71,29 @@ public class VerifyWikipediaProcessingMonolingual {
   private int galagoIntDocVector1Id = 1;
   private ImmutableMap<Integer, Float> galagoIntDocVector1 =
       new ImmutableMap.Builder<Integer, Float>()
-          .put(17836, 0.1396f)
-          .put(28723, 0.1389f)
+          .put(17835, 0.1396f)
+          .put(28725, 0.1389f)
           .put(10641, 0.1270f)
           .put(23480, 0.1235f)
-          .put(95282, 0.1218f)
-          .put(68145, 0.1189f)
-          .put(38972, 0.1152f)
-          .put(84485, 0.1049f)
+          .put(95280, 0.1218f)
+          .put(68146, 0.1189f)
+          .put(38973, 0.1152f)
+          .put(84488, 0.1049f)
           .put(56020, 0.0986f)
-          .put(10242, 0.0980f)
+          .put(10241, 0.0980f)
           .build();
 
   private int galagoIntDocVector2Id = 2;
   private ImmutableMap<Integer, Float> galagoIntDocVector2 =
       new ImmutableMap.Builder<Integer, Float>()
-          .put(33608, 0.1578f)
-          .put(26081, 0.1485f)
-          .put(18041, 0.1457f)
-          .put(124021, 0.1231f)
-          .put(42434, 0.1200f)
-          .put(93174, 0.1184f)
+          .put(33609, 0.1578f)
+          .put(26082, 0.1485f)
+          .put(18040, 0.1457f)
+          .put(124022, 0.1231f)
+          .put(42436, 0.1200f)
+          .put(93173, 0.1184f)
           .put(5348, 0.0976f)
-          .put(588669, 0.0968f)
+          .put(588707, 0.0968f)
           .put(5232, 0.0936f)
           .put(6676, 0.0895f)
           .build();
@@ -135,23 +135,23 @@ public class VerifyWikipediaProcessingMonolingual {
   private int opennlpIntDocVector1Id = 1;
   private ImmutableMap<Integer, Float> opennlpIntDocVector1 =
       new ImmutableMap.Builder<Integer, Float>()
-          .put(13537, 0.1824f)
-          .put(9150, 0.1663f)
-          .put(16224, 0.1588f)
+          .put(13535, 0.1824f)
+          .put(9149, 0.1663f)
+          .put(16223, 0.1588f)
           .put(21027, 0.1463f)
-          .put(8939, 0.1259f)
+          .put(8938, 0.1259f)
           .put(23931, 0.1235f)
           .put(10558, 0.1229f)
           .put(7006, 0.1138f)
           .put(9483, 0.0900f)
-          .put(15808, 0.0884f)
+          .put(15807, 0.0884f)
           .build();
 
   private int opennlpIntDocVector2Id = 2;
   private ImmutableMap<Integer, Float> opennlpIntDocVector2 =
       new ImmutableMap.Builder<Integer, Float>()
-          .put(17355, 0.1791f)
-          .put(13641, 0.1773f)
+          .put(17354, 0.1791f)
+          .put(13640, 0.1773f)
           .put(5042, 0.1168f)
           .put(4935, 0.1114f)
           .put(6187, 0.1054f)
@@ -222,69 +222,55 @@ public class VerifyWikipediaProcessingMonolingual {
         "-keys=" + galagoIntDocVector1Id + "," + galagoIntDocVector2Id,
         "-valueclass=" + ivory.core.data.document.WeightedIntDocVector.class.getCanonicalName() };
     IntegrationUtils.exec(Joiner.on(" ").join(args));
-  }
 
-  @Test
-  public void verifyTermDocVectorsGalago() throws Exception {
     System.out.println("verifyTermDocVectorsGalago");
-    Configuration conf = IntegrationUtils.getBespinConfiguration();
-    FileSystem fs = FileSystem.get(conf);
+    IntWritable key1 = new IntWritable();
+    HMapSFW value1 = new HMapSFW();
 
-    SequenceFile.Reader reader;
-    IntWritable key = new IntWritable();
-    HMapSFW value = new HMapSFW();
-
-    reader = new SequenceFile.Reader(fs.getConf(),
+    SequenceFile.Reader reader1 = new SequenceFile.Reader(fs.getConf(),
         SequenceFile.Reader.file(new Path(galagoIndex + "/test_wt-term-doc-vectors/part-00000")));
 
-    reader.next(key, value);
+    reader1.next(key1, value1);
     System.out.println("*** top 10 terms ***");
-    for (MapKF.Entry<String> entry : value.getEntriesSortedByValue(10)) {
+    for (MapKF.Entry<String> entry : value1.getEntriesSortedByValue(10)) {
       System.out.println(entry.getKey() + ": " + entry.getValue());
     }
-    verifyTermDocVector(galagoTermDocVector1, value);
+    verifyTermDocVector(galagoTermDocVector1, value1);
 
-    reader.next(key, value);
+    reader1.next(key1, value1);
 
     System.out.println("*** top 10 terms ***");
-    for (MapKF.Entry<String> entry : value.getEntriesSortedByValue(10)) {
+    for (MapKF.Entry<String> entry : value1.getEntriesSortedByValue(10)) {
       System.out.println(entry.getKey() + ": " + entry.getValue());
     }
 
-    verifyTermDocVector(galagoTermDocVector2, value);
-    reader.close();
-  }
+    verifyTermDocVector(galagoTermDocVector2, value1);
+    reader1.close();
 
-  @Test
-  public void verifyIntDocVectorsGalago() throws Exception {
     System.out.println("verifyIntDocVectorsGalago");
-    Configuration conf = IntegrationUtils.getBespinConfiguration();
-    FileSystem fs = FileSystem.get(conf);
-
-    SequenceFile.Reader reader;
-    IntWritable key = new IntWritable();
+    IntWritable key2 = new IntWritable();
+    WeightedIntDocVector value2 = new WeightedIntDocVector();
     HMapIFW map = new HMapIFW();
-    WeightedIntDocVector value = new WeightedIntDocVector();
 
-    reader = new SequenceFile.Reader(fs.getConf(),
+    SequenceFile.Reader reader2 = new SequenceFile.Reader(fs.getConf(),
         SequenceFile.Reader.file(new Path(galagoIndex + "/test_wt-int-doc-vectors/part-00000")));
 
-    reader.next(key, value);
+    reader2.next(key2, value2);
     System.out.println("*** top 10 terms ***");
-    map = value.getWeightedTerms();
+    map = value2.getWeightedTerms();
     for ( MapIF.Entry entry : map.getEntriesSortedByValue(10)) {
       System.out.println(entry.getKey() + ": " + entry.getValue());
     }
-    verifyIntDocVector(galagoIntDocVector1, value);
+    verifyIntDocVector(galagoIntDocVector1, value2);
 
-    reader.next(key, value);
+    reader2.next(key2, value2);
     System.out.println("*** top 10 terms ***");
-    map = value.getWeightedTerms();
+    map = value2.getWeightedTerms();
     for ( MapIF.Entry entry : map.getEntriesSortedByValue(10)) {
       System.out.println(entry.getKey() + ": " + entry.getValue());
     }
-    verifyIntDocVector(galagoIntDocVector2, value);
-    reader.close();
+    verifyIntDocVector(galagoIntDocVector2, value2);
+    reader2.close();
   }
 
   @Test
@@ -349,66 +335,52 @@ public class VerifyWikipediaProcessingMonolingual {
         "-keys=" + opennlpIntDocVector1Id + "," + opennlpIntDocVector2Id,
         "-valueclass=" + ivory.core.data.document.WeightedIntDocVector.class.getCanonicalName() };
     IntegrationUtils.exec(Joiner.on(" ").join(args));
-  }
 
-  @Test
-  public void verifyTermDocVectorsOpennlp() throws Exception {
     System.out.println("verifyTermDocVectorsOpennlp");
-    Configuration conf = IntegrationUtils.getBespinConfiguration();
-    FileSystem fs = FileSystem.get(conf);
+    IntWritable key1 = new IntWritable();
+    HMapSFW value1 = new HMapSFW();
 
-    SequenceFile.Reader reader;
-    IntWritable key = new IntWritable();
-    HMapSFW value = new HMapSFW();
-
-    reader = new SequenceFile.Reader(fs.getConf(),
+    SequenceFile.Reader reader1 = new SequenceFile.Reader(fs.getConf(),
         SequenceFile.Reader.file(new Path(opennlpIndex + "/test_wt-term-doc-vectors/part-00000")));
 
-    reader.next(key, value);
+    reader1.next(key1, value1);
     System.out.println("*** top 10 terms ***");
-    for (MapKF.Entry<String> entry : value.getEntriesSortedByValue(10)) {
+    for (MapKF.Entry<String> entry : value1.getEntriesSortedByValue(10)) {
       System.out.println(entry.getKey() + ": " + entry.getValue());
     }
-    verifyTermDocVector(opennlpTermDocVector1, value);
+    verifyTermDocVector(opennlpTermDocVector1, value1);
 
-    reader.next(key, value);
+    reader1.next(key1, value1);
     System.out.println("*** top 10 terms ***");
-    for (MapKF.Entry<String> entry : value.getEntriesSortedByValue(10)) {
+    for (MapKF.Entry<String> entry : value1.getEntriesSortedByValue(10)) {
       System.out.println(entry.getKey() + ": " + entry.getValue());
     }
-    verifyTermDocVector(opennlpTermDocVector2, value);
-    reader.close();
-  }
+    verifyTermDocVector(opennlpTermDocVector2, value1);
+    reader1.close();
 
-  @Test
-  public void verifyIntDocVectorsOpennlp() throws Exception {
     System.out.println("verifyIntDocVectorsOpennlp");
-    Configuration conf = IntegrationUtils.getBespinConfiguration();
-    FileSystem fs = FileSystem.get(conf);
-
-    SequenceFile.Reader reader;
-    IntWritable key = new IntWritable();
-    WeightedIntDocVector value = new WeightedIntDocVector();
+    IntWritable key2 = new IntWritable();
+    WeightedIntDocVector value2 = new WeightedIntDocVector();
     HMapIFW map = new HMapIFW();
 
-    reader = new SequenceFile.Reader(fs.getConf(),
+    SequenceFile.Reader reader2 = new SequenceFile.Reader(fs.getConf(),
         SequenceFile.Reader.file(new Path(opennlpIndex + "/test_wt-int-doc-vectors/part-00000")));
-    reader.next(key, value);
-    map = value.getWeightedTerms();
+    reader2.next(key2, value2);
+    map = value2.getWeightedTerms();
     System.out.println("*** top 10 terms ***");
     for ( MapIF.Entry entry : map.getEntriesSortedByValue(10)) {
       System.out.println(entry.getKey() + ": " + entry.getValue());
     }
-    verifyIntDocVector(opennlpIntDocVector1, value);
+    verifyIntDocVector(opennlpIntDocVector1, value2);
 
-    reader.next(key, value);
-    map = value.getWeightedTerms();
+    reader2.next(key2, value2);
+    map = value2.getWeightedTerms();
     System.out.println("*** top 10 terms ***");
     for ( MapIF.Entry entry : map.getEntriesSortedByValue(10)) {
       System.out.println(entry.getKey() + ": " + entry.getValue());
     }
-    verifyIntDocVector(opennlpIntDocVector2, value);
-    reader.close();
+    verifyIntDocVector(opennlpIntDocVector2, value2);
+    reader2.close();
   }
 
   private void verifyTermDocVector(Map<String, Float> doc, HMapSFW value) {

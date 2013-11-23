@@ -173,19 +173,15 @@ public class EnFr_CLEF06 {
 
   public static void main(String[] args) {
     initialize();
+    
     HMapSFW tenbestAPMap = array2Map(Nbest_AP.get(2));
     HMapSFW onebestAPMap = array2Map(Onebest_AP.get(2));
     HMapSFW grammarAPMap = array2Map(grammar_AP.get(2));
     HMapSFW tokenAPMap = array2Map(baseline_token_AP);
-    HMapSFW gridAPMap = array2Map(Interp_AP.get(2));
-    System.out.println(countNumberOfImprovedTopics(tokenAPMap, gridAPMap));
-    System.out.println(countNumberOfImprovedTopics(tokenAPMap, tenbestAPMap));
-    System.out.println(countNumberOfImprovedTopics(tokenAPMap, onebestAPMap));
-    System.out.println(countNumberOfImprovedTopics(tokenAPMap, grammarAPMap));
-    System.out.println(countNumberOfNegligibleTopics(tokenAPMap, gridAPMap));
-    System.out.println(countNumberOfNegligibleTopics(tokenAPMap, tenbestAPMap));
-    System.out.println(countNumberOfNegligibleTopics(tokenAPMap, onebestAPMap));
-    System.out.println(countNumberOfNegligibleTopics(tokenAPMap, grammarAPMap));
+//    HMapSFW gridAPMap = array2Map(Interp_AP.get(2));
+    System.out.println("10best: improved=" + countNumberOfImprovedTopics(tokenAPMap, tenbestAPMap) + ", negligible=" + countNumberOfNegligibleTopics(tokenAPMap, tenbestAPMap));
+    System.out.println("Grammar: improved=" + countNumberOfImprovedTopics(tokenAPMap, grammarAPMap) + ", negligible=" + countNumberOfNegligibleTopics(tokenAPMap, grammarAPMap));
+    System.out.println("1best: improved=" + countNumberOfImprovedTopics(tokenAPMap, onebestAPMap) + ", negligible=" + countNumberOfNegligibleTopics(tokenAPMap, onebestAPMap));
   }
 
   private static int countNumberOfImprovedTopics(HMapSFW tokenAPMap, HMapSFW gridAPMap) {

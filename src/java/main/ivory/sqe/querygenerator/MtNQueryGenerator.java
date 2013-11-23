@@ -96,8 +96,8 @@ public class MtNQueryGenerator implements QueryGenerator {
 
 
     unknownWords = Utils.readUnknowns(fs, conf.get(Constants.UNKFile));
+      
     LOG.info("Unknown words = " + unknownWords);
-
     LOG.info("one2many= " + conf.getInt(Constants.One2Many, 2));
 
     if (clGenerator == null) {
@@ -138,6 +138,7 @@ public class MtNQueryGenerator implements QueryGenerator {
 
     // create a mapping from {source token stemmed with query language tokenizer} to {source token stemmed with doc language tokenizer}
     // if decoder uses a pass-through rule and leave a token as it is, we use this mapping to re-stem the token wrt doc language vocab
+      
     String[] stemmedSourceTokens = defaultTokenizer.processContent(origQuery);
     Map<String,String> stemmed2Stemmed = translation.getStemMapping();
 

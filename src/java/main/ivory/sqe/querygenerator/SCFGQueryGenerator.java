@@ -87,7 +87,6 @@ public class SCFGQueryGenerator implements QueryGenerator {
     } else {
       defaultTokenizer = queryLangTokenizer;
     }
-    
     docLangTokenizer = TokenizerFactory.createTokenizer(fs, conf, docLang, conf.get(Constants.DocTokenizerData), true, null, conf.get(Constants.StemmedStopwordListD), null);
   }
 
@@ -100,7 +99,6 @@ public class SCFGQueryGenerator implements QueryGenerator {
     Map<String, HMapSFW> probMap = processGrammar(fs, conf, grammarFile);
     
     Map<String, String> stemmed2Stemmed = Utils.getStemMapping(origQuery, defaultTokenizer, docLangTokenizer);
-
     JsonArray tokenTranslations = new JsonArray();
     String[] tokens = queryLangTokenizerWithStemming.processContent(origQuery);
     length = tokens.length;

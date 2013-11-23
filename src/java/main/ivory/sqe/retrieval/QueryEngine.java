@@ -103,7 +103,7 @@ public class QueryEngine {
     Map<String, String> queries = Maps.newLinkedHashMap();
     NodeList queryNodes = d.getElementsByTagName("query");
 
-    LOG.info("Parsing "+queryNodes.getLength()+" nodes...");
+    System.out.println("Parsing "+queryNodes.getLength()+" nodes...");
     for (int i = 0; i < queryNodes.getLength(); i++) {
       // Get query XML node.
       Node node = queryNodes.item(i);
@@ -142,7 +142,6 @@ public class QueryEngine {
     Map<String, String> grammarPaths = Maps.newLinkedHashMap();
     NodeList queryNodes = d.getElementsByTagName("query");
 
-    LOG.info("Parsing "+queryNodes.getLength()+" nodes...");
     for (int i = 0; i < queryNodes.getLength(); i++) {
       // Get query XML node.
       Node node = queryNodes.item(i);
@@ -202,7 +201,7 @@ public class QueryEngine {
     float rankTime = 0, generateTime = 0;
 
     try {
-      LOG.info("Parsed " + queries.size() + " queries");
+      System.out.println("Parsed " + queries.size() + " queries");
       
       String outFile = conf.get(Constants.OutputPath);
 
@@ -220,13 +219,13 @@ public class QueryEngine {
           long start = System.currentTimeMillis();
           StructuredQuery structuredQuery = generator.parseQuery(query, fs, conf);
           long end = System.currentTimeMillis();
-          LOG.info("Generating " + qid + ": " + ( end - start) + "ms");
+          System.out.println("Generating " + qid + ": " + ( end - start) + "ms");
           generateTime += ( end - start ) ;
-          LOG.info("<Processed>:::" + runName + ":::" + qid + ":::" + structuredQuery.getQuery());
+          System.out.println("<Processed>:::" + runName + ":::" + qid + ":::" + structuredQuery.getQuery());
           printResults(qid, runName, structuredQuery, resultWriter, translateOnly.equals(Constants.Indri));
         }
         resultWriter.flush();
-        LOG.info("<TIME>:::" + runName + ":::" + generateTime + ":::" + rankTime);
+        System.out.println("<TIME>:::" + runName + ":::" + generateTime + ":::" + rankTime);
       } else {
         ResultWriter resultWriter = new ResultWriter((outFile == null ? "ranking." + runName + ".txt" : outFile), false, fs);
         for ( String qid : queries.keySet()) {
@@ -240,14 +239,14 @@ public class QueryEngine {
           long start = System.currentTimeMillis();
           StructuredQuery structuredQuery = generator.parseQuery(query, fs, conf);
           long end = System.currentTimeMillis();
-          LOG.info("Generating " + qid + ": " + ( end - start) + "ms");
+          System.out.println("Generating " + qid + ": " + ( end - start) + "ms");
           generateTime += ( end - start ) ;
-          LOG.info("<Processed>:::" + runName + ":::" + qid + ":::" + structuredQuery.getQuery());
+          System.out.println("<Processed>:::" + runName + ":::" + qid + ":::" + structuredQuery.getQuery());
           
           start = System.currentTimeMillis();
           ranker.rank(qid, structuredQuery.getQuery(), structuredQuery.getQueryLength());
           end = System.currentTimeMillis();
-          LOG.info("Ranking " + qid + ": " + ( end - start) + "ms");
+          System.out.println("Ranking " + qid + ": " + ( end - start) + "ms");
           rankTime += ( end - start ) ;
           printResults(qid, runName, ranker, resultWriter);
           
@@ -255,7 +254,7 @@ public class QueryEngine {
           allResults.put(runName, getResults());
         }   
         resultWriter.flush();
-        LOG.info("<TIME>:::" + runName + ":::" + generateTime + ":::" + rankTime);
+        System.out.println("<TIME>:::" + runName + ":::" + generateTime + ":::" + rankTime);
       }
     } catch (IOException e) {
       e.printStackTrace();

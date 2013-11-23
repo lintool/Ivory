@@ -50,7 +50,8 @@ mkdir derivs.${n}best
 cat $name.$e.seg | $cdec -c $inifile -w $weights -k $n --show_derivations derivs.${n}best 1> out.$n 2> err.$n
 
 ### remove initial nonterminal [X] in grammar rules, for compatibility with Moses phrase table format
-perl $IVORY/etc/clean-scfg.pl $name.grammar/grammar.*
+### (There is a script to undo this: $IVORY/etc/clir.scripts/unclean-scfg.pl)
+perl $IVORY/etc/clir.scripts/clean-scfg.pl $name.grammar/grammar.*
 
 ### put all grammar rules together, for easy lookup
 cat $name.grammar/grammar.* > $name.grammar.singlefile
@@ -118,9 +119,10 @@ etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/run.xml --queries_path d
 
  ## Some useful options:
  
- # -translate_only indri: Skip retrieval, only translate the query. Argument (indri or ivory) specifies the output format
- # -output_path: Specify output file. Default is generated based on parameters.
-
+ # --translate_only indri: Skip retrieval, only translate the query. Argument (indri or ivory) specifies the output format
+ # --output_path: Specify output file. Default is generated based on parameters.
+ # --qrels_path [qrels in TREC-style text file]: Evaluate run after results are generated (i.e., a shortcut to running trec_eval after running CLIR experiment, as shown below)
+ # --grid: Run a grid-search on interpolation parameters (performs 0.1 increments on lambda1 and lambda2). This will take a while. Figures in paper generated with this option.
 
 ==============================================================================
 
@@ -150,11 +152,11 @@ etc/clir.scripts/trec_eval data/en-fr.clef06/qrels.en-fr.clef06.txt ranking.en-f
 ## Current implementation allows two ways to run the token-based CLIR approach: 
 
 ## 1) run interpolation mode (query_type=mtN) with token_weight set to 100.
-etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-fr.clef06/run_en-fr.token.xml -queries_path data/en-fr.clef06/$MT/title_en-fr-trans10-filtered.xml >& run.en-fr.token.log
+etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-fr.clef06/run_en-fr.token.xml -queries_path data/en-fr.clef06/$MT/title_en-fr-trans10-filtered.xml --is_stemming --is_doc_stemmed >& run.en-fr.token.log
 etc/clir.scripts/trec_eval data/en-fr.clef06/qrels.en-fr.clef06.txt ranking.en-fr.token_10-0-100-100_-1.txt
 
 ## 2) run token-based mode (query_type=clir).
-etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-fr.clef06/run_en-fr.token-alt.xml -queries_path data/en-fr.clef06/queries.xml >& run.en-fr.token-alt.log
+etc/run.sh ivory.sqe.retrieval.RunQueryEngine -xml data/en-fr.clef06/run_en-fr.token-alt.xml -queries_path data/en-fr.clef06/queries.xml --is_stemming --is_doc_stemmed >& run.en-fr.token-alt.log
 etc/clir.scripts/trec_eval data/en-fr.clef06/qrels.en-fr.clef06.txt ranking.en-fr.token_0-0-0-100_-1.txt
 
 etc/junit.sh ivory.regression.coling2012.EnFr_CLEF06 >& log &
