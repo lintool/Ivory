@@ -1,3 +1,9 @@
+Version 0.13.0
+==============
+November 23, 2013
+
++ Upgrade to JDK7, fixed minor integration issues with CLIR and other code
+
 Version 0.12.3
 ==============
 September 15, 2013
