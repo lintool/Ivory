@@ -7,9 +7,7 @@ import ivory.core.data.index.PostingsList;
 import ivory.core.data.index.PostingsListDocSortedPositional.PostingsReader;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -20,9 +18,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.log4j.Level;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -32,38 +27,25 @@ import org.xml.sax.SAXException;
 import com.google.common.collect.Maps;
 
 public class ExtractPostingsForQueries {
-  static {
-//    List<Logger> loggers = Collections.<Logger>list(LogManager.getCurrentLoggers());
-//    loggers.add(LogManager.getRootLogger());
-//    for ( Logger logger : loggers ) {
-//        logger.setLevel(Level.OFF);
-//    }
-    
-    // Turn off all logging
-    Logger.getRootLogger().removeAllAppenders();
-  }
-  
   public static void main(String[] args) throws Exception {
-//    List<Logger> loggers = Collections.<Logger>list(LogManager.getCurrentLoggers());
-//    loggers.add(LogManager.getRootLogger());
-//    for ( Logger logger : loggers ) {
-//        logger.setLevel(Level.OFF);
-//    }
-    
     // Turn off all logging
-    //Logger.getRootLogger().removeAllAppenders();
     ((ch.qos.logback.classic.Logger) LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME)).setLevel(ch.qos.logback.classic.Level.OFF);
-    
-    
+
+    if (args.length != 2 ) {
+      System.err.println("usage: [indexPath] [queries]");
+    }
+
+    String qFile = args[0];
+    String indexPath = args[1];
+
     Configuration conf = new Configuration();
     FileSystem fs = FileSystem.getLocal(conf);
 
     Document d = null;
-    String element = "data/trec/queries.robust04.xml";
 
     try {
       d = DocumentBuilderFactory.newInstance().newDocumentBuilder()
-          .parse(fs.open(new Path(element)));
+          .parse(fs.open(new Path(qFile)));
     } catch (SAXException e) {
       throw new ConfigurationException(e.getMessage());
     } catch (IOException e) {
@@ -94,11 +76,10 @@ public class ExtractPostingsForQueries {
       queries.put(qid, queryText);
     }
 
-    String indexPath = "/scratch0/indexes/adhoc/trec/";
     RetrievalEnvironment env = new RetrievalEnvironment(indexPath, fs);
     env.initialize(true);
 
-    System.out.println("# Postings dump of " + indexPath + " for queries " + element + ": " + new Date());
+    System.out.println("# Postings dump of " + indexPath + " for queries " + qFile + ": " + new Date());
     System.out.println("# docs: " + env.getDocumentCount());
     System.out.println("# collection size: " + env.getCollectionSize());
     System.out.println("# vocab size: " + env.getDictionary().size());
