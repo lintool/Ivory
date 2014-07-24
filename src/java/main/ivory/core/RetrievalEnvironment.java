@@ -384,6 +384,10 @@ public class RetrievalEnvironment {
 		}
 	}
 
+	public DefaultFrequencySortedDictionary getDictionary() {
+	  return termidMap;
+	}
+
 	public String getTermFromId(int termid) {
 		return termidMap.getTerm(termid);
 	}
