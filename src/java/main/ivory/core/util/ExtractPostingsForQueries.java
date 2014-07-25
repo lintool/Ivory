@@ -99,7 +99,7 @@ public class ExtractPostingsForQueries {
       Posting p = new Posting();
       System.out.print(e.getValue() + "=");
       while (r.nextPosting(p)) {
-        System.out.print(p.getDocno() + ":" + p.getTf() + ", ");
+        System.out.print(p.getDocno() + ":" + p.getTf() + ",");
       }
       System.out.println("");
     }
