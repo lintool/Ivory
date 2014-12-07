@@ -4,6 +4,7 @@ import ivory.core.tokenize.Tokenizer;
 import ivory.core.tokenize.TokenizerFactory;
 import ivory.core.util.CLIRUtils;
 import ivory.pwsim.score.Bm25;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -14,6 +15,7 @@ import java.io.UnsupportedEncodingException;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
@@ -24,12 +26,14 @@ import org.apache.commons.cli.ParseException;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import edu.umd.cloud9.io.map.HMapIFW;
-import edu.umd.cloud9.io.map.HMapIIW;
-import edu.umd.cloud9.io.map.HMapSFW;
-import edu.umd.cloud9.io.map.HMapSIW;
-import edu.umd.cloud9.util.array.ArrayListOfInts;
-import edu.umd.cloud9.util.map.MapKI.Entry;
+
+import tl.lin.data.array.ArrayListOfInts;
+import tl.lin.data.map.HMapIFW;
+import tl.lin.data.map.HMapIIW;
+import tl.lin.data.map.HMapSFW;
+import tl.lin.data.map.HMapSIW;
+import tl.lin.data.map.MapKF;
+import tl.lin.data.map.MapKI;
 import edu.umd.hooka.Vocab;
 import edu.umd.hooka.alignment.HadoopAlign;
 import edu.umd.hooka.ttables.TTable_monolithic_IFAs;
@@ -265,12 +269,12 @@ public class BitextClassifierUtils {
     for (HMapSIW enDoc : term2tfVectors) {
       HMapSFW v = new HMapSFW();
       int docLen = 0;
-      for (Entry<String> item : enDoc.entrySet()) {
+      for (MapKI.Entry<String> item : enDoc.entrySet()) {
         int tf = item.getValue();
         docLen += tf;
       }
       float sum2 = 0;
-      for (Entry<String> item : enDoc.entrySet()) {
+      for (MapKI.Entry<String> item : enDoc.entrySet()) {
         String term = item.getKey();
         int tf = item.getValue();
         int df = dfTable.get(term);
@@ -284,7 +288,7 @@ public class BitextClassifierUtils {
 
       // normalize
       sum2 = (float) Math.sqrt(sum2);
-      for (edu.umd.cloud9.util.map.MapKF.Entry<String> e : v.entrySet()) {
+      for (MapKF.Entry<String> e : v.entrySet()) {
         float score = v.get(e.getKey());
         v.put(e.getKey(), score / sum2);
       }

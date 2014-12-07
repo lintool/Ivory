@@ -43,9 +43,9 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 import org.apache.log4j.Logger;
 
+import tl.lin.data.map.HMapIV;
+import tl.lin.data.map.MapIV;
 import edu.umd.cloud9.util.PowerTool;
-import edu.umd.cloud9.util.map.HMapIV;
-import edu.umd.cloud9.util.map.MapIV;
 
 /**
  * Indexer for building document-sorted inverted indexes.

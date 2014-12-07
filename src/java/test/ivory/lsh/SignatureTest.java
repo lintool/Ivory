@@ -23,9 +23,9 @@ import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.io.WritableComparable;
 import org.junit.Test;
 
+import tl.lin.data.array.ArrayListOfIntsWritable;
+import tl.lin.data.pair.PairOfWritables;
 import edu.umd.cloud9.io.SequenceFileUtils;
-import edu.umd.cloud9.io.array.ArrayListOfIntsWritable;
-import edu.umd.cloud9.io.pair.PairOfWritables;
 
 public class SignatureTest {
   private static final String TMP_FILENAME1 = "tmp1.out";

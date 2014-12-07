@@ -18,14 +18,14 @@ import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.SequenceFile;
 import org.junit.Test;
 
+import tl.lin.data.map.HMapIFW;
+import tl.lin.data.map.HMapSFW;
+import tl.lin.data.map.MapIF;
+import tl.lin.data.map.MapKF;
+
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-
-import edu.umd.cloud9.io.map.HMapIFW;
-import edu.umd.cloud9.io.map.HMapSFW;
-import edu.umd.cloud9.util.map.MapIF;
-import edu.umd.cloud9.util.map.MapKF;
 
 public class VerifyWikipediaProcessingMonolingual {
   private static final Random RAND = new Random();
@@ -212,7 +212,7 @@ public class VerifyWikipediaProcessingMonolingual {
         "-input=" + galagoIndex + "/wt-term-doc-vectors",
         "-output=" + galagoIndex + "/test_wt-term-doc-vectors",
         "-keys=" + galagoTermDocVector1Id + "," + galagoTermDocVector2Id,
-        "-valueclass=" + edu.umd.cloud9.io.map.HMapSFW.class.getCanonicalName() };
+        "-valueclass=" + HMapSFW.class.getCanonicalName() };
     IntegrationUtils.exec(Joiner.on(" ").join(args));
 
     args = new String[] { "hadoop jar", IntegrationUtils.getJar("dist", "ivory"),
@@ -325,7 +325,7 @@ public class VerifyWikipediaProcessingMonolingual {
         "-input=" + opennlpIndex + "/wt-term-doc-vectors",
         "-output=" + opennlpIndex + "/test_wt-term-doc-vectors",
         "-keys=" + opennlpTermDocVector1Id + "," + opennlpTermDocVector2Id,
-        "-valueclass=" + edu.umd.cloud9.io.map.HMapSFW.class.getCanonicalName() };
+        "-valueclass=" + HMapSFW.class.getCanonicalName() };
     IntegrationUtils.exec(Joiner.on(" ").join(args));
 
     args = new String[] { "hadoop jar", IntegrationUtils.getJar("dist", "ivory"),

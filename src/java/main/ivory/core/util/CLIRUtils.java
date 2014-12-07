@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -39,15 +40,15 @@ import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.SequenceFile;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import edu.stanford.nlp.util.StringUtils;
-import edu.umd.cloud9.io.map.HMapIFW;
-import edu.umd.cloud9.io.map.HMapSFW;
-import edu.umd.cloud9.io.map.HMapSIW;
-import edu.umd.cloud9.io.pair.PairOfFloatString;
-import edu.umd.cloud9.io.pair.PairOfFloats;
-import edu.umd.cloud9.io.pair.PairOfIntFloat;
-import edu.umd.cloud9.util.map.HMapIF;
-import edu.umd.cloud9.util.map.MapKF.Entry;
+
+import tl.lin.data.map.HMapIF;
+import tl.lin.data.map.HMapIFW;
+import tl.lin.data.map.HMapSFW;
+import tl.lin.data.map.HMapSIW;
+import tl.lin.data.map.MapKF;
+import tl.lin.data.pair.PairOfFloatString;
+import tl.lin.data.pair.PairOfFloats;
+import tl.lin.data.pair.PairOfIntFloat;
 import edu.umd.hooka.Vocab;
 import edu.umd.hooka.VocabularyWritable;
 import edu.umd.hooka.alignment.HadoopAlign;
@@ -120,14 +121,14 @@ public class CLIRUtils extends Configured {
    */
   public static float cosine(HMapIFW vectorA, HMapIFW vectorB) {
     float sum = 0, magA = 0, magB = 0;
-    for(edu.umd.cloud9.util.map.MapIF.Entry e : vectorA.entrySet()){
+    for(tl.lin.data.map.MapIF.Entry e : vectorA.entrySet()){
       float value = e.getValue();
       magA += (value * value);
       if(vectorB.containsKey(e.getKey())){
         sum+= value*vectorB.get(e.getKey());
       }
     }
-    for(edu.umd.cloud9.util.map.MapIF.Entry e : vectorB.entrySet()){
+    for(tl.lin.data.map.MapIF.Entry e : vectorB.entrySet()){
       float value = e.getValue();
       magB += (value * value);
     }
@@ -148,14 +149,14 @@ public class CLIRUtils extends Configured {
    */
   public static float cosine(HMapSFW vectorA, HMapSFW vectorB) {
     float sum = 0, magA = 0, magB = 0;
-    for(edu.umd.cloud9.util.map.MapKF.Entry<String> e : vectorA.entrySet()){
+    for(tl.lin.data.map.MapKF.Entry<String> e : vectorA.entrySet()){
       float value = e.getValue();
       magA += (value * value);
       if(vectorB.containsKey(e.getKey())){
         sum+= value*vectorB.get(e.getKey());
       }
     }
-    for(edu.umd.cloud9.util.map.MapKF.Entry<String> e : vectorB.entrySet()){
+    for(tl.lin.data.map.MapKF.Entry<String> e : vectorB.entrySet()){
       float value = e.getValue();
       magB += (value * value);
     }
@@ -177,7 +178,7 @@ public class CLIRUtils extends Configured {
    */
   public static float cosineNormalized(HMapSFW vectorA, HMapSFW vectorB) {
     float sum = 0;
-    for(edu.umd.cloud9.util.map.MapKF.Entry<String> e : vectorA.entrySet()){
+    for(tl.lin.data.map.MapKF.Entry<String> e : vectorA.entrySet()){
       float value = e.getValue();
       if(vectorB.containsKey(e.getKey())){
         sum += value*vectorB.get(e.getKey());
@@ -411,7 +412,7 @@ public class CLIRUtils extends Configured {
     }
 
     int docLen = 0;
-    for(edu.umd.cloud9.util.map.MapKI.Entry<String> item : doc.entrySet()){
+    for(tl.lin.data.map.MapKI.Entry<String> item : doc.entrySet()){
       String fTerm = item.getKey();
       int tf = item.getValue();
       docLen += tf;
@@ -490,7 +491,7 @@ public class CLIRUtils extends Configured {
     // length-normalize doc vector
     if(isNormalize){
       normalization = (float) Math.sqrt(normalization);
-      for(Entry<String> e : v.entrySet()){
+      for(MapKF.Entry<String> e : v.entrySet()){
         v.put(e.getKey(), e.getValue()/normalization);
       }
     }
@@ -530,7 +531,7 @@ public class CLIRUtils extends Configured {
     // length-normalize doc vector
     if(isNormalize){
       normalization = (float) Math.sqrt(normalization);
-      for(Entry<String> e : v.entrySet()){
+      for(MapKF.Entry<String> e : v.entrySet()){
         v.put(e.getKey(), e.getValue()/normalization);
       }
     }
@@ -564,7 +565,7 @@ public class CLIRUtils extends Configured {
 
     HMapSFW v = new HMapSFW();
     float normalization=0;
-    for(edu.umd.cloud9.util.map.MapIF.Entry entry : tfTable.entrySet()){
+    for(tl.lin.data.map.MapIF.Entry entry : tfTable.entrySet()){
       // retrieve term string, tf and df
       String eTerm = eVocab.get(entry.getKey());
       float tf = entry.getValue();
@@ -592,7 +593,7 @@ public class CLIRUtils extends Configured {
     // length-normalize doc vector
     if(isNormalize){
       normalization = (float) Math.sqrt(normalization);
-      for(Entry<String> e : v.entrySet()){
+      for(MapKF.Entry<String> e : v.entrySet()){
         v.put(e.getKey(), e.getValue()/normalization);
       }
     }
@@ -623,7 +624,7 @@ public class CLIRUtils extends Configured {
 
     HMapSFW v = new HMapSFW();
     float normalization=0;
-    for(edu.umd.cloud9.util.map.MapKI.Entry<String> entry : tfTable.entrySet()){
+    for(tl.lin.data.map.MapKI.Entry<String> entry : tfTable.entrySet()){
       // retrieve term string, tf and df
       String eTerm = entry.getKey();
       float tf = entry.getValue();
@@ -651,7 +652,7 @@ public class CLIRUtils extends Configured {
     // length-normalize doc vector
     if(isNormalize){
       normalization = (float) Math.sqrt(normalization);
-      for(Entry<String> e : v.entrySet()){
+      for(MapKF.Entry<String> e : v.entrySet()){
         v.put(e.getKey(), e.getValue()/normalization);
       }
     }

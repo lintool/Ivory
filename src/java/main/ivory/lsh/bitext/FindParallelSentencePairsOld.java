@@ -3,10 +3,13 @@ package ivory.lsh.bitext;
 import ivory.core.RetrievalEnvironment;
 import ivory.core.util.CLIRUtils;
 import ivory.lsh.data.WikiDocInfo;
+
 import java.io.IOException;
 import java.net.URI;
 import java.util.Iterator;
+
 import opennlp.model.RealValueFileEventStream;
+
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.filecache.DistributedCache;
 import org.apache.hadoop.fs.FileSystem;
@@ -30,13 +33,14 @@ import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+
+import tl.lin.data.array.ArrayListOfIntsWritable;
+import tl.lin.data.array.ArrayListWritable;
+import tl.lin.data.map.HMapIV;
+import tl.lin.data.map.HMapSFW;
+import tl.lin.data.pair.PairOfInts;
 import edu.umd.cloud9.collection.Indexable;
 import edu.umd.cloud9.collection.wikipedia.WikipediaPage;
-import edu.umd.cloud9.io.array.ArrayListOfIntsWritable;
-import edu.umd.cloud9.io.array.ArrayListWritable;
-import edu.umd.cloud9.io.map.HMapSFW;
-import edu.umd.cloud9.io.pair.PairOfInts;
-import edu.umd.cloud9.util.map.HMapIV;
 
 /**
 

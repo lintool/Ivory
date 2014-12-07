@@ -3,7 +3,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import edu.umd.cloud9.io.array.ArrayListOfIntsWritable;
+import tl.lin.data.array.ArrayListOfIntsWritable;
 
 /**
  * 

@@ -3,10 +3,12 @@ package ivory.lsh.data;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
-import edu.umd.cloud9.io.array.ArrayListWritable;
-import edu.umd.cloud9.io.map.HMapSFW;
+
+import tl.lin.data.array.ArrayListWritable;
+import tl.lin.data.map.HMapSFW;
 
 public class WikiDocInfo implements Writable {
 	int langID;

@@ -2,8 +2,9 @@ package ivory.sqe.querygenerator;
 
 import java.util.Map;
 import java.util.Set;
-import edu.umd.cloud9.io.map.HMapSFW;
-import edu.umd.cloud9.io.map.HMapSIW;
+
+import tl.lin.data.map.HMapSFW;
+import tl.lin.data.map.HMapSIW;
 
 public abstract class Translation {
   public static final int NBEST = 0, DERIVATION = 1; 

@@ -42,10 +42,10 @@ import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
-import edu.umd.cloud9.io.pair.PairOfInts;
+import tl.lin.data.map.HMapII;
+import tl.lin.data.map.MapII;
+import tl.lin.data.pair.PairOfInts;
 import edu.umd.cloud9.util.PowerTool;
-import edu.umd.cloud9.util.map.HMapII;
-import edu.umd.cloud9.util.map.MapII;
 
 /**
  * Indexer for building document-sorted inverted indexes.

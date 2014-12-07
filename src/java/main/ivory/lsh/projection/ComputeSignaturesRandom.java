@@ -5,9 +5,11 @@ import ivory.core.data.document.WeightedIntDocVector;
 import ivory.lsh.data.FloatAsBytesWritable;
 import ivory.lsh.data.NBitSignature;
 import ivory.lsh.driver.PwsimEnvironment;
+
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.filecache.DistributedCache;
 import org.apache.hadoop.fs.FileSystem;
@@ -27,11 +29,12 @@ import org.apache.hadoop.mapred.SequenceFileOutputFormat;
 import org.apache.hadoop.mapred.lib.IdentityReducer;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+
+import tl.lin.data.array.ArrayListOfFloatsWritable;
+import tl.lin.data.map.HMapIFW;
+import tl.lin.data.map.MapIF;
 import edu.umd.cloud9.io.SequenceFileUtils;
-import edu.umd.cloud9.io.array.ArrayListOfFloatsWritable;
-import edu.umd.cloud9.io.map.HMapIFW;
 import edu.umd.cloud9.util.PowerTool;
-import edu.umd.cloud9.util.map.MapIF;
 
 /**
  * A Hadoop task to compute signatures from document vectors.

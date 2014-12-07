@@ -1,14 +1,14 @@
 package ivory.lsh.eval;
 
 import ivory.core.RetrievalEnvironment;
-import ivory.core.data.document.WeightedIntDocVector;
 import ivory.lsh.driver.PwsimEnvironment;
 import ivory.lsh.eval.SampleSignatures.mapoutput;
+
 import java.io.IOException;
 import java.net.URI;
 import java.util.Iterator;
-import java.util.SortedMap;
 import java.util.Map.Entry;
+import java.util.SortedMap;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -17,7 +17,6 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.filecache.DistributedCache;
 import org.apache.hadoop.fs.FSDataOutputStream;
@@ -38,17 +37,16 @@ import org.apache.hadoop.mapred.Reducer;
 import org.apache.hadoop.mapred.Reporter;
 import org.apache.hadoop.mapred.SequenceFileInputFormat;
 import org.apache.hadoop.mapred.SequenceFileOutputFormat;
-import org.apache.hadoop.mapred.lib.IdentityReducer;
 import org.apache.hadoop.util.LineReader;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
+import tl.lin.data.map.HMapII;
+import tl.lin.data.map.HMapIIW;
+import tl.lin.data.map.HMapSFW;
 import edu.umd.cloud9.io.SequenceFileUtils;
-import edu.umd.cloud9.io.map.HMapIIW;
-import edu.umd.cloud9.io.map.HMapSFW;
-import edu.umd.cloud9.util.map.HMapII;
 
 /**
  * <p>

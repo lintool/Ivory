@@ -48,11 +48,12 @@ import org.apache.hadoop.mapred.SequenceFileInputFormat;
 import org.apache.hadoop.mapred.SequenceFileOutputFormat;
 import org.apache.log4j.Logger;
 
+import tl.lin.data.map.HMapSFW;
+import tl.lin.data.map.MapKF;
+
 import com.google.common.collect.Maps;
 
-import edu.umd.cloud9.io.map.HMapSFW;
 import edu.umd.cloud9.util.PowerTool;
-import edu.umd.cloud9.util.map.MapKF;
 
 public class BuildWeightedTermDocVectors extends PowerTool {
   private static final Logger LOG = Logger.getLogger(BuildWeightedTermDocVectors.class);

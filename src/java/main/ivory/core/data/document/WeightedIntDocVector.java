@@ -6,11 +6,10 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 import org.apache.hadoop.io.WritableUtils;
-
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
-import edu.umd.cloud9.io.map.HMapIFW;
+import tl.lin.data.map.HMapIFW;
 
 /**
  * Implementation of {@link IntDocVector} with term weights
@@ -72,7 +71,7 @@ public class WeightedIntDocVector implements IntDocVector {
 
 	public float dot (WeightedIntDocVector otherVector) {
 		//sLogger.debug ("dot (otherVector: " + otherVector + ")");
-		float result = weightedTerms.dot (otherVector.weightedTerms);
+		float result = (float) weightedTerms.dot(otherVector.weightedTerms);
 		//sLogger.debug ("in KMeansClusterDocs mapper dotProduct () returning: " + result);
 		return result;
 	}

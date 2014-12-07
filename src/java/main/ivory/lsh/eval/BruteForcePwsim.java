@@ -40,11 +40,11 @@ import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
+import tl.lin.data.map.HMapSFW;
+import tl.lin.data.pair.PairOfFloatInt;
+import tl.lin.data.pair.PairOfInts;
+import tl.lin.data.pair.PairOfWritables;
 import edu.umd.cloud9.io.SequenceFileUtils;
-import edu.umd.cloud9.io.map.HMapSFW;
-import edu.umd.cloud9.io.pair.PairOfFloatInt;
-import edu.umd.cloud9.io.pair.PairOfInts;
-import edu.umd.cloud9.io.pair.PairOfWritables;
 
 /**
  * A class to extract the similarity list of each sample document, either by performing dot product

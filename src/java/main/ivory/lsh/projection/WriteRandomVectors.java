@@ -25,7 +25,7 @@ import org.apache.hadoop.mapred.SequenceFileInputFormat;
 import org.apache.hadoop.mapred.SequenceFileOutputFormat;
 import org.apache.log4j.Logger;
 
-import edu.umd.cloud9.io.array.ArrayListOfFloatsWritable;
+import tl.lin.data.array.ArrayListOfFloatsWritable;
 import edu.umd.cloud9.util.PowerTool;
 
 /**

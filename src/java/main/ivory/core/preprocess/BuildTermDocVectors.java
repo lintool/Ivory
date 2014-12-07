@@ -47,14 +47,14 @@ import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 import org.apache.hadoop.util.LineReader;
 import org.apache.log4j.Logger;
 
+import tl.lin.data.array.ArrayListOfInts;
+import tl.lin.data.map.HMapII;
+import tl.lin.data.map.MapII;
 import edu.umd.cloud9.collection.DocnoMapping;
 import edu.umd.cloud9.collection.Indexable;
 import edu.umd.cloud9.mapreduce.NullInputFormat;
 import edu.umd.cloud9.mapreduce.NullMapper;
 import edu.umd.cloud9.util.PowerTool;
-import edu.umd.cloud9.util.array.ArrayListOfInts;
-import edu.umd.cloud9.util.map.HMapII;
-import edu.umd.cloud9.util.map.MapII;
 
 public class BuildTermDocVectors extends PowerTool {
   private static final Logger LOG = Logger.getLogger(BuildTermDocVectors.class);

@@ -21,10 +21,10 @@ import org.apache.hadoop.mapred.SequenceFileOutputFormat;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
-import edu.umd.cloud9.io.map.HMapIFW;
-import edu.umd.cloud9.io.pair.PairOfInts;
+import tl.lin.data.map.HMapIFW;
+import tl.lin.data.map.MapIF;
+import tl.lin.data.pair.PairOfInts;
 import edu.umd.cloud9.util.PowerTool;
-import edu.umd.cloud9.util.map.MapIF.Entry;
 
 /**
  * 
@@ -68,7 +68,7 @@ public class ConvertMapToPairs extends PowerTool {
     public void map(IntWritable docno, HMapIFW map,
         OutputCollector<PairOfInts, IntWritable> output, Reporter reporter) throws IOException {
       reporter.incrCounter(mapoutput.count, map.size());
-      for (Entry e : map.entrySet()) {
+      for (MapIF.Entry e : map.entrySet()) {
         outKey.set(e.getKey(), docno.get());
         outVal.set((int) e.getValue()); // the similarity weight is casted to an integer
         output.collect(outKey, outVal);

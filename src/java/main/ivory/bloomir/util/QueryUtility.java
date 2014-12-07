@@ -15,13 +15,13 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import tl.lin.data.map.HMapIF;
+import tl.lin.data.map.HMapIV;
+
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.io.Files;
 import com.google.common.io.InputSupplier;
-
-import edu.umd.cloud9.util.map.HMapIF;
-import edu.umd.cloud9.util.map.HMapIV;
 
 /**
  * Provides auxiliary functions for query processing.

@@ -1,22 +1,8 @@
 package ivory.ffg.driver;
 
-import java.io.IOException;
-import java.util.Map;
-
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.FSDataInputStream;
-import org.apache.hadoop.fs.FSDataOutputStream;
-import org.apache.hadoop.fs.Path;
-import org.apache.log4j.Logger;
-
-import edu.umd.cloud9.util.map.HMapIF;
-import edu.umd.cloud9.util.map.HMapII;
-import edu.umd.cloud9.util.map.HMapIV;
-
+import ivory.bloomir.util.DocumentUtility;
 import ivory.bloomir.util.OptionManager;
 import ivory.bloomir.util.QueryUtility;
-import ivory.bloomir.util.DocumentUtility;
 import ivory.core.RetrievalEnvironment;
 import ivory.core.data.stat.SpamPercentileScore;
 import ivory.ffg.data.CompressedPositionalPostings;
@@ -24,6 +10,20 @@ import ivory.ffg.feature.Feature;
 import ivory.ffg.stats.GlobalStats;
 import ivory.ffg.util.FeatureUtility;
 import ivory.ffg.util.QrelUtility;
+
+import java.io.IOException;
+import java.util.Map;
+
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FSDataInputStream;
+import org.apache.hadoop.fs.FSDataOutputStream;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
+import org.apache.log4j.Logger;
+
+import tl.lin.data.map.HMapIF;
+import tl.lin.data.map.HMapII;
+import tl.lin.data.map.HMapIV;
 
 public class RankAndFeaturesSmallAdaptive {
   private static final Logger LOGGER = Logger.getLogger(RankAndFeaturesSmallAdaptive.class);

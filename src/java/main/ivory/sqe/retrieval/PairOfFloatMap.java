@@ -1,8 +1,8 @@
 package ivory.sqe.retrieval;
 
-import com.google.common.base.Preconditions;
+import tl.lin.data.map.HMapSFW;
 
-import edu.umd.cloud9.io.map.HMapSFW;
+import com.google.common.base.Preconditions;
 
 public class PairOfFloatMap {
   private HMapSFW map;

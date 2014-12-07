@@ -7,16 +7,21 @@ import ivory.core.tokenize.Tokenizer;
 import ivory.core.tokenize.TokenizerFactory;
 import ivory.sqe.retrieval.Constants;
 import ivory.sqe.retrieval.StructuredQuery;
+
 import java.io.IOException;
 import java.util.Map;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+
+import tl.lin.data.map.HMapSFW;
+import tl.lin.data.map.MapKF;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import edu.umd.cloud9.io.map.HMapSFW;
 
 /**
  * In addition to PSQ implemented in CLWordQueryGenerator, phrase translations are learned from a provided Synchronous context-free grammar (SCFG) (Hiero, 2006) and added to the representation.
@@ -150,7 +155,7 @@ public class SCFGQueryGenerator implements QueryGenerator {
 
     float maxProb = 0f;
     String maxProbTrans = null;
-    for (edu.umd.cloud9.util.map.MapKF.Entry<String> entry : probDist.entrySet()) {
+    for (MapKF.Entry<String> entry : probDist.entrySet()) {
       if (entry.getValue() > maxProb) {
         maxProb = entry.getValue();
         maxProbTrans = entry.getKey();

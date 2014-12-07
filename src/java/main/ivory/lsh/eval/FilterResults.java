@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Iterator;
 import java.util.TreeSet;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
@@ -35,8 +36,9 @@ import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import edu.umd.cloud9.io.map.HMapIIW;
-import edu.umd.cloud9.io.pair.PairOfInts;
+
+import tl.lin.data.map.HMapIIW;
+import tl.lin.data.pair.PairOfInts;
 
 @SuppressWarnings("deprecation")
 public class FilterResults extends Configured implements Tool {

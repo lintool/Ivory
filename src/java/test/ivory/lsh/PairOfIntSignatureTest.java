@@ -3,9 +3,12 @@ package ivory.lsh;
 import ivory.lsh.data.NBitSignature;
 import ivory.lsh.data.PairOfIntNBitSignature;
 import ivory.lsh.data.PairOfIntSignature;
+
 import java.io.IOException;
 import java.util.List;
+
 import junit.framework.JUnit4TestAdapter;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -13,7 +16,8 @@ import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.io.Writable;
 import org.junit.Test;
-import edu.umd.cloud9.io.pair.PairOfWritables;
+
+import tl.lin.data.pair.PairOfWritables;
 import edu.umd.cloud9.io.SequenceFileUtils;
 
 public class PairOfIntSignatureTest {

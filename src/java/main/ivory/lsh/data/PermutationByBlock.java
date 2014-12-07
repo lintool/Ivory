@@ -1,13 +1,10 @@
 package ivory.lsh.data;
 
-import ivory.lsh.data.Permutation;
-
 import java.util.ArrayList;
 import java.util.Collections;
 
-
-import edu.umd.cloud9.io.array.ArrayListOfIntsWritable;
-import edu.umd.cloud9.util.array.ArrayListOfInts;
+import tl.lin.data.array.ArrayListOfInts;
+import tl.lin.data.array.ArrayListOfIntsWritable;
 
 /**
  * Permute a list of ints, block-by-block, as described in WWW07 paper by Manku et al

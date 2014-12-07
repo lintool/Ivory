@@ -31,10 +31,9 @@ import org.apache.hadoop.io.WritableUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
-
-import edu.umd.cloud9.io.pair.PairOfIntLong;
-import edu.umd.cloud9.util.map.HMapKI;
-import edu.umd.cloud9.util.map.HMapKL;
+import tl.lin.data.map.HMapKI;
+import tl.lin.data.map.HMapKL;
+import tl.lin.data.pair.PairOfIntLong;
 
 public class PrefixEncodedGlobalStatsWithIndex {
 

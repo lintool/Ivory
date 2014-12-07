@@ -1,17 +1,5 @@
 package ivory.ffg.driver;
 
-import java.util.Map;
-
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.FSDataInputStream;
-import org.apache.hadoop.fs.FSDataOutputStream;
-import org.apache.hadoop.fs.Path;
-import org.apache.log4j.Logger;
-
-import edu.umd.cloud9.util.map.HMapIF;
-import edu.umd.cloud9.util.map.HMapIV;
-
 import ivory.bloomir.util.OptionManager;
 import ivory.bloomir.util.QueryUtility;
 import ivory.core.RetrievalEnvironment;
@@ -21,6 +9,18 @@ import ivory.ffg.feature.Feature;
 import ivory.ffg.stats.GlobalStats;
 import ivory.ffg.util.FeatureUtility;
 import ivory.ffg.util.QrelUtility;
+
+import java.util.Map;
+
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FSDataInputStream;
+import org.apache.hadoop.fs.FSDataOutputStream;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
+import org.apache.log4j.Logger;
+
+import tl.lin.data.map.HMapIF;
+import tl.lin.data.map.HMapIV;
 
 /**
  * @author Nima Asadi

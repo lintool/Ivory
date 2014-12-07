@@ -3,6 +3,7 @@ package ivory.sqe.querygenerator;
 import ivory.core.tokenize.Tokenizer;
 import ivory.sqe.retrieval.Constants;
 import ivory.sqe.retrieval.PairOfFloatMap;
+
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -15,23 +16,26 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+
+import tl.lin.data.array.ArrayListOfInts;
+import tl.lin.data.map.HMapIV;
+import tl.lin.data.map.HMapKF;
+import tl.lin.data.map.HMapKI;
+import tl.lin.data.map.HMapSFW;
+import tl.lin.data.map.HMapSIW;
+import tl.lin.data.map.MapKF;
+import tl.lin.data.pair.PairOfStringFloat;
+import tl.lin.data.pair.PairOfStrings;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonPrimitive;
-import edu.umd.cloud9.io.map.HMapSFW;
-import edu.umd.cloud9.io.map.HMapSIW;
-import edu.umd.cloud9.io.pair.PairOfStringFloat;
-import edu.umd.cloud9.io.pair.PairOfStrings;
-import edu.umd.cloud9.util.array.ArrayListOfInts;
-import edu.umd.cloud9.util.map.HMapIV;
-import edu.umd.cloud9.util.map.HMapKF;
-import edu.umd.cloud9.util.map.HMapKI;
-import edu.umd.cloud9.util.map.MapKF.Entry;
 
 public class Utils {
   private static final Logger LOG = Logger.getLogger(Utils.class);
@@ -426,7 +430,7 @@ public class Utils {
   public static HMapSFW scaleProbMap(float threshold, float scale, HMapSFW probMap) {
     HMapSFW scaledProbMap = new HMapSFW();
 
-    for (Entry<String> entry : probMap.entrySet()) {
+    for (MapKF.Entry<String> entry : probMap.entrySet()) {
       float pr = entry.getValue() * scale;
       if (pr > threshold) {
         scaledProbMap.put(entry.getKey(), pr);
@@ -500,13 +504,13 @@ public class Utils {
 
       // compute normalization factor
       float sumProb = 0;
-      for (Entry<String> entry : probDist.entrySet()) {
+      for (MapKF.Entry<String> entry : probDist.entrySet()) {
         sumProb += entry.getValue(); 
       }
 
       // normalize values and remove low-prob entries based on normalized values
       float sumProb2 = 0;
-      for (Entry<String> entry : probDist.entrySet()) {
+      for (MapKF.Entry<String> entry : probDist.entrySet()) {
         float pr = entry.getValue() / sumProb;
         if (pr > lexProbThreshold) {
           sumProb2 += pr;
@@ -536,17 +540,17 @@ public class Utils {
    */
   public static void normalize(HMapSFW probMap) {
     float normalization = 0;
-    for (Entry<String> e : probMap.entrySet()) {
+    for (MapKF.Entry<String> e : probMap.entrySet()) {
       float weight = e.getValue();
       normalization += weight;
     }
-    for (Entry<String> e : probMap.entrySet()) {
+    for (MapKF.Entry<String> e : probMap.entrySet()) {
       probMap.put(e.getKey(), e.getValue()/normalization);
     }              
   }
 
   public static void filter(HMapSFW probMap, float lexProbThreshold) {
-    for (Entry<String> e : probMap.entrySet()) {
+    for (MapKF.Entry<String> e : probMap.entrySet()) {
       if (e.getValue() > lexProbThreshold) {
         probMap.put(e.getKey(), e.getValue());
       }
@@ -604,7 +608,7 @@ public class Utils {
     }
 
     JsonArray arr = new JsonArray();
-    for(Entry<String> entry : probMap.entrySet()) {
+    for(MapKF.Entry<String> entry : probMap.entrySet()) {
       arr.add(new JsonPrimitive(entry.getValue()));
       arr.add(new JsonPrimitive(entry.getKey()));
     }

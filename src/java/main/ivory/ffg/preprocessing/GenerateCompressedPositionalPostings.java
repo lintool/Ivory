@@ -1,26 +1,8 @@
 package ivory.ffg.preprocessing;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.FSDataOutputStream;
-import org.apache.hadoop.fs.Path;
-import org.apache.log4j.Logger;
-
-import edu.umd.cloud9.util.map.HMapII;
-import edu.umd.cloud9.util.map.HMapIV;
-
+import ivory.bloomir.util.DocumentUtility;
 import ivory.bloomir.util.OptionManager;
 import ivory.bloomir.util.QueryUtility;
-import ivory.bloomir.util.DocumentUtility;
 import ivory.core.RetrievalEnvironment;
 import ivory.core.data.index.Posting;
 import ivory.core.data.index.PostingsList;
@@ -28,6 +10,24 @@ import ivory.core.data.index.PostingsReader;
 import ivory.core.data.index.TermPositions;
 import ivory.core.data.stat.SpamPercentileScore;
 import ivory.ffg.data.CompressedPositionalPostings;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FSDataOutputStream;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
+import org.apache.log4j.Logger;
+
+import tl.lin.data.map.HMapII;
+import tl.lin.data.map.HMapIV;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 public class GenerateCompressedPositionalPostings {
   private static final Logger LOGGER = Logger.getLogger(GenerateCompressedPositionalPostings.class);

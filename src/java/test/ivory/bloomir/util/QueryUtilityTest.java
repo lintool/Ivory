@@ -1,14 +1,14 @@
 package ivory.bloomir.util;
 
-import junit.framework.JUnit4TestAdapter;
-
-import com.google.common.io.ByteStreams;
-
-import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import junit.framework.JUnit4TestAdapter;
 
-import edu.umd.cloud9.util.map.HMapIV;
+import org.junit.Test;
+
+import tl.lin.data.map.HMapIV;
+
+import com.google.common.io.ByteStreams;
 
 public class QueryUtilityTest {
   @Test public void testEmpty() throws Exception {

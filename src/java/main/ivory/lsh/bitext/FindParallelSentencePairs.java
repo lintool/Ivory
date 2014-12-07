@@ -3,9 +3,12 @@ package ivory.lsh.bitext;
 import ivory.core.util.CLIRUtils;
 import ivory.lsh.data.WikiSentenceInfo;
 import ivory.lsh.driver.PwsimEnvironment;
+
 import java.io.IOException;
 import java.util.Iterator;
+
 import opennlp.model.RealValueFileEventStream;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
@@ -34,11 +37,12 @@ import org.apache.hadoop.mapred.TextOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Logger;
-import edu.umd.cloud9.io.array.ArrayListOfIntsWritable;
-import edu.umd.cloud9.io.array.ArrayListWritable;
-import edu.umd.cloud9.io.map.HMapSFW;
-import edu.umd.cloud9.io.pair.PairOfInts;
-import edu.umd.cloud9.util.map.HMapIV;
+
+import tl.lin.data.array.ArrayListOfIntsWritable;
+import tl.lin.data.array.ArrayListWritable;
+import tl.lin.data.map.HMapIV;
+import tl.lin.data.map.HMapSFW;
+import tl.lin.data.pair.PairOfInts;
 
 /**
   Step 1 of the bitext extraction algorithm.

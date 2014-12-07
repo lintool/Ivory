@@ -18,7 +18,7 @@ package ivory.ptc.judgments.extractor;
 
 import ivory.ptc.data.AnchorTextTarget;
 import ivory.ptc.data.PseudoJudgments;
-import edu.umd.cloud9.io.array.ArrayListWritable;
+import tl.lin.data.array.ArrayListWritable;
 
 
 /**

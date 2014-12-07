@@ -5,9 +5,11 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.apache.hadoop.io.Writable;
-import edu.umd.cloud9.io.pair.PairOfInts;
-import edu.umd.cloud9.util.array.ArrayListOfInts;
+
+import tl.lin.data.array.ArrayListOfInts;
+import tl.lin.data.pair.PairOfInts;
 
 public class ListOfIntPairs implements Writable {
 

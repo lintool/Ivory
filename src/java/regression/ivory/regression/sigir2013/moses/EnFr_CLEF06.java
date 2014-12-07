@@ -6,16 +6,22 @@ import ivory.regression.GroundTruth.Metric;
 import ivory.smrf.retrieval.Accumulator;
 import ivory.sqe.retrieval.QueryEngine;
 import ivory.sqe.retrieval.RunQueryEngine;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
 import junit.framework.JUnit4TestAdapter;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.junit.Test;
+
+import tl.lin.data.map.HMapSFW;
+
 import com.google.common.collect.Maps;
+
 import edu.umd.cloud9.collection.DocnoMapping;
-import edu.umd.cloud9.io.map.HMapSFW;
 
 public class EnFr_CLEF06 {
   private QueryEngine qe;

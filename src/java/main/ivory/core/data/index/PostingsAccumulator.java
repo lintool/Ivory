@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.io.WritableUtils;
 
-import edu.umd.cloud9.util.array.ArrayListOfInts;
+import tl.lin.data.array.ArrayListOfInts;
 
 public class PostingsAccumulator implements Writable {
   private ArrayListOfInts docnos = new ArrayListOfInts();

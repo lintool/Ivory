@@ -2,14 +2,17 @@ package ivory.sqe.querygenerator;
 
 import ivory.core.tokenize.Tokenizer;
 import ivory.sqe.retrieval.Constants;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.log4j.Logger;
-import edu.umd.cloud9.io.map.HMapSFW;
-import edu.umd.cloud9.io.map.HMapSIW;
+
+import tl.lin.data.map.HMapSFW;
+import tl.lin.data.map.HMapSIW;
 
 public class TranslationFactory {
   private static final Logger LOG = Logger.getLogger(TranslationFactory.class);

@@ -8,13 +8,15 @@ import ivory.core.tokenize.TokenizerFactory;
 import ivory.core.util.CLIRUtils;
 import ivory.pwsim.score.Bm25;
 import ivory.pwsim.score.ScoringModel;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
+
 import opennlp.model.MaxentModel;
-import ivory.lsh.bitext.MoreGenericModelReader;
 import opennlp.tools.sentdetect.SentenceDetectorME;
 import opennlp.tools.sentdetect.SentenceModel;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.filecache.DistributedCache;
 import org.apache.hadoop.fs.FileSystem;
@@ -23,13 +25,16 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+
+import tl.lin.data.array.ArrayListOfIntsWritable;
+import tl.lin.data.array.ArrayListWritable;
+import tl.lin.data.map.HMapIFW;
+import tl.lin.data.map.HMapSFW;
+import tl.lin.data.map.HMapSIW;
+import tl.lin.data.map.MapKI;
+
 import com.google.common.collect.Maps;
-import edu.umd.cloud9.io.array.ArrayListOfIntsWritable;
-import edu.umd.cloud9.io.array.ArrayListWritable;
-import edu.umd.cloud9.io.map.HMapIFW;
-import edu.umd.cloud9.io.map.HMapSFW;
-import edu.umd.cloud9.io.map.HMapSIW;
-import edu.umd.cloud9.util.map.MapKI.Entry;
+
 import edu.umd.hooka.Vocab;
 import edu.umd.hooka.VocabularyWritable;
 import edu.umd.hooka.alignment.HadoopAlign;
@@ -226,7 +231,7 @@ public class PreprocessHelper {
 
     //translated tf values
     HMapIFW transTermTf = new HMapIFW();
-    for(Entry<String> entry : term2Tf.entrySet()){
+    for(MapKI.Entry<String> entry : term2Tf.entrySet()){
       String fTerm = entry.getKey();
       int tf = entry.getValue();
       // transTermTf won't be updated if fTerm not in vocab

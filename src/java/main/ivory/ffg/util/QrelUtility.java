@@ -1,29 +1,27 @@
 package ivory.ffg.util;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.IOException;
-import java.io.File;
-import java.io.FileInputStream;
 import java.nio.charset.Charset;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
-import com.google.common.io.InputSupplier;
-import com.google.common.io.Files;
-
-import org.xml.sax.SAXException;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
-import edu.umd.cloud9.util.map.HMapIV;
+import tl.lin.data.map.HMapIV;
+
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
+import com.google.common.io.Files;
+import com.google.common.io.InputSupplier;
 
 /**
  * Provides auxiliary functions for parsing qrel files.

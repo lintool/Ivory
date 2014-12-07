@@ -31,7 +31,7 @@ import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
-import edu.umd.cloud9.io.map.HMapSFW;
+import tl.lin.data.map.HMapSFW;
 
 /**
  * Read sequence files, output key-value pairs that match specified key.

@@ -1,7 +1,7 @@
 package ivory.lsh.data;
 import org.apache.hadoop.io.WritableComparable;
 
-import edu.umd.cloud9.io.array.ArrayListOfIntsWritable;
+import tl.lin.data.array.ArrayListOfIntsWritable;
 
 
 /**
