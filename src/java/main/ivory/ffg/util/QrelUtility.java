@@ -3,9 +3,7 @@ package ivory.ffg.util;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.charset.Charset;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -20,8 +18,8 @@ import tl.lin.data.map.HMapIV;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import com.google.common.io.ByteSource;
 import com.google.common.io.Files;
-import com.google.common.io.InputSupplier;
 
 /**
  * Provides auxiliary functions for parsing qrel files.
@@ -33,23 +31,21 @@ public class QrelUtility {
     throws Exception {
     Preconditions.checkNotNull(qrelPath);
 
-    return QrelUtility.loadQrelsFromXML(Files.newInputStreamSupplier(new File(qrelPath)));
+    return QrelUtility.loadQrelsFromXML(Files.asByteSource(new File(qrelPath)));
   }
 
   public static HMapIV<int[]> parseQrelsFromTabDelimited(String qrelPath)
     throws Exception {
     Preconditions.checkNotNull(qrelPath);
 
-    return QrelUtility.loadQrelsFromTabDelimited(Files.newReaderSupplier(new File(qrelPath),
-                                                                          Charset.defaultCharset()));
+    return QrelUtility.loadQrelsFromTabDelimited(Files.asByteSource(new File(qrelPath)));
   }
 
   public static HMapIV<long[]> parseLongQrelsFromTabDelimited(String qrelPath)
     throws Exception {
     Preconditions.checkNotNull(qrelPath);
 
-    return QrelUtility.loadLongQrelsFromTabDelimited(Files.newReaderSupplier(new File(qrelPath),
-                                                                             Charset.defaultCharset()));
+    return QrelUtility.loadLongQrelsFromTabDelimited(Files.asByteSource(new File(qrelPath)));
   }
 
   /**
@@ -61,11 +57,11 @@ public class QrelUtility {
    * @param qrelInputSupplier An input supplier that provides the qrels
    * @return A map of query id to a list of document ids
    */
-  public static HMapIV<int[]> loadQrelsFromXML(InputSupplier<? extends InputStream> qrelInputSupplier)
+  public static HMapIV<int[]> loadQrelsFromXML(ByteSource source)
       throws ParserConfigurationException, SAXException, IOException {
-    Preconditions.checkNotNull(qrelInputSupplier);
+    Preconditions.checkNotNull(source);
 
-    Document dom = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(qrelInputSupplier.getInput());
+    Document dom = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(source.openStream());
     NodeList nodeList = dom.getDocumentElement().getElementsByTagName("judgment");
 
     if(nodeList == null) {
@@ -98,12 +94,12 @@ public class QrelUtility {
     return qrels;
   }
 
-  public static HMapIV<int[]> loadQrelsFromTabDelimited(InputSupplier<? extends InputStreamReader> qrelInputSupplier)
+  public static HMapIV<int[]> loadQrelsFromTabDelimited(ByteSource source)
       throws IOException {
-    Preconditions.checkNotNull(qrelInputSupplier);
+    Preconditions.checkNotNull(source);
 
     HMapIV<List<Integer>> tempQrels = new HMapIV<List<Integer>>();
-    BufferedReader reader = new BufferedReader(qrelInputSupplier.getInput());
+    BufferedReader reader = new BufferedReader(new InputStreamReader(source.openStream()));
 
     String line;
     while((line = reader.readLine()) != null) {
@@ -131,12 +127,12 @@ public class QrelUtility {
     return qrels;
   }
 
-  public static HMapIV<long[]> loadLongQrelsFromTabDelimited(InputSupplier<? extends InputStreamReader> qrelInputSupplier)
+  public static HMapIV<long[]> loadLongQrelsFromTabDelimited(ByteSource source)
       throws IOException {
-    Preconditions.checkNotNull(qrelInputSupplier);
+    Preconditions.checkNotNull(source);
 
     HMapIV<List<Long>> tempQrels = new HMapIV<List<Long>>();
-    BufferedReader reader = new BufferedReader(qrelInputSupplier.getInput());
+    BufferedReader reader = new BufferedReader(new InputStreamReader(source.openStream()));
 
     String line;
     while((line = reader.readLine()) != null) {

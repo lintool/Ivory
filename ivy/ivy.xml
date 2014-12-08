@@ -6,7 +6,14 @@
   </publications>
 
   <dependencies>
-    <dependency org="edu.umd" name="cloud9" rev="2.0.0-SNAPSHOT" conf="*->*,!sources,!javadoc" />
+    <dependency org="edu.umd" name="cloud9" rev="2.0.0-SNAPSHOT" conf="*->*,!sources,!javadoc">
+      <exclude org="it.unimi.dsi" /> 
+    </dependency>
+
+    <dependency org="it.unimi.dsi" name="fastutil" rev="6.5.4" conf="*->*,!sources,!javadoc"/>
+    <dependency org="it.unimi.dsi" name="dsiutils" rev="2.0.15" conf="*->*,!sources,!javadoc"/>
+    <dependency org="it.unimi.dsi" name="sux4j" rev="3.0.8" conf="*->*,!sources,!javadoc"/>
+
     <dependency org="" name="stanford-chinese-segmenter" rev="2011-09-14-ivory" conf="*->*,!sources,!javadoc"/>
 
     <!-- Needed for building dictionaries: com.martiansoftware.jsap.StringParser -->

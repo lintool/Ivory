@@ -8,13 +8,13 @@ import org.junit.Test;
 
 import tl.lin.data.map.HMapIV;
 
-import com.google.common.io.ByteStreams;
+import com.google.common.io.ByteSource;
 
 public class QueryUtilityTest {
   @Test public void testEmpty() throws Exception {
     String queriesXML = "<parameters></parameters>";
     HMapIV<String> returned = QueryUtility.
-      loadQueries(ByteStreams.newInputStreamSupplier(queriesXML.getBytes()));
+      loadQueries(ByteSource.wrap(queriesXML.getBytes()));
     assertEquals(returned.size(), 0);
   }
 
@@ -28,7 +28,7 @@ public class QueryUtilityTest {
     expected.put(10, "text 10");
 
     HMapIV<String> returned = QueryUtility.
-      loadQueries(ByteStreams.newInputStreamSupplier(queriesXML.getBytes()));
+      loadQueries(ByteSource.wrap(queriesXML.getBytes()));
 
     assertEquals(returned.size(), expected.size());
     for(int qid: expected.keySet()) {

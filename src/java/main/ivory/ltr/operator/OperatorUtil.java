@@ -1,23 +1,21 @@
 package ivory.ltr.operator;
 
-import java.io.InputStream;
-import java.io.IOException;
 import java.io.File;
+import java.io.IOException;
 import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Maps;
-import com.google.common.io.InputSupplier;
-import com.google.common.io.Files;
-
-import org.xml.sax.SAXException;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Maps;
+import com.google.common.io.ByteSource;
+import com.google.common.io.Files;
 
 /**
  * Provides auxiliary functions to parse operators.
@@ -33,7 +31,7 @@ public class OperatorUtil {
    */
   public static Map<String, Operator> parseOperators(String featurePath)
       throws Exception {
-    return OperatorUtil.loadOperators(Files.newInputStreamSupplier(new File(featurePath)));
+    return OperatorUtil.loadOperators(Files.asByteSource(new File(featurePath)));
   }
 
   /**
@@ -42,12 +40,12 @@ public class OperatorUtil {
    * @param featureInputSupplier An input supplier that provides the feature descriptions
    * @return A map of feature id to Operator
    */
-  public static Map<String, Operator> loadOperators(InputSupplier<? extends InputStream> featureInputSupplier)
+  public static Map<String, Operator> loadOperators(ByteSource source)
     throws ParserConfigurationException, SAXException, IOException, Exception {
-    Preconditions.checkNotNull(featureInputSupplier);
+    Preconditions.checkNotNull(source);
 
     Map<String, Operator> operators = Maps.newHashMap();
-    Document dom = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(featureInputSupplier.getInput());
+    Document dom = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(source.openStream());
     NodeList nodeList = dom.getDocumentElement().getElementsByTagName("model");
 
     if(nodeList == null) {
