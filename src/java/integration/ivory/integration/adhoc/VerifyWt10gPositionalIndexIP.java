@@ -47,6 +47,7 @@ public class VerifyWt10gPositionalIndexIP {
     jars.add(IntegrationUtils.getJar("lib", "sux4j"));
     jars.add(IntegrationUtils.getJar("lib", "commons-collections"));
     jars.add(IntegrationUtils.getJar("lib", "kamikaze"));
+    jars.add(IntegrationUtils.getJar("lib", "lintools-datatypes-1.0.0"));
     jars.add(IntegrationUtils.getJar("dist", "ivory"));
 
     String libjars = String.format("-libjars=%s", Joiner.on(",").join(jars));

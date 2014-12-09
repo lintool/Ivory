@@ -48,6 +48,7 @@ public class VerifyClueNonPositionalIndexIP {
     jars.add(IntegrationUtils.getJar("lib", "jsap"));
     jars.add(IntegrationUtils.getJar("lib", "sux4j"));
     jars.add(IntegrationUtils.getJar("lib", "commons-collections"));
+    jars.add(IntegrationUtils.getJar("lib", "lintools-datatypes-1.0.0"));
     jars.add(IntegrationUtils.getJar("dist", "ivory"));
 
     String libjars = String.format("-libjars=%s", Joiner.on(",").join(jars));
