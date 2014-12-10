@@ -98,11 +98,6 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
       MIN_SIZE = conf.getInt("Ivory.MinNumTerms", 0);
 
       try {
-        if (conf.get ("mapred.job.tracker").equals ("local")) {
-          // Explicitly not support local mode.
-          throw new RuntimeException("Local mode not supported!");
-        }
-
         FileSystem remoteFS = FileSystem.get(conf);
         RetrievalEnvironment targetEnv = new RetrievalEnvironment(conf.get(Constants.TargetIndexPath), remoteFS);
 

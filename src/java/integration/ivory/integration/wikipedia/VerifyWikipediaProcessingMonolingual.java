@@ -191,6 +191,7 @@ public class VerifyWikipediaProcessingMonolingual {
     jars.add(IntegrationUtils.getJar("lib", "maxent"));
     jars.add(IntegrationUtils.getJar("lib", "lucene-analyzers"));
     jars.add(IntegrationUtils.getJar("lib", "lucene-core"));
+    jars.add(IntegrationUtils.getJar("lib", "lintools-datatypes-1.0.0"));
     jars.add(IntegrationUtils.getJar("dist", "ivory"));
 
     String libjars = String.format("-libjars=%s", Joiner.on(",").join(jars));
@@ -302,6 +303,7 @@ public class VerifyWikipediaProcessingMonolingual {
     jars.add(IntegrationUtils.getJar("lib", "maxent"));
     jars.add(IntegrationUtils.getJar("lib", "lucene-analyzers"));
     jars.add(IntegrationUtils.getJar("lib", "lucene-core"));
+    jars.add(IntegrationUtils.getJar("lib", "lintools-datatypes-1.0.0"));
     jars.add(IntegrationUtils.getJar("dist", "ivory"));
 
     String libjars = String.format("-libjars=%s", Joiner.on(",").join(jars));
@@ -386,6 +388,7 @@ public class VerifyWikipediaProcessingMonolingual {
   private void verifyTermDocVector(Map<String, Float> doc, HMapSFW value) {
     assertTrue(value != null);
     for (Map.Entry<String, Float> entry : doc.entrySet()) {
+      System.out.println("checking " + entry.getKey() + ": expected = " + entry.getValue() + ", actual = " + value.get(entry.getKey()));
       assertTrue(value.containsKey(entry.getKey()));
       assertEquals(entry.getValue(), value.get(entry.getKey()), 10e-4);
     }
@@ -394,6 +397,7 @@ public class VerifyWikipediaProcessingMonolingual {
   private void verifyIntDocVector(Map<Integer, Float> doc, WeightedIntDocVector value) {
     assertTrue(value != null);
     for (Map.Entry<Integer, Float> entry : doc.entrySet()) {
+      System.out.println("checking " + entry.getKey() + ": expected = " + entry.getValue() + ", actual = " + value.getWeight(entry.getKey()));
       assertTrue(value.containsTerm(entry.getKey()));
       assertEquals(entry.getValue(), value.getWeight(entry.getKey()), 10e-4);
     }
