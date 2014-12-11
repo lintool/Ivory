@@ -129,7 +129,7 @@ public class SearchSequenceFiles extends Configured implements Tool {
     LOG.info("Output directory: "+outputPath);
     LOG.info("Value class: "+valueClassName);
 
-    if (valueClassName.contains("HMapSFW")) {
+    if (valueClassName.contains("HMapStFW")) {
       job.setMapperClass(MyMapperTerm.class);
       job.setMapOutputValueClass(HMapStFW.class);
       job.setOutputValueClass(HMapStFW.class);
