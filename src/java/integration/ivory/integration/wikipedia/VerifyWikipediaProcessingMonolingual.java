@@ -71,30 +71,30 @@ public class VerifyWikipediaProcessingMonolingual {
   private int galagoIntDocVector1Id = 1;
   private ImmutableMap<Integer, Float> galagoIntDocVector1 =
       new ImmutableMap.Builder<Integer, Float>()
-          .put(17835, 0.1396f)
-          .put(28725, 0.1389f)
+          .put(17836, 0.1396f)
+          .put(28723, 0.1389f)
           .put(10641, 0.1270f)
           .put(23480, 0.1235f)
-          .put(95280, 0.1218f)
-          .put(68146, 0.1189f)
-          .put(38973, 0.1152f)
-          .put(84488, 0.1049f)
+          .put(95282, 0.1218f)
+          .put(68145, 0.1189f)
+          .put(38972, 0.1152f)
+          .put(84485, 0.1049f)
           .put(56020, 0.0986f)
-          .put(10241, 0.0980f)
+          .put(10242, 0.0980f)
           .build();
 
   private int galagoIntDocVector2Id = 2;
   private ImmutableMap<Integer, Float> galagoIntDocVector2 =
       new ImmutableMap.Builder<Integer, Float>()
-          .put(33609, 0.1578f)
-          .put(26082, 0.1485f)
-          .put(18040, 0.1457f)
-          .put(124022, 0.1231f)
-          .put(42436, 0.1200f)
-          .put(93173, 0.1184f)
-          .put(5348, 0.0976f)
-          .put(588707, 0.0968f)
-          .put(5232, 0.0936f)
+          .put(33608, 0.1578f)
+          .put(26081, 0.1485f)
+          .put(18041, 0.1457f)
+          .put(124021, 0.1231f)
+          .put(42434, 0.1200f)
+          .put(93174, 0.1184f)
+          .put(5349, 0.0976f)
+          .put(588669, 0.0968f)
+          .put(5233, 0.0936f)
           .put(6676, 0.0895f)
           .build();
 
@@ -135,25 +135,25 @@ public class VerifyWikipediaProcessingMonolingual {
   private int opennlpIntDocVector1Id = 1;
   private ImmutableMap<Integer, Float> opennlpIntDocVector1 =
       new ImmutableMap.Builder<Integer, Float>()
-          .put(13535, 0.1824f)
-          .put(9149, 0.1663f)
-          .put(16223, 0.1588f)
+          .put(13536, 0.1824f)
+          .put(9150, 0.1663f)
+          .put(16224, 0.1588f)
           .put(21027, 0.1463f)
-          .put(8938, 0.1259f)
+          .put(8939, 0.1259f)
           .put(23931, 0.1235f)
           .put(10558, 0.1229f)
           .put(7006, 0.1138f)
           .put(9483, 0.0900f)
-          .put(15807, 0.0884f)
+          .put(15808, 0.0884f)
           .build();
 
   private int opennlpIntDocVector2Id = 2;
   private ImmutableMap<Integer, Float> opennlpIntDocVector2 =
       new ImmutableMap.Builder<Integer, Float>()
-          .put(17354, 0.1791f)
-          .put(13640, 0.1773f)
-          .put(5042, 0.1168f)
-          .put(4935, 0.1114f)
+          .put(17355, 0.1791f)
+          .put(13641, 0.1773f)
+          .put(5043, 0.1168f)
+          .put(4936, 0.1114f)
           .put(6187, 0.1054f)
           .put(3595, 0.1048f)
           .put(6407, 0.1045f)
