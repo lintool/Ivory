@@ -37,7 +37,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import tl.lin.data.map.HMapIFW;
-import tl.lin.data.map.HMapSFW;
+import tl.lin.data.map.HMapStFW;
 import tl.lin.data.map.MapIF;
 
 import com.google.common.collect.Maps;
@@ -66,7 +66,7 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
   protected static enum DF { TransDf, NoDf }
 
   private static class MyMapperTrans extends MapReduceBase implements
-  Mapper<IntWritable, TermDocVector, IntWritable, HMapSFW> {
+  Mapper<IntWritable, TermDocVector, IntWritable, HMapStFW> {
 
     private ScoringModel model;
     // eVocabSrc is the English vocabulary for probability table e2f_Probs.
@@ -209,7 +209,7 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
     }
 
     public void map(IntWritable docno, TermDocVector doc,
-        OutputCollector<IntWritable, HMapSFW> output, Reporter reporter) throws IOException {
+        OutputCollector<IntWritable, HMapStFW> output, Reporter reporter) throws IOException {
       if (docno.get() % SAMPLING != 0) {
         return; // for generating sample document vectors. no sampling if SAMPLING=1
       }
@@ -236,7 +236,7 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
       int docLen = CLIRUtils.translateTFs(doc, tfS, eVocabSrc, eVocabTrg, fVocabSrc, fVocabTrg,
           e2f_Probs, f2e_Probs, tokenizer, LOG);
 
-      HMapSFW v = CLIRUtils.createTermDocVector(docLen, tfS, eVocabTrg, model, dict, dfTable,
+      HMapStFW v = CLIRUtils.createTermDocVector(docLen, tfS, eVocabTrg, model, dict, dfTable,
           isNormalize, LOG);
 
       // If no translation of any word is in the target vocab, remove document i.e., our model
@@ -354,9 +354,9 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
 
     conf.setInputFormat(SequenceFileInputFormat.class);
     conf.setMapOutputKeyClass(IntWritable.class);
-    conf.setMapOutputValueClass(HMapSFW.class);
+    conf.setMapOutputValueClass(HMapStFW.class);
     conf.setOutputKeyClass(IntWritable.class);
-    conf.setOutputValueClass(HMapSFW.class);
+    conf.setOutputValueClass(HMapStFW.class);
     conf.setOutputFormat(SequenceFileOutputFormat.class);
 
     conf.setMapperClass(MyMapperTrans.class);

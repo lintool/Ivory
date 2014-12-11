@@ -18,7 +18,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
-import tl.lin.data.map.HMapSFW;
+import tl.lin.data.map.HMapStFW;
 import tl.lin.data.pair.PairOfFloatInt;
 import tl.lin.data.pair.PairOfStrings;
 
@@ -145,7 +145,7 @@ public class ProbabilisticStructuredQueryGenerator implements QueryGenerator {
         }
       } else {
         JsonObject tokenTrans = new JsonObject();
-        HMapSFW distr = getTranslations(origQuery, token, phrasePairs, stemmed2Stemmed);
+        HMapStFW distr = getTranslations(origQuery, token, phrasePairs, stemmed2Stemmed);
         JsonArray weights = Utils.createJsonArrayFromProbabilities(distr);
         if (weights != null) {
           tokenTrans.add("#weight", weights);
@@ -185,8 +185,8 @@ public class ProbabilisticStructuredQueryGenerator implements QueryGenerator {
     return token;
   }
 
-  protected HMapSFW getTranslations(String query, String token, Set<PairOfStrings> pairsInSCFG, Map<String, String> stemmed2Stemmed) {
-    HMapSFW probDist = new HMapSFW();
+  protected HMapStFW getTranslations(String query, String token, Set<PairOfStrings> pairsInSCFG, Map<String, String> stemmed2Stemmed) {
+    HMapStFW probDist = new HMapStFW();
     int f = fVocab_f2e.get(token);
     if (f <= 0) {
 

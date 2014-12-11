@@ -28,8 +28,8 @@ import tl.lin.data.array.ArrayListOfInts;
 import tl.lin.data.map.HMapIV;
 import tl.lin.data.map.HMapKF;
 import tl.lin.data.map.HMapKI;
-import tl.lin.data.map.HMapSFW;
-import tl.lin.data.map.HMapSIW;
+import tl.lin.data.map.HMapStFW;
+import tl.lin.data.map.HMapStIW;
 import tl.lin.data.map.MapKF;
 import tl.lin.data.pair.PairOfStringFloat;
 import tl.lin.data.pair.PairOfStrings;
@@ -72,14 +72,14 @@ public class Utils {
    * @param phrase2score
    * @param phrase2count
    */
-  private static void addToPhraseTable(String fPhrase, String transPhrase, float prob, Map<String, HMapSFW> phrase2score, Map<String, HMapKI<String>> phrase2count){
+  private static void addToPhraseTable(String fPhrase, String transPhrase, float prob, Map<String, HMapStFW> phrase2score, Map<String, HMapKI<String>> phrase2count){
     fPhrase = fPhrase.trim();
     transPhrase = transPhrase.trim();
 
     //LOG.info("Found translation phrase " + transPhrase);
 
     if (!phrase2score.containsKey(fPhrase)) {
-      phrase2score.put(fPhrase, new HMapSFW());
+      phrase2score.put(fPhrase, new HMapStFW());
     }
     // if same phrase extracted from multiple rules, average prob.s
 
@@ -188,7 +188,7 @@ public class Utils {
    * @param docLangTokenizer
    *    to check for stopwords on RHS
    */
-  public static Map<String, HMapSFW> generateTranslationTable(FileSystem fs, Configuration conf, String grammarFile, Tokenizer queryLangTokenizer, Tokenizer docLangTokenizer) {
+  public static Map<String, HMapStFW> generateTranslationTable(FileSystem fs, Configuration conf, String grammarFile, Tokenizer queryLangTokenizer, Tokenizer docLangTokenizer) {
     if (conf.getBoolean(Constants.Quiet, false)) {
       LOG.setLevel(Level.OFF);
     }
@@ -198,12 +198,12 @@ public class Utils {
     int one2many = conf.getInt(Constants.One2Many, 2);
 
     // scfgDist table is a set of (source_token --> X) maps, where X is a set of (token_trans --> score) maps
-    Map<String,HMapSFW> scfgDist = new HashMap<String,HMapSFW>();
+    Map<String,HMapStFW> scfgDist = new HashMap<String,HMapStFW>();
 
     // phrase2count table is a set of (source_phrase --> X) maps, where X is a set of (phrase_trans --> count) maps
-    HMapSFW phraseDist = new HMapSFW();
+    HMapStFW phraseDist = new HMapStFW();
 
-    HMapSIW srcTokenCnt = new HMapSIW();
+    HMapStIW srcTokenCnt = new HMapStIW();
 
     Set<String> bagOfTargetTokens = new HashSet<String>();
 
@@ -230,8 +230,8 @@ public class Utils {
     return scfgDist;
   }
 
-  public static void processRule(int isOne2Many, boolean isMany2Many, float score, String rule, Set<String> bagOfTargetTokens, Map<String, HMapSFW> probDist, 
-      HMapSFW phraseDist, HMapSIW srcTokenCnt, Tokenizer queryLangTokenizer, Tokenizer docLangTokenizer, Map<String,String> stemmed2Stemmed, Set<String> unknownWords) {
+  public static void processRule(int isOne2Many, boolean isMany2Many, float score, String rule, Set<String> bagOfTargetTokens, Map<String, HMapStFW> probDist, 
+      HMapStFW phraseDist, HMapStIW srcTokenCnt, Tokenizer queryLangTokenizer, Tokenizer docLangTokenizer, Map<String,String> stemmed2Stemmed, Set<String> unknownWords) {
     //    LOG.info("Processing rule " + rule);
 
     String[] parts = rule.split("\\|\\|\\|");
@@ -306,10 +306,10 @@ public class Utils {
         bagOfTargetTokens.add(eTerm);
         if (isOne2Many <= 1) {
           if (probDist.containsKey(fTerm)) {
-            HMapSFW eToken2Prob = probDist.get(fTerm);
+            HMapStFW eToken2Prob = probDist.get(fTerm);
             eToken2Prob.increment(eTerm, weight);
           }else {
-            HMapSFW eToken2Prob = new HMapSFW();
+            HMapStFW eToken2Prob = new HMapStFW();
             eToken2Prob.put(eTerm, weight);
             probDist.put(fTerm, eToken2Prob);
           }
@@ -336,10 +336,10 @@ public class Utils {
 
         // update prob. distr.
         if (probDist.containsKey(fTerm)) {
-          HMapSFW eToken2Prob = probDist.get(fTerm);
+          HMapStFW eToken2Prob = probDist.get(fTerm);
           eToken2Prob.increment(eTerm, weight);
         }else {
-          HMapSFW eToken2Prob = new HMapSFW();
+          HMapStFW eToken2Prob = new HMapStFW();
           eToken2Prob.put(eTerm, weight);
           probDist.put(fTerm, eToken2Prob);
         }
@@ -427,8 +427,8 @@ public class Utils {
    * @param scale
    * @param probMap
    */
-  public static HMapSFW scaleProbMap(float threshold, float scale, HMapSFW probMap) {
-    HMapSFW scaledProbMap = new HMapSFW();
+  public static HMapStFW scaleProbMap(float threshold, float scale, HMapStFW probMap) {
+    HMapStFW scaledProbMap = new HMapStFW();
 
     for (MapKF.Entry<String> entry : probMap.entrySet()) {
       float pr = entry.getValue() * scale;
@@ -449,8 +449,8 @@ public class Utils {
    * @param probMaps
    *    list of probability distributions
    */
-  public static HMapSFW combineProbMaps(float threshold, float scale, List<PairOfFloatMap> probMaps) {
-    HMapSFW combinedProbMap = new HMapSFW();
+  public static HMapStFW combineProbMaps(float threshold, float scale, List<PairOfFloatMap> probMaps) {
+    HMapStFW combinedProbMap = new HMapStFW();
 
     int numDistributions = probMaps.size();
 
@@ -459,7 +459,7 @@ public class Utils {
     Set<String> translationAlternatives = new HashSet<String>();
     float sumWeights = 0;
     for (int i=0; i < numDistributions; i++) {
-      HMapSFW dist = probMaps.get(i).getMap();
+      HMapStFW dist = probMaps.get(i).getMap();
       float weight = probMaps.get(i).getWeight();
 
       // don't add vocabulary from a distribution that has 0 weight
@@ -473,7 +473,7 @@ public class Utils {
     for (String e : translationAlternatives) {
       float combinedProb = 0f;
       for (int i=0; i < numDistributions; i++) {
-        HMapSFW dist = probMaps.get(i).getMap();
+        HMapStFW dist = probMaps.get(i).getMap();
         float weight = probMaps.get(i).getWeight();
         combinedProb += (weight/sumWeights) * dist.get(e);    // Prob(e|f) = weighted average of all distributions
       }
@@ -496,11 +496,11 @@ public class Utils {
    * @param cumProbThreshold
    * @param maxNumTrans
    */
-  public static void normalize(Map<String, HMapSFW> probMap, float lexProbThreshold, float cumProbThreshold, int maxNumTrans) {
+  public static void normalize(Map<String, HMapStFW> probMap, float lexProbThreshold, float cumProbThreshold, int maxNumTrans) {
     for (String sourceTerm : probMap.keySet()) {
-      HMapSFW probDist = probMap.get(sourceTerm);
+      HMapStFW probDist = probMap.get(sourceTerm);
       TreeSet<PairOfStringFloat> sortedFilteredProbDist = new TreeSet<PairOfStringFloat>();
-      HMapSFW normProbDist = new HMapSFW();
+      HMapStFW normProbDist = new HMapStFW();
 
       // compute normalization factor
       float sumProb = 0;
@@ -538,7 +538,7 @@ public class Utils {
    * 
    * @param probMap
    */
-  public static void normalize(HMapSFW probMap) {
+  public static void normalize(HMapStFW probMap) {
     float normalization = 0;
     for (MapKF.Entry<String> e : probMap.entrySet()) {
       float weight = e.getValue();
@@ -549,7 +549,7 @@ public class Utils {
     }              
   }
 
-  public static void filter(HMapSFW probMap, float lexProbThreshold) {
+  public static void filter(HMapStFW probMap, float lexProbThreshold) {
     for (MapKF.Entry<String> e : probMap.entrySet()) {
       if (e.getValue() > lexProbThreshold) {
         probMap.put(e.getKey(), e.getValue());
@@ -602,7 +602,7 @@ public class Utils {
    * Convert prob. distribution to JSONArray in which float at position 2k corresponds to probabilities of term at position 2k+1, k=0...(n/2-1)
    * @param probMap
    */
-  public static JsonArray createJsonArrayFromProbabilities(HMapSFW probMap) {
+  public static JsonArray createJsonArrayFromProbabilities(HMapStFW probMap) {
     if (probMap == null) {
       return null;
     }

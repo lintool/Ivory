@@ -48,7 +48,7 @@ import org.apache.hadoop.mapred.SequenceFileInputFormat;
 import org.apache.hadoop.mapred.SequenceFileOutputFormat;
 import org.apache.log4j.Logger;
 
-import tl.lin.data.map.HMapSFW;
+import tl.lin.data.map.HMapStFW;
 import tl.lin.data.map.MapKF;
 
 import com.google.common.collect.Maps;
@@ -61,7 +61,7 @@ public class BuildWeightedTermDocVectors extends PowerTool {
   protected static enum Docs { Total, ZERO, SHORT }
 
   private static class MyMapper extends MapReduceBase implements
-      Mapper<IntWritable, LazyTermDocVector, IntWritable, HMapSFW> {
+      Mapper<IntWritable, LazyTermDocVector, IntWritable, HMapStFW> {
 
     static IntWritable mDocno = new IntWritable();
     private static DocLengthTable mDLTable;
@@ -72,7 +72,7 @@ public class BuildWeightedTermDocVectors extends PowerTool {
     private boolean normalize = false;
     DefaultFrequencySortedDictionary dict;
     DfTableArray dfTable; 
-    HMapSFW weightedVector = new HMapSFW();
+    HMapStFW weightedVector = new HMapStFW();
     String term;
     float wt, sum2;
 
@@ -162,7 +162,7 @@ public class BuildWeightedTermDocVectors extends PowerTool {
     }
     
     public void map(IntWritable docno, LazyTermDocVector doc,
-        OutputCollector<IntWritable, HMapSFW> output, Reporter reporter)
+        OutputCollector<IntWritable, HMapStFW> output, Reporter reporter)
     throws IOException {      
       mDocno.set(docno.get());
       int docLen = mDLTable.getDocLength(mDocno.get());
@@ -288,10 +288,10 @@ public class BuildWeightedTermDocVectors extends PowerTool {
     FileOutputFormat.setOutputPath(conf, weightedVectorsPath);
     conf.setInputFormat(SequenceFileInputFormat.class);
     conf.setMapOutputKeyClass(IntWritable.class);
-    conf.setMapOutputValueClass(HMapSFW.class);
+    conf.setMapOutputValueClass(HMapStFW.class);
     conf.setOutputFormat(SequenceFileOutputFormat.class);
     conf.setOutputKeyClass(IntWritable.class);
-    conf.setOutputValueClass(HMapSFW.class);
+    conf.setOutputValueClass(HMapStFW.class);
 
     LOG.info("Running job: "+conf.getJobName());
 

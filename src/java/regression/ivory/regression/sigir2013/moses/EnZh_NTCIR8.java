@@ -18,7 +18,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.junit.Test;
 
-import tl.lin.data.map.HMapSFW;
+import tl.lin.data.map.HMapStFW;
 
 import com.google.common.collect.Maps;
 
@@ -187,17 +187,17 @@ public class EnZh_NTCIR8 {
   public static void main(String[] args) {
     initialize();
 
-    HMapSFW tenbestAPMap = array2Map(Nbest_AP.get(2));
-    HMapSFW onebestAPMap = array2Map(Onebest_AP.get(1));
-    HMapSFW grammarAPMap = array2Map(grammar_AP.get(0));
-    HMapSFW tokenAPMap = array2Map(baseline_token_AP);
+    HMapStFW tenbestAPMap = array2Map(Nbest_AP.get(2));
+    HMapStFW onebestAPMap = array2Map(Onebest_AP.get(1));
+    HMapStFW grammarAPMap = array2Map(grammar_AP.get(0));
+    HMapStFW tokenAPMap = array2Map(baseline_token_AP);
     
     System.out.println("10best: improved=" + countNumberOfImprovedTopics(tokenAPMap, tenbestAPMap) + ", negligible=" + countNumberOfNegligibleTopics(tokenAPMap, tenbestAPMap));
     System.out.println("Grammar: improved=" + countNumberOfImprovedTopics(tokenAPMap, grammarAPMap) + ", negligible=" + countNumberOfNegligibleTopics(tokenAPMap, grammarAPMap));
     System.out.println("1best: improved=" + countNumberOfImprovedTopics(tokenAPMap, onebestAPMap) + ", negligible=" + countNumberOfNegligibleTopics(tokenAPMap, onebestAPMap));
   }
 
-  private static int countNumberOfImprovedTopics(HMapSFW tokenAPMap, HMapSFW gridAPMap) {
+  private static int countNumberOfImprovedTopics(HMapStFW tokenAPMap, HMapStFW gridAPMap) {
     int cnt = 0;
     for (String key : tokenAPMap.keySet()) {
       float difference = gridAPMap.get(key) - tokenAPMap.get(key); 
@@ -208,7 +208,7 @@ public class EnZh_NTCIR8 {
     return cnt;
   }
 
-  private static int countNumberOfNegligibleTopics(HMapSFW tokenAPMap, HMapSFW gridAPMap) {
+  private static int countNumberOfNegligibleTopics(HMapStFW tokenAPMap, HMapStFW gridAPMap) {
     int cnt = 0;
     for (String key : tokenAPMap.keySet()) {
       float difference = gridAPMap.get(key) - tokenAPMap.get(key); 
@@ -219,8 +219,8 @@ public class EnZh_NTCIR8 {
     return cnt;
   }
 
-  private static HMapSFW array2Map(String[] array) {
-    HMapSFW map = new HMapSFW();
+  private static HMapStFW array2Map(String[] array) {
+    HMapStFW map = new HMapStFW();
     for ( int i = 0; i < array.length; i += 2 ) {
       map.put(array[i], Float.parseFloat(array[i+1]));
     }

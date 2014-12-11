@@ -35,8 +35,8 @@ import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
-import tl.lin.data.map.HMapSFW;
-import tl.lin.data.map.HMapSIW;
+import tl.lin.data.map.HMapStFW;
+import tl.lin.data.map.HMapStIW;
 
 /**
   Step 2 of the bitext extraction algorithm.
@@ -73,7 +73,7 @@ public class FilterSentencePairs extends Configured implements Tool {
     private PreprocessHelper helper;
     private String eSent, fSent;
     private int eLen, fLen;
-    private HMapSFW eVector, fVector;
+    private HMapStFW eVector, fVector;
     private Tokenizer eTok, fTok;
     private Text outSent1, outSent2;
     private float classifierThreshold;
@@ -111,9 +111,9 @@ public class FilterSentencePairs extends Configured implements Tool {
       fSent = sentences[0];
       eLen = eTok.getNumberTokens(eSent);
       fLen = fTok.getNumberTokens(fSent);
-      HMapSIW eSrcTfs = new HMapSIW();
+      HMapStIW eSrcTfs = new HMapStIW();
       eVector = helper.createEDocVector(eSent, eSrcTfs);
-      HMapSIW fSrcTfs = new HMapSIW();
+      HMapStIW fSrcTfs = new HMapStIW();
       fVector = helper.createFDocVector(fSent, fSrcTfs);
 
       if (eVector == null || fVector == null) {

@@ -37,7 +37,7 @@ import org.apache.log4j.Logger;
 import tl.lin.data.array.ArrayListOfIntsWritable;
 import tl.lin.data.array.ArrayListWritable;
 import tl.lin.data.map.HMapIV;
-import tl.lin.data.map.HMapSFW;
+import tl.lin.data.map.HMapStFW;
 import tl.lin.data.pair.PairOfInts;
 import edu.umd.cloud9.collection.Indexable;
 import edu.umd.cloud9.collection.wikipedia.WikipediaPage;
@@ -184,7 +184,7 @@ public class FindParallelSentencePairsOld extends Configured implements Tool {
 			}
 
 			ArrayListWritable<Text> sentences;
-			ArrayListWritable<HMapSFW> vectors = new ArrayListWritable<HMapSFW>();
+			ArrayListWritable<HMapStFW> vectors = new ArrayListWritable<HMapStFW>();
 			ArrayListOfIntsWritable sentLengths = new ArrayListOfIntsWritable();
 			try {
 				if(lang.equals("en")){
@@ -235,7 +235,7 @@ public class FindParallelSentencePairsOld extends Configured implements Tool {
 	Reducer<PairOfInts, WikiDocInfo, Text, Text>{
 	  private int fDocno, eDocno;
 	  private int classifierPositiveId;
-	  private ArrayListWritable<HMapSFW> fVectors, eVectors;
+	  private ArrayListWritable<HMapStFW> fVectors, eVectors;
 	  private ArrayListWritable<Text> fSentences, eSentences;
 	  private PreprocessHelper helper;						// for modularity, helper provides methods to preprocess data
 	  private float classifierThreshold;
@@ -259,8 +259,8 @@ public class FindParallelSentencePairsOld extends Configured implements Tool {
 				throw new RuntimeException("Classifier confidence threshold > 1, provide value in [0,1]: "+classifierThreshold);				
 			}
 			
-			eVectors = new ArrayListWritable<HMapSFW>();
-			fVectors = new ArrayListWritable<HMapSFW>();
+			eVectors = new ArrayListWritable<HMapStFW>();
+			fVectors = new ArrayListWritable<HMapStFW>();
 			eSentences = new ArrayListWritable<Text>();
 			fSentences = new ArrayListWritable<Text>();
 		}
@@ -323,11 +323,11 @@ public class FindParallelSentencePairsOld extends Configured implements Tool {
 			
 			// classify each e-f sentence pair in the candidate set
 			for (int f = 0; f < fVectors.size(); f++) {
-				HMapSFW fVector = fVectors.get(f);
+				HMapStFW fVector = fVectors.get(f);
 				int fSentLength = fSentences.get(f).getLength();
 
 				for (int e = 0; e < eVectors.size(); e++) {
-					HMapSFW eVector = eVectors.get(e);
+					HMapStFW eVector = eVectors.get(e);
 					int eSentLength = eSentences.get(e).getLength();
 
 					if (eSentLength > 2 * fSentLength || fSentLength > 2 * eSentLength) {

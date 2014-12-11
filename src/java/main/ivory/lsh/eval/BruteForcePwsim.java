@@ -40,7 +40,7 @@ import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
-import tl.lin.data.map.HMapSFW;
+import tl.lin.data.map.HMapStFW;
 import tl.lin.data.pair.PairOfFloatInt;
 import tl.lin.data.pair.PairOfInts;
 import tl.lin.data.pair.PairOfWritables;
@@ -119,8 +119,8 @@ public class BruteForcePwsim extends Configured implements Tool {
    * @author ferhanture
    */
   public static class MyMapperTermDocVectors extends MapReduceBase implements
-  Mapper<IntWritable, HMapSFW, IntWritable, PairOfFloatInt> {
-    private List<PairOfWritables<IntWritable, HMapSFW>> vectors;
+  Mapper<IntWritable, HMapStFW, IntWritable, PairOfFloatInt> {
+    private List<PairOfWritables<IntWritable, HMapStFW>> vectors;
     float threshold;
 
     public void configure(JobConf job) {
@@ -144,12 +144,12 @@ public class BruteForcePwsim extends Configured implements Tool {
       LOG.info("Read " + vectors.size() + " sample doc vectors");
     }
 
-    public void map(IntWritable docno, HMapSFW docvector,
+    public void map(IntWritable docno, HMapStFW docvector,
         OutputCollector<IntWritable, PairOfFloatInt> output, Reporter reporter) throws IOException {
       for (int i = 0; i < vectors.size(); i++) {
         reporter.incrCounter(Pairs.Total, 1);
         IntWritable sampleDocno = vectors.get(i).getLeftElement();
-        HMapSFW fromSample = vectors.get(i).getRightElement();
+        HMapStFW fromSample = vectors.get(i).getRightElement();
 
         float cs = CLIRUtils.cosine(docvector, fromSample);       
         if (cs >= threshold) {

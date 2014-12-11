@@ -24,7 +24,7 @@ import org.apache.hadoop.mapred.lib.IdentityReducer;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
-import tl.lin.data.map.HMapSFW;
+import tl.lin.data.map.HMapStFW;
 import tl.lin.data.map.MapKF;
 import edu.umd.cloud9.util.PowerTool;
 
@@ -60,7 +60,7 @@ public class ComputeSignaturesSimhash extends PowerTool {
    * 
    */
   public static class MyMapper extends MapReduceBase implements
-      Mapper<IntWritable, HMapSFW, IntWritable, SixtyFourBitSignature> {
+      Mapper<IntWritable, HMapStFW, IntWritable, SixtyFourBitSignature> {
 
     static GeneralHashFunctionLibrary hashLib;
     static float[] V = new float[64];
@@ -70,7 +70,7 @@ public class ComputeSignaturesSimhash extends PowerTool {
       hashLib = new GeneralHashFunctionLibrary();
     }
 
-    public void map(IntWritable docno, HMapSFW docvector,
+    public void map(IntWritable docno, HMapStFW docvector,
         OutputCollector<IntWritable, SixtyFourBitSignature> output, Reporter reporter)
         throws IOException {
       V = new float[64];

@@ -38,7 +38,7 @@ import org.apache.log4j.Logger;
 
 import tl.lin.data.array.ArrayListOfIntsWritable;
 import tl.lin.data.array.ArrayListWritable;
-import tl.lin.data.map.HMapSFW;
+import tl.lin.data.map.HMapStFW;
 import tl.lin.data.pair.PairOfInts;
 import edu.umd.cloud9.collection.wikipedia.WikipediaPage;
 
@@ -111,7 +111,7 @@ public class Docs2Sentences extends Configured implements Tool {
       int langID;
 
       ArrayListWritable<Text> sentences;
-      ArrayListWritable<HMapSFW> vectors = new ArrayListWritable<HMapSFW>();
+      ArrayListWritable<HMapStFW> vectors = new ArrayListWritable<HMapStFW>();
       ArrayListOfIntsWritable sentLengths = new ArrayListOfIntsWritable();
       // identify sentences in document, filter out ones below MinSentLength threshold
       // convert each sentence into a tf-idf vector, using general DF map for collection and a heuristic for avg. doc length

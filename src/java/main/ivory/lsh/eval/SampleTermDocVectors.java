@@ -45,7 +45,7 @@ import org.apache.log4j.Logger;
 
 import tl.lin.data.map.HMapII;
 import tl.lin.data.map.HMapIIW;
-import tl.lin.data.map.HMapSFW;
+import tl.lin.data.map.HMapStFW;
 import edu.umd.cloud9.io.SequenceFileUtils;
 
 /**
@@ -95,7 +95,7 @@ import edu.umd.cloud9.io.SequenceFileUtils;
 @SuppressWarnings("deprecation")
 public class SampleTermDocVectors extends Configured implements Tool {
   @SuppressWarnings("unchecked")
-  static Class keyClass = IntWritable.class, valueClass = HMapSFW.class,
+  static Class keyClass = IntWritable.class, valueClass = HMapStFW.class,
   inputFormat = SequenceFileInputFormat.class;
 
   private static final Logger sLogger = Logger.getLogger(SampleTermDocVectors.class);
@@ -107,7 +107,7 @@ public class SampleTermDocVectors extends Configured implements Tool {
 
 
   private static class MyMapper extends MapReduceBase implements
-  Mapper<IntWritable, HMapSFW, IntWritable, HMapSFW> {
+  Mapper<IntWritable, HMapStFW, IntWritable, HMapStFW> {
     private int sampleFreq;
     private HMapII samplesMap = null;
 
@@ -159,8 +159,8 @@ public class SampleTermDocVectors extends Configured implements Tool {
       }
     }
 
-    public void map(IntWritable key, HMapSFW val,
-        OutputCollector<IntWritable, HMapSFW> output, Reporter reporter)
+    public void map(IntWritable key, HMapStFW val,
+        OutputCollector<IntWritable, HMapStFW> output, Reporter reporter)
     throws IOException {
       if (samplesMap != null) {
         if (samplesMap.containsKey(key.get())) {
@@ -177,11 +177,11 @@ public class SampleTermDocVectors extends Configured implements Tool {
   }
 
   public static class MyReducer extends MapReduceBase implements
-  Reducer<IntWritable, HMapSFW, IntWritable, HMapSFW> {
+  Reducer<IntWritable, HMapStFW, IntWritable, HMapStFW> {
 
     @Override
-    public void reduce(IntWritable key, Iterator<HMapSFW> values,
-        OutputCollector<IntWritable, HMapSFW> output, Reporter reporter)
+    public void reduce(IntWritable key, Iterator<HMapStFW> values,
+        OutputCollector<IntWritable, HMapStFW> output, Reporter reporter)
     throws IOException {
       output.collect(key, values.next());
     }

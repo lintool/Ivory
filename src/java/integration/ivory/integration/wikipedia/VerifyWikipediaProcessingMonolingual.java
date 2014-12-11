@@ -19,7 +19,7 @@ import org.apache.hadoop.io.SequenceFile;
 import org.junit.Test;
 
 import tl.lin.data.map.HMapIFW;
-import tl.lin.data.map.HMapSFW;
+import tl.lin.data.map.HMapStFW;
 import tl.lin.data.map.MapIF;
 import tl.lin.data.map.MapKF;
 
@@ -213,7 +213,7 @@ public class VerifyWikipediaProcessingMonolingual {
         "-input=" + galagoIndex + "/wt-term-doc-vectors",
         "-output=" + galagoIndex + "/test_wt-term-doc-vectors",
         "-keys=" + galagoTermDocVector1Id + "," + galagoTermDocVector2Id,
-        "-valueclass=" + HMapSFW.class.getCanonicalName() };
+        "-valueclass=" + HMapStFW.class.getCanonicalName() };
     IntegrationUtils.exec(Joiner.on(" ").join(args));
 
     args = new String[] { "hadoop jar", IntegrationUtils.getJar("dist", "ivory"),
@@ -226,7 +226,7 @@ public class VerifyWikipediaProcessingMonolingual {
 
     System.out.println("verifyTermDocVectorsGalago");
     IntWritable key1 = new IntWritable();
-    HMapSFW value1 = new HMapSFW();
+    HMapStFW value1 = new HMapStFW();
 
     SequenceFile.Reader reader1 = new SequenceFile.Reader(fs.getConf(),
         SequenceFile.Reader.file(new Path(galagoIndex + "/test_wt-term-doc-vectors/part-00000")));
@@ -327,7 +327,7 @@ public class VerifyWikipediaProcessingMonolingual {
         "-input=" + opennlpIndex + "/wt-term-doc-vectors",
         "-output=" + opennlpIndex + "/test_wt-term-doc-vectors",
         "-keys=" + opennlpTermDocVector1Id + "," + opennlpTermDocVector2Id,
-        "-valueclass=" + HMapSFW.class.getCanonicalName() };
+        "-valueclass=" + HMapStFW.class.getCanonicalName() };
     IntegrationUtils.exec(Joiner.on(" ").join(args));
 
     args = new String[] { "hadoop jar", IntegrationUtils.getJar("dist", "ivory"),
@@ -340,7 +340,7 @@ public class VerifyWikipediaProcessingMonolingual {
 
     System.out.println("verifyTermDocVectorsOpennlp");
     IntWritable key1 = new IntWritable();
-    HMapSFW value1 = new HMapSFW();
+    HMapStFW value1 = new HMapStFW();
 
     SequenceFile.Reader reader1 = new SequenceFile.Reader(fs.getConf(),
         SequenceFile.Reader.file(new Path(opennlpIndex + "/test_wt-term-doc-vectors/part-00000")));
@@ -385,7 +385,7 @@ public class VerifyWikipediaProcessingMonolingual {
     reader2.close();
   }
 
-  private void verifyTermDocVector(Map<String, Float> doc, HMapSFW value) {
+  private void verifyTermDocVector(Map<String, Float> doc, HMapStFW value) {
     assertTrue(value != null);
     for (Map.Entry<String, Float> entry : doc.entrySet()) {
       System.out.println("checking " + entry.getKey() + ": expected = " + entry.getValue() + ", actual = " + value.get(entry.getKey()));

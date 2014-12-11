@@ -19,7 +19,7 @@ import org.apache.hadoop.io.SequenceFile;
 import org.junit.Test;
 
 import tl.lin.data.map.HMapIFW;
-import tl.lin.data.map.HMapSFW;
+import tl.lin.data.map.HMapStFW;
 import tl.lin.data.map.MapIF;
 import tl.lin.data.map.MapKF;
 
@@ -233,7 +233,7 @@ public class VerifyWikipediaProcessingCrosslingual {
         "-input=" + enwikiEn + "/wt-term-doc-vectors", 
         "-output=" + enwikiEn + "/test_wt-term-doc-vectors", 
         "-keys=" + enTermDocVector1Id + "," + enTermDocVector2Id, 
-        "-valueclass=" + HMapSFW.class.getCanonicalName()};
+        "-valueclass=" + HMapStFW.class.getCanonicalName()};
     IntegrationUtils.exec(Joiner.on(" ").join(args));
 
     args = new String[] { "hadoop jar", IntegrationUtils.getJar("dist", "ivory"),
@@ -252,7 +252,7 @@ public class VerifyWikipediaProcessingCrosslingual {
 
     SequenceFile.Reader reader;
     IntWritable key = new IntWritable();
-    HMapSFW value = new HMapSFW();
+    HMapStFW value = new HMapStFW();
 
     reader = new SequenceFile.Reader(fs.getConf(),
         SequenceFile.Reader.file(new Path(enwikiEn + "/test_wt-term-doc-vectors/part-00000")));
@@ -365,7 +365,7 @@ public class VerifyWikipediaProcessingCrosslingual {
         "-input=" + dewikiEn + "/wt-term-doc-vectors", 
         "-output=" + dewikiEn + "/test_wt-term-doc-vectors", 
         "-keys=" + deTermDocVector1Id + "," + deTermDocVector2Id, 
-        "-valueclass=" + HMapSFW.class.getCanonicalName()};
+        "-valueclass=" + HMapStFW.class.getCanonicalName()};
     IntegrationUtils.exec(Joiner.on(" ").join(args));
 
     args = new String[] { "hadoop jar", IntegrationUtils.getJar("dist", "ivory"),
@@ -384,7 +384,7 @@ public class VerifyWikipediaProcessingCrosslingual {
 
     SequenceFile.Reader reader;
     IntWritable key = new IntWritable();
-    HMapSFW value = new HMapSFW();
+    HMapStFW value = new HMapStFW();
 
     reader = new SequenceFile.Reader(fs.getConf(),
         SequenceFile.Reader.file(new Path(dewikiEn + "/test_wt-term-doc-vectors/part-00000")));
@@ -434,7 +434,7 @@ public class VerifyWikipediaProcessingCrosslingual {
     reader.close();
   }
 
-  private void verifyTermDocVector(Map<String, Float> doc, HMapSFW value) {
+  private void verifyTermDocVector(Map<String, Float> doc, HMapStFW value) {
     assertTrue(value != null);
     for (Map.Entry<String, Float> entry : doc.entrySet()) {
       assertTrue(value.containsKey(entry.getKey()));

@@ -17,7 +17,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
-import tl.lin.data.map.HMapSFW;
+import tl.lin.data.map.HMapStFW;
 import tl.lin.data.pair.PairOfStrings;
 
 import com.google.gson.JsonArray;
@@ -126,7 +126,7 @@ public class MtNQueryGenerator implements QueryGenerator {
 
     String origQuery = translation.getOriginalQuery();
     String grammarFile = conf.get(Constants.GrammarPath);
-    Map<String, HMapSFW> probMap = null;
+    Map<String, HMapStFW> probMap = null;
     if (scfgWeight > 0) {
       probMap = scfgGenerator.processGrammar(fs, conf, grammarFile);
     }
@@ -188,7 +188,7 @@ public class MtNQueryGenerator implements QueryGenerator {
       JsonArray tokensArr = new JsonArray();
       if (tokenWeight > 0) {
         for (String srcToken : stemmedSourceTokens) {
-          HMapSFW nbestDist = translation.getDistributionOf(srcToken);
+          HMapStFW nbestDist = translation.getDistributionOf(srcToken);
 
           if (defaultTokenizer.isStopWord(srcToken)){
             continue;
@@ -200,7 +200,7 @@ public class MtNQueryGenerator implements QueryGenerator {
 
           // Pr{bitext}
           if (bitextWeight > 0) {
-            HMapSFW bitextDist = clGenerator.getTranslations(origQuery.trim(), srcToken, pairsInGrammar, stemmed2Stemmed);
+            HMapStFW bitextDist = clGenerator.getTranslations(origQuery.trim(), srcToken, pairsInGrammar, stemmed2Stemmed);
             if(bitextDist != null && !bitextDist.isEmpty()){
               tokenRepresentationList.add(new PairOfFloatMap(bitextDist, bitextWeight));
             }
@@ -208,7 +208,7 @@ public class MtNQueryGenerator implements QueryGenerator {
 
           // Pr{scfg}
           if (scfgWeight > 0) {
-            HMapSFW scfgDist = scfgGenerator.getTranslations(origQuery.trim(), srcToken, probMap, stemmed2Stemmed);
+            HMapStFW scfgDist = scfgGenerator.getTranslations(origQuery.trim(), srcToken, probMap, stemmed2Stemmed);
             if (scfgDist != null && !scfgDist.isEmpty() ){
               tokenRepresentationList.add(new PairOfFloatMap(scfgDist, scfgWeight));
             }
@@ -248,7 +248,7 @@ public class MtNQueryGenerator implements QueryGenerator {
       // combine the token-based and phrase-based representations into a #combweight structure
       JsonArray queryJsonArr = new JsonArray();
 
-      HMapSFW scaledPhrase2Weight = null;
+      HMapStFW scaledPhrase2Weight = null;
       if (phraseWeight > 0) {
         scaledPhrase2Weight = Utils.scaleProbMap(lexProbThreshold, phraseWeight, translation.getPhraseDist());      
         for (String phrase : scaledPhrase2Weight.keySet()) {

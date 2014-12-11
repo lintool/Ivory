@@ -30,8 +30,8 @@ import org.apache.hadoop.fs.Path;
 import tl.lin.data.array.ArrayListOfInts;
 import tl.lin.data.map.HMapIFW;
 import tl.lin.data.map.HMapIIW;
-import tl.lin.data.map.HMapSFW;
-import tl.lin.data.map.HMapSIW;
+import tl.lin.data.map.HMapStFW;
+import tl.lin.data.map.HMapStIW;
 import tl.lin.data.map.MapKF;
 import tl.lin.data.map.MapKI;
 import edu.umd.hooka.Vocab;
@@ -45,26 +45,26 @@ import edu.umd.hooka.ttables.TTable_monolithic_IFAs;
  * 
  */
 public class BitextClassifierUtils {
-  static List<HMapSIW> fDocs = new ArrayList<HMapSIW>();
-  static List<HMapSIW> fDocTfs = new ArrayList<HMapSIW>();
+  static List<HMapStIW> fDocs = new ArrayList<HMapStIW>();
+  static List<HMapStIW> fDocTfs = new ArrayList<HMapStIW>();
   static List<String> fSents = new ArrayList<String>();
-  static List<HMapSIW> eDocs = new ArrayList<HMapSIW>();
-  static List<HMapSIW> eDocTfs = new ArrayList<HMapSIW>();
+  static List<HMapStIW> eDocs = new ArrayList<HMapStIW>();
+  static List<HMapStIW> eDocTfs = new ArrayList<HMapStIW>();
   static List<String> eSents = new ArrayList<String>();
 
   static ArrayListOfInts enSentLengths = new ArrayListOfInts();
   static ArrayListOfInts deSentLengths = new ArrayListOfInts();
 
-  static HMapSIW numSentencesPerDocE;
-  static HMapSIW numSentencesPerDocF;
+  static HMapStIW numSentencesPerDocE;
+  static HMapStIW numSentencesPerDocF;
 
-  static List<HMapSIW> gDocs = new ArrayList<HMapSIW>();
-  static HMapSIW dfE = new HMapSIW();
-  static HMapSIW dfD = new HMapSIW();
-  static HMapSIW dfG = new HMapSIW();
+  static List<HMapStIW> gDocs = new ArrayList<HMapStIW>();
+  static HMapStIW dfE = new HMapStIW();
+  static HMapStIW dfD = new HMapStIW();
+  static HMapStIW dfG = new HMapStIW();
 
-  static HMapSIW fTitle2SentCnt = new HMapSIW();
-  static HMapSIW eTitle2SentCnt = new HMapSIW();
+  static HMapStIW fTitle2SentCnt = new HMapStIW();
+  static HMapStIW eTitle2SentCnt = new HMapStIW();
   static HMapIIW parallelPairs = new HMapIIW();
 
   static float avgFDocLeng;
@@ -75,8 +75,8 @@ public class BitextClassifierUtils {
   static TTable_monolithic_IFAs f2e_Probs, e2f_Probs;
   private static Options options;
 
-  private List<HMapSFW> translateDocVectors(String eLang, 
-      String eTokenizerModelFile, String eStopwordsFile, List<HMapSIW> docs, float avgLen, HMapSIW transDfTable) {
+  private List<HMapStFW> translateDocVectors(String eLang, 
+      String eTokenizerModelFile, String eStopwordsFile, List<HMapStIW> docs, float avgLen, HMapStIW transDfTable) {
     Bm25 mModel = new Bm25();
     // set number of docs
     mModel.setDocCount(docs.size());
@@ -84,12 +84,12 @@ public class BitextClassifierUtils {
     // set average doc length
     mModel.setAvgDocLength(avgLen);
 
-    List<HMapSFW> transDocs = new ArrayList<HMapSFW>();
+    List<HMapStFW> transDocs = new ArrayList<HMapStFW>();
     Tokenizer tokenizer = TokenizerFactory.createTokenizer(eLang, 
         eTokenizerModelFile, true, eStopwordsFile, eStopwordsFile + ".stemmed", null);
 
     // translate doc texts here
-    for (HMapSIW deDoc : docs) {
+    for (HMapStIW deDoc : docs) {
       HMapIFW tfS = new HMapIFW();
       int docLen = 0;
       try {
@@ -98,7 +98,7 @@ public class BitextClassifierUtils {
       } catch (IOException e) {
         e.printStackTrace();
       }
-      HMapSFW v = CLIRUtils.createTermDocVector(docLen, tfS, eVocabTrg, mModel, dfE, true, null);
+      HMapStFW v = CLIRUtils.createTermDocVector(docLen, tfS, eVocabTrg, mModel, dfE, true, null);
       // System.out.println("f"+(n++)+" : " + v);
 
       transDocs.add(v);
@@ -137,13 +137,13 @@ public class BitextClassifierUtils {
     }
   }
 
-  private float readLines(BufferedReader reader, Tokenizer tokenizer, HMapSIW title2SentCnt, ArrayListOfInts sentLengths,
-      List<HMapSIW> sentTfs, List<String> sents, HMapSIW dfTable) throws IOException {
+  private float readLines(BufferedReader reader, Tokenizer tokenizer, HMapStIW title2SentCnt, ArrayListOfInts sentLengths,
+      List<HMapStIW> sentTfs, List<String> sents, HMapStIW dfTable) throws IOException {
     String line = null;
     boolean isNewDoc = true;
     int cnt = 0;
     float sumLengths = 0;
-    HMapSIW sent = new HMapSIW();
+    HMapStIW sent = new HMapStIW();
 
     while ((line = reader.readLine()) != null) {
       line = line.trim();
@@ -187,8 +187,8 @@ public class BitextClassifierUtils {
     try {
       BufferedReader dis1 = new BufferedReader(new InputStreamReader(new FileInputStream(new File(eReadFile)), "UTF-8"));
       BufferedReader dis2 = new BufferedReader(new InputStreamReader(new FileInputStream(new File(fReadFile)), "UTF-8"));
-      HMapSIW fDoc = new HMapSIW();
-      HMapSIW eDoc = new HMapSIW();
+      HMapStIW fDoc = new HMapStIW();
+      HMapStIW eDoc = new HMapStIW();
       String eLine = null, fLine = null;
       int cntEDocs = 0, cntFDocs = 0, lastDocLenE = 0, lastDocLenF = 0, numSents = 0;
 
@@ -231,8 +231,8 @@ public class BitextClassifierUtils {
           cntFDocs++;
           
           // reset variables 
-          fDoc = new HMapSIW();
-          eDoc = new HMapSIW();
+          fDoc = new HMapStIW();
+          eDoc = new HMapStIW();
           numSents = 0;
           lastDocLenE = 0;
           lastDocLenF = 0;
@@ -255,8 +255,8 @@ public class BitextClassifierUtils {
     }
   }
 
-  private List<HMapSFW> buildDocVectors(List<HMapSIW> term2tfVectors, float avgLen,
-      HMapSIW dfTable) {
+  private List<HMapStFW> buildDocVectors(List<HMapStIW> term2tfVectors, float avgLen,
+      HMapStIW dfTable) {
     Bm25 mModel = new Bm25();
     // set number of docs
     mModel.setDocCount(term2tfVectors.size());
@@ -265,9 +265,9 @@ public class BitextClassifierUtils {
     mModel.setAvgDocLength(avgLen);
 
     // tf-idf computation
-    List<HMapSFW> docVectors = new ArrayList<HMapSFW>();
-    for (HMapSIW enDoc : term2tfVectors) {
-      HMapSFW v = new HMapSFW();
+    List<HMapStFW> docVectors = new ArrayList<HMapStFW>();
+    for (HMapStIW enDoc : term2tfVectors) {
+      HMapStFW v = new HMapStFW();
       int docLen = 0;
       for (MapKI.Entry<String> item : enDoc.entrySet()) {
         int tf = item.getValue();
@@ -322,8 +322,8 @@ public class BitextClassifierUtils {
 
   private void prepareTrainTestData(List<String> fSents, List<String> eSents, 
       Tokenizer fTokenizer, Tokenizer eTokenizer,
-      List<HMapSIW> fTfs, List<HMapSIW> eTfs, HMapIIW parallelPairs, List<HMapSFW> transVectors,
-      List<HMapSFW> eVectors, int featureSet, float prob, List<String> alignments) {
+      List<HMapStIW> fTfs, List<HMapStIW> eTfs, HMapIIW parallelPairs, List<HMapStFW> transVectors,
+      List<HMapStFW> eVectors, int featureSet, float prob, List<String> alignments) {
     NumberFormat nf = NumberFormat.getNumberInstance();
     nf.setGroupingUsed(false);
     nf.setMaximumFractionDigits(2);
@@ -332,12 +332,12 @@ public class BitextClassifierUtils {
     long time = System.currentTimeMillis();
 
     for (int i = 0; i < transVectors.size(); i++) {
-      HMapSFW transVector = transVectors.get(i);
-      HMapSIW fTfMap = fTfs.get(i);
+      HMapStFW transVector = transVectors.get(i);
+      HMapStIW fTfMap = fTfs.get(i);
       String fSent = fSents.get(i);
       for (int j = 0; j < eVectors.size(); j++) {
-        HMapSFW eVector = eVectors.get(j);
-        HMapSIW eTfMap = eTfs.get(j);
+        HMapStFW eVector = eVectors.get(j);
+        HMapStIW eTfMap = eTfs.get(j);
         String eSent = eSents.get(j);
         if (parallelPairs.get(i) == j) {
           label = "parallel";
@@ -418,12 +418,12 @@ public class BitextClassifierUtils {
       System.out.println("Sentences read in " + (sentTime - startTime) + 
           " ms. Number of sentences: " + fDocTfs.size() + " = " + eDocTfs.size());
 
-      List<HMapSFW> eSentVectors = buildDocVectors(eDocTfs, avgEDocLeng, dfE);
+      List<HMapStFW> eSentVectors = buildDocVectors(eDocTfs, avgEDocLeng, dfE);
 
       long evectTime = System.currentTimeMillis();
       System.out.println("E vectors created in " + (evectTime - sentTime) + " ms");
 
-      List<HMapSFW> fSentVectors = translateDocVectors(eLang, eTokenFile, eStopwordsFile, fDocTfs, avgFDocLeng, dfE);
+      List<HMapStFW> fSentVectors = translateDocVectors(eLang, eTokenFile, eStopwordsFile, fDocTfs, avgFDocLeng, dfE);
 
       long fvectTime = System.currentTimeMillis();
       System.out.println("F vectors created in " + (fvectTime - evectTime) + 
@@ -489,8 +489,8 @@ public class BitextClassifierUtils {
     String DATADIR = "/fs/clip-qa/ferhan/cl-pwsim/pwsim-experiments-2013";    // /Users/ferhanture/edu/research_archive/data/de-en/eu-nc-wmt08
     
     BitextClassifierUtils dt = new BitextClassifierUtils();
-    numSentencesPerDocE = new HMapSIW();
-    numSentencesPerDocF = new HMapSIW();
+    numSentencesPerDocE = new HMapStIW();
+    numSentencesPerDocF = new HMapStIW();
     FileSystem localFs = FileSystem.getLocal(new Configuration());
     eVocabSrc = HadoopAlign.loadVocab(new Path(VOCABDIR+"/vocab.en-de.en"), localFs);
     eVocabTrg = HadoopAlign.loadVocab(new Path(VOCABDIR+"/vocab.de-en.en"), localFs);
@@ -505,7 +505,7 @@ public class BitextClassifierUtils {
         TOKENDIR+"/en-token.bin", 
         TOKENDIR+"/de.stop", 
         TOKENDIR+"/en.stop");
-    List<HMapSFW> fDocVectors = dt.translateDocVectors("en", 
+    List<HMapStFW> fDocVectors = dt.translateDocVectors("en", 
         TOKENDIR+"/en-token.bin", 
         TOKENDIR+"/en.stop", 
         fDocTfs, avgFDocLeng, dfE);
@@ -519,7 +519,7 @@ public class BitextClassifierUtils {
         TOKENDIR+"/en-token.bin", 
         TOKENDIR+"/de.stop", 
         TOKENDIR+"/en.stop");
-    List<HMapSFW> googletransDocVectors = dt.buildDocVectors(eDocTfs, avgEDocLeng, dfE);
+    List<HMapStFW> googletransDocVectors = dt.buildDocVectors(eDocTfs, avgEDocLeng, dfE);
     eDocTfs.clear();
     dfE.clear();
     
@@ -530,7 +530,7 @@ public class BitextClassifierUtils {
         TOKENDIR+"/en-token.bin", 
         TOKENDIR+"/de.stop", 
         TOKENDIR+"/en.stop");
-    List<HMapSFW> cdectransDocVectors = dt.buildDocVectors(eDocTfs, avgEDocLeng, dfE);
+    List<HMapStFW> cdectransDocVectors = dt.buildDocVectors(eDocTfs, avgEDocLeng, dfE);
     eDocTfs.clear();
     dfE.clear();
     
@@ -541,7 +541,7 @@ public class BitextClassifierUtils {
         TOKENDIR+"/en-token.bin", 
         TOKENDIR+"/de.stop", 
         TOKENDIR+"/en.stop");
-    List<HMapSFW> eDocVectors = dt.buildDocVectors(eDocTfs, avgEDocLeng, dfE);
+    List<HMapStFW> eDocVectors = dt.buildDocVectors(eDocTfs, avgEDocLeng, dfE);
     for (int i=0; i<100; i++) {
 //      System.out.println(CLIRUtils.cosine(fDocVectors.get(i), eDocVectors.get(i)));
       System.out.println("cdec\t+\t" + CLIRUtils.cosine(cdectransDocVectors.get(i), eDocVectors.get(i)));

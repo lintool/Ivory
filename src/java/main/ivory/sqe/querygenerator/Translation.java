@@ -3,15 +3,15 @@ package ivory.sqe.querygenerator;
 import java.util.Map;
 import java.util.Set;
 
-import tl.lin.data.map.HMapSFW;
-import tl.lin.data.map.HMapSIW;
+import tl.lin.data.map.HMapStFW;
+import tl.lin.data.map.HMapStIW;
 
 public abstract class Translation {
   public static final int NBEST = 0, DERIVATION = 1; 
-  private Map<String, HMapSFW> tok2tokDist;
+  private Map<String, HMapStFW> tok2tokDist;
   private Set<String> targetTokens;      // all non-stopword target tokens s.t. aligned to some source non-stopword token
-  private HMapSFW targetPhraseDist;     // map from RHSs of rules to translation scores; there is only one RHS (equal to entire translation), if we don't have derivation info
-  private HMapSIW sourceTokenCnt;
+  private HMapStFW targetPhraseDist;     // map from RHSs of rules to translation scores; there is only one RHS (equal to entire translation), if we don't have derivation info
+  private HMapStIW sourceTokenCnt;
   private String originalQuery;
   private int count;
   private Map<String,String> stemMapping;
@@ -34,19 +34,19 @@ public abstract class Translation {
     this.targetTokens = targetTokens;
   }
 
-  public HMapSIW getSourceTokenCnt() {
+  public HMapStIW getSourceTokenCnt() {
     return sourceTokenCnt;
   }
 
-  public void setSourceTokenCnt(HMapSIW sourceTokenCnt) {
+  public void setSourceTokenCnt(HMapStIW sourceTokenCnt) {
     this.sourceTokenCnt = sourceTokenCnt;
   }
 
-  public void setPhraseDist(HMapSFW dist) {
+  public void setPhraseDist(HMapStFW dist) {
     targetPhraseDist = dist;
   }
   
-  public HMapSFW getPhraseDist() {
+  public HMapStFW getPhraseDist() {
     return targetPhraseDist;
   }
 
@@ -58,11 +58,11 @@ public abstract class Translation {
     originalQuery = o;
   }
 
-  public Map<String, HMapSFW> getTokenDist() {
+  public Map<String, HMapStFW> getTokenDist() {
     return tok2tokDist;
   }
   
-  public void setTokenDist(Map<String, HMapSFW> dist) {
+  public void setTokenDist(Map<String, HMapStFW> dist) {
     tok2tokDist = dist;
   }
 
@@ -74,7 +74,7 @@ public abstract class Translation {
     return count;
   }
 
-  public HMapSFW getDistributionOf(String srcToken) {
+  public HMapStFW getDistributionOf(String srcToken) {
     return tok2tokDist.get(srcToken);
   }
 }
