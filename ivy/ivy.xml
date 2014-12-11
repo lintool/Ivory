@@ -6,7 +6,7 @@
   </publications>
 
   <dependencies>
-    <dependency org="edu.umd" name="cloud9" rev="2.0.0-SNAPSHOT" conf="*->*,!sources,!javadoc">
+    <dependency org="edu.umd" name="cloud9" rev="2.0.0" conf="*->*,!sources,!javadoc">
       <exclude org="it.unimi.dsi" /> 
     </dependency>
 
