@@ -28,8 +28,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.WritableUtils;
 import org.apache.log4j.Logger;
 
-
-import edu.umd.cloud9.io.pair.PairOfIntLong;
+import tl.lin.data.pair.PairOfIntLong;
 
 public class PrefixEncodedGlobalStats {
 	private static final Logger LOG = Logger.getLogger(PrefixEncodedGlobalStats.class);

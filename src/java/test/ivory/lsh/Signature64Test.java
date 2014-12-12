@@ -4,10 +4,13 @@ import static org.junit.Assert.assertTrue;
 import ivory.lsh.data.NBitSignature;
 import ivory.lsh.data.PermutationByBit;
 import ivory.lsh.data.SixtyFourBitSignature;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.PriorityQueue;
+
 import junit.framework.JUnit4TestAdapter;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
@@ -17,9 +20,10 @@ import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.io.WritableComparable;
 import org.junit.Test;
+
+import tl.lin.data.array.ArrayListOfIntsWritable;
+import tl.lin.data.pair.PairOfWritables;
 import edu.umd.cloud9.io.SequenceFileUtils;
-import edu.umd.cloud9.io.array.ArrayListOfIntsWritable;
-import edu.umd.cloud9.io.pair.PairOfWritables;
 
 public class Signature64Test {
   private static final String TMP_FILENAME1 = "tmp1.out";

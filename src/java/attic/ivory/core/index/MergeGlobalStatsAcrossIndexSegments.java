@@ -45,7 +45,7 @@ import org.apache.hadoop.mapred.lib.NLineInputFormat;
 import org.apache.hadoop.mapred.lib.NullOutputFormat;
 import org.apache.log4j.Logger;
 
-import edu.umd.cloud9.io.pair.PairOfIntLong;
+import tl.lin.data.pair.PairOfIntLong;
 import edu.umd.cloud9.util.PowerTool;
 
 public class MergeGlobalStatsAcrossIndexSegments extends PowerTool {

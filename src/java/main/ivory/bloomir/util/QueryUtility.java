@@ -4,7 +4,6 @@ import ivory.core.RetrievalEnvironment;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -15,13 +14,13 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import tl.lin.data.map.HMapIF;
+import tl.lin.data.map.HMapIV;
+
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import com.google.common.io.ByteSource;
 import com.google.common.io.Files;
-import com.google.common.io.InputSupplier;
-
-import edu.umd.cloud9.util.map.HMapIF;
-import edu.umd.cloud9.util.map.HMapIV;
 
 /**
  * Provides auxiliary functions for query processing.
@@ -41,7 +40,7 @@ public class QueryUtility {
     Preconditions.checkNotNull(env);
     Preconditions.checkNotNull(queryPath);
 
-    HMapIV<String> queries = QueryUtility.loadQueries(Files.newInputStreamSupplier(new File(queryPath)));
+    HMapIV<String> queries = QueryUtility.loadQueries(Files.asByteSource(new File(queryPath)));
     HMapIV<String[]> parsedQueries = new HMapIV<String[]>();
 
     for (int qid: queries.keySet()) {
@@ -63,7 +62,7 @@ public class QueryUtility {
     Preconditions.checkNotNull(queryPath);
 
     HMapIF idfs = new HMapIF();
-    HMapIV<String> parsedQueries = QueryUtility.loadQueries(Files.newInputStreamSupplier(new File(queryPath)));
+    HMapIV<String> parsedQueries = QueryUtility.loadQueries(Files.asByteSource(new File(queryPath)));
 
     for(int qid: parsedQueries.keySet()) {
       String[] tokens = env.tokenize(parsedQueries.get(qid));
@@ -119,7 +118,7 @@ public class QueryUtility {
     Preconditions.checkNotNull(queryPath);
 
     HMapIF cfs = new HMapIF();
-    HMapIV<String> parsedQueries = QueryUtility.loadQueries(Files.newInputStreamSupplier(new File(queryPath)));
+    HMapIV<String> parsedQueries = QueryUtility.loadQueries(Files.asByteSource(new File(queryPath)));
 
     for(int qid: parsedQueries.keySet()) {
       String[] tokens = env.tokenize(parsedQueries.get(qid));
@@ -175,7 +174,7 @@ public class QueryUtility {
     Preconditions.checkNotNull(queryPath);
 
     HMapIV<int[]> queries = new HMapIV<int[]>();
-    HMapIV<String> parsedQueries = QueryUtility.loadQueries(Files.newInputStreamSupplier(new File(queryPath)));
+    HMapIV<String> parsedQueries = QueryUtility.loadQueries(Files.asByteSource(new File(queryPath)));
 
     for(int qid: parsedQueries.keySet()) {
       String[] tokens = env.tokenize(parsedQueries.get(qid));
@@ -245,7 +244,7 @@ public class QueryUtility {
   public static HMapIV<String> loadQueries(String queryPath)
     throws Exception {
     Preconditions.checkNotNull(queryPath);
-    return QueryUtility.loadQueries(Files.newInputStreamSupplier(new File(queryPath)));
+    return QueryUtility.loadQueries(Files.asByteSource(new File(queryPath)));
   }
 
   /**
@@ -257,12 +256,12 @@ public class QueryUtility {
    * @param queryInputSupplier An input supplier that provides the queries
    * @return A map of query id to query text
    */
-  public static HMapIV<String> loadQueries(InputSupplier<? extends InputStream> queryInputSupplier)
+  public static HMapIV<String> loadQueries(ByteSource source)
       throws ParserConfigurationException, SAXException, IOException {
-    Preconditions.checkNotNull(queryInputSupplier);
+    Preconditions.checkNotNull(source);
 
     HMapIV<String> queries = new HMapIV<String>();
-    Document dom = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(queryInputSupplier.getInput());
+    Document dom = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(source.openStream());
     NodeList nodeList = dom.getDocumentElement().getElementsByTagName("query");
 
     if(nodeList == null) {

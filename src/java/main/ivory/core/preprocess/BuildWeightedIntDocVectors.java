@@ -48,11 +48,12 @@ import org.apache.hadoop.mapred.SequenceFileOutputFormat;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
+import tl.lin.data.map.HMapIFW;
+import tl.lin.data.map.MapIF;
+
 import com.google.common.collect.Maps;
 
-import edu.umd.cloud9.io.map.HMapIFW;
 import edu.umd.cloud9.util.PowerTool;
-import edu.umd.cloud9.util.map.MapIF;
 
 public class BuildWeightedIntDocVectors extends PowerTool {
   private static final Logger LOG = Logger.getLogger(BuildWeightedIntDocVectors.class);
@@ -85,11 +86,6 @@ public class BuildWeightedIntDocVectors extends PowerTool {
       String dlFile;
 
       try {
-        if (conf.get ("mapred.job.tracker").equals ("local")) {
-          // Explicitly not support local mode.
-          throw new RuntimeException("Local mode not supported!");
-        }
-
         FileSystem fs = FileSystem.get(conf);
         RetrievalEnvironment env = new RetrievalEnvironment(conf.get(Constants.IndexPath), fs);
         dfFile = env.getDfByIntData();

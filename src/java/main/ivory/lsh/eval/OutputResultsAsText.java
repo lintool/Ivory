@@ -16,7 +16,7 @@ import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Logger;
 
-import edu.umd.cloud9.io.pair.PairOfInts;
+import tl.lin.data.pair.PairOfInts;
 
 /**
  * Read in sequence file format and output as text format.

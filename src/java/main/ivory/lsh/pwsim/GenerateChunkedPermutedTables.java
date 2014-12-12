@@ -7,11 +7,13 @@ import ivory.lsh.data.Permutation;
 import ivory.lsh.data.PermutationByBit;
 import ivory.lsh.data.Signature;
 import ivory.lsh.driver.PwsimEnvironment;
+
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.net.URI;
 import java.util.Iterator;
 import java.util.List;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
@@ -42,8 +44,9 @@ import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+
+import tl.lin.data.array.ArrayListOfIntsWritable;
 import edu.umd.cloud9.io.SequenceFileUtils;
-import edu.umd.cloud9.io.array.ArrayListOfIntsWritable;
 
 @SuppressWarnings("deprecation")
 public class GenerateChunkedPermutedTables extends Configured implements Tool {

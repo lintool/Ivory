@@ -26,10 +26,11 @@ import java.util.SortedMap;
 
 import org.apache.log4j.Logger;
 
+import tl.lin.data.array.ArrayListOfInts;
+
 import com.google.common.collect.Maps;
 
 import edu.umd.cloud9.collection.Indexable;
-import edu.umd.cloud9.util.array.ArrayListOfInts;
 
 /**
  * @author Tamer Elsayed

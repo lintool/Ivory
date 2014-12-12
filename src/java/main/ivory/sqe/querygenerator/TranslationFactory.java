@@ -2,14 +2,17 @@ package ivory.sqe.querygenerator;
 
 import ivory.core.tokenize.Tokenizer;
 import ivory.sqe.retrieval.Constants;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.log4j.Logger;
-import edu.umd.cloud9.io.map.HMapSFW;
-import edu.umd.cloud9.io.map.HMapSIW;
+
+import tl.lin.data.map.HMapStFW;
+import tl.lin.data.map.HMapStIW;
 
 public class TranslationFactory {
   private static final Logger LOG = Logger.getLogger(TranslationFactory.class);
@@ -43,12 +46,12 @@ public class TranslationFactory {
     int one2many = conf.getInt(Constants.One2Many, 2);
     
     // src token --> (trg token --> prob(trg|src))
-    Map<String,HMapSFW> token2tokenDist = new HashMap<String,HMapSFW>();
+    Map<String,HMapStFW> token2tokenDist = new HashMap<String,HMapStFW>();
     
     // target phrase --> prob
-    HMapSFW phraseDist = new HMapSFW();
+    HMapStFW phraseDist = new HMapStFW();
     
-    HMapSIW srcTokenCnt = new HMapSIW();
+    HMapStIW srcTokenCnt = new HMapStIW();
 
     Set<String> bagOfTargetTokens = new HashSet<String>();
 

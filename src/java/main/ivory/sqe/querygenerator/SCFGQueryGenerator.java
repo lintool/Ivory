@@ -7,16 +7,21 @@ import ivory.core.tokenize.Tokenizer;
 import ivory.core.tokenize.TokenizerFactory;
 import ivory.sqe.retrieval.Constants;
 import ivory.sqe.retrieval.StructuredQuery;
+
 import java.io.IOException;
 import java.util.Map;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+
+import tl.lin.data.map.HMapStFW;
+import tl.lin.data.map.MapKF;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import edu.umd.cloud9.io.map.HMapSFW;
 
 /**
  * In addition to PSQ implemented in CLWordQueryGenerator, phrase translations are learned from a provided Synchronous context-free grammar (SCFG) (Hiero, 2006) and added to the representation.
@@ -27,7 +32,7 @@ import edu.umd.cloud9.io.map.HMapSFW;
 public class SCFGQueryGenerator implements QueryGenerator {
   private static final Logger LOG = Logger.getLogger(SCFGQueryGenerator.class);
   private Tokenizer defaultTokenizer, docLangTokenizer, queryLangTokenizerWithStemming, queryLangTokenizer, bigramTokenizer;
-  private Map<String, Map<String, HMapSFW>> query2probMap;
+  private Map<String, Map<String, HMapStFW>> query2probMap;
   private int length, numTransPerToken;
   private boolean isDocStemmed, isStemming, bigramSegment = false;
   private RetrievalEnvironment env;
@@ -96,7 +101,7 @@ public class SCFGQueryGenerator implements QueryGenerator {
    
     String origQuery = query.trim().split("\\|\\|\\|\\|")[0].trim();
     String grammarFile = conf.get(Constants.GrammarPath);
-    Map<String, HMapSFW> probMap = processGrammar(fs, conf, grammarFile);
+    Map<String, HMapStFW> probMap = processGrammar(fs, conf, grammarFile);
     
     Map<String, String> stemmed2Stemmed = Utils.getStemMapping(origQuery, defaultTokenizer, docLangTokenizer);
     JsonArray tokenTranslations = new JsonArray();
@@ -129,8 +134,8 @@ public class SCFGQueryGenerator implements QueryGenerator {
     return new StructuredQuery(queryJson, length);
   }
 
-  public Map<String, HMapSFW> processGrammar(FileSystem fs, Configuration conf, String grammarFile) {
-    Map<String, HMapSFW> probMap = Utils.generateTranslationTable(fs, conf, grammarFile, 
+  public Map<String, HMapStFW> processGrammar(FileSystem fs, Configuration conf, String grammarFile) {
+    Map<String, HMapStFW> probMap = Utils.generateTranslationTable(fs, conf, grammarFile, 
         queryLangTokenizerWithStemming, docLangTokenizer);
     if (probMap == null) {
       LOG.info("No probabilities extracted from " + grammarFile);
@@ -142,7 +147,7 @@ public class SCFGQueryGenerator implements QueryGenerator {
   }
 
   private String getBestTranslation(String query, String token) {
-    HMapSFW probDist = query2probMap.get(query).get(token);
+    HMapStFW probDist = query2probMap.get(query).get(token);
 
     if(probDist == null){
       return token;
@@ -150,7 +155,7 @@ public class SCFGQueryGenerator implements QueryGenerator {
 
     float maxProb = 0f;
     String maxProbTrans = null;
-    for (edu.umd.cloud9.util.map.MapKF.Entry<String> entry : probDist.entrySet()) {
+    for (MapKF.Entry<String> entry : probDist.entrySet()) {
       if (entry.getValue() > maxProb) {
         maxProb = entry.getValue();
         maxProbTrans = entry.getKey();
@@ -159,8 +164,8 @@ public class SCFGQueryGenerator implements QueryGenerator {
     return maxProbTrans;
   }
 
-  protected HMapSFW getTranslations(String query, String token, Map<String, HMapSFW> probMap, Map<String, String> stemmed2Stemmed) {
-    HMapSFW probDist = null;
+  protected HMapStFW getTranslations(String query, String token, Map<String, HMapStFW> probMap, Map<String, String> stemmed2Stemmed) {
+    HMapStFW probDist = null;
     try {
       probDist = probMap.get(token);
     } catch (NullPointerException e) {
@@ -170,7 +175,7 @@ public class SCFGQueryGenerator implements QueryGenerator {
     
     if(probDist == null){
       // borrow OOV word heuristic from MT: if no translation found, include itself as translation
-      probDist = new HMapSFW();
+      probDist = new HMapStFW();
       String targetStem = stemmed2Stemmed.get(token);
       String target = (stemmed2Stemmed == null || targetStem == null) ? token : stemmed2Stemmed.get(token);
       probDist.put(target, 1);      

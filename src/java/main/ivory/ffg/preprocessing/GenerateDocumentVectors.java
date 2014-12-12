@@ -1,22 +1,22 @@
 package ivory.ffg.preprocessing;
 
-import java.util.Set;
-
-import com.google.common.collect.Sets;
-
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.FSDataOutputStream;
-import org.apache.hadoop.fs.Path;
-import org.apache.log4j.Logger;
-
-import edu.umd.cloud9.util.map.HMapIV;
-
 import ivory.bloomir.util.OptionManager;
 import ivory.core.RetrievalEnvironment;
 import ivory.core.data.document.IntDocVector;
 import ivory.ffg.data.DocumentVectorUtility;
 import ivory.ffg.util.QrelUtility;
+
+import java.util.Set;
+
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FSDataOutputStream;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
+import org.apache.log4j.Logger;
+
+import tl.lin.data.map.HMapIV;
+
+import com.google.common.collect.Sets;
 
 /**
  * @author Nima Asadi

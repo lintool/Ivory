@@ -4,24 +4,28 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import ivory.core.data.document.WeightedIntDocVector;
 import ivory.integration.IntegrationUtils;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+
 import junit.framework.JUnit4TestAdapter;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.SequenceFile;
 import org.junit.Test;
+
+import tl.lin.data.map.HMapIFW;
+import tl.lin.data.map.HMapStFW;
+import tl.lin.data.map.MapIF;
+import tl.lin.data.map.MapKF;
+
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-
-import edu.umd.cloud9.io.map.HMapIFW;
-import edu.umd.cloud9.io.map.HMapSFW;
-import edu.umd.cloud9.util.map.MapIF;
-import edu.umd.cloud9.util.map.MapKF;
 
 public class VerifyWikipediaProcessingCrosslingual {
   private static final Random RAND = new Random();
@@ -205,6 +209,7 @@ public class VerifyWikipediaProcessingCrosslingual {
     jars.add(IntegrationUtils.getJar("lib", "maxent"));
     jars.add(IntegrationUtils.getJar("lib", "lucene-analyzers"));
     jars.add(IntegrationUtils.getJar("lib", "lucene-core"));
+    jars.add(IntegrationUtils.getJar("lib", "lintools-datatypes-1.0.0"));
     jars.add(IntegrationUtils.getJar("dist", "ivory"));
 
     String libjars = String.format("-libjars=%s", Joiner.on(",").join(jars));
@@ -228,7 +233,7 @@ public class VerifyWikipediaProcessingCrosslingual {
         "-input=" + enwikiEn + "/wt-term-doc-vectors", 
         "-output=" + enwikiEn + "/test_wt-term-doc-vectors", 
         "-keys=" + enTermDocVector1Id + "," + enTermDocVector2Id, 
-        "-valueclass=" + edu.umd.cloud9.io.map.HMapSFW.class.getCanonicalName()};
+        "-valueclass=" + HMapStFW.class.getCanonicalName()};
     IntegrationUtils.exec(Joiner.on(" ").join(args));
 
     args = new String[] { "hadoop jar", IntegrationUtils.getJar("dist", "ivory"),
@@ -247,7 +252,7 @@ public class VerifyWikipediaProcessingCrosslingual {
 
     SequenceFile.Reader reader;
     IntWritable key = new IntWritable();
-    HMapSFW value = new HMapSFW();
+    HMapStFW value = new HMapStFW();
 
     reader = new SequenceFile.Reader(fs.getConf(),
         SequenceFile.Reader.file(new Path(enwikiEn + "/test_wt-term-doc-vectors/part-00000")));
@@ -326,6 +331,7 @@ public class VerifyWikipediaProcessingCrosslingual {
     jars.add(IntegrationUtils.getJar("lib", "maxent"));
     jars.add(IntegrationUtils.getJar("lib", "lucene-analyzers"));
     jars.add(IntegrationUtils.getJar("lib", "lucene-core"));
+    jars.add(IntegrationUtils.getJar("lib", "lintools-datatypes-1.0.0"));
     jars.add(IntegrationUtils.getJar("dist", "ivory"));
 
     String libjars = String.format("-libjars=%s", Joiner.on(",").join(jars));
@@ -359,7 +365,7 @@ public class VerifyWikipediaProcessingCrosslingual {
         "-input=" + dewikiEn + "/wt-term-doc-vectors", 
         "-output=" + dewikiEn + "/test_wt-term-doc-vectors", 
         "-keys=" + deTermDocVector1Id + "," + deTermDocVector2Id, 
-        "-valueclass=" + edu.umd.cloud9.io.map.HMapSFW.class.getCanonicalName()};
+        "-valueclass=" + HMapStFW.class.getCanonicalName()};
     IntegrationUtils.exec(Joiner.on(" ").join(args));
 
     args = new String[] { "hadoop jar", IntegrationUtils.getJar("dist", "ivory"),
@@ -378,7 +384,7 @@ public class VerifyWikipediaProcessingCrosslingual {
 
     SequenceFile.Reader reader;
     IntWritable key = new IntWritable();
-    HMapSFW value = new HMapSFW();
+    HMapStFW value = new HMapStFW();
 
     reader = new SequenceFile.Reader(fs.getConf(),
         SequenceFile.Reader.file(new Path(dewikiEn + "/test_wt-term-doc-vectors/part-00000")));
@@ -428,7 +434,7 @@ public class VerifyWikipediaProcessingCrosslingual {
     reader.close();
   }
 
-  private void verifyTermDocVector(Map<String, Float> doc, HMapSFW value) {
+  private void verifyTermDocVector(Map<String, Float> doc, HMapStFW value) {
     assertTrue(value != null);
     for (Map.Entry<String, Float> entry : doc.entrySet()) {
       assertTrue(value.containsKey(entry.getKey()));

@@ -17,14 +17,13 @@
 package ivory.ptc.data;
 
 import java.io.DataInput;
-
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.Iterator;
 
-import edu.umd.cloud9.io.array.ArrayListOfIntsWritable;
-
 import org.apache.hadoop.io.WritableComparable;
+
+import tl.lin.data.array.ArrayListOfIntsWritable;
 
 /**
  * Data structure that holds a target document along with

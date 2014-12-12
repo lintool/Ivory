@@ -1,35 +1,31 @@
 package ivory.ffg.util;
 
-import java.io.InputStream;
-import java.io.IOException;
+import ivory.ffg.feature.Feature;
+import ivory.ffg.feature.OrderedWindowSequentialDependenceFeature;
+import ivory.ffg.feature.TermFeature;
+import ivory.ffg.feature.UnorderedWindowSequentialDependenceFeature;
+import ivory.ffg.score.BM25ScoringFunction;
+import ivory.ffg.score.DirichletScoringFunction;
+import ivory.ffg.score.ScoringFunction;
+import ivory.ffg.score.TfIdfScoringFunction;
+import ivory.ffg.score.TfScoringFunction;
+
 import java.io.File;
-import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Maps;
-import com.google.common.io.InputSupplier;
-import com.google.common.io.Files;
-
-import org.xml.sax.SAXException;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
-import ivory.ffg.feature.Feature;
-import ivory.ffg.feature.OrderedWindowSequentialDependenceFeature;
-import ivory.ffg.feature.TermFeature;
-import ivory.ffg.feature.UnorderedWindowSequentialDependenceFeature;
-
-import ivory.ffg.score.BM25ScoringFunction;
-import ivory.ffg.score.DirichletScoringFunction;
-import ivory.ffg.score.ScoringFunction;
-import ivory.ffg.score.TfScoringFunction;
-import ivory.ffg.score.TfIdfScoringFunction;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Maps;
+import com.google.common.io.ByteSource;
+import com.google.common.io.Files;
 
 /**
  * Provides auxiliary functions for parsing feature files..
@@ -39,7 +35,7 @@ import ivory.ffg.score.TfIdfScoringFunction;
 public class FeatureUtility {
   public static Map<String, Feature> parseFeatures(String featurePath)
     throws Exception {
-    return FeatureUtility.loadFeatures(Files.newInputStreamSupplier(new File(featurePath)));
+    return FeatureUtility.loadFeatures(Files.asByteSource(new File(featurePath)));
   }
 
   /**
@@ -52,12 +48,12 @@ public class FeatureUtility {
    * @param featureInputSupplier An input supplier that provides the features
    * @return A map of feature id to features
    */
-  public static Map<String, Feature> loadFeatures(InputSupplier<? extends InputStream> featureInputSupplier)
+  public static Map<String, Feature> loadFeatures(ByteSource source)
     throws ParserConfigurationException, SAXException, IOException, ClassNotFoundException {
-    Preconditions.checkNotNull(featureInputSupplier);
+    Preconditions.checkNotNull(source);
 
     Map<String, Feature> features = Maps.newTreeMap();
-    Document dom = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(featureInputSupplier.getInput());
+    Document dom = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(source.openStream());
     NodeList nodeList = dom.getDocumentElement().getElementsByTagName("feature");
 
     if(nodeList == null) {

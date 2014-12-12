@@ -31,9 +31,9 @@ import org.apache.hadoop.mapred.lib.IdentityReducer;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
+import tl.lin.data.array.ArrayListOfIntsWritable;
+import tl.lin.data.map.HMapIFW;
 import edu.umd.cloud9.io.SequenceFileUtils;
-import edu.umd.cloud9.io.array.ArrayListOfIntsWritable;
-import edu.umd.cloud9.io.map.HMapIFW;
 import edu.umd.cloud9.util.PowerTool;
 
 /**

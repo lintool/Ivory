@@ -8,7 +8,7 @@ import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.mapred.JobConf;
 
-import edu.umd.cloud9.io.array.ArrayListOfIntsWritable;
+import tl.lin.data.array.ArrayListOfIntsWritable;
 
 @SuppressWarnings("deprecation")
 public abstract class Permutation {

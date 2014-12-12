@@ -1,9 +1,11 @@
 package ivory.lsh.eval;
 
 import ivory.core.util.CLIRUtils;
+
 import java.io.IOException;
 import java.net.URI;
 import java.util.Iterator;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
@@ -34,12 +36,13 @@ import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+
+import tl.lin.data.array.ArrayListOfIntsWritable;
+import tl.lin.data.map.HMapIIW;
+import tl.lin.data.map.HMapIV;
+import tl.lin.data.pair.PairOfIntString;
+import tl.lin.data.pair.PairOfInts;
 import edu.umd.cloud9.collection.wikipedia.WikipediaPage;
-import edu.umd.cloud9.io.array.ArrayListOfIntsWritable;
-import edu.umd.cloud9.io.map.HMapIIW;
-import edu.umd.cloud9.io.pair.PairOfIntString;
-import edu.umd.cloud9.io.pair.PairOfInts;
-import edu.umd.cloud9.util.map.HMapIV;
 
 /**
 

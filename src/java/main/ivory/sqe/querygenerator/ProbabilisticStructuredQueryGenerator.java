@@ -1,35 +1,31 @@
 package ivory.sqe.querygenerator;
 
-import ivory.core.ConfigurationException;
 import ivory.core.RetrievalEnvironment;
 import ivory.core.tokenize.Tokenizer;
 import ivory.core.tokenize.TokenizerFactory;
 import ivory.sqe.retrieval.Constants;
 import ivory.sqe.retrieval.StructuredQuery;
-import java.util.regex.*;
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Set;
+import java.util.regex.Pattern;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+
+import tl.lin.data.map.HMapStFW;
+import tl.lin.data.pair.PairOfFloatInt;
+import tl.lin.data.pair.PairOfStrings;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import edu.umd.cloud9.io.map.HMapSFW;
-import edu.umd.cloud9.io.pair.PairOfFloatInt;
-import edu.umd.cloud9.io.pair.PairOfStrings;
+
 import edu.umd.hooka.VocabularyWritable;
 import edu.umd.hooka.alignment.HadoopAlign;
 import edu.umd.hooka.ttables.TTable_monolithic_IFAs;
@@ -149,7 +145,7 @@ public class ProbabilisticStructuredQueryGenerator implements QueryGenerator {
         }
       } else {
         JsonObject tokenTrans = new JsonObject();
-        HMapSFW distr = getTranslations(origQuery, token, phrasePairs, stemmed2Stemmed);
+        HMapStFW distr = getTranslations(origQuery, token, phrasePairs, stemmed2Stemmed);
         JsonArray weights = Utils.createJsonArrayFromProbabilities(distr);
         if (weights != null) {
           tokenTrans.add("#weight", weights);
@@ -189,8 +185,8 @@ public class ProbabilisticStructuredQueryGenerator implements QueryGenerator {
     return token;
   }
 
-  protected HMapSFW getTranslations(String query, String token, Set<PairOfStrings> pairsInSCFG, Map<String, String> stemmed2Stemmed) {
-    HMapSFW probDist = new HMapSFW();
+  protected HMapStFW getTranslations(String query, String token, Set<PairOfStrings> pairsInSCFG, Map<String, String> stemmed2Stemmed) {
+    HMapStFW probDist = new HMapStFW();
     int f = fVocab_f2e.get(token);
     if (f <= 0) {
 

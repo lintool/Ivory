@@ -31,10 +31,9 @@ import org.apache.hadoop.mapred.lib.IdentityReducer;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
-
-import edu.umd.cloud9.io.map.HMapIFW;
+import tl.lin.data.map.HMapIFW;
+import tl.lin.data.map.MapIF;
 import edu.umd.cloud9.util.PowerTool;
-import edu.umd.cloud9.util.map.MapIF;
 
 /**
  * <p>

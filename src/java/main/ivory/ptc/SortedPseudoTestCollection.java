@@ -16,6 +16,13 @@
 
 package ivory.ptc;
 
+import ivory.ptc.data.AnchorTextTarget;
+import ivory.ptc.data.PseudoJudgments;
+import ivory.ptc.data.PseudoQuery;
+import ivory.ptc.judgments.extractor.PseudoJudgmentExtractor;
+import ivory.ptc.sampling.Criterion;
+import ivory.ptc.scorer.PseudoQueryScorer;
+
 import java.io.IOException;
 import java.util.Iterator;
 
@@ -37,16 +44,8 @@ import org.apache.hadoop.mapred.SequenceFileOutputFormat;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
-
-import edu.umd.cloud9.io.array.ArrayListWritable;
+import tl.lin.data.array.ArrayListWritable;
 import edu.umd.cloud9.util.PowerTool;
-
-import ivory.ptc.data.AnchorTextTarget;
-import ivory.ptc.data.PseudoJudgments;
-import ivory.ptc.data.PseudoQuery;
-import ivory.ptc.judgments.extractor.PseudoJudgmentExtractor;
-import ivory.ptc.sampling.Criterion;
-import ivory.ptc.scorer.PseudoQueryScorer;
 
 /**
  * Map-Reduce job to extract a Pseudo Test Collection according to

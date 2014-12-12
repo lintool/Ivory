@@ -8,13 +8,15 @@ import ivory.core.tokenize.TokenizerFactory;
 import ivory.core.util.CLIRUtils;
 import ivory.pwsim.score.Bm25;
 import ivory.pwsim.score.ScoringModel;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
+
 import opennlp.model.MaxentModel;
-import ivory.lsh.bitext.MoreGenericModelReader;
 import opennlp.tools.sentdetect.SentenceDetectorME;
 import opennlp.tools.sentdetect.SentenceModel;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.filecache.DistributedCache;
 import org.apache.hadoop.fs.FileSystem;
@@ -23,13 +25,16 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+
+import tl.lin.data.array.ArrayListOfIntsWritable;
+import tl.lin.data.array.ArrayListWritable;
+import tl.lin.data.map.HMapIFW;
+import tl.lin.data.map.HMapStFW;
+import tl.lin.data.map.HMapStIW;
+import tl.lin.data.map.MapKI;
+
 import com.google.common.collect.Maps;
-import edu.umd.cloud9.io.array.ArrayListOfIntsWritable;
-import edu.umd.cloud9.io.array.ArrayListWritable;
-import edu.umd.cloud9.io.map.HMapIFW;
-import edu.umd.cloud9.io.map.HMapSFW;
-import edu.umd.cloud9.io.map.HMapSIW;
-import edu.umd.cloud9.util.map.MapKI.Entry;
+
 import edu.umd.hooka.Vocab;
 import edu.umd.hooka.VocabularyWritable;
 import edu.umd.hooka.alignment.HadoopAlign;
@@ -48,7 +53,7 @@ public class PreprocessHelper {
   private DfTableArray dfTable;
   private DefaultFrequencySortedDictionary dict;
   private final Logger sLogger = Logger.getLogger(PreprocessHelper.class);
-  private static final HMapSIW lang2AvgSentLen = new HMapSIW();
+  private static final HMapStIW lang2AvgSentLen = new HMapStIW();
   static {
     // took average # of tokens per sentence in Wikipedia data
     lang2AvgSentLen.put("en",21);       
@@ -213,11 +218,11 @@ public class PreprocessHelper {
     dfTable = new DfTableArray(new Path(env.getDfByTermData()), fs);
   }
 
-  public HMapSFW createFDocVector(String sentence) {
-    return createFDocVector(sentence, new HMapSIW());
+  public HMapStFW createFDocVector(String sentence) {
+    return createFDocVector(sentence, new HMapStIW());
   }
 
-  public HMapSFW createFDocVector(String sentence, HMapSIW term2Tf) {
+  public HMapStFW createFDocVector(String sentence, HMapStIW term2Tf) {
     String[] terms = fTok.processContent(sentence);
 
     for(String term : terms){
@@ -226,14 +231,14 @@ public class PreprocessHelper {
 
     //translated tf values
     HMapIFW transTermTf = new HMapIFW();
-    for(Entry<String> entry : term2Tf.entrySet()){
+    for(MapKI.Entry<String> entry : term2Tf.entrySet()){
       String fTerm = entry.getKey();
       int tf = entry.getValue();
       // transTermTf won't be updated if fTerm not in vocab
       transTermTf = CLIRUtils.updateTFsByTerm(fTerm, tf, transTermTf, eVocabSrc, eVocabTrg, fVocabSrc, fVocabTrg, e2f_Probs, f2e_Probs, eTok, sLogger);
     }
 
-    HMapSFW weightedVector = CLIRUtils.createTermDocVector(terms.length, transTermTf, eVocabTrg, fScoreFn, dict, dfTable, true, sLogger);
+    HMapStFW weightedVector = CLIRUtils.createTermDocVector(terms.length, transTermTf, eVocabTrg, fScoreFn, dict, dfTable, true, sLogger);
 
     // don't count numbers for the min #terms constraint since Wikipedia has "sentences" full of numbers that doesn't make any sense
     int numNonNumbers = 0;
@@ -249,12 +254,12 @@ public class PreprocessHelper {
     }
   }
 
-  public HMapSFW createEDocVector(String sentence) {
-    return createEDocVector(sentence, new HMapSIW());
+  public HMapStFW createEDocVector(String sentence) {
+    return createEDocVector(sentence, new HMapStIW());
   }
 
-  public HMapSFW createEDocVector(String sentence, HMapSIW term2Tf) {
-    HMapSFW weightedVector = new HMapSFW();
+  public HMapStFW createEDocVector(String sentence, HMapStIW term2Tf) {
+    HMapStFW weightedVector = new HMapStFW();
     String[] terms = eTok.processContent(sentence);
 
     for(String term : terms){
@@ -276,7 +281,7 @@ public class PreprocessHelper {
     }
   }
 
-  public ArrayListWritable<Text> getESentences(String text, ArrayListWritable<HMapSFW> vectors, ArrayListOfIntsWritable sentLengths) throws ClassNotFoundException, InstantiationException, IllegalAccessException, IOException {
+  public ArrayListWritable<Text> getESentences(String text, ArrayListWritable<HMapStFW> vectors, ArrayListOfIntsWritable sentLengths) throws ClassNotFoundException, InstantiationException, IllegalAccessException, IOException {
     ArrayListWritable<Text> sentences = new ArrayListWritable<Text>();
     String[] lines = text.split("\n");
 
@@ -290,7 +295,7 @@ public class PreprocessHelper {
           }
           int length = eTok.getNumberTokens(sent);
           if(length >= MinSentenceLength){
-            HMapSFW vector = createEDocVector(sent.toString());
+            HMapStFW vector = createEDocVector(sent.toString());
             if(vector != null){
               vectors.add(vector);
               sentences.add(new Text(sent));
@@ -303,7 +308,7 @@ public class PreprocessHelper {
     return sentences;
   }
 
-  public ArrayListWritable<Text> getFSentences(String text, ArrayListWritable<HMapSFW> vectors, ArrayListOfIntsWritable sentLengths) throws ClassNotFoundException, InstantiationException, IllegalAccessException, IOException {
+  public ArrayListWritable<Text> getFSentences(String text, ArrayListWritable<HMapStFW> vectors, ArrayListOfIntsWritable sentLengths) throws ClassNotFoundException, InstantiationException, IllegalAccessException, IOException {
     //        sLogger.setLevel(Level.DEBUG);
     sLogger.debug("text length="+text.length());
 
@@ -336,7 +341,7 @@ public class PreprocessHelper {
           }
           int length = fTok.getNumberTokens(sent);
           if (length >= MinSentenceLength) {
-            HMapSFW vector = createFDocVector(sent);
+            HMapStFW vector = createFDocVector(sent);
             if (vector != null) {
               vectors.add(vector);
               sentences.add(new Text(sent));

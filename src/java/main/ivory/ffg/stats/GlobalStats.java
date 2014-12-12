@@ -1,6 +1,6 @@
 package ivory.ffg.stats;
 
-import edu.umd.cloud9.util.map.HMapIF;
+import tl.lin.data.map.HMapIF;
 
 /**
  * Global statistics used in computing features (e.g., idf and cf)

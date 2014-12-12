@@ -3,7 +3,9 @@ package ivory.lsh.bitext;
 import ivory.core.util.CLIRUtils;
 import ivory.lsh.data.WikiSentenceInfo;
 import ivory.lsh.driver.PwsimEnvironment;
+
 import java.io.IOException;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
@@ -33,11 +35,12 @@ import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+
+import tl.lin.data.array.ArrayListOfIntsWritable;
+import tl.lin.data.array.ArrayListWritable;
+import tl.lin.data.map.HMapStFW;
+import tl.lin.data.pair.PairOfInts;
 import edu.umd.cloud9.collection.wikipedia.WikipediaPage;
-import edu.umd.cloud9.io.array.ArrayListOfIntsWritable;
-import edu.umd.cloud9.io.array.ArrayListWritable;
-import edu.umd.cloud9.io.map.HMapSFW;
-import edu.umd.cloud9.io.pair.PairOfInts;
 
 /**
 
@@ -108,7 +111,7 @@ public class Docs2Sentences extends Configured implements Tool {
       int langID;
 
       ArrayListWritable<Text> sentences;
-      ArrayListWritable<HMapSFW> vectors = new ArrayListWritable<HMapSFW>();
+      ArrayListWritable<HMapStFW> vectors = new ArrayListWritable<HMapStFW>();
       ArrayListOfIntsWritable sentLengths = new ArrayListOfIntsWritable();
       // identify sentences in document, filter out ones below MinSentLength threshold
       // convert each sentence into a tf-idf vector, using general DF map for collection and a heuristic for avg. doc length

@@ -3,12 +3,12 @@ package ivory.sqe.querygenerator;
 import java.util.Map;
 import java.util.Set;
 
-import edu.umd.cloud9.io.map.HMapSFW;
-import edu.umd.cloud9.io.map.HMapSIW;
+import tl.lin.data.map.HMapStFW;
+import tl.lin.data.map.HMapStIW;
 
 public class TranslationFromNBest extends Translation {
   
-   public TranslationFromNBest(int n, String origQuery, Map<String,String> stemmed2stemmed, Set<String> bagOfTargetTokens, Map<String, HMapSFW> token2tokenDist, HMapSFW phraseDist, HMapSIW srcTokenCnt) {
+   public TranslationFromNBest(int n, String origQuery, Map<String,String> stemmed2stemmed, Set<String> bagOfTargetTokens, Map<String, HMapStFW> token2tokenDist, HMapStFW phraseDist, HMapStIW srcTokenCnt) {
      setOriginalQuery(origQuery);
      setPhraseDist(phraseDist);
      setTokenDist(token2tokenDist);

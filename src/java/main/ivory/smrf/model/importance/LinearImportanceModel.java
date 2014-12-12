@@ -33,10 +33,10 @@ import org.apache.hadoop.fs.Path;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import tl.lin.data.map.HMapKF;
+
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-
-import edu.umd.cloud9.util.map.HMapKF;
 
 /**
  * @author Don Metzler

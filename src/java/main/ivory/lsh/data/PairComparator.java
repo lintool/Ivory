@@ -2,7 +2,7 @@ package ivory.lsh.data;
 
 import java.util.Comparator;
 
-import edu.umd.cloud9.io.pair.PairOfFloatInt;
+import tl.lin.data.pair.PairOfFloatInt;
 
 public class PairComparator implements Comparator<PairOfFloatInt>{
 

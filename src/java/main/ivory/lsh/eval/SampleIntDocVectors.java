@@ -4,11 +4,13 @@ import ivory.core.RetrievalEnvironment;
 import ivory.core.data.document.WeightedIntDocVector;
 import ivory.lsh.driver.PwsimEnvironment;
 import ivory.lsh.eval.SampleSignatures.mapoutput;
+
 import java.io.IOException;
 import java.net.URI;
 import java.util.Iterator;
-import java.util.SortedMap;
 import java.util.Map.Entry;
+import java.util.SortedMap;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
@@ -41,9 +43,10 @@ import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+
+import tl.lin.data.map.HMapII;
+import tl.lin.data.map.HMapIIW;
 import edu.umd.cloud9.io.SequenceFileUtils;
-import edu.umd.cloud9.io.map.HMapIIW;
-import edu.umd.cloud9.util.map.HMapII;
 
 /**
  * <p>

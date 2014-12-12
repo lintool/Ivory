@@ -33,7 +33,7 @@ import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
-import edu.umd.cloud9.io.map.HMapIIW;
+import tl.lin.data.map.HMapIIW;
 
 @SuppressWarnings("deprecation")
 public class SampleSignatures extends Configured implements Tool {

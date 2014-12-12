@@ -1,13 +1,12 @@
 package ivory.ffg.data;
 
+import static org.junit.Assert.assertEquals;
 import junit.framework.JUnit4TestAdapter;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
-import edu.umd.cloud9.util.map.HMapII;
+import tl.lin.data.map.HMapII;
 
 public class DocumentVectorUtilityTest {
   private static final int[] document = new int[500];

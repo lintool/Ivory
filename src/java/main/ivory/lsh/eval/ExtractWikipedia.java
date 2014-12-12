@@ -34,11 +34,11 @@ import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
+import tl.lin.data.map.HMapIIW;
 import edu.umd.cloud9.collection.DocnoMapping;
 import edu.umd.cloud9.collection.wikipedia.WikipediaDocnoMapping;
 import edu.umd.cloud9.collection.wikipedia.WikipediaPage;
 import edu.umd.cloud9.io.SequenceFileUtils;
-import edu.umd.cloud9.io.map.HMapIIW;
 
 /**
  * A class to extract interwiki language links from a Wikipedia collection .

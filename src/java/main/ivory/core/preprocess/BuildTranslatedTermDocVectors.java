@@ -11,9 +11,11 @@ import ivory.core.tokenize.Tokenizer;
 import ivory.core.tokenize.TokenizerFactory;
 import ivory.core.util.CLIRUtils;
 import ivory.pwsim.score.ScoringModel;
+
 import java.io.IOException;
 import java.net.URI;
 import java.util.Map;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.filecache.DistributedCache;
 import org.apache.hadoop.fs.FileSystem;
@@ -33,14 +35,17 @@ import org.apache.hadoop.mapred.SequenceFileInputFormat;
 import org.apache.hadoop.mapred.SequenceFileOutputFormat;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+
+import tl.lin.data.map.HMapIFW;
+import tl.lin.data.map.HMapStFW;
+import tl.lin.data.map.MapIF;
+
 import com.google.common.collect.Maps;
-import edu.umd.cloud9.io.map.HMapIFW;
-import edu.umd.cloud9.io.map.HMapSFW;
+
 import edu.umd.cloud9.mapred.NullInputFormat;
 import edu.umd.cloud9.mapred.NullMapper;
 import edu.umd.cloud9.mapred.NullOutputFormat;
 import edu.umd.cloud9.util.PowerTool;
-import edu.umd.cloud9.util.map.MapIF;
 import edu.umd.hooka.Vocab;
 import edu.umd.hooka.alignment.HadoopAlign;
 import edu.umd.hooka.ttables.TTable_monolithic_IFAs;
@@ -61,7 +66,7 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
   protected static enum DF { TransDf, NoDf }
 
   private static class MyMapperTrans extends MapReduceBase implements
-  Mapper<IntWritable, TermDocVector, IntWritable, HMapSFW> {
+  Mapper<IntWritable, TermDocVector, IntWritable, HMapStFW> {
 
     private ScoringModel model;
     // eVocabSrc is the English vocabulary for probability table e2f_Probs.
@@ -93,11 +98,6 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
       MIN_SIZE = conf.getInt("Ivory.MinNumTerms", 0);
 
       try {
-        if (conf.get ("mapred.job.tracker").equals ("local")) {
-          // Explicitly not support local mode.
-          throw new RuntimeException("Local mode not supported!");
-        }
-
         FileSystem remoteFS = FileSystem.get(conf);
         RetrievalEnvironment targetEnv = new RetrievalEnvironment(conf.get(Constants.TargetIndexPath), remoteFS);
 
@@ -209,7 +209,7 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
     }
 
     public void map(IntWritable docno, TermDocVector doc,
-        OutputCollector<IntWritable, HMapSFW> output, Reporter reporter) throws IOException {
+        OutputCollector<IntWritable, HMapStFW> output, Reporter reporter) throws IOException {
       if (docno.get() % SAMPLING != 0) {
         return; // for generating sample document vectors. no sampling if SAMPLING=1
       }
@@ -236,7 +236,7 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
       int docLen = CLIRUtils.translateTFs(doc, tfS, eVocabSrc, eVocabTrg, fVocabSrc, fVocabTrg,
           e2f_Probs, f2e_Probs, tokenizer, LOG);
 
-      HMapSFW v = CLIRUtils.createTermDocVector(docLen, tfS, eVocabTrg, model, dict, dfTable,
+      HMapStFW v = CLIRUtils.createTermDocVector(docLen, tfS, eVocabTrg, model, dict, dfTable,
           isNormalize, LOG);
 
       // If no translation of any word is in the target vocab, remove document i.e., our model
@@ -354,9 +354,9 @@ public class BuildTranslatedTermDocVectors extends PowerTool {
 
     conf.setInputFormat(SequenceFileInputFormat.class);
     conf.setMapOutputKeyClass(IntWritable.class);
-    conf.setMapOutputValueClass(HMapSFW.class);
+    conf.setMapOutputValueClass(HMapStFW.class);
     conf.setOutputKeyClass(IntWritable.class);
-    conf.setOutputValueClass(HMapSFW.class);
+    conf.setOutputValueClass(HMapStFW.class);
     conf.setOutputFormat(SequenceFileOutputFormat.class);
 
     conf.setMapperClass(MyMapperTrans.class);

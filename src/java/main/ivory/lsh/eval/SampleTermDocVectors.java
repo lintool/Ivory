@@ -1,14 +1,14 @@
 package ivory.lsh.eval;
 
 import ivory.core.RetrievalEnvironment;
-import ivory.core.data.document.WeightedIntDocVector;
 import ivory.lsh.driver.PwsimEnvironment;
 import ivory.lsh.eval.SampleSignatures.mapoutput;
+
 import java.io.IOException;
 import java.net.URI;
 import java.util.Iterator;
-import java.util.SortedMap;
 import java.util.Map.Entry;
+import java.util.SortedMap;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -17,7 +17,6 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.filecache.DistributedCache;
 import org.apache.hadoop.fs.FSDataOutputStream;
@@ -38,17 +37,16 @@ import org.apache.hadoop.mapred.Reducer;
 import org.apache.hadoop.mapred.Reporter;
 import org.apache.hadoop.mapred.SequenceFileInputFormat;
 import org.apache.hadoop.mapred.SequenceFileOutputFormat;
-import org.apache.hadoop.mapred.lib.IdentityReducer;
 import org.apache.hadoop.util.LineReader;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
+import tl.lin.data.map.HMapII;
+import tl.lin.data.map.HMapIIW;
+import tl.lin.data.map.HMapStFW;
 import edu.umd.cloud9.io.SequenceFileUtils;
-import edu.umd.cloud9.io.map.HMapIIW;
-import edu.umd.cloud9.io.map.HMapSFW;
-import edu.umd.cloud9.util.map.HMapII;
 
 /**
  * <p>
@@ -97,7 +95,7 @@ import edu.umd.cloud9.util.map.HMapII;
 @SuppressWarnings("deprecation")
 public class SampleTermDocVectors extends Configured implements Tool {
   @SuppressWarnings("unchecked")
-  static Class keyClass = IntWritable.class, valueClass = HMapSFW.class,
+  static Class keyClass = IntWritable.class, valueClass = HMapStFW.class,
   inputFormat = SequenceFileInputFormat.class;
 
   private static final Logger sLogger = Logger.getLogger(SampleTermDocVectors.class);
@@ -109,7 +107,7 @@ public class SampleTermDocVectors extends Configured implements Tool {
 
 
   private static class MyMapper extends MapReduceBase implements
-  Mapper<IntWritable, HMapSFW, IntWritable, HMapSFW> {
+  Mapper<IntWritable, HMapStFW, IntWritable, HMapStFW> {
     private int sampleFreq;
     private HMapII samplesMap = null;
 
@@ -161,8 +159,8 @@ public class SampleTermDocVectors extends Configured implements Tool {
       }
     }
 
-    public void map(IntWritable key, HMapSFW val,
-        OutputCollector<IntWritable, HMapSFW> output, Reporter reporter)
+    public void map(IntWritable key, HMapStFW val,
+        OutputCollector<IntWritable, HMapStFW> output, Reporter reporter)
     throws IOException {
       if (samplesMap != null) {
         if (samplesMap.containsKey(key.get())) {
@@ -179,11 +177,11 @@ public class SampleTermDocVectors extends Configured implements Tool {
   }
 
   public static class MyReducer extends MapReduceBase implements
-  Reducer<IntWritable, HMapSFW, IntWritable, HMapSFW> {
+  Reducer<IntWritable, HMapStFW, IntWritable, HMapStFW> {
 
     @Override
-    public void reduce(IntWritable key, Iterator<HMapSFW> values,
-        OutputCollector<IntWritable, HMapSFW> output, Reporter reporter)
+    public void reduce(IntWritable key, Iterator<HMapStFW> values,
+        OutputCollector<IntWritable, HMapStFW> output, Reporter reporter)
     throws IOException {
       output.collect(key, values.next());
     }

@@ -20,10 +20,10 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import edu.umd.cloud9.util.array.ArrayListOfFloats;
-import edu.umd.cloud9.util.array.ArrayListOfInts;
-
 import org.apache.hadoop.io.Writable;
+
+import tl.lin.data.array.ArrayListOfFloats;
+import tl.lin.data.array.ArrayListOfInts;
 
 /**
  * Data structure that represents a set of pseudo relevence judgments.

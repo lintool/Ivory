@@ -3,9 +3,12 @@ package ivory.lsh.bitext;
 import ivory.core.util.CLIRUtils;
 import ivory.lsh.data.WikiSentenceInfo;
 import ivory.lsh.driver.PwsimEnvironment;
+
 import java.io.IOException;
 import java.util.Iterator;
+
 import opennlp.model.RealValueFileEventStream;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
@@ -34,11 +37,12 @@ import org.apache.hadoop.mapred.TextOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Logger;
-import edu.umd.cloud9.io.array.ArrayListOfIntsWritable;
-import edu.umd.cloud9.io.array.ArrayListWritable;
-import edu.umd.cloud9.io.map.HMapSFW;
-import edu.umd.cloud9.io.pair.PairOfInts;
-import edu.umd.cloud9.util.map.HMapIV;
+
+import tl.lin.data.array.ArrayListOfIntsWritable;
+import tl.lin.data.array.ArrayListWritable;
+import tl.lin.data.map.HMapIV;
+import tl.lin.data.map.HMapStFW;
+import tl.lin.data.pair.PairOfInts;
 
 /**
   Step 1 of the bitext extraction algorithm.
@@ -214,7 +218,7 @@ public class FindParallelSentencePairs extends Configured implements Tool {
   Reducer<PairOfInts, WikiSentenceInfo, Text, Text>{
     private int fDocno, eDocno;
     private int classifierPositiveId;
-    private ArrayListWritable<HMapSFW> fVectors, eVectors;
+    private ArrayListWritable<HMapStFW> fVectors, eVectors;
     private ArrayListWritable<Text> fSentences, eSentences;
     private PreprocessHelper helper;            // for modularity, helper provides methods to preprocess data
     private float classifierThreshold;
@@ -238,8 +242,8 @@ public class FindParallelSentencePairs extends Configured implements Tool {
         throw new RuntimeException("Classifier confidence threshold > 1, provide value in [0,1]: "+classifierThreshold);        
       }
 
-      eVectors = new ArrayListWritable<HMapSFW>();
-      fVectors = new ArrayListWritable<HMapSFW>();
+      eVectors = new ArrayListWritable<HMapStFW>();
+      fVectors = new ArrayListWritable<HMapStFW>();
       eSentences = new ArrayListWritable<Text>();
       fSentences = new ArrayListWritable<Text>();
     }
@@ -299,11 +303,11 @@ public class FindParallelSentencePairs extends Configured implements Tool {
 
       // classify each e-f sentence pair in the candidate set
       for (int f = 0; f < fVectors.size(); f++) {
-        HMapSFW fVector = fVectors.get(f);
+        HMapStFW fVector = fVectors.get(f);
         int fSentLength = fSentences.get(f).getLength();
 
         for (int e = 0; e < eVectors.size(); e++) {
-          HMapSFW eVector = eVectors.get(e);
+          HMapStFW eVector = eVectors.get(e);
           int eSentLength = eSentences.get(e).getLength();
 
           if (eSentLength > 2 * fSentLength || fSentLength > 2 * eSentLength) {

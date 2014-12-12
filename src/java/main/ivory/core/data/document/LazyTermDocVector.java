@@ -29,7 +29,7 @@ import java.util.Map;
 
 import org.apache.hadoop.io.WritableUtils;
 
-import edu.umd.cloud9.util.array.ArrayListOfInts;
+import tl.lin.data.array.ArrayListOfInts;
 
 /**
  * Implementation of {@link TermDocVector} that lazily decodes term and

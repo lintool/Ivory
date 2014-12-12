@@ -31,7 +31,7 @@ import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
-import edu.umd.cloud9.io.map.HMapSFW;
+import tl.lin.data.map.HMapStFW;
 
 /**
  * Read sequence files, output key-value pairs that match specified key.
@@ -59,14 +59,14 @@ public class SearchSequenceFiles extends Configured implements Tool {
   }
 
   static class MyMapperTerm extends MapReduceBase implements
-  Mapper<IntWritable, HMapSFW, IntWritable, HMapSFW> {
+  Mapper<IntWritable, HMapStFW, IntWritable, HMapStFW> {
     private String[] keys;
     
     public void configure(JobConf job) {
       keys = job.get("keys").split(",");
     }
 
-    public void map(IntWritable key, HMapSFW value, OutputCollector<IntWritable, HMapSFW> output,
+    public void map(IntWritable key, HMapStFW value, OutputCollector<IntWritable, HMapStFW> output,
         Reporter reporter) throws IOException {
       for (String compareKey : keys) {
         int k = Integer.parseInt(compareKey);
@@ -129,10 +129,10 @@ public class SearchSequenceFiles extends Configured implements Tool {
     LOG.info("Output directory: "+outputPath);
     LOG.info("Value class: "+valueClassName);
 
-    if (valueClassName.contains("HMapSFW")) {
+    if (valueClassName.contains("HMapStFW")) {
       job.setMapperClass(MyMapperTerm.class);
-      job.setMapOutputValueClass(HMapSFW.class);
-      job.setOutputValueClass(HMapSFW.class);
+      job.setMapOutputValueClass(HMapStFW.class);
+      job.setOutputValueClass(HMapStFW.class);
     } else {
       job.setMapperClass(MyMapperInt.class);      
       job.setMapOutputValueClass(WeightedIntDocVector.class);

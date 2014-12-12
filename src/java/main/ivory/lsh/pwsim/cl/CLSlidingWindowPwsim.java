@@ -3,11 +3,13 @@ package ivory.lsh.pwsim.cl;
 import ivory.lsh.data.BitsSignatureTable;
 import ivory.lsh.data.Signature;
 import ivory.lsh.driver.PwsimEnvironment;
+
 import java.io.IOException;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.TreeSet;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
@@ -40,8 +42,9 @@ import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import edu.umd.cloud9.io.map.HMapIIW;
-import edu.umd.cloud9.io.pair.PairOfInts;
+
+import tl.lin.data.map.HMapIIW;
+import tl.lin.data.pair.PairOfInts;
 
 /**
  * Implementation of sliding window algorithm for cross-lingual pairwise similarity (see Ture et al,

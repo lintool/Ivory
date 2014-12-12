@@ -3,21 +3,22 @@ package ivory.lsh.data;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
 
-import edu.umd.cloud9.io.map.HMapSFW;
+import tl.lin.data.map.HMapStFW;
 
 public class WikiSentenceInfo implements Writable {
   int langID;
   Text sentence;
-  HMapSFW vector;
+  HMapStFW vector;
 
   public WikiSentenceInfo() {
     super();
   }
 
-  public WikiSentenceInfo(int i1, Text t, HMapSFW v){
+  public WikiSentenceInfo(int i1, Text t, HMapStFW v){
     langID = i1;
     sentence = t;
     vector = v;
@@ -34,7 +35,7 @@ public class WikiSentenceInfo implements Writable {
     try {
       sentence = new Text();
       sentence.readFields(in);
-      vector = new HMapSFW();
+      vector = new HMapStFW();
       vector.readFields(in);
     } catch (IOException e) {
       throw new RuntimeException("Could not read vectors/sentences in WikiSentenceInfo");
@@ -57,7 +58,7 @@ public class WikiSentenceInfo implements Writable {
     return sentence;
   }
 
-  public HMapSFW getVector() {
+  public HMapStFW getVector() {
     return vector;
   }
 
@@ -65,7 +66,7 @@ public class WikiSentenceInfo implements Writable {
     return langID;
   }
 
-  public void set(int n1, Text sentence, HMapSFW vector) {
+  public void set(int n1, Text sentence, HMapStFW vector) {
     this.langID = n1;		
     this.sentence = sentence;
     this.vector = vector;

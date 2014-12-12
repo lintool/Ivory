@@ -24,10 +24,10 @@ import ivory.core.tokenize.DocumentProcessingUtils;
 import ivory.core.tokenize.Tokenizer;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.Map;
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.filecache.DistributedCache;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
@@ -47,14 +47,14 @@ import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 import org.apache.hadoop.util.LineReader;
 import org.apache.log4j.Logger;
 
+import tl.lin.data.array.ArrayListOfInts;
+import tl.lin.data.map.HMapII;
+import tl.lin.data.map.MapII;
 import edu.umd.cloud9.collection.DocnoMapping;
 import edu.umd.cloud9.collection.Indexable;
 import edu.umd.cloud9.mapreduce.NullInputFormat;
 import edu.umd.cloud9.mapreduce.NullMapper;
 import edu.umd.cloud9.util.PowerTool;
-import edu.umd.cloud9.util.array.ArrayListOfInts;
-import edu.umd.cloud9.util.map.HMapII;
-import edu.umd.cloud9.util.map.MapII;
 
 public class BuildTermDocVectors extends PowerTool {
   private static final Logger LOG = Logger.getLogger(BuildTermDocVectors.class);
@@ -78,20 +78,11 @@ public class BuildTermDocVectors extends PowerTool {
       Configuration conf = context.getConfiguration();
 
       try {
-        FileSystem localFs = FileSystem.getLocal(conf);
         docMapping =
           (DocnoMapping) Class.forName(conf.get(Constants.DocnoMappingClass)).newInstance();
 
-        // Take a different code path if we're in standalone mode.
-        if (conf.get("mapred.job.tracker").equals("local")) {
-          RetrievalEnvironment env = new RetrievalEnvironment(
-              context.getConfiguration().get(Constants.IndexPath), localFs);
-          docMapping.loadMapping(env.getDocnoMappingData(), localFs);
-        } else {
-          Path[] localFiles = DistributedCache.getLocalCacheFiles(conf);
-          // Load the docid to docno mappings. Assume file 0.
-          docMapping.loadMapping(localFiles[0], localFs);
-        }
+          URI[] local = context.getCacheFiles();
+          docMapping.loadMapping(new Path(local[0].toString()), FileSystem.get(local[0], conf));
       } catch (Exception e) {
         throw new RuntimeException("Error initializing docno mapping!", e);
       }
@@ -247,11 +238,13 @@ public class BuildTermDocVectors extends PowerTool {
             // data. Therefore, we can't just count number of doclengths read. Instead, keep track
             // of largest docno encountered.
             if (docno < docnoOffset) {
+              reader.close();
               throw new RuntimeException("Error: docno " + docno + " < docnoOffset " + docnoOffset
                   + "!");
             }
 
             if (docno - docnoOffset >= doclengths.length) {
+              reader.close();
               throw new RuntimeException("Error: docno - docnoOffset " + (docno - docnoOffset) 
                   + " >= collectionDocCount " + collectionDocCount + "!");
             }
@@ -350,8 +343,6 @@ public class BuildTermDocVectors extends PowerTool {
       throw new RuntimeException("Error, docno mapping data file " + mappingFile + " doesn't exist!");
     }
 
-    DistributedCache.addCacheFile(mappingFile.toUri(), conf);
-
     Path outputPath = new Path(env.getTermDocVectorsDirectory());
     if (fs.exists(outputPath)) {
       LOG.info("TermDocVectors already exist: Skipping!");
@@ -388,6 +379,8 @@ public class BuildTermDocVectors extends PowerTool {
     job1.setOutputValueClass(LazyTermDocVector.class);
 
     job1.setMapperClass(MyMapper.class);
+
+    job1.addCacheFile(mappingFile.toUri());
 
     long startTime = System.currentTimeMillis();
     job1.waitForCompletion(true);

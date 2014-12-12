@@ -15,8 +15,8 @@ import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 
+import tl.lin.data.map.HMapIV;
 import edu.umd.cloud9.collection.DocnoMapping;
-import edu.umd.cloud9.util.map.HMapIV;
 
 public class SmallAdaptiveRanker {
   private CompressedPostings[] postings;  //Postings lists

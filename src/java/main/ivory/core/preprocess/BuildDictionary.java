@@ -46,9 +46,10 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 import org.apache.log4j.Logger;
 
+import tl.lin.data.pair.PairOfIntLong;
+
 import com.google.common.collect.Lists;
 
-import edu.umd.cloud9.io.pair.PairOfIntLong;
 import edu.umd.cloud9.util.PowerTool;
 
 public class BuildDictionary extends PowerTool {
